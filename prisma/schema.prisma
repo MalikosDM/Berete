@@ -1,0 +1,156 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../server/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+// Your models go below.
+
+enum PieceCategory {
+  CHAINS
+  PENDANTS
+  RINGS
+}
+
+model Piece {
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  title      String
+  category   PieceCategory
+  subtitle   String
+  year       String?
+  intro      String
+  story      String
+  coverImage String
+  gallery    Json
+  videos     Json
+  specs      Json
+  press      Json
+  customBox  Boolean       @default(false)
+  featured   Boolean       @default(false)
+  sortOrder  Int           @default(0)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  players    Player[]
+
+  @@index([category])
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  number    Int?
+  club      String?
+  portrait  String?
+  bio       String
+  gallery   Json?
+  kind      String   @default("player")
+  sortOrder Int      @default(0)
+  pieceId   String?
+  piece     Piece?   @relation(fields: [pieceId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([pieceId])
+}
+
+model Box {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  image       String
+  pieceSlug   String?
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Story {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      String
+  club       String?
+  pieceName  String?
+  coverImage String?
+  media      Json
+  jewelSlug  String?
+  articleUrl String?
+  ownerSlug  String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Capsule {
+  id         String   @id @default(cuid())
+  slug       String   @unique
+  title      String
+  tagline    String
+  intro      String
+  coverImage String
+  sortOrder  Int      @default(0)
+  jewels     Jewel[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Jewel {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  type         String
+  line         String?
+  client       String?
+  clientPublic Boolean  @default(false)
+  coverImage   String
+  steps        Json
+  specs        Json
+  press        Json
+  customBox    Boolean  @default(false)
+  playerSlugs  String   @default("")
+  sortOrder    Int      @default(0)
+  capsuleId    String
+  capsule      Capsule  @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([capsuleId])
+}
+
+model MediaFile {
+  id        String   @id @default(cuid())
+  mime      String
+  name      String?
+  size      Int      @default(0)
+  data      String
+  createdAt DateTime @default(now())
+}
+
+model CallbackRequest {
+  id        String   @id @default(cuid())
+  name      String
+  phone     String
+  interest  String?
+  createdAt DateTime @default(now())
+}
+
+model SiteFlag {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  createdAt DateTime @default(now())
+}

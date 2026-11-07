@@ -1,0 +1,73 @@
+{
+  "siteName": "Berete Jewellers",
+  "language": "fr",
+  "titleTemplate": "%s — Berete Jewellers",
+  "organization": {
+    "type": "Organization",
+    "name": "Berete Jewellers"
+  },
+  "pages": {
+    "/": {
+      "title": "Berete Jewellers — Custom High Jewellery, Dubai",
+      "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars."
+    },
+    "/about": {
+      "title": "About",
+      "description": "The story of Berete Jewellers, a Dubai house creating custom high jewellery for champions."
+    },
+    "/admin": {
+      "title": "Admin",
+      "robots": "noindex,nofollow",
+      "sitemap": false
+    },
+    "/atelier": {
+      "title": "Atelier",
+      "description": "Inside the Dubai atelier: every piece sculpted, then set stone by stone by hand."
+    },
+    "/boxes": {
+      "title": "Boxes",
+      "description": "Custom presentation boxes, available as an option on selected pieces."
+    },
+    "/capsules/:slug": {
+      "title": "Capsule",
+      "description": "A Berete Jewellers capsule and every piece created for it."
+    },
+    "/contact": {
+      "title": "Contact",
+      "description": "Start your custom piece with Berete Jewellers on WhatsApp, by phone or by email."
+    },
+    "/creations": {
+      "title": "Creations",
+      "description": "Every Berete Jewellers piece: chains, pendants, rings, bracelets and watches."
+    },
+    "/creations/:slug": {
+      "robots": "noindex,follow",
+      "sitemap": false
+    },
+    "/legal": {
+      "title": "Legal notice",
+      "description": "Legal notice of the Berete Jewellers website."
+    },
+    "/pieces": {},
+    "/pieces/:slug": {
+      "title": "Piece",
+      "description": "A Berete Jewellers piece and the story of its creation, from the idea to the handover."
+    },
+    "/players": {
+      "title": "Players",
+      "description": "The footballers who wear Berete Jewellers pieces."
+    },
+    "/players/:slug": {
+      "title": "Player",
+      "description": "A footballer and the Berete Jewellers piece made for him."
+    },
+    "/privacy": {
+      "title": "Privacy",
+      "description": "How Berete Jewellers handles your personal data."
+    },
+    "/process": {
+      "title": "Process",
+      "description": "Six clear steps from your first message to the handover of your piece."
+    }
+  }
+}

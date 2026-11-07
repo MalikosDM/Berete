@@ -1,0 +1,194 @@
+@import "tailwindcss";
+
+/* Build outputs are not sources: never scan them for classes. */
+@source not "../dist";
+@source not "../dist-ssr";
+@source not "../dist-server";
+
+@theme {
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #141313;
+  --color-ink-line: #2a2626;
+  --color-white: #ffffff;
+  --color-bone: #f4f2ef;
+  --color-mist: #d6d2cc;
+  --color-rose-deep: #9c5b4f;
+  --color-rose-light: #e8b4a0;
+  --color-rose: #b76e79;
+
+  --font-display: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+
+  --animate-sheen: sheen 7s ease-in-out infinite;
+  --animate-draw: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+
+  @keyframes sheen {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  @keyframes draw {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+@keyframes diamond-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes logo-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Rose gold: one accent, used sparingly */
+@utility text-rose-gold {
+  background-image: linear-gradient(110deg, #9c5b4f 0%, #e8b4a0 35%, #f6d6c8 50%, #e8b4a0 62%, #b76e79 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: sheen 7s ease-in-out infinite;
+}
+
+@utility bg-rose-gold {
+  background-image: linear-gradient(110deg, #9c5b4f 0%, #e8b4a0 35%, #f6d6c8 50%, #e8b4a0 62%, #b76e79 100%);
+  background-size: 220% 100%;
+  animation: sheen 7s ease-in-out infinite;
+}
+
+@utility border-rose-gold {
+  border-style: solid;
+  border-width: 1px;
+  border-image: linear-gradient(110deg, #9c5b4f, #e8b4a0, #b76e79) 1;
+}
+
+@utility rule-rose {
+  height: 1px;
+  width: 100%;
+  background-image: linear-gradient(90deg, transparent, #9c5b4f 15%, #e8b4a0 50%, #b76e79 85%, transparent);
+}
+
+/* Jewels shot on black float on the page */
+@utility jewel {
+  mix-blend-mode: lighten;
+  object-fit: contain;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+@utility title-caps {
+  font-family: var(--font-display);
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  line-height: 1.05;
+}
+
+@utility eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: var(--color-rose-light);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  html {
+    background-color: var(--color-ink);
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-white);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      font-size: 1.0625rem;
+    }
+  }
+
+  ::selection {
+    background-color: var(--color-rose-light);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-rose-light);
+    outline-offset: 3px;
+  }
+
+  img,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

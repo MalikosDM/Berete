@@ -1,0 +1,6 @@
+node_modules
+dist
+dist-server
+.env
+server/generated
+dist-ssr
