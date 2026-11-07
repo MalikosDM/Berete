@@ -12,6 +12,7 @@ services:
     environment:
       DATABASE_URL: postgresql://app:app@db:5432/app
       PORT: "3001"
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
     ports:
       - "3001:3001"
     depends_on:

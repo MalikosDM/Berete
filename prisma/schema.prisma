@@ -9,129 +9,72 @@ datasource db {
   provider = "postgresql"
 }
 
-model ContactMessage {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  message   String
-  createdAt DateTime @default(now())
-}
+/// The site content. It starts from src/data/catalogue.ts (server/catalogue.ts)
+/// and is edited from /admin. Media lists are MediaItem[] (src/data/types.ts).
 
-// Your models go below.
-
-enum PieceCategory {
-  CHAINS
-  PENDANTS
-  RINGS
-}
-
-model Piece {
-  id         String        @id @default(cuid())
-  slug       String        @unique
+model Story {
+  id         String   @id @default(cuid())
+  slug       String   @unique
   title      String
-  category   PieceCategory
-  subtitle   String
-  year       String?
-  intro      String
-  story      String
-  coverImage String
-  gallery    Json
-  videos     Json
-  specs      Json
-  press      Json
-  customBox  Boolean       @default(false)
-  featured   Boolean       @default(false)
-  sortOrder  Int           @default(0)
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  players    Player[]
-
-  @@index([category])
+  cover      String   @default("")
+  media      Json     @default("[]")
+  people     String[] @default([])
+  pieceSlug  String?
+  articleUrl String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
 
-model Player {
+model Person {
   id        String   @id @default(cuid())
   slug      String   @unique
   name      String
+  kind      String   @default("player")
   number    Int?
   club      String?
   portrait  String?
-  bio       String
-  gallery   Json?
-  kind      String   @default("player")
+  bio       String   @default("")
   sortOrder Int      @default(0)
-  pieceId   String?
-  piece     Piece?   @relation(fields: [pieceId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
 
-  @@index([pieceId])
+model Piece {
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  type         String
+  line         String   @default("")
+  story        String   @default("")
+  client       String?
+  clientPublic Boolean  @default(false)
+  cover        Json
+  gallery      Json     @default("[]")
+  handover     Json     @default("[]")
+  specs        Json     @default("[]")
+  press        Json     @default("[]")
+  people       String[] @default([])
+  boxSlug      String?
+  featured     Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Box {
   id          String   @id @default(cuid())
   slug        String   @unique
   name        String
-  description String
-  image       String
+  description String   @default("")
+  images      Json     @default("[]")
   pieceSlug   String?
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-model Story {
-  id         String   @id @default(cuid())
-  slug       String   @unique
-  title      String
-  club       String?
-  pieceName  String?
-  coverImage String?
-  media      Json
-  jewelSlug  String?
-  articleUrl String?
-  ownerSlug  String?
-  sortOrder  Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model Capsule {
-  id         String   @id @default(cuid())
-  slug       String   @unique
-  title      String
-  tagline    String
-  intro      String
-  coverImage String
-  sortOrder  Int      @default(0)
-  jewels     Jewel[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model Jewel {
-  id           String   @id @default(cuid())
-  slug         String   @unique
-  title        String
-  type         String
-  line         String?
-  client       String?
-  clientPublic Boolean  @default(false)
-  coverImage   String
-  steps        Json
-  specs        Json
-  press        Json
-  customBox    Boolean  @default(false)
-  playerSlugs  String   @default("")
-  sortOrder    Int      @default(0)
-  capsuleId    String
-  capsule      Capsule  @relation(fields: [capsuleId], references: [id], onDelete: Cascade)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  @@index([capsuleId])
-}
-
+/// Files uploaded from /admin, served at /api/media/:id.
 model MediaFile {
   id        String   @id @default(cuid())
   mime      String
@@ -141,16 +84,24 @@ model MediaFile {
   createdAt DateTime @default(now())
 }
 
+/// Default entries already written once: an entry deleted from /admin is not written again.
+model SeededEntry {
+  key       String   @id
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
 model CallbackRequest {
   id        String   @id @default(cuid())
   name      String
   phone     String
   interest  String?
-  createdAt DateTime @default(now())
-}
-
-model SiteFlag {
-  id        String   @id @default(cuid())
-  key       String   @unique
   createdAt DateTime @default(now())
 }
