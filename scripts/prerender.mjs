@@ -1,4 +1,4 @@
-// Pre-renders every page to static HTML after "vite build" - written by the platform. Do not edit.
+// Pre-renders every page to static HTML after "vite build".
 // npm run build runs vite build, then the server bundle of the pages
 // (vite build --ssr src/extensions/seo/entry-server.tsx --outDir dist-ssr), then
 // this script: one HTML file per route, with its rendered content and its head,
