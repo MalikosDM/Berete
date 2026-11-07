@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from "react-router";
 import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Logo from "@/components/Logo";
-import { DEFAULT_MESSAGE, waLink } from "@/lib/site";
+import { BASE_LINE, DEFAULT_MESSAGE, waLink } from "@/lib/site";
 import { getLenis } from "@/lib/gsap";
 
 type NavLinkItem = { label: string; to: string };
@@ -26,7 +26,7 @@ const MAIN_LINKS: NavLinkItem[] = [
 
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
-    "relative inline-flex min-h-12 items-center text-[0.8125rem] font-medium uppercase tracking-[0.2em] transition-colors",
+    "relative inline-flex min-h-12 items-center text-[0.8125rem] font-medium uppercase tracking-[0.18em] transition-colors",
     "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -39,14 +39,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
+    const id = window.requestAnimationFrame(onScroll);
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.cancelAnimationFrame(id);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, []);
 
-  useEffect(() => {
+  // A new page closes the menu.
+  const here = location.pathname + location.search;
+  const [menuPage, setMenuPage] = useState(here);
+  if (menuPage !== here) {
+    setMenuPage(here);
     setOpen(false);
-  }, [location.pathname, location.search]);
+  }
 
   useEffect(() => {
     const lenis = getLenis();
@@ -67,7 +74,6 @@ export default function Navbar() {
   const creationsActive = location.pathname.startsWith("/creations");
 
   return (
-    <>
     <header
       className={[
         "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-500",
@@ -76,8 +82,8 @@ export default function Navbar() {
     >
       <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-6 px-5 sm:px-8 lg:h-22 lg:px-12">
         <Link to="/" className="group flex min-h-12 flex-col justify-center" aria-label="Berete Jewellers, home">
-          <Logo crop className="h-10 w-[4.75rem] lg:hidden" />
-          <Logo className="hidden h-14 w-52 lg:block" />
+          <Logo variant="mark" className="h-10 w-[3.375rem] lg:hidden" />
+          <Logo className="hidden h-14 w-[4.875rem] lg:block" />
         </Link>
 
         <nav aria-label="Main" className="hidden items-center gap-8 xl:flex">
@@ -180,10 +186,9 @@ export default function Navbar() {
             ))}
           </ul>
           <div className="rule-rose my-10" />
-          <p className="text-base text-mist">Based in Dubai · Worldwide delivery</p>
+          <p className="text-base text-mist">{BASE_LINE}</p>
         </nav>
       </div>
     </header>
-    </>
   );
 }

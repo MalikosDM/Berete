@@ -1,19 +1,29 @@
-const LOGO_URL = "/images/fournies/berete-jewellers-cropped.svg";
+/*
+ * The owner's logo (scripts/import-media.mjs writes /media/brand/), used as a mask
+ * over the metallic rose gold, with its slow sheen: sharp at every size.
+ * "full": diamond, BRT and the name. "mark": the diamond and BRT only.
+ */
+const FILES = { full: "/media/brand/logo.svg", mark: "/media/brand/logo-mark.svg" } as const;
 
-type LogoProps = { className?: string; position?: "left" | "center"; crop?: boolean };
+type LogoProps = { variant?: keyof typeof FILES; className?: string; position?: "left" | "center" };
 
-/** The owner's SVG logo, used as a mask over the rose-gold gradient: sharp at every size. */
-export default function Logo({ className = "", position = "left", crop = false }: LogoProps) {
+export default function Logo({ variant = "full", className = "", position = "left" }: LogoProps) {
+  const url = "url(" + FILES[variant] + ")";
+  const place = position === "center" ? "center" : "left center";
   return (
     <span
       aria-hidden="true"
-      className={
-        "bg-rose-gold block [mask-image:url(/images/fournies/berete-jewellers-cropped.svg)] [-webkit-mask-image:url(/images/fournies/berete-jewellers-cropped.svg)] [mask-repeat:no-repeat] [-webkit-mask-repeat:no-repeat] " +
-        (crop ? "[mask-size:auto_100%] [-webkit-mask-size:auto_100%] " : "[mask-size:contain] [-webkit-mask-size:contain] ") +
-        (position === "center" ? "[mask-position:center] [-webkit-mask-position:center] " : "[mask-position:left_center] [-webkit-mask-position:left_center] ") +
-        className
-      }
-      data-src={LOGO_URL}
+      className={"bg-rose-gold block " + className}
+      style={{
+        maskImage: url,
+        WebkitMaskImage: url,
+        maskRepeat: "no-repeat",
+        WebkitMaskRepeat: "no-repeat",
+        maskSize: "contain",
+        WebkitMaskSize: "contain",
+        maskPosition: place,
+        WebkitMaskPosition: place,
+      }}
     />
   );
 }

@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Logo from "@/components/Logo";
-import { DEFAULT_MESSAGE, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink } from "@/lib/site";
+import { BASE_LINE, DEFAULT_MESSAGE, EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink } from "@/lib/site";
 
 const CREATIONS = [
   { label: "All creations", to: "/creations" },
@@ -29,9 +29,9 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-5 pt-20 sm:px-8 lg:px-12 lg:pt-28">
         <p className="eyebrow">Made by us. Inspired by you.</p>
         <Link to="/" className="mt-6 block" aria-label="Berete Jewellers, home">
-          <Logo className="h-[clamp(7rem,22vw,16rem)] w-full max-w-4xl" />
+          <Logo className="h-[clamp(7rem,18vw,13rem)] w-full max-w-3xl" />
         </Link>
-        <p className="mt-8 text-lg text-mist">Based in Dubai · Worldwide delivery</p>
+        <p className="mt-8 text-lg text-mist">{BASE_LINE}</p>
 
         <div className="mt-16 grid gap-12 sm:grid-cols-2 lg:mt-24 lg:grid-cols-12">
           <div className="lg:col-span-3">
@@ -72,6 +72,13 @@ export default function Footer() {
                   <BrandIcon name="instagram" className="size-5" />@{INSTAGRAM_HANDLE}
                 </a>
               </li>
+              {EMAIL ? (
+                <li>
+                  <a href={"mailto:" + EMAIL} className={linkCls}>
+                    {EMAIL}
+                  </a>
+                </li>
+              ) : null}
               <li>
                 <Link to="/contact" className={linkCls}>
                   Contact page

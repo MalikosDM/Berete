@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
-import JewelImage from "@/components/JewelImage";
+import { MediaView } from "@/components/Media";
+import type { MediaItem } from "@/data/types";
 import { gsap, getLenis, useReducedMotion } from "@/lib/gsap";
 
-export type HorizontalGalleryItem = { src: string; alt: string; caption?: string };
 
 type HorizontalGalleryProps = {
-  items: HorizontalGalleryItem[];
+  items: MediaItem[];
   title?: string;
 };
 
@@ -15,6 +15,7 @@ export default function HorizontalGallery({ items, title = "Details" }: Horizont
   const trackRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const photos = items.filter((m) => m.type === "image");
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -58,22 +59,25 @@ export default function HorizontalGallery({ items, title = "Details" }: Horizont
       >
         {items.map((item, i) => (
           <figure key={item.src + i} className="w-[78vw] shrink-0 snap-center sm:w-[55vw] lg:w-[38vw] xl:w-[32vw]">
-            <button
-              type="button"
-              onClick={() => setOpenIndex(i)}
-              className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden"
-              aria-label={"Open in full screen: " + item.alt}
-            >
-              <JewelImage
-                src={item.src}
-                alt={item.alt}
-                sizes="(min-width: 1024px) 38vw, 78vw"
-                className="h-full w-full transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
-              />
-              <span className="absolute right-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
-                <ZoomIn className="size-5" aria-hidden="true" />
+            {item.type === "video" ? (
+              <span className="relative block aspect-[4/5] w-full overflow-hidden bg-ink">
+                <MediaView item={item} />
               </span>
-            </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setOpenIndex(photos.indexOf(item))}
+                className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
+                aria-label={"Open in full screen: " + (item.alt ?? title)}
+              >
+                <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]">
+                  <MediaView item={item} />
+                </span>
+                <span className="absolute right-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
+                  <ZoomIn className="size-5" aria-hidden="true" />
+                </span>
+              </button>
+            )}
             <figcaption className="mt-4 flex items-baseline gap-4">
               <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
               <span className="text-base text-bone">{item.caption ?? item.alt}</span>
@@ -84,14 +88,14 @@ export default function HorizontalGallery({ items, title = "Details" }: Horizont
       </div>
 
       {openIndex !== null ? (
-        <Lightbox items={items} index={openIndex} onIndex={setOpenIndex} onClose={() => setOpenIndex(null)} />
+        <Lightbox items={photos} index={openIndex} onIndex={setOpenIndex} onClose={() => setOpenIndex(null)} />
       ) : null}
     </section>
   );
 }
 
 type LightboxProps = {
-  items: HorizontalGalleryItem[];
+  items: MediaItem[];
   index: number;
   onIndex: (i: number) => void;
   onClose: () => void;
@@ -149,7 +153,7 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
   const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/70 text-white transition-colors hover:border-rose-light hover:text-rose-light";
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={item.alt} data-lenis-prevent className="fixed inset-0 z-[90] flex flex-col bg-ink">
+    <div role="dialog" aria-modal="true" aria-label={item.alt ?? "Photo"} data-lenis-prevent className="fixed inset-0 z-[90] flex flex-col bg-ink">
       <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <p className="text-base text-bone">
           <span className="text-rose-gold font-display text-xl">{String(index + 1).padStart(2, "0")}</span>
@@ -175,11 +179,11 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
         >
           <img
             src={item.src}
-            alt={item.alt}
-            width={1600}
-            height={2000}
+            alt={item.alt ?? ""}
+            width={item.width}
+            height={item.height}
             decoding="async"
-            className="jewel h-full w-full transition-transform duration-700 ease-out"
+            className={"h-full w-full object-contain transition-transform duration-700 ease-out " + (item.onBlack ? "mix-blend-lighten" : "")}
             style={{ transform: zoomed ? "scale(2.2)" : "scale(1)", transformOrigin: origin }}
           />
         </button>

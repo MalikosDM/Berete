@@ -25,7 +25,9 @@ export default function Preloader() {
     } catch {
       return;
     }
-    setState("on");
+    // First visit of the session: the intro starts on the next frame.
+    const id = window.requestAnimationFrame(() => setState("on"));
+    return () => window.cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {

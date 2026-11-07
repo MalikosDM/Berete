@@ -1,42 +1,6 @@
+/* The forms of the site: POST /api/contact and POST /api/callback (server/routes/site.ts). */
 
-/*
- * Data layer. The server (server/routes/site.ts) answers:
- *   GET /api/pieces?category=CHAINS|PENDANTS|RINGS -> { pieces: PieceSummary[] }
- *   GET /api/pieces/:slug                          -> { piece: Piece }
- *   GET /api/players                               -> { players: Player[] }
- *   GET /api/players/:slug                         -> { player: Player }
- *   GET /api/boxes                                 -> { boxes: Box[] }
- *   POST /api/callback {name, phone, interest}     -> { ok: true }
- * When the API is unreachable, a local copy of the catalogue keeps the site readable.
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ---------- Forms ---------- */
-
-type SendResult = { ok: true } | { ok: false; error: string };
+export type SendResult = { ok: true } | { ok: false; error: string };
 
 async function postJson(url: string, body: Record<string, string>): Promise<SendResult> {
   try {
@@ -56,3 +20,6 @@ export function requestCallback(data: { name: string; phone: string; interest?: 
   return postJson("/api/callback", { name: data.name, phone: data.phone, interest: data.interest ?? "" });
 }
 
+export function sendMessage(data: { name: string; email: string; message: string; company: string }): Promise<SendResult> {
+  return postJson("/api/contact", data);
+}

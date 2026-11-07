@@ -1,6 +1,9 @@
-/* Constants and copy shared by the whole site. Texts are provisional (English). */
+/* Settings and copy shared by the whole site. The only place to change the contact details. Texts are provisional (English). */
 
-const WHATSAPP_NUMBER = "971XXXXXXXXX"; // placeholder: replace with the real number
+/** WhatsApp number, digits only with the country code. Placeholder: replace with the real number. */
+export const WHATSAPP_NUMBER = "971XXXXXXXXX";
+/** Public email address. Empty: not shown on the site (the email form still works). */
+export const EMAIL = "";
 export const INSTAGRAM_HANDLE = "beretejewellers";
 export const INSTAGRAM_URL = "https://www.instagram.com/" + INSTAGRAM_HANDLE + "/";
 export const BASE_LINE = "Based in Dubai · Worldwide delivery";
@@ -15,21 +18,11 @@ export function pieceMessage(name: string): string {
   return 'Hello Berete Jewellers, I want a piece like "' + name + '". Can we talk about it?';
 }
 
-
-
-
-
-
-
-
-
-
-
 /* ---------- Contact configurator ---------- */
 
 export type Choice = { value: string; label: string };
 
-export const PIECE_TYPES: Choice[] = [
+export const PIECE_CHOICES: Choice[] = [
   { value: "chain", label: "Chain" },
   { value: "pendant", label: "Pendant" },
   { value: "ring", label: "Championship ring" },
@@ -51,13 +44,7 @@ export const TIMINGS: Choice[] = [
 ];
 
 export function configuratorMessage(type: string, budget: string, timing: string, pieceName?: string): string {
-  const lines = [
-    "Hello Berete Jewellers, I would like to start a piece.",
-    "Piece: " + type,
-    "Budget: " + budget,
-    "Timing: " + timing,
-  ];
+  const lines = ["Hello Berete Jewellers, I would like to start a piece.", "Piece: " + type, "Budget: " + budget, "Timing: " + timing];
   if (pieceName) lines.push('Inspired by: "' + pieceName + '"');
   return lines.join("\n");
 }
-

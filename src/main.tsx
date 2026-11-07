@@ -3,14 +3,17 @@ import { createRoot, hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import App from "./App";
 import Extensions from "./extensions";
+import { CatalogueProvider } from "./lib/catalogue";
 import "./index.css";
 
 const root = document.getElementById("root")!;
 const app = (
   <StrictMode>
     <BrowserRouter>
-      <App />
-      <Extensions />
+      <CatalogueProvider>
+        <App />
+        <Extensions />
+      </CatalogueProvider>
     </BrowserRouter>
   </StrictMode>
 );

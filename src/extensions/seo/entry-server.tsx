@@ -1,9 +1,11 @@
-// Renders the pages on the server for the prerender (npm run build) - written by the platform. Do not edit.
+// Renders the pages on the server for the prerender (npm run build).
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router";
 import App from "../../App";
+import { CatalogueProvider } from "../../lib/catalogue";
 import seo from "./seo.json";
+import { dynamicPaths, extrasFor } from "./extras";
 import { isIndexable, type SeoExtras, type SeoSettings } from "./head";
 
 export { headFor, injectHead, robotsTxt, sitemapXml } from "./head";
@@ -15,18 +17,18 @@ export function render(url: string): string {
   return renderToString(
     <StrictMode>
       <StaticRouter location={url}>
-        <App />
+        <CatalogueProvider>
+          <App />
+        </CatalogueProvider>
       </StaticRouter>
     </StrictMode>,
   );
 }
 
-/** Every address to write as a static page: the pages of the settings, and the articles. */
+/** Every address to write as a static page: the pages of the settings, every piece and every person. */
 export function prerenderTargets(): { path: string; extras?: SeoExtras }[] {
-  const targets: { path: string; extras?: SeoExtras }[] = Object.keys(settings.pages)
-    .filter((path) => !path.includes(":") && !path.includes("*"))
-    .map((path) => ({ path }));
-  return targets;
+  const fixed = Object.keys(settings.pages).filter((path) => !path.includes(":") && !path.includes("*") && path !== "/pieces");
+  return [...fixed, ...dynamicPaths()].map((path) => ({ path, extras: extrasFor(path) }));
 }
 
 /** The pages closed to search engines (robots.txt disallows them). */

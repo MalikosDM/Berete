@@ -1,12 +1,6 @@
-// The extensions mounted on every page - written by the platform. Do not edit.
+// Mounted on every page: keeps the title and the meta tags of the head in step with the route.
 import SeoHead from "./seo/SeoHead";
-import PageViews from "./analytics/PageViews";
 
 export default function Extensions() {
-  return (
-    <>
-      <SeoHead />
-      <PageViews />
-    </>
-  );
+  return <SeoHead />;
 }

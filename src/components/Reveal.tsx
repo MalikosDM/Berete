@@ -1,4 +1,4 @@
-import { createElement, useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode, type Ref } from "react";
 import { gsap, useReducedMotion } from "@/lib/gsap";
 
 type RevealTag = "div" | "section" | "article" | "figure" | "li" | "p" | "span";
@@ -52,5 +52,10 @@ export default function Reveal({ children, className = "", mask = false, delay =
     return () => ctx.revert();
   }, [mask, delay, reduced]);
 
-  return createElement(as, { ref, className }, children);
+  const Tag = as;
+  return (
+    <Tag ref={ref as Ref<never>} className={className}>
+      {children}
+    </Tag>
+  );
 }

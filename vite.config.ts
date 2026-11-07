@@ -8,6 +8,19 @@ export default defineConfig({
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
+  build: {
+    rolldownOptions: {
+      output: {
+        // Libraries in their own files: cached across visits and deployments.
+        codeSplitting: {
+          groups: [
+            { name: "react", test: /node_modules[\\/](react|react-dom|react-router|scheduler)[\\/]/ },
+            { name: "motion", test: /node_modules[\\/](gsap|lenis)[\\/]/ },
+          ],
+        },
+      },
+    },
+  },
   server: {
     // The API (server/index.ts) runs on 3001 in development: npm run dev:server
     proxy: { "/api": "http://localhost:3001" },

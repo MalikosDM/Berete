@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { ArrowRight, Check, LoaderCircle, MapPin, PhoneCall, RotateCcw } from "lucide-react";
+import { ArrowRight, Check, LoaderCircle, Mail, MapPin, PhoneCall, RotateCcw } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Reveal from "@/components/Reveal";
 import {
@@ -8,7 +8,8 @@ import {
   DEFAULT_MESSAGE,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
-  PIECE_TYPES,
+  EMAIL,
+  PIECE_CHOICES,
   TIMINGS,
   configuratorMessage,
   pieceMessage,
@@ -16,6 +17,7 @@ import {
   type Choice,
 } from "@/lib/site";
 import { requestCallback } from "@/lib/api";
+import { useCatalogue } from "@/lib/catalogue";
 
 type ContactBlockProps = {
   pieceName?: string;
@@ -24,13 +26,15 @@ type ContactBlockProps = {
 };
 
 const STEPS: { title: string; options: Choice[] }[] = [
-  { title: "Type of piece", options: PIECE_TYPES },
+  { title: "Type of piece", options: PIECE_CHOICES },
   { title: "Budget", options: BUDGETS },
   { title: "Timing", options: TIMINGS },
 ];
 
 export default function ContactBlock({ pieceName, compact = false, id }: ContactBlockProps) {
   const mainMessage = pieceName ? pieceMessage(pieceName) : DEFAULT_MESSAGE;
+  const { people } = useCatalogue();
+  const proof = [...people.filter((p) => p.kind === "club"), ...people.filter((p) => p.kind === "player" && p.number !== null)].map((p) => p.name);
 
   return (
     <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-24 bg-ink " + (compact ? "py-20 lg:py-28" : "py-24 lg:py-36")}>
@@ -66,7 +70,22 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
                   <BrandIcon name="instagram" className="size-5 text-rose-light" />@{INSTAGRAM_HANDLE}
                 </a>
               </li>
+              {EMAIL ? (
+                <li>
+                  <a href={"mailto:" + EMAIL} className="inline-flex min-h-12 items-center gap-3 transition-colors hover:text-rose-light">
+                    <Mail className="size-5 text-rose-light" aria-hidden="true" />
+                    {EMAIL}
+                  </a>
+                </li>
+              ) : null}
             </ul>
+
+            {proof.length > 0 ? (
+              <div className="mt-10 border-t border-white/15 pt-8">
+                <p className="eyebrow">Trusted by</p>
+                <p className="mt-4 max-w-md font-display text-xl uppercase leading-relaxed tracking-[0.08em] text-white">{proof.join(" · ")}</p>
+              </div>
+            ) : null}
 
           </div>
 

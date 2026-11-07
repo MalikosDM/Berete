@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import { Check, ChevronDown, LoaderCircle, Mail } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
 import ContactBlock from "@/components/ContactBlock";
+import { sendMessage } from "@/lib/api";
 import { getLenis } from "@/lib/gsap";
 
 export default function Contact() {
@@ -53,21 +54,10 @@ function EmailForm() {
     if (errs.name || errs.email || errs.message) return;
 
     setStatus("sending");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim(), company }),
-      });
-      if (res.ok) {
-        setStatus("sent");
-        return;
-      }
-      const data = (await res.json().catch(() => null)) as { error?: string } | null;
-      setError(data?.error ?? "Your message could not be sent. Please try again or write to us on WhatsApp.");
-      setStatus("error");
-    } catch {
-      setError("Connection problem. Please try again or write to us on WhatsApp.");
+    const res = await sendMessage({ name: name.trim(), email: email.trim(), message: message.trim(), company });
+    if (res.ok) setStatus("sent");
+    else {
+      setError(res.error);
       setStatus("error");
     }
   };
@@ -76,7 +66,7 @@ function EmailForm() {
     "mt-2 block w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
 
   return (
-    <section aria-labelledby="email-title" className="bg-ink pb-28 lg:pb-40">
+    <section aria-labelledby="email-title" className="bg-ink pb-24 lg:pb-32">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <div className="border border-white/15 p-6 sm:p-10">
           <button

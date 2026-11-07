@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router";
-import { ArrowRight, Check, ChevronDown } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Reveal from "@/components/Reveal";
-import { ScrollTrigger, getLenis, useReducedMotion } from "@/lib/gsap";
+import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
+import { media } from "@/data/catalogue";
 import { DEFAULT_MESSAGE, waLink } from "@/lib/site";
-
-const VIDEO_SRC = "/images/fournies/video-process.mp4";
-const VIDEO_FALLBACK = "https://sparkonic.ai/api/media/2b181c15-040d-44e0-b4d4-21341d9e8e89";
 
 type Step = {
   n: number;
@@ -93,273 +91,79 @@ function paymentAt(p: number): Step | null {
   return current;
 }
 
-function stepOpacity(p: number, from: number, to: number): number {
-  const f = 0.018;
-  if (p < from - f || p > to + f) return 0;
-  if (p < from) return (p - (from - f)) / f;
-  if (p > to) return 1 - (p - to) / f;
-  return 1;
-}
-
 export default function Process() {
-  const reduced = useReducedMotion();
   return (
     <>
-      {reduced ? <StaticIntro /> : <ScrubbedProcess />}
+      <ScrollVideo media={media.scroll.process!} steps={FILM_STEPS} label="The process, step by step, played by scrolling" overlay={(p) => <Payment progress={p} />} showProgress={false} />
       <StepsOverview />
       <Closing />
     </>
   );
 }
 
-/* Scroll-scrubbed video: frozen on the first frame, the scroll moves it frame by frame. */
-function ScrubbedProcess() {
-  const wrapRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [src, setSrc] = useState(VIDEO_SRC);
-
-  useEffect(() => {
-    const wrap = wrapRef.current;
-    const video = videoRef.current;
-    if (!wrap || !video) return undefined;
-
-    let target = 0;
-    let frame = 0;
-    let snapTimer = 0;
-    let snapEnd = 0;
-    let snapping = false;
-    const fine = window.matchMedia("(pointer: fine)").matches;
-
-    video.pause();
-
-    const apply = () => {
-      const d = video.duration;
-      if (!d || !Number.isFinite(d) || video.seeking) return;
-      const t = Math.min(d - 0.04, Math.max(0, target * d));
-      if (Math.abs(video.currentTime - t) > 0.015) video.currentTime = t;
-    };
-    const onData = () => {
-      video.pause();
-      if (video.currentTime === 0) video.currentTime = 0.001;
-      apply();
-    };
-
-    // iOS only paints seeked frames once the video has been unlocked by a gesture.
-    const unlock = () => {
-      video.muted = true;
-      video
-        .play()
-        .then(() => {
-          video.pause();
-          apply();
-        })
-        .catch(() => undefined);
-    };
-    window.addEventListener("touchstart", unlock, { once: true, passive: true });
-
-    let trigger: ScrollTrigger | null = null;
-
-    // Gentle magnet towards the nearest text step, cancelled by any new user scroll.
-    function magnet() {
-      if (!trigger) return;
-      const p = target;
-      if (p <= 0.01 || p >= 0.97) return;
-      let best = STEPS[0];
-      let dist = Infinity;
-      for (const s of STEPS) {
-        const d = Math.abs(p - (s.from + s.to) / 2);
-        if (d < dist) {
-          dist = d;
-          best = s;
-        }
-      }
-      if (dist < 0.006 || dist > 0.09) return;
-      const mid = (best.from + best.to) / 2;
-      const y = trigger.start + mid * (trigger.end - trigger.start);
-      snapping = true;
-      window.clearTimeout(snapEnd);
-      snapEnd = window.setTimeout(() => {
-        snapping = false;
-      }, 1100);
-      const lenis = getLenis();
-      if (lenis) lenis.scrollTo(y, { duration: 0.9 });
-      else window.scrollTo({ top: y, behavior: "smooth" });
-    }
-
-    trigger = ScrollTrigger.create({
-      trigger: wrap,
-      start: "top top",
-      end: "bottom bottom",
-      onUpdate: (self) => {
-        target = self.progress;
-        apply();
-        if (!frame) {
-          frame = requestAnimationFrame(() => {
-            frame = 0;
-            setProgress(target);
-          });
-        }
-        if (fine && !snapping) {
-          window.clearTimeout(snapTimer);
-          snapTimer = window.setTimeout(magnet, 240);
-        }
-      },
-    });
-
-    const cancel = () => {
-      window.clearTimeout(snapTimer);
-      window.clearTimeout(snapEnd);
-      snapping = false;
-    };
-
-    video.addEventListener("seeked", apply);
-    video.addEventListener("loadedmetadata", apply);
-    video.addEventListener("loadeddata", onData);
-    window.addEventListener("wheel", cancel, { passive: true });
-    window.addEventListener("touchstart", cancel, { passive: true });
-    window.addEventListener("pointerdown", cancel);
-    window.addEventListener("keydown", cancel);
-
-    return () => {
-      trigger?.kill();
-      cancelAnimationFrame(frame);
-      window.clearTimeout(snapTimer);
-      window.clearTimeout(snapEnd);
-      video.removeEventListener("seeked", apply);
-      video.removeEventListener("loadedmetadata", apply);
-      video.removeEventListener("loadeddata", onData);
-      window.removeEventListener("wheel", cancel);
-      window.removeEventListener("touchstart", unlock);
-      window.removeEventListener("touchstart", cancel);
-      window.removeEventListener("pointerdown", cancel);
-      window.removeEventListener("keydown", cancel);
-    };
-  }, [src]);
-
-  const introOpacity = Math.max(0, 1 - Math.max(0, progress - 0.004) / 0.022);
-  const current = paymentAt(progress);
-  const fill = current ? current.paid : 0;
-
-  return (
-    <section ref={wrapRef} aria-label="The process, step by step" className="relative h-[700vh]">
-      <div className="sticky top-0 h-svh overflow-hidden bg-ink">
-        <video
-          ref={videoRef}
-          src={src}
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-          tabIndex={-1}
-          onError={() => {
-            if (src === VIDEO_SRC) setSrc(VIDEO_FALLBACK);
-          }}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/45 to-ink/60" />
-
-        {/* First frame: title */}
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center"
-          style={{ opacity: introOpacity, transform: `translateY(${(1 - introOpacity) * -30}px)` }}
-        >
-          <p className="eyebrow">Six steps, one conversation</p>
-          <h1 className="title-caps mt-6 text-[clamp(3rem,11vw,9rem)] tracking-[0.16em] text-white">The Process</h1>
-          <p className="mt-6 max-w-xl text-lg text-bone">From your first message to the day you wear it.</p>
-          <p className="mt-12 flex items-center gap-3 text-base text-mist" aria-hidden="true">
-            Scroll to begin
-            <ChevronDown className="size-5 animate-bounce text-rose-light" />
-          </p>
-        </div>
-
-        {/* Text steps */}
-        {STEPS.map((s, i) => {
-          const last = i === STEPS.length - 1;
-          const op = last ? (progress >= s.from ? Math.min(1, (progress - (s.from - 0.018)) / 0.018) : 0) : stepOpacity(progress, s.from, s.to);
-          const visible = op > 0.05;
-          return (
-            <div
-              key={s.n}
-              aria-hidden={!visible}
-              className={
-                "absolute inset-x-5 bottom-32 sm:inset-x-8 md:bottom-24 lg:right-auto lg:bottom-[16vh] lg:left-[10vw] lg:max-w-xl " +
-                (visible ? "" : "pointer-events-none")
-              }
-              style={{ opacity: Math.max(0, op), transform: `translateY(${(1 - Math.max(0, op)) * 28}px)` }}
-            >
-              <span className="text-rose-gold font-display text-7xl font-light leading-none lg:text-8xl">{pad(s.n)}</span>
-              <h2 className="title-caps mt-4 text-[clamp(2rem,5vw,3.75rem)] tracking-[0.14em] text-white">{s.title}</h2>
-              <p className="mt-4 max-w-md text-lg text-bone">{s.text}</p>
-              {last ? (
-                <Link
-                  to="/contact"
-                  tabIndex={visible ? 0 : -1}
-                  className="mt-8 inline-flex min-h-14 items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light"
-                >
-                  Start your piece
-                  <ArrowRight className="size-4" aria-hidden="true" />
-                </Link>
-              ) : null}
-            </div>
-          );
-        })}
-
-        {/* Rose-gold progress line */}
-        <div aria-hidden="true" className="absolute top-28 right-4 bottom-32 w-px bg-white/20 md:bottom-24 lg:right-12 lg:top-36">
-          <div className="bg-rose-gold absolute inset-x-0 top-0 h-full origin-top" style={{ transform: `scaleY(${progress})` }} />
-          {STEPS.map((s) => (
-            <span
-              key={s.n}
-              className={
-                "absolute left-1/2 size-2 -translate-x-1/2 rounded-full border transition-colors duration-500 " +
-                (progress >= s.from ? "border-rose-light bg-rose-light" : "border-white/50 bg-ink")
-              }
-              style={{ top: `${s.from * 100}%` }}
-            />
-          ))}
-        </div>
-
-        {/* Payment indicator */}
-        <div className="absolute top-24 right-12 left-5 sm:left-8 lg:top-32 lg:right-24 lg:left-auto lg:w-80" style={{ opacity: 1 - introOpacity * 0.6 }}>
-          <div className="flex items-baseline justify-between gap-4">
-            <span className="text-sm font-medium uppercase tracking-[0.24em] text-bone">Payment</span>
-            <span className="text-rose-gold font-display text-2xl" aria-live="polite">{current ? current.meter : "0%"}</span>
-          </div>
-          <div className="mt-3 h-1 w-full bg-white/15" role="progressbar" aria-label="Amount paid" aria-valuemin={0} aria-valuemax={100} aria-valuenow={fill}>
-            <div className="bg-rose-gold h-full transition-[width] duration-700 ease-out" style={{ width: `${fill}%` }} />
-          </div>
-          <p className="mt-3 hidden text-base text-bone sm:block">{current ? current.payNote : "No payment at this stage."}</p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* Reduced motion: no scrubbing, the first frame and the title. */
-function StaticIntro() {
-  const [src, setSrc] = useState(VIDEO_SRC);
-  return (
-    <section className="relative flex min-h-[80svh] items-center justify-center overflow-hidden bg-ink px-5 pt-28 text-center">
-      <video
-        src={src}
-        muted
-        playsInline
-        preload="metadata"
-        aria-hidden="true"
-        tabIndex={-1}
-        onError={() => {
-          if (src === VIDEO_SRC) setSrc(VIDEO_FALLBACK);
-        }}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div aria-hidden="true" className="absolute inset-0 bg-ink/65" />
-      <div className="relative">
+const FILM_STEPS: ScrollStep[] = [
+  {
+    from: 0,
+    to: 0.025,
+    align: "center",
+    content: (
+      <div className="mx-auto max-w-3xl text-center [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">
         <p className="eyebrow">Six steps, one conversation</p>
         <h1 className="title-caps mt-6 text-[clamp(3rem,11vw,9rem)] tracking-[0.16em] text-white">The Process</h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-bone">From your first message to the day you wear it.</p>
+        <p className="mt-6 text-lg text-bone">From your first message to the day you wear it.</p>
       </div>
-    </section>
+    ),
+  },
+  ...STEPS.map(
+    (s, i): ScrollStep => ({
+      from: s.from,
+      to: i === STEPS.length - 1 ? 1 : s.to,
+      align: "left",
+      content: (
+        <div className="max-w-xl [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">
+          <span className="text-rose-gold font-display text-7xl font-light leading-none lg:text-8xl">{pad(s.n)}</span>
+          <h2 className="title-caps mt-4 text-[clamp(2rem,5vw,3.75rem)] tracking-[0.14em] text-white">{s.title}</h2>
+          <p className="mt-4 max-w-md text-lg text-bone">{s.text}</p>
+          {i === STEPS.length - 1 ? (
+            <Link to="/contact" className="mt-8 inline-flex min-h-14 items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light">
+              Start your piece
+              <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
+          ) : null}
+        </div>
+      ),
+    }),
+  ),
+];
+
+/* Over the film: the rose-gold line that progresses and the payment meter that fills. */
+function Payment({ progress }: { progress: number }) {
+  const current = paymentAt(progress);
+  const fill = current ? current.paid : 0;
+  const shown = Math.min(1, Math.max(0, (progress - 0.01) / 0.02));
+  return (
+    <>
+      <div aria-hidden="true" className="absolute top-40 right-4 bottom-32 w-px bg-white/20 md:bottom-24 lg:right-12">
+        <div className="bg-rose-gold absolute inset-x-0 top-0 h-full origin-top" style={{ transform: "scaleY(" + progress + ")" }} />
+        {STEPS.map((s) => (
+          <span
+            key={s.n}
+            className={"absolute left-1/2 size-2 -translate-x-1/2 rounded-full border transition-colors duration-500 " + (progress >= s.from ? "border-rose-light bg-rose-light" : "border-white/50 bg-ink")}
+            style={{ top: s.from * 100 + "%" }}
+          />
+        ))}
+      </div>
+      <div className="absolute top-24 right-10 left-5 sm:left-8 lg:top-32 lg:right-24 lg:left-auto lg:w-80" style={{ opacity: shown }}>
+        <div className="flex items-baseline justify-between gap-4">
+          <span className="text-base font-medium uppercase tracking-[0.2em] text-bone">Payment</span>
+          <span className="text-rose-gold font-display text-2xl">{current ? current.meter : "0%"}</span>
+        </div>
+        <div className="mt-3 h-1 w-full bg-white/15" role="progressbar" aria-label="Amount paid" aria-valuemin={0} aria-valuemax={100} aria-valuenow={fill}>
+          <div className="bg-rose-gold h-full transition-[width] duration-700 ease-out" style={{ width: fill + "%" }} />
+        </div>
+        <p className="mt-3 hidden text-base text-bone sm:block">{current ? current.payNote : "No payment at this stage."}</p>
+      </div>
+    </>
   );
 }
 

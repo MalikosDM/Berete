@@ -1,73 +1,74 @@
 {
   "siteName": "Berete Jewellers",
-  "language": "fr",
+  "language": "en",
   "titleTemplate": "%s — Berete Jewellers",
+  "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars.",
+  "image": "/media/home/frames-desktop/0001.webp",
   "organization": {
     "type": "Organization",
-    "name": "Berete Jewellers"
+    "name": "Berete Jewellers",
+    "logo": "/media/brand/logo.svg",
+    "sameAs": ["https://www.instagram.com/beretejewellers/"]
   },
   "pages": {
     "/": {
       "title": "Berete Jewellers — Custom High Jewellery, Dubai",
-      "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars."
+      "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars. Made by us. Inspired by you."
+    },
+    "/creations": {
+      "title": "Creations: Chains, Pendants and Championship Rings",
+      "description": "Every Berete Jewellers piece, filterable: diamond chains, pendants, championship rings, bracelets and watches, each one made to measure in Dubai."
+    },
+    "/pieces/:slug": {},
+    "/players": {
+      "title": "Players, Clubs and Personalities",
+      "description": "The footballers, clubs and personalities who wear Berete Jewellers: their stories and the custom pieces made for them."
+    },
+    "/players/:slug": {},
+    "/atelier": {
+      "title": "The Atelier in Dubai",
+      "description": "Inside the Berete Jewellers atelier in Dubai: casting, assembly, polishing and stone setting, every piece made by hand."
+    },
+    "/boxes": {
+      "title": "Custom Boxes and Trunks",
+      "description": "Custom boxes and trunks made to measure for selected Berete Jewellers pieces, available as an option."
+    },
+    "/process": {
+      "title": "The Process, Step by Step",
+      "description": "Six clear steps from your first message to the handover: design deposit, validation, creation followed on WhatsApp, photoshoot and delivery."
     },
     "/about": {
-      "title": "About",
+      "title": "Our Story",
       "description": "The story of Berete Jewellers, a Dubai house creating custom high jewellery for champions."
     },
+    "/contact": {
+      "title": "Contact: Start Your Piece",
+      "description": "Start your custom piece with Berete Jewellers: chat on WhatsApp, build your request in three clicks or ask for a call back."
+    },
+    "/legal": {
+      "title": "Legal Notice",
+      "description": "Legal notice of the Berete Jewellers website."
+    },
+    "/privacy": {
+      "title": "Privacy Policy",
+      "description": "How Berete Jewellers handles the personal data you share on this website."
+    },
     "/admin": {
-      "title": "Admin",
+      "title": "Administration",
       "robots": "noindex,nofollow",
       "sitemap": false
     },
-    "/atelier": {
-      "title": "Atelier",
-      "description": "Inside the Dubai atelier: every piece sculpted, then set stone by stone by hand."
-    },
-    "/boxes": {
-      "title": "Boxes",
-      "description": "Custom presentation boxes, available as an option on selected pieces."
-    },
-    "/capsules/:slug": {
-      "title": "Capsule",
-      "description": "A Berete Jewellers capsule and every piece created for it."
-    },
-    "/contact": {
-      "title": "Contact",
-      "description": "Start your custom piece with Berete Jewellers on WhatsApp, by phone or by email."
-    },
-    "/creations": {
-      "title": "Creations",
-      "description": "Every Berete Jewellers piece: chains, pendants, rings, bracelets and watches."
+    "/pieces": {
+      "robots": "noindex,follow",
+      "sitemap": false
     },
     "/creations/:slug": {
       "robots": "noindex,follow",
       "sitemap": false
     },
-    "/legal": {
-      "title": "Legal notice",
-      "description": "Legal notice of the Berete Jewellers website."
-    },
-    "/pieces": {},
-    "/pieces/:slug": {
-      "title": "Piece",
-      "description": "A Berete Jewellers piece and the story of its creation, from the idea to the handover."
-    },
-    "/players": {
-      "title": "Players",
-      "description": "The footballers who wear Berete Jewellers pieces."
-    },
-    "/players/:slug": {
-      "title": "Player",
-      "description": "A footballer and the Berete Jewellers piece made for him."
-    },
-    "/privacy": {
-      "title": "Privacy",
-      "description": "How Berete Jewellers handles your personal data."
-    },
-    "/process": {
-      "title": "Process",
-      "description": "Six clear steps from your first message to the handover of your piece."
+    "/capsules/:slug": {
+      "robots": "noindex,follow",
+      "sitemap": false
     }
   }
 }

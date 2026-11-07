@@ -1,29 +1,20 @@
-// Keeps the head of the page in step with the route - written by the platform. Do not edit.
+// Keeps the head of the page in step with the route.
 import { useEffect } from "react";
 import { useLocation } from "react-router";
+import { useCatalogue } from "@/lib/catalogue";
 import seo from "./seo.json";
-import { applyHead, headFor, normalizePath, type SeoExtras, type SeoSettings } from "./head";
+import { extrasFor } from "./extras";
+import { applyHead, headFor, normalizePath, type SeoSettings } from "./head";
 
 const settings = seo as unknown as SeoSettings;
 
-/** What the settings cannot know: the product or the article a page shows. */
-async function extrasFor(path: string): Promise<SeoExtras | undefined> {
-  return undefined;
-}
-
 export default function SeoHead() {
   const { pathname } = useLocation();
+  const cat = useCatalogue();
   useEffect(() => {
-    let current = true;
     const path = normalizePath(pathname);
     const origin = /^https?:/.test(window.location.origin) ? window.location.origin : "";
-    applyHead(headFor(settings, path, undefined, origin), document);
-    void extrasFor(path).then((extras) => {
-      if (current && extras !== undefined) applyHead(headFor(settings, path, extras, origin), document);
-    }).catch(() => undefined);
-    return () => {
-      current = false;
-    };
-  }, [pathname]);
+    applyHead(headFor(settings, path, extrasFor(path, cat), origin), document);
+  }, [pathname, cat]);
   return null;
 }

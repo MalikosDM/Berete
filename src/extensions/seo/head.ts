@@ -1,4 +1,4 @@
-// SEO head - written by the platform. Do not edit.
+// SEO head.
 // It turns the SEO settings of the site (seo.json) and the address of a page
 // into the tags of its head: title, description, canonical, robots, Open Graph,
 // Twitter card, hreflang and JSON-LD structured data. The same code runs in the

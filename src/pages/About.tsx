@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { ArrowRight, UserRound } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import Logo from "@/components/Logo";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 
@@ -31,8 +32,8 @@ export default function About() {
         <div className="mx-auto grid max-w-[1600px] gap-14 px-5 sm:px-8 lg:grid-cols-12 lg:gap-12 lg:px-12">
           <Reveal mask className="lg:col-span-5">
             <div className="border-rose-gold relative flex aspect-[4/5] flex-col items-center justify-center gap-4 bg-ink-soft">
-              <UserRound className="size-12 text-rose-light" aria-hidden="true" />
-              <p className="text-base uppercase tracking-[0.24em] text-bone">Portrait coming soon</p>
+              <Logo variant="mark" position="center" className="h-1/4 w-1/2 opacity-80" />
+              <span className="sr-only">Portrait of the founder</span>
             </div>
           </Reveal>
 
