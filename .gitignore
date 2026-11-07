@@ -4,3 +4,7 @@ dist-server
 .env
 server/generated
 dist-ssr
+scripts/.import-media-cache.json
+.local
+test-results
+playwright-report

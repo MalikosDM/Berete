@@ -1,0 +1,325 @@
+{
+  "groups": {
+    "atelier": [
+      {
+        "type": "image",
+        "src": "/media/atelier/01.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/atelier/02.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/atelier/03.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/atelier/04.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    ],
+    "pieces/vfb-stuttgart-dfb-pokal-2025": [
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/01.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/08.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/09.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/10.webp",
+        "width": 1080,
+        "height": 1918
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/11.webp",
+        "width": 1080,
+        "height": 2342
+      }
+    ],
+    "pieces/campione-d-italia-2023-2024": [
+      {
+        "type": "image",
+        "src": "/media/pieces/campione-d-italia-2023-2024/01.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/campione-d-italia-2023-2024/02.webp",
+        "width": 1080,
+        "height": 810
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/campione-d-italia-2023-2024/03.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    ],
+    "pieces/the-hand": [
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/the-hand/06.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    ],
+    "pieces/white-hands": [
+      {
+        "type": "image",
+        "src": "/media/pieces/white-hands/01.webp",
+        "width": 1080,
+        "height": 1434
+      }
+    ],
+    "pieces/t-serpent": [
+      {
+        "type": "image",
+        "src": "/media/pieces/t-serpent/01.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/t-serpent/02.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    ],
+    "pieces/the-jersey": [
+      {
+        "type": "image",
+        "src": "/media/pieces/the-jersey/01.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    ],
+    "pieces/rs": [
+      {
+        "type": "image",
+        "src": "/media/pieces/rs/01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/rs/02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/rs/03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/rs/04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/rs/05.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    ],
+    "pieces/butterfly": [
+      {
+        "type": "image",
+        "src": "/media/pieces/butterfly/01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/butterfly/02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/butterfly/03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      {
+        "type": "image",
+        "src": "/media/pieces/butterfly/04.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    ],
+    "pieces/sirius": [
+      {
+        "type": "image",
+        "src": "/media/pieces/sirius/01.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    ],
+    "boxes/sirius": [
+      {
+        "type": "image",
+        "src": "/media/boxes/sirius/01.webp",
+        "width": 1080,
+        "height": 720
+      },
+      {
+        "type": "image",
+        "src": "/media/boxes/sirius/02.webp",
+        "width": 1080,
+        "height": 720
+      },
+      {
+        "type": "image",
+        "src": "/media/boxes/sirius/03.webp",
+        "width": 1080,
+        "height": 720
+      }
+    ],
+    "boxes/tulips-on-tour": [
+      {
+        "type": "image",
+        "src": "/media/boxes/tulips-on-tour/01.webp",
+        "width": 1080,
+        "height": 720
+      }
+    ]
+  },
+  "videos": {
+    "atelier/setting": {
+      "type": "video",
+      "src": "/media/atelier/setting.mp4",
+      "poster": "/media/atelier/setting-poster.webp",
+      "width": 464,
+      "height": 848,
+      "duration": 10.77,
+      "audio": false
+    }
+  },
+  "scroll": {
+    "home": {
+      "desktop": {
+        "count": 332,
+        "width": 1280,
+        "height": 720,
+        "path": "/media/home/frames-desktop/"
+      },
+      "mobile": {
+        "count": 166,
+        "width": 504,
+        "height": 896,
+        "path": "/media/home/frames-mobile/"
+      },
+      "video": "/media/home/scrub.mp4",
+      "poster": "/media/home/frames-desktop/0001.webp"
+    },
+    "process": {
+      "desktop": {
+        "count": 361,
+        "width": 1280,
+        "height": 720,
+        "path": "/media/process/frames-desktop/"
+      },
+      "mobile": {
+        "count": 181,
+        "width": 504,
+        "height": 896,
+        "path": "/media/process/frames-mobile/"
+      },
+      "video": "/media/process/scrub.mp4",
+      "poster": "/media/process/frames-desktop/0001.webp"
+    }
+  }
+}

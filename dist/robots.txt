@@ -1,5 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-
-Sitemap: https://berete-jewellers-2.odoro.ai/sitemap.xml
