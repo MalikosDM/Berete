@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
+import CollectionTiles from "@/components/CollectionTiles";
 import { MediaView } from "@/components/Media";
 import PiecesShowcase from "@/components/PiecesShowcase";
 import Reveal from "@/components/Reveal";
@@ -10,7 +11,7 @@ import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
 import SplitHeading from "@/components/SplitHeading";
 import StoriesBar from "@/components/stories/StoriesBar";
 import { media } from "@/data/catalogue";
-import { findPiece } from "@/data/relations";
+import { INTER } from "@/data/pieces";
 import { useCatalogue } from "@/lib/catalogue";
 import { DEFAULT_MESSAGE, waLink } from "@/lib/site";
 
@@ -75,10 +76,18 @@ const HOME_STEPS: ScrollStep[] = [
   },
 ];
 
-const DOORS = [
-  { label: "Chains", to: "/creations?category=chains", piece: "butterfly" },
-  { label: "Pendants", to: "/creations?category=pendants", piece: "the-hand" },
-  { label: "Championship Rings", to: "/creations?category=rings", piece: "vfb-stuttgart-dfb-pokal-2025" },
+/* A selection of pieces for the row of the home page (the collections show all of them). */
+const SELECTION = [
+  "kevin-schade-dragon-ball-pendant",
+  "michy-batshuayi-butterfly-chain",
+  "marcus-thuram-t-serpent-pendant",
+  INTER,
+  "noah-okafor-jersey-pendant",
+  "kenan-yildiz-celebration-pendant",
+  "marcus-thuram-ruby-t-necklace",
+  "malik-tillman-cross-pendant",
+  "tanguy-nianzou-fam-medallion",
+  "marcus-thuram-skeleton-watch",
 ];
 
 const PROCESS_PREVIEW = ["First contact", "Design deposit", "Validation", "Creation", "Photoshoot", "Balance & delivery"];
@@ -97,28 +106,7 @@ export default function Home() {
       <StoriesBar />
       <ScrollVideo media={media.scroll.home!} steps={HOME_STEPS} label="Berete Jewellers film, played by scrolling" />
 
-      {/* Three doors */}
-      <section aria-label="Creations" className="grid gap-px bg-white/10 md:grid-cols-3">
-        {DOORS.map((d) => {
-          const piece = findPiece(cat, d.piece);
-          return (
-            <Link key={d.label} to={d.to} className="group relative flex h-[78svh] flex-col justify-end overflow-hidden bg-ink md:h-[92svh]">
-              {piece ? (
-                <span className="absolute inset-0 flex items-center justify-center p-8 transition-transform duration-[1.6s] ease-out group-hover:scale-110">
-                  <MediaView item={piece.cover} alt={d.label + ": " + piece.title} />
-                </span>
-              ) : null}
-              <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-ink via-ink/70 to-transparent" />
-              <span className="relative p-6 sm:p-10">
-                <span className="title-caps block text-[clamp(2rem,4vw,3.5rem)] tracking-[0.1em] text-white transition-colors group-hover:text-rose-light">{d.label}</span>
-                <span className="mt-4 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white group-hover:text-rose-light">
-                  Explore <ArrowUpRight className="size-4" aria-hidden="true" />
-                </span>
-              </span>
-            </Link>
-          );
-        })}
-      </section>
+      <CollectionTiles />
 
       {/* Featured capsule */}
       {featured ? (
@@ -164,7 +152,7 @@ export default function Home() {
         </section>
       ) : null}
 
-      <PiecesShowcase exclude={featured?.slug} />
+      <PiecesShowcase slugs={SELECTION} exclude={featured?.slug} />
 
       {/* Players band */}
       <section aria-labelledby="players-band-title" className="border-y border-white/10 py-24 lg:py-32">

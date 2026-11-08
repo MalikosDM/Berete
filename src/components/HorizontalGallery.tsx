@@ -1,21 +1,22 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
-import { MediaView } from "@/components/Media";
+import { forceMuted, MediaView } from "@/components/Media";
 import type { MediaItem } from "@/data/types";
 import { gsap, getLenis, useReducedMotion } from "@/lib/gsap";
-
 
 type HorizontalGalleryProps = {
   items: MediaItem[];
   title?: string;
 };
 
-export default function HorizontalGallery({ items, title = "Details" }: HorizontalGalleryProps) {
+export default function HorizontalGallery({
+  items,
+  title = "Details",
+}: HorizontalGalleryProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const photos = items.filter((m) => m.type === "image");
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -44,29 +45,39 @@ export default function HorizontalGallery({ items, title = "Details" }: Horizont
   if (items.length === 0) return null;
   const pinned = !reduced && items.length > 1;
 
+  // The pinned section sits in a wrapper owned by React: GSAP wraps the section
+  // in its own "pin-spacer", and React must still find its node when it leaves.
   return (
-    <section ref={sectionRef} aria-label={title} className="relative overflow-hidden bg-ink py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0">
-      <div className="mx-auto mb-10 flex w-full max-w-[1600px] items-end justify-between gap-6 px-5 sm:px-8 lg:mb-14 lg:px-12">
-        <h2 className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.16em]">{title}</h2>
-        <p className="hidden text-base text-mist sm:block">{pinned ? "Scroll to explore · Tap to zoom" : "Tap to zoom"}</p>
-      </div>
-      <div
-        ref={trackRef}
-        className={
-          "no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 sm:px-8 lg:gap-12 lg:px-12 " +
-          (pinned ? "lg:w-max lg:snap-none lg:overflow-visible" : "")
-        }
+    <div data-pin-wrapper>
+      <section
+        ref={sectionRef}
+        aria-label={title}
+        className="relative overflow-hidden bg-ink py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0"
       >
-        {items.map((item, i) => (
-          <figure key={item.src + i} className="w-[78vw] shrink-0 snap-center sm:w-[55vw] lg:w-[38vw] xl:w-[32vw]">
-            {item.type === "video" ? (
-              <span className="relative block aspect-[4/5] w-full overflow-hidden bg-ink">
-                <MediaView item={item} />
-              </span>
-            ) : (
+        <div className="mx-auto mb-10 flex w-full max-w-[1600px] items-end justify-between gap-6 px-5 sm:px-8 lg:mb-14 lg:px-12">
+          <h2 className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.16em]">
+            {title}
+          </h2>
+          <p className="hidden text-base text-mist sm:block">
+            {pinned ? "Scroll to explore · Tap to zoom" : "Tap to zoom"}
+          </p>
+        </div>
+        <div
+          ref={trackRef}
+          className={
+            "no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 sm:px-8 lg:gap-12 lg:px-12 " +
+            (pinned ? "lg:w-max lg:snap-none lg:overflow-visible" : "")
+          }
+        >
+          {items.map((item, i) => (
+            <figure
+              key={item.src + i}
+              data-gallery-item={item.type}
+              className="w-[78vw] shrink-0 snap-center sm:w-[55vw] lg:w-[38vw] xl:w-[32vw]"
+            >
               <button
                 type="button"
-                onClick={() => setOpenIndex(photos.indexOf(item))}
+                onClick={() => setOpenIndex(i)}
                 className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
                 aria-label={"Open in full screen: " + (item.alt ?? title)}
               >
@@ -77,20 +88,29 @@ export default function HorizontalGallery({ items, title = "Details" }: Horizont
                   <ZoomIn className="size-5" aria-hidden="true" />
                 </span>
               </button>
-            )}
-            <figcaption className="mt-4 flex items-baseline gap-4">
-              <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
-              <span className="text-base text-bone">{item.caption ?? item.alt}</span>
-            </figcaption>
-          </figure>
-        ))}
-        <div aria-hidden="true" className="w-1 shrink-0 lg:w-[8vw]" />
-      </div>
+              <figcaption className="mt-4 flex items-baseline gap-4">
+                <span className="text-rose-gold font-display text-xl">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-base text-bone">
+                  {item.caption ?? item.alt}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+          <div aria-hidden="true" className="w-1 shrink-0 lg:w-[8vw]" />
+        </div>
 
-      {openIndex !== null ? (
-        <Lightbox items={photos} index={openIndex} onIndex={setOpenIndex} onClose={() => setOpenIndex(null)} />
-      ) : null}
-    </section>
+        {openIndex !== null ? (
+          <Lightbox
+            items={items}
+            index={openIndex}
+            onIndex={setOpenIndex}
+            onClose={() => setOpenIndex(null)}
+          />
+        ) : null}
+      </section>
+    </div>
   );
 }
 
@@ -150,21 +170,45 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
     setZoomed((z) => !z);
   };
 
-  const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/70 text-white transition-colors hover:border-rose-light hover:text-rose-light";
+  const btn =
+    "inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/70 text-white transition-colors hover:border-rose-light hover:text-rose-light";
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={item.alt ?? "Photo"} data-lenis-prevent className="fixed inset-0 z-[90] flex flex-col bg-ink">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={item.alt ?? "Photo"}
+      data-lenis-prevent
+      className="fixed inset-0 z-[90] flex flex-col bg-ink"
+    >
       <div className="flex items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <p className="text-base text-bone">
-          <span className="text-rose-gold font-display text-xl">{String(index + 1).padStart(2, "0")}</span>
+          <span className="text-rose-gold font-display text-xl">
+            {String(index + 1).padStart(2, "0")}
+          </span>
           <span className="mx-2 text-mist">/</span>
           {String(count).padStart(2, "0")}
         </p>
         <div className="flex gap-3">
-          <button type="button" className={btn} onClick={() => setZoomed((z) => !z)} aria-label={zoomed ? "Zoom out" : "Zoom in"}>
-            {zoomed ? <ZoomOut className="size-5" aria-hidden="true" /> : <ZoomIn className="size-5" aria-hidden="true" />}
+          <button
+            type="button"
+            className={btn}
+            onClick={() => setZoomed((z) => !z)}
+            aria-label={zoomed ? "Zoom out" : "Zoom in"}
+          >
+            {zoomed ? (
+              <ZoomOut className="size-5" aria-hidden="true" />
+            ) : (
+              <ZoomIn className="size-5" aria-hidden="true" />
+            )}
           </button>
-          <button ref={closeRef} type="button" className={btn} onClick={onClose} aria-label="Close">
+          <button
+            ref={closeRef}
+            type="button"
+            className={btn}
+            onClick={onClose}
+            aria-label="Close"
+          >
             <X className="size-5" aria-hidden="true" />
           </button>
         </div>
@@ -174,32 +218,79 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
         <button
           type="button"
           onClick={toggleZoom}
-          className={"block h-full w-full " + (zoomed ? "cursor-zoom-out" : "cursor-zoom-in")}
+          className={
+            "block h-full w-full " +
+            (zoomed ? "cursor-zoom-out" : "cursor-zoom-in")
+          }
           aria-label={zoomed ? "Zoom out" : "Zoom in"}
         >
-          <img
-            src={item.src}
-            alt={item.alt ?? ""}
-            width={item.width}
-            height={item.height}
-            decoding="async"
-            className={"h-full w-full object-contain transition-transform duration-700 ease-out " + (item.onBlack ? "mix-blend-lighten" : "")}
-            style={{ transform: zoomed ? "scale(2.2)" : "scale(1)", transformOrigin: origin }}
-          />
+          {item.type === "video" ? (
+            <video
+              key={item.src}
+              ref={(v) => {
+                if (v) {
+                  forceMuted(v);
+                  v.play().catch(() => undefined);
+                }
+              }}
+              src={item.src}
+              poster={item.poster}
+              muted
+              loop
+              playsInline
+              autoPlay
+              aria-label={item.alt ?? ""}
+              className="h-full w-full object-contain transition-transform duration-700 ease-out"
+              style={{
+                transform: zoomed ? "scale(2.2)" : "scale(1)",
+                transformOrigin: origin,
+              }}
+            />
+          ) : (
+            <img
+              src={item.src}
+              alt={item.alt ?? ""}
+              width={item.width}
+              height={item.height}
+              decoding="async"
+              className={
+                "h-full w-full object-contain transition-transform duration-700 ease-out " +
+                (item.onBlack ? "mix-blend-lighten" : "")
+              }
+              style={{
+                transform: zoomed ? "scale(2.2)" : "scale(1)",
+                transformOrigin: origin,
+              }}
+            />
+          )}
         </button>
         {count > 1 ? (
           <>
-            <button type="button" onClick={() => go(-1)} className={btn + " absolute top-1/2 left-4 -translate-y-1/2"} aria-label="Previous image">
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              className={btn + " absolute top-1/2 left-4 -translate-y-1/2"}
+              aria-label="Previous"
+            >
               <ChevronLeft className="size-5" aria-hidden="true" />
             </button>
-            <button type="button" onClick={() => go(1)} className={btn + " absolute top-1/2 right-4 -translate-y-1/2"} aria-label="Next image">
+            <button
+              type="button"
+              onClick={() => go(1)}
+              className={btn + " absolute top-1/2 right-4 -translate-y-1/2"}
+              aria-label="Next"
+            >
               <ChevronRight className="size-5" aria-hidden="true" />
             </button>
           </>
         ) : null}
       </div>
 
-      {item.caption ? <p className="px-5 py-5 text-center text-base text-bone sm:px-8">{item.caption}</p> : null}
+      {item.caption ? (
+        <p className="px-5 py-5 text-center text-base text-bone sm:px-8">
+          {item.caption}
+        </p>
+      ) : null}
     </div>
   );
 }

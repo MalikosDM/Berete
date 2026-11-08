@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import { Link } from "react-router";
 import { ArrowRight, ArrowUpRight, Play, Volume2, VolumeX, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
+import { pieceByMedia } from "@/data/relations";
 import type { Story } from "@/data/types";
+import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
 import { pieceMessage, waLink } from "@/lib/site";
 import { isAbort, itemsOf, preload, setSound, setSoundWanted, soundWanted, storyVideo } from "./player";
@@ -11,7 +13,14 @@ import { isAbort, itemsOf, preload, setSound, setSoundWanted, soundWanted, story
 const IMAGE_MS = 5000;
 const HOLD_MS = 220;
 
-type Props = { stories: Story[]; start: number; onClose: () => void; onSeen?: (slug: string) => void };
+type Props = {
+  stories: Story[];
+  start: number;
+  /** The step to open the first story at (a piece page opens it on the piece). */
+  startStep?: number;
+  onClose: () => void;
+  onSeen?: (slug: string) => void;
+};
 
 /**
  * Full screen story viewer: progress bars, tap right / left for the next /
@@ -19,18 +28,23 @@ type Props = { stories: Story[]; start: number; onClose: () => void; onSeen?: (s
  * close with the cross or a swipe down. Photos last 5 s; videos their real
  * length, in the one shared <video> element.
  */
-export default function StoryViewer({ stories, start, onClose, onSeen }: Props) {
+export default function StoryViewer({ stories, start, startStep = 0, onClose, onSeen }: Props) {
   const [s, setS] = useState(start);
-  const [m, setM] = useState(0);
+  const [m, setM] = useState(startStep);
   const [progress, setProgress] = useState(0);
   const [held, setHeld] = useState(false);
   const [soundOn, setSoundOn] = useState(soundWanted);
   // The step whose video could not start, even muted: it shows a play button.
   const [blockedStep, setBlockedStep] = useState<string | null>(null);
 
+  const cat = useCatalogue();
+  const byMedia = useMemo(() => pieceByMedia(cat), [cat]);
   const story = stories[s];
   const items = story ? itemsOf(story) : [];
   const item = items[m];
+  // The piece shown in this photo or video, else the piece of the story.
+  const pieceSlug = (item && byMedia.get(item.src)) ?? story?.pieceSlug ?? null;
+  const piece = pieceSlug ? cat.pieces.find((p) => p.slug === pieceSlug) : undefined;
   const isVideo = item?.type === "video";
   const stepKey = s + ":" + m;
   const blocked = blockedStep === stepKey;
@@ -333,14 +347,22 @@ export default function StoryViewer({ stories, start, onClose, onSeen }: Props) 
                 Read the article <ArrowUpRight className="size-5" aria-hidden="true" />
               </a>
             ) : null}
-            {!story.articleUrl && story.pieceSlug ? (
-              <Link to={"/pieces/" + story.pieceSlug} onClick={onClose} className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/60 px-5 text-base font-semibold text-white">
-                View the piece <ArrowRight className="size-5" aria-hidden="true" />
-              </Link>
-            ) : null}
-            <a href={waLink(pieceMessage(story.title))} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
-              <BrandIcon name="whatsapp" className="size-5" /> Want yours? WhatsApp
-            </a>
+            <div className="flex gap-3">
+              <a href={waLink(pieceMessage(piece?.title ?? story.title))} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
+                <BrandIcon name="whatsapp" className="size-5" /> Want yours? WhatsApp
+              </a>
+              {piece ? (
+                <Link
+                  to={"/pieces/" + piece.slug}
+                  onClick={onClose}
+                  data-see-piece={piece.slug}
+                  aria-label={"See the piece: " + piece.title}
+                  className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 border border-white/40 bg-black/30 px-4 text-base font-medium text-white backdrop-blur-sm"
+                >
+                  See the piece <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

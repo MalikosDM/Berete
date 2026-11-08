@@ -1,6 +1,6 @@
 // The title and description of the pages that show one piece or one person.
 import { defaultCatalogue } from "@/data/catalogue";
-import { TYPE_LABELS } from "@/data/relations";
+import { madeFor, TYPE_LABELS } from "@/data/relations";
 import type { Catalogue } from "@/data/types";
 import { normalizePath, type SeoExtras } from "./head";
 
@@ -16,7 +16,7 @@ export function extrasFor(path: string, cat: Catalogue = defaultCatalogue): SeoE
     const found = cat.pieces.find((x) => x.slug === piece[1]);
     if (!found) return undefined;
     const label = TYPE_LABELS[found.type];
-    return { title: found.title, description: clip(found.title + ", " + label.toLowerCase() + " by Berete Jewellers, Dubai. " + found.line + " " + found.story) };
+    return { title: found.title, description: clip(found.title + ": " + label.toLowerCase() + " made for " + madeFor(cat, found) + " by Berete Jewellers, Dubai. " + found.line + " " + found.story) };
   }
   const person = /^\/players\/([a-z0-9-]+)$/.exec(p);
   if (person) {

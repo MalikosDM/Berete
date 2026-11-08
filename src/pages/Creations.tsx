@@ -1,28 +1,27 @@
-import { Link, Navigate, useParams, useSearchParams } from "react-router";
-import { ArrowUpRight } from "lucide-react";
-import { MediaView } from "@/components/Media";
+import { Link, useSearchParams } from "react-router";
+import { ArrowRight } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
+import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
-import { TYPE_LABELS } from "@/data/relations";
+import { COLLECTIONS } from "@/data/collections";
 import type { PieceType } from "@/data/types";
 import { useCatalogue } from "@/lib/catalogue";
 
-const FILTERS: { key: PieceType | "all"; param: string; label: string }[] = [
+const ALL: { key: PieceType | "all"; param: string; label: string }[] = [
   { key: "all", param: "", label: "All" },
-  { key: "chain", param: "chains", label: "Chains" },
-  { key: "pendant", param: "pendants", label: "Pendants" },
-  { key: "ring", param: "rings", label: "Rings" },
-  { key: "bracelet", param: "bracelets", label: "Bracelets" },
-  { key: "watch", param: "watches", label: "Watches" },
+  ...COLLECTIONS.map((c) => ({ key: c.type, param: c.slug, label: c.name })),
 ];
 
 /** Every piece, filterable by type. Each card opens /pieces/:slug. */
 export default function Creations() {
   const { pieces } = useCatalogue();
   const [params, setParams] = useSearchParams();
+  // Only the types that have pieces get a filter.
+  const FILTERS = ALL.filter((f) => f.key === "all" || pieces.some((p) => p.type === f.key));
   const raw = (params.get("category") ?? "").toLowerCase();
-  const active = FILTERS.find((f) => f.param === raw || f.key === raw)?.key ?? "all";
+  const active = ALL.find((f) => f.param === raw || f.key === raw)?.key ?? "all";
   const list = active === "all" ? pieces : pieces.filter((p) => p.type === active);
+  const collection = COLLECTIONS.find((c) => c.type === active);
 
   const select = (param: string) => {
     const next = new URLSearchParams(params);
@@ -48,10 +47,17 @@ export default function Creations() {
                 className={"inline-flex min-h-12 shrink-0 items-center border px-6 text-base font-semibold uppercase tracking-[0.16em] transition-colors " + (on ? "border-rose-light text-rose-light" : "border-white/25 text-white hover:border-rose-light hover:text-rose-light")}
               >
                 {f.label}
+                <span className="ml-3 text-mist">{f.key === "all" ? pieces.length : pieces.filter((p) => p.type === f.key).length}</span>
               </button>
             );
           })}
         </div>
+
+        {collection && list.length > 0 ? (
+          <Link to={"/creations/" + collection.slug} className="mt-8 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white hover:text-rose-light">
+            Enter the {collection.name.toLowerCase()} collection <ArrowRight className="size-4" aria-hidden="true" />
+          </Link>
+        ) : null}
 
         <div className="mt-12 lg:mt-16" aria-live="polite">
           {list.length === 0 ? (
@@ -67,24 +73,7 @@ export default function Creations() {
               {list.map((p, i) => (
                 <li key={p.slug}>
                   <Reveal delay={(i % 3) * 0.08}>
-                    <Link to={"/pieces/" + p.slug} className="group block">
-                      <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
-                        <span className="absolute inset-0 p-4 transition-transform duration-[1.6s] ease-out group-hover:scale-105">
-                          <MediaView item={p.cover} alt={p.title} fit="contain" eager={i < 3} />
-                        </span>
-                        <span aria-hidden="true" className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-rose-light/20 to-transparent transition-transform duration-[1.6s] ease-out group-hover:translate-x-full" />
-                      </span>
-                      <span className="mt-5 flex items-start justify-between gap-4">
-                        <span className="min-w-0">
-                          <span className="title-caps block text-2xl tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light sm:text-3xl">{p.title}</span>
-                          <span className="mt-2 block text-base text-mist">
-                            {TYPE_LABELS[p.type]}
-                            {p.clientPublic && p.client ? " · " + p.client : ""}
-                          </span>
-                        </span>
-                        <ArrowUpRight className="size-6 shrink-0 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light" aria-hidden="true" />
-                      </span>
-                    </Link>
+                    <PieceCard piece={p} eager={i < 3} showType={active === "all"} />
                   </Reveal>
                 </li>
               ))}
@@ -94,10 +83,4 @@ export default function Creations() {
       </section>
     </>
   );
-}
-
-/** Old /creations/:slug addresses lead to the single piece page. */
-export function CreationRedirect() {
-  const { slug = "" } = useParams();
-  return <Navigate to={slug ? "/pieces/" + slug : "/creations"} replace />;
 }

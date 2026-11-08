@@ -1,58 +1,182 @@
-import { Link, useParams } from "react-router";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper } from "lucide-react";
-import ContactBlock from "@/components/ContactBlock";
+import { useState } from "react";
+import { Link, Navigate, useParams } from "react-router";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play } from "lucide-react";
+import BrandIcon from "@/components/BrandIcon";
 import HorizontalGallery from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
+import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
-import { findPiece, peopleOf, TYPE_LABELS } from "@/data/relations";
+import { primeStoryVideo } from "@/components/stories/player";
+import StoryViewer from "@/components/stories/StoryViewer";
+import { media } from "@/data/catalogue";
+import { collectionOf } from "@/data/collections";
+import { RENAMED_PIECES } from "@/data/pieces";
+import { findPiece, initials, madeFor, mediaOfPiece, peopleOf, portraitOf, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { useCatalogue } from "@/lib/catalogue";
+import { pieceMessage, waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
-const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
+const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
+
+const STEPS: Record<MakingStep, { title: string; text: string }> = {
+  sketch: { title: "Sketch", text: "The idea is drawn by hand, then modelled until every proportion is right." },
+  raw: { title: "Raw piece", text: "The metal is cast and assembled, before a single stone is set." },
+  setting: { title: "Setting", text: "Each stone is set by hand, under magnification." },
+  polishing: { title: "Polishing", text: "Every surface is polished until the metal disappears behind the light." },
+  delivery: { title: "Delivery", text: "Checked, photographed, then handed over, in its box when it has one." },
+};
+
+/** The atelier photos that illustrate a step when the piece has none of its own. */
+function atelierFor(step: MakingStep): MediaItem | null {
+  const atelier = media.groups["atelier"] ?? [];
+  if (step === "raw") return atelier[1] ?? null;
+  if (step === "setting") return media.videos["atelier/setting"] ?? null;
+  if (step === "polishing") return atelier[2] ?? null;
+  return null;
+}
 
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
   const { slug = "" } = useParams();
   const cat = useCatalogue();
+  const [viewer, setViewer] = useState<{ stories: Story[]; step: number } | null>(null);
   const piece = findPiece(cat, slug);
-  if (!piece) return <NotFound />;
+  if (!piece) {
+    const renamed = RENAMED_PIECES[slug];
+    return renamed ? <Navigate to={"/pieces/" + renamed} replace /> : <NotFound />;
+  }
 
-  const index = cat.pieces.indexOf(piece);
-  const next = cat.pieces.length > 1 ? cat.pieces[(index + 1) % cat.pieces.length] : undefined;
+  const collection = collectionOf(piece.type);
   const people = peopleOf(cat, piece);
   const box = piece.boxSlug ? cat.boxes.find((b) => b.slug === piece.boxSlug) : undefined;
-  const client = piece.clientPublic ? piece.client : null;
+  const similar = similarPieces(cat, piece, 4);
+  const seenIn = storiesOfPiece(cat, piece);
+  const wa = waLink(pieceMessage(piece.title));
+
+  // Opens stories on the first photo or video of this piece, when they show it.
+  const openStories = (stories: Story[]) => {
+    const first = stories[0];
+    if (!first) return;
+    const files = new Set(mediaOfPiece(piece).map((m) => m.src));
+    const step = Math.max(0, first.media.findIndex((m) => files.has(m.src)));
+    primeStoryVideo(first, step);
+    setViewer({ stories, step });
+  };
 
   return (
-    <article>
-      {/* Opening: the jewel, hero of the screen */}
-      <section className="relative mx-auto grid min-h-svh max-w-[1600px] items-center gap-10 px-5 pt-32 pb-16 sm:px-8 lg:grid-cols-12 lg:px-12 lg:pt-28">
-        <div className="relative z-10 lg:col-span-5">
-          <Link to="/creations" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-bone hover:text-rose-light">
+    <article data-piece={piece.slug} data-draft={piece.draft ? "true" : undefined}>
+      {/* Opening: the jewel, full screen */}
+      <section aria-labelledby="piece-title" className="relative isolate flex min-h-svh flex-col overflow-hidden bg-ink lg:grid lg:grid-cols-12 lg:items-end">
+        {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
+        <div className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
+          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" eager />
+        </div>
+        <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
+          <div className="flex flex-col gap-8">
+            <div className={shadow}>
+              <p className="eyebrow">
+                <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center hover:text-white">
+                  {collection.name}
+                </Link>
+                <span className="text-mist"> · Made for {madeFor(cat, piece)}</span>
+              </p>
+              <h1 id="piece-title" className="title-caps mt-3 text-[clamp(2.25rem,4.2vw,4.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance]">
+                {piece.title}
+              </h1>
+              {piece.line ? <p className="mt-5 max-w-2xl text-lg text-bone md:text-xl">{piece.line}</p> : null}
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row">
+              <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+                <BrandIcon name="whatsapp" className="size-5" /> I want a piece like this
+              </a>
+              <a href="#piece-details" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                The details <ArrowDown className="size-4" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
+          <Link to="/creations" className="mt-8 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-mist hover:text-rose-light">
             <ArrowLeft className="size-4" aria-hidden="true" /> All creations
           </Link>
-          <p className="eyebrow mt-8">
-            {TYPE_LABELS[piece.type]}
-            {client ? " · " + client : ""}
-          </p>
-          <h1 className={"title-caps mt-5 text-[clamp(2.5rem,6vw,5.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance] " + shadow}>{piece.title}</h1>
-          {piece.line ? <p className="mt-6 max-w-xl text-xl text-bone">{piece.line}</p> : null}
-          {piece.story ? <p className="mt-6 max-w-xl text-lg text-mist">{piece.story}</p> : null}
-        </div>
-        <div className="relative h-[62svh] lg:col-span-7 lg:h-[82svh]">
-          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" eager />
         </div>
       </section>
 
-      {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title="The details" /> : null}
+      <div id="piece-details" className="scroll-mt-24">
+        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title="The details" /> : null}
+      </div>
+
+      {/* Made for, and the story */}
+      <section aria-label="Made for and the story" className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
+        <div className="lg:col-span-5" data-made-for>
+          <h2 className="eyebrow">Made for</h2>
+          {people.length > 0 ? (
+            <ul className="mt-8 space-y-6">
+              {people.slice(0, 3).map((person) => {
+                const portrait = portraitOf(cat, person);
+                const stories = storiesOf(cat, person.slug);
+                return (
+                  <li key={person.slug} className="flex items-center gap-5">
+                    <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
+                      <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
+                        {portrait ? <Img src={portrait} alt="" loading="lazy" className="h-full w-full object-cover" /> : <span className="font-display text-xl text-white">{initials(person.name)}</span>}
+                      </span>
+                    </Link>
+                    <div className="min-w-0">
+                      <Link to={"/players/" + person.slug} data-made-for-person={person.slug} className="inline-flex min-h-12 items-baseline gap-2 font-display text-[clamp(1.5rem,3vw,2.25rem)] uppercase tracking-[0.06em] text-white hover:text-rose-light">
+                        {person.number !== null ? <span className="text-rose-gold text-lg">{person.number}</span> : null}
+                        {person.name}
+                      </Link>
+                      <p className="flex flex-wrap gap-x-5">
+                        <Link to={"/players/" + person.slug} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
+                          {person.kind === "club" ? "The club" : "The profile"} <ArrowRight className="size-4" aria-hidden="true" />
+                        </Link>
+                        {stories.length > 0 ? (
+                          <button type="button" onClick={() => openStories(stories)} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
+                            <Play className="size-4" aria-hidden="true" /> {stories.length > 1 ? "The stories" : "The story"}
+                          </button>
+                        ) : null}
+                      </p>
+                    </div>
+                  </li>
+                );
+              })}
+              {people.length > 3 ? (
+                <li className="text-base text-mist">
+                  And {people.slice(3).map((p) => p.name).join(", ")}.
+                </li>
+              ) : null}
+            </ul>
+          ) : (
+            <p className="mt-8 font-display text-[clamp(1.5rem,3vw,2.25rem)] uppercase tracking-[0.06em] text-white">{madeFor(cat, piece)}</p>
+          )}
+          {seenIn.length > 0 ? (
+            <button
+              type="button"
+              data-seen-in-stories
+              onClick={() => openStories(seenIn)}
+              className="mt-10 inline-flex min-h-12 items-center gap-3 border border-white/40 px-6 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
+            >
+              <Play className="size-4 fill-current" aria-hidden="true" /> Seen in our stories
+            </button>
+          ) : null}
+        </div>
+
+        <div className="lg:col-span-6 lg:col-start-7">
+          <h2 className="eyebrow">The story</h2>
+          {piece.line ? <p className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</p> : null}
+          {piece.story ? <p className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">{piece.story}</p> : null}
+        </div>
+      </section>
+
+      <MakingSection piece={piece} boxImage={box?.images[0]} />
 
       {piece.handover.length > 0 ? (
         <section aria-labelledby="handover-title" className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
           <p className="eyebrow">Delivered</p>
           <h2 id="handover-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
-            {client ? "Handed over to " + client : "The handover"}
+            {piece.clientPublic && piece.client ? "Handed over to " + piece.client : "The handover"}
           </h2>
-          <ul className={"mt-12 grid gap-8 " + (piece.handover.length > 1 ? "md:grid-cols-2" : "")}>
+          <ul className={"mt-12 grid gap-8 " + (piece.handover.length > 1 ? "md:grid-cols-2 xl:grid-cols-3" : "")}>
             {piece.handover.map((m) => (
               <li key={m.src}>
                 <Reveal>
@@ -69,89 +193,150 @@ export default function PiecePage() {
         </section>
       ) : null}
 
-      {/* Technical sheet, box, press, people */}
+      {/* Technical sheet, box, press */}
       <section aria-labelledby="sheet-title" className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
         <div className="lg:col-span-6">
           <h2 id="sheet-title" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">Technical sheet</h2>
-          {piece.specs.length > 0 ? (
-            <dl className="mt-8 border-t border-white/15">
-              {piece.specs.map((s) => (
-                <div key={s.label} className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-3 sm:gap-6">
-                  <dt className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{s.label}</dt>
-                  <dd className="text-lg text-white sm:col-span-2">{s.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : (
-            <p className="mt-8 text-lg text-bone">Full specifications shared on request.</p>
-          )}
+          <dl className="mt-8 border-t border-white/15">
+            {piece.specs.map((s) => (
+              <div key={s.label} className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-3 sm:gap-6">
+                <dt className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{s.label}</dt>
+                <dd className="text-lg text-white sm:col-span-2">{s.value}</dd>
+              </div>
+            ))}
+          </dl>
           {box ? (
-            <Link to="/boxes" className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
+            <Link to="/boxes" data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
               <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</span>
               <span>
                 <span className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
                   <Gift className="size-5 text-rose-light" aria-hidden="true" /> Custom box available
                 </span>
-                <span className="mt-2 block text-base text-bone">Delivered in the {box.name} box, made for it.</span>
+                <span className="mt-2 block text-base text-bone">Delivered in the {box.name}, made for it.</span>
               </span>
             </Link>
           ) : null}
         </div>
 
-        <div className="space-y-14 lg:col-span-5 lg:col-start-8">
-          {people.length > 0 ? (
-            <div>
-              <h2 className="eyebrow">Worn by</h2>
-              <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
-                {people.map((p) => (
-                  <li key={p.slug}>
-                    <Link to={"/players/" + p.slug} className="inline-flex min-h-12 items-baseline gap-2 font-display text-2xl uppercase tracking-[0.06em] text-white hover:text-rose-light">
-                      {p.number !== null ? <span className="text-rose-gold text-lg">{p.number}</span> : null}
-                      {p.name}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {piece.press.length > 0 ? (
-            <div id="press">
-              <h2 className="eyebrow">Press</h2>
-              <ul className="mt-5 border-t border-white/15">
-                {piece.press.map((p) => (
-                  <li key={p.outlet + p.title} className="border-b border-white/15 py-5">
-                    <div className="flex items-start gap-5">
-                      {p.image ? <Img src={p.image} alt={p.outlet + " article"} loading="lazy" className="h-28 w-20 shrink-0 object-cover object-top" /> : <Newspaper className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />}
-                      <div>
-                        <p className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{p.outlet}</p>
-                        <p className="mt-2 text-lg text-white">{p.title}</p>
-                        {p.url ? (
-                          <a href={p.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white underline-offset-4 hover:text-rose-light hover:underline">
-                            Read the article <ArrowUpRight className="size-4" aria-hidden="true" />
-                          </a>
-                        ) : null}
-                      </div>
+        {piece.press.length > 0 ? (
+          <div id="press" className="lg:col-span-5 lg:col-start-8">
+            <h2 className="eyebrow">Press</h2>
+            <ul className="mt-5 border-t border-white/15">
+              {piece.press.map((p) => (
+                <li key={p.outlet + p.title} className="border-b border-white/15 py-5">
+                  <div className="flex items-start gap-5">
+                    {p.image ? <Img src={p.image} alt={p.outlet + " article"} loading="lazy" className="h-28 w-20 shrink-0 object-cover object-top" /> : <Newspaper className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />}
+                    <div>
+                      <p className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{p.outlet}</p>
+                      <p className="mt-2 text-lg text-white">{p.title}</p>
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white underline-offset-4 hover:text-rose-light hover:underline">
+                          Read the article <ArrowUpRight className="size-4" aria-hidden="true" />
+                        </a>
+                      ) : null}
                     </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </section>
 
-          {next && next.slug !== piece.slug ? (
-            <Link to={"/pieces/" + next.slug} className="group flex min-h-12 items-center justify-between gap-4 border-t border-white/15 pt-8">
-              <span>
-                <span className="eyebrow block">Next piece</span>
-                <span className="title-caps mt-3 block text-2xl tracking-[0.08em] text-white group-hover:text-rose-light">{next.title}</span>
-              </span>
-              <ArrowRight className="size-6 shrink-0 text-white group-hover:text-rose-light" aria-hidden="true" />
+      {similar.length > 0 ? (
+        <section aria-labelledby="similar-title" data-similar className="border-t border-white/10">
+          <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+            <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="eyebrow">Similar pieces</p>
+                <h2 id="similar-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
+                  More {collection.name.toLowerCase()}
+                </h2>
+              </div>
+              <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light">
+                The collection <ArrowRight className="size-4" aria-hidden="true" />
+              </Link>
+            </div>
+            <ul className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
+              {similar.map((p, i) => (
+                <li key={p.slug}>
+                  <Reveal delay={i * 0.1}>
+                    <PieceCard piece={p} />
+                  </Reveal>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      ) : null}
+
+      {/* The call to action */}
+      <section aria-labelledby="want-title" className="border-t border-white/10 bg-ink-soft">
+        <div className="mx-auto flex max-w-[1600px] flex-col items-start gap-10 px-5 py-24 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12 lg:py-32">
+          <div className="max-w-3xl">
+            <p className="eyebrow">Your piece</p>
+            <h2 id="want-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4.25rem)] tracking-[0.1em] [text-wrap:balance]">
+              A piece like this one, drawn for you.
+            </h2>
+            <p className="mt-6 max-w-xl text-lg text-bone">Send us its name on WhatsApp: we answer with a first idea and the next steps.</p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a href={wa} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+              <BrandIcon name="whatsapp" className="size-5" /> I want a piece like this
+            </a>
+            <Link to="/contact" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+              Other ways to reach us
             </Link>
-          ) : null}
+          </div>
         </div>
       </section>
 
-      <ContactBlock pieceName={piece.title} compact id="piece-contact" />
+      {viewer ? <StoryViewer stories={viewer.stories} start={0} startStep={viewer.step} onClose={() => setViewer(null)} /> : null}
     </article>
+  );
+}
+
+/** "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. */
+function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem }) {
+  return (
+    <section aria-labelledby="making-title" data-making className="border-y border-white/10 py-24 lg:py-32">
+      <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+        <p className="eyebrow">From sketch to handover</p>
+        <h2 id="making-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
+          How it was made
+        </h2>
+      </div>
+      <ol className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:mx-auto lg:grid lg:max-w-[1600px] lg:grid-cols-5 lg:gap-6 lg:overflow-visible lg:px-12">
+        {MAKING_STEPS.map((step, i) => {
+          const own = piece.making[step] ?? (step === "delivery" ? boxImage : undefined);
+          const item = own ?? atelierFor(step);
+          const label = own ? (own.caption ?? "This piece") : item ? "In the atelier" : null;
+          return (
+            <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
+              <Reveal delay={i * 0.08}>
+                <span className="relative block aspect-[3/4] overflow-hidden border border-white/10 bg-ink-soft">
+                  {item ? (
+                    <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center p-8">
+                      <span aria-hidden="true" className="font-display text-[5rem] leading-none font-light text-white/10">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </span>
+                  )}
+                  {label ? <span className="absolute bottom-3 left-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
+                </span>
+                <p className="mt-5 flex items-baseline gap-3">
+                  <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="title-caps text-2xl tracking-[0.12em] text-white">{STEPS[step].title}</span>
+                </p>
+                <p className="mt-3 text-base text-bone">{STEPS[step].text}</p>
+              </Reveal>
+            </li>
+          );
+        })}
+        <li aria-hidden="true" className="w-1 shrink-0 lg:hidden" />
+      </ol>
+    </section>
   );
 }

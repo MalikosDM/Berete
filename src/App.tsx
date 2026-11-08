@@ -1,10 +1,11 @@
-import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router";
+import { Fragment, lazy, Suspense, type ReactNode } from "react";
+import { Navigate, Route, Routes, useParams } from "react-router";
 import Layout from "@/components/Layout";
 import About from "@/pages/About";
 import Atelier, { Boxes } from "@/pages/Atelier";
 import Contact from "@/pages/Contact";
-import Creations, { CreationRedirect } from "@/pages/Creations";
+import { CreationsParam } from "@/pages/Collection";
+import Creations from "@/pages/Creations";
 import Home from "@/pages/Home";
 import Legal, { Privacy } from "@/pages/Legal";
 import NotFound from "@/pages/NotFound";
@@ -15,18 +16,28 @@ import Process from "@/pages/Process";
 // The back-office is loaded only when it is opened.
 const Admin = lazy(() => import("@/pages/Admin"));
 
+/**
+ * A page of one piece, person or collection starts afresh when its address
+ * changes: the scroll animations (pins, split titles) of the previous one are
+ * removed with it instead of being updated in place.
+ */
+function OnePerAddress({ children }: { children: ReactNode }) {
+  const { slug = "" } = useParams();
+  return <Fragment key={slug}>{children}</Fragment>;
+}
+
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/creations" element={<Creations />} />
-        <Route path="/creations/:slug" element={<CreationRedirect />} />
+        <Route path="/creations/:slug" element={<OnePerAddress><CreationsParam /></OnePerAddress>} />
         <Route path="/pieces" element={<Navigate to="/creations" replace />} />
-        <Route path="/pieces/:slug" element={<PiecePage />} />
+        <Route path="/pieces/:slug" element={<OnePerAddress><PiecePage /></OnePerAddress>} />
         <Route path="/capsules/*" element={<Navigate to="/creations" replace />} />
         <Route path="/players" element={<Players />} />
-        <Route path="/players/:slug" element={<PlayerPage />} />
+        <Route path="/players/:slug" element={<OnePerAddress><PlayerPage /></OnePerAddress>} />
         <Route path="/atelier" element={<Atelier />} />
         <Route path="/boxes" element={<Boxes />} />
         <Route path="/process" element={<Process />} />

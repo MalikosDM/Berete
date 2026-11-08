@@ -70,10 +70,10 @@ export function itemsOf(story: Story): MediaItem[] {
  * that the sound is allowed for the rest of the visit, then lets the viewer
  * take over.
  */
-export function primeStoryVideo(story: Story): void {
+export function primeStoryVideo(story: Story, step = 0): void {
   const v = storyVideo();
   if (!v) return;
-  const first = itemsOf(story)[0];
+  const first = itemsOf(story)[step];
   const anyVideo = first?.type === "video" ? first : itemsOf(story).find((m) => m.type === "video");
   setSound(v, soundWanted());
   if (anyVideo) {

@@ -2,13 +2,15 @@
   "siteName": "Berete Jewellers",
   "language": "en",
   "titleTemplate": "%s — Berete Jewellers",
-  "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars.",
+  "description": "Custom high jewellery made in Dubai: diamond pendants, chains, championship rings and watches for clubs, footballers and stars.",
   "image": "/media/home/frames-desktop/0001.webp",
   "organization": {
     "type": "Organization",
     "name": "Berete Jewellers",
     "logo": "/media/brand/logo.svg",
-    "sameAs": ["https://www.instagram.com/beretejewellers/"]
+    "sameAs": [
+      "https://www.instagram.com/beretejewellers/"
+    ]
   },
   "pages": {
     "/": {
@@ -16,8 +18,30 @@
       "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars. Made by us. Inspired by you."
     },
     "/creations": {
-      "title": "Creations: Chains, Pendants and Championship Rings",
-      "description": "Every Berete Jewellers piece, filterable: diamond chains, pendants, championship rings, bracelets and watches, each one made to measure in Dubai."
+      "title": "Creations: Pendants, Chains, Rings and Watches",
+      "description": "Every Berete Jewellers piece, filterable by type: diamond pendants, chains, championship and signet rings and watches, each one made to measure in Dubai."
+    },
+    "/creations/pendants": {
+      "title": "Pendants: Custom Diamond Pendants",
+      "description": "The pendants of Berete Jewellers: initials, emblems and celebrations sculpted in volume and set stone by stone for footballers and collectors, made in Dubai."
+    },
+    "/creations/chains": {
+      "title": "Chains: Custom Diamond Chains",
+      "description": "The chains of Berete Jewellers: butterfly links, infinity knots and diamond flowers, drawn link by link and made to measure in Dubai."
+    },
+    "/creations/rings": {
+      "title": "Rings: Championship and Signet Rings",
+      "description": "Championship rings for VfB Stuttgart and Inter Milan, and signet rings set with diamonds: the rings of Berete Jewellers, made in Dubai."
+    },
+    "/creations/watches": {
+      "title": "Watches Set with Diamonds",
+      "description": "Watches set with diamonds from the case to the bracelet, worn by footballers: the watches of Berete Jewellers, Dubai."
+    },
+    "/creations/bracelets": {
+      "title": "Bracelets",
+      "description": "Bracelets made to measure by Berete Jewellers in Dubai. New pieces are being crafted.",
+      "robots": "noindex,follow",
+      "sitemap": false
     },
     "/pieces/:slug": {},
     "/players": {
