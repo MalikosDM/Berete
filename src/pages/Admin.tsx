@@ -61,6 +61,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "client", label: "Client", type: "text" },
       { key: "clientPublic", label: "Afficher le client", type: "checkbox" },
       { key: "featured", label: "Capsule à la une (accueil)", type: "checkbox" },
+      { key: "draft", label: "Brouillon : textes à faire valider par le client", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
       { key: "gallery", label: "Détails (photos et vidéos)", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
@@ -69,7 +70,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "people", label: "Joueurs et clubs liés (adresses séparées par des virgules)", type: "slugs" },
       { key: "boxSlug", label: "Écrin lié (adresse)", type: "text" },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins",
@@ -401,7 +402,10 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
             <li key={String(item.id)} className="flex flex-wrap items-center gap-4 border-b border-white/15 py-4">
               <span className="size-14 shrink-0 overflow-hidden bg-ink-soft">{thumbOf(item) ? <img src={thumbOf(item)} alt="" className="h-full w-full object-cover" /> : null}</span>
               <span className="min-w-0 flex-1">
-                <span className="block break-words text-lg text-white">{asText(item[name])}</span>
+                <span className="block break-words text-lg text-white">
+                  {asText(item[name])}
+                  {item.draft === true ? <span className="ml-3 inline-block border border-rose-light/60 px-2 align-middle text-base text-rose-light">Brouillon</span> : null}
+                </span>
                 <span className="block text-base text-mist">/{asText(item.slug)}{Array.isArray(item.media) ? " · " + item.media.length + " fichiers" : ""}</span>
               </span>
               <span className="flex gap-2">

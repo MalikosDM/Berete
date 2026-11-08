@@ -4,7 +4,7 @@ import type { Catalogue, MediaItem, Person, Piece, PieceType, Story } from "./ty
 export const TYPE_LABELS: Record<PieceType, string> = {
   chain: "Chain",
   pendant: "Pendant",
-  ring: "Championship ring",
+  ring: "Ring",
   bracelet: "Bracelet",
   watch: "Watch",
 };
@@ -46,6 +46,45 @@ export function portraitOf(cat: Catalogue, person: Person): string {
     if (own) return own.src;
   }
   return "";
+}
+
+/** Who a piece was made for, in a few words: "Kevin Schade", "VfB Stuttgart", "A private collector". */
+export function madeFor(cat: Catalogue, piece: Piece): string {
+  const people = peopleOf(cat, piece);
+  const named = people.filter((p) => p.kind !== "club");
+  if (named.length > 0) return named.map((p) => p.name).join(", ");
+  if (people.length > 0) return people.map((p) => p.name).join(", ");
+  if (piece.clientPublic && piece.client) return piece.client;
+  return "A private collector";
+}
+
+/** Every photo or video of a piece: opening, details, handover and making. */
+export function mediaOfPiece(piece: Piece): MediaItem[] {
+  return [piece.cover, ...piece.gallery, ...piece.handover, ...Object.values(piece.making).filter((m): m is MediaItem => m !== undefined)];
+}
+
+/** The piece shown in each photo or video of the stories (by file), for "See the piece". */
+export function pieceByMedia(cat: Catalogue): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const piece of cat.pieces) {
+    for (const m of mediaOfPiece(piece)) if (m.src && !map.has(m.src)) map.set(m.src, piece.slug);
+  }
+  return map;
+}
+
+/** Other pieces of the same type, the ones made for the same people first. */
+export function similarPieces(cat: Catalogue, piece: Piece, count = 4): Piece[] {
+  const same = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
+  const shared = (p: Piece) => p.people.some((x) => piece.people.includes(x));
+  return [...same.filter(shared), ...same.filter((p) => !shared(p))].slice(0, count);
+}
+
+/** The stories in which the photos or videos of a piece appear, then the stories of its people. */
+export function storiesOfPiece(cat: Catalogue, piece: Piece): Story[] {
+  const files = new Set(mediaOfPiece(piece).map((m) => m.src));
+  const direct = cat.stories.filter((s) => s.pieceSlug === piece.slug || s.media.some((m) => files.has(m.src)));
+  const viaPeople = cat.stories.filter((s) => !direct.includes(s) && s.people.some((x) => piece.people.includes(x)));
+  return [...direct, ...viaPeople];
 }
 
 export function findPiece(cat: Catalogue, slug: string): Piece | undefined {

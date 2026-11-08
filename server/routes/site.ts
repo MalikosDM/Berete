@@ -2,7 +2,7 @@ import express, { Router, type NextFunction, type Request, type Response } from 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { PIECE_TYPES } from "../../src/data/types.js";
-import { MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory } from "../catalogue.js";
+import { MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory } from "../catalogue.js";
 import { prisma } from "../db.js";
 
 /**
@@ -203,6 +203,8 @@ const PieceIn = z.object({
   people: Slugs,
   boxSlug: optText(200),
   featured: z.boolean().default(false),
+  draft: z.boolean().default(false),
+  making: MakingSchema.optional(),
 });
 
 const BoxIn = z.object({

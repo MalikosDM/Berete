@@ -11,6 +11,9 @@ datasource db {
 
 /// The site content. It starts from src/data/catalogue.ts (server/catalogue.ts)
 /// and is edited from /admin. Media lists are MediaItem[] (src/data/types.ts).
+/// seedHash: fingerprint of the texts last written from the catalogue; when the
+/// texts in the base still match it, a new version of the catalogue replaces
+/// them, otherwise they were edited from /admin and are kept.
 
 model Story {
   id         String   @id @default(cuid())
@@ -21,6 +24,7 @@ model Story {
   people     String[] @default([])
   pieceSlug  String?
   articleUrl String?
+  seedHash   String?
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -35,6 +39,7 @@ model Person {
   club      String?
   portrait  String?
   bio       String   @default("")
+  seedHash  String?
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -57,6 +62,11 @@ model Piece {
   people       String[] @default([])
   boxSlug      String?
   featured     Boolean  @default(false)
+  /// Provisional texts, to be checked with the client.
+  draft        Boolean  @default(false)
+  /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
+  making       Json     @default("{}")
+  seedHash     String?
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -69,6 +79,7 @@ model Box {
   description String   @default("")
   images      Json     @default("[]")
   pieceSlug   String?
+  seedHash    String?
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

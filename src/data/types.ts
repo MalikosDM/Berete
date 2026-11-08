@@ -52,6 +52,12 @@ export type Person = {
 export const PIECE_TYPES = ["chain", "pendant", "ring", "bracelet", "watch"] as const;
 export type PieceType = (typeof PIECE_TYPES)[number];
 
+/** The steps of "How it was made", in order. */
+export const MAKING_STEPS = ["sketch", "raw", "setting", "polishing", "delivery"] as const;
+export type MakingStep = (typeof MAKING_STEPS)[number];
+/** Photos or videos of this piece for some steps; the others show the atelier. */
+export type Making = Partial<Record<MakingStep, MediaItem>>;
+
 export type Spec = { label: string; value: string };
 export type Press = { outlet: string; title: string; url: string | null; image: string | null };
 
@@ -78,6 +84,9 @@ export type Piece = {
   /** The custom box made for it, if any. */
   boxSlug: string | null;
   featured: boolean;
+  /** Provisional texts, to be checked with the client. */
+  draft: boolean;
+  making: Making;
 };
 
 export type Box = {
@@ -112,5 +121,7 @@ export type ScrollMedia = { desktop: FrameSet; mobile: FrameSet; video: string; 
 export type GeneratedMedia = {
   groups: Record<string, MediaItem[]>;
   videos: Record<string, MediaItem>;
+  /** Photos made from the stories and the Boutique folder (scripts/piece-media.mjs), by key. */
+  stills: Record<string, MediaItem>;
   scroll: Record<string, ScrollMedia>;
 };
