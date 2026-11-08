@@ -42,7 +42,7 @@ export default function CollectionTiles() {
                 className="group relative flex h-[78svh] flex-col justify-end overflow-hidden bg-ink md:h-[88svh]"
               >
                 <span className="absolute inset-0 flex items-center justify-center p-8 pb-40 transition-transform duration-[2.4s] ease-out group-hover:scale-110 sm:p-12 sm:pb-44">
-                  <MediaView item={hero.cover} alt={t.collections.tileAlt(name, hero.title)} fit="contain" eager={i < 2} />
+                  <MediaView item={hero.cover} alt={t.collections.tileAlt(name, hero.title)} fit="contain" sizes="(max-width: 767px) 84vw, 50vw" />
                 </span>
                 <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-ink via-ink/80 to-transparent" />
                 <span className="relative block p-6 sm:p-10">

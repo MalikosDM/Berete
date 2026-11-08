@@ -1,7 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
-import { MAKING_STEPS, type Catalogue, type Piece } from "../src/data/types";
+import { MAKING_STEPS, type Catalogue, type MediaItem, type Piece } from "../src/data/types";
+import { coverSrcSet, srcSetOf } from "../src/lib/responsive";
 import { checkPage, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
 /*
@@ -46,10 +47,15 @@ function pieceByMedia(cat: Catalogue): Map<string, string> {
   return map;
 }
 
-/** Sharpness of a photo: variance of its Laplacian at 320px (same measure as the review of the photos). */
+/**
+ * Sharpness of a photo: variance of its Laplacian at 320px (same measure as the review of the photos).
+ * Measured on the file the browser chose (currentSrc): with a srcset, naturalWidth is scaled to the screen.
+ */
 async function sharpness(page: Page, selector: string): Promise<{ score: number; width: number; height: number }> {
-  return page.locator(selector).first().evaluate((el) => {
-    const img = el as HTMLImageElement;
+  return page.locator(selector).first().evaluate(async (el) => {
+    const img = new Image();
+    img.src = (el as HTMLImageElement).currentSrc || (el as HTMLImageElement).src;
+    await img.decode();
     const s = 320 / Math.max(img.naturalWidth, img.naturalHeight);
     const w = Math.max(1, Math.round(img.naturalWidth * s));
     const h = Math.max(1, Math.round(img.naturalHeight * s));
@@ -215,6 +221,22 @@ test("creations filters and old addresses", async ({ page }) => {
 });
 
 /* ---------- Players, pieces and stories are linked both ways ---------- */
+
+test("every photo of the catalogue has its lighter copies (npm run media:sizes)", async ({ page }) => {
+  test.skip(test.info().project.name !== "desktop", "once is enough");
+  const cat = await getCatalogue(page);
+  const photos: MediaItem[] = [
+    ...cat.pieces.flatMap((p) => [p.cover, ...p.gallery, ...p.handover, ...Object.values(p.making ?? {})]),
+    ...cat.boxes.flatMap((b) => b.images),
+    ...cat.stories.flatMap((s) => s.media),
+  ].filter((m): m is MediaItem => !!m && m.type === "image");
+  const sets = [...photos.map((m) => srcSetOf(m.src, m.width)), ...cat.stories.map((s) => coverSrcSet(s.cover))];
+  const copies = [...new Set(sets.flatMap((s) => (s ? s.split(", ").map((c) => c.split(" ")[0]!) : [])))];
+  expect(copies.length, "copies offered").toBeGreaterThan(200);
+  const missing: string[] = [];
+  for (const url of copies) if ((await page.request.head(url)).status() !== 200) missing.push(url);
+  expect(missing, "missing copies").toEqual([]);
+});
 
 test("player pages show their stories and all their pieces", async ({ page }) => {
   const cat = await getCatalogue(page);

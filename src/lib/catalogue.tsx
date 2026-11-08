@@ -3,11 +3,13 @@ import { defaultCatalogue } from "@/data/catalogue";
 import type { Catalogue } from "@/data/types";
 import { bundleOf, useBundleVersion, useLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
+import { afterLoad } from "@/lib/idle";
 
 /*
  * The catalogue of the site. Pages render at once with the catalogue built
  * into the site (also used by the prerender), then show the live one from
- * the API (/api/catalogue) as soon as it answers, with the edits of /admin.
+ * the API (/api/catalogue), with the edits of /admin, asked once the page
+ * has loaded.
  * Pages receive it in the language of the address (useCatalogue).
  */
 
@@ -25,16 +27,20 @@ export function CatalogueProvider({ children }: { children: ReactNode }) {
   const locale = useLocale();
   const version = useBundleVersion();
 
+  // Asked once the page is on screen: the built-in catalogue already shows it.
   useEffect(() => {
     let alive = true;
-    fetch("/api/catalogue", { headers: { Accept: "application/json" } })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((json: unknown) => {
-        if (alive && isCatalogue(json) && json.stories.length + json.pieces.length > 0) setCatalogue(json);
-      })
-      .catch(() => undefined);
+    const cancel = afterLoad(() => {
+      fetch("/api/catalogue", { headers: { Accept: "application/json" } })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json: unknown) => {
+          if (alive && isCatalogue(json) && json.stories.length + json.pieces.length > 0) setCatalogue(json);
+        })
+        .catch(() => undefined);
+    });
     return () => {
       alive = false;
+      cancel();
     };
   }, []);
 

@@ -95,7 +95,7 @@ export default function PiecesShowcase({
                     item={p.cover}
                     alt={p.title}
                     fit="contain"
-                    eager={i < 2}
+                    sizes="(max-width: 639px) 82vw, (max-width: 1023px) 46vw, 30vw"
                   />
                 </span>
                 <span

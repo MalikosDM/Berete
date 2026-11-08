@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import ContactBlock from "@/components/ContactBlock";
 import { Img, MediaView } from "@/components/Media";
+import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PageIntro from "@/components/PageIntro";
 import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
@@ -26,7 +27,7 @@ function Portrait({ person, className = "", big = false }: { person: Person; cla
       </span>
     );
   }
-  return <Img src={src} alt={t.players.portrait(person.name)} loading="lazy" decoding="async" className={"object-cover " + className} />;
+  return <Img src={src} srcSet={coverSrcSet(src)} sizes={big ? "(max-width: 1023px) 100vw, 40vw" : "96px"} alt={t.players.portrait(person.name)} loading="lazy" decoding="async" className={"object-cover " + className} />;
 }
 
 export default function Players() {
@@ -130,7 +131,7 @@ export function PlayerPage() {
                   <Link to={"/pieces/" + p.slug} className="group block">
                     <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
                       <span className="absolute inset-0 p-4 transition-transform duration-[1.6s] group-hover:scale-105">
-                        <MediaView item={visual} fit="contain" />
+                        <MediaView item={visual} fit="contain" sizes={SIZES_FOR.grid3} />
                       </span>
                     </span>
                     <span className="title-caps mt-5 block text-2xl tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">{p.title}</span>
@@ -163,7 +164,7 @@ export function PlayerPage() {
                 >
                   <span className="relative block aspect-square overflow-hidden rounded-full bg-rose-gold p-[2px]">
                     <span className="block h-full w-full overflow-hidden rounded-full border-2 border-ink">
-                      <Img src={s.cover} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                      <Img src={s.cover} srcSet={coverSrcSet(s.cover)} sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 20vw" alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
                   </span>
                   <span className="mt-3 block text-center text-base font-medium text-white group-hover:text-rose-light">{s.title}</span>

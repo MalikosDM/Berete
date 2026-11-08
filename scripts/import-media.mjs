@@ -28,6 +28,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { cpus, homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
+import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, STILLS } from "./piece-media.mjs";
 
@@ -511,7 +512,9 @@ async function listFiles(dir) {
 async function prune(dirs) {
   for (const dir of dirs) {
     for (const file of await listFiles(dir)) {
-      if (!produced.has(file) && !file.endsWith(".DS_Store")) {
+      // The smaller copies of a photo still on the site stay (scripts/media-sizes.mjs).
+      const original = copyOf(file);
+      if (!produced.has(file) && !(original && produced.has(original)) && !file.endsWith(".DS_Store")) {
         await rm(file);
         delete cache[relative(ROOT, file)];
         console.log("  - " + relative(ROOT, file));
@@ -573,4 +576,5 @@ await writeJson(mediaFile, media);
 
 await prune(pruneDirs);
 await writeFile(CACHE_FILE, JSON.stringify(cache, null, 1));
+await makeSizes();
 console.log("Done: " + encoded + " encoded, " + skipped + " already up to date.");

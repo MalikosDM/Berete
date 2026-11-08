@@ -16,11 +16,17 @@
     "db:local": "node scripts/local-db.mjs",
     "lint": "eslint .",
     "verify": "playwright test",
-    "i18n:check": "tsx scripts/i18n-check.ts"
+    "i18n:check": "tsx scripts/i18n-check.ts",
+    "media:sizes": "node scripts/media-sizes.mjs"
   },
   "dependencies": {
+    "@fontsource/amiri": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "compression": "^1.8.1",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
     "gsap": "3.15.0",
@@ -36,6 +42,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/compression": "^1.8.1",
     "@types/express": "^5.0.6",
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",

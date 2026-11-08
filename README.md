@@ -33,6 +33,8 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   sont décrites dans `scripts/piece-media.mjs`.
   On peut le relancer après avoir ajouté des fichiers : rien n'est créé en double, seuls les nouveaux fichiers sont traités.
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
+  À la fin, il prépare des copies plus légères de chaque photo (`cover.w640.webp`, `cover.w160.webp`) que le navigateur
+  choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
 - **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`) modifie les stories, joueurs, pièces et écrins dans la base,
   et affiche les messages et demandes de rappel. Au démarrage, l'API ajoute à la base ce qui est nouveau dans `src/data/`
   (nouvelles stories, nouvelles photos, nouveaux textes) sans jamais écraser un texte modifié depuis l'admin.
@@ -70,6 +72,20 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 ```
+
+## Vitesse (Lighthouse)
+
+- **Compression et mémoire du navigateur** : le serveur (`server/index.ts`) envoie les pages, le code et l'API
+  compressés, garde un an le code et les polices d'une version (leur nom change à chaque build), un jour les photos.
+- **Le film de l'accueil** ne télécharge ses images qu'au premier geste du visiteur, ou 2,5 s après le chargement
+  de la page (`src/components/ScrollVideo.tsx`).
+- **Les photos** : la photo principale de la page passe en premier (`priority`) ; les autres attendent que la page soit
+  chargée, puis se chargent quand on s'en approche ; le navigateur choisit la copie la plus légère qui reste nette
+  (`sizes`, `src/lib/responsive.ts`).
+- **Les polices** sont servies par le site (paquets `@fontsource`, `src/main.tsx`) ; les polices arabes ne se
+  téléchargent que sur les pages en arabe.
+- Mesurer sur le site construit (`http://localhost:3001`), pas sur la version de travail : la note varie de quelques
+  points d'une mesure à l'autre.
 
 ## Mettre en ligne
 

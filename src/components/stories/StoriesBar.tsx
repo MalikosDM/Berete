@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Img } from "@/components/Media";
+import { coverSrcSet } from "@/lib/responsive";
 import { useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { primeStoryVideo } from "./player";
@@ -114,7 +115,7 @@ export default function StoriesBar() {
                   >
                     <span className={"block rounded-full p-[2px] transition-opacity duration-500 bg-rose-gold " + (seen.includes(s.slug) ? "opacity-60" : "opacity-100")}>
                       <span className={"block overflow-hidden rounded-full border-2 border-ink bg-ink-soft transition-all duration-500 " + bubble}>
-                        <Img src={s.cover} alt="" width={160} height={160} loading={i < 8 ? "eager" : "lazy"} decoding="async" className="h-full w-full object-cover" />
+                        <Img src={s.cover} srcSet={coverSrcSet(s.cover)} sizes="76px" alt="" width={160} height={160} loading={i < 8 ? "eager" : "lazy"} decoding="async" className="h-full w-full object-cover" />
                       </span>
                     </span>
                     <span

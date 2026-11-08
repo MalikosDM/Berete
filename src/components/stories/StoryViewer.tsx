@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as
 import { ArrowRight, ArrowUpRight, Play, Volume2, VolumeX, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
+import { srcSetOf } from "@/lib/responsive";
 import { pieceByMedia } from "@/data/relations";
 import type { Story } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
@@ -305,7 +306,7 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
           onContextMenu={(e) => e.preventDefault()}
         >
           <div ref={hostRef} className={isVideo ? "h-full w-full" : "hidden"} />
-          {item && !isVideo ? <Img key={item.src} src={item.src} alt={item.alt || story.title} draggable={false} className="h-full w-full object-cover" /> : null}
+          {item && !isVideo ? <Img key={item.src} src={item.src} srcSet={srcSetOf(item.src, item.width)} sizes="(max-width: 767px) 100vw, 560px" alt={item.alt || story.title} draggable={false} className="h-full w-full object-cover" /> : null}
           {!item ? <Img src="" alt={story.title} className="h-full w-full" /> : null}
         </div>
 

@@ -4,6 +4,7 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play }
 import BrandIcon from "@/components/BrandIcon";
 import HorizontalGallery from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
+import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
 import { primeStoryVideo } from "@/components/stories/player";
@@ -67,7 +68,7 @@ export default function PiecePage() {
       <section aria-labelledby="piece-title" className="relative isolate flex min-h-svh flex-col overflow-hidden bg-ink lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
         <div className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
-          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" eager />
+          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
         </div>
         <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
           <div className="flex flex-col gap-8">
@@ -115,7 +116,7 @@ export default function PiecePage() {
                   <li key={person.slug} className="flex items-center gap-5">
                     <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
                       <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
-                        {portrait ? <Img src={portrait} alt="" loading="lazy" className="h-full w-full object-cover" /> : <span className="font-display text-xl text-white">{initials(person.name)}</span>}
+                        {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span className="font-display text-xl text-white">{initials(person.name)}</span>}
                       </span>
                     </Link>
                     <div className="min-w-0">
@@ -179,7 +180,7 @@ export default function PiecePage() {
                 <Reveal>
                   <figure>
                     <span className="block aspect-[4/5] overflow-hidden bg-ink-soft">
-                      <MediaView item={m} fit="cover" />
+                      <MediaView item={m} fit="cover" sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw" />
                     </span>
                     {m.caption ? <figcaption className="mt-4 text-base text-bone">{m.caption}</figcaption> : null}
                   </figure>
@@ -204,7 +205,7 @@ export default function PiecePage() {
           </dl>
           {box ? (
             <Link to="/boxes" data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
-              <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</span>
+              <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" sizes={SIZES_FOR.thumb} /> : null}</span>
               <span>
                 <span className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
                   <Gift className="size-5 text-rose-light" aria-hidden="true" /> {t.piece.customBox}
@@ -315,7 +316,7 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
               <Reveal delay={i * 0.08}>
                 <span className="relative block aspect-[3/4] overflow-hidden border border-white/10 bg-ink-soft">
                   {item ? (
-                    <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" />
+                    <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center p-8">
                       <span aria-hidden="true" className="font-display text-[5rem] leading-none font-light text-white/10">

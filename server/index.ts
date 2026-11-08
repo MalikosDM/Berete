@@ -1,6 +1,7 @@
 import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
+import compression from "compression";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { syncCatalogue } from "./catalogue.js";
@@ -8,6 +9,8 @@ import { site } from "./routes/site.js";
 
 const app = express();
 app.disable("x-powered-by");
+// Pages, code and API answers travel compressed (about 5 times lighter); photos and videos already are.
+app.use(compression());
 app.use(express.json({ limit: "2mb" }));
 
 app.use("/api", site);
@@ -18,6 +21,18 @@ app.use("/api", (_req, res) => {
 // In production the same server serves the built front (npm run build -> dist/).
 const dist = path.resolve(process.env.STATIC_DIR ?? "dist");
 const LANGUAGES = ["fr", "es", "de", "nl", "ar"];
+
+// How long the browser keeps each file. The pages are checked again at every visit (a new version
+// shows at once). The code, styles and fonts of a build have their fingerprint in their name: kept a
+// year. The photos and videos keep their name when they are encoded again: kept a day, then checked
+// in the background for a week.
+const PAGE_CACHE = "no-cache";
+function cacheFor(file: string): string {
+  const relative = path.relative(dist, file).split(path.sep).join("/");
+  if (relative.startsWith("assets/")) return "public, max-age=31536000, immutable";
+  if (relative.startsWith("media/")) return "public, max-age=86400, stale-while-revalidate=604800";
+  return PAGE_CACHE;
+}
 
 // The pre-rendered pages are served at their address: /about is about.html,
 // /fr is fr.html, /fr/creations is fr/creations.html. This comes before the
@@ -34,9 +49,9 @@ app.use((req, res, next) => {
   if (address === "" || path.extname(address) !== "") return next();
   const file = path.join(dist, address + ".html");
   if (!file.startsWith(dist + path.sep)) return next();
-  fs.stat(file, (error, stats) => (error || !stats.isFile() ? next() : res.sendFile(file)));
+  fs.stat(file, (error, stats) => (error || !stats.isFile() ? next() : res.sendFile(file, { headers: { "Cache-Control": PAGE_CACHE } })));
 });
-app.use(express.static(dist, { redirect: false }));
+app.use(express.static(dist, { redirect: false, setHeaders: (res, file) => res.setHeader("Cache-Control", cacheFor(file)) }));
 
 // The old addresses of the site lead to the new ones (permanent redirects, in every language):
 // /pieces and /capsules/... to /creations, a piece under /creations/<slug> to /pieces/<slug>,

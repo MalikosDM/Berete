@@ -134,11 +134,11 @@ export default function Home() {
             >
               <span className="relative block h-[56svh] w-full md:h-[64vh]">
                 <span className={"absolute inset-0 transition-opacity duration-700 " + (ringOpen && opened ? "opacity-0" : opened ? "md:group-hover:opacity-0" : "")}>
-                  <MediaView item={featured.cover} eager />
+                  <MediaView item={featured.cover} />
                 </span>
                 {opened ? (
                   <span className={"absolute inset-0 transition-opacity duration-700 " + (ringOpen ? "opacity-100" : "opacity-0 md:group-hover:opacity-100")}>
-                    <MediaView item={opened} eager />
+                    <MediaView item={opened} />
                   </span>
                 ) : null}
               </span>
@@ -185,7 +185,7 @@ export default function Home() {
         <div className="mt-14 grid gap-px bg-white/10 lg:grid-cols-3">
           <Reveal className="bg-ink">
             <Link to="/atelier" className="group flex h-full flex-col p-6 sm:p-8">
-              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{setting ? <MediaView item={setting} alt={t.home.atelierAlt} fit="cover" /> : null}</div>
+              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{setting ? <MediaView item={setting} alt={t.home.atelierAlt} fit="cover" sizes="(max-width: 1023px) 100vw, 33vw" /> : null}</div>
               <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.atelierTitle}</p>
               <p className="mt-3 text-lg text-bone">{t.home.atelierText}</p>
               <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.enter} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
@@ -193,7 +193,7 @@ export default function Home() {
           </Reveal>
           <Reveal className="bg-ink" delay={0.08}>
             <Link to="/boxes" className="group flex h-full flex-col p-6 sm:p-8">
-              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{box?.images[1] ?? box?.images[0] ? <MediaView item={(box.images[1] ?? box.images[0])!} fit="cover" className="transition-transform duration-[1.4s] group-hover:scale-105" /> : null}</div>
+              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{box?.images[1] ?? box?.images[0] ? <MediaView item={(box.images[1] ?? box.images[0])!} fit="cover" sizes="(max-width: 1023px) 100vw, 33vw" className="transition-transform duration-[1.4s] group-hover:scale-105" /> : null}</div>
               <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.boxesTitle}</p>
               <p className="mt-3 text-lg text-bone">{t.home.boxesText}</p>
               <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.discoverShort} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>

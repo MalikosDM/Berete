@@ -16,10 +16,9 @@
   --color-rose-light: #e8b4a0;
   --color-rose: #b76e79;
 
-  /* Arabic letters come from Amiri and IBM Plex Sans Arabic: the Latin fonts have none, and the
-     browser downloads the Arabic ones only for a page that shows Arabic. */
-  --font-display: "Cormorant Garamond", "Amiri", "Times New Roman", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  /* The Arabic pages add Amiri and IBM Plex Sans Arabic (below, html[lang="ar"]). */
+  --font-display: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
 
   --animate-sheen: sheen 7s ease-in-out infinite;
   --animate-draw: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -51,6 +50,13 @@
  * break them apart), no capitals, no slanted letters, and taller lines for
  * the marks above and below the letters.
  */
+/* Its letters come from Amiri and IBM Plex Sans Arabic (the Latin fonts have none). Only the Arabic
+   pages name them: elsewhere, the word العربية of the language menu would download a whole font. */
+html[lang="ar"] {
+  --font-display: "Cormorant Garamond", "Amiri", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+}
+
 html[lang="ar"] * {
   letter-spacing: 0 !important;
   text-transform: none !important;

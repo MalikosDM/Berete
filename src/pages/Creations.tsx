@@ -74,7 +74,7 @@ export default function Creations() {
               {list.map((p, i) => (
                 <li key={p.slug}>
                   <Reveal delay={(i % 3) * 0.08}>
-                    <PieceCard piece={p} eager={i < 3} showType={active === "all"} />
+                    <PieceCard piece={p} eager={i < 3} priority={i === 0} showType={active === "all"} />
                   </Reveal>
                 </li>
               ))}

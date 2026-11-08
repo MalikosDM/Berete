@@ -41,7 +41,7 @@ function CollectionPage({ collection }: { collection: Collection }) {
         {hero ? (
           <div aria-hidden="true" className="relative flex h-[46svh] shrink-0 items-center justify-center px-6 pt-24 md:absolute md:inset-0 md:-z-10 md:h-auto md:justify-end md:px-16 md:pt-28 md:pb-24 lg:px-24">
             <div className="h-full w-full md:w-[55%]">
-              <MediaView item={hero.cover} alt="" fit="contain" eager />
+              <MediaView item={hero.cover} alt="" fit="contain" priority sizes="(max-width: 767px) 60vw, 55vw" />
             </div>
           </div>
         ) : null}
@@ -80,7 +80,7 @@ function CollectionPage({ collection }: { collection: Collection }) {
             {pieces.map((p, i) => (
               <li key={p.slug} className={i % 3 === 1 ? "lg:mt-28" : ""}>
                 <Reveal delay={(i % 3) * 0.12}>
-                  <PieceCard piece={p} eager={i < 3} />
+                  <PieceCard piece={p} />
                 </Reveal>
               </li>
             ))}

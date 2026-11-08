@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import type { ScrollMedia } from "@/data/types";
 import { useI18n } from "@/i18n";
 import { ScrollTrigger, getLenis, scrollToY, useReducedMotion } from "@/lib/gsap";
+import { afterLoad } from "@/lib/idle";
 
 /**
  * A film played by the scroll: never by itself, never in a loop. Frozen on
@@ -36,6 +37,8 @@ type ScrollVideoProps = {
 
 const FADE = 0.025;
 const EAGER_FRAMES = 12;
+/** Wait after the page has loaded before the frame sequence downloads, when the visitor does nothing. */
+const FRAMES_DELAY = 2500;
 
 const clamp = (v: number, min = 0, max = 1) => Math.min(max, Math.max(min, v));
 const frameUrl = (path: string, i: number) => path + String(i + 1).padStart(4, "0") + ".webp";
@@ -153,15 +156,21 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
         img.src = frameUrl(set.path, i);
         imgs[i] = img;
       });
-    // The first frames first: no black screen on arrival. Then the rest, in small batches.
-    const eager = Math.min(EAGER_FRAMES, set.count);
-    void Promise.all(Array.from({ length: eager }, (_, i) => load(i))).then(async () => {
-      for (let i = eager; i < set.count && !cancelled; i += 8) {
-        await Promise.all(Array.from({ length: Math.min(8, set.count - i) }, (_, j) => load(i + j)));
-      }
-    });
+    // The first frame is already on screen (the <img> below). The sequence waits for the visitor's
+    // first gesture, or a moment after the page has loaded, so it does not slow the page down:
+    // the first frames first, then the rest in small batches.
+    const start = () => {
+      const eager = Math.min(EAGER_FRAMES, set.count);
+      void Promise.all(Array.from({ length: eager }, (_, i) => load(i))).then(async () => {
+        for (let i = eager; i < set.count && !cancelled; i += 8) {
+          await Promise.all(Array.from({ length: Math.min(8, set.count - i) }, (_, j) => load(i + j)));
+        }
+      });
+    };
+    const cancelStart = afterLoad(start, { delay: FRAMES_DELAY, onGesture: true });
     return () => {
       cancelled = true;
+      cancelStart();
     };
   }, [useFrames, reduced, known, set.path, set.count, drawFrame]);
 
@@ -339,8 +348,12 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
       <div className="sticky top-0 h-svh w-full overflow-hidden">
         {useFrames ? (
           <>
-            {/* The first frame, painted before the canvas is ready. */}
-            <img src={frameUrl(set.path, 0)} alt="" aria-hidden="true" fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+            {/* The first frame, painted before the canvas is ready: the portrait one on phones, chosen by the
+                browser from the start (the screen is not known yet in the pre-rendered page). */}
+            <picture>
+              {media.mobile.count > 0 ? <source media="(max-aspect-ratio: 4/5)" srcSet={frameUrl(media.mobile.path, 0)} /> : null}
+              <img src={frameUrl(media.desktop.count > 0 ? media.desktop.path : set.path, 0)} alt="" aria-hidden="true" fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+            </picture>
             <canvas ref={canvasRef} aria-hidden="true" data-frames={known ? set.count : undefined} className="absolute inset-0 h-full w-full" />
           </>
         ) : (

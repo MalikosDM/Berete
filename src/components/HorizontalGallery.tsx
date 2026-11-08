@@ -87,7 +87,7 @@ export default function HorizontalGallery({
                 aria-label={t.gallery.open(item.alt ?? title)}
               >
                 <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]">
-                  <MediaView item={item} />
+                  <MediaView item={item} sizes="(max-width: 639px) 78vw, (max-width: 1023px) 55vw, 38vw" />
                 </span>
                 <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
                   <ZoomIn className="size-5" aria-hidden="true" />
