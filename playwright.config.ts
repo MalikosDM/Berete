@@ -11,8 +11,8 @@ export default defineConfig({
   testDir: "tests",
   timeout: 15 * 60_000,
   expect: { timeout: 15_000 },
-  fullyParallel: false,
-  workers: 2,
+  fullyParallel: true,
+  workers: 4,
   reporter: [["list"]],
   use: {
     baseURL: process.env.BASE_URL ?? "http://localhost:3001",

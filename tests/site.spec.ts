@@ -1,12 +1,16 @@
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import type { Catalogue } from "../src/data/types";
+import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
+import { PIECES } from "../src/data/pieces";
+import { MAKING_STEPS, type Catalogue, type Piece } from "../src/data/types";
 
 /*
  * Checks of the whole site, on a 1440px desktop and a 390px iPhone:
  * no console error, no 404, the 30 stories in order with every step shown
  * and every video really playing, the scroll-driven films, every page of the
- * catalogue, no horizontal overflow, readable text. Screenshots: verification/.
+ * catalogue, no horizontal overflow, readable text; the collections from the
+ * home page to every piece; the links between players, pieces and stories in
+ * both directions; sharp, well framed main photos. Screenshots: verification/.
  */
 
 const STORY_TITLES = [
@@ -160,35 +164,162 @@ test("main pages: no error, no 404, no overflow, own title", async ({ page }, in
   expect(new Set(titles.values()).size, "every page has its own title").toBe(titles.size);
 });
 
-test("every piece and every person has a working page", async ({ page }, info) => {
+/** The piece shown in each story file, as the story viewer computes it. */
+function pieceByMedia(cat: Catalogue): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const p of cat.pieces) {
+    for (const m of [p.cover, ...p.gallery, ...p.handover, ...Object.values(p.making)]) if (m && m.src && !map.has(m.src)) map.set(m.src, p.slug);
+  }
+  return map;
+}
+
+/** Sharpness of a photo: variance of its Laplacian at 320px (same measure as the review of the photos). */
+async function sharpness(page: Page, selector: string): Promise<{ score: number; width: number; height: number }> {
+  return page.locator(selector).first().evaluate((el) => {
+    const img = el as HTMLImageElement;
+    const s = 320 / Math.max(img.naturalWidth, img.naturalHeight);
+    const w = Math.max(1, Math.round(img.naturalWidth * s));
+    const h = Math.max(1, Math.round(img.naturalHeight * s));
+    const c = document.createElement("canvas");
+    c.width = w;
+    c.height = h;
+    const ctx = c.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, w, h);
+    const d = ctx.getImageData(0, 0, w, h).data;
+    const g = (x: number, y: number) => {
+      const i = (y * w + x) * 4;
+      return 0.299 * d[i]! + 0.587 * d[i + 1]! + 0.114 * d[i + 2]!;
+    };
+    let sum = 0;
+    let sq = 0;
+    let n = 0;
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < w - 1; x++) {
+        const v = Math.min(255, Math.max(0, g(x - 1, y) + g(x + 1, y) + g(x, y - 1) + g(x, y + 1) - 4 * g(x, y) + 128));
+        sum += v;
+        sq += v * v;
+        n++;
+      }
+    }
+    const mean = sum / n;
+    return { score: sq / n - mean * mean, width: img.naturalWidth, height: img.naturalHeight };
+  });
+}
+
+/** What a piece page must show: its cover (sharp), gallery, people, the five steps, similar pieces, the WhatsApp button. */
+async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
+  const id = piece.slug;
+  await expect(page.locator("h1#piece-title"), id).toHaveText(piece.title);
+  const cover = 'section[aria-labelledby="piece-title"] img';
+  await expect.poll(() => page.locator(cover).first().evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { message: id + " cover loaded" }).toBe(true);
+  const quality = await sharpness(page, cover);
+  expect(Math.min(quality.width, quality.height), id + " cover size").toBeGreaterThanOrEqual(360);
+  expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
+  await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  await expect(page.locator("[data-gallery-item]"), id + " gallery").toHaveCount(piece.gallery.length);
+  for (const v of await page.locator("[data-gallery-item] video").all()) {
+    expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
+  }
+  await expect(page.locator("[data-making-step]"), id + " making").toHaveCount(MAKING_STEPS.length);
+  for (const slug of piece.people.slice(0, 3)) await expect(page.locator('[data-made-for-person="' + slug + '"]'), id + " made for " + slug).toHaveAttribute("href", "/players/" + slug);
+  const sameType = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
+  const similar = await page.locator("[data-similar] [data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));
+  expect(similar.length, id + " similar").toBe(Math.min(4, sameType.length));
+  for (const s of similar) expect(sameType.some((p) => p.slug === s), id + " similar " + s + " is of the same type").toBe(true);
+  if (piece.boxSlug) await expect(page.locator("[data-custom-box]"), id + " custom box").toHaveCount(1);
+}
+
+/** Three pieces get full screenshots, desktop and phone. */
+const SHOWCASE = ["kevin-schade-dragon-ball-pendant", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-chain"];
+const CHUNK = 8;
+
+for (let i = 0; i < PIECES.length; i += CHUNK) {
+  const slugs = PIECES.slice(i, i + CHUNK).map((p) => p.slug);
+  test("piece pages " + (i + 1) + " to " + (i + slugs.length) + ": opening, gallery, made for, making, similar, WhatsApp", async ({ page }, info) => {
+    const cat = await getCatalogue(page);
+    for (const slug of slugs) {
+      const piece = cat.pieces.find((p) => p.slug === slug);
+      expect(piece, slug + " is in the base").toBeTruthy();
+      const showcase = SHOWCASE.includes(slug);
+      await checkPage(page, info, "/pieces/" + slug, (showcase ? "piece-showcase-" : "piece-") + slug, showcase ? 5 : 1);
+      await checkPieceStructure(page, cat, piece!);
+    }
+  });
+}
+
+test("every person has a working page", async ({ page }, info) => {
   const cat = await getCatalogue(page);
   const titles = new Set<string>();
-  for (const p of cat.pieces) titles.add(await checkPage(page, info, "/pieces/" + p.slug, "piece-" + p.slug, 1));
   for (const p of cat.people) titles.add(await checkPage(page, info, "/players/" + p.slug, "player-" + p.slug, 1));
-  expect(titles.size, "unique titles").toBe(cat.pieces.length + cat.people.length);
+  expect(titles.size, "unique titles").toBe(cat.people.length);
+});
+
+test("home collections lead to every type page, every card to its piece", async ({ page }, info) => {
+  const cat = await getCatalogue(page);
+  const count = (type: string) => cat.pieces.filter((p) => p.type === type).length;
+  const expected = COLLECTIONS.filter((c) => count(c.type) >= MIN_PIECES);
+  expect(expected.length, "at least four collections").toBeGreaterThanOrEqual(4);
+
+  await page.goto("/");
+  const tiles = page.locator("[data-collection-tile]");
+  expect(await tiles.evaluateAll((els) => els.map((e) => e.getAttribute("data-collection-tile")))).toEqual(expected.map((c) => c.slug));
+  for (const c of expected) await expect(page.locator('[data-collection-tile="' + c.slug + '"]')).toContainText(String(count(c.type)) + " pieces");
+  await page.locator("[data-collections]").evaluate((el) => el.scrollIntoView({ block: "start" }));
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: shotPath(info, "home-collections"), type: "jpeg", quality: 60 });
+
+  const titles = new Set<string>();
+  for (const c of expected) {
+    await page.goto("/");
+    const tile = page.locator('[data-collection-tile="' + c.slug + '"]');
+    await tile.evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await tile.click();
+    await expect(page).toHaveURL(new RegExp("/creations/" + c.slug + "$"));
+    // Reached in the page itself (no reload): the collection is really shown.
+    await expect(page.locator("h1")).toContainText(c.name);
+    titles.add(await checkPage(page, info, "/creations/" + c.slug, "collection-" + c.slug, 3));
+    const hrefs = await page.locator("[data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+    expect(hrefs.sort(), c.slug + " shows all its pieces").toEqual(cat.pieces.filter((p) => p.type === c.type).map((p) => "/pieces/" + p.slug).sort());
+    await expect(page.locator("h1")).toContainText(c.name);
+  }
+  expect(titles.size, "each collection has its own title").toBe(expected.length);
+
+  // A type without pieces yet: no error, a clear message.
+  const empty = COLLECTIONS.find((c) => count(c.type) === 0);
+  if (empty) {
+    await checkPage(page, info, "/creations/" + empty.slug, "collection-" + empty.slug, 1);
+    await expect(page.getByText("New pieces are being crafted")).toBeVisible();
+  }
 });
 
 test("creations filters and old addresses", async ({ page }) => {
   const problems = watch(page);
+  const cat = await getCatalogue(page);
+  const count = (type: string) => cat.pieces.filter((p) => p.type === type).length;
   await page.goto("/creations");
-  const cards = page.locator('a[href^="/pieces/"]');
-  await expect(cards).toHaveCount(9);
-  await page.getByRole("button", { name: "Pendants" }).click();
-  await expect(cards).toHaveCount(5);
-  await page.getByRole("button", { name: "Rings" }).click();
-  await expect(cards).toHaveCount(2);
-  await page.getByRole("button", { name: "Chains" }).click();
-  await expect(cards).toHaveCount(2);
-  await page.getByRole("button", { name: "Watches" }).click();
-  await expect(page.getByText("New pieces are being crafted")).toBeVisible();
+  const cards = page.locator("[data-piece-card]");
+  await expect(cards).toHaveCount(cat.pieces.length);
+  for (const c of COLLECTIONS) {
+    const button = page.getByRole("button", { name: new RegExp("^" + c.name) });
+    if (count(c.type) === 0) {
+      await expect(button, c.name + " has no filter while it has no piece").toHaveCount(0);
+      continue;
+    }
+    await button.click();
+    await expect(cards).toHaveCount(count(c.type));
+  }
+  // Old addresses: a piece under /creations, renamed pieces, /pieces alone.
   await page.goto("/creations/the-hand");
   await expect(page).toHaveURL(/\/pieces\/the-hand$/);
+  await page.goto("/creations/rs");
+  await expect(page).toHaveURL(/\/pieces\/angelo-stiller-as-pendant$/);
+  await page.goto("/pieces/white-hands");
+  await expect(page).toHaveURL(/\/pieces\/kenan-yildiz-celebration-pendant$/);
   await page.goto("/pieces");
   await expect(page).toHaveURL(/\/creations$/);
-  // Every image of the catalogue answers.
-  const cat = await getCatalogue(page);
+  // Every photo and video of the catalogue answers.
   const files = new Set<string>();
-  for (const p of cat.pieces) [p.cover, ...p.gallery, ...p.handover].forEach((m) => files.add(m.src));
+  for (const p of cat.pieces) [p.cover, ...p.gallery, ...p.handover, ...Object.values(p.making)].forEach((m) => m && files.add(m.src));
   for (const b of cat.boxes) b.images.forEach((m) => files.add(m.src));
   for (const s of cat.stories) {
     files.add(s.cover);
@@ -204,33 +335,79 @@ test("creations filters and old addresses", async ({ page }) => {
   expect(problems.errors).toEqual([]);
 });
 
-/* ---------- Players are in sync with the stories ---------- */
+/* ---------- Players, pieces and stories are linked both ways ---------- */
 
-test("player pages show their stories and pieces", async ({ page }) => {
-  const expected: Record<string, { stories: string[]; pieces: number }> = {
-    "noah-okafor": { stories: ["Noah Okafor", "Noah Okafor II", "Noah Okafor S24"], pieces: 0 },
-    "marcus-thuram": { stories: ["Thuram", "Thuram II", "Thuram SS23", "Marcus Thuram"], pieces: 1 },
-    "malik-tillman": { stories: ["Malik Tillman", "Malik Tillman II"], pieces: 0 },
-    "tanguy-nianzou": { stories: ["NZ", "Tanguy Nianzou"], pieces: 0 },
-    "inter-milan": { stories: ["Inter Milan", "Inter Squad"], pieces: 1 },
-    "deniz-undav": { stories: ["Deniz Undav"], pieces: 1 },
-    "angelo-stiller": { stories: ["Angelo Stiller"], pieces: 1 },
-    "jamie-leweling": { stories: ["Jamie Leweling"], pieces: 1 },
-    "maximilian-mittelstaedt": { stories: [], pieces: 1 },
-    "chris-fuehrich": { stories: [], pieces: 1 },
-    "atakan-karazor": { stories: [], pieces: 1 },
-    "vfb-stuttgart": { stories: [], pieces: 1 },
-    "sidney-eweka": { stories: ["Sidney Eweka"], pieces: 0 },
+test("player pages show their stories and all their pieces", async ({ page }) => {
+  const cat = await getCatalogue(page);
+  const expected: Record<string, string[]> = {
+    "noah-okafor": ["Noah Okafor", "Noah Okafor II", "Noah Okafor S24"],
+    "marcus-thuram": ["Thuram", "Thuram II", "Thuram SS23", "Marcus Thuram"],
+    "malik-tillman": ["Malik Tillman", "Malik Tillman II"],
+    "tanguy-nianzou": ["NZ", "Tanguy Nianzou"],
+    "inter-milan": ["Inter Milan", "Inter Squad"],
+    "deniz-undav": ["Deniz Undav"],
+    "angelo-stiller": ["Angelo Stiller"],
+    "jamie-leweling": ["Jamie Leweling"],
+    "maximilian-mittelstaedt": [],
+    "vfb-stuttgart": [],
+    "sidney-eweka": ["Sidney Eweka"],
   };
-  for (const [slug, want] of Object.entries(expected)) {
-    await page.goto("/players/" + slug);
-    const stories = await page.locator("[data-player-story]").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace("Open the story ", "")));
-    expect(stories, slug).toEqual(want.stories);
-    await expect(page.locator('#player-pieces ~ ul a[href^="/pieces/"]'), slug).toHaveCount(want.pieces);
+  for (const person of cat.people) {
+    await page.goto("/players/" + person.slug);
+    if (expected[person.slug]) {
+      const stories = await page.locator("[data-player-story]").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace("Open the story ", "")));
+      expect(stories, person.slug).toEqual(expected[person.slug]);
+    }
+    // Player -> pieces: every piece made for this person, and nothing else.
+    const hrefs = await page.locator('#player-pieces ~ ul a[href^="/pieces/"]').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+    const own = cat.pieces.filter((p) => p.people.includes(person.slug)).map((p) => "/pieces/" + p.slug);
+    expect(hrefs.sort(), person.slug + " pieces").toEqual(own.sort());
   }
   // Collectors and Press stay stories only.
   await page.goto("/players");
   await expect(page.locator('a[href="/players/collectors"], a[href="/players/press"]')).toHaveCount(0);
+});
+
+test("piece -> player and stories, story -> piece", async ({ page }) => {
+  const problems = watch(page);
+  // Piece -> its stories.
+  await page.goto("/pieces/kevin-schade-dragon-ball-pendant");
+  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator("[data-seen-in-stories]").click();
+  await expect(page.locator('[role="dialog"][data-story="kevin-schade"]')).toBeVisible();
+  // Story -> piece, from the viewer.
+  const see = page.locator('[role="dialog"] [data-see-piece]');
+  await expect(see).toHaveAttribute("data-see-piece", "kevin-schade-dragon-ball-pendant");
+  await page.getByRole("button", { name: "Close the story" }).click();
+  // Piece -> player -> stories.
+  await page.locator('[data-made-for-person="kevin-schade"]').evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator('[data-made-for-person="kevin-schade"]').click();
+  await expect(page).toHaveURL(/\/players\/kevin-schade$/);
+  await expect(page.locator('[data-player-story="kevin-schade"]')).toHaveCount(1);
+  await expect(page.locator('a[href="/pieces/kevin-schade-dragon-ball-pendant"]').first()).toBeVisible();
+  // Story -> piece from the home bar, then the click opens the piece.
+  await page.goto("/");
+  await page.locator('[data-story-bubble="michy-batshuayi"]').click();
+  const link = page.locator('[role="dialog"] [data-see-piece]');
+  await expect(link).toHaveAttribute("href", "/pieces/michy-batshuayi-butterfly-chain");
+  await link.click();
+  await expect(page).toHaveURL(/\/pieces\/michy-batshuayi-butterfly-chain$/);
+  await expect(page.locator("h1#piece-title")).toContainText("Butterfly");
+  // From a piece to a similar one, then to its collection and another one, without reloading.
+  const similar = page.locator("[data-similar] [data-piece-card]").first();
+  const next = await similar.getAttribute("data-piece-card");
+  await similar.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await similar.click();
+  await expect(page).toHaveURL(new RegExp("/pieces/" + next + "$"));
+  const nextTitle = (await getCatalogue(page)).pieces.find((p) => p.slug === next)!.title;
+  await expect(page.locator("h1#piece-title")).toHaveText(nextTitle);
+  await page.goto("/creations/pendants");
+  await page.locator('a[href="/creations/chains"]').first().evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator('a[href="/creations/chains"]').first().click();
+  await expect(page.locator("h1")).toContainText("Chains");
+  const chains = (await getCatalogue(page)).pieces.filter((p) => p.type === "chain").length;
+  await expect(page.locator("[data-piece-card]")).toHaveCount(chains);
+  expect(problems.errors).toEqual([]);
 });
 
 /* ---------- Stories ---------- */
@@ -274,6 +451,7 @@ test("the 30 stories, in order, every step shown, videos playing", async ({ page
   }
   await page.screenshot({ path: shotPath(info, "stories-bar"), type: "jpeg", quality: 60 });
 
+  const byMedia = pieceByMedia(cat);
   await bubbles.first().click();
   const dialog = page.locator('[role="dialog"][data-story]');
   await expect(dialog).toBeVisible();
@@ -281,6 +459,10 @@ test("the 30 stories, in order, every step shown, videos playing", async ({ page
     await expect(dialog).toHaveAttribute("data-story", story.slug);
     for (const [j, item] of story.media.entries()) {
       await expect(dialog, story.slug + " step " + (j + 1)).toHaveAttribute("data-step", String(j));
+      // "See the piece": the piece shown in this file, else the piece of the story.
+      const piece = byMedia.get(item.src) ?? story.pieceSlug;
+      if (piece) await expect(dialog.locator("[data-see-piece]"), story.slug + " step " + (j + 1) + " piece").toHaveAttribute("data-see-piece", piece);
+      else await expect(dialog.locator("[data-see-piece]"), story.slug + " step " + (j + 1) + " no piece").toHaveCount(0);
       if (item.type === "image") {
         const img = dialog.locator("[data-story-surface] img");
         await expect(img).toHaveAttribute("src", item.src);
