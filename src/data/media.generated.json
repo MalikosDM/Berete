@@ -152,90 +152,90 @@
         "height": 1620
       }
     ],
-    "pieces/white-hands": [
+    "pieces/kenan-yildiz-celebration-pendant": [
       {
         "type": "image",
-        "src": "/media/pieces/white-hands/01.webp",
+        "src": "/media/pieces/kenan-yildiz-celebration-pendant/01.webp",
         "width": 1080,
         "height": 1434
       }
     ],
-    "pieces/t-serpent": [
+    "pieces/marcus-thuram-t-serpent-pendant": [
       {
         "type": "image",
-        "src": "/media/pieces/t-serpent/01.webp",
+        "src": "/media/pieces/marcus-thuram-t-serpent-pendant/01.webp",
         "width": 1080,
         "height": 1440
       },
       {
         "type": "image",
-        "src": "/media/pieces/t-serpent/02.webp",
+        "src": "/media/pieces/marcus-thuram-t-serpent-pendant/02.webp",
         "width": 1080,
         "height": 1440
       }
     ],
-    "pieces/the-jersey": [
+    "pieces/noah-okafor-jersey-pendant": [
       {
         "type": "image",
-        "src": "/media/pieces/the-jersey/01.webp",
+        "src": "/media/pieces/noah-okafor-jersey-pendant/01.webp",
         "width": 1080,
         "height": 1440
       }
     ],
-    "pieces/rs": [
+    "pieces/angelo-stiller-as-pendant": [
       {
         "type": "image",
-        "src": "/media/pieces/rs/01.webp",
+        "src": "/media/pieces/angelo-stiller-as-pendant/01.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/rs/02.webp",
+        "src": "/media/pieces/angelo-stiller-as-pendant/02.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/rs/03.webp",
+        "src": "/media/pieces/angelo-stiller-as-pendant/03.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/rs/04.webp",
+        "src": "/media/pieces/angelo-stiller-as-pendant/04.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/rs/05.webp",
+        "src": "/media/pieces/angelo-stiller-as-pendant/05.webp",
         "width": 1080,
         "height": 1620
       }
     ],
-    "pieces/butterfly": [
+    "pieces/michy-batshuayi-butterfly-chain": [
       {
         "type": "image",
-        "src": "/media/pieces/butterfly/01.webp",
+        "src": "/media/pieces/michy-batshuayi-butterfly-chain/01.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/butterfly/02.webp",
+        "src": "/media/pieces/michy-batshuayi-butterfly-chain/02.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/butterfly/03.webp",
+        "src": "/media/pieces/michy-batshuayi-butterfly-chain/03.webp",
         "width": 1080,
         "height": 1620
       },
       {
         "type": "image",
-        "src": "/media/pieces/butterfly/04.webp",
+        "src": "/media/pieces/michy-batshuayi-butterfly-chain/04.webp",
         "width": 1080,
         "height": 1620
       }
@@ -286,6 +286,227 @@
       "height": 848,
       "duration": 10.77,
       "audio": false
+    }
+  },
+  "stills": {
+    "pieces/kenan-yildiz-celebration-pendant/angle": {
+      "type": "image",
+      "src": "/media/pieces/kenan-yildiz-celebration-pendant/angle.webp",
+      "width": 1080,
+      "height": 1434
+    },
+    "pieces/noah-okafor-oka-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/noah-okafor-oka-pendant/cover.webp",
+      "width": 1080,
+      "height": 1174
+    },
+    "pieces/noah-okafor-octagon-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/noah-okafor-octagon-pendant/cover.webp",
+      "width": 618,
+      "height": 666
+    },
+    "pieces/kevin-schade-dragon-ball-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/kevin-schade-dragon-ball-pendant/cover.webp",
+      "width": 1080,
+      "height": 1440
+    },
+    "pieces/marcus-thuram-t-monster-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-t-monster-pendant/cover.webp",
+      "width": 588,
+      "height": 862
+    },
+    "pieces/marcus-thuram-thorned-t-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp",
+      "width": 634,
+      "height": 844
+    },
+    "pieces/marcus-thuram-jesus-piece/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-jesus-piece/cover.webp",
+      "width": 374,
+      "height": 562
+    },
+    "pieces/marcus-thuram-snowflake-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-snowflake-pendant/cover.webp",
+      "width": 720,
+      "height": 896
+    },
+    "pieces/jamie-leweling-jl-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/jamie-leweling-jl-pendant/cover.webp",
+      "width": 720,
+      "height": 742
+    },
+    "pieces/deniz-undav-l-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/deniz-undav-l-pendant/cover.webp",
+      "width": 1080,
+      "height": 1920
+    },
+    "pieces/malik-tillman-cross-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/malik-tillman-cross-pendant/cover.webp",
+      "width": 662,
+      "height": 1024
+    },
+    "pieces/malik-tillman-tm-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/malik-tillman-tm-pendant/cover.webp",
+      "width": 1080,
+      "height": 1796
+    },
+    "pieces/tanguy-nianzou-fam-medallion/cover": {
+      "type": "image",
+      "src": "/media/pieces/tanguy-nianzou-fam-medallion/cover.webp",
+      "width": 604,
+      "height": 768
+    },
+    "pieces/tanguy-nianzou-nz-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/tanguy-nianzou-nz-pendant/cover.webp",
+      "width": 1080,
+      "height": 1310
+    },
+    "pieces/sidney-eweka-999-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/sidney-eweka-999-pendant/cover.webp",
+      "width": 1080,
+      "height": 960
+    },
+    "pieces/jeff-chabot-jc-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/jeff-chabot-jc-pendant/cover.webp",
+      "width": 402,
+      "height": 742
+    },
+    "pieces/lois-openda-nameplate-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/lois-openda-nameplate-pendant/cover.webp",
+      "width": 1080,
+      "height": 1376
+    },
+    "pieces/flaneur-medallion/cover": {
+      "type": "image",
+      "src": "/media/pieces/flaneur-medallion/cover.webp",
+      "width": 604,
+      "height": 768
+    },
+    "pieces/jack-nameplate-pendant/cover": {
+      "type": "image",
+      "src": "/media/pieces/jack-nameplate-pendant/cover.webp",
+      "width": 634,
+      "height": 588
+    },
+    "pieces/tulips-on-tour-medallion/cover": {
+      "type": "image",
+      "src": "/media/pieces/tulips-on-tour-medallion/cover.webp",
+      "width": 576,
+      "height": 588
+    },
+    "pieces/marcus-thuram-infinity-chain/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-infinity-chain/cover.webp",
+      "width": 720,
+      "height": 946
+    },
+    "pieces/the-safi-link/cover": {
+      "type": "image",
+      "src": "/media/pieces/the-safi-link/cover.webp",
+      "width": 618,
+      "height": 742
+    },
+    "pieces/vfb-stuttgart-dfb-pokal-2025/crest": {
+      "type": "image",
+      "src": "/media/pieces/vfb-stuttgart-dfb-pokal-2025/crest.webp",
+      "width": 1080,
+      "height": 1440
+    },
+    "pieces/tanguy-nianzou-nz-ring/cover": {
+      "type": "image",
+      "src": "/media/pieces/tanguy-nianzou-nz-ring/cover.webp",
+      "width": 546,
+      "height": 486
+    },
+    "pieces/marcus-thuram-signet-ring/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-signet-ring/cover.webp",
+      "width": 720,
+      "height": 498
+    },
+    "pieces/tajon-buchanan-iced-watch/cover": {
+      "type": "image",
+      "src": "/media/pieces/tajon-buchanan-iced-watch/cover.webp",
+      "width": 662,
+      "height": 844
+    },
+    "pieces/radja-nainggolan-iced-watch/cover": {
+      "type": "image",
+      "src": "/media/pieces/radja-nainggolan-iced-watch/cover.webp",
+      "width": 504,
+      "height": 460
+    },
+    "pieces/marcus-thuram-skeleton-watch/cover": {
+      "type": "image",
+      "src": "/media/pieces/marcus-thuram-skeleton-watch/cover.webp",
+      "width": 1068,
+      "height": 1016
+    },
+    "boxes/dragon-ball-trunk/01": {
+      "type": "image",
+      "src": "/media/boxes/dragon-ball-trunk/01.webp",
+      "width": 604,
+      "height": 716
+    },
+    "boxes/campione-d-italia-case/01": {
+      "type": "image",
+      "src": "/media/boxes/campione-d-italia-case/01.webp",
+      "width": 1080,
+      "height": 1920
+    },
+    "boxes/campione-d-italia-case/02": {
+      "type": "image",
+      "src": "/media/boxes/campione-d-italia-case/02.webp",
+      "width": 1080,
+      "height": 1920
+    },
+    "boxes/nz-travel-case/01": {
+      "type": "image",
+      "src": "/media/boxes/nz-travel-case/01.webp",
+      "width": 1080,
+      "height": 1190
+    },
+    "boxes/butterfly-trunk/01": {
+      "type": "image",
+      "src": "/media/boxes/butterfly-trunk/01.webp",
+      "width": 576,
+      "height": 946
+    },
+    "boxes/okafor-trunk/01": {
+      "type": "image",
+      "src": "/media/boxes/okafor-trunk/01.webp",
+      "width": 720,
+      "height": 1280
+    },
+    "boxes/okafor-trunk/02": {
+      "type": "image",
+      "src": "/media/boxes/okafor-trunk/02.webp",
+      "width": 720,
+      "height": 1280
+    },
+    "pieces/campione-d-italia-2023-2024/film": {
+      "type": "video",
+      "src": "/media/pieces/campione-d-italia-2023-2024/film.mp4",
+      "poster": "/media/pieces/campione-d-italia-2023-2024/film-poster.webp",
+      "width": 720,
+      "height": 1280,
+      "duration": 49.44,
+      "audio": true
     }
   },
   "scroll": {

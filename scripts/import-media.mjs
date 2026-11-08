@@ -16,6 +16,10 @@
  *   BERETE_STORIES_DIR  ~/Desktop/Berete - Stories
  *   BERETE_SITE_DIR     ~/Desktop/01 Audiovisuel/Berete - Envoi ODORO
  *   BERETE_LOGO_FILE    ~/Desktop/berete_jewellers-cropped.svg
+ *   BERETE_BOUTIQUE_DIR ~/Desktop/02 Projets/Sites clients/Boutique Bijoutier
+ *
+ * The main photos of the pieces taken from the stories (frames, crops) and
+ * the photos of the boxes are listed in scripts/piece-media.mjs.
  *
  * Needs ffmpeg and ffprobe (with libx264 and libwebp) on the PATH.
  */
@@ -25,6 +29,7 @@ import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises"
 import { cpus, homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { BOUTIQUE_VIDEOS, STILLS } from "./piece-media.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = join(ROOT, "public");
@@ -36,6 +41,7 @@ const DESKTOP = join(homedir(), "Desktop");
 const STORIES_DIR = process.env.BERETE_STORIES_DIR ?? join(DESKTOP, "Berete - Stories");
 const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DESKTOP, "01 Audiovisuel", "Berete - Envoi ODORO");
 const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DESKTOP, "berete_jewellers-cropped.svg");
+const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DESKTOP, "02 Projets", "Sites clients", "Boutique Bijoutier");
 
 const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
@@ -65,11 +71,16 @@ const SITE_GROUPS = [
   { key: "pieces/vfb-stuttgart-dfb-pokal-2025", folder: "04 - Capsule VfB Stuttgart", numbers: range(1, 11) },
   { key: "pieces/campione-d-italia-2023-2024", folder: "05 - Capsule Inter", numbers: range(1, 3) },
   { key: "pieces/the-hand", folder: "06 - Pendentifs", numbers: range(1, 6) },
-  { key: "pieces/white-hands", folder: "06 - Pendentifs", numbers: [7] },
-  { key: "pieces/t-serpent", folder: "06 - Pendentifs", numbers: [8, 9] },
-  { key: "pieces/the-jersey", folder: "06 - Pendentifs", numbers: [10] },
-  { key: "pieces/rs", folder: "06 - Pendentifs", numbers: range(11, 15) },
-  { key: "pieces/butterfly", folder: "07 - Chaines", numbers: range(1, 4) },
+  // "White Hands": the celebration of Kenan Yildiz (his stories show it).
+  { key: "pieces/kenan-yildiz-celebration-pendant", folder: "06 - Pendentifs", numbers: [7] },
+  // "T-Serpent": the pendant of Marcus Thuram (story "Thuram").
+  { key: "pieces/marcus-thuram-t-serpent-pendant", folder: "06 - Pendentifs", numbers: [8, 9] },
+  // "The Jersey": the pendant of Noah Okafor.
+  { key: "pieces/noah-okafor-jersey-pendant", folder: "06 - Pendentifs", numbers: [10] },
+  // "RS": the AS of Angelo Stiller (story "Angelo Stiller", @angelo.stiller).
+  { key: "pieces/angelo-stiller-as-pendant", folder: "06 - Pendentifs", numbers: range(11, 15) },
+  // "Butterfly": the chain of Michy Batshuayi.
+  { key: "pieces/michy-batshuayi-butterfly-chain", folder: "07 - Chaines", numbers: range(1, 4) },
   { key: "pieces/sirius", folder: "07 - Chaines", numbers: [5] },
   { key: "boxes/sirius", folder: "08 - Ecrins", numbers: range(1, 3) },
   { key: "boxes/tulips-on-tour", folder: "08 - Ecrins", numbers: [4] },
@@ -154,7 +165,10 @@ async function upToDate(out, src, recipe) {
   const s = await stat(src);
   const entry = cache[relative(ROOT, out)];
   if (entry) return entry.size === s.size && entry.mtime === Math.round(s.mtimeMs) && entry.recipe === recipe;
-  return (await stat(out)).mtimeMs >= s.mtimeMs;
+  // No cache yet (fresh copy of the project): a file newer than its source is kept, and remembered.
+  if ((await stat(out)).mtimeMs < s.mtimeMs) return false;
+  await remember(out, src, recipe);
+  return true;
 }
 
 async function remember(out, src, recipe) {
@@ -335,6 +349,76 @@ async function importSite() {
   return { groups, videos };
 }
 
+/* ---------- Photos made from the stories and the Boutique folder (scripts/piece-media.mjs) ---------- */
+
+async function listDir(dir) {
+  return existsSync(dir) ? readdir(dir) : [];
+}
+
+/** "story:03/21", "boutique:8497...", "site:06/07" -> the file on disk, or null. */
+async function sourceOf(ref) {
+  const [kind, rest = ""] = ref.split(/:(.+)/);
+  if (kind === "story" || kind === "site") {
+    const [nn, mm] = rest.split("/");
+    const root = kind === "story" ? STORIES_DIR : SITE_DIR;
+    const folder = (await listDir(root)).find((n) => n.startsWith(nn + (kind === "story" ? " " : " - ")) && !n.includes(FORBIDDEN));
+    if (!folder) return null;
+    const pattern = kind === "story" ? new RegExp("\\s-\\s" + mm + "\\.[a-z0-9]+$", "i") : new RegExp("^" + mm + "[_ -]");
+    const file = (await listDir(join(root, folder))).find((n) => pattern.test(n) && (IMAGE_EXT.test(n) || VIDEO_EXT.test(n)));
+    return file ? join(root, folder, file) : null;
+  }
+  if (kind === "boutique") {
+    const file = (await listDir(BOUTIQUE_DIR)).find((n) => n.startsWith(rest));
+    return file ? join(BOUTIQUE_DIR, file) : null;
+  }
+  return null;
+}
+
+const frac = (v) => Number(v).toFixed(4);
+
+/** One photo: a frame of a video or a photo, masked then cropped, encoded like every photo. */
+async function still(src, out, { at, crop, mask = [] }) {
+  // Masks are drawn in RGB so that black stays pure black.
+  const filters = mask.length > 0 ? ["format=rgb24"] : [];
+  filters.push(...mask.map(([x, y, w, h]) => "drawbox=x=iw*" + frac(x) + ":y=ih*" + frac(y) + ":w=iw*" + frac(w) + ":h=ih*" + frac(h) + ":color=black:t=fill"));
+  if (crop) {
+    const [x, y, w, h] = crop;
+    filters.push("crop=iw*" + frac(w) + ":ih*" + frac(h) + ":iw*" + frac(x) + ":ih*" + frac(y));
+  }
+  filters.push("scale='min(" + PHOTO.maxW + ",iw)':-2:flags=lanczos");
+  const vf = filters.join(",");
+  const seek = VIDEO_EXT.test(src) ? ["-ss", String(at ?? 0)] : [];
+  const recipe = "still:" + (at ?? "") + ":" + vf + ":" + PHOTO.quality;
+  await produce(out, src, recipe, [...seek, "-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PHOTO.quality), "-compression_level", "6"]);
+  const p = await probe(out);
+  return { type: "image", src: webPath(out), width: p.width, height: p.height };
+}
+
+async function importStills() {
+  const stills = {};
+  const jobs = [];
+  for (const s of STILLS) {
+    const src = await sourceOf(s.from);
+    if (!src) {
+      console.warn("  ! source not found for " + s.key + " (" + s.from + ")");
+      continue;
+    }
+    jobs.push({ heavy: false, go: async () => (stills[s.key] = await still(src, join(MEDIA, s.key + ".webp"), s)) });
+  }
+  for (const v of BOUTIQUE_VIDEOS) {
+    const src = await sourceOf(v.from);
+    if (!src) {
+      console.warn("  ! source not found for " + v.key + " (" + v.from + ")");
+      continue;
+    }
+    jobs.push({ heavy: true, go: async () => (stills[v.key] = await video(src, join(MEDIA, v.key + ".mp4"))) });
+  }
+  await pool(jobs.filter((j) => !j.heavy), cpus().length, (j) => j.go());
+  await pool(jobs.filter((j) => j.heavy), 1, (j) => j.go());
+  // Same order as the list, whatever finished first.
+  return Object.fromEntries([...STILLS, ...BOUTIQUE_VIDEOS].filter((s) => stills[s.key]).map((s) => [s.key, stills[s.key]]));
+}
+
 /* ---------- Scroll-driven videos: WebP frame sequences + an all-intra fallback ---------- */
 
 async function frameSet(src, dir, start, set, crop) {
@@ -465,7 +549,7 @@ if (runs("stories")) {
 }
 
 const mediaFile = join(DATA, "media.generated.json");
-let media = { groups: {}, videos: {}, scroll: {} };
+let media = { groups: {}, videos: {}, stills: {}, scroll: {} };
 try {
   media = { ...media, ...JSON.parse(await readFile(mediaFile, "utf8")) };
 } catch {
@@ -476,6 +560,8 @@ if (runs("site")) {
   if (site !== null) {
     media.groups = site.groups;
     media.videos = site.videos;
+    console.log("Photos of the pieces and boxes (scripts/piece-media.mjs)");
+    media.stills = await importStills();
     pruneDirs.push(join(MEDIA, "atelier"), join(MEDIA, "pieces"), join(MEDIA, "boxes"));
   }
 }
