@@ -2,16 +2,20 @@ import { expect, test, type Page } from "@playwright/test";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { catalogueTexts } from "../src/i18n/content";
 import arContent from "../src/i18n/content/ar";
+import deContent from "../src/i18n/content/de";
 import esContent from "../src/i18n/content/es";
 import frContent from "../src/i18n/content/fr";
+import nlContent from "../src/i18n/content/nl";
 import { ar } from "../src/i18n/ui/ar";
+import { de } from "../src/i18n/ui/de";
 import { en } from "../src/i18n/ui/en";
 import { es } from "../src/i18n/ui/es";
 import { fr } from "../src/i18n/ui/fr";
+import { nl } from "../src/i18n/ui/nl";
 import { checkPage, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
 /*
- * The languages of the site (English at the root, /fr, /es, /ar), on the
+ * The languages of the site (English at the root, /fr, /es, /de, /nl, /ar), on the
  * 1440px desktop and the 390px iPhone: every page answers in its language
  * with no English left (texts, photo descriptions, button labels), no
  * error and no overflow; Arabic reads right to left with its own fonts; the
@@ -23,6 +27,8 @@ import { checkPage, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 const LANGUAGES = [
   { code: "fr", ui: fr, content: frContent },
   { code: "es", ui: es, content: esContent },
+  { code: "de", ui: de, content: deContent },
+  { code: "nl", ui: nl, content: nlContent },
   { code: "ar", ui: ar, content: arContent },
 ] as const;
 
@@ -102,9 +108,14 @@ test("the language menu keeps the page, the links stay in the language", async (
   };
   await choose("fr");
   await expect(page.locator("h1")).toContainText(fr.collections.items.pendants.name);
+  await choose("de");
+  await expect(page.locator("h1")).toContainText(de.collections.items.pendants.name);
   await choose("ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(page.locator("h1")).toContainText(ar.collections.items.pendants.name);
+  await choose("nl");
+  await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
+  await expect(page.locator("h1")).toContainText(nl.collections.items.pendants.name);
   await choose("es");
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
 
@@ -181,9 +192,9 @@ test("addresses: each language has its pages, its not-found page, its hreflang a
   // hreflang: every language of the page, and the English one by default.
   await page.goto("/fr/atelier", { waitUntil: "load" });
   const alternates = await page.locator("link[rel='alternate'][hreflang]").evaluateAll((els) => els.map((l) => l.getAttribute("hreflang") + " " + new URL(l.getAttribute("href") ?? "").pathname));
-  expect(alternates.sort()).toEqual(["ar /ar/atelier", "en /atelier", "es /es/atelier", "fr /fr/atelier", "x-default /atelier"]);
+  expect(alternates.sort()).toEqual(["ar /ar/atelier", "de /de/atelier", "en /atelier", "es /es/atelier", "fr /fr/atelier", "nl /nl/atelier", "x-default /atelier"]);
 
   const sitemap = await (await page.request.get("/sitemap.xml")).text();
-  for (const path of ["/fr/creations/pendants", "/es/pieces/kevin-schade-dragon-ball-pendant", "/ar/players/marcus-thuram"]) expect(sitemap).toContain(path + "</loc>");
+  for (const path of ["/fr/creations/pendants", "/es/pieces/kevin-schade-dragon-ball-pendant", "/de/players/deniz-undav", "/nl/boxes", "/ar/players/marcus-thuram"]) expect(sitemap).toContain(path + "</loc>");
   expect(sitemap).not.toContain("/fr/admin");
 });

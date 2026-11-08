@@ -11,11 +11,15 @@ import { defaultCatalogue } from "../src/data/catalogue.js";
 import seo from "../src/extensions/seo/seo.json" with { type: "json" };
 import { catalogueTexts } from "../src/i18n/content.js";
 import ar from "../src/i18n/content/ar.js";
+import de from "../src/i18n/content/de.js";
 import es from "../src/i18n/content/es.js";
 import fr from "../src/i18n/content/fr.js";
+import nl from "../src/i18n/content/nl.js";
 import { ar as arUi } from "../src/i18n/ui/ar.js";
+import { de as deUi } from "../src/i18n/ui/de.js";
 import { es as esUi } from "../src/i18n/ui/es.js";
 import { fr as frUi } from "../src/i18n/ui/fr.js";
+import { nl as nlUi } from "../src/i18n/ui/nl.js";
 
 /** The languages whose script is not the Latin one: the names are written in it too. */
 const OWN_SCRIPT = new Set(["ar"]);
@@ -36,6 +40,8 @@ if (source !== -1) {
 const languages = [
   { code: "fr", content: fr, ui: frUi },
   { code: "es", content: es, ui: esUi },
+  { code: "de", content: de, ui: deUi },
+  { code: "nl", content: nl, ui: nlUi },
   { code: "ar", content: ar, ui: arUi },
 ];
 

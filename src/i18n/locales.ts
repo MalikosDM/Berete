@@ -5,7 +5,7 @@
  * the pre-rendered pages.
  */
 
-export const LOCALES = ["en", "fr", "es", "ar"] as const;
+export const LOCALES = ["en", "fr", "es", "de", "nl", "ar"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
@@ -25,6 +25,8 @@ export const LOCALE_INFO: Record<Locale, LocaleInfo> = {
   en: { name: "English", short: "EN", dir: "ltr", prefix: "", intl: "en-GB" },
   fr: { name: "Français", short: "FR", dir: "ltr", prefix: "/fr", intl: "fr-FR" },
   es: { name: "Español", short: "ES", dir: "ltr", prefix: "/es", intl: "es-ES" },
+  de: { name: "Deutsch", short: "DE", dir: "ltr", prefix: "/de", intl: "de-DE" },
+  nl: { name: "Nederlands", short: "NL", dir: "ltr", prefix: "/nl", intl: "nl-NL" },
   ar: { name: "العربية", short: "AR", dir: "rtl", prefix: "/ar", intl: "ar" },
 };
 

@@ -1,0 +1,476 @@
+/*
+ * The words of the site, in Dutch (standard Dutch for the Netherlands and
+ * Flanders, polite "u"). Mirrors en.ts: the same entries, in the same order.
+ */
+import { plural } from "../format";
+import type { Messages } from "./en";
+
+const n = (count: number, one: string, other: string) => plural("nl-NL", count, { one, other });
+
+const PRIVATE_COLLECTOR = "Een privéverzamelaar";
+/** "Een privéverzamelaar" written inside a sentence. Clubs take no article in Dutch (voor VfB Stuttgart). */
+const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "een privéverzamelaar" : who);
+
+export const nl: Messages = {
+  site: {
+    skip: "Naar de inhoud",
+    homeLabel: "Berete Jewellers, home",
+    tagline: "Door ons gemaakt. Door u geïnspireerd.",
+    baseLine: "Gevestigd in Dubai · Wereldwijde levering",
+    rights: (year: number) => "© " + year + " Berete Jewellers. Alle rechten voorbehouden.",
+  },
+
+  language: {
+    label: "Taal",
+    choose: "Kies de taal",
+  },
+
+  common: {
+    startPiece: "Ontwerp uw juweel",
+    whatsapp: "WhatsApp",
+    chatWhatsapp: "Chat met ons via WhatsApp",
+    allCreations: "Alle creaties",
+    allPlayers: "Alle spelers",
+    seePiece: "Bekijk het juweel",
+    readArticle: "Lees het artikel",
+    close: "Sluiten",
+    previous: "Vorige",
+    next: "Volgende",
+    back: "Terug",
+    yourPiece: "Uw juweel",
+    yourStory: "Uw verhaal, in diamanten",
+    madeFor: (who: string) => "Gemaakt voor " + inSentence(who),
+    privateCollector: PRIVATE_COLLECTOR,
+    newPiecesTitle: "Nieuwe juwelen in de maak",
+    newPiecesText: "Deze collectie wordt binnenkort onthuld. Begin intussen aan uw eigen juweel.",
+  },
+
+  whatsapp: {
+    hello: "Hallo Berete Jewellers, ik zou graag een juweel op maat laten maken.",
+    piece: (name: string) => "Hallo Berete Jewellers, ik zou graag een juweel zoals “" + name + "” willen. Kunnen we het erover hebben?",
+    configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
+      ["Hallo Berete Jewellers, ik zou graag een juweel laten maken.", "Juweel: " + type, "Budget: " + budget, "Termijn: " + timing, ...(pieceName ? ["Geïnspireerd door: “" + pieceName + "”"] : [])].join("\n"),
+  },
+
+  types: {
+    chain: "Ketting",
+    pendant: "Hanger",
+    ring: "Ring",
+    bracelet: "Armband",
+    watch: "Horloge",
+  },
+
+  nav: {
+    main: "Hoofdmenu",
+    mobile: "Mobiel menu",
+    creations: "Creaties",
+    players: "Spelers",
+    atelier: "Atelier",
+    boxes: "Etuis",
+    process: "Werkwijze",
+    about: "Over ons",
+    contact: "Contact",
+    openMenu: "Menu openen",
+    closeMenu: "Menu sluiten",
+  },
+
+  footer: {
+    creations: "Creaties",
+    house: "Het huis",
+    contact: "Contact",
+    contactPage: "Contactpagina",
+    yourPiece: "Uw juweel",
+    pitch: "Kettingen, hangers en kampioensringen, samen met u ontworpen en gemaakt voor het moment.",
+    legal: "Juridische informatie",
+    privacy: "Privacy",
+  },
+
+  collections: {
+    items: {
+      pendants: { name: "Hangers", intro: "Initialen, emblemen, juichgebaren: elke hanger vertelt één verhaal, driedimensionaal gebeeldhouwd en steen voor steen gezet." },
+      chains: { name: "Kettingen", intro: "Schakels die één voor één worden getekend, van vlinders tot oneindigheidstekens, om alleen of met een hanger te dragen." },
+      rings: { name: "Ringen", intro: "Kampioensringen voor een hele selectie, en zegelringen gemaakt voor één hand." },
+      bracelets: { name: "Armbanden", intro: "Armbanden op maat, schakel voor schakel." },
+      watches: { name: "Horloges", intro: "Horloges bezet met diamanten, van de kast tot de band." },
+    },
+    eyebrow: "Collecties",
+    title: "Per soort juweel",
+    explore: "Ontdekken",
+    count: (count: number) => n(count, "# creatie", "# creaties"),
+    tileAlt: (collection: string, piece: string) => collection + ": " + piece,
+    collection: "Collectie",
+    listLabel: (collection: string) => "De juwelen: " + collection,
+    others: "Andere collecties",
+    ctaTitle: "De uwe, vanaf de eerste schets.",
+    ctaText: "Elk stuk begint met één gesprek. Vertel ons uw verhaal, wij tekenen het.",
+    ctaButton: "Begin via WhatsApp",
+  },
+
+  home: {
+    filmLabel: "Film van Berete Jewellers, afgespeeld door te scrollen",
+    kicker: "Berete Jewellers · Dubai",
+    title: "Haute joaillerie op maat voor kampioenen.",
+    discover: "Ontdek de creaties",
+    statements: ["Ontworpen voor clubs. Gedragen door kampioenen.", "Het bovenstuk gaat omhoog en onthult de trofee.", "Gebeeldhouwd, daarna steen voor steen gezet.", "Uitgesproken stukken, gemaakt om gezien te worden."],
+    featured: "Uitgelichte capsule",
+    enterCapsule: "Ontdek de capsule",
+    liftTop: "Bovenstuk optillen",
+    closeTop: "Bovenstuk sluiten",
+    liftTopLabel: "Het bovenstuk van de ring optillen",
+    closeTopLabel: "Het bovenstuk van de ring sluiten",
+    wornBy: "Gedragen door",
+    players: "De spelers",
+    inside: "In het huis",
+    insideTitle: "Van schets tot overhandiging",
+    atelierTitle: "Atelier",
+    atelierText: "Elke steen met de hand gezet, onder de microscoop.",
+    atelierAlt: "Close-up van een zetgereedschap aan het werk op diamanten",
+    enter: "Binnenkijken",
+    boxesTitle: "Etuis",
+    boxesText: "Etuis op maat voor geselecteerde juwelen, als optie.",
+    discoverShort: "Ontdekken",
+    processTitle: "Werkwijze",
+    processText: "Zes heldere stappen, te volgen via WhatsApp.",
+    follow: "Volgen",
+  },
+
+  showcase: {
+    eyebrow: "Geselecteerde juwelen",
+    title: "De capsules",
+  },
+
+  scroll: {
+    hint: "Scrollen",
+  },
+
+  creations: {
+    eyebrow: "Creaties",
+    title: "De creaties",
+    lead: "Kettingen, hangers, ringen, armbanden en horloges. Elk stuk wordt getekend voor één persoon, één club, één moment, en daarna in Dubai gemaakt.",
+    listLabel: "Alle juwelen",
+    filterLabel: "Juwelen filteren",
+    all: "Alle",
+    enterCollection: (collection: string) => "Ontdek de " + collection.toLowerCase(),
+  },
+
+  piece: {
+    steps: {
+      sketch: { title: "Schets", text: "Het idee wordt met de hand getekend en daarna gemodelleerd tot elke verhouding klopt." },
+      raw: { title: "Ruw stuk", text: "Het metaal wordt gegoten en samengesteld, nog voordat er één steen wordt gezet." },
+      setting: { title: "Zetten", text: "Elke steen wordt met de hand gezet, onder vergroting." },
+      polishing: { title: "Polijsten", text: "Elk oppervlak wordt gepolijst tot het metaal achter het licht verdwijnt." },
+      delivery: { title: "Levering", text: "Gecontroleerd, gefotografeerd en daarna overhandigd, in het eigen etui als er een is." },
+    },
+    want: "Ik wil graag een juweel zoals dit",
+    details: "De details",
+    madeFor: "Gemaakt voor",
+    theClub: "De club",
+    theProfile: "Het profiel",
+    stories: (count: number) => n(count, "De story", "De stories"),
+    andOthers: (names: string) => "En ook " + names + ".",
+    seenInStories: "Te zien in onze stories",
+    story: "Het verhaal",
+    makingEyebrow: "Van schets tot overhandiging",
+    makingTitle: "Zo werd het gemaakt",
+    thisPiece: "Dit juweel",
+    inAtelier: "In het atelier",
+    delivered: "Geleverd",
+    handedOverTo: (client: string) => "Overhandigd aan " + inSentence(client),
+    handover: "De overhandiging",
+    sheet: "Technische gegevens",
+    customBox: "Etui op maat beschikbaar",
+    deliveredIn: (box: string) => "Geleverd in het etui dat ervoor werd gemaakt: " + box + ".",
+    press: "Pers",
+    pressAlt: (outlet: string) => "Artikel van " + outlet,
+    similar: "Vergelijkbare juwelen",
+    more: (collection: string) => "Meer " + collection.toLowerCase(),
+    theCollection: "De collectie",
+    ctaTitle: "Een juweel zoals dit, voor u getekend.",
+    ctaText: "Stuur ons de naam via WhatsApp: wij antwoorden met een eerste idee en de volgende stappen.",
+    otherWays: "Andere manieren om ons te bereiken",
+  },
+
+  gallery: {
+    title: "Details",
+    hintPinned: "Scroll om te verkennen · Tik om te zoomen",
+    hint: "Tik om te zoomen",
+    open: (what: string) => "Op volledig scherm openen: " + what,
+    photo: "Foto",
+    zoomIn: "Inzoomen",
+    zoomOut: "Uitzoomen",
+  },
+
+  players: {
+    eyebrow: "Spelers",
+    title: "Gedragen door kampioenen",
+    lead: "Voetballers, clubs en persoonlijkheden die ons hun moment toevertrouwden. Elke naam opent hun stories en hun juwelen.",
+    listLabel: "Lijst van spelers",
+    groups: { player: "Spelers", club: "Clubs", personality: "Persoonlijkheden" },
+    portrait: (name: string) => "Portret van " + name,
+    club: "Club",
+    personality: "Persoonlijkheid",
+    number: "Nr.",
+    bioWithPieces: (name: string) => "De juwelen die voor " + name + " werden gemaakt, en de momenten die we deelden op ons Instagram-account.",
+    bioStories: (name: string) => "De momenten die we met " + name + " deelden op ons Instagram-account.",
+    watch: (count: number) => n(count, "Bekijk de story", "Bekijk de stories"),
+    pieces: (count: number) => n(count, "Het juweel", "De juwelen"),
+    stories: "Stories",
+    moments: (count: number) => n(count, "# moment", "# momenten"),
+    theirPlayers: "De spelers",
+  },
+
+  stories: {
+    bar: "Stories",
+    previous: "Vorige stories",
+    next: "Volgende stories",
+    open: (title: string) => "Story openen: " + title,
+    dialog: (title: string) => "Story: " + title,
+    alt: (title: string, index: number) => title + ", story " + index,
+    play: "Video afspelen",
+    soundOff: "Geluid uit",
+    soundOn: "Geluid aan",
+    close: "Story sluiten",
+    help: "Tik op de rechterkant voor de volgende stap en op de linkerkant voor de vorige. Houd ingedrukt om te pauzeren.",
+    want: "Uw eigen juweel? WhatsApp",
+    seePieceLabel: (title: string) => "Bekijk het juweel: " + title,
+  },
+
+  atelier: {
+    steps: [
+      { title: "Gieten", text: "Het model wordt ruw metaal: een hanger vóór zijn eerste steen." },
+      { title: "Assemblage", text: "Schakel na schakel krijgt een armband vorm op de werkbank." },
+      { title: "Polijsten", text: "Elke schakel wordt met de hand gepolijst, zodat alleen de stenen te zien zijn." },
+      { title: "Afwerking", text: "Een kenmerkend stuk in de maak, gecontroleerd onder de lamp." },
+    ],
+    step: (index: number) => "Stap " + index,
+    stepAlt: (step: string) => step + " in het atelier",
+    filmLabel: "Stenen met de hand gezet in het atelier",
+    eyebrow: "Dubai",
+    title: "Het atelier",
+    lead: "Waar elk stuk wordt gebeeldhouwd en daarna steen voor steen gezet.",
+    making: "Zo ontstaat een juweel",
+    ctaTitle: "Volg het via WhatsApp, stap voor stap.",
+    ctaText: "Tijdens de hele creatie delen we foto’s en video’s van de vorderingen met u.",
+    seeProcess: "Bekijk de werkwijze",
+  },
+
+  boxes: {
+    eyebrow: "Op maat",
+    title: "Etuis",
+    lead: "Etuis op maat, als optie beschikbaar voor geselecteerde juwelen.",
+    listLabel: "Etuis op maat",
+    open: (name: string) => name + " op volledig scherm openen",
+    photos: (count: number) => n(count, "# foto", "# foto’s"),
+  },
+
+  process: {
+    filmLabel: "De werkwijze, stap voor stap, afgespeeld door te scrollen",
+    steps: [
+      { title: "Eerste contact", text: "Ideeën en budget. Vertel ons welk moment u wilt vastleggen, uw referenties, uw verhaal.", meter: "0%", payNote: "Geen betaling in deze fase." },
+      { title: "Voorschot voor het ontwerp", text: "Wordt bij bevestiging van de eindprijs afgetrokken en dekt bij annulering de ontwerpkosten.", meter: "Voorschot", payNote: "Ontwerpvoorschot betaald." },
+      { title: "Goedkeuring", text: "50% van de productie wordt betaald voordat het maken begint.", meter: "50%", payNote: "50% van de productie betaald." },
+      { title: "Creatie", text: "Foto’s en video’s van de vorderingen via WhatsApp; de doorlooptijd hangt af van de complexiteit.", meter: "50%", payNote: "Tijdens het maken hoeft u niets meer te betalen." },
+      { title: "Fotoshoot", text: "Een eigen fotoshoot, daarna de voorbereiding van de levering.", meter: "50%", payNote: "Uw juweel wordt gefotografeerd voordat het het atelier verlaat." },
+      { title: "Saldo en levering", text: "De resterende 50% ongeveer een week vóór de overhandiging.", meter: "100%", payNote: "Volledig betaald, klaar voor de overhandiging." },
+    ],
+    eyebrow: "Zes stappen, één gesprek",
+    title: "De werkwijze",
+    lead: "Van uw eerste bericht tot de dag waarop u het draagt.",
+    payment: "Betaling",
+    paid: "Betaald bedrag",
+    noPayment: "Geen betaling in deze fase.",
+    clear: "Helder vanaf het begin",
+    overviewTitle: "Zes stappen, gespreide betaling",
+    overviewText: "Een ontwerpvoorschot, de helft van de productie bij de goedkeuring, het saldo een week vóór de overhandiging. U volgt elke fase via WhatsApp.",
+    closingEyebrow: "De eerste stap is een bericht",
+  },
+
+  about: {
+    eyebrow: "Over ons",
+    title: "Ons verhaal",
+    lead: "Haute joaillerie op maat, gemaakt in Dubai voor wie geschiedenis schrijft, op het veld en daarbuiten.",
+    founderLabel: "Oprichter",
+    founderPortrait: "Portret van de oprichter",
+    provisionalQuote: "Voorlopig citaat",
+    quote: "“Elk stuk begint met een verhaal. Ons vak is het een leven lang te laten schitteren.”",
+    founder: "Oprichter, Berete Jewellers",
+    chapters: "Hoofdstukken",
+    chapterList: [
+      { title: "Het begin", text: "Voorlopige tekst. Hoe het eerste stuk werd getekend, voor wie het was, en waarom het met de hand gemaakt moest worden in plaats van kant-en-klaar gekocht." },
+      { title: "Dubai", text: "Voorlopige tekst. Een huis gevestigd in Dubai, op het kruispunt van stenen, ambachtslieden en klanten van alle continenten, met levering wereldwijd." },
+      { title: "Voor kampioenen", text: "Voorlopige tekst. Kampioensringen voor clubs, kettingen en hangers voor spelers en sterren: juwelen die een titel, een nummer, een naam dragen." },
+    ],
+  },
+
+  contact: {
+    eyebrow: "Contact",
+    title: "Ontwerp uw juweel",
+    lead: "De snelste weg is WhatsApp. Drie klikken, één bericht, en wij doen de rest.",
+    inspired: "Geïnspireerd door dit juweel?",
+    oneConversation: "Eén gesprek is genoeg om te beginnen. Vertel ons uw idee via WhatsApp, wij antwoorden persoonlijk.",
+    trustedBy: "Zij vertrouwen op ons",
+    configTitle: "Uw juweel in 3 klikken",
+    configSteps: ["Soort juweel", "Budget", "Termijn"],
+    answer: (question: string) => question + ":",
+    pieceChoices: { chain: "Ketting", pendant: "Hanger", ring: "Kampioensring", other: "Iets anders" },
+    budgets: { "10k": "Tot 10.000 USD", "25k": "10.000 tot 25.000 USD", "50k": "25.000 tot 50.000 USD", "50k+": "50.000 USD en meer", unsure: "Nog niet bepaald" },
+    timings: { asap: "Binnen een maand", quarter: "Binnen 1 tot 3 maanden", flexible: "Geen haast" },
+    openWhatsapp: "WhatsApp openen",
+    startOver: "Opnieuw beginnen",
+    name: "Naam",
+    email: "E-mail",
+    phone: "Telefoonnummer",
+    idea: "Uw idee",
+    errName: "Vul uw naam in.",
+    errEmail: "Vul een geldig e-mailadres in.",
+    errMessage: "Vertel ons iets meer (minimaal 10 tekens).",
+    errPhone: "Vul een geldig telefoonnummer in.",
+    errServer: "Er ging iets mis. Probeer het opnieuw of stuur ons een bericht via WhatsApp.",
+    errNetwork: "Netwerkfout. Probeer het opnieuw of stuur ons een bericht via WhatsApp.",
+    callTitle: "Liever teruggebeld?",
+    callSent: "Dank u. Wij bellen u binnenkort terug.",
+    callButton: "Bel mij terug",
+    emailTitle: "Liever per e-mail?",
+    emailSent: "Dank u. Uw bericht is goed ontvangen, wij antwoorden u persoonlijk.",
+    emailButton: "Bericht versturen",
+  },
+
+  legal: {
+    eyebrow: "Informatie",
+    legalTitle: "Juridische informatie",
+    privacyTitle: "Privacybeleid",
+    updated: "Voorlopige versie. Passages gemarkeerd met “exemple à adapter” zijn voorbeelden die vóór de lancering moeten worden aangepast.",
+    legal: [
+      {
+        title: "Uitgever",
+        paragraphs: [
+          "Deze website wordt uitgegeven door Berete Jewellers, gevestigd in Dubai, Verenigde Arabische Emiraten.",
+          "Handelsnaam: Berete Jewellers. Statutaire zetel: Dubai, Verenigde Arabische Emiraten. Handelsvergunning afgegeven in Dubai. (Exemple à adapter : indiquez la raison sociale exacte, le numéro de licence commerciale et l'adresse complète.)",
+          "Contact: via WhatsApp of de contactpagina van deze website.",
+        ],
+      },
+      {
+        title: "Hosting",
+        paragraphs: ["Deze website en de gegevens ervan worden gehost door een professionele cloudhostingprovider, op beveiligde servers. (Exemple à adapter : indiquez le nom, l'adresse et le contact de votre hébergeur.)"],
+      },
+      {
+        title: "Intellectuele eigendom",
+        paragraphs: [
+          "Alle ontwerpen, foto’s, video’s, teksten en visuele elementen van deze website zijn eigendom van Berete Jewellers of worden met toestemming gebruikt. Elke volledige of gedeeltelijke reproductie zonder voorafgaande schriftelijke toestemming is verboden.",
+          "Namen van clubs, trofeeën en spelers worden vermeld om de voor hen gemaakte juwelen te beschrijven en blijven eigendom van hun respectieve rechthebbenden.",
+        ],
+      },
+      {
+        title: "Aansprakelijkheid",
+        paragraphs: ["De informatie op deze website wordt verstrekt ter presentatie. De getoonde juwelen zijn creaties op maat; voor elk nieuw stuk wordt een individuele offerte opgesteld."],
+      },
+    ],
+    privacy: [
+      {
+        title: "Gegevens die wij verzamelen",
+        paragraphs: [
+          "Wanneer u vraagt om teruggebeld te worden, verzamelen wij uw naam, uw telefoonnummer en, indien van toepassing, het juweel waarin u geïnteresseerd bent. Wanneer u ons per e-mail schrijft, verzamelen wij uw naam, uw e-mailadres en uw bericht.",
+          "Paginabezoeken worden gemeten zonder cookies en zonder u te identificeren.",
+        ],
+      },
+      {
+        title: "Waarom wij ze gebruiken",
+        paragraphs: ["Uitsluitend om uw aanvraag te beantwoorden, uw offerte op te stellen en uw project op te volgen. Wij verkopen uw gegevens nooit."],
+      },
+      {
+        title: "WhatsApp",
+        paragraphs: ["Knoppen met het opschrift WhatsApp openen een gesprek op WhatsApp, een dienst van een derde partij met een eigen privacybeleid. Berichten die u daar verstuurt, worden binnen WhatsApp verwerkt."],
+      },
+      {
+        title: "Bewaartermijn",
+        paragraphs: ["Contact- en terugbelverzoeken worden tot drie jaar na ons laatste contact bewaard en daarna verwijderd. (Exemple à adapter selon votre pratique réelle de conservation.)"],
+      },
+      {
+        title: "Uw rechten",
+        paragraphs: ["U kunt op elk moment vragen om inzage in, correctie of verwijdering van uw gegevens, door contact met ons op te nemen via WhatsApp of de contactpagina."],
+      },
+    ],
+  },
+
+  notFound: {
+    eyebrow: "Pagina niet gevonden",
+    title: "Dit juweel bestaat niet… nog niet.",
+    text: "De pagina die u zoekt, is verplaatst of heeft nooit bestaan. Elk bijzonder juweel begint met een gesprek: vertel ons over het uwe.",
+    home: "Terug naar de startpagina",
+    whatsapp: "Of chat met ons via WhatsApp",
+  },
+
+  seoPages: {
+    "/": {
+      title: "Berete Jewellers — Haute joaillerie op maat, Dubai",
+      description: "Haute joaillerie op maat uit Dubai: diamanten kettingen, hangers en kampioensringen voor clubs, voetballers en sterren. Door ons gemaakt. Door u geïnspireerd.",
+    },
+    "/creations": {
+      title: "Creaties: hangers, kettingen, ringen en horloges",
+      description: "Alle juwelen van Berete Jewellers, te filteren per soort: diamanten hangers, kettingen, kampioens- en zegelringen en horloges, elk op maat gemaakt in Dubai.",
+    },
+    "/creations/pendants": {
+      title: "Hangers: diamanten hangers op maat",
+      description: "Hangers van Berete Jewellers: initialen, emblemen en juichgebaren, driedimensionaal gebeeldhouwd en steen voor steen gezet voor voetballers en verzamelaars, in Dubai.",
+    },
+    "/creations/chains": {
+      title: "Kettingen: diamanten kettingen op maat",
+      description: "De kettingen van Berete Jewellers: vlinderschakels, oneindigheidstekens en diamanten bloemen, schakel voor schakel getekend en op maat gemaakt in Dubai.",
+    },
+    "/creations/rings": {
+      title: "Ringen: kampioensringen en zegelringen",
+      description: "Kampioensringen voor VfB Stuttgart en Inter Milaan, en zegelringen bezet met diamanten: de ringen van Berete Jewellers, gemaakt in Dubai.",
+    },
+    "/creations/watches": {
+      title: "Horloges bezet met diamanten",
+      description: "Horloges bezet met diamanten, van de kast tot de band, gedragen door voetballers: de horloges van Berete Jewellers, Dubai.",
+    },
+    "/creations/bracelets": {
+      title: "Armbanden",
+      description: "Armbanden op maat van Berete Jewellers in Dubai. Nieuwe juwelen zijn in de maak.",
+    },
+    "/players": {
+      title: "Spelers, clubs en persoonlijkheden",
+      description: "De voetballers, clubs en persoonlijkheden die Berete Jewellers dragen: hun stories en de juwelen die voor hen op maat werden gemaakt.",
+    },
+    "/atelier": {
+      title: "Het atelier in Dubai",
+      description: "In het atelier van Berete Jewellers in Dubai: gieten, assemblage, polijsten en het zetten van de stenen, elk stuk met de hand gemaakt.",
+    },
+    "/boxes": {
+      title: "Etuis en koffers op maat",
+      description: "Etuis en koffers, op maat gemaakt voor geselecteerde juwelen van Berete Jewellers, als optie beschikbaar.",
+    },
+    "/process": {
+      title: "De werkwijze, stap voor stap",
+      description: "Zes heldere stappen, van uw eerste bericht tot de overhandiging: ontwerpvoorschot, goedkeuring, creatie gevolgd via WhatsApp, fotoshoot en levering.",
+    },
+    "/about": {
+      title: "Ons verhaal",
+      description: "Het verhaal van Berete Jewellers, een huis in Dubai dat haute joaillerie op maat creëert voor kampioenen.",
+    },
+    "/contact": {
+      title: "Contact: ontwerp uw juweel",
+      description: "Begin aan uw juweel op maat met Berete Jewellers: chat via WhatsApp, stel uw aanvraag samen in drie klikken of vraag om teruggebeld te worden.",
+    },
+    "/legal": {
+      title: "Juridische informatie",
+      description: "Juridische informatie over de website van Berete Jewellers.",
+    },
+    "/privacy": {
+      title: "Privacybeleid",
+      description: "Hoe Berete Jewellers omgaat met de persoonsgegevens die u op deze website deelt.",
+    },
+    "/404": {
+      title: "Pagina niet gevonden",
+      description: "",
+    },
+  },
+
+  seo: {
+    pieceDescription: (title: string, type: string, who: string) => title + ": een " + type.toLowerCase() + " gemaakt voor " + inSentence(who) + " door Berete Jewellers in Dubai.",
+    personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", speler" : kind === "club" ? ", club" : ""),
+    personDescription: (name: string, kind: "player" | "club" | "personality") =>
+      "De stories en de juwelen op maat van " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "persoonlijkheid" : "speler") + ") bij Berete Jewellers, haute joaillerie op maat uit Dubai.",
+  },
+};

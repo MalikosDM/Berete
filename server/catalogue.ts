@@ -39,7 +39,7 @@ export const MediaListSchema = z.array(MediaItemSchema).max(200);
 export const MakingSchema = z.object(Object.fromEntries(MAKING_STEPS.map((k) => [k, MediaItemSchema.optional()])) as Record<(typeof MAKING_STEPS)[number], z.ZodOptional<typeof MediaItemSchema>>);
 /** Texts written in /admin for another language, by field: { fr: { title: "..." } }. */
 export const TranslationsSchema = z
-  .object({ fr: z.record(z.string().max(40), z.string().max(5000)), es: z.record(z.string().max(40), z.string().max(5000)), ar: z.record(z.string().max(40), z.string().max(5000)) })
+  .object({ fr: z.record(z.string().max(40), z.string().max(5000)), es: z.record(z.string().max(40), z.string().max(5000)), de: z.record(z.string().max(40), z.string().max(5000)), nl: z.record(z.string().max(40), z.string().max(5000)), ar: z.record(z.string().max(40), z.string().max(5000)) })
   .partial();
 export const SpecSchema = z.object({ label: z.string().max(100), value: z.string().max(300) });
 export const PressSchema = z.object({

@@ -26,7 +26,7 @@ site.get("/catalogue", async (_req, res) => {
 
 /* ---------- Visitors ---------- */
 
-const Language = z.enum(["en", "fr", "es", "ar"]).catch("en").default("en");
+const Language = z.enum(["en", "fr", "es", "de", "nl", "ar"]).catch("en").default("en");
 
 const ContactIn = z.object({
   name: z.string().trim().min(1).max(200),

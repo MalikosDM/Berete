@@ -46,7 +46,7 @@ export default function CollectionTiles() {
                 </span>
                 <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-ink via-ink/80 to-transparent" />
                 <span className="relative block p-6 sm:p-10">
-                  <span className="flex items-baseline justify-between gap-6">
+                  <span className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                     <span className="title-caps block text-[clamp(2.25rem,5vw,4.5rem)] tracking-[0.1em] text-white transition-colors duration-500 group-hover:text-rose-light">{name}</span>
                     <span className="shrink-0 font-display text-2xl" data-count>
                       <Count text={t.collections.count(pieces.length)} numberClassName="text-rose-gold" wordClassName="text-rose-light text-base uppercase tracking-[0.2em]" />

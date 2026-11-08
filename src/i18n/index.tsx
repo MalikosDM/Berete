@@ -26,6 +26,8 @@ const bundles: Partial<Record<Locale, Bundle>> = { en: { ui: en, content: {} } }
 const loaders: Record<Exclude<Locale, "en">, () => Promise<{ default: Bundle }>> = {
   fr: () => import("./bundles/fr"),
   es: () => import("./bundles/es"),
+  de: () => import("./bundles/de"),
+  nl: () => import("./bundles/nl"),
   ar: () => import("./bundles/ar"),
 };
 

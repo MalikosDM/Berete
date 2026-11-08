@@ -21,7 +21,7 @@ type Field =
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
   | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
 
-const TRANSLATIONS_LABEL = "Traductions (français, espagnol, arabe)";
+const TRANSLATIONS_LABEL = "Traductions (français, espagnol, allemand, néerlandais, arabe)";
 
 const TYPE_NAMES: Record<string, string> = { chain: "Chaîne", pendant: "Pendentif", ring: "Bague", bracelet: "Bracelet", watch: "Montre" };
 
@@ -221,7 +221,7 @@ function MediaField({ token, label, value, onChange, single, imagesOnly }: { tok
 
 /* ---------- Translations ---------- */
 
-const OTHER_LANGUAGES = ["fr", "es", "ar"] as const;
+const OTHER_LANGUAGES = ["fr", "es", "de", "nl", "ar"] as const;
 
 function asTranslations(v: unknown): Translations {
   return v !== null && typeof v === "object" ? (v as Translations) : {};
@@ -505,7 +505,7 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
   if (err) return <p role="alert" className="mt-8 text-base text-rose-light">{err}</p>;
   if (!data) return <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>;
   const date = (v: unknown) => new Date(asText(v)).toLocaleString("fr-FR");
-  const languageName = (v: unknown) => "écrit depuis le site en " + ({ en: "anglais", fr: "français", es: "espagnol", ar: "arabe" }[asText(v)] ?? "anglais");
+  const languageName = (v: unknown) => "écrit depuis le site en " + ({ en: "anglais", fr: "français", es: "espagnol", de: "allemand", nl: "néerlandais", ar: "arabe" }[asText(v)] ?? "anglais");
   return (
     <div className="mt-8 grid gap-12">
       <div>

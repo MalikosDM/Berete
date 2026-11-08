@@ -17,7 +17,7 @@ app.use("/api", (_req, res) => {
 
 // In production the same server serves the built front (npm run build -> dist/).
 const dist = path.resolve(process.env.STATIC_DIR ?? "dist");
-const LANGUAGES = ["fr", "es", "ar"];
+const LANGUAGES = ["fr", "es", "de", "nl", "ar"];
 
 // The pre-rendered pages are served at their address: /about is about.html,
 // /fr is fr.html, /fr/creations is fr/creations.html. This comes before the

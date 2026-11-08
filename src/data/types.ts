@@ -27,7 +27,7 @@ export type MediaItem = {
  * "story"...). A field left empty uses the translation of the site
  * (src/i18n/content), else the English text.
  */
-export type Translations = Partial<Record<"fr" | "es" | "ar", Record<string, string>>>;
+export type Translations = Partial<Record<"fr" | "es" | "de" | "nl" | "ar", Record<string, string>>>;
 
 export type Story = {
   slug: string;

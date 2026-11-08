@@ -112,7 +112,7 @@ model ContactMessage {
   name      String
   email     String
   message   String
-  /// The language of the page it was sent from (en, fr, es, ar): answer in it.
+  /// The language of the page it was sent from (en, fr, es, de, nl, ar): answer in it.
   language  String   @default("en")
   createdAt DateTime @default(now())
 }
@@ -122,7 +122,7 @@ model CallbackRequest {
   name      String
   phone     String
   interest  String?
-  /// The language of the page it was sent from (en, fr, es, ar): answer in it.
+  /// The language of the page it was sent from (en, fr, es, de, nl, ar): answer in it.
   language  String   @default("en")
   createdAt DateTime @default(now())
 }

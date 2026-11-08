@@ -69,6 +69,16 @@ html[lang="ar"] .eyebrow {
   font-size: 1rem;
 }
 
+/*
+ * German and Dutch join their words into long ones ("Aansprakelijkheid",
+ * "Meisterringe"): in titles, a word too long for the screen is cut with a
+ * hyphen, as these languages do, instead of going past the edge.
+ */
+html:is([lang="de"], [lang="nl"]) :is(h1, h2, h3, .title-caps) {
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
 /* Mobile readability: no text under 16px on phones. */
 @media (max-width: 767px) {
   :root {
