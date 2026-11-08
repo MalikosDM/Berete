@@ -3,13 +3,17 @@
  * over the metallic rose gold, with its slow sheen: sharp at every size.
  * "full": diamond, BRT and the name. "mark": the diamond and BRT only.
  */
+import { useI18n } from "@/i18n";
+
 const FILES = { full: "/media/brand/logo.svg", mark: "/media/brand/logo-mark.svg" } as const;
 
-type LogoProps = { variant?: keyof typeof FILES; className?: string; position?: "left" | "center" };
+/** "start": against the start of the line (the left, the right in Arabic). */
+type LogoProps = { variant?: keyof typeof FILES; className?: string; position?: "start" | "center" };
 
-export default function Logo({ variant = "full", className = "", position = "left" }: LogoProps) {
+export default function Logo({ variant = "full", className = "", position = "start" }: LogoProps) {
+  const { dir } = useI18n();
   const url = "url(" + FILES[variant] + ")";
-  const place = position === "center" ? "center" : "left center";
+  const place = position === "center" ? "center" : dir === "rtl" ? "right center" : "left center";
   return (
     <span
       aria-hidden="true"

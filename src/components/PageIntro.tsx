@@ -32,7 +32,7 @@ export default function PageIntro({ eyebrow, title, lead, children }: PageIntroP
             </Reveal>
           ) : null}
         </div>
-        <div className="rule-rose mt-14 origin-left animate-draw lg:mt-20" aria-hidden="true" />
+        <div className="rule-rose mt-14 origin-left animate-draw rtl:origin-right lg:mt-20" aria-hidden="true" />
       </div>
     </section>
   );

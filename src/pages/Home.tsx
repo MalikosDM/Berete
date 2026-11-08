@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
 import { ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
@@ -12,8 +11,9 @@ import SplitHeading from "@/components/SplitHeading";
 import StoriesBar from "@/components/stories/StoriesBar";
 import { media } from "@/data/catalogue";
 import { INTER } from "@/data/pieces";
+import { Link, useI18n, type Messages } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
-import { DEFAULT_MESSAGE, waLink } from "@/lib/site";
+import { waLink } from "@/lib/site";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
 
@@ -26,7 +26,7 @@ function Statement({ n, children }: { n: string; children: string }) {
   );
 }
 
-const HOME_STEPS: ScrollStep[] = [
+const homeSteps = (t: Messages): ScrollStep[] => [
   {
     from: 0,
     to: 0.05,
@@ -34,31 +34,31 @@ const HOME_STEPS: ScrollStep[] = [
     content: (
       <div className={"max-w-4xl " + shadow}>
         <p className="flex flex-col gap-4 font-display text-base uppercase tracking-[0.3em] text-white md:text-lg">
-          <span>Berete Jewellers · Dubai</span>
+          <span>{t.home.kicker}</span>
           <span aria-hidden="true" className="bg-rose-gold block h-px w-24" />
         </p>
-        <h1 className="mt-8 max-w-3xl font-display text-[clamp(2.5rem,6vw,4.5rem)] font-light uppercase leading-[1.05] tracking-[0.06em] text-white">Custom high jewellery for champions.</h1>
-        <p className="mt-5 text-lg text-bone md:text-xl">Made by us. Inspired by you.</p>
+        <h1 className="mt-8 max-w-3xl font-display text-[clamp(2.5rem,6vw,4.5rem)] font-light uppercase leading-[1.05] tracking-[0.06em] text-white">{t.home.title}</h1>
+        <p className="mt-5 text-lg text-bone md:text-xl">{t.site.tagline}</p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Link to="/creations" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/70 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base">
-            Discover creations
+            {t.home.discover}
           </Link>
           <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-7 text-sm font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-rose-light max-sm:text-base">
-            Start your piece
-            <ArrowRight className="size-4" aria-hidden="true" />
+            {t.common.startPiece}
+            <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
-          <a href={waLink(DEFAULT_MESSAGE)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base">
+          <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base">
             <BrandIcon name="whatsapp" className="size-5" />
-            WhatsApp
+            {t.common.whatsapp}
           </a>
         </div>
       </div>
     ),
   },
-  { from: 0.08, to: 0.2, align: "right", content: <Statement n="01">Designed for clubs. Worn by champions.</Statement> },
-  { from: 0.25, to: 0.38, align: "left", content: <Statement n="02">The top lifts off and reveals the trophy.</Statement> },
-  { from: 0.43, to: 0.56, align: "right", content: <Statement n="03">Sculpted, then set stone by stone.</Statement> },
-  { from: 0.61, to: 0.76, align: "left", content: <Statement n="04">Statement pieces, made to be seen.</Statement> },
+  { from: 0.08, to: 0.2, align: "right", content: <Statement n="01">{t.home.statements[0]!}</Statement> },
+  { from: 0.25, to: 0.38, align: "left", content: <Statement n="02">{t.home.statements[1]!}</Statement> },
+  { from: 0.43, to: 0.56, align: "right", content: <Statement n="03">{t.home.statements[2]!}</Statement> },
+  { from: 0.61, to: 0.76, align: "left", content: <Statement n="04">{t.home.statements[3]!}</Statement> },
   {
     from: 0.82,
     to: 0.95,
@@ -66,10 +66,10 @@ const HOME_STEPS: ScrollStep[] = [
     content: (
       <div className={"mx-auto max-w-4xl text-center " + shadow}>
         <span className="text-rose-gold font-display text-2xl">05</span>
-        <p className="title-caps mt-4 text-[clamp(2.25rem,7vw,6.5rem)] tracking-[0.1em] text-white">Your story, in diamonds.</p>
+        <p className="title-caps mt-4 text-[clamp(2.25rem,7vw,6.5rem)] tracking-[0.1em] text-white">{t.common.yourStory}</p>
         <Link to="/contact" className="mt-10 inline-flex min-h-14 items-center gap-3 bg-white px-9 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light">
-          Start your piece
-          <ArrowRight className="size-4" aria-hidden="true" />
+          {t.common.startPiece}
+          <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
         </Link>
       </div>
     ),
@@ -90,9 +90,8 @@ const SELECTION = [
   "marcus-thuram-skeleton-watch",
 ];
 
-const PROCESS_PREVIEW = ["First contact", "Design deposit", "Validation", "Creation", "Photoshoot", "Balance & delivery"];
-
 export default function Home() {
+  const { t } = useI18n();
   const cat = useCatalogue();
   const [ringOpen, setRingOpen] = useState(false);
   const featured = cat.pieces.find((p) => p.featured) ?? cat.pieces[0];
@@ -104,7 +103,7 @@ export default function Home() {
   return (
     <>
       <StoriesBar />
-      <ScrollVideo media={media.scroll.home!} steps={HOME_STEPS} label="Berete Jewellers film, played by scrolling" />
+      <ScrollVideo media={media.scroll.home!} steps={homeSteps(t)} label={t.home.filmLabel} />
 
       <CollectionTiles />
 
@@ -113,7 +112,7 @@ export default function Home() {
         <section aria-labelledby="featured-title" className="mx-auto max-w-[1600px] px-5 py-28 sm:px-8 lg:px-12 lg:py-40">
           <div className="grid items-center gap-12 md:grid-cols-2">
             <div>
-              <p className="eyebrow">Featured capsule</p>
+              <p className="eyebrow">{t.home.featured}</p>
               <SplitHeading as="h2" className="mt-6 text-[clamp(2.25rem,5vw,4.5rem)] tracking-[0.08em]">
                 {featured.client ?? featured.title}
               </SplitHeading>
@@ -122,15 +121,15 @@ export default function Home() {
               </p>
               <p className="mt-8 max-w-md text-lg text-bone">{featured.story}</p>
               <Link to={"/pieces/" + featured.slug} className="mt-10 inline-flex min-h-14 items-center gap-3 border border-rose-light/80 px-8 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink">
-                Enter the capsule
-                <ArrowRight className="size-4" aria-hidden="true" />
+                {t.home.enterCapsule}
+                <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             </div>
             <button
               type="button"
               onClick={() => setRingOpen((v) => !v)}
               aria-pressed={ringOpen}
-              aria-label={ringOpen ? "Close the top of the ring" : "Lift the top of the ring"}
+              aria-label={ringOpen ? t.home.closeTopLabel : t.home.liftTopLabel}
               className="group relative flex min-h-[60svh] w-full flex-col items-center justify-center md:min-h-[70vh]"
             >
               <span className="relative block h-[56svh] w-full md:h-[64vh]">
@@ -145,7 +144,7 @@ export default function Home() {
               </span>
               <span className="mt-6 inline-flex min-h-12 items-center gap-3 text-base font-medium uppercase tracking-[0.2em] text-bone">
                 <span aria-hidden="true" className="bg-rose-gold block h-px w-10" />
-                {ringOpen ? "Close the top" : "Lift the top"}
+                {ringOpen ? t.home.closeTop : t.home.liftTop}
               </span>
             </button>
           </div>
@@ -159,18 +158,18 @@ export default function Home() {
         <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
-              <p className="eyebrow">Worn by</p>
-              <h2 id="players-band-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">The players</h2>
+              <p className="eyebrow">{t.home.wornBy}</p>
+              <h2 id="players-band-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.home.players}</h2>
             </div>
             <Link to="/players" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light">
-              All players <ArrowRight className="size-4" aria-hidden="true" />
+              {t.common.allPlayers} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
           </div>
           <ul className="mt-14 flex flex-wrap items-baseline gap-x-10 gap-y-4">
             {players.map((p) => (
               <li key={p.slug}>
                 <Link to={"/players/" + p.slug} className="group inline-flex min-h-12 items-baseline">
-                  {p.number !== null ? <span className="text-rose-gold mr-3 font-display text-xl">{p.number}</span> : null}
+                  {p.number !== null ? <span className="text-rose-gold me-3 font-display text-xl">{p.number}</span> : null}
                   <span className="font-display text-[clamp(1.75rem,4vw,3.25rem)] font-light uppercase tracking-[0.06em] text-white transition-colors group-hover:text-rose-light">{p.name}</span>
                 </Link>
               </li>
@@ -181,23 +180,23 @@ export default function Home() {
 
       {/* Atelier, Boxes, Process */}
       <section aria-labelledby="house-title" className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-36">
-        <p className="eyebrow">Inside the house</p>
-        <h2 id="house-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">From sketch to handover</h2>
+        <p className="eyebrow">{t.home.inside}</p>
+        <h2 id="house-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.home.insideTitle}</h2>
         <div className="mt-14 grid gap-px bg-white/10 lg:grid-cols-3">
           <Reveal className="bg-ink">
             <Link to="/atelier" className="group flex h-full flex-col p-6 sm:p-8">
-              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{setting ? <MediaView item={setting} alt="Close-up of a setting tool working on diamonds" fit="cover" /> : null}</div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">Atelier</p>
-              <p className="mt-3 text-lg text-bone">Every stone set by hand, under the microscope.</p>
-              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">Enter <ArrowRight className="size-4" aria-hidden="true" /></span>
+              <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{setting ? <MediaView item={setting} alt={t.home.atelierAlt} fit="cover" /> : null}</div>
+              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.atelierTitle}</p>
+              <p className="mt-3 text-lg text-bone">{t.home.atelierText}</p>
+              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.enter} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>
           </Reveal>
           <Reveal className="bg-ink" delay={0.08}>
             <Link to="/boxes" className="group flex h-full flex-col p-6 sm:p-8">
               <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{box?.images[1] ?? box?.images[0] ? <MediaView item={(box.images[1] ?? box.images[0])!} fit="cover" className="transition-transform duration-[1.4s] group-hover:scale-105" /> : null}</div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">Boxes</p>
-              <p className="mt-3 text-lg text-bone">Custom boxes on selected pieces, as an option.</p>
-              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">Discover <ArrowRight className="size-4" aria-hidden="true" /></span>
+              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.boxesTitle}</p>
+              <p className="mt-3 text-lg text-bone">{t.home.boxesText}</p>
+              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.discoverShort} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>
           </Reveal>
           <Reveal className="bg-ink" delay={0.16}>
@@ -206,7 +205,7 @@ export default function Home() {
                 <img src={media.scroll.process?.poster} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
                 <div aria-hidden="true" className="absolute inset-0 bg-ink/60" />
                 <ol className="relative flex h-full flex-col justify-center gap-4 px-6">
-                  {PROCESS_PREVIEW.map((s, i) => (
+                  {t.process.steps.map(({ title: s }, i) => (
                     <li key={s} className="flex items-baseline gap-4">
                       <span className="text-rose-gold w-6 font-display text-xl">{i + 1}</span>
                       <span className="text-base text-white">{s}</span>
@@ -214,9 +213,9 @@ export default function Home() {
                   ))}
                 </ol>
               </div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">Process</p>
-              <p className="mt-3 text-lg text-bone">Six clear steps, followed on WhatsApp.</p>
-              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">Follow <ArrowRight className="size-4" aria-hidden="true" /></span>
+              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.processTitle}</p>
+              <p className="mt-3 text-lg text-bone">{t.home.processText}</p>
+              <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.follow} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>
           </Reveal>
         </div>

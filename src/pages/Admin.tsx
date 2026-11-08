@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
-import { PIECE_TYPES, type MediaItem } from "@/data/types";
+import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
+import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 
 /*
  * Back-office of the site (/admin), in French for the owner. It edits the same
@@ -16,7 +17,11 @@ type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
   | { key: string; label: string; type: "select"; options: readonly (readonly [string, string])[] }
   | { key: string; label: string; type: "image" | "media" | "medialist" }
-  | { key: string; label: string; type: "specs" | "press" };
+  | { key: string; label: string; type: "specs" | "press" }
+  /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
+  | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
+
+const TRANSLATIONS_LABEL = "Traductions (français, espagnol, arabe)";
 
 const TYPE_NAMES: Record<string, string> = { chain: "Chaîne", pendant: "Pendentif", ring: "Bague", bracelet: "Bracelet", watch: "Montre" };
 
@@ -32,6 +37,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "people", label: "Joueurs, clubs ou personnalités liés (adresses séparées par des virgules)", type: "slugs" },
       { key: "pieceSlug", label: "Pièce liée (adresse, ajoute « View the piece »)", type: "text" },
       { key: "articleUrl", label: "Lien d'article (le bouton devient « Read the article »)", type: "text" },
+      { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false]] },
     ],
     empty: { title: "", slug: "", cover: "", media: [], people: [], pieceSlug: "", articleUrl: "" },
   },
@@ -46,6 +52,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "club", label: "Club", type: "text" },
       { key: "portrait", label: "Portrait (vide : la couverture de sa story)", type: "image" },
       { key: "bio", label: "Texte", type: "textarea" },
+      { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["bio", "Texte", true]] },
     ],
     empty: { name: "", slug: "", kind: "player", number: null, club: "", portrait: "", bio: "" },
   },
@@ -69,6 +76,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "press", label: "Presse (une ligne par article : Média | Titre | Lien)", type: "press" },
       { key: "people", label: "Joueurs et clubs liés (adresses séparées par des virgules)", type: "slugs" },
       { key: "boxSlug", label: "Écrin lié (adresse)", type: "text" },
+      { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
     empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], press: [], people: [], boxSlug: "" },
   },
@@ -81,6 +89,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
       { key: "description", label: "Texte", type: "textarea" },
       { key: "images", label: "Photos", type: "medialist" },
       { key: "pieceSlug", label: "Pièce liée (adresse)", type: "text" },
+      { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["description", "Texte", true]] },
     ],
     empty: { name: "", slug: "", description: "", images: [], pieceSlug: "" },
   },
@@ -210,6 +219,64 @@ function MediaField({ token, label, value, onChange, single, imagesOnly }: { tok
   );
 }
 
+/* ---------- Translations ---------- */
+
+const OTHER_LANGUAGES = ["fr", "es", "ar"] as const;
+
+function asTranslations(v: unknown): Translations {
+  return v !== null && typeof v === "object" ? (v as Translations) : {};
+}
+
+/** Only the texts actually written: an empty field uses the translation of the site. */
+function cleanTranslations(v: unknown): Translations {
+  const out: Translations = {};
+  for (const l of OTHER_LANGUAGES) {
+    const fields = Object.entries(asTranslations(v)[l] ?? {}).filter(([, text]) => typeof text === "string" && text.trim() !== "");
+    if (fields.length > 0) out[l] = Object.fromEntries(fields.map(([k, text]) => [k, text.trim()]));
+  }
+  return out;
+}
+
+/**
+ * The texts of an item in the other languages. Empty, a field shows (in grey)
+ * the translation the site already uses; written, it replaces it. A text
+ * changed in English stays in English in the other languages until it has
+ * its translation here.
+ */
+function TranslationsField({ label, fields, value, source, onChange }: { label: string; fields: readonly (readonly [string, string, boolean])[]; value: Translations; source: Rec; onChange: (v: Translations) => void }) {
+  const [, setLoaded] = useState(0);
+  useEffect(() => {
+    Promise.all(OTHER_LANGUAGES.map((l) => loadLocale(l)))
+      .then(() => setLoaded((n) => n + 1))
+      .catch(() => undefined);
+  }, []);
+  return (
+    <fieldset className="border border-white/15 p-4" data-translations>
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      <p className="text-base text-mist">Laissez un champ vide pour garder la traduction du site, affichée en gris. Si vous changez un texte anglais plus haut, écrivez aussi sa traduction ici : sinon cette langue l'affiche en anglais.</p>
+      {OTHER_LANGUAGES.map((l) => (
+        <div key={l} className="mt-6 border-t border-white/10 pt-4">
+          <p className="eyebrow">{LOCALE_INFO[l].name}</p>
+          {fields.map(([key, name, long]) => {
+            const english = asText(source[key]);
+            const own = asTranslations(value)[l]?.[key] ?? "";
+            const site = bundleOf(l).content[english] ?? (key === "name" && LOCALE_INFO[l].dir === "ltr" ? english : "");
+            const set = (text: string) => onChange({ ...asTranslations(value), [l]: { ...(asTranslations(value)[l] ?? {}), [key]: text } });
+            const props = { lang: l, dir: LOCALE_INFO[l].dir, value: own, placeholder: site, onChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => set(e.target.value) };
+            return (
+              <label key={key} className="mt-3 block text-base text-bone">
+                {name}
+                {long ? <textarea rows={4} {...props} className={inputCls + " py-3 placeholder:text-mist/60"} /> : <input type="text" {...props} className={inputCls + " placeholder:text-mist/60"} />}
+                {english && !own && !site ? <span className="mt-1 block text-base text-rose-light">Pas encore traduit : cette langue affiche le texte anglais.</span> : null}
+              </label>
+            );
+          })}
+        </div>
+      ))}
+    </fieldset>
+  );
+}
+
 /* Form values <-> API bodies */
 
 function toForm(kind: Kind, item: Rec): Rec {
@@ -240,6 +307,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
         .map((l) => l.split(":"))
         .filter((p) => p.length > 1 && p[0]!.trim())
         .map((p) => ({ label: p[0]!.trim(), value: p.slice(1).join(":").trim() }));
+    else if (field.type === "translations") body[field.key] = cleanTranslations(v);
     else if (field.type === "press")
       body[field.key] = asText(v)
         .split("\n")
@@ -275,6 +343,7 @@ function Editor({ kind, token, initial, onDone, onExpired }: { kind: Kind; token
 
   const field = (d: Field): ReactNode => {
     const v = f[d.key];
+    if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
     if (d.type === "medialist") return <MediaField key={d.key} token={token} label={d.label} value={asList(v)} onChange={(l) => set(d.key, l)} />;
@@ -436,6 +505,7 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
   if (err) return <p role="alert" className="mt-8 text-base text-rose-light">{err}</p>;
   if (!data) return <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>;
   const date = (v: unknown) => new Date(asText(v)).toLocaleString("fr-FR");
+  const languageName = (v: unknown) => "écrit depuis le site en " + ({ en: "anglais", fr: "français", es: "espagnol", ar: "arabe" }[asText(v)] ?? "anglais");
   return (
     <div className="mt-8 grid gap-12">
       <div>
@@ -446,7 +516,7 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
             <li key={String(c.id)} className="border-b border-white/15 py-4 text-base">
               <span className="text-white">{asText(c.name)}</span> · <a href={"tel:" + asText(c.phone)} className="text-rose-light">{asText(c.phone)}</a>
               {c.interest ? <span className="text-bone"> · {asText(c.interest)}</span> : null}
-              <span className="block text-mist">{date(c.createdAt)}</span>
+              <span className="block text-mist">{date(c.createdAt)} · {languageName(c.language)}</span>
             </li>
           ))}
         </ul>
@@ -458,8 +528,8 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
           {data.messages.map((m) => (
             <li key={String(m.id)} className="border-b border-white/15 py-4 text-base">
               <span className="text-white">{asText(m.name)}</span> · <a href={"mailto:" + asText(m.email)} className="text-rose-light">{asText(m.email)}</a>
-              <span className="block text-mist">{date(m.createdAt)}</span>
-              <p className="mt-2 whitespace-pre-line text-bone">{asText(m.message)}</p>
+              <span className="block text-mist">{date(m.createdAt)} · {languageName(m.language)}</span>
+              <p className="mt-2 whitespace-pre-line text-bone" dir="auto">{asText(m.message)}</p>
             </li>
           ))}
         </ul>

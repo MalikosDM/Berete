@@ -16,7 +16,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
-import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story } from "../src/data/types.js";
+import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
 import { prisma } from "./db.js";
 
 const IMPORTED = "/media/";
@@ -37,6 +37,10 @@ export const MediaItemSchema = z.object({
 });
 export const MediaListSchema = z.array(MediaItemSchema).max(200);
 export const MakingSchema = z.object(Object.fromEntries(MAKING_STEPS.map((k) => [k, MediaItemSchema.optional()])) as Record<(typeof MAKING_STEPS)[number], z.ZodOptional<typeof MediaItemSchema>>);
+/** Texts written in /admin for another language, by field: { fr: { title: "..." } }. */
+export const TranslationsSchema = z
+  .object({ fr: z.record(z.string().max(40), z.string().max(5000)), es: z.record(z.string().max(40), z.string().max(5000)), ar: z.record(z.string().max(40), z.string().max(5000)) })
+  .partial();
 export const SpecSchema = z.object({ label: z.string().max(100), value: z.string().max(300) });
 export const PressSchema = z.object({
   outlet: z.string().max(200),
@@ -55,6 +59,11 @@ function mediaList(v: unknown): MediaItem[] {
 function mediaOne(v: unknown): MediaItem {
   const parsed = MediaItemSchema.safeParse(v);
   return parsed.success ? parsed.data : EMPTY_MEDIA;
+}
+
+function translationsOf(v: unknown): Translations {
+  const parsed = TranslationsSchema.safeParse(v);
+  return parsed.success ? parsed.data : {};
 }
 
 function makingOf(v: unknown): Making {
@@ -95,6 +104,7 @@ export const toStory = (r: StoryRow): Story => ({
   people: r.people,
   pieceSlug: r.pieceSlug,
   articleUrl: r.articleUrl,
+  translations: translationsOf(r.translations),
 });
 
 export const toPerson = (r: PersonRow): Person => ({
@@ -105,6 +115,7 @@ export const toPerson = (r: PersonRow): Person => ({
   club: r.club,
   portrait: r.portrait,
   bio: r.bio,
+  translations: translationsOf(r.translations),
 });
 
 export const toPiece = (r: PieceRow): Piece => ({
@@ -125,6 +136,7 @@ export const toPiece = (r: PieceRow): Piece => ({
   featured: r.featured,
   draft: r.draft,
   making: makingOf(r.making),
+  translations: translationsOf(r.translations),
 });
 
 export const toBox = (r: BoxRow): Box => ({
@@ -133,6 +145,7 @@ export const toBox = (r: BoxRow): Box => ({
   description: r.description,
   images: mediaList(r.images),
   pieceSlug: r.pieceSlug,
+  translations: translationsOf(r.translations),
 });
 
 const order = [{ sortOrder: "asc" as const }, { createdAt: "asc" as const }];

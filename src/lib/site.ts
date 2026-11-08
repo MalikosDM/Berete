@@ -1,4 +1,4 @@
-/* Settings and copy shared by the whole site. The only place to change the contact details. Texts are provisional (English). */
+/* Settings shared by the whole site. The only place to change the contact details. The words of the site are in src/i18n. */
 
 /** WhatsApp number, digits only with the country code. Placeholder: replace with the real number. */
 export const WHATSAPP_NUMBER = "971XXXXXXXXX";
@@ -6,45 +6,14 @@ export const WHATSAPP_NUMBER = "971XXXXXXXXX";
 export const EMAIL = "";
 export const INSTAGRAM_HANDLE = "beretejewellers";
 export const INSTAGRAM_URL = "https://www.instagram.com/" + INSTAGRAM_HANDLE + "/";
-export const BASE_LINE = "Based in Dubai · Worldwide delivery";
 
+/** A WhatsApp conversation opened with this message (written in the language of the page). */
 export function waLink(message: string): string {
   return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);
 }
 
-export const DEFAULT_MESSAGE = "Hello Berete Jewellers, I would like to start a custom piece.";
+/* ---------- Contact configurator: the answers, whose words are in src/i18n (contact.pieceChoices...) ---------- */
 
-export function pieceMessage(name: string): string {
-  return 'Hello Berete Jewellers, I want a piece like "' + name + '". Can we talk about it?';
-}
-
-/* ---------- Contact configurator ---------- */
-
-export type Choice = { value: string; label: string };
-
-export const PIECE_CHOICES: Choice[] = [
-  { value: "chain", label: "Chain" },
-  { value: "pendant", label: "Pendant" },
-  { value: "ring", label: "Championship ring" },
-  { value: "other", label: "Something else" },
-];
-
-export const BUDGETS: Choice[] = [
-  { value: "10k", label: "Up to 10,000 USD" },
-  { value: "25k", label: "10,000 to 25,000 USD" },
-  { value: "50k", label: "25,000 to 50,000 USD" },
-  { value: "50k+", label: "50,000 USD and above" },
-  { value: "unsure", label: "Not sure yet" },
-];
-
-export const TIMINGS: Choice[] = [
-  { value: "asap", label: "Within a month" },
-  { value: "quarter", label: "In 1 to 3 months" },
-  { value: "flexible", label: "No rush" },
-];
-
-export function configuratorMessage(type: string, budget: string, timing: string, pieceName?: string): string {
-  const lines = ["Hello Berete Jewellers, I would like to start a piece.", "Piece: " + type, "Budget: " + budget, "Timing: " + timing];
-  if (pieceName) lines.push('Inspired by: "' + pieceName + '"');
-  return lines.join("\n");
-}
+export const PIECE_CHOICES = ["chain", "pendant", "ring", "other"] as const;
+export const BUDGETS = ["10k", "25k", "50k", "50k+", "unsure"] as const;
+export const TIMINGS = ["asap", "quarter", "flexible"] as const;

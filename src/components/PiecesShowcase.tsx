@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router";
 import { ArrowUpRight } from "lucide-react";
 import { MediaView } from "@/components/Media";
-import { TYPE_LABELS } from "@/data/relations";
+import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { gsap, useReducedMotion } from "@/lib/gsap";
 
@@ -14,6 +13,7 @@ export default function PiecesShowcase({
   slugs?: string[];
   exclude?: string;
 }) {
+  const { t, dir } = useI18n();
   const { pieces: all } = useCatalogue();
   const chosen = slugs
     ? slugs
@@ -31,9 +31,11 @@ export default function PiecesShowcase({
     if (!section || !track || reduced || pieces.length < 3) return undefined;
     const mm = gsap.matchMedia();
     mm.add("(min-width: 1024px)", () => {
+      // Right to left (Arabic), the row starts on the right and moves to the right.
+      const sign = dir === "rtl" ? 1 : -1;
       const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
       gsap.to(track, {
-        x: () => -distance(),
+        x: () => sign * distance(),
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -47,7 +49,7 @@ export default function PiecesShowcase({
       });
     });
     return () => mm.revert();
-  }, [pieces.length, reduced]);
+  }, [pieces.length, reduced, dir]);
 
   if (pieces.length === 0) return null;
 
@@ -62,19 +64,19 @@ export default function PiecesShowcase({
       >
         <div className="mx-auto mb-10 flex w-full max-w-[1600px] flex-col justify-between gap-4 px-5 sm:flex-row sm:items-end sm:px-8 lg:mb-12 lg:px-12">
           <div>
-            <p className="eyebrow">Selected pieces</p>
+            <p className="eyebrow">{t.showcase.eyebrow}</p>
             <h2
               id="capsules-title"
               className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]"
             >
-              The capsules
+              {t.showcase.title}
             </h2>
           </div>
           <Link
             to="/creations"
             className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light"
           >
-            All creations <ArrowUpRight className="size-4" aria-hidden="true" />
+            {t.common.allCreations} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>
         <div
@@ -109,7 +111,7 @@ export default function PiecesShowcase({
                   {p.title}
                 </span>
                 <span className="mt-3 block text-base text-mist">
-                  {TYPE_LABELS[p.type]}
+                  {t.types[p.type]}
                 </span>
               </span>
             </Link>

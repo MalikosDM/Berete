@@ -38,15 +38,37 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   (nouvelles stories, nouvelles photos, nouveaux textes) sans jamais écraser un texte modifié depuis l'admin.
 - **Le numéro WhatsApp, l'email, Instagram** : `src/lib/site.ts` (seul fichier à modifier).
 
+## Les langues
+
+Le site existe en anglais (`/creations`), français (`/fr/creations`), espagnol (`/es/...`) et arabe (`/ar/...`,
+lu de droite à gauche). Le menu de langue (barre du haut, menu mobile, pied de page) garde la même page.
+
+- **Les mots des pages** : `src/i18n/ui/en.ts` (la source), puis `fr.ts`, `es.ts`, `ar.ts`. TypeScript refuse
+  une langue à laquelle il manque une phrase. Les titres et descriptions Google de chaque page sont dans `seoPages`
+  (l'anglais dans `src/extensions/seo/seo.json`).
+- **Les textes du catalogue** (pièces, joueurs, stories, écrins) sont écrits en anglais dans `src/data/` ; chaque langue
+  les traduit dans `src/i18n/content/<langue>.ts`, rangés par texte anglais. `npm run i18n:check` dit ce qui manque.
+- **Depuis l'admin** : chaque fiche a un bloc « Traductions » (français, espagnol, arabe). Vide, la fiche garde la
+  traduction du site (affichée en gris) ; rempli, il la remplace. Un texte anglais modifié dans l'admin reste en anglais
+  dans les autres langues tant que sa traduction n'est pas écrite dans ce bloc.
+- **Arabe** : polices Amiri (titres) et IBM Plex Sans Arabic (texte), sans espacement entre les lettres ; mise en page,
+  flèches, galeries et stories en miroir (on avance vers la gauche).
+- **WhatsApp et formulaires** : les messages préremplis sont écrits dans la langue de la page ; les messages et demandes
+  de rappel indiquent dans l'admin la langue du visiteur.
+- **Google** : chaque langue a ses pages pré-rendues, son plan du site et ses liens `hreflang`. Pour que ces liens
+  figurent dans les pages construites, définir l'adresse publique au moment du build : `SITE_URL=https://… npm run build`.
+
 ## Vérifier
 
 ```sh
 npm run lint
 npm run typecheck
+npm run i18n:check      # aucune traduction ne manque (français, espagnol, arabe)
 npm run build && npm run build:server
 npm start               # site construit + API sur http://localhost:3001
 npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px), captures dans verification/
-                        # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos)
+                        # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
+                        #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 ```
 
 ## Mettre en ligne

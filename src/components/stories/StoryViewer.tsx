@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
-import { Link } from "react-router";
 import { ArrowRight, ArrowUpRight, Play, Volume2, VolumeX, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
 import { pieceByMedia } from "@/data/relations";
 import type { Story } from "@/data/types";
+import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
-import { pieceMessage, waLink } from "@/lib/site";
+import { waLink } from "@/lib/site";
 import { isAbort, itemsOf, preload, setSound, setSoundWanted, soundWanted, storyVideo } from "./player";
 
 const IMAGE_MS = 5000;
@@ -24,7 +24,7 @@ type Props = {
 
 /**
  * Full screen story viewer: progress bars, tap right / left for the next /
- * previous step, swipe for the next / previous story, long press to pause,
+ * previous step (mirrored right to left, in Arabic), swipe for the next / previous story, long press to pause,
  * close with the cross or a swipe down. Photos last 5 s; videos their real
  * length, in the one shared <video> element.
  */
@@ -37,6 +37,8 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   // The step whose video could not start, even muted: it shows a play button.
   const [blockedStep, setBlockedStep] = useState<string | null>(null);
 
+  const { t, dir } = useI18n();
+  const rtl = dir === "rtl";
   const cat = useCatalogue();
   const byMedia = useMemo(() => pieceByMedia(cat), [cat]);
   const story = stories[s];
@@ -114,8 +116,8 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      else if (e.key === "ArrowRight") next();
-      else if (e.key === "ArrowLeft") prev();
+      else if (e.key === "ArrowRight") (rtl ? prev : next)();
+      else if (e.key === "ArrowLeft") (rtl ? next : prev)();
       else if (e.key === " ") {
         e.preventDefault();
         setHeld((h) => !h);
@@ -123,7 +125,7 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [next, prev, onClose]);
+  }, [next, prev, onClose, rtl]);
 
   /* ---------- The shared video element lives in the viewer while it is open ---------- */
 
@@ -272,10 +274,12 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
     const dx = e.clientX - p.x;
     const dy = e.clientY - p.y;
     if (dy > 80 && Math.abs(dy) > Math.abs(dx)) return onClose();
-    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) return dx < 0 ? nextStory() : prevStory();
+    // A swipe toward the start of the line shows the next story; a tap on the first third goes back.
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) return (rtl ? dx > 0 : dx < 0) ? nextStory() : prevStory();
     if (p.holding) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    if (e.clientX - rect.left < rect.width / 3) prev();
+    const fromStart = rtl ? rect.right - e.clientX : e.clientX - rect.left;
+    if (fromStart < rect.width / 3) prev();
     else next();
   };
 
@@ -289,7 +293,7 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   const first = s === 0 && m === 0;
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={"Story: " + story.title} data-lenis-prevent data-story={story.slug} data-step={m} className="fixed inset-0 z-[95] flex justify-center bg-black">
+    <div role="dialog" aria-modal="true" aria-label={t.stories.dialog(story.title)} data-lenis-prevent data-story={story.slug} data-step={m} className="fixed inset-0 z-[95] flex justify-center bg-black">
       <div className="relative h-full w-full overflow-hidden sm:max-w-[min(28rem,56svh)]">
         <div
           data-story-surface
@@ -309,7 +313,7 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
           <button
             type="button"
             onClick={() => videoRef.current && play(videoRef.current)}
-            aria-label="Play the video"
+            aria-label={t.stories.play}
             className="absolute top-1/2 left-1/2 z-10 inline-flex size-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-black/50 text-white backdrop-blur-sm"
           >
             <Play className="size-10 translate-x-0.5 fill-current" aria-hidden="true" />
@@ -325,41 +329,41 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
             ))}
           </div>
           <div className="mt-2 flex items-center justify-between gap-3">
-            <p className="truncate pl-1 text-base font-medium text-white">{story.title}</p>
+            <p className="truncate ps-1 text-base font-medium text-white">{story.title}</p>
             <div className="flex shrink-0 items-center">
               {isVideo ? (
-                <button type="button" onClick={toggleSound} aria-pressed={soundOn} aria-label={soundOn ? "Mute the sound" : "Turn the sound on"} className="pointer-events-auto inline-flex size-12 items-center justify-center text-white">
+                <button type="button" onClick={toggleSound} aria-pressed={soundOn} aria-label={soundOn ? t.stories.soundOff : t.stories.soundOn} className="pointer-events-auto inline-flex size-12 items-center justify-center text-white">
                   {soundOn ? <Volume2 className="size-6" aria-hidden="true" /> : <VolumeX className="size-6" aria-hidden="true" />}
                 </button>
               ) : null}
-              <button ref={closeRef} type="button" onClick={onClose} aria-label="Close the story" className="pointer-events-auto inline-flex size-12 items-center justify-center text-white">
+              <button ref={closeRef} type="button" onClick={onClose} aria-label={t.stories.close} className="pointer-events-auto inline-flex size-12 items-center justify-center text-white">
                 <X className="size-7" aria-hidden="true" />
               </button>
             </div>
           </div>
-          {first && !held ? <p className="sr-only">Tap the right side for the next step, the left side for the previous one. Hold to pause.</p> : null}
+          {first && !held ? <p className="sr-only">{t.stories.help}</p> : null}
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black via-black/70 to-transparent px-4 pt-20 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="pointer-events-auto flex flex-col gap-3">
             {story.articleUrl ? (
               <a href={story.articleUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-5 text-base font-semibold text-ink">
-                Read the article <ArrowUpRight className="size-5" aria-hidden="true" />
+                {t.common.readArticle} <ArrowUpRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
               </a>
             ) : null}
             <div className="flex gap-3">
-              <a href={waLink(pieceMessage(piece?.title ?? story.title))} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
-                <BrandIcon name="whatsapp" className="size-5" /> Want yours? WhatsApp
+              <a href={waLink(t.whatsapp.piece(piece?.title ?? story.title))} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
+                <BrandIcon name="whatsapp" className="size-5" /> {t.stories.want}
               </a>
               {piece ? (
                 <Link
                   to={"/pieces/" + piece.slug}
                   onClick={onClose}
                   data-see-piece={piece.slug}
-                  aria-label={"See the piece: " + piece.title}
+                  aria-label={t.stories.seePieceLabel(piece.title)}
                   className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 border border-white/40 bg-black/30 px-4 text-base font-medium text-white backdrop-blur-sm"
                 >
-                  See the piece <ArrowRight className="size-4" aria-hidden="true" />
+                  {t.common.seePiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                 </Link>
               ) : null}
             </div>

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { ScrollMedia } from "@/data/types";
+import { useI18n } from "@/i18n";
 import { ScrollTrigger, getLenis, scrollToY, useReducedMotion } from "@/lib/gsap";
 
 /**
@@ -47,9 +48,9 @@ function stepOpacity(p: number, s: ScrollStep): number {
 }
 
 const ALIGN: Record<NonNullable<ScrollStep["align"]>, { box: string; inner: string }> = {
-  left: { box: "items-end justify-start text-left md:items-center", inner: "max-w-3xl" },
+  left: { box: "items-end justify-start text-start md:items-center", inner: "max-w-3xl" },
   center: { box: "items-center justify-center text-center", inner: "mx-auto max-w-4xl" },
-  right: { box: "items-end justify-end text-right md:items-center", inner: "max-w-3xl" },
+  right: { box: "items-end justify-end text-end md:items-center", inner: "max-w-3xl" },
 };
 
 /** Portrait screens use the portrait sequence. null until the screen is known. */
@@ -79,6 +80,7 @@ function Sparkles() {
 }
 
 export default function ScrollVideo({ media, steps, label, heightVh = 700, overlay, magnet = true, showProgress = true }: ScrollVideoProps) {
+  const { t } = useI18n();
   const reduced = useReducedMotion();
   const portrait = usePortrait();
   const containerRef = useRef<HTMLElement>(null);
@@ -303,7 +305,7 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
 
   const scrims = (
     <>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/60 via-black/20 to-transparent" />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-r from-black/60 via-black/20 to-transparent rtl:bg-linear-to-l" />
       {/* Phones: the text sits over the jewel, a light veil keeps it readable. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black/30 md:hidden" />
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-48 bg-linear-to-b from-ink/80 to-transparent" />
@@ -382,13 +384,13 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
         {overlay ? overlay(progress) : null}
 
         {showProgress ? (
-          <div aria-hidden="true" className="absolute top-1/2 right-6 hidden h-48 w-px -translate-y-1/2 bg-white/20 lg:block">
+          <div aria-hidden="true" className="absolute top-1/2 end-6 hidden h-48 w-px -translate-y-1/2 bg-white/20 lg:block">
             <div className="bg-rose-gold w-px origin-top" style={{ height: progress * 100 + "%" }} />
           </div>
         ) : null}
 
         <div aria-hidden="true" className="pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 transition-opacity duration-500 md:flex" style={{ opacity: progress < 0.02 ? 1 : 0 }}>
-          <span className="text-base tracking-[0.2em] text-bone uppercase">Scroll</span>
+          <span className="text-base tracking-[0.2em] text-bone uppercase">{t.scroll.hint}</span>
           <span className="bg-rose-gold block h-12 w-px" />
         </div>
       </div>

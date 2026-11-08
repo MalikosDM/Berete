@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate, useParams } from "react-router";
+import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import HorizontalGallery from "@/components/HorizontalGallery";
@@ -11,21 +11,15 @@ import StoryViewer from "@/components/stories/StoryViewer";
 import { media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { RENAMED_PIECES } from "@/data/pieces";
-import { findPiece, initials, madeFor, mediaOfPiece, peopleOf, portraitOf, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
+import { listOf } from "@/i18n/format";
+import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
-import { pieceMessage, waLink } from "@/lib/site";
+import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
-
-const STEPS: Record<MakingStep, { title: string; text: string }> = {
-  sketch: { title: "Sketch", text: "The idea is drawn by hand, then modelled until every proportion is right." },
-  raw: { title: "Raw piece", text: "The metal is cast and assembled, before a single stone is set." },
-  setting: { title: "Setting", text: "Each stone is set by hand, under magnification." },
-  polishing: { title: "Polishing", text: "Every surface is polished until the metal disappears behind the light." },
-  delivery: { title: "Delivery", text: "Checked, photographed, then handed over, in its box when it has one." },
-};
 
 /** The atelier photos that illustrate a step when the piece has none of its own. */
 function atelierFor(step: MakingStep): MediaItem | null {
@@ -39,6 +33,8 @@ function atelierFor(step: MakingStep): MediaItem | null {
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
   const { slug = "" } = useParams();
+  const { t, intl } = useI18n();
+  const madeFor = useMadeFor();
   const cat = useCatalogue();
   const [viewer, setViewer] = useState<{ stories: Story[]; step: number } | null>(null);
   const piece = findPiece(cat, slug);
@@ -48,11 +44,12 @@ export default function PiecePage() {
   }
 
   const collection = collectionOf(piece.type);
+  const collectionName = collectionWords(t, collection.slug, collection).name;
   const people = peopleOf(cat, piece);
   const box = piece.boxSlug ? cat.boxes.find((b) => b.slug === piece.boxSlug) : undefined;
   const similar = similarPieces(cat, piece, 4);
   const seenIn = storiesOfPiece(cat, piece);
-  const wa = waLink(pieceMessage(piece.title));
+  const wa = waLink(t.whatsapp.piece(piece.title));
 
   // Opens stories on the first photo or video of this piece, when they show it.
   const openStories = (stories: Story[]) => {
@@ -77,9 +74,9 @@ export default function PiecePage() {
             <div className={shadow}>
               <p className="eyebrow">
                 <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center hover:text-white">
-                  {collection.name}
+                  {collectionName}
                 </Link>
-                <span className="text-mist"> · Made for {madeFor(cat, piece)}</span>
+                <span className="text-mist"> · {t.common.madeFor(madeFor(cat, piece))}</span>
               </p>
               <h1 id="piece-title" className="title-caps mt-3 text-[clamp(2.25rem,4.2vw,4.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance]">
                 {piece.title}
@@ -88,27 +85,27 @@ export default function PiecePage() {
             </div>
             <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row">
               <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
-                <BrandIcon name="whatsapp" className="size-5" /> I want a piece like this
+                <BrandIcon name="whatsapp" className="size-5" /> {t.piece.want}
               </a>
               <a href="#piece-details" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
-                The details <ArrowDown className="size-4" aria-hidden="true" />
+                {t.piece.details} <ArrowDown className="size-4" aria-hidden="true" />
               </a>
             </div>
           </div>
           <Link to="/creations" className="mt-8 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-mist hover:text-rose-light">
-            <ArrowLeft className="size-4" aria-hidden="true" /> All creations
+            <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" /> {t.common.allCreations}
           </Link>
         </div>
       </section>
 
       <div id="piece-details" className="scroll-mt-24">
-        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title="The details" /> : null}
+        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={t.piece.details} /> : null}
       </div>
 
       {/* Made for, and the story */}
-      <section aria-label="Made for and the story" className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
+      <section aria-label={t.piece.madeFor + " · " + t.piece.story} className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
         <div className="lg:col-span-5" data-made-for>
-          <h2 className="eyebrow">Made for</h2>
+          <h2 className="eyebrow">{t.piece.madeFor}</h2>
           {people.length > 0 ? (
             <ul className="mt-8 space-y-6">
               {people.slice(0, 3).map((person) => {
@@ -128,11 +125,11 @@ export default function PiecePage() {
                       </Link>
                       <p className="flex flex-wrap gap-x-5">
                         <Link to={"/players/" + person.slug} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-                          {person.kind === "club" ? "The club" : "The profile"} <ArrowRight className="size-4" aria-hidden="true" />
+                          {person.kind === "club" ? t.piece.theClub : t.piece.theProfile} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                         </Link>
                         {stories.length > 0 ? (
                           <button type="button" onClick={() => openStories(stories)} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-                            <Play className="size-4" aria-hidden="true" /> {stories.length > 1 ? "The stories" : "The story"}
+                            <Play className="size-4" aria-hidden="true" /> {t.piece.stories(stories.length)}
                           </button>
                         ) : null}
                       </p>
@@ -142,7 +139,7 @@ export default function PiecePage() {
               })}
               {people.length > 3 ? (
                 <li className="text-base text-mist">
-                  And {people.slice(3).map((p) => p.name).join(", ")}.
+                  {t.piece.andOthers(listOf(intl, people.slice(3).map((p) => p.name)))}
                 </li>
               ) : null}
             </ul>
@@ -156,13 +153,13 @@ export default function PiecePage() {
               onClick={() => openStories(seenIn)}
               className="mt-10 inline-flex min-h-12 items-center gap-3 border border-white/40 px-6 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
             >
-              <Play className="size-4 fill-current" aria-hidden="true" /> Seen in our stories
+              <Play className="size-4 fill-current" aria-hidden="true" /> {t.piece.seenInStories}
             </button>
           ) : null}
         </div>
 
         <div className="lg:col-span-6 lg:col-start-7">
-          <h2 className="eyebrow">The story</h2>
+          <h2 className="eyebrow">{t.piece.story}</h2>
           {piece.line ? <p className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</p> : null}
           {piece.story ? <p className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">{piece.story}</p> : null}
         </div>
@@ -172,9 +169,9 @@ export default function PiecePage() {
 
       {piece.handover.length > 0 ? (
         <section aria-labelledby="handover-title" className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
-          <p className="eyebrow">Delivered</p>
+          <p className="eyebrow">{t.piece.delivered}</p>
           <h2 id="handover-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
-            {piece.clientPublic && piece.client ? "Handed over to " + piece.client : "The handover"}
+            {piece.clientPublic && piece.client ? t.piece.handedOverTo(piece.client) : t.piece.handover}
           </h2>
           <ul className={"mt-12 grid gap-8 " + (piece.handover.length > 1 ? "md:grid-cols-2 xl:grid-cols-3" : "")}>
             {piece.handover.map((m) => (
@@ -196,7 +193,7 @@ export default function PiecePage() {
       {/* Technical sheet, box, press */}
       <section aria-labelledby="sheet-title" className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
         <div className="lg:col-span-6">
-          <h2 id="sheet-title" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">Technical sheet</h2>
+          <h2 id="sheet-title" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">{t.piece.sheet}</h2>
           <dl className="mt-8 border-t border-white/15">
             {piece.specs.map((s) => (
               <div key={s.label} className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-3 sm:gap-6">
@@ -210,9 +207,9 @@ export default function PiecePage() {
               <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</span>
               <span>
                 <span className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
-                  <Gift className="size-5 text-rose-light" aria-hidden="true" /> Custom box available
+                  <Gift className="size-5 text-rose-light" aria-hidden="true" /> {t.piece.customBox}
                 </span>
-                <span className="mt-2 block text-base text-bone">Delivered in the {box.name}, made for it.</span>
+                <span className="mt-2 block text-base text-bone">{t.piece.deliveredIn(box.name)}</span>
               </span>
             </Link>
           ) : null}
@@ -220,18 +217,18 @@ export default function PiecePage() {
 
         {piece.press.length > 0 ? (
           <div id="press" className="lg:col-span-5 lg:col-start-8">
-            <h2 className="eyebrow">Press</h2>
+            <h2 className="eyebrow">{t.piece.press}</h2>
             <ul className="mt-5 border-t border-white/15">
               {piece.press.map((p) => (
                 <li key={p.outlet + p.title} className="border-b border-white/15 py-5">
                   <div className="flex items-start gap-5">
-                    {p.image ? <Img src={p.image} alt={p.outlet + " article"} loading="lazy" className="h-28 w-20 shrink-0 object-cover object-top" /> : <Newspaper className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />}
+                    {p.image ? <Img src={p.image} alt={t.piece.pressAlt(p.outlet)} loading="lazy" className="h-28 w-20 shrink-0 object-cover object-top" /> : <Newspaper className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />}
                     <div>
                       <p className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{p.outlet}</p>
                       <p className="mt-2 text-lg text-white">{p.title}</p>
                       {p.url ? (
                         <a href={p.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white underline-offset-4 hover:text-rose-light hover:underline">
-                          Read the article <ArrowUpRight className="size-4" aria-hidden="true" />
+                          {t.common.readArticle} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                         </a>
                       ) : null}
                     </div>
@@ -248,13 +245,13 @@ export default function PiecePage() {
           <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
             <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
               <div>
-                <p className="eyebrow">Similar pieces</p>
+                <p className="eyebrow">{t.piece.similar}</p>
                 <h2 id="similar-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
-                  More {collection.name.toLowerCase()}
+                  {t.piece.more(collectionName)}
                 </h2>
               </div>
               <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light">
-                The collection <ArrowRight className="size-4" aria-hidden="true" />
+                {t.piece.theCollection} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             </div>
             <ul className="mt-14 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -274,18 +271,18 @@ export default function PiecePage() {
       <section aria-labelledby="want-title" className="border-t border-white/10 bg-ink-soft">
         <div className="mx-auto flex max-w-[1600px] flex-col items-start gap-10 px-5 py-24 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12 lg:py-32">
           <div className="max-w-3xl">
-            <p className="eyebrow">Your piece</p>
+            <p className="eyebrow">{t.common.yourPiece}</p>
             <h2 id="want-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4.25rem)] tracking-[0.1em] [text-wrap:balance]">
-              A piece like this one, drawn for you.
+              {t.piece.ctaTitle}
             </h2>
-            <p className="mt-6 max-w-xl text-lg text-bone">Send us its name on WhatsApp: we answer with a first idea and the next steps.</p>
+            <p className="mt-6 max-w-xl text-lg text-bone">{t.piece.ctaText}</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <a href={wa} target="_blank" rel="noreferrer" className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
-              <BrandIcon name="whatsapp" className="size-5" /> I want a piece like this
+              <BrandIcon name="whatsapp" className="size-5" /> {t.piece.want}
             </a>
             <Link to="/contact" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
-              Other ways to reach us
+              {t.piece.otherWays}
             </Link>
           </div>
         </div>
@@ -298,19 +295,21 @@ export default function PiecePage() {
 
 /** "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. */
 function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem }) {
+  const { t } = useI18n();
+  const STEPS: Record<MakingStep, { title: string; text: string }> = t.piece.steps;
   return (
     <section aria-labelledby="making-title" data-making className="border-y border-white/10 py-24 lg:py-32">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
-        <p className="eyebrow">From sketch to handover</p>
+        <p className="eyebrow">{t.piece.makingEyebrow}</p>
         <h2 id="making-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
-          How it was made
+          {t.piece.makingTitle}
         </h2>
       </div>
       <ol className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:mx-auto lg:grid lg:max-w-[1600px] lg:grid-cols-5 lg:gap-6 lg:overflow-visible lg:px-12">
         {MAKING_STEPS.map((step, i) => {
           const own = piece.making[step] ?? (step === "delivery" ? boxImage : undefined);
           const item = own ?? atelierFor(step);
-          const label = own ? (own.caption ?? "This piece") : item ? "In the atelier" : null;
+          const label = own ? (own.caption ?? t.piece.thisPiece) : item ? t.piece.inAtelier : null;
           return (
             <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
               <Reveal delay={i * 0.08}>
@@ -324,7 +323,7 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
                       </span>
                     </span>
                   )}
-                  {label ? <span className="absolute bottom-3 left-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
+                  {label ? <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
                 </span>
                 <p className="mt-5 flex items-baseline gap-3">
                   <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>

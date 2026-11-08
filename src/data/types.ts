@@ -22,6 +22,13 @@ export type MediaItem = {
   onBlack?: boolean;
 };
 
+/**
+ * Texts written in the admin for another language, by field ("title",
+ * "story"...). A field left empty uses the translation of the site
+ * (src/i18n/content), else the English text.
+ */
+export type Translations = Partial<Record<"fr" | "es" | "ar", Record<string, string>>>;
+
 export type Story = {
   slug: string;
   title: string;
@@ -34,6 +41,7 @@ export type Story = {
   pieceSlug: string | null;
   /** An article about the story: the main button becomes "Read the article". */
   articleUrl: string | null;
+  translations?: Translations;
 };
 
 export type PersonKind = "player" | "club" | "personality";
@@ -47,6 +55,7 @@ export type Person = {
   /** Portrait photo. Empty: the cover of the person's first story is used. */
   portrait: string | null;
   bio: string;
+  translations?: Translations;
 };
 
 export const PIECE_TYPES = ["chain", "pendant", "ring", "bracelet", "watch"] as const;
@@ -87,6 +96,7 @@ export type Piece = {
   /** Provisional texts, to be checked with the client. */
   draft: boolean;
   making: Making;
+  translations?: Translations;
 };
 
 export type Box = {
@@ -96,6 +106,7 @@ export type Box = {
   images: MediaItem[];
   /** The piece this box was made for, if it has a page. */
   pieceSlug: string | null;
+  translations?: Translations;
 };
 
 export type Catalogue = {

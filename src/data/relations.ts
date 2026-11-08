@@ -49,13 +49,13 @@ export function portraitOf(cat: Catalogue, person: Person): string {
 }
 
 /** Who a piece was made for, in a few words: "Kevin Schade", "VfB Stuttgart", "A private collector". */
-export function madeFor(cat: Catalogue, piece: Piece): string {
+export function madeFor(cat: Catalogue, piece: Piece, privateCollector = "A private collector", join: (names: string[]) => string = (names) => names.join(", ")): string {
   const people = peopleOf(cat, piece);
   const named = people.filter((p) => p.kind !== "club");
-  if (named.length > 0) return named.map((p) => p.name).join(", ");
-  if (people.length > 0) return people.map((p) => p.name).join(", ");
+  if (named.length > 0) return join(named.map((p) => p.name));
+  if (people.length > 0) return join(people.map((p) => p.name));
   if (piece.clientPublic && piece.client) return piece.client;
-  return "A private collector";
+  return privateCollector;
 }
 
 /** Every photo or video of a piece: opening, details, handover and making. */
@@ -96,6 +96,8 @@ export function findPerson(cat: Catalogue, slug: string): Person | undefined {
 }
 
 export function initials(name: string): string {
+  // Arabic letters do not stand alone as initials: the first one only.
+  if (/[\u0600-\u06ff]/.test(name)) return name.trim().charAt(0);
   return name
     .split(/\s+/)
     .filter(Boolean)

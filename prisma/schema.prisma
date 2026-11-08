@@ -14,6 +14,8 @@ datasource db {
 /// seedHash: fingerprint of the texts last written from the catalogue; when the
 /// texts in the base still match it, a new version of the catalogue replaces
 /// them, otherwise they were edited from /admin and are kept.
+/// translations: texts written in /admin for the other languages of the site,
+/// { "fr": { "title": "..." }, "ar": {...} } (Translations, src/data/types.ts).
 
 model Story {
   id         String   @id @default(cuid())
@@ -24,6 +26,7 @@ model Story {
   people     String[] @default([])
   pieceSlug  String?
   articleUrl String?
+  translations Json   @default("{}")
   seedHash   String?
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
@@ -39,6 +42,7 @@ model Person {
   club      String?
   portrait  String?
   bio       String   @default("")
+  translations Json   @default("{}")
   seedHash  String?
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
@@ -66,6 +70,7 @@ model Piece {
   draft        Boolean  @default(false)
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
+  translations Json   @default("{}")
   seedHash     String?
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
@@ -79,6 +84,7 @@ model Box {
   description String   @default("")
   images      Json     @default("[]")
   pieceSlug   String?
+  translations Json   @default("{}")
   seedHash    String?
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
@@ -106,6 +112,8 @@ model ContactMessage {
   name      String
   email     String
   message   String
+  /// The language of the page it was sent from (en, fr, es, ar): answer in it.
+  language  String   @default("en")
   createdAt DateTime @default(now())
 }
 
@@ -114,5 +122,7 @@ model CallbackRequest {
   name      String
   phone     String
   interest  String?
+  /// The language of the page it was sent from (en, fr, es, ar): answer in it.
+  language  String   @default("en")
   createdAt DateTime @default(now())
 }

@@ -93,6 +93,11 @@
     "/capsules/:slug": {
       "robots": "noindex,follow",
       "sitemap": false
+    },
+    "/404": {
+      "title": "Page not found",
+      "robots": "noindex,follow",
+      "sitemap": false
     }
   }
 }

@@ -2,7 +2,7 @@ import express, { Router, type NextFunction, type Request, type Response } from 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { PIECE_TYPES } from "../../src/data/types.js";
-import { MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory } from "../catalogue.js";
+import { MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
 
 /**
@@ -26,12 +26,16 @@ site.get("/catalogue", async (_req, res) => {
 
 /* ---------- Visitors ---------- */
 
+const Language = z.enum(["en", "fr", "es", "ar"]).catch("en").default("en");
+
 const ContactIn = z.object({
   name: z.string().trim().min(1).max(200),
   email: z.email().max(320),
   message: z.string().trim().min(1).max(5000),
   /** Honeypot: humans leave it empty. */
   company: z.string().max(0).optional(),
+  /** The language of the page: the answer is written in it. */
+  language: Language,
 });
 
 site.post("/contact", async (req, res) => {
@@ -40,8 +44,8 @@ site.post("/contact", async (req, res) => {
     res.status(400).json({ error: "Please check the form and try again." });
     return;
   }
-  const { name, email, message } = p.data;
-  await prisma.contactMessage.create({ data: { name, email, message } });
+  const { name, email, message, language } = p.data;
+  await prisma.contactMessage.create({ data: { name, email, message, language } });
   res.status(201).json({ ok: true });
 });
 
@@ -49,6 +53,7 @@ const CallbackIn = z.object({
   name: z.string().trim().min(1).max(200),
   phone: z.string().trim().min(5).max(40),
   interest: z.string().trim().max(200).optional(),
+  language: Language,
 });
 
 site.post("/callback", async (req, res) => {
@@ -57,7 +62,7 @@ site.post("/callback", async (req, res) => {
     res.status(400).json({ error: "Please check your name and number." });
     return;
   }
-  await prisma.callbackRequest.create({ data: { name: p.data.name, phone: p.data.phone, interest: p.data.interest || null } });
+  await prisma.callbackRequest.create({ data: { name: p.data.name, phone: p.data.phone, interest: p.data.interest || null, language: p.data.language } });
   res.status(201).json({ ok: true });
 });
 
@@ -175,6 +180,7 @@ const StoryIn = z.object({
   people: Slugs,
   pieceSlug: optText(200),
   articleUrl: optText(500),
+  translations: TranslationsSchema.default({}),
 });
 
 const PersonIn = z.object({
@@ -185,6 +191,7 @@ const PersonIn = z.object({
   club: optText(200),
   portrait: optText(500),
   bio: z.string().max(5000).default(""),
+  translations: TranslationsSchema.default({}),
 });
 
 const PieceIn = z.object({
@@ -205,6 +212,7 @@ const PieceIn = z.object({
   featured: z.boolean().default(false),
   draft: z.boolean().default(false),
   making: MakingSchema.optional(),
+  translations: TranslationsSchema.default({}),
 });
 
 const BoxIn = z.object({
@@ -213,6 +221,7 @@ const BoxIn = z.object({
   description: z.string().max(3000).default(""),
   images: MediaListSchema.default([]),
   pieceSlug: optText(200),
+  translations: TranslationsSchema.default({}),
 });
 
 type Delegate = {

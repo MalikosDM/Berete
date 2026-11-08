@@ -16,8 +16,10 @@
   --color-rose-light: #e8b4a0;
   --color-rose: #b76e79;
 
-  --font-display: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  /* Arabic letters come from Amiri and IBM Plex Sans Arabic: the Latin fonts have none, and the
+     browser downloads the Arabic ones only for a page that shows Arabic. */
+  --font-display: "Cormorant Garamond", "Amiri", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
 
   --animate-sheen: sheen 7s ease-in-out infinite;
   --animate-draw: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -42,6 +44,29 @@
       transform: scaleX(1);
     }
   }
+}
+
+/*
+ * Arabic, right to left. Its letters are joined: no letter spacing (it would
+ * break them apart), no capitals, no slanted letters, and taller lines for
+ * the marks above and below the letters.
+ */
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+html[lang="ar"] .italic {
+  font-style: normal;
+}
+
+html[lang="ar"] .title-caps,
+html[lang="ar"] .font-display {
+  line-height: 1.45 !important;
+}
+
+html[lang="ar"] .eyebrow {
+  font-size: 1rem;
 }
 
 /* Mobile readability: no text under 16px on phones. */

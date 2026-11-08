@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import ContactBlock from "@/components/ContactBlock";
 import { Img, MediaView } from "@/components/Media";
@@ -7,18 +7,16 @@ import PageIntro from "@/components/PageIntro";
 import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
-import { findPerson, initials, membersOf, pieceVisualFor, piecesOf, portraitOf, storiesOf, TYPE_LABELS } from "@/data/relations";
+import { findPerson, initials, membersOf, pieceVisualFor, piecesOf, portraitOf, storiesOf } from "@/data/relations";
 import type { Person, PersonKind } from "@/data/types";
+import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import NotFound from "@/pages/NotFound";
 
-const GROUPS: { kind: PersonKind; title: string }[] = [
-  { kind: "player", title: "Players" },
-  { kind: "club", title: "Clubs" },
-  { kind: "personality", title: "Personalities" },
-];
+const GROUPS: PersonKind[] = ["player", "club", "personality"];
 
 function Portrait({ person, className = "", big = false }: { person: Person; className?: string; big?: boolean }) {
+  const { t } = useI18n();
   const cat = useCatalogue();
   const src = portraitOf(cat, person);
   if (!src) {
@@ -28,22 +26,23 @@ function Portrait({ person, className = "", big = false }: { person: Person; cla
       </span>
     );
   }
-  return <Img src={src} alt={"Portrait of " + person.name} loading="lazy" decoding="async" className={"object-cover " + className} />;
+  return <Img src={src} alt={t.players.portrait(person.name)} loading="lazy" decoding="async" className={"object-cover " + className} />;
 }
 
 export default function Players() {
+  const { t } = useI18n();
   const { people } = useCatalogue();
   return (
     <>
-      <PageIntro eyebrow="Players" title="Worn by champions" lead="Footballers, clubs and personalities who trusted us with their moment. Each name opens their stories and their pieces." />
+      <PageIntro eyebrow={t.players.eyebrow} title={t.players.title} lead={t.players.lead} />
 
-      <section aria-label="Players list" className="mx-auto max-w-[1600px] px-5 pb-24 sm:px-8 lg:px-12 lg:pb-32">
-        {GROUPS.map((g) => {
-          const list = people.filter((p) => p.kind === g.kind);
+      <section aria-label={t.players.listLabel} className="mx-auto max-w-[1600px] px-5 pb-24 sm:px-8 lg:px-12 lg:pb-32">
+        {GROUPS.map((kind) => {
+          const list = people.filter((p) => p.kind === kind);
           if (list.length === 0) return null;
           return (
-            <div key={g.kind} className="mt-16 first:mt-0">
-              <h2 className="eyebrow mb-6">{g.title}</h2>
+            <div key={kind} className="mt-16 first:mt-0">
+              <h2 className="eyebrow mb-6">{t.players.groups[kind]}</h2>
               <ul className="border-t border-white/15">
                 {list.map((p) => (
                   <li key={p.slug} className="border-b border-white/15">
@@ -55,7 +54,7 @@ export default function Players() {
                       </span>
                       <span className="col-start-2 flex items-center gap-4 text-base text-bone sm:col-start-auto">
                         {p.club}
-                        <ArrowUpRight className="size-6 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light" aria-hidden="true" />
+                        <ArrowUpRight className="size-6 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
                       </span>
                     </Link>
                   </li>
@@ -71,6 +70,7 @@ export default function Players() {
 
 export function PlayerPage() {
   const { slug = "" } = useParams();
+  const { t } = useI18n();
   const cat = useCatalogue();
   const [open, setOpen] = useState<number | null>(null);
   const person = findPerson(cat, slug);
@@ -79,7 +79,7 @@ export function PlayerPage() {
   const stories = storiesOf(cat, person.slug);
   const pieces = piecesOf(cat, person.slug);
   const members = membersOf(cat, person);
-  const kindLabel = person.kind === "club" ? "Club" : person.kind === "personality" ? "Personality" : person.club;
+  const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
 
   return (
     <>
@@ -89,7 +89,7 @@ export function PlayerPage() {
         </div>
         <div className="flex flex-col justify-center lg:col-span-6 lg:col-start-7">
           <Link to="/players" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-bone hover:text-rose-light">
-            <ArrowLeft className="size-4" aria-hidden="true" /> All players
+            <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" /> {t.common.allPlayers}
           </Link>
           {kindLabel ? <p className="eyebrow mt-8">{kindLabel}</p> : null}
           <SplitHeading as="h1" className="mt-5 text-[clamp(2.5rem,7vw,6.5rem)] tracking-[0.05em]">
@@ -97,15 +97,12 @@ export function PlayerPage() {
           </SplitHeading>
           {person.number !== null ? (
             <p className="mt-6 flex items-baseline gap-4">
-              <span className="text-base font-semibold uppercase tracking-[0.24em] text-bone">No.</span>
+              <span className="text-base font-semibold uppercase tracking-[0.24em] text-bone">{t.players.number}</span>
               <span className="text-rose-gold font-display text-[clamp(4rem,10vw,8rem)] leading-none font-light">{person.number}</span>
             </p>
           ) : null}
           <p className="mt-8 max-w-xl text-lg text-bone">
-            {person.bio ||
-              (pieces.length > 0
-                ? "The pieces made for " + person.name + ", and the moments shared on our Instagram."
-                : "The moments shared with " + person.name + " on our Instagram.")}
+            {person.bio || (pieces.length > 0 ? t.players.bioWithPieces(person.name) : t.players.bioStories(person.name))}
           </p>
           {stories.length > 0 ? (
             <button
@@ -116,7 +113,7 @@ export function PlayerPage() {
               }}
               className="mt-10 inline-flex min-h-14 w-fit items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light"
             >
-              <Play className="size-5 fill-current" aria-hidden="true" /> Watch the {stories.length > 1 ? "stories" : "story"}
+              <Play className="size-5 fill-current" aria-hidden="true" /> {t.players.watch(stories.length)}
             </button>
           ) : null}
         </div>
@@ -124,7 +121,7 @@ export function PlayerPage() {
 
       {pieces.length > 0 ? (
         <section aria-labelledby="player-pieces" className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-          <h2 id="player-pieces" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{pieces.length > 1 ? "The pieces" : "The piece"}</h2>
+          <h2 id="player-pieces" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.players.pieces(pieces.length)}</h2>
           <ul className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
             {pieces.map((p) => {
               const visual = pieceVisualFor(p, person);
@@ -138,7 +135,7 @@ export function PlayerPage() {
                     </span>
                     <span className="title-caps mt-5 block text-2xl tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">{p.title}</span>
                     <span className="mt-2 inline-flex min-h-12 items-center gap-2 text-base text-mist group-hover:text-rose-light">
-                      {visual.caption && visual !== p.cover ? visual.caption : TYPE_LABELS[p.type]} <ArrowRight className="size-4" aria-hidden="true" />
+                      {visual.caption && visual !== p.cover ? visual.caption : t.types[p.type]} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                     </span>
                   </Link>
                 </li>
@@ -150,7 +147,7 @@ export function PlayerPage() {
 
       {stories.length > 0 ? (
         <section aria-labelledby="player-stories" className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-          <h2 id="player-stories" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">Stories</h2>
+          <h2 id="player-stories" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.players.stories}</h2>
           <ul className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {stories.map((s, i) => (
               <li key={s.slug}>
@@ -161,8 +158,8 @@ export function PlayerPage() {
                     primeStoryVideo(s);
                     setOpen(i);
                   }}
-                  className="group block w-full text-left"
-                  aria-label={"Open the story " + s.title}
+                  className="group block w-full text-start"
+                  aria-label={t.stories.open(s.title)}
                 >
                   <span className="relative block aspect-square overflow-hidden rounded-full bg-rose-gold p-[2px]">
                     <span className="block h-full w-full overflow-hidden rounded-full border-2 border-ink">
@@ -171,7 +168,7 @@ export function PlayerPage() {
                   </span>
                   <span className="mt-3 block text-center text-base font-medium text-white group-hover:text-rose-light">{s.title}</span>
                   <span className="block text-center text-base text-mist">
-                    {s.media.length} {s.media.length === 1 ? "moment" : "moments"}
+                    {t.players.moments(s.media.length)}
                   </span>
                 </button>
               </li>
@@ -182,7 +179,7 @@ export function PlayerPage() {
 
       {members.length > 0 ? (
         <section aria-labelledby="club-players" className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-          <h2 id="club-players" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">The players</h2>
+          <h2 id="club-players" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.players.theirPlayers}</h2>
           <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-3">
             {members.map((m) => (
               <li key={m.slug}>

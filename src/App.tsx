@@ -1,6 +1,7 @@
 import { Fragment, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router";
+import { Route, Routes, useParams } from "react-router";
 import Layout from "@/components/Layout";
+import { DEFAULT_LOCALE, LOCALES, Navigate } from "@/i18n";
 import About from "@/pages/About";
 import Atelier, { Boxes } from "@/pages/Atelier";
 import Contact from "@/pages/Contact";
@@ -26,27 +27,42 @@ function OnePerAddress({ children }: { children: ReactNode }) {
   return <Fragment key={slug}>{children}</Fragment>;
 }
 
+/** The pages of the site, the same in every language: at the root in English, under /fr, /es and /ar. */
+function pages(prefix: string) {
+  return (
+    <>
+      <Route index element={<Home />} />
+      <Route path="creations" element={<Creations />} />
+      <Route path="creations/:slug" element={<OnePerAddress><CreationsParam /></OnePerAddress>} />
+      <Route path="pieces" element={<Navigate to="/creations" replace />} />
+      <Route path="pieces/:slug" element={<OnePerAddress><PiecePage /></OnePerAddress>} />
+      <Route path="capsules/*" element={<Navigate to="/creations" replace />} />
+      <Route path="players" element={<Players />} />
+      <Route path="players/:slug" element={<OnePerAddress><PlayerPage /></OnePerAddress>} />
+      <Route path="atelier" element={<Atelier />} />
+      <Route path="boxes" element={<Boxes />} />
+      <Route path="process" element={<Process />} />
+      <Route path="about" element={<About />} />
+      <Route path="contact" element={<Contact />} />
+      <Route path="legal" element={<Legal />} />
+      <Route path="privacy" element={<Privacy />} />
+      <Route path="*" element={<NotFound />} key={prefix + "*"} />
+    </>
+  );
+}
+
 export default function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/creations" element={<Creations />} />
-        <Route path="/creations/:slug" element={<OnePerAddress><CreationsParam /></OnePerAddress>} />
-        <Route path="/pieces" element={<Navigate to="/creations" replace />} />
-        <Route path="/pieces/:slug" element={<OnePerAddress><PiecePage /></OnePerAddress>} />
-        <Route path="/capsules/*" element={<Navigate to="/creations" replace />} />
-        <Route path="/players" element={<Players />} />
-        <Route path="/players/:slug" element={<OnePerAddress><PlayerPage /></OnePerAddress>} />
-        <Route path="/atelier" element={<Atelier />} />
-        <Route path="/boxes" element={<Boxes />} />
-        <Route path="/process" element={<Process />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/legal" element={<Legal />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
-        <Route path="*" element={<NotFound />} />
+        {pages("")}
+        {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
+          <Route key={l} path={l}>
+            {pages(l)}
+          </Route>
+        ))}
+        {/* The back-office, in French for the owner: one address only. */}
+        <Route path="admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
       </Route>
     </Routes>
   );

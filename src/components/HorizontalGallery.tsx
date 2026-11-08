@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 import { forceMuted, MediaView } from "@/components/Media";
 import type { MediaItem } from "@/data/types";
+import { useI18n } from "@/i18n";
 import { gsap, getLenis, useReducedMotion } from "@/lib/gsap";
 
 type HorizontalGalleryProps = {
@@ -11,8 +12,10 @@ type HorizontalGalleryProps = {
 
 export default function HorizontalGallery({
   items,
-  title = "Details",
+  title: ownTitle,
 }: HorizontalGalleryProps) {
+  const { t, dir } = useI18n();
+  const title = ownTitle ?? t.gallery.title;
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -24,9 +27,11 @@ export default function HorizontalGallery({
     if (!section || !track || reduced || items.length < 2) return undefined;
     const mm = gsap.matchMedia();
     mm.add("(min-width: 1024px)", () => {
+      // Right to left (Arabic), the row starts on the right and moves to the right.
+      const sign = dir === "rtl" ? 1 : -1;
       const distance = () => Math.max(0, track.scrollWidth - window.innerWidth);
       gsap.to(track, {
-        x: () => -distance(),
+        x: () => sign * distance(),
         ease: "none",
         scrollTrigger: {
           trigger: section,
@@ -40,7 +45,7 @@ export default function HorizontalGallery({
       });
     });
     return () => mm.revert();
-  }, [items.length, reduced]);
+  }, [items.length, reduced, dir]);
 
   if (items.length === 0) return null;
   const pinned = !reduced && items.length > 1;
@@ -59,7 +64,7 @@ export default function HorizontalGallery({
             {title}
           </h2>
           <p className="hidden text-base text-mist sm:block">
-            {pinned ? "Scroll to explore · Tap to zoom" : "Tap to zoom"}
+            {pinned ? t.gallery.hintPinned : t.gallery.hint}
           </p>
         </div>
         <div
@@ -79,12 +84,12 @@ export default function HorizontalGallery({
                 type="button"
                 onClick={() => setOpenIndex(i)}
                 className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
-                aria-label={"Open in full screen: " + (item.alt ?? title)}
+                aria-label={t.gallery.open(item.alt ?? title)}
               >
                 <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]">
                   <MediaView item={item} />
                 </span>
-                <span className="absolute right-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
+                <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
                   <ZoomIn className="size-5" aria-hidden="true" />
                 </span>
               </button>
@@ -122,6 +127,7 @@ type LightboxProps = {
 };
 
 function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
+  const { t, dir } = useI18n();
   const [zoomed, setZoomed] = useState(false);
   const [origin, setOrigin] = useState("50% 50%");
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -153,12 +159,13 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
-      else if (e.key === "ArrowRight" && count > 1) go(1);
-      else if (e.key === "ArrowLeft" && count > 1) go(-1);
+      // The arrow keys follow the reading direction: right to left, the left arrow goes forward.
+      else if (e.key === "ArrowRight" && count > 1) go(dir === "rtl" ? -1 : 1);
+      else if (e.key === "ArrowLeft" && count > 1) go(dir === "rtl" ? 1 : -1);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [go, onClose, count]);
+  }, [go, onClose, count, dir]);
 
   if (!item) return null;
 
@@ -177,7 +184,7 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={item.alt ?? "Photo"}
+      aria-label={item.alt ?? t.gallery.photo}
       data-lenis-prevent
       className="fixed inset-0 z-[90] flex flex-col bg-ink"
     >
@@ -194,7 +201,7 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
             type="button"
             className={btn}
             onClick={() => setZoomed((z) => !z)}
-            aria-label={zoomed ? "Zoom out" : "Zoom in"}
+            aria-label={zoomed ? t.gallery.zoomOut : t.gallery.zoomIn}
           >
             {zoomed ? (
               <ZoomOut className="size-5" aria-hidden="true" />
@@ -207,7 +214,7 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
             type="button"
             className={btn}
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.common.close}
           >
             <X className="size-5" aria-hidden="true" />
           </button>
@@ -222,7 +229,7 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
             "block h-full w-full " +
             (zoomed ? "cursor-zoom-out" : "cursor-zoom-in")
           }
-          aria-label={zoomed ? "Zoom out" : "Zoom in"}
+          aria-label={zoomed ? t.gallery.zoomOut : t.gallery.zoomIn}
         >
           {item.type === "video" ? (
             <video
@@ -269,18 +276,18 @@ function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
             <button
               type="button"
               onClick={() => go(-1)}
-              className={btn + " absolute top-1/2 left-4 -translate-y-1/2"}
-              aria-label="Previous"
+              className={btn + " absolute top-1/2 start-4 -translate-y-1/2"}
+              aria-label={t.common.previous}
             >
-              <ChevronLeft className="size-5" aria-hidden="true" />
+              <ChevronLeft className="size-5 rtl:-scale-x-100" aria-hidden="true" />
             </button>
             <button
               type="button"
               onClick={() => go(1)}
-              className={btn + " absolute top-1/2 right-4 -translate-y-1/2"}
-              aria-label="Next"
+              className={btn + " absolute top-1/2 end-4 -translate-y-1/2"}
+              aria-label={t.common.next}
             >
-              <ChevronRight className="size-5" aria-hidden="true" />
+              <ChevronRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
             </button>
           </>
         ) : null}
