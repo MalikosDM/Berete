@@ -1,0 +1,472 @@
+/*
+ * The words of the site, in Arabic (Modern Standard Arabic, polite plural).
+ * Mirrors en.ts: the same entries, with its own words.
+ */
+import { plural, type PluralForms } from "../format";
+import type { Messages } from "./en";
+
+const n = (count: number, forms: PluralForms) => plural("ar", count, forms);
+
+export const ar: Messages = {
+  site: {
+    skip: "الانتقال إلى المحتوى",
+    homeLabel: "Berete Jewellers، الصفحة الرئيسية",
+    tagline: "من صنعنا. وبإلهام منكم.",
+    baseLine: "مقرنا دبي · توصيل إلى جميع أنحاء العالم",
+    rights: (year: number) => "© " + year + " Berete Jewellers. جميع الحقوق محفوظة.",
+  },
+
+  language: {
+    label: "اللغة",
+    choose: "اختيار اللغة",
+  },
+
+  common: {
+    startPiece: "ابدؤوا تصميم قطعتكم",
+    whatsapp: "WhatsApp",
+    chatWhatsapp: "تواصلوا معنا عبر WhatsApp",
+    allCreations: "جميع الإبداعات",
+    allPlayers: "جميع اللاعبين",
+    seePiece: "مشاهدة القطعة",
+    readArticle: "قراءة المقال",
+    close: "إغلاق",
+    previous: "السابق",
+    next: "التالي",
+    back: "رجوع",
+    yourPiece: "قطعتكم",
+    yourStory: "قصتكم، مرصعة بالألماس",
+    madeFor: (who: string) => "صُنعت خصيصاً من أجل " + who,
+    privateCollector: "مقتنٍ خاص",
+    newPiecesTitle: "قطع جديدة قيد الصياغة",
+    newPiecesText: "ستُكشف هذه المجموعة قريباً. وإلى ذلك الحين، ابدؤوا تصميم قطعتكم.",
+  },
+
+  whatsapp: {
+    hello: "مرحباً Berete Jewellers، أود البدء في تصميم قطعة حسب الطلب.",
+    piece: (name: string) => "مرحباً Berete Jewellers، أرغب في قطعة مثل «" + name + "». هل يمكننا التحدث بشأنها؟",
+    configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
+      ["مرحباً Berete Jewellers، أود البدء في تصميم قطعة.", "القطعة: " + type, "الميزانية: " + budget, "التوقيت: " + timing, ...(pieceName ? ["مستوحاة من: «" + pieceName + "»"] : [])].join("\n"),
+  },
+
+  types: {
+    chain: "سلسلة",
+    pendant: "قلادة",
+    ring: "خاتم",
+    bracelet: "سوار",
+    watch: "ساعة",
+  },
+
+  nav: {
+    main: "القائمة الرئيسية",
+    mobile: "قائمة الجوال",
+    creations: "الإبداعات",
+    players: "اللاعبون",
+    atelier: "المشغل",
+    boxes: "العلب",
+    process: "آلية العمل",
+    about: "من نحن",
+    contact: "التواصل",
+    openMenu: "فتح القائمة",
+    closeMenu: "إغلاق القائمة",
+  },
+
+  footer: {
+    creations: "الإبداعات",
+    house: "الدار",
+    contact: "التواصل",
+    contactPage: "صفحة التواصل",
+    yourPiece: "قطعتكم",
+    pitch: "سلاسل وقلادات وخواتم بطولة، تُصمم معكم وتُصاغ من أجل اللحظة.",
+    legal: "الإشعار القانوني",
+    privacy: "الخصوصية",
+  },
+
+  collections: {
+    items: {
+      pendants: { name: "القلادات", intro: "حروف أولى، وشعارات، واحتفالات: كل قلادة تروي قصة واحدة، منحوتة بتجسيم ومرصعة حجراً حجراً." },
+      chains: { name: "السلاسل", intro: "حلقات تُرسم واحدة تلو الأخرى، من الفراشات إلى رموز اللانهاية، صُنعت لتُرتدى وحدها أو مع قلادة." },
+      rings: { name: "الخواتم", intro: "خواتم بطولة لفريق بأكمله، وخواتم ختم صُنعت ليد واحدة." },
+      bracelets: { name: "الأساور", intro: "أساور تُصنع حسب المقاس، حلقة بعد حلقة." },
+      watches: { name: "الساعات", intro: "ساعات مرصعة بالألماس من الهيكل إلى السوار." },
+    },
+    eyebrow: "المجموعات",
+    title: "حسب نوع القطعة",
+    explore: "استكشاف",
+    count: (count: number) => n(count, { zero: "# قطعة", one: "قطعة واحدة", two: "قطعتان", few: "# قطع", many: "# قطعة", other: "# قطعة" }),
+    tileAlt: (collection: string, piece: string) => collection + ": " + piece,
+    collection: "المجموعة",
+    listLabel: (collection: string) => "قطع مجموعة " + collection,
+    others: "مجموعات أخرى",
+    ctaTitle: "قطعتكم، منذ الرسم الأول.",
+    ctaText: "كل قطعة تبدأ بحديث واحد. أخبرونا بقصتكم، ونحن نرسمها.",
+    ctaButton: "ابدؤوا عبر WhatsApp",
+  },
+
+  home: {
+    filmLabel: "فيلم Berete Jewellers، يُعرض بالتمرير",
+    kicker: "Berete Jewellers · دبي",
+    title: "مجوهرات راقية حسب الطلب للأبطال.",
+    discover: "اكتشفوا الإبداعات",
+    statements: ["مصممة للأندية. يرتديها الأبطال.", "يُرفع الغطاء فتنكشف الكأس.", "منحوتة، ثم مرصعة حجراً حجراً.", "قطع لافتة، صُنعت لتُرى."],
+    featured: "إصدار مختار",
+    enterCapsule: "اكتشاف الإصدار",
+    liftTop: "رفع الغطاء",
+    closeTop: "إغلاق الغطاء",
+    liftTopLabel: "رفع غطاء الخاتم",
+    closeTopLabel: "إغلاق غطاء الخاتم",
+    wornBy: "يرتديها",
+    players: "اللاعبون",
+    inside: "داخل الدار",
+    insideTitle: "من الرسم إلى التسليم",
+    atelierTitle: "المشغل",
+    atelierText: "كل حجر يُرصع باليد، تحت المجهر.",
+    atelierAlt: "لقطة قريبة لأداة ترصيع تعمل على الألماس",
+    enter: "دخول",
+    boxesTitle: "العلب",
+    boxesText: "علب حسب الطلب لقطع مختارة، عند الرغبة.",
+    discoverShort: "اكتشاف",
+    processTitle: "آلية العمل",
+    processText: "ست خطوات واضحة، تتابعونها عبر WhatsApp.",
+    follow: "متابعة",
+  },
+
+  showcase: {
+    eyebrow: "قطع مختارة",
+    title: "الإصدارات",
+  },
+
+  scroll: {
+    hint: "مرروا",
+  },
+
+  creations: {
+    eyebrow: "الإبداعات",
+    title: "الإبداعات",
+    lead: "سلاسل وقلادات وخواتم وأساور وساعات. كل قطعة تُرسم من أجل شخص واحد، أو نادٍ واحد، أو لحظة واحدة، ثم تُصاغ في دبي.",
+    listLabel: "جميع القطع",
+    filterLabel: "تصفية القطع",
+    all: "الكل",
+    enterCollection: (collection: string) => "استكشاف مجموعة " + collection,
+  },
+
+  piece: {
+    steps: {
+      sketch: { title: "الرسم", text: "تُرسم الفكرة باليد، ثم يُصاغ نموذجها حتى تستقيم كل النسب." },
+      raw: { title: "القطعة الخام", text: "يُصب المعدن ويُجمَّع، قبل ترصيع أي حجر." },
+      setting: { title: "الترصيع", text: "يُرصع كل حجر باليد، تحت العدسة المكبرة." },
+      polishing: { title: "الصقل", text: "يُصقل كل سطح حتى يتوارى المعدن خلف الضوء." },
+      delivery: { title: "التسليم", text: "تُفحص القطعة وتُصوَّر، ثم تُسلَّم في علبتها حين تكون لها علبة." },
+    },
+    want: "أرغب في قطعة مثل هذه",
+    details: "التفاصيل",
+    madeFor: "صُنعت خصيصاً من أجل",
+    theClub: "النادي",
+    theProfile: "الملف الشخصي",
+    stories: (count: number) => n(count, { one: "القصة", two: "القصتان", other: "القصص" }),
+    andOthers: (names: string) => "وكذلك " + names + ".",
+    seenInStories: "ظهرت في قصصنا",
+    story: "القصة",
+    makingEyebrow: "من الرسم إلى التسليم",
+    makingTitle: "كيف صُنعت",
+    thisPiece: "هذه القطعة",
+    inAtelier: "في المشغل",
+    delivered: "تم التسليم",
+    handedOverTo: (client: string) => "سُلِّمت إلى " + client,
+    handover: "التسليم",
+    sheet: "المواصفات الفنية",
+    customBox: "علبة حسب الطلب متوفرة",
+    deliveredIn: (box: string) => "تُسلَّم في علبتها المصنوعة خصيصاً لها: " + box + ".",
+    press: "الصحافة",
+    pressAlt: (outlet: string) => "مقال " + outlet,
+    similar: "قطع مشابهة",
+    more: (collection: string) => "المزيد من " + collection,
+    theCollection: "المجموعة",
+    ctaTitle: "قطعة كهذه، تُرسم من أجلكم.",
+    ctaText: "أرسلوا إلينا اسمها عبر WhatsApp: نرد عليكم بفكرة أولى وبالخطوات التالية.",
+    otherWays: "طرق أخرى للتواصل معنا",
+  },
+
+  gallery: {
+    title: "التفاصيل",
+    hintPinned: "مرروا للاستكشاف · انقروا للتكبير",
+    hint: "انقروا للتكبير",
+    open: (what: string) => "فتح بملء الشاشة: " + what,
+    photo: "صورة",
+    zoomIn: "تكبير",
+    zoomOut: "تصغير",
+  },
+
+  players: {
+    eyebrow: "اللاعبون",
+    title: "يرتديها الأبطال",
+    lead: "لاعبو كرة قدم وأندية وشخصيات ائتمنونا على لحظتهم. كل اسم يفتح قصصهم وقطعهم.",
+    listLabel: "قائمة اللاعبين",
+    groups: { player: "اللاعبون", club: "الأندية", personality: "الشخصيات" },
+    portrait: (name: string) => "صورة " + name,
+    club: "نادٍ",
+    personality: "شخصية",
+    number: "الرقم",
+    bioWithPieces: (name: string) => "القطع التي صُنعت خصيصاً من أجل " + name + "، واللحظات التي شاركناها على حسابنا في Instagram.",
+    bioStories: (name: string) => "اللحظات التي شاركناها مع " + name + " على حسابنا في Instagram.",
+    watch: (count: number) => n(count, { one: "مشاهدة القصة", two: "مشاهدة القصتين", other: "مشاهدة القصص" }),
+    pieces: (count: number) => n(count, { one: "القطعة", two: "القطعتان", other: "القطع" }),
+    stories: "القصص",
+    moments: (count: number) => n(count, { zero: "# لحظة", one: "لحظة واحدة", two: "لحظتان", few: "# لحظات", many: "# لحظة", other: "# لحظة" }),
+    theirPlayers: "اللاعبون",
+  },
+
+  stories: {
+    bar: "القصص",
+    previous: "القصص السابقة",
+    next: "القصص التالية",
+    open: (title: string) => "فتح القصة: " + title,
+    dialog: (title: string) => "القصة: " + title,
+    alt: (title: string, index: number) => title + "، القصة " + index,
+    play: "تشغيل الفيديو",
+    soundOff: "كتم الصوت",
+    soundOn: "تشغيل الصوت",
+    close: "إغلاق القصة",
+    help: "انقروا على الجانب الأيسر للانتقال إلى الخطوة التالية، وعلى الجانب الأيمن للعودة إلى الخطوة السابقة. اضغطوا مطولاً للإيقاف المؤقت.",
+    want: "ترغبون في قطعتكم؟ WhatsApp",
+    seePieceLabel: (title: string) => "مشاهدة القطعة: " + title,
+  },
+
+  atelier: {
+    steps: [
+      { title: "الصب", text: "يتحول النموذج إلى معدن خام: قلادة قبل حجرها الأول." },
+      { title: "التجميع", text: "حلقة بعد حلقة، يتشكل السوار على طاولة العمل." },
+      { title: "الصقل", text: "تُصقل كل حلقة باليد، فلا يُرى سوى الأحجار." },
+      { title: "اللمسات الأخيرة", text: "قطعة تحمل توقيع الدار قيد الصنع، تُفحص تحت المصباح." },
+    ],
+    step: (index: number) => "الخطوة " + index,
+    stepAlt: (step: string) => step + " في المشغل",
+    filmLabel: "أحجار تُرصع باليد في المشغل",
+    eyebrow: "دبي",
+    title: "المشغل",
+    lead: "حيث تُنحت كل قطعة، ثم تُرصع حجراً حجراً.",
+    making: "صناعة قطعة",
+    ctaTitle: "تابعوها عبر WhatsApp، خطوة بخطوة.",
+    ctaText: "نشارككم صور مراحل العمل ومقاطع الفيديو طوال فترة الإبداع.",
+    seeProcess: "اكتشاف آلية العمل",
+  },
+
+  boxes: {
+    eyebrow: "حسب المقاس",
+    title: "العلب",
+    lead: "علب حسب الطلب متوفرة لقطع مختارة، عند الرغبة.",
+    listLabel: "علب حسب الطلب",
+    open: (name: string) => "عرض " + name + " بملء الشاشة",
+    photos: (count: number) => n(count, { zero: "# صورة", one: "صورة واحدة", two: "صورتان", few: "# صور", many: "# صورة", other: "# صورة" }),
+  },
+
+  process: {
+    filmLabel: "آلية العمل، خطوة بخطوة، تُعرض بالتمرير",
+    steps: [
+      { title: "التواصل الأول", text: "الأفكار والميزانية. أخبرونا باللحظة التي تودون تخليدها، وبمراجعكم، وبقصتكم.", meter: "0%", payNote: "لا يُطلب أي دفع في هذه المرحلة." },
+      { title: "عربون التصميم", text: "يُخصم من السعر النهائي عند التأكيد، ويغطي تكاليف التصميم في حال الإلغاء.", meter: "العربون", payNote: "تم دفع عربون التصميم." },
+      { title: "الاعتماد", text: "يُدفع 50% من تكلفة الإنتاج قبل بدء الصياغة.", meter: "50%", payNote: "تم دفع 50% من تكلفة الإنتاج." },
+      { title: "الإبداع", text: "صور ومقاطع فيديو لمراحل العمل عبر WhatsApp، وتتوقف المدة على درجة التعقيد.", meter: "50%", payNote: "لا شيء آخر للدفع خلال الصياغة." },
+      { title: "جلسة التصوير", text: "جلسة تصوير مخصصة، ثم التحضير للتسليم.", meter: "50%", payNote: "تُصوَّر قطعتكم قبل أن تغادر المشغل." },
+      { title: "الرصيد والتسليم", text: "تُدفع نسبة الـ50% المتبقية قبل التسليم بنحو أسبوع.", meter: "100%", payNote: "مدفوعة بالكامل، وجاهزة للتسليم." },
+    ],
+    eyebrow: "ست خطوات، وحديث واحد",
+    title: "آلية العمل",
+    lead: "من رسالتكم الأولى إلى يوم ترتدونها.",
+    payment: "الدفع",
+    paid: "المبلغ المدفوع",
+    noPayment: "لا يُطلب أي دفع في هذه المرحلة.",
+    clear: "وضوح منذ البداية",
+    overviewTitle: "ست خطوات، والدفع على مراحل",
+    overviewText: "عربون للتصميم، ونصف تكلفة الإنتاج عند الاعتماد، والرصيد قبل التسليم بأسبوع. وتتابعون كل مرحلة عبر WhatsApp.",
+    closingEyebrow: "الخطوة الأولى رسالة",
+  },
+
+  about: {
+    eyebrow: "من نحن",
+    title: "قصتنا",
+    lead: "مجوهرات راقية حسب الطلب، تُصنع في دبي لمن يصنعون التاريخ في الملاعب وخارجها.",
+    founderLabel: "المؤسس",
+    founderPortrait: "صورة المؤسس",
+    provisionalQuote: "اقتباس مؤقت",
+    quote: "«كل قطعة تبدأ بقصة. ومهمتنا أن نجعلها تتألق مدى الحياة.»",
+    founder: "المؤسس، Berete Jewellers",
+    chapters: "فصول",
+    chapterList: [
+      { title: "البداية", text: "نص مؤقت. كيف رُسمت القطعة الأولى، ولمن صُنعت، ولماذا كان لا بد أن تُصنع باليد بدلاً من أن تُشترى جاهزة من على الرف." },
+      { title: "دبي", text: "نص مؤقت. دار مقرها دبي، عند ملتقى الأحجار والحرفيين والعملاء من كل القارات، توصل قطعها إلى جميع أنحاء العالم." },
+      { title: "للأبطال", text: "نص مؤقت. خواتم بطولة للأندية، وسلاسل وقلادات للاعبين والنجوم: قطع تحمل لقباً، ورقماً، واسماً." },
+    ],
+  },
+
+  contact: {
+    eyebrow: "التواصل",
+    title: "ابدؤوا تصميم قطعتكم",
+    lead: "أسرع طريقة هي WhatsApp. ثلاث نقرات، ورسالة واحدة، ونتولى نحن الباقي.",
+    inspired: "ألهمتكم هذه القطعة؟",
+    oneConversation: "حديث واحد يكفي للبدء. أخبرونا بفكرتكم عبر WhatsApp، وسنرد عليكم شخصياً.",
+    trustedBy: "حظينا بثقة",
+    configTitle: "قطعتكم في 3 نقرات",
+    configSteps: ["نوع القطعة", "الميزانية", "التوقيت"],
+    answer: (question: string) => question + ":",
+    pieceChoices: { chain: "سلسلة", pendant: "قلادة", ring: "خاتم بطولة", other: "قطعة أخرى" },
+    budgets: { "10k": "حتى 10,000 دولار أمريكي", "25k": "من 10,000 إلى 25,000 دولار أمريكي", "50k": "من 25,000 إلى 50,000 دولار أمريكي", "50k+": "50,000 دولار أمريكي فأكثر", unsure: "لم أحدد بعد" },
+    timings: { asap: "خلال شهر", quarter: "خلال شهر إلى 3 أشهر", flexible: "دون استعجال" },
+    openWhatsapp: "فتح WhatsApp",
+    startOver: "البدء من جديد",
+    name: "الاسم",
+    email: "البريد الإلكتروني",
+    phone: "رقم الهاتف",
+    idea: "فكرتكم",
+    errName: "يرجى إدخال اسمكم.",
+    errEmail: "يرجى إدخال عنوان بريد إلكتروني صحيح.",
+    errMessage: "يرجى إخبارنا بالمزيد قليلاً (10 أحرف على الأقل).",
+    errPhone: "يرجى إدخال رقم هاتف صحيح.",
+    errServer: "حدث خطأ ما. يرجى المحاولة مجدداً أو مراسلتنا عبر WhatsApp.",
+    errNetwork: "خطأ في الشبكة. يرجى المحاولة مجدداً أو مراسلتنا عبر WhatsApp.",
+    callTitle: "هل تفضلون أن نتصل بكم؟",
+    callSent: "شكراً لكم. سنعاود الاتصال بكم قريباً.",
+    callButton: "طلب معاودة الاتصال",
+    emailTitle: "هل تفضلون البريد الإلكتروني؟",
+    emailSent: "شكراً لكم. وصلتنا رسالتكم، وسنرد عليكم شخصياً.",
+    emailButton: "إرسال الرسالة",
+  },
+
+  legal: {
+    eyebrow: "معلومات",
+    legalTitle: "الإشعار القانوني",
+    privacyTitle: "سياسة الخصوصية",
+    updated: "نسخة مؤقتة. المقاطع التي تحمل العلامة “exemple à adapter” أمثلة يجب تعديلها قبل الإطلاق.",
+    legal: [
+      {
+        title: "الناشر",
+        paragraphs: [
+          "ينشر هذا الموقع Berete Jewellers، ومقرها دبي، الإمارات العربية المتحدة.",
+          "الاسم التجاري: Berete Jewellers. المقر المسجل: دبي، الإمارات العربية المتحدة. رخصة تجارية صادرة في دبي. (Exemple à adapter : indiquez la raison sociale exacte, le numéro de licence commerciale et l'adresse complète.)",
+          "للتواصل: عبر WhatsApp أو صفحة التواصل في هذا الموقع.",
+        ],
+      },
+      {
+        title: "الاستضافة",
+        paragraphs: ["يستضيف هذا الموقع وبياناته مزود محترف لخدمات الاستضافة السحابية على خوادم آمنة. (Exemple à adapter : indiquez le nom, l'adresse et le contact de votre hébergeur.)"],
+      },
+      {
+        title: "الملكية الفكرية",
+        paragraphs: [
+          "جميع التصاميم والصور ومقاطع الفيديو والنصوص والعناصر المرئية في هذا الموقع ملك لدار Berete Jewellers أو مستخدمة بإذن. ويُحظر أي نسخ، كلياً أو جزئياً، دون موافقة خطية مسبقة.",
+          "تُذكر أسماء الأندية والكؤوس واللاعبين لوصف القطع التي صُنعت من أجلهم، وتبقى ملكاً لأصحابها.",
+        ],
+      },
+      {
+        title: "المسؤولية",
+        paragraphs: ["تُقدَّم المعلومات الواردة في هذا الموقع لأغراض العرض. والقطع المعروضة إبداعات حسب الطلب؛ ويُعد لكل قطعة جديدة عرض سعر خاص بها."],
+      },
+    ],
+    privacy: [
+      {
+        title: "البيانات التي نجمعها",
+        paragraphs: [
+          "عندما تطلبون معاودة الاتصال، نجمع اسمكم ورقم هاتفكم، وعند الاقتضاء القطعة التي تهمكم. وعندما تراسلوننا عبر البريد الإلكتروني، نجمع اسمكم وعنوان بريدكم الإلكتروني ورسالتكم.",
+          "تُقاس مشاهدات الصفحات دون ملفات تعريف الارتباط ودون التعرف على هويتكم.",
+        ],
+      },
+      {
+        title: "لماذا نستخدمها",
+        paragraphs: ["فقط للرد على طلبكم، وإعداد عرض السعر، ومتابعة مشروعكم. ولا نبيع بياناتكم أبداً."],
+      },
+      {
+        title: "WhatsApp",
+        paragraphs: ["تفتح الأزرار التي تحمل اسم WhatsApp محادثة على WhatsApp، وهي خدمة يديرها طرف ثالث وفق سياسة الخصوصية الخاصة به. وتُعالَج الرسائل التي ترسلونها هناك داخل WhatsApp."],
+      },
+      {
+        title: "مدة الاحتفاظ",
+        paragraphs: ["تُحفظ طلبات التواصل ومعاودة الاتصال لمدة أقصاها ثلاث سنوات بعد آخر تواصل بيننا، ثم تُحذف. (Exemple à adapter selon votre pratique réelle de conservation.)"],
+      },
+      {
+        title: "حقوقكم",
+        paragraphs: ["يمكنكم في أي وقت طلب الاطلاع على بياناتكم أو تصحيحها أو حذفها، بالتواصل معنا عبر WhatsApp أو صفحة التواصل."],
+      },
+    ],
+  },
+
+  notFound: {
+    eyebrow: "الصفحة غير موجودة",
+    title: "هذه القطعة غير موجودة… بعد.",
+    text: "الصفحة التي تبحثون عنها نُقلت أو لم تُنشأ قط. كل قطعة عظيمة تبدأ بحديث: حدثونا عن قطعتكم.",
+    home: "العودة إلى الرئيسية",
+    whatsapp: "أو تواصلوا معنا عبر WhatsApp",
+  },
+
+  seoPages: {
+    "/": {
+      title: "Berete Jewellers — مجوهرات راقية حسب الطلب، دبي",
+      description: "مجوهرات راقية حسب الطلب تُصنع في دبي: سلاسل وقلادات ألماس وخواتم بطولة للأندية ولاعبي كرة القدم والنجوم. من صنعنا، وبإلهام منكم.",
+    },
+    "/creations": {
+      title: "الإبداعات: قلادات وسلاسل وخواتم وساعات",
+      description: "جميع قطع Berete Jewellers حسب النوع: قلادات ألماس، وسلاسل، وخواتم بطولة وخواتم ختم، وساعات، وكل منها يُصنع حسب المقاس في دبي.",
+    },
+    "/creations/pendants": {
+      title: "القلادات: قلادات ألماس حسب الطلب",
+      description: "قلادات Berete Jewellers: حروف أولى وشعارات واحتفالات منحوتة بتجسيم ومرصعة حجراً حجراً للاعبي كرة القدم والمقتنين، تُصنع في دبي.",
+    },
+    "/creations/chains": {
+      title: "السلاسل: سلاسل ألماس حسب الطلب",
+      description: "سلاسل Berete Jewellers: حلقات على شكل فراشات ورموز اللانهاية وزهور من الألماس، تُرسم حلقة بعد حلقة وتُصنع حسب المقاس في دبي.",
+    },
+    "/creations/rings": {
+      title: "الخواتم: خواتم البطولة وخواتم الختم",
+      description: "خواتم بطولة لشتوتغارت وإنتر ميلان، وخواتم ختم مرصعة بالألماس: خواتم Berete Jewellers، تُصنع في دبي.",
+    },
+    "/creations/watches": {
+      title: "ساعات مرصعة بالألماس",
+      description: "ساعات مرصعة بالألماس من الهيكل إلى السوار، يرتديها لاعبو كرة القدم: ساعات Berete Jewellers، دبي.",
+    },
+    "/creations/bracelets": {
+      title: "الأساور",
+      description: "أساور تُصنع حسب المقاس لدى Berete Jewellers في دبي. قطع جديدة قيد الصياغة.",
+    },
+    "/players": {
+      title: "اللاعبون والأندية والشخصيات",
+      description: "لاعبو كرة القدم والأندية والشخصيات الذين يرتدون Berete Jewellers: قصصهم والقطع التي صُنعت خصيصاً من أجلهم.",
+    },
+    "/atelier": {
+      title: "المشغل في دبي",
+      description: "داخل مشغل Berete Jewellers في دبي: الصب والتجميع والصقل وترصيع الأحجار، وكل قطعة تُصنع باليد.",
+    },
+    "/boxes": {
+      title: "علب وصناديق حسب الطلب",
+      description: "علب وصناديق تُصنع حسب المقاس لقطع مختارة من Berete Jewellers، متوفرة عند الرغبة.",
+    },
+    "/process": {
+      title: "آلية العمل، خطوة بخطوة",
+      description: "ست خطوات واضحة من رسالتكم الأولى حتى التسليم: عربون التصميم، والاعتماد، والإبداع بمتابعة عبر WhatsApp، وجلسة التصوير، والتسليم.",
+    },
+    "/about": {
+      title: "قصتنا",
+      description: "قصة Berete Jewellers، دار في دبي تبدع مجوهرات راقية حسب الطلب للأبطال.",
+    },
+    "/contact": {
+      title: "التواصل: ابدؤوا تصميم قطعتكم",
+      description: "ابدؤوا تصميم قطعتكم حسب الطلب مع Berete Jewellers: تحدثوا معنا عبر WhatsApp، أو أعدوا طلبكم في ثلاث نقرات، أو اطلبوا معاودة الاتصال.",
+    },
+    "/legal": {
+      title: "الإشعار القانوني",
+      description: "الإشعار القانوني لموقع Berete Jewellers، دار المجوهرات الراقية حسب الطلب في دبي: الناشر والاستضافة والملكية الفكرية.",
+    },
+    "/privacy": {
+      title: "سياسة الخصوصية",
+      description: "كيف تتعامل Berete Jewellers مع البيانات الشخصية التي تشاركونها على هذا الموقع.",
+    },
+    "/404": {
+      title: "الصفحة غير موجودة",
+      description: "",
+    },
+  },
+
+  seo: {
+    pieceDescription: (title: string, type: string, who: string) => title + ": " + type + " من صنع Berete Jewellers في دبي، خصيصاً من أجل " + who + ".",
+    personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? "، لاعب" : kind === "club" ? "، نادٍ" : ""),
+    personDescription: (name: string, kind: "player" | "club" | "personality") =>
+      "القصص والقطع المصممة حسب الطلب التي جمعت " + name + " (" + (kind === "club" ? "نادٍ" : kind === "personality" ? "شخصية" : "لاعب") + ") بدار Berete Jewellers، للمجوهرات الراقية المصنوعة في دبي.",
+  },
+};

@@ -1,0 +1,476 @@
+/*
+ * The words of the site, in Spanish (neutral international Spanish, "usted").
+ * Mirrors en.ts: the same entries, in the same order.
+ */
+import { plural } from "../format";
+import type { Messages } from "./en";
+
+const n = (count: number, one: string, other: string) => plural("es-ES", count, { one, other });
+
+const PRIVATE_COLLECTOR = "Un coleccionista privado";
+/** "Un coleccionista privado" written inside a sentence. */
+const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "un coleccionista privado" : who);
+
+export const es: Messages = {
+  site: {
+    skip: "Ir al contenido",
+    homeLabel: "Berete Jewellers, inicio",
+    tagline: "Creado por nosotros. Inspirado por usted.",
+    baseLine: "Con sede en Dubái · Envíos a todo el mundo",
+    rights: (year: number) => "© " + year + " Berete Jewellers. Todos los derechos reservados.",
+  },
+
+  language: {
+    label: "Idioma",
+    choose: "Elegir el idioma",
+  },
+
+  common: {
+    startPiece: "Empiece su pieza",
+    whatsapp: "WhatsApp",
+    chatWhatsapp: "Escríbanos por WhatsApp",
+    allCreations: "Todas las creaciones",
+    allPlayers: "Todos los jugadores",
+    seePiece: "Ver la pieza",
+    readArticle: "Leer el artículo",
+    close: "Cerrar",
+    previous: "Anterior",
+    next: "Siguiente",
+    back: "Volver",
+    yourPiece: "Su pieza",
+    yourStory: "Su historia, en diamantes",
+    madeFor: (who: string) => "Creada para " + inSentence(who),
+    privateCollector: PRIVATE_COLLECTOR,
+    newPiecesTitle: "Nuevas piezas en creación",
+    newPiecesText: "Esta colección se desvelará pronto. Mientras tanto, empiece la suya.",
+  },
+
+  whatsapp: {
+    hello: "Hola, Berete Jewellers. Me gustaría encargar una pieza a medida.",
+    piece: (name: string) => "Hola, Berete Jewellers. Me gustaría una pieza como “" + name + "”. ¿Podríamos hablarlo?",
+    configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
+      ["Hola, Berete Jewellers. Me gustaría empezar una pieza.", "Pieza: " + type, "Presupuesto: " + budget, "Plazo: " + timing, ...(pieceName ? ["Inspirada en: “" + pieceName + "”"] : [])].join("\n"),
+  },
+
+  types: {
+    chain: "Cadena",
+    pendant: "Colgante",
+    ring: "Anillo",
+    bracelet: "Pulsera",
+    watch: "Reloj",
+  },
+
+  nav: {
+    main: "Principal",
+    mobile: "Móvil",
+    creations: "Creaciones",
+    players: "Jugadores",
+    atelier: "Taller",
+    boxes: "Estuches",
+    process: "Proceso",
+    about: "Nosotros",
+    contact: "Contacto",
+    openMenu: "Abrir el menú",
+    closeMenu: "Cerrar el menú",
+  },
+
+  footer: {
+    creations: "Creaciones",
+    house: "La casa",
+    contact: "Contacto",
+    contactPage: "Página de contacto",
+    yourPiece: "Su pieza",
+    pitch: "Cadenas, colgantes y anillos de campeón, diseñados con usted y creados para el momento.",
+    legal: "Aviso legal",
+    privacy: "Privacidad",
+  },
+
+  collections: {
+    items: {
+      pendants: { name: "Colgantes", intro: "Iniciales, emblemas, celebraciones: cada colgante cuenta una historia, esculpido en volumen y engastado piedra a piedra." },
+      chains: { name: "Cadenas", intro: "Eslabones dibujados uno a uno, de las mariposas a los nudos infinitos, en cadenas que se llevan solas o con un colgante." },
+      rings: { name: "Anillos", intro: "Anillos de campeón para toda una plantilla y anillos de sello creados para una sola mano." },
+      bracelets: { name: "Pulseras", intro: "Pulseras a medida, eslabón a eslabón." },
+      watches: { name: "Relojes", intro: "Relojes engastados con diamantes, de la caja al brazalete." },
+    },
+    eyebrow: "Colecciones",
+    title: "Por tipo de joya",
+    explore: "Explorar",
+    count: (count: number) => n(count, "# pieza", "# piezas"),
+    tileAlt: (collection: string, piece: string) => collection + ": " + piece,
+    collection: "Colección",
+    listLabel: (collection: string) => "Las piezas: " + collection,
+    others: "Otras colecciones",
+    ctaTitle: "La suya, desde el primer boceto.",
+    ctaText: "Cada pieza empieza con una conversación. Cuéntenos su historia: nosotros la dibujamos.",
+    ctaButton: "Empezar por WhatsApp",
+  },
+
+  home: {
+    filmLabel: "Vídeo de Berete Jewellers, que avanza al desplazarse por la página",
+    kicker: "Berete Jewellers · Dubái",
+    title: "Alta joyería a medida para campeones.",
+    discover: "Descubra las creaciones",
+    statements: ["Diseñadas para clubes. Lucidas por campeones.", "La tapa se levanta y descubre el trofeo.", "Esculpidas y después engastadas piedra a piedra.", "Piezas de carácter, creadas para ser vistas."],
+    featured: "Cápsula destacada",
+    enterCapsule: "Entre en la cápsula",
+    liftTop: "Levantar la tapa",
+    closeTop: "Cerrar la tapa",
+    liftTopLabel: "Levantar la tapa del anillo",
+    closeTopLabel: "Cerrar la tapa del anillo",
+    wornBy: "Lucidas por",
+    players: "Los jugadores",
+    inside: "Dentro de la casa",
+    insideTitle: "Del boceto a la entrega",
+    atelierTitle: "Taller",
+    atelierText: "Cada piedra, engastada a mano bajo el microscopio.",
+    atelierAlt: "Primer plano de una herramienta de engaste trabajando sobre diamantes",
+    enter: "Entrar",
+    boxesTitle: "Estuches",
+    boxesText: "Estuches a medida para una selección de piezas, como opción.",
+    discoverShort: "Descubrir",
+    processTitle: "Proceso",
+    processText: "Seis etapas claras, seguidas por WhatsApp.",
+    follow: "Seguir",
+  },
+
+  showcase: {
+    eyebrow: "Piezas seleccionadas",
+    title: "Las cápsulas",
+  },
+
+  scroll: {
+    hint: "Desplácese",
+  },
+
+  creations: {
+    eyebrow: "Creaciones",
+    title: "Las creaciones",
+    lead: "Cadenas, colgantes, anillos, pulseras y relojes. Cada pieza se dibuja para una persona, un club, un momento, y después se crea en Dubái.",
+    listLabel: "Todas las piezas",
+    filterLabel: "Filtrar las piezas",
+    all: "Todas",
+    enterCollection: (collection: string) => "Entre en la colección de " + collection.toLowerCase(),
+  },
+
+  piece: {
+    steps: {
+      sketch: { title: "Boceto", text: "La idea se dibuja a mano y después se modela hasta que cada proporción es justa." },
+      raw: { title: "Pieza en bruto", text: "El metal se funde y se ensambla antes de engastar una sola piedra." },
+      setting: { title: "Engaste", text: "Cada piedra se engasta a mano, bajo lupa." },
+      polishing: { title: "Pulido", text: "Cada superficie se pule hasta que el metal desaparece tras la luz." },
+      delivery: { title: "Entrega", text: "Revisada, fotografiada y después entregada, en su estuche cuando lo tiene." },
+    },
+    want: "Quiero una pieza como esta",
+    details: "Los detalles",
+    madeFor: "Creada para",
+    theClub: "El club",
+    theProfile: "El perfil",
+    stories: (count: number) => n(count, "La historia", "Las historias"),
+    andOthers: (names: string) => "También " + names + ".",
+    seenInStories: "Vista en nuestras historias",
+    story: "La historia",
+    makingEyebrow: "Del boceto a la entrega",
+    makingTitle: "Cómo se creó",
+    thisPiece: "Esta pieza",
+    inAtelier: "En el taller",
+    delivered: "Entregada",
+    handedOverTo: (client: string) => "Entregada a " + client,
+    handover: "La entrega",
+    sheet: "Ficha técnica",
+    customBox: "Estuche a medida disponible",
+    deliveredIn: (box: string) => "Se entrega en su estuche, creado para ella: " + box + ".",
+    press: "Prensa",
+    pressAlt: (outlet: string) => "Artículo de " + outlet,
+    similar: "Piezas similares",
+    more: (collection: string) => "Más " + collection.toLowerCase(),
+    theCollection: "La colección",
+    ctaTitle: "Una pieza como esta, dibujada para usted.",
+    ctaText: "Envíenos el nombre de la pieza por WhatsApp: le responderemos con una primera idea y los siguientes pasos.",
+    otherWays: "Otras formas de contactarnos",
+  },
+
+  gallery: {
+    title: "Detalles",
+    hintPinned: "Desplácese para explorar · Toque para ampliar",
+    hint: "Toque para ampliar",
+    open: (what: string) => "Ver en pantalla completa: " + what,
+    photo: "Foto",
+    zoomIn: "Ampliar",
+    zoomOut: "Reducir",
+  },
+
+  players: {
+    eyebrow: "Jugadores",
+    title: "Lucidas por campeones",
+    lead: "Futbolistas, clubes y personalidades que nos confiaron su momento. Cada nombre abre sus historias y sus piezas.",
+    listLabel: "Lista de jugadores",
+    groups: { player: "Jugadores", club: "Clubes", personality: "Personalidades" },
+    portrait: (name: string) => "Retrato de " + name,
+    club: "Club",
+    personality: "Personalidad",
+    number: "Dorsal",
+    bioWithPieces: (name: string) => "Las piezas creadas para " + name + " y los momentos compartidos en nuestro Instagram.",
+    bioStories: (name: string) => "Los momentos compartidos con " + name + " en nuestro Instagram.",
+    watch: (count: number) => n(count, "Ver la historia", "Ver las historias"),
+    pieces: (count: number) => n(count, "La pieza", "Las piezas"),
+    stories: "Historias",
+    moments: (count: number) => n(count, "# momento", "# momentos"),
+    theirPlayers: "Los jugadores",
+  },
+
+  stories: {
+    bar: "Historias",
+    previous: "Historias anteriores",
+    next: "Historias siguientes",
+    open: (title: string) => "Abrir la historia: " + title,
+    dialog: (title: string) => "Historia: " + title,
+    alt: (title: string, index: number) => title + ", historia " + index,
+    play: "Reproducir el vídeo",
+    soundOff: "Silenciar",
+    soundOn: "Activar el sonido",
+    close: "Cerrar la historia",
+    help: "Toque el lado derecho para avanzar y el izquierdo para volver atrás. Mantenga pulsado para hacer una pausa.",
+    want: "¿Quiere la suya? WhatsApp",
+    seePieceLabel: (title: string) => "Ver la pieza: " + title,
+  },
+
+  atelier: {
+    steps: [
+      { title: "Fundición", text: "El modelo se convierte en metal en bruto: un colgante antes de su primera piedra." },
+      { title: "Montaje", text: "Eslabón a eslabón, una pulsera toma forma sobre el banco del joyero." },
+      { title: "Pulido", text: "Cada eslabón se pule a mano, para que solo se vean las piedras." },
+      { title: "Acabado", text: "Una pieza insignia en plena creación, revisada bajo la lámpara." },
+    ],
+    step: (index: number) => "Etapa " + index,
+    stepAlt: (step: string) => step + " en el taller",
+    filmLabel: "Piedras engastadas a mano en el taller",
+    eyebrow: "Dubái",
+    title: "El taller",
+    lead: "Donde cada pieza se esculpe y después se engasta piedra a piedra.",
+    making: "La creación de una pieza",
+    ctaTitle: "Siga su pieza por WhatsApp, paso a paso.",
+    ctaText: "Durante toda la creación, compartimos con usted fotos y vídeos de los avances.",
+    seeProcess: "Ver el proceso",
+  },
+
+  boxes: {
+    eyebrow: "A medida",
+    title: "Estuches",
+    lead: "Estuches a medida disponibles para una selección de piezas, como opción.",
+    listLabel: "Estuches a medida",
+    open: (name: string) => "Ver " + name + " en pantalla completa",
+    photos: (count: number) => n(count, "# foto", "# fotos"),
+  },
+
+  process: {
+    filmLabel: "El proceso, paso a paso, que avanza al desplazarse por la página",
+    steps: [
+      { title: "Primer contacto", text: "Ideas y presupuesto. Cuéntenos el momento que desea celebrar, sus referencias, su historia.", meter: "0%", payNote: "Ningún pago en esta etapa." },
+      { title: "Anticipo de diseño", text: "Se descuenta del precio final si se confirma; cubre los gastos de diseño si se cancela.", meter: "Anticipo", payNote: "Anticipo de diseño abonado." },
+      { title: "Validación", text: "El 50% de la producción se abona antes de empezar la fabricación.", meter: "50%", payNote: "50% de la producción abonado." },
+      { title: "Creación", text: "Fotos y vídeos de los avances por WhatsApp; el plazo depende de la complejidad.", meter: "50%", payNote: "Nada más que pagar mientras creamos su pieza." },
+      { title: "Sesión de fotos", text: "Una sesión fotográfica dedicada y, después, la preparación de la entrega.", meter: "50%", payNote: "Su pieza se fotografía antes de salir del taller." },
+      { title: "Saldo y entrega", text: "El 50% restante, aproximadamente una semana antes de la entrega.", meter: "100%", payNote: "Totalmente abonada, lista para la entrega." },
+    ],
+    eyebrow: "Seis etapas, una conversación",
+    title: "El proceso",
+    lead: "Desde su primer mensaje hasta el día en que luzca su pieza.",
+    payment: "Pago",
+    paid: "Importe abonado",
+    noPayment: "Ningún pago en esta etapa.",
+    clear: "Claro desde el principio",
+    overviewTitle: "Seis etapas, pago por fases",
+    overviewText: "Un anticipo de diseño, la mitad de la producción en la validación y el saldo una semana antes de la entrega. Usted sigue cada etapa por WhatsApp.",
+    closingEyebrow: "La primera etapa es un mensaje",
+  },
+
+  about: {
+    eyebrow: "Nosotros",
+    title: "Nuestra historia",
+    lead: "Alta joyería a medida, creada en Dubái para quienes hacen historia dentro y fuera del campo.",
+    founderLabel: "Fundador",
+    founderPortrait: "Retrato del fundador",
+    provisionalQuote: "Cita provisional",
+    quote: "“Cada pieza nace de una historia. Nuestro oficio es hacerla brillar toda una vida.”",
+    founder: "Fundador, Berete Jewellers",
+    chapters: "Capítulos",
+    chapterList: [
+      { title: "Los comienzos", text: "Texto provisional. Cómo se dibujó la primera pieza, para quién era y por qué tenía que hacerse a mano en lugar de comprarse ya hecha." },
+      { title: "Dubái", text: "Texto provisional. Una casa con sede en Dubái, en la encrucijada de piedras, artesanos y clientes de todos los continentes, con entregas en todo el mundo." },
+      { title: "Para campeones", text: "Texto provisional. Anillos de campeón para clubes, cadenas y colgantes para jugadores y estrellas: piezas que llevan un título, un número, un nombre." },
+    ],
+  },
+
+  contact: {
+    eyebrow: "Contacto",
+    title: "Empiece su pieza",
+    lead: "La vía más rápida es WhatsApp. Tres clics, un mensaje, y nosotros nos ocupamos del resto.",
+    inspired: "¿Le inspira esta pieza?",
+    oneConversation: "Basta una conversación para empezar. Cuéntenos su idea por WhatsApp: le responderemos personalmente.",
+    trustedBy: "Confían en nosotros",
+    configTitle: "Su pieza en 3 clics",
+    configSteps: ["Tipo de pieza", "Presupuesto", "Plazo"],
+    answer: (question: string) => question + ":",
+    pieceChoices: { chain: "Cadena", pendant: "Colgante", ring: "Anillo de campeón", other: "Otra pieza" },
+    budgets: { "10k": "Hasta 10 000 USD", "25k": "De 10 000 a 25 000 USD", "50k": "De 25 000 a 50 000 USD", "50k+": "50 000 USD o más", unsure: "Aún por definir" },
+    timings: { asap: "En menos de un mes", quarter: "Entre 1 y 3 meses", flexible: "Sin prisa" },
+    openWhatsapp: "Abrir WhatsApp",
+    startOver: "Volver a empezar",
+    name: "Nombre",
+    email: "Correo electrónico",
+    phone: "Número de teléfono",
+    idea: "Su idea",
+    errName: "Por favor, indique su nombre.",
+    errEmail: "Por favor, indique una dirección de correo electrónico válida.",
+    errMessage: "Por favor, cuéntenos un poco más (10 caracteres como mínimo).",
+    errPhone: "Por favor, indique un número de teléfono válido.",
+    errServer: "Se ha producido un error. Inténtelo de nuevo o escríbanos por WhatsApp.",
+    errNetwork: "Error de conexión. Inténtelo de nuevo o escríbanos por WhatsApp.",
+    callTitle: "¿Prefiere que le llamemos?",
+    callSent: "Gracias. Le llamaremos en breve.",
+    callButton: "Llámenme",
+    emailTitle: "¿Prefiere el correo electrónico?",
+    emailSent: "Gracias. Hemos recibido su mensaje; le responderemos personalmente.",
+    emailButton: "Enviar el mensaje",
+  },
+
+  legal: {
+    eyebrow: "Información",
+    legalTitle: "Aviso legal",
+    privacyTitle: "Política de privacidad",
+    updated: "Versión provisional. Los pasajes marcados “exemple à adapter” son ejemplos que deben adaptarse antes del lanzamiento.",
+    legal: [
+      {
+        title: "Titular del sitio",
+        paragraphs: [
+          "El titular de este sitio web es Berete Jewellers, con sede en Dubái, Emiratos Árabes Unidos.",
+          "Nombre comercial: Berete Jewellers. Domicilio social: Dubái, Emiratos Árabes Unidos. Licencia comercial expedida en Dubái. (Exemple à adapter : indiquez la raison sociale exacte, le numéro de licence commerciale et l'adresse complète.)",
+          "Contacto: por WhatsApp o a través de la página de contacto de este sitio web.",
+        ],
+      },
+      {
+        title: "Alojamiento",
+        paragraphs: ["Este sitio web y sus datos están alojados por un proveedor profesional de alojamiento en la nube, en servidores seguros. (Exemple à adapter : indiquez le nom, l'adresse et le contact de votre hébergeur.)"],
+      },
+      {
+        title: "Propiedad intelectual",
+        paragraphs: [
+          "Todos los diseños, fotografías, vídeos, textos y elementos visuales de este sitio web son propiedad de Berete Jewellers o se utilizan con autorización. Queda prohibida cualquier reproducción, total o parcial, sin consentimiento previo por escrito.",
+          "Los nombres de clubes, trofeos y jugadores se mencionan para describir las piezas creadas para ellos y siguen siendo propiedad de sus respectivos titulares.",
+        ],
+      },
+      {
+        title: "Responsabilidad",
+        paragraphs: ["La información de este sitio web se ofrece con fines de presentación. Las piezas mostradas son creaciones a medida; cada nueva pieza se presupuesta de forma individual."],
+      },
+    ],
+    privacy: [
+      {
+        title: "Datos que recopilamos",
+        paragraphs: [
+          "Cuando solicita que le llamemos, recopilamos su nombre, su número de teléfono y, cuando procede, la pieza que le interesa. Cuando nos escribe por correo electrónico, recopilamos su nombre, su dirección de correo electrónico y su mensaje.",
+          "Las visitas a las páginas se miden sin cookies y sin identificarle.",
+        ],
+      },
+      {
+        title: "Para qué los utilizamos",
+        paragraphs: ["Únicamente para responder a su solicitud, preparar su presupuesto y hacer el seguimiento de su proyecto. Nunca vendemos sus datos."],
+      },
+      {
+        title: "WhatsApp",
+        paragraphs: ["Los botones marcados WhatsApp abren una conversación en WhatsApp, un servicio gestionado por un tercero con su propia política de privacidad. Los mensajes que envíe allí se tratan dentro de WhatsApp."],
+      },
+      {
+        title: "Conservación",
+        paragraphs: ["Las solicitudes de contacto y de llamada se conservan durante un máximo de tres años después de nuestro último intercambio y, a continuación, se eliminan. (Exemple à adapter selon votre pratique réelle de conservation.)"],
+      },
+      {
+        title: "Sus derechos",
+        paragraphs: ["Puede solicitar en cualquier momento el acceso a sus datos, su rectificación o su supresión, contactándonos por WhatsApp o a través de la página de contacto."],
+      },
+    ],
+  },
+
+  notFound: {
+    eyebrow: "Página no encontrada",
+    title: "Esta pieza no existe… todavía.",
+    text: "La página que busca se ha trasladado o nunca llegó a existir. Toda gran pieza empieza con una conversación: cuéntenos la suya.",
+    home: "Volver al inicio",
+    whatsapp: "O escríbanos por WhatsApp",
+  },
+
+  seoPages: {
+    "/": {
+      title: "Berete Jewellers — Alta joyería a medida, Dubái",
+      description: "Alta joyería a medida en Dubái: cadenas, colgantes y anillos de campeón de diamantes para clubes, futbolistas y estrellas. Creado por nosotros. Inspirado por usted.",
+    },
+    "/creations": {
+      title: "Creaciones: colgantes, cadenas, anillos y relojes",
+      description: "Todas las piezas de Berete Jewellers, por tipo: colgantes y cadenas de diamantes, anillos de campeón y de sello, y relojes, cada uno creado a medida en Dubái.",
+    },
+    "/creations/pendants": {
+      title: "Colgantes de diamantes a medida",
+      description: "Colgantes de Berete Jewellers: iniciales, emblemas y celebraciones esculpidos en volumen, engastados piedra a piedra en Dubái para futbolistas y coleccionistas.",
+    },
+    "/creations/chains": {
+      title: "Cadenas de diamantes a medida",
+      description: "Las cadenas de Berete Jewellers: eslabones de mariposas, nudos infinitos y flores de diamantes, dibujadas eslabón a eslabón y creadas a medida en Dubái.",
+    },
+    "/creations/rings": {
+      title: "Anillos de campeón y anillos de sello",
+      description: "Anillos de campeón para el VfB Stuttgart y el Inter de Milán, y anillos de sello engastados con diamantes: los anillos de Berete Jewellers, creados en Dubái.",
+    },
+    "/creations/watches": {
+      title: "Relojes engastados con diamantes",
+      description: "Relojes engastados con diamantes de la caja al brazalete, lucidos por futbolistas: los relojes de Berete Jewellers, Dubái.",
+    },
+    "/creations/bracelets": {
+      title: "Pulseras",
+      description: "Pulseras a medida de Berete Jewellers en Dubái. Nuevas piezas en creación.",
+    },
+    "/players": {
+      title: "Jugadores, clubes y personalidades",
+      description: "Los futbolistas, clubes y personalidades que lucen Berete Jewellers: sus historias y las piezas a medida creadas para ellos.",
+    },
+    "/atelier": {
+      title: "El taller en Dubái",
+      description: "Dentro del taller de Berete Jewellers en Dubái: fundición, montaje, pulido y engaste de las piedras, cada pieza hecha a mano.",
+    },
+    "/boxes": {
+      title: "Estuches y baúles a medida",
+      description: "Estuches y baúles hechos a medida para una selección de piezas de Berete Jewellers, disponibles como opción.",
+    },
+    "/process": {
+      title: "El proceso, paso a paso",
+      description: "Seis etapas claras, de su primer mensaje a la entrega: anticipo de diseño, validación, creación seguida por WhatsApp, sesión de fotos y entrega.",
+    },
+    "/about": {
+      title: "Nuestra historia",
+      description: "La historia de Berete Jewellers, una casa de Dubái que crea alta joyería a medida para campeones.",
+    },
+    "/contact": {
+      title: "Contacto: empiece su pieza",
+      description: "Empiece su pieza a medida con Berete Jewellers: escríbanos por WhatsApp, prepare su solicitud en tres clics o pida que le llamemos.",
+    },
+    "/legal": {
+      title: "Aviso legal",
+      description: "Aviso legal del sitio web de Berete Jewellers.",
+    },
+    "/privacy": {
+      title: "Política de privacidad",
+      description: "Cómo trata Berete Jewellers los datos personales que usted comparte en este sitio web.",
+    },
+    "/404": {
+      title: "Página no encontrada",
+      description: "",
+    },
+  },
+
+  seo: {
+    pieceDescription: (title: string, type: string, who: string) => title + ": " + type.toLowerCase() + " a medida para " + inSentence(who) + ", obra de Berete Jewellers, Dubái.",
+    personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", jugador" : kind === "club" ? ", club" : ""),
+    personDescription: (name: string, kind: "player" | "club" | "personality") =>
+      "Las historias y las piezas personalizadas de " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "personalidad" : "jugador") + ") con Berete Jewellers, alta joyería a medida creada en Dubái.",
+  },
+};
