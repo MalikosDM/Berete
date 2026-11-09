@@ -2,7 +2,7 @@
 // npm run build runs vite build, then the server bundle of the pages
 // (vite build --ssr src/extensions/seo/entry-server.tsx --outDir dist-ssr), then
 // this script: one HTML file per route, with its rendered content and its head,
-// plus sitemap.xml and robots.txt. SITE_URL gives the public address.
+// plus sitemap.xml and robots.txt. SITE_URL gives the public address (on Vercel, the address of the project).
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -10,7 +10,9 @@ import { pathToFileURL } from "node:url";
 const root = process.cwd();
 const server = await import(pathToFileURL(join(root, "dist-ssr", "entry-server.js")).href);
 const template = await readFile(join(root, "dist", "index.html"), "utf8");
-const origin = (process.env.SITE_URL || server.settings.siteUrl || "").replace(/\/+$/, "");
+// On Vercel, without SITE_URL, the address of the project (https://<project>.vercel.app).
+const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : "";
+const origin = (process.env.SITE_URL || vercelUrl || server.settings.siteUrl || "").replace(/\/+$/, "");
 const targets = server.prerenderTargets();
 
 /** "/" is dist/index.html; "/about" is dist/about.html (served at /about). */

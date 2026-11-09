@@ -8,3 +8,6 @@ scripts/.import-media-cache.json
 .local
 test-results
 playwright-report
+.vercel
+.env*
+!.env.example
