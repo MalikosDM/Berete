@@ -210,6 +210,8 @@ export function descriptionFor(settings: SeoSettings, path: string, extras?: Seo
 }
 
 export function robotsFor(settings: SeoSettings, path: string): string {
+  // Private links to a 3D model: never indexed.
+  if (/^(\/[a-z]{2})?\/view(\/|$)/.test(path)) return "noindex,nofollow";
   const found = pageFor(settings, path);
   return (found && found.page.robots ? found.page.robots : "") || "index,follow";
 }

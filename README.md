@@ -60,6 +60,38 @@ néerlandais (`/nl/...`) et arabe (`/ar/...`, lu de droite à gauche). Le menu d
 - **Google** : chaque langue a ses pages pré-rendues, son plan du site et ses liens `hreflang`. Pour que ces liens
   figurent dans les pages construites, définir l'adresse publique au moment du build : `SITE_URL=https://… npm run build`.
 
+## Visualiseur 3D
+
+Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien privé.
+
+- **Admin, onglet « 3D »** : envoyer un fichier `.3dm` (Rhino, le mieux : il garde les calques), `.glb` ou `.stl`,
+  jusqu'à 800 Mo (envoi par morceaux), suivre l'optimisation, donner un rôle à chaque calque (Métal avec son métal
+  par défaut, Diamant, Pierre de couleur avec sa couleur, Émail, Masquer ; « Voir seul » montre un calque), choisir les
+  métaux proposés, la lumière, le fond, « Enregistrer cette vue » (et son image d'attente), rattacher le modèle à une
+  pièce, créer des liens privés (expiration et mot de passe facultatifs) et les copier.
+- **Les rôles des calques** sont devinés (pierre répétée des centaines de fois = diamant, grand volume = métal, nom du
+  calque : « Diamonds », « Gold »…) puis **retenus par nom** : un fichier dont les calques portent les mêmes noms reçoit
+  les mêmes rôles (table `LayerMemory`). Le fichier de test ZN1242-bj001 est déjà réglé (`server/models/demo.ts`,
+  ses versions optimisées dans `storage/demo/`).
+- **Le pipeline** (`server/models/pipeline/`, lancé dans un processus à part par `server/models/jobs.ts`) : lecture
+  (STL lu par morceaux, GLB avec Draco, 3DM avec rhino3dm : calques et blocs), soudure des sommets à 0,0001 mm, découpage
+  en morceaux, copies d'une même forme placées sur la première par alignement (Kabsch, aussi en miroir) et dessinées une
+  seule fois (`EXT_mesh_gpu_instancing`) ; dans un STL, les pierres sont reconnues (petites, convexes, avec une table,
+  répétées, ou les 174 et 40 triangles des tailles Rhino) ; métal simplifié (0,01 mm pour la version ordinateur, 0,03 mm
+  pour la version téléphone), normales nettes aux arêtes (35°), compression Meshopt. Le fichier d'origine est toujours
+  gardé. En ligne de commande : `npm run models:optimize -- <fichier> <dossier>`.
+- **Les fichiers** sont dans `storage/` (hors git, `MODELS_DIR` pour un autre dossier), derrière `server/models/storage.ts` :
+  seul ce fichier change pour les mettre ailleurs (disque du VPS, stockage objet).
+- **Le visualiseur** (`src/viewer/`, three.js, React Three Fiber, chargé seulement quand il est montré) : réfraction et
+  feu des diamants sur ordinateur, verre d'indice 2,42 avec dispersion sur téléphone, 5 métaux par calque, 3 lumières
+  (studio, chaude, projecteur) et lumière tournante, zoom vers le curseur ou le pincement, double-clic / double-tap
+  pour s'approcher d'un détail, **jamais de recentrage tout seul**, vues de face, côté, dessus, rotation, plein écran,
+  image PNG, fond noir ou clair. Éclairages HDRI de Poly Haven (CC0) dans `public/hdri/`, décodeur Draco dans `public/draco/`.
+- **Où il apparaît** : « Explore in 3D » sur la page d'une pièce qui a un modèle (bouton WhatsApp avec le métal choisi) ;
+  `/view/<lien>` pour un client (logo, pièce en 3D, « I love it » / « I'd like a change » sur WhatsApp), jamais indexé.
+- **Vérifier** : `npm run verify:3d` (site construit lancé) envoie les fichiers de test par l'admin, ouvre chaque modèle
+  sur ordinateur et iPhone avec le GPU, contrôle les liens et écrit `verification/3d/rapport.md` et ses captures.
+
 ## Vérifier
 
 ```sh
@@ -71,6 +103,7 @@ npm start               # site construit + API sur http://localhost:3001
 npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px), captures dans verification/
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
+npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
 ```
 
 ## Vitesse (Lighthouse)
@@ -89,4 +122,6 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
 
 ## Mettre en ligne
 
-`docker compose up` lance la base et le site construit (définir `ADMIN_PASSWORD` dans `.env`).
+`docker compose up` lance la base et le site construit (définir `ADMIN_PASSWORD` dans `.env`). Les modèles 3D sont
+gardés dans le volume `models` (`/app/storage/models`). Facultatif : `MODEL_SECRET` signe les adresses des fichiers 3D (sinon
+elles sont signées à partir d'`ADMIN_PASSWORD`).

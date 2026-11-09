@@ -14,8 +14,9 @@ import PiecePage from "@/pages/PiecePage";
 import Players, { PlayerPage } from "@/pages/Players";
 import Process from "@/pages/Process";
 
-// The back-office is loaded only when it is opened.
+// The back-office and the private 3D links are loaded only when they are opened.
 const Admin = lazy(() => import("@/pages/Admin"));
+const ViewLink = lazy(() => import("@/pages/ViewLink"));
 
 /**
  * A page of one piece, person or collection starts afresh when its address
@@ -52,8 +53,14 @@ function pages(prefix: string) {
 }
 
 export default function App() {
+  const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
   return (
     <Routes>
+      {/* A private 3D link sent to a client: its own sober page, without the menu of the site. */}
+      <Route path="view/:token" element={viewLink} />
+      {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
+        <Route key={"view-" + l} path={l + "/view/:token"} element={viewLink} />
+      ))}
       <Route element={<Layout />}>
         {pages("")}
         {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (

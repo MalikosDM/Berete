@@ -9,6 +9,8 @@ export default defineConfig({
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
   build: {
+    // The 3D viewer (three.js and its tools, about 1.2 MB) is its own chunk, loaded only on the pages that show a model.
+    chunkSizeWarningLimit: 1300,
     rolldownOptions: {
       output: {
         // Libraries in their own files: cached across visits and deployments.

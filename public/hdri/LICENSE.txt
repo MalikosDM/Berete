@@ -1,0 +1,5 @@
+Studio lighting (HDRI) from Poly Haven, CC0 (public domain): https://polyhaven.com/license
+- studio_small_09.hdr  https://polyhaven.com/a/studio_small_09  (Studio)
+- brown_photostudio_02.hdr  https://polyhaven.com/a/brown_photostudio_02  (Warm)
+- studio_small_03.hdr  https://polyhaven.com/a/studio_small_03  (Spotlight)
+1k versions, unchanged.

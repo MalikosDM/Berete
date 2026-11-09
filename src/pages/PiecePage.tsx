@@ -6,6 +6,7 @@ import HorizontalGallery from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
+import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
@@ -102,6 +103,8 @@ export default function PiecePage() {
       <div id="piece-details" className="scroll-mt-24">
         {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={t.piece.details} /> : null}
       </div>
+
+      <Piece3D piece={piece} />
 
       {/* Made for, and the story */}
       <section aria-label={t.piece.madeFor + " · " + t.piece.story} className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">

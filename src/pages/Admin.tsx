@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEven
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
+import Models3D from "@/pages/admin/Models3D";
 
 /*
  * Back-office of the site (/admin), in French for the owner. It edits the same
@@ -11,7 +12,7 @@ import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "messages";
+type Tab = Kind | "messages" | "3d";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -95,7 +96,7 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
   },
 };
 
-const TABS: { key: Tab; label: string }[] = [...(Object.keys(KINDS) as Kind[]).map((k) => ({ key: k as Tab, label: KINDS[k].label })), { key: "messages", label: "Messages" }];
+const TABS: { key: Tab; label: string }[] = [...(Object.keys(KINDS) as Kind[]).map((k) => ({ key: k as Tab, label: KINDS[k].label })), { key: "3d", label: "3D" }, { key: "messages", label: "Messages" }];
 
 /* The session token, kept for the visit. */
 const TOKEN_KEY = "bj-admin-token";
@@ -589,7 +590,7 @@ export default function Admin() {
             </div>
             <button type="button" onClick={logout} className={btn}><LogOut className="size-4" aria-hidden="true" /> Déconnexion</button>
           </div>
-          {tab === "messages" ? <Messages token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+          {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
         </>
       )}
     </section>
