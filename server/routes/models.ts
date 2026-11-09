@@ -1,6 +1,7 @@
 /*
  * The 3D models, mounted on /api:
- *   GET  /models/piece/:slug          the model shown on the page of a piece (or null)
+ *   GET  /models/pieces               the models shown on the pages of the pieces, by piece
+ *   GET  /models/piece/:slug          the model shown on the page of one piece (or null)
  *   GET  /view/:token                 a private link (POST with { password } when it has one)
  *   GET  /models/:id/files/:file      full.glb, light.glb, poster.webp (signed address, given by the two above)
  * and the admin (/admin/models..., /admin/links...), behind ADMIN_PASSWORD:
@@ -95,6 +96,15 @@ function safely<T>(read: () => T, fallback: T): T {
 }
 
 /* ---------- Visitors ---------- */
+
+// The models shown on the pages of the pieces, by piece: asked once per visit (not at each page).
+models.get("/models/pieces", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-cache");
+  const rows = await prisma.model3D.findMany({ where: { status: "ready", pieceSlug: { not: null } }, orderBy: { updatedAt: "asc" } });
+  const out: Record<string, PublicModel> = {};
+  for (const row of rows) out[row.pieceSlug!] = publicModel(row, 0);
+  res.json(out);
+});
 
 // A piece without a model answers null (not 404: no error in the console of its page).
 models.get("/models/piece/:slug", async (req, res) => {

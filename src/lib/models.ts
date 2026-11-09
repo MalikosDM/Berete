@@ -4,10 +4,18 @@ import type { Messages } from "@/i18n";
 import { listOf } from "@/i18n/format";
 import type { Selection } from "@/viewer";
 
-/** The model shown on the page of a piece, or null. */
+let pieceModels: Promise<Record<string, PublicModel>> | null = null;
+
+/**
+ * The model shown on the page of a piece, or null. The list of the pieces that have one is asked
+ * once per visit: moving from piece to piece sends no new request.
+ */
 export async function pieceModel(slug: string): Promise<PublicModel | null> {
-  const res = await fetch("/api/models/piece/" + encodeURIComponent(slug), { headers: { Accept: "application/json" } });
-  return res.ok ? ((await res.json()) as PublicModel | null) : null;
+  pieceModels ??= fetch("/api/models/pieces", { headers: { Accept: "application/json" } })
+    .then((res) => (res.ok ? (res.json() as Promise<Record<string, PublicModel>>) : {}))
+    .catch(() => ({}));
+  const all = await pieceModels;
+  return all[slug] ?? null;
 }
 
 export type LinkAnswer =
