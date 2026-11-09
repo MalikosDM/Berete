@@ -11,3 +11,6 @@ playwright-report
 .vercel
 .env*
 !.env.example
+# 3D models (server/models/storage.ts): kept outside git, except the optimised test model
+storage/*
+!storage/demo/

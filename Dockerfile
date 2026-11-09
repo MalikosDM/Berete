@@ -16,5 +16,7 @@ COPY --from=build /app/dist ./dist
 COPY --from=build /app/dist-server ./dist-server
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/prisma.config.ts ./
+# The optimised test model, written in the base at the first start.
+COPY --from=build /app/storage/demo ./storage/demo
 EXPOSE 3001
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist-server/server/index.js"]

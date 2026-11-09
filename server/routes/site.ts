@@ -100,7 +100,7 @@ function adminToken(): string | null {
   return createHmac("sha256", password).update("berete-admin").digest("hex");
 }
 
-function requireAdmin(req: Request, res: Response, next: NextFunction): void {
+export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   const token = adminToken();
   const header = req.headers.authorization ?? "";
   const given = header.startsWith("Bearer ") ? header.slice(7) : "";

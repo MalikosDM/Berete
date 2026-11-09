@@ -1,0 +1,95 @@
+{
+  "stats": {
+    "kind": "glb",
+    "sourceTriangles": 10353626,
+    "pieces": 4151,
+    "unaligned": 18,
+    "size": [
+      189.0287094116211,
+      9.895362377166748,
+      191.77621459960938
+    ],
+    "stones": [],
+    "stonesMissing": false,
+    "versions": {
+      "full": {
+        "bytes": 9071276,
+        "triangles": 1759038,
+        "drawn": 2578145
+      },
+      "light": {
+        "bytes": 2438820,
+        "triangles": 311658,
+        "drawn": 1020971
+      }
+    },
+    "seconds": 8
+  },
+  "layers": [
+    {
+      "name": "图层01",
+      "meshes": 43,
+      "copies": 133,
+      "triangles": 8465276,
+      "size": [
+        189.0287094116211,
+        9.422458171844482,
+        191.77621459960938
+      ],
+      "guess": "metal",
+      "check": false
+    },
+    {
+      "name": "图层04",
+      "meshes": 1,
+      "copies": 1,
+      "triangles": 6056,
+      "size": [
+        7.827059745788574,
+        1.5020804405212402,
+        6.740440368652344
+      ],
+      "guess": "metal",
+      "check": true
+    },
+    {
+      "name": "图层05",
+      "meshes": 3,
+      "copies": 3,
+      "triangles": 1222056,
+      "size": [
+        180.74546813964844,
+        7.15139102935791,
+        179.86090087890625
+      ],
+      "guess": "metal",
+      "check": false
+    },
+    {
+      "name": "图层09",
+      "meshes": 1,
+      "copies": 3601,
+      "triangles": 626574,
+      "size": [
+        187.69768524169922,
+        7.411607265472412,
+        190.39791870117188
+      ],
+      "guess": "diamond",
+      "check": false
+    },
+    {
+      "name": "图层10",
+      "meshes": 2,
+      "copies": 199,
+      "triangles": 33664,
+      "size": [
+        182.5141143798828,
+        3.368796467781067,
+        184.59996032714844
+      ],
+      "guess": "diamond",
+      "check": false
+    }
+  ]
+}

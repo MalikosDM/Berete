@@ -126,3 +126,51 @@ model CallbackRequest {
   language  String   @default("en")
   createdAt DateTime @default(now())
 }
+
+/// A 3D model of a jewel (admin "3D"). Its files live in the model storage
+/// (server/models/storage.ts): the original as sent, full.glb (computers),
+/// light.glb (phones), poster.webp (still image of the saved view).
+/// status: queued, processing, ready, failed. sizes: bytes { original, full, light }.
+/// stats: ModelStats, layers: LayerInfo[] (server/models/pipeline/index.ts).
+/// settings: ModelSettings (src/data/models.ts): role of each layer, metals, view.
+model Model3D {
+  id         String     @id @default(cuid())
+  name       String
+  sourceName String
+  sourceKind String
+  status     String     @default("queued")
+  progress   Int        @default(0)
+  step       String     @default("")
+  error      String?
+  sizes      Json       @default("{}")
+  stats      Json       @default("{}")
+  layers     Json       @default("[]")
+  settings   Json       @default("{}")
+  hasPoster  Boolean    @default(false)
+  /// The piece whose page shows this model ("Explore in 3D").
+  pieceSlug  String?
+  links      ViewLink[]
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+}
+
+/// A private link sent to a client instead of a link to another viewer: /view/<token>.
+/// The token is random (24 bytes); the password, if any, is stored hashed (scrypt).
+model ViewLink {
+  id           String    @id @default(cuid())
+  token        String    @unique
+  modelId      String
+  model        Model3D   @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  title        String    @default("")
+  expiresAt    DateTime?
+  passwordHash String?
+  createdAt    DateTime  @default(now())
+}
+
+/// The role last given to a layer name in /admin (LayerSetting, src/data/models.ts):
+/// a new model whose layers have the same names gets the same roles.
+model LayerMemory {
+  name      String   @id
+  setting   Json
+  updatedAt DateTime @updatedAt
+}

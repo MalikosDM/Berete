@@ -14,6 +14,8 @@ const template = await readFile(join(root, "dist", "index.html"), "utf8");
 const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL ? "https://" + process.env.VERCEL_PROJECT_PRODUCTION_URL : "";
 const origin = (process.env.SITE_URL || vercelUrl || server.settings.siteUrl || "").replace(/\/+$/, "");
 const targets = server.prerenderTargets();
+// The empty page of the app, for the addresses that are not written in advance (private links /view/...).
+await writeFile(join(root, "dist", "app.html"), template.replace("<head>", "<head>\n    <meta name=\"robots\" content=\"noindex, nofollow\" />"), "utf8");
 
 /** "/" is dist/index.html; "/about" is dist/about.html (served at /about). */
 function fileOf(path) {

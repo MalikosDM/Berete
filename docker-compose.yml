@@ -15,7 +15,10 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
     ports:
       - "3001:3001"
+    volumes:
+      - models:/app/storage/models
     depends_on:
       - db
 volumes:
   db-data:
+  models:

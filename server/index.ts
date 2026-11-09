@@ -5,6 +5,9 @@ import compression from "compression";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { syncCatalogue } from "./catalogue.js";
+import { seedDemo } from "./models/demo.js";
+import { resumeJobs } from "./models/jobs.js";
+import { models } from "./routes/models.js";
 import { site } from "./routes/site.js";
 
 const app = express();
@@ -13,6 +16,7 @@ app.disable("x-powered-by");
 app.use(compression());
 app.use(express.json({ limit: "2mb" }));
 
+app.use("/api", models);
 app.use("/api", site);
 app.use("/api", (_req, res) => {
   res.status(404).json({ error: "Not found" });
@@ -33,6 +37,13 @@ function cacheFor(file: string): string {
   if (relative.startsWith("media/")) return "public, max-age=86400, stale-while-revalidate=604800";
   return PAGE_CACHE;
 }
+
+// A private link to a 3D model (/view/<token>, /fr/view/<token>...): the empty page of the app,
+// which asks the API for the model. Never indexed.
+app.get(/^\/(?:(?:fr|es|de|nl|ar)\/)?view\/[A-Za-z0-9_-]+\/?$/, (_req, res, next) => {
+  const shell = path.join(dist, "app.html");
+  fs.stat(shell, (error) => (error ? next() : res.sendFile(shell, { headers: { "Cache-Control": PAGE_CACHE, "X-Robots-Tag": "noindex, nofollow" } })));
+});
 
 // The pre-rendered pages are served at their address: /about is about.html,
 // /fr is fr.html, /fr/creations is fr/creations.html. This comes before the
@@ -86,6 +97,8 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 await syncCatalogue();
+await seedDemo();
+await resumeJobs();
 
 const port = Number(process.env.PORT ?? 3001);
 app.listen(port, () => {
