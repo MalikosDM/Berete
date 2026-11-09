@@ -35,6 +35,7 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import type { Ambiance, Background, LayerSetting, MetalId, ModelSettings, ModelView } from "@/data/models";
+import { diamondEnv } from "./diamondEnv";
 import { enamelMaterial, ghostMaterial, lightStoneMaterial, metalMaterial, refractionMaterial, setMetal, updateRefraction, type RefractionMaterial } from "./materials";
 
 /* ---------- Loaders (decoders served by the site: /draco/, Meshopt inside the code) ---------- */
@@ -48,10 +49,10 @@ function loader(): GLTFLoader {
   return gltfLoader;
 }
 
-export const AMBIANCE_LOOKS: Record<Ambiance, { file: string; intensity: number; stone: number }> = {
-  studio: { file: "/hdri/studio_small_09.hdr", intensity: 1, stone: 1 },
-  warm: { file: "/hdri/brown_photostudio_02.hdr", intensity: 1.05, stone: 1.05 },
-  spotlight: { file: "/hdri/studio_small_03.hdr", intensity: 0.45, stone: 1.25 },
+export const AMBIANCE_LOOKS: Record<Ambiance, { file: string; intensity: number }> = {
+  studio: { file: "/hdri/studio_small_09.hdr", intensity: 1 },
+  warm: { file: "/hdri/brown_photostudio_02.hdr", intensity: 1.05 },
+  spotlight: { file: "/hdri/studio_small_03.hdr", intensity: 0.45 },
 };
 
 const hdrCache = new Map<string, Promise<Texture>>();
@@ -83,6 +84,8 @@ type Props = {
   url: string;
   bytes: number;
   phone: boolean;
+  /** The device is too slow for refraction: the stones become glass of the same index. */
+  simpleStones: boolean;
   settings: ModelSettings;
   choices: Choices;
   ambiance: Ambiance;
@@ -128,18 +131,16 @@ type Loaded = { root: Object3D; layers: LayerMeshes; box: Box3; sphere: Sphere }
 type Frame = { key: number; cx: number; cy: number; cz: number; radius: number; minY: number; width: number; height: number };
 
 export default function Stage(props: Props) {
-  const { url, bytes, phone, settings, choices, ambiance, lightAngle, background, autoRotate, highlight, onApi, onProgress, onReady, onError } = props;
+  const { url, bytes, phone, simpleStones, settings, choices, ambiance, lightAngle, background, autoRotate, highlight, onApi, onProgress, onReady, onError } = props;
   // The scene, the renderer and the camera are read when needed (get), never kept from a render.
   const get = useThree((s) => s.get);
   const controls = useRef<CameraControls>(null);
   const composer = useRef<Composer>(null);
   const model = useRef<Loaded | null>(null);
-  const envMap = useRef<Texture | null>(null);
   const refraction = useRef<RefractionMaterial[]>([]);
   const savedView = useRef<ModelView | null>(settings.view);
   const angle = useRef(lightAngle);
   const [frame, setFrame] = useState<Frame | null>(null);
-  const [envVersion, setEnvVersion] = useState(0);
 
   useEffect(() => {
     savedView.current = settings.view;
@@ -210,8 +211,6 @@ export default function Stage(props: Props) {
         const { scene, invalidate } = get();
         scene.environment = texture;
         scene.environmentIntensity = AMBIANCE_LOOKS[ambiance].intensity;
-        envMap.current = texture;
-        setEnvVersion((v) => v + 1);
         invalidate();
       })
       .catch(() => undefined);
@@ -236,13 +235,13 @@ export default function Stage(props: Props) {
   useEffect(() => {
     const loaded = model.current;
     if (!loaded || frame === null) return undefined;
-    const { made, refracting } = applyMaterials(loaded, envMap.current, { settings: settings.layers, choices, highlight, phone, ambiance });
+    const { made, refracting } = applyMaterials(loaded, { settings: settings.layers, choices, highlight, phone, simpleStones, ambiance });
     refraction.current = refracting;
     get().invalidate();
     return () => {
       for (const m of made) m.dispose();
     };
-  }, [frame, envVersion, settings.layers, choices, highlight, phone, ambiance, get]);
+  }, [frame, settings.layers, choices, highlight, phone, simpleStones, ambiance, get]);
 
   /* Every frame drawn: the stones follow the camera, near and far follow the distance */
   useFrame((state, delta) => {
@@ -453,10 +452,10 @@ export default function Stage(props: Props) {
   );
 }
 
-type Looks = { settings: ModelSettings["layers"]; choices: Choices; highlight: string | null; phone: boolean; ambiance: Ambiance };
+type Looks = { settings: ModelSettings["layers"]; choices: Choices; highlight: string | null; phone: boolean; simpleStones: boolean; ambiance: Ambiance };
 
 /** Gives each mesh the material of its layer's role; returns the materials made (to dispose) and the refracting ones. */
-function applyMaterials(loaded: Loaded, env: Texture | null, { settings, choices, highlight, phone, ambiance }: Looks): { made: Material[]; refracting: RefractionMaterial[] } {
+function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, simpleStones, ambiance }: Looks): { made: Material[]; refracting: RefractionMaterial[] } {
   const made: Material[] = [];
   const refracting: RefractionMaterial[] = [];
   const metalByLayer = new Map<string, MeshStandardMaterial>();
@@ -485,14 +484,14 @@ function applyMaterials(loaded: Loaded, env: Texture | null, { settings, choices
         mesh.material = material;
       } else {
         const color = setting.role === "stone" ? (choices.colors[name] ?? setting.color ?? "#9b111e") : "#ffffff";
-        if (!phone && env) {
-          const material = refractionMaterial(mesh.geometry as BufferGeometry, env, color);
-          (material.uniforms.color!.value as Color).multiplyScalar(AMBIANCE_LOOKS[ambiance].stone);
+        // True refraction (lighter on phones), or a glass of the same index when the device is too slow for it.
+        if (!simpleStones) {
+          const material = refractionMaterial(mesh.geometry as BufferGeometry, diamondEnv(ambiance), color, phone ? "light" : "high");
           refracting.push(material);
           made.push(material);
           mesh.material = material;
         } else {
-          const material = lightStoneMaterial(color);
+          const material = lightStoneMaterial(color, diamondEnv(ambiance));
           made.push(material);
           mesh.material = material;
         }

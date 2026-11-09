@@ -60,6 +60,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   const maxDpr = phone ? 1.5 : 2;
   // Starts at 1.5 pixels per point at most, then goes up (or down) with the measured fluidity.
   const [dpr, setDpr] = useState(() => Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 1.5));
+  const [simpleStones, setSimpleStones] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
@@ -167,11 +168,21 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
             className="touch-none"
             aria-label={words.canvasLabel(model.name)}
           >
-            <PerformanceMonitor ms={300} iterations={6} onDecline={() => setDpr((d) => Math.max(1, Math.round((d - 0.25) * 4) / 4))} onIncline={() => setDpr((d) => Math.min(maxDpr, Math.round((d + 0.25) * 4) / 4))} />
+            {/* Too slow: fewer pixels first; already at one pixel per point, simpler stones. */}
+            <PerformanceMonitor
+              ms={300}
+              iterations={6}
+              onDecline={() => {
+                if (dpr <= 1) setSimpleStones(true);
+                setDpr((d) => Math.max(1, Math.round((d - 0.25) * 4) / 4));
+              }}
+              onIncline={() => setDpr((d) => Math.min(maxDpr, Math.round((d + 0.25) * 4) / 4))}
+            />
             <Stage
               url={phone ? model.files.light : model.files.full}
               bytes={phone ? model.bytes.light : model.bytes.full}
               phone={phone}
+              simpleStones={simpleStones}
               settings={settings}
               choices={choices}
               ambiance={ambiance}

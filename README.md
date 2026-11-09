@@ -83,7 +83,8 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
 - **Les fichiers** sont dans `storage/` (hors git, `MODELS_DIR` pour un autre dossier), derrière `server/models/storage.ts` :
   seul ce fichier change pour les mettre ailleurs (disque du VPS, stockage objet).
 - **Le visualiseur** (`src/viewer/`, three.js, React Three Fiber, chargé seulement quand il est montré) : réfraction et
-  feu des diamants sur ordinateur, verre d'indice 2,42 avec dispersion sur téléphone, 5 métaux par calque, 3 lumières
+  feu des diamants sous un éclairage de bijoutier qui leur est propre (`src/viewer/diamondEnv.ts` ; plus léger sur
+  téléphone, verre d'indice 2,42 avec dispersion si l'appareil est trop lent), 5 métaux par calque, 3 lumières
   (studio, chaude, projecteur) et lumière tournante, zoom vers le curseur ou le pincement, double-clic / double-tap
   pour s'approcher d'un détail, **jamais de recentrage tout seul**, vues de face, côté, dessus, rotation, plein écran,
   image PNG, fond noir ou clair. Éclairages HDRI de Poly Haven (CC0) dans `public/hdri/`, décodeur Draco dans `public/draco/`.
