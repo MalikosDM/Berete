@@ -17,6 +17,7 @@ import { AMBIANCES, BACKGROUNDS, backgroundOf, DEFAULT_SETTINGS, LAYER_ROLES, ME
 import { prisma } from "../db.js";
 import { enqueue, rememberLayers } from "../models/jobs.js";
 import { MODEL_FILES, storage, type ModelFile } from "../models/storage.js";
+import { serverSecret } from "../secret.js";
 import { requireAdmin } from "./site.js";
 
 const scrypt = promisify(scryptCb) as (password: string, salt: string, keylen: number) => Promise<Buffer>;
@@ -25,11 +26,8 @@ export const models = Router();
 
 /* ---------- Signed addresses of the files ---------- */
 
-const RANDOM_SECRET = randomBytes(32).toString("hex");
 function secret(): string {
-  if (process.env.MODEL_SECRET) return process.env.MODEL_SECRET;
-  if (process.env.ADMIN_PASSWORD) return createHmac("sha256", process.env.ADMIN_PASSWORD).update("berete-models").digest("hex");
-  return RANDOM_SECRET;
+  return serverSecret();
 }
 
 function signature(id: string, file: string, exp: number): string {

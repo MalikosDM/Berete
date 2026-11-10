@@ -87,6 +87,11 @@ export default function Footer() {
                   {t.footer.contactPage}
                 </Link>
               </li>
+              <li>
+                <Link to="/vip" className={linkCls} data-vip-link>
+                  {t.vip.footerLink}
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="lg:col-span-3">

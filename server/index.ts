@@ -8,6 +8,8 @@ import { syncCatalogue } from "./catalogue.js";
 import { seedDemo } from "./models/demo.js";
 import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
+import { vip } from "./routes/vip.js";
+import { loadSecret } from "./secret.js";
 import { site } from "./routes/site.js";
 
 const app = express();
@@ -17,6 +19,7 @@ app.use(compression());
 app.use(express.json({ limit: "2mb" }));
 
 app.use("/api", models);
+app.use("/api", vip);
 app.use("/api", site);
 app.use("/api", (_req, res) => {
   res.status(404).json({ error: "Not found" });
@@ -38,9 +41,9 @@ function cacheFor(file: string): string {
   return PAGE_CACHE;
 }
 
-// A private link to a 3D model (/view/<token>, /fr/view/<token>...): the empty page of the app,
-// which asks the API for the model. Never indexed.
-app.get(/^\/(?:(?:fr|es|de|nl|ar)\/)?view\/[A-Za-z0-9_-]+\/?$/, (_req, res, next) => {
+// A private link to a 3D model (/view/<token>) and the client space (/vip, /vip/<token>), in every
+// language: the empty page of the app, which asks the API. Never indexed.
+app.get(/^\/(?:(?:fr|es|de|nl|ar)\/)?(?:view\/[A-Za-z0-9_-]+|vip(?:\/[A-Za-z0-9_-]+)?)\/?$/, (_req, res, next) => {
   const shell = path.join(dist, "app.html");
   fs.stat(shell, (error) => (error ? next() : res.sendFile(shell, { headers: { "Cache-Control": PAGE_CACHE, "X-Robots-Tag": "noindex, nofollow" } })));
 });
@@ -96,6 +99,7 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: "Something went wrong." });
 });
 
+await loadSecret();
 await syncCatalogue();
 await seedDemo();
 await resumeJobs();

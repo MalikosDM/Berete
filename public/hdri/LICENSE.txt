@@ -3,3 +3,8 @@ Studio lighting (HDRI) from Poly Haven, CC0 (public domain): https://polyhaven.c
 - brown_photostudio_02.hdr  https://polyhaven.com/a/brown_photostudio_02  (Warm)
 - studio_small_03.hdr  https://polyhaven.com/a/studio_small_03  (Spotlight)
 1k versions, unchanged.
+Backdrops of the settings (shown blurred behind the jewel), same licence:
+- fireplace.hdr  https://polyhaven.com/a/fireplace  (Wooden table)
+- photo_studio_loft_hall.hdr  https://polyhaven.com/a/photo_studio_loft_hall  (Black velvet)
+- cayley_interior.hdr  https://polyhaven.com/a/cayley_interior  (Champagne satin)
+- brown_photostudio_01.hdr  https://polyhaven.com/a/brown_photostudio_01  (White leather)

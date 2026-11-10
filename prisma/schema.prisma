@@ -150,6 +150,7 @@ model Model3D {
   /// The piece whose page shows this model ("Explore in 3D").
   pieceSlug  String?
   links      ViewLink[]
+  clients    ClientModel[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -173,4 +174,36 @@ model LayerMemory {
   name      String   @id
   setting   Json
   updatedAt DateTime @updatedAt
+}
+
+/// A client of the jeweller with a private space on the site (/vip): the 3D
+/// models he was given. He enters with his personal link (/vip/<token>) or
+/// with his access code; the code is kept only as a keyed fingerprint (codeKey).
+model Client {
+  id         String        @id @default(cuid())
+  name       String
+  email      String?
+  phone      String?
+  token      String        @unique
+  codeKey    String        @unique
+  lastSeenAt DateTime?
+  models     ClientModel[]
+  createdAt  DateTime      @default(now())
+}
+
+/// Which models a client sees in his space.
+model ClientModel {
+  clientId  String
+  modelId   String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  model     Model3D  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([clientId, modelId])
+}
+
+/// Values of the server kept in the base (the secret signing sessions and file addresses).
+model ServerSetting {
+  key   String @id
+  value String
 }

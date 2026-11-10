@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEven
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
+import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
 
 /*
@@ -12,7 +13,7 @@ import Models3D from "@/pages/admin/Models3D";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "messages" | "3d";
+type Tab = Kind | "messages" | "3d" | "clients";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -22,36 +23,41 @@ type Field =
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
   | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
 
-const TRANSLATIONS_LABEL = "Traductions (français, espagnol, allemand, néerlandais, arabe)";
+const TRANSLATIONS_LABEL = "Traductions";
 
 const TYPE_NAMES: Record<string, string> = { chain: "Chaîne", pendant: "Pendentif", ring: "Bague", bracelet: "Bracelet", watch: "Montre" };
 
-const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty: Rec }> = {
+/** add / edit: the words of the buttons and titles ("Ajouter une story", "Modifier la story"). */
+const KINDS: Record<Kind, { label: string; add: string; edit: string; name: string; fields: Field[]; empty: Rec }> = {
   stories: {
     label: "Stories",
+    add: "Ajouter une story",
+    edit: "Modifier la story",
     name: "title",
     fields: [
       { key: "title", label: "Titre", type: "text" },
-      { key: "slug", label: "Adresse (minuscules et tirets)", type: "text" },
-      { key: "cover", label: "Couverture (bulle)", type: "image" },
-      { key: "media", label: "Photos et vidéos de la story, dans l'ordre", type: "medialist" },
-      { key: "people", label: "Joueurs, clubs ou personnalités liés (adresses séparées par des virgules)", type: "slugs" },
-      { key: "pieceSlug", label: "Pièce liée (adresse, ajoute « View the piece »)", type: "text" },
-      { key: "articleUrl", label: "Lien d'article (le bouton devient « Read the article »)", type: "text" },
+      { key: "slug", label: "Adresse web (ex. kevin-schade)", type: "text" },
+      { key: "cover", label: "Image de la bulle", type: "image" },
+      { key: "media", label: "Photos et vidéos, dans l'ordre", type: "medialist" },
+      { key: "people", label: "Joueurs liés (adresses web, séparées par des virgules)", type: "slugs" },
+      { key: "pieceSlug", label: "Pièce liée (adresse web)", type: "text" },
+      { key: "articleUrl", label: "Lien d'un article", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false]] },
     ],
     empty: { title: "", slug: "", cover: "", media: [], people: [], pieceSlug: "", articleUrl: "" },
   },
   people: {
     label: "Joueurs",
+    add: "Ajouter un joueur",
+    edit: "Modifier le joueur",
     name: "name",
     fields: [
       { key: "name", label: "Nom", type: "text" },
-      { key: "slug", label: "Adresse (minuscules et tirets)", type: "text" },
+      { key: "slug", label: "Adresse web (ex. kevin-schade)", type: "text" },
       { key: "kind", label: "Type", type: "select", options: [["player", "Joueur"], ["club", "Club"], ["personality", "Personnalité"]] },
       { key: "number", label: "Numéro", type: "number" },
       { key: "club", label: "Club", type: "text" },
-      { key: "portrait", label: "Portrait (vide : la couverture de sa story)", type: "image" },
+      { key: "portrait", label: "Portrait", type: "image" },
       { key: "bio", label: "Texte", type: "textarea" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["bio", "Texte", true]] },
     ],
@@ -59,44 +65,48 @@ const KINDS: Record<Kind, { label: string; name: string; fields: Field[]; empty:
   },
   pieces: {
     label: "Pièces",
+    add: "Ajouter une pièce",
+    edit: "Modifier la pièce",
     name: "title",
     fields: [
       { key: "title", label: "Titre", type: "text" },
-      { key: "slug", label: "Adresse (minuscules et tirets)", type: "text" },
+      { key: "slug", label: "Adresse web (ex. kevin-schade-pendant)", type: "text" },
       { key: "type", label: "Type", type: "select", options: PIECE_TYPES.map((t) => [t, TYPE_NAMES[t] ?? t] as const) },
       { key: "line", label: "Phrase d'accroche", type: "text" },
       { key: "story", label: "Texte", type: "textarea" },
       { key: "client", label: "Client", type: "text" },
       { key: "clientPublic", label: "Afficher le client", type: "checkbox" },
-      { key: "featured", label: "Capsule à la une (accueil)", type: "checkbox" },
-      { key: "draft", label: "Brouillon : textes à faire valider par le client", type: "checkbox" },
+      { key: "featured", label: "Mettre à la une de l'accueil", type: "checkbox" },
+      { key: "draft", label: "Brouillon (textes à valider)", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
-      { key: "gallery", label: "Détails (photos et vidéos)", type: "medialist" },
+      { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
       { key: "specs", label: "Fiche technique (une ligne par info, ex. Or : 18 carats)", type: "specs" },
-      { key: "press", label: "Presse (une ligne par article : Média | Titre | Lien)", type: "press" },
-      { key: "people", label: "Joueurs et clubs liés (adresses séparées par des virgules)", type: "slugs" },
-      { key: "boxSlug", label: "Écrin lié (adresse)", type: "text" },
+      { key: "press", label: "Presse (une ligne : Média | Titre | Lien)", type: "press" },
+      { key: "people", label: "Joueurs liés (adresses web, séparées par des virgules)", type: "slugs" },
+      { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
     empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins",
+    add: "Ajouter un écrin",
+    edit: "Modifier l'écrin",
     name: "name",
     fields: [
       { key: "name", label: "Nom", type: "text" },
-      { key: "slug", label: "Adresse (minuscules et tirets)", type: "text" },
+      { key: "slug", label: "Adresse web (ex. ecrin-inter)", type: "text" },
       { key: "description", label: "Texte", type: "textarea" },
       { key: "images", label: "Photos", type: "medialist" },
-      { key: "pieceSlug", label: "Pièce liée (adresse)", type: "text" },
+      { key: "pieceSlug", label: "Pièce liée (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["description", "Texte", true]] },
     ],
     empty: { name: "", slug: "", description: "", images: [], pieceSlug: "" },
   },
 };
 
-const TABS: { key: Tab; label: string }[] = [...(Object.keys(KINDS) as Kind[]).map((k) => ({ key: k as Tab, label: KINDS[k].label })), { key: "3d", label: "3D" }, { key: "messages", label: "Messages" }];
+const TABS: { key: Tab; label: string }[] = [...(Object.keys(KINDS) as Kind[]).map((k) => ({ key: k as Tab, label: KINDS[k].label })), { key: "3d", label: "Modèles 3D" }, { key: "clients", label: "Clients VIP" }, { key: "messages", label: "Messages" }];
 
 /* The session token, kept for the visit. */
 const TOKEN_KEY = "bj-admin-token";
@@ -254,7 +264,7 @@ function TranslationsField({ label, fields, value, source, onChange }: { label: 
   return (
     <fieldset className="border border-white/15 p-4" data-translations>
       <legend className="px-2 text-base text-bone">{label}</legend>
-      <p className="text-base text-mist">Laissez un champ vide pour garder la traduction du site, affichée en gris. Si vous changez un texte anglais plus haut, écrivez aussi sa traduction ici : sinon cette langue l'affiche en anglais.</p>
+      <p className="text-base text-mist">Laissez vide pour garder la traduction du site (en gris).</p>
       {OTHER_LANGUAGES.map((l) => (
         <div key={l} className="mt-6 border-t border-white/10 pt-4">
           <p className="eyebrow">{LOCALE_INFO[l].name}</p>
@@ -268,7 +278,7 @@ function TranslationsField({ label, fields, value, source, onChange }: { label: 
               <label key={key} className="mt-3 block text-base text-bone">
                 {name}
                 {long ? <textarea rows={4} {...props} className={inputCls + " py-3 placeholder:text-mist/60"} /> : <input type="text" {...props} className={inputCls + " placeholder:text-mist/60"} />}
-                {english && !own && !site ? <span className="mt-1 block text-base text-rose-light">Pas encore traduit : cette langue affiche le texte anglais.</span> : null}
+                {english && !own && !site ? <span className="mt-1 block text-base text-rose-light">Pas traduit : le texte anglais s'affiche.</span> : null}
               </label>
             );
           })}
@@ -376,7 +386,7 @@ function Editor({ kind, token, initial, onDone, onExpired }: { kind: Kind; token
 
   return (
     <form onSubmit={submit} className="mt-8 grid gap-6 border border-rose-light/40 p-5 sm:p-8">
-      <h2 className="title-caps text-2xl tracking-[0.12em]">{initial.id ? "Modifier" : "Ajouter"}</h2>
+      <h2 className="title-caps text-2xl tracking-[0.12em]">{initial.id ? KINDS[kind].edit : KINDS[kind].add}</h2>
       {KINDS[kind].fields.map(field)}
       {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -459,13 +469,13 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
   return (
     <div className="mt-8">
       <button type="button" onClick={() => setEditing({ ...KINDS[kind].empty })} className={btnMain}>
-        <Plus className="size-4" aria-hidden="true" /> Ajouter
+        <Plus className="size-4" aria-hidden="true" /> {KINDS[kind].add}
       </button>
       {err ? <p role="alert" className="mt-4 text-base text-rose-light">{err}</p> : null}
       {items === null ? (
         <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>
       ) : items.length === 0 ? (
-        <p className="mt-8 border border-white/15 p-8 text-center text-bone">Rien pour l'instant.</p>
+        <p className="mt-8 border border-white/15 p-8 text-center text-bone">Aucun élément pour l'instant.</p>
       ) : (
         <ul className="mt-8 border-t border-white/15">
           {items.map((item, i) => (
@@ -588,9 +598,9 @@ export default function Admin() {
                 </button>
               ))}
             </div>
-            <button type="button" onClick={logout} className={btn}><LogOut className="size-4" aria-hidden="true" /> Déconnexion</button>
+            <button type="button" onClick={logout} className={btn}><LogOut className="size-4" aria-hidden="true" /> Se déconnecter</button>
           </div>
-          {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+          {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
         </>
       )}
     </section>

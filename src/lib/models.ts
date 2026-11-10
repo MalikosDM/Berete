@@ -50,3 +50,36 @@ export function metalsInWords(selection: Selection, words: Messages["viewer"], i
   if (selection.length === 1 || new Set(selection.map((s) => s.metal)).size === 1) return words.metals[selection[0]!.metal];
   return listOf(intl, selection.map((s) => words.metalOf(words.metals[s.metal], s.label)));
 }
+
+/* ---------- The client space (/vip) ---------- */
+
+export type VipAnswer = { state: "ok"; name: string; pieces: PublicModel[] } | { state: "out" };
+
+async function vipCall(path: string, body?: object): Promise<Record<string, unknown>> {
+  try {
+    const res = await fetch("/api/vip/" + path, {
+      method: body ? "POST" : "GET",
+      credentials: "same-origin",
+      headers: { Accept: "application/json", ...(body ? { "Content-Type": "application/json" } : {}) },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    return res.ok ? ((await res.json()) as Record<string, unknown>) : { state: "out" };
+  } catch {
+    return { state: "out" };
+  }
+}
+
+/** Enter the space with the access code or the personal link. */
+export async function vipEnter(by: { code: string } | { token: string }): Promise<{ state: "ok" | "wrong" | "missing" | "out" }> {
+  return (await vipCall("code" in by ? "login" : "link", by)) as { state: "ok" | "wrong" | "missing" | "out" };
+}
+
+/** The client entered and his pieces, or { state: "out" }. */
+export async function vipMe(): Promise<VipAnswer> {
+  const answer = await vipCall("me");
+  return answer.state === "ok" ? (answer as unknown as VipAnswer) : { state: "out" };
+}
+
+export async function vipLeave(): Promise<void> {
+  await vipCall("logout", {});
+}

@@ -36,7 +36,7 @@ type ModelRow = {
 const ROLE_NAMES: Record<LayerRole, string> = { metal: "Métal", diamond: "Diamant", stone: "Pierre de couleur", enamel: "Émail", hide: "Masquer" };
 const METAL_NAMES: Record<string, string> = { "yellow-gold": "Or jaune 18 carats", "white-gold": "Or blanc 18 carats", "rose-gold": "Or rose 18 carats", platinum: "Platine", "black-rhodium": "Rhodium noir" };
 const AMBIANCE_NAMES: Record<string, string> = { studio: "Studio", warm: "Chaude", spotlight: "Projecteur (scintillement)" };
-const BACKGROUND_NAMES: Record<string, string> = { black: "Noir (couleur du site)", "studio-dark": "Studio sombre (dégradé)", grey: "Gris", white: "Blanc", "studio-light": "Studio clair (dégradé)", cream: "Crème", rose: "Rosé" };
+const BACKGROUND_NAMES: Record<string, string> = { "studio-dark": "Studio sombre", black: "Noir", "studio-light": "Studio clair", white: "Blanc", rose: "Rosé", wood: "Table en noyer", velvet: "Velours noir", satin: "Satin champagne", leather: "Cuir blanc" };
 const STEP_NAMES: Record<string, string> = { read: "lecture du fichier", pieces: "pièces et pierres", full: "version ordinateur", light: "version téléphone" };
 
 const inputCls = "mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
@@ -121,9 +121,8 @@ function Weights({ m }: { m: ModelRow }) {
   const v = m.stats.versions;
   return (
     <p className="text-base text-mist" data-weights>
-      Fichier envoyé <span className="text-white">{mb(m.sizes.original)}</span> → ordinateur <span className="text-white">{mb(m.sizes.full)}</span> · téléphone <span className="text-white">{mb(m.sizes.light)}</span>
-      {v ? <> · {count(v.full.drawn)} triangles affichés (téléphone {count(v.light.drawn)})</> : null}
-      {m.stats.seconds !== undefined ? <> · traité en {String(m.stats.seconds).replace(".", ",")} s</> : null}
+      Original <span className="text-white">{mb(m.sizes.original)}</span> · ordinateur <span className="text-white">{mb(m.sizes.full)}</span> · téléphone <span className="text-white">{mb(m.sizes.light)}</span>
+      {v && m.stats.seconds !== undefined ? <> · prêt en {String(m.stats.seconds).replace(".", ",")} s</> : null}
     </p>
   );
 }
@@ -200,7 +199,8 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
   return (
     <div className="mt-8 grid gap-8" data-admin-3d>
       <div className="border border-white/15 p-5 sm:p-6">
-        <p className="text-base text-bone">Envoyer un modèle 3D du joaillier : <span className="text-white">.3dm</span> (Rhino, le mieux : il garde les calques), <span className="text-white">.glb</span> ou <span className="text-white">.stl</span>, jusqu'à 800 Mo. Le fichier d'origine est toujours gardé tel quel.</p>
+        <h2 className="title-caps text-2xl tracking-[0.12em]">Envoyer un modèle 3D</h2>
+        <p className="mt-2 text-base text-mist">.3dm (le mieux), .glb ou .stl, jusqu'à 800 Mo.</p>
         <label className={btnMain + " mt-4 cursor-pointer"}>
           {sending ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Upload className="size-4" aria-hidden="true" />}
           Choisir un fichier
@@ -235,7 +235,7 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                 <div className="flex gap-2">
                   {m.status === "ready" ? (
                     <button type="button" className={btn} onClick={() => setOpen(m.id)} data-open-model>
-                      Régler
+                      Régler le modèle
                     </button>
                   ) : null}
                   <button type="button" aria-label="Supprimer" className={iconBtn} onClick={() => void remove(m)}>
@@ -369,7 +369,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   return (
     <div className="mt-8 grid gap-8" data-model-editor={model.sourceName}>
       <button type="button" onClick={onClose} className={btn + " justify-self-start"}>
-        <ArrowLeft className="size-4" aria-hidden="true" /> Tous les modèles
+        <ArrowLeft className="size-4" aria-hidden="true" /> Revenir aux modèles
       </button>
       <div className="grid gap-3">
         <label className="block text-base text-bone">
@@ -384,8 +384,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
 
       {/* Layers */}
       <fieldset className="border border-white/15 p-4 sm:p-5">
-        <legend className="px-2 text-base text-bone">Calques et matières</legend>
-        <p className="text-base text-mist">Le fichier n'a pas de vraies matières : chaque calque reçoit un rôle. Le rôle proposé est deviné (pierre répétée des centaines de fois = diamant, grand volume = métal). « Voir seul » montre le calque, les autres en transparence. Les rôles enregistrés servent ensuite aux fichiers dont les calques portent les mêmes noms.</p>
+        <legend className="px-2 text-base text-bone">Matières</legend>
+        <p className="text-base text-mist">Choisissez le rôle de chaque calque. « Voir seul » montre un calque.</p>
         <ul className="mt-4 grid gap-4">
           {model.layers.map((layer) => {
             const s = settings.layers[layer.name] ?? { role: layer.guess };
@@ -397,7 +397,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
                     {layer.name}
                     {layer.check ? <span className="ml-3 inline-block border border-rose-light/60 px-2 text-base text-rose-light">À vérifier</span> : null}
                     <span className="block text-mist">
-                      {count(layer.meshes)} {layer.meshes > 1 ? "objets" : "objet"} · {count(layer.copies)} {layer.copies > 1 ? "exemplaires" : "exemplaire"} · {count(layer.triangles)} triangles · deviné : {ROLE_NAMES[layer.guess]}
+                      {count(layer.copies)} {layer.copies > 1 ? "exemplaires" : "exemplaire"} · proposé : {ROLE_NAMES[layer.guess]}
                     </span>
                   </p>
                   <button type="button" className={btn} aria-pressed={solo} onClick={() => setHighlight(solo ? null : layer.name)}>
@@ -416,7 +416,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
                   {s.role === "metal" ? (
                     <>
                       <label className="block text-base text-bone">
-                        Métal par défaut
+                        Métal de départ
                         <select value={s.metal ?? "rose-gold"} onChange={(e) => setLayer(layer.name, { metal: e.target.value as LayerSetting["metal"] })} className={inputCls}>
                           {METALS.map((m) => (
                             <option key={m} value={m}>{METAL_NAMES[m]}</option>
@@ -424,7 +424,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
                         </select>
                       </label>
                       <label className="block text-base text-bone">
-                        Nom montré au client
+                        Nom pour le client
                         <input value={s.label ?? ""} placeholder="ex. Maillons" onChange={(e) => setLayer(layer.name, { label: e.target.value })} className={inputCls + " placeholder:text-mist/60"} />
                       </label>
                     </>
@@ -458,7 +458,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </div>
         <div className="grid gap-4 sm:grid-cols-3">
           <label className="block text-base text-bone">
-            Lumière au départ
+            Lumière de départ
             <select value={settings.ambiance} onChange={(e) => setSettings({ ...settings, ambiance: e.target.value as ModelSettings["ambiance"] })} className={inputCls}>
               {AMBIANCES.map((a) => (
                 <option key={a} value={a}>{AMBIANCE_NAMES[a]}</option>
@@ -466,7 +466,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
             </select>
           </label>
           <label className="block text-base text-bone">
-            Fond
+            Fond de départ
             <select value={settings.background} onChange={(e) => setSettings({ ...settings, background: e.target.value as ModelSettings["background"] })} className={inputCls}>
               {BACKGROUNDS.map((b) => (
                 <option key={b} value={b}>{BACKGROUND_NAMES[b]}</option>
@@ -474,9 +474,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
             </select>
           </label>
           <label className="block text-base text-bone">
-            Montré sur la page de la pièce
+            Afficher sur la page d'une pièce
             <select value={pieceSlug} onChange={(e) => setPieceSlug(e.target.value)} className={inputCls} data-piece-select>
-              <option value="">Aucune (lien privé seulement)</option>
+              <option value="">Aucune</option>
               {pieces.map((p) => (
                 <option key={p.slug} value={p.slug}>{p.title}</option>
               ))}
@@ -485,26 +485,72 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
-            Enregistrer cette vue
+            Enregistrer la vue
           </button>
           {settings.view ? (
             <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
-              Revenir à la vue automatique
+              Effacer la vue
             </button>
           ) : null}
           <button type="button" onClick={() => void save()} disabled={saving} className={btnMain} data-save-model>
             {saving ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Check className="size-4" aria-hidden="true" />} Enregistrer
           </button>
           <button type="button" onClick={() => void call(token, "POST", "/api/admin/models/" + id + "/reprocess").then(onClose, fail)} className={btn}>
-            <RefreshCw className="size-4" aria-hidden="true" /> Refaire l'optimisation
+            <RefreshCw className="size-4" aria-hidden="true" /> Relancer l'optimisation
           </button>
         </div>
         {note ? <p role="status" className="text-base text-bone">{note}</p> : null}
         {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
       </fieldset>
 
+      <ShareVip model={model} token={token} onError={fail} />
       <Links model={model} token={token} onChange={() => void load()} onError={fail} />
     </div>
+  );
+}
+
+/** The VIP clients who see this model in their private space. */
+function ShareVip({ model, token, onError }: { model: ModelRow; token: string; onError: (x: unknown) => void }) {
+  const [clients, setClients] = useState<{ id: string; name: string; email: string | null; phone: string | null; modelIds: string[] }[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    call(token, "GET", "/api/admin/clients")
+      .then((res) => alive && setClients((res.items as typeof clients) ?? []))
+      .catch((x: unknown) => alive && onError(x));
+    return () => {
+      alive = false;
+    };
+  }, [token, onError]);
+  const toggle = async (id: string) => {
+    const client = clients?.find((c) => c.id === id);
+    if (!client || !clients) return;
+    const modelIds = client.modelIds.includes(model.id) ? client.modelIds.filter((m) => m !== model.id) : [...client.modelIds, model.id];
+    setClients(clients.map((c) => (c.id === id ? { ...c, modelIds } : c)));
+    try {
+      await call(token, "PUT", "/api/admin/clients/" + id, { name: client.name, email: client.email, phone: client.phone, modelIds });
+    } catch (x) {
+      onError(x);
+    }
+  };
+  return (
+    <fieldset className="grid gap-4 border border-white/15 p-4 sm:p-5" data-share-vip>
+      <legend className="px-2 text-base text-bone">Partager dans l'espace VIP</legend>
+      <p className="text-base text-mist">Cochez les clients qui voient cette pièce dans leur espace privé.</p>
+      {clients === null ? null : clients.length === 0 ? (
+        <p className="text-base text-mist">Ajoutez d'abord un client dans l'onglet Clients VIP.</p>
+      ) : (
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {clients.map((c) => (
+            <li key={c.id}>
+              <label className="flex min-h-12 items-center gap-3 border border-white/10 px-3 text-base text-white">
+                <input type="checkbox" className="size-5" checked={c.modelIds.includes(model.id)} onChange={() => void toggle(c.id)} />
+                {c.name}
+              </label>
+            </li>
+          ))}
+        </ul>
+      )}
+    </fieldset>
   );
 }
 
@@ -556,11 +602,11 @@ function Links({ model, token, onChange, onError }: { model: ModelRow; token: st
 
   return (
     <fieldset className="grid gap-5 border border-white/15 p-4 sm:p-5" data-links>
-      <legend className="px-2 text-base text-bone">Liens privés pour un client</legend>
-      <p className="text-base text-mist">À envoyer au client à la place d'un lien iJewel : une page sobre avec le logo, la pièce en 3D et deux boutons WhatsApp (« Je l'adore » / « J'aimerais un changement »). Le lien est impossible à deviner et n'apparaît jamais sur Google.</p>
+      <legend className="px-2 text-base text-bone">Partager par lien</legend>
+      <p className="text-base text-mist">Envoyez ce lien à un client : il voit la pièce en 3D, sans compte.</p>
       <form onSubmit={create} className="grid gap-4 sm:grid-cols-[1fr_auto_auto_auto] sm:items-end">
         <label className="block text-base text-bone">
-          Titre montré au client
+          Titre pour le client
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={inputCls} />
         </label>
         <label className="block text-base text-bone">

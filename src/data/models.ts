@@ -15,14 +15,15 @@ export type LayerRole = (typeof LAYER_ROLES)[number];
 export const AMBIANCES = ["studio", "warm", "spotlight"] as const;
 export type Ambiance = (typeof AMBIANCES)[number];
 
-/** Backgrounds of the viewer: flat colours and studio gradients (lighter in the middle). */
-export const BACKGROUNDS = ["black", "studio-dark", "grey", "white", "studio-light", "cream", "rose"] as const;
+/** Backgrounds of the viewer: plain colours, studio gradients, and settings (a surface in front of a room out of focus). */
+export const BACKGROUNDS = ["studio-dark", "black", "studio-light", "white", "rose", "wood", "velvet", "satin", "leather"] as const;
 export type Background = (typeof BACKGROUNDS)[number];
 
 /** A background from the settings (the first versions only had "dark" and "light"). */
 export function backgroundOf(value: unknown): Background {
   if (value === "dark") return "studio-dark";
-  if (value === "light") return "studio-light";
+  if (value === "light" || value === "cream") return "studio-light";
+  if (value === "grey") return "studio-dark";
   return (BACKGROUNDS as readonly unknown[]).includes(value) ? (value as Background) : "studio-dark";
 }
 

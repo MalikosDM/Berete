@@ -1,0 +1,6 @@
+Surfaces under the jewel, from Poly Haven, CC0 (public domain): https://polyhaven.com/license
+1k versions (colour, normal OpenGL, roughness), unchanged:
+- dark_wood_*.jpg  https://polyhaven.com/a/dark_wood
+- velour_velvet_*.jpg  https://polyhaven.com/a/velour_velvet  (tinted black in the viewer)
+- crepe_satin_*.jpg  https://polyhaven.com/a/crepe_satin
+- leather_white_*.jpg  https://polyhaven.com/a/leather_white

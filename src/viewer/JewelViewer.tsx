@@ -12,7 +12,7 @@ import { AMBIANCES, BACKGROUNDS, backgroundOf, METALS, type Ambiance, type Backg
 import type { Messages } from "@/i18n";
 import Logo from "@/components/Logo";
 import { METAL_LOOKS, STONE_COLORS } from "./materials";
-import { BACKGROUND_LOOKS, backgroundCss } from "./backgrounds";
+import { BACKGROUND_LOOKS, backgroundCss, swatchCss } from "./backgrounds";
 import Stage, { type Choices, type StageApi } from "./Stage";
 
 export type ViewerHandle = {
@@ -315,7 +315,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
             <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={words.background}>
               {BACKGROUNDS.map((b) => (
                 <button key={b} type="button" role="radio" aria-checked={background === b} aria-label={words.backgrounds[b]} title={words.backgrounds[b]} data-background={b} onClick={() => setBackground(b)} className={"size-12 rounded-full p-[3px] transition-transform hover:scale-105 " + (background === b ? "bg-rose-gold" : "bg-white/15")}>
-                  <span className="block h-full w-full rounded-full border border-white/10" style={{ background: backgroundCss(b) }} />
+                  <span className="block h-full w-full rounded-full border border-white/10" style={{ background: swatchCss(b) }} />
                 </button>
               ))}
             </div>

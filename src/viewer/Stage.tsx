@@ -5,13 +5,18 @@
  * glides to the detail under it. Only the buttons of the viewer frame the
  * whole jewel again.
  */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { CameraControls, ContactShadows } from "@react-three/drei";
 import { Bloom, EffectComposer, N8AO, ToneMapping } from "@react-three/postprocessing";
 import { ToneMappingMode, type EffectComposer as Composer } from "postprocessing";
 import {
   Box3,
+  Color,
+  MeshPhysicalMaterial,
+  RepeatWrapping,
+  SRGBColorSpace,
+  TextureLoader,
   EquirectangularReflectionMapping,
   FloatType,
   HalfFloatType,
@@ -35,7 +40,7 @@ import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import type { Ambiance, Background, LayerSetting, MetalId, ModelSettings, ModelView } from "@/data/models";
 import { AccumulatePass, jitter } from "./accumulate";
-import { BACKGROUND_LOOKS, backgroundOfScene } from "./backgrounds";
+import { BACKGROUND_LOOKS, backgroundOfScene, fadeTexture, type Surface } from "./backgrounds";
 import { diamondEnv } from "./diamondEnv";
 import { enamelMaterial, gemFrame, ghostMaterial, lightStoneMaterial, metalMaterial, refractionMaterial, setMetal, updateRefraction, type RefractionMaterial } from "./materials";
 
@@ -148,6 +153,10 @@ export default function Stage(props: Props) {
   const [accumulate] = useState(() => new AccumulatePass());
   const dirty = useRef(true);
   const lastCamera = useRef("");
+  const markDirty = useCallback(() => {
+    dirty.current = true;
+    get().invalidate();
+  }, [get]);
 
   useEffect(() => {
     savedView.current = settings.view;
@@ -234,11 +243,29 @@ export default function Stage(props: Props) {
     invalidate();
   }, [lightAngle, get]);
 
+  // Behind the jewel: a colour or gradient, or a room seen out of focus.
   useEffect(() => {
-    const { scene, invalidate } = get();
-    scene.background = backgroundOfScene(background);
-    dirty.current = true;
-    invalidate();
+    let alive = true;
+    const look = BACKGROUND_LOOKS[background];
+    const show = (painted: Color | Texture, blur: number, intensity: number, rotation: number) => {
+      const { scene, invalidate } = get();
+      scene.background = painted;
+      scene.backgroundBlurriness = blur;
+      scene.backgroundIntensity = intensity;
+      scene.backgroundRotation.set(0, rotation, 0);
+      dirty.current = true;
+      invalidate();
+    };
+    show(backgroundOfScene(background), 0, 1, 0);
+    if (look.room) {
+      const room = look.room;
+      loadHdr(room.file)
+        .then((texture) => alive && show(texture, room.blur, room.intensity, room.rotation))
+        .catch(() => undefined);
+    }
+    return () => {
+      alive = false;
+    };
   }, [background, get]);
 
   /* Materials of each layer */
@@ -312,6 +339,14 @@ export default function Stage(props: Props) {
       const override = scene.overrideMaterial;
       scene.background = null;
       scene.overrideMaterial = picker.material;
+      // The surface and the shadow under the jewel are not details to glide to.
+      const hidden: Object3D[] = [];
+      scene.traverse((o) => {
+        if (o.userData.noPick && o.visible) {
+          o.visible = false;
+          hidden.push(o);
+        }
+      });
       cam.setViewOffset(rect.width, rect.height, clientX - rect.left, clientY - rect.top, 1, 1);
       const before = gl.getRenderTarget();
       gl.setRenderTarget(target);
@@ -328,6 +363,7 @@ export default function Stage(props: Props) {
       cam.clearViewOffset();
       scene.background = background;
       scene.overrideMaterial = override;
+      for (const o of hidden) o.visible = true;
       invalidate();
       return pixel[3]! > 0.5 ? new Vector3(pixel[0], pixel[1], pixel[2]) : null;
     };
@@ -459,14 +495,16 @@ export default function Stage(props: Props) {
       ) : null}
       {ambiance === "warm" ? <directionalLight position={[cx + Math.sin(lightAngle + 1) * radius * 3, cy + radius * 2, cz + Math.cos(lightAngle + 1) * radius * 3]} intensity={1.1} color="#ffcf9e" /> : null}
       {/* A soft shadow on the ground under the jewel (on pure black it would only draw a darker square). */}
+      {frame && BACKGROUND_LOOKS[background].surface ? <SurfaceUnder key={background + frame.key} surface={BACKGROUND_LOOKS[background].surface!} frame={frame} onReady={markDirty} /> : null}
       {frame && background !== "black" ? (
         <ContactShadows
+          userData={{ noPick: true }}
           key={background + frame.key}
           position={[cx, frame.minY - radius * 0.002, cz]}
           scale={frame.width * 1.6}
           far={Math.max(frame.height, radius * 0.2) * 1.5}
           blur={2.2}
-          opacity={BACKGROUND_LOOKS[background].light ? 0.55 : 0.85}
+          opacity={BACKGROUND_LOOKS[background].surface ? 0.7 : BACKGROUND_LOOKS[background].light ? 0.55 : 0.85}
           resolution={1024}
           frames={1}
           color="#000000"
@@ -532,6 +570,77 @@ function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, s
     }
   }
   return { made, refracting };
+}
+
+const textureLoader = new TextureLoader();
+const surfaceCache = new Map<string, Promise<{ map: Texture; normal: Texture; rough: Texture }>>();
+
+function loadSurface(name: string): Promise<{ map: Texture; normal: Texture; rough: Texture }> {
+  let found = surfaceCache.get(name);
+  if (!found) {
+    const one = (kind: string) => textureLoader.loadAsync("/decor/" + name + "_" + kind + ".jpg");
+    found = Promise.all([one("diff"), one("nor"), one("rough")]).then(([map, normal, rough]) => {
+      map.colorSpace = SRGBColorSpace;
+      for (const t of [map, normal, rough]) {
+        t.wrapS = RepeatWrapping;
+        t.wrapT = RepeatWrapping;
+        t.anisotropy = 8;
+      }
+      return { map, normal, rough };
+    });
+    found.catch(() => surfaceCache.delete(name));
+    surfaceCache.set(name, found);
+  }
+  return found;
+}
+
+/** The surface the jewel lies on (walnut, velvet...), fading into the room behind. */
+function SurfaceUnder({ surface, frame, onReady }: { surface: Surface; frame: Frame; onReady: () => void }) {
+  const [textures, setTextures] = useState<{ map: Texture; normal: Texture; rough: Texture } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    loadSurface(surface.name)
+      .then((t) => {
+        if (!alive) return;
+        setTextures(t);
+        onReady();
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [surface.name, onReady]);
+  const radius = Math.max(frame.width * 3, frame.radius * 6, 0.12);
+  const material = useMemo(() => {
+    if (!textures) return null;
+    const repeat = (radius * 2) / surface.tile;
+    const own = (t: Texture) => {
+      const c = t.clone();
+      c.repeat.set(repeat, repeat);
+      c.needsUpdate = true;
+      return c;
+    };
+    return new MeshPhysicalMaterial({
+      map: own(textures.map),
+      normalMap: own(textures.normal),
+      roughnessMap: own(textures.rough),
+      color: new Color(surface.tint ?? "#ffffff"),
+      sheen: surface.sheen ? 1 : 0,
+      sheenColor: new Color(surface.sheen ?? "#000000"),
+      sheenRoughness: 0.45,
+      roughness: surface.roughness ?? 1,
+      alphaMap: fadeTexture(),
+      transparent: true,
+      envMapIntensity: 0.7,
+    });
+  }, [textures, radius, surface]);
+  useEffect(() => () => material?.dispose(), [material]);
+  if (!material) return null;
+  return (
+    <mesh userData={{ noPick: true }} material={material} rotation={[-Math.PI / 2, 0, 0]} position={[frame.cx, frame.minY - frame.radius * 0.004, frame.cz]} renderOrder={-1}>
+      <circleGeometry args={[radius, 96]} />
+    </mesh>
+  );
 }
 
 /** The first view: the one the jeweller saved, else the whole jewel seen from the front and above, its long side across the screen. */

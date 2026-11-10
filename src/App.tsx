@@ -17,6 +17,7 @@ import Process from "@/pages/Process";
 // The back-office and the private 3D links are loaded only when they are opened.
 const Admin = lazy(() => import("@/pages/Admin"));
 const ViewLink = lazy(() => import("@/pages/ViewLink"));
+const Vip = lazy(() => import("@/pages/Vip"));
 
 /**
  * A page of one piece, person or collection starts afresh when its address
@@ -47,6 +48,9 @@ function pages(prefix: string) {
       <Route path="contact" element={<Contact />} />
       <Route path="legal" element={<Legal />} />
       <Route path="privacy" element={<Privacy />} />
+      {/* The private space of the clients: their pieces in 3D. */}
+      <Route path="vip" element={<Suspense fallback={null}><Vip /></Suspense>} />
+      <Route path="vip/:token" element={<Suspense fallback={null}><Vip /></Suspense>} />
       <Route path="*" element={<NotFound />} key={prefix + "*"} />
     </>
   );
