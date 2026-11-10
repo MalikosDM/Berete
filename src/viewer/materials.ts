@@ -214,8 +214,9 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
 
 const rotation = new Matrix4();
 
-/** Keeps a refraction material in step with the camera and the turned light. */
-export function updateRefraction(material: RefractionMaterial, camera: { matrixWorld: Matrix4; projectionMatrixInverse: Matrix4 }, width: number, height: number, lightAngle: number): void {
+/** Keeps a refraction material in step with the camera, the turned light and the bounces of the moment. */
+export function updateRefraction(material: RefractionMaterial, camera: { matrixWorld: Matrix4; projectionMatrixInverse: Matrix4 }, width: number, height: number, lightAngle: number, bounces: number): void {
+  material.uniforms.bounces!.value = bounces;
   material.uniforms.viewMatrixInverse!.value = camera.matrixWorld;
   material.uniforms.projectionMatrixInverse!.value = camera.projectionMatrixInverse;
   (material.uniforms.resolution!.value as { set(x: number, y: number): void }).set(width, height);

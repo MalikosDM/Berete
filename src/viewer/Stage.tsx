@@ -292,10 +292,7 @@ export default function Stage(props: Props) {
     const still = accumulate.count > 0 || (!dirty.current && key === lastCamera.current && cam.view?.enabled === true);
     const bounces = still ? (phone ? STONE_BOUNCES.phoneStill : STONE_BOUNCES.still) : phone ? STONE_BOUNCES.phoneMoving : STONE_BOUNCES.moving;
     if (refraction.current.length > 0) {
-      for (const m of refraction.current) {
-        updateRefraction(m, cam, w, h, angle.current);
-        m.uniforms.bounces!.value = bounces;
-      }
+      for (const m of refraction.current) updateRefraction(m, cam, w, h, angle.current, bounces);
     }
   });
 
