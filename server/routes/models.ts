@@ -13,7 +13,7 @@ import { createHmac, randomBytes, scrypt as scryptCb, timingSafeEqual } from "no
 import path from "node:path";
 import { promisify } from "node:util";
 import { z } from "zod";
-import { AMBIANCES, DEFAULT_SETTINGS, LAYER_ROLES, METALS, type ModelSettings, type PublicModel } from "../../src/data/models.js";
+import { AMBIANCES, BACKGROUNDS, backgroundOf, DEFAULT_SETTINGS, LAYER_ROLES, METALS, type ModelSettings, type PublicModel } from "../../src/data/models.js";
 import { prisma } from "../db.js";
 import { enqueue, rememberLayers } from "../models/jobs.js";
 import { MODEL_FILES, storage, type ModelFile } from "../models/storage.js";
@@ -59,7 +59,7 @@ export const SettingsSchema = z.object({
   metals: z.array(z.enum(METALS)).max(METALS.length),
   view: z.object({ position: z.tuple([z.number(), z.number(), z.number()]), target: z.tuple([z.number(), z.number(), z.number()]) }).nullable(),
   ambiance: z.enum(AMBIANCES),
-  background: z.enum(["dark", "light"]),
+  background: z.preprocess(backgroundOf, z.enum(BACKGROUNDS)),
 });
 
 export function settingsOf(v: unknown): ModelSettings {

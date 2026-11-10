@@ -67,7 +67,8 @@ async function upload(file) {
   fs.closeSync(fd);
   const sent = Date.now();
   const { id } = await api("POST", "/api/admin/models/uploads/" + start.uploadId + "/complete", { name, size }, token);
-  return waitReady(id, t0, sent);
+  const m = await waitReady(id, t0, sent);
+  return m.status === "ready" ? { ...(await markAsTest(m)), uploadSeconds: m.uploadSeconds, processSeconds: m.processSeconds } : m;
 }
 
 async function waitReady(id, t0 = Date.now(), sent = Date.now()) {
@@ -78,9 +79,20 @@ async function waitReady(id, t0 = Date.now(), sent = Date.now()) {
   }
 }
 
-async function removeBySource(name, keep = []) {
+/** The models sent by this check are named so, and deleted at the end: the models of the site and their links stay untouched. */
+const TEST_PREFIX = "[vérification] ";
+const created = [];
+
+async function markAsTest(m) {
+  created.push(m.id);
+  await api("PUT", "/api/admin/models/" + m.id, { name: TEST_PREFIX + m.name, settings: m.settings, pieceSlug: null }, token);
+  return { ...m, name: TEST_PREFIX + m.name };
+}
+
+/** Test models left by a check that stopped half-way. */
+async function removeOldTests() {
   const { items } = await api("GET", "/api/admin/models", undefined, token);
-  for (const m of items) if (m.sourceName === name && !keep.includes(m.id)) await api("DELETE", "/api/admin/models/" + m.id, undefined, token);
+  for (const m of items) if (m.name.startsWith(TEST_PREFIX)) await api("DELETE", "/api/admin/models/" + m.id, undefined, token);
 }
 
 async function link(id, extra = {}) {
@@ -266,7 +278,8 @@ fs.mkdirSync(OUT, { recursive: true });
 const models = {};
 
 // The .glb test model through the admin page itself.
-await removeBySource("ZN1242-bj001.glb", ["demo-zn1242"]);
+await removeOldTests();
+const knownIds = (await api("GET", "/api/admin/models", undefined, token)).items.map((m) => m.id);
 {
   const { context, page } = await open("desktop", "/admin");
   await page.goto(BASE + "/admin");
@@ -289,7 +302,9 @@ await removeBySource("ZN1242-bj001.glb", ["demo-zn1242"]);
   const seconds = (Date.now() - t0) / 1000;
   await page.screenshot({ path: path.join(OUT, "admin-2-liste.jpg"), type: "jpeg", quality: 85, fullPage: true });
   const { items } = await api("GET", "/api/admin/models", undefined, token);
-  const m = items.find((x) => x.sourceName === "ZN1242-bj001.glb" && x.id !== "demo-zn1242" && x.status === "ready");
+  const before3 = new Set(knownIds);
+  const fresh = items.find((x) => x.sourceName === "ZN1242-bj001.glb" && !before3.has(x.id) && x.status === "ready");
+  const m = await markAsTest(fresh);
   models["ZN1242-bj001.glb"] = { ...m, uploadSeconds: Math.max(0, seconds - (m.stats.seconds ?? 0)), uploadAndProcessSeconds: seconds };
   // The editor: layers recognised from their names, one layer shown alone. (The new model is first in the list.)
   await page.locator('[data-model-row="ZN1242-bj001.glb"] [data-open-model]').first().click();
@@ -305,7 +320,6 @@ await removeBySource("ZN1242-bj001.glb", ["demo-zn1242"]);
 for (const name of STLS) {
   const file = path.join(STL_DIR, name);
   if (!fs.existsSync(file)) continue;
-  await removeBySource(name);
   models[name] = await upload(file);
 }
 
@@ -345,12 +359,10 @@ for (const name of STLS) {
   }
   const file = path.join(os.tmpdir(), "berete-test-rhino.3dm");
   fs.writeFileSync(file, doc.toByteArray());
-  await removeBySource("berete-test-rhino.3dm");
   const m = await upload(file);
   const metal = m.layers.find((l) => l.name === "Metal 18K");
   const gems = m.layers.find((l) => l.name === "Diamonds");
   rhinoCheck = ["Import .3dm (fichier Rhino fabriqué pour le test) : calques « Metal 18K » → " + metal?.guess + ", « Diamonds » → " + gems?.guess + ", " + m.stats.pieces + " morceaux lus (la pièce de métal et 20 pierres : un bloc posé 12 fois et 8 copies tournées)", metal?.guess === "metal" && gems?.guess === "diamond" && m.stats.pieces === 21];
-  await api("DELETE", "/api/admin/models/" + m.id, undefined, token);
   fs.rmSync(file, { force: true });
 }
 
@@ -436,6 +448,8 @@ const demo = models["ZN1242-bj001.glb"];
   checks.push(["Calques du fichier de test reconnus par leur nom : 图层01 " + layers["图层01"]?.metal + ", 图层05 " + layers["图层05"]?.metal + ", 图层09 " + layers["图层09"]?.role, layers["图层01"]?.metal === "white-gold" && layers["图层09"]?.role === "diamond"]);
 }
 await browser.close();
+// The test models and their links are deleted: only the report and the images stay.
+for (const id of created) await api("DELETE", "/api/admin/models/" + id, undefined, token).catch(() => undefined);
 
 /* ---------- 4. The report ---------- */
 

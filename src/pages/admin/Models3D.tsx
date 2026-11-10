@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ArrowLeft, Check, Copy, Eye, EyeOff, LoaderCircle, Plus, RefreshCw, Trash2, Upload } from "lucide-react";
-import { AMBIANCES, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
+import { AMBIANCES, BACKGROUNDS, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
 import { bundleOf, loadLocale, useI18n, type Messages } from "@/i18n";
 import { Jewel3D, type ViewerHandle } from "@/viewer";
 
@@ -36,6 +36,7 @@ type ModelRow = {
 const ROLE_NAMES: Record<LayerRole, string> = { metal: "Métal", diamond: "Diamant", stone: "Pierre de couleur", enamel: "Émail", hide: "Masquer" };
 const METAL_NAMES: Record<string, string> = { "yellow-gold": "Or jaune 18 carats", "white-gold": "Or blanc 18 carats", "rose-gold": "Or rose 18 carats", platinum: "Platine", "black-rhodium": "Rhodium noir" };
 const AMBIANCE_NAMES: Record<string, string> = { studio: "Studio", warm: "Chaude", spotlight: "Projecteur (scintillement)" };
+const BACKGROUND_NAMES: Record<string, string> = { black: "Noir (couleur du site)", "studio-dark": "Studio sombre (dégradé)", grey: "Gris", white: "Blanc", "studio-light": "Studio clair (dégradé)", cream: "Crème", rose: "Rosé" };
 const STEP_NAMES: Record<string, string> = { read: "lecture du fichier", pieces: "pièces et pierres", full: "version ordinateur", light: "version téléphone" };
 
 const inputCls = "mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
@@ -467,8 +468,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
           <label className="block text-base text-bone">
             Fond
             <select value={settings.background} onChange={(e) => setSettings({ ...settings, background: e.target.value as ModelSettings["background"] })} className={inputCls}>
-              <option value="dark">Noir (couleurs du site)</option>
-              <option value="light">Clair</option>
+              {BACKGROUNDS.map((b) => (
+                <option key={b} value={b}>{BACKGROUND_NAMES[b]}</option>
+              ))}
             </select>
           </label>
           <label className="block text-base text-bone">

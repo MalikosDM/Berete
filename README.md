@@ -82,12 +82,18 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
   gardé. En ligne de commande : `npm run models:optimize -- <fichier> <dossier>`.
 - **Les fichiers** sont dans `storage/` (hors git, `MODELS_DIR` pour un autre dossier), derrière `server/models/storage.ts` :
   seul ce fichier change pour les mettre ailleurs (disque du VPS, stockage objet).
-- **Le visualiseur** (`src/viewer/`, three.js, React Three Fiber, chargé seulement quand il est montré) : réfraction et
-  feu des diamants sous un éclairage de bijoutier qui leur est propre (`src/viewer/diamondEnv.ts` ; plus léger sur
-  téléphone, verre d'indice 2,42 avec dispersion si l'appareil est trop lent), 5 métaux par calque, 3 lumières
-  (studio, chaude, projecteur) et lumière tournante, zoom vers le curseur ou le pincement, double-clic / double-tap
-  pour s'approcher d'un détail, **jamais de recentrage tout seul**, vues de face, côté, dessus, rotation, plein écran,
-  image PNG, fond noir ou clair. Éclairages HDRI de Poly Haven (CC0) dans `public/hdri/`, décodeur Draco dans `public/draco/`.
+- **Le visualiseur** (`src/viewer/`, three.js, React Three Fiber, chargé seulement quand il est montré) :
+  - diamants en vraie réfraction (rayons suivis dans la pierre, 7 rebonds, feu couleur par couleur) sous un éclairage de
+    bijoutier qui leur est propre et **attaché à chaque pierre**, sa table vers le haut (comme l'« oriented lighting »
+    d'iJewel3D : toutes les pierres d'un pavé scintillent) — `materials.ts`, `diamondEnv.ts` ; plus léger sur téléphone,
+    verre d'indice 2,42 seulement si un téléphone reste trop lent ;
+  - **rendu progressif** : dès que la caméra s'arrête, 32 images décalées d'une fraction de pixel sont moyennées
+    (facettes et petites pierres nettes) — `accumulate.ts` ; ombres dans les creux (N8AO) sur ordinateur ;
+  - ombre douce au sol, 7 fonds (noir, studio sombre, gris, blanc, studio clair, crème, rosé) — `backgrounds.ts` ;
+  - 5 métaux par calque, 3 lumières (studio, chaude, projecteur) et lumière tournante, zoom vers le curseur ou le
+    pincement, double-clic / double-tap pour s'approcher d'un détail, **jamais de recentrage tout seul**, vues de face,
+    côté, dessus, rotation, plein écran, image PNG. Éclairages HDRI de Poly Haven (CC0) dans `public/hdri/`, décodeur
+    Draco dans `public/draco/`.
 - **Où il apparaît** : « Explore in 3D » sur la page d'une pièce qui a un modèle (bouton WhatsApp avec le métal choisi) ;
   `/view/<lien>` pour un client (logo, pièce en 3D, « I love it » / « I'd like a change » sur WhatsApp), jamais indexé.
 - **Vérifier** : `npm run verify:3d` (site construit lancé) envoie les fichiers de test par l'admin, ouvre chaque modèle

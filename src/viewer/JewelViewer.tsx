@@ -7,12 +7,13 @@
 import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
-import { Camera, Maximize, Minimize, Moon, Pause, RotateCcw, Rotate3d, Sun } from "lucide-react";
-import { AMBIANCES, METALS, type Ambiance, type Background, type MetalId, type ModelView, type PublicModel } from "@/data/models";
+import { Camera, Maximize, Minimize, Pause, RotateCcw, Rotate3d } from "lucide-react";
+import { AMBIANCES, BACKGROUNDS, backgroundOf, METALS, type Ambiance, type Background, type MetalId, type ModelView, type PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import Logo from "@/components/Logo";
 import { METAL_LOOKS, STONE_COLORS } from "./materials";
-import Stage, { BACKGROUNDS, type Choices, type StageApi } from "./Stage";
+import { BACKGROUND_LOOKS, backgroundCss } from "./backgrounds";
+import Stage, { type Choices, type StageApi } from "./Stage";
 
 export type ViewerHandle = {
   getView(): ModelView | null;
@@ -61,11 +62,12 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   // Starts at 1.5 pixels per point at most, then goes up (or down) with the measured fluidity.
   const [dpr, setDpr] = useState(() => Math.min(typeof window === "undefined" ? 1 : window.devicePixelRatio || 1, 1.5));
   const [simpleStones, setSimpleStones] = useState(false);
+  const readyAt = useRef(0);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = useState(0);
   const [ambiance, setAmbiance] = useState<Ambiance>(settings.ambiance);
-  const [background, setBackground] = useState<Background>(settings.background);
+  const [background, setBackground] = useState<Background>(() => backgroundOf(settings.background));
   const [lightAngle, setLightAngle] = useState(0);
   const [autoRotate, setAutoRotate] = useState(false);
   const [full, setFull] = useState(false);
@@ -79,7 +81,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   if (given.ambiance !== settings.ambiance || given.background !== settings.background) {
     setGiven({ ambiance: settings.ambiance, background: settings.background });
     setAmbiance(settings.ambiance);
-    setBackground(settings.background);
+    setBackground(backgroundOf(settings.background));
   }
 
   useImperativeHandle(ref, () => ({ getView: () => api.current?.getView() ?? null, capture: () => api.current?.capture() ?? null }), []);
@@ -100,6 +102,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
 
   const onProgress = useCallback((p: number) => setProgress(p), []);
   const onReady = useCallback((names: string[]) => {
+    readyAt.current = performance.now();
     setPresent(names);
     setStatus("ready");
   }, []);
@@ -147,14 +150,14 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
     a.click();
   };
 
-  const dark = background === "dark";
+  const dark = !BACKGROUND_LOOKS[background].light;
   const iconBtn = "inline-flex size-12 items-center justify-center rounded-full border backdrop-blur-sm transition-colors " + (dark ? "border-white/25 bg-ink/60 text-white hover:border-rose-light hover:text-rose-light" : "border-ink/20 bg-white/70 text-ink hover:border-rose-deep hover:text-rose-deep");
   const viewBtn = "inline-flex min-h-12 items-center justify-center rounded-full border px-4 text-base backdrop-blur-sm transition-colors " + (dark ? "border-white/25 bg-ink/60 text-white hover:border-rose-light hover:text-rose-light" : "border-ink/20 bg-white/70 text-ink hover:border-rose-deep hover:text-rose-deep");
   const chip = (on: boolean) => "inline-flex min-h-12 items-center justify-center rounded-full border px-5 text-base transition-colors " + (on ? "border-rose-light text-rose-light" : "border-white/25 text-white hover:border-rose-light/70");
 
   return (
     <div ref={wrap} data-viewer className={(isFull ? "fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-ink " : "") + className}>
-      <div className={"relative w-full overflow-hidden " + (isFull ? "min-h-[60svh] flex-1" : "aspect-[4/5] sm:aspect-[4/3] lg:aspect-[16/10]")} style={{ backgroundColor: BACKGROUNDS[background] }}>
+      <div className={"relative w-full overflow-hidden " + (isFull ? "min-h-[60svh] flex-1" : "aspect-[4/5] sm:aspect-[4/3] lg:aspect-[16/10]")} style={{ background: backgroundCss(background) }}>
         {webgl && status !== "error" ? (
           <Canvas
             key={attempt}
@@ -168,12 +171,14 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
             className="touch-none"
             aria-label={words.canvasLabel(model.name)}
           >
-            {/* Too slow: fewer pixels first; already at one pixel per point, simpler stones. */}
+            {/* Too slow: fewer pixels first; still very slow at one pixel per point, simpler stones. */}
             <PerformanceMonitor
               ms={300}
               iterations={6}
-              onDecline={() => {
-                if (dpr <= 1) setSimpleStones(true);
+              onDecline={({ fps }) => {
+                // Simpler stones only on a phone that stays really slow (under 15 images per second) at one
+                // pixel per point, well after loading (the first images, while the stones are prepared, are slow everywhere).
+                if (phone && dpr <= 1 && fps < 15 && readyAt.current > 0 && performance.now() - readyAt.current > 5000) setSimpleStones(true);
                 setDpr((d) => Math.max(1, Math.round((d - 0.25) * 4) / 4));
               }}
               onIncline={() => setDpr((d) => Math.min(maxDpr, Math.round((d + 0.25) * 4) / 4))}
@@ -241,9 +246,6 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
               <button type="button" className={iconBtn + (autoRotate ? " !border-rose-light !text-rose-light" : "")} onClick={() => setAutoRotate((a) => !a)} aria-pressed={autoRotate} aria-label={autoRotate ? words.stopRotate : words.autoRotate} title={autoRotate ? words.stopRotate : words.autoRotate}>
                 {autoRotate ? <Pause className="size-5" aria-hidden="true" /> : <Rotate3d className="size-5" aria-hidden="true" />}
               </button>
-              <button type="button" className={iconBtn} onClick={() => setBackground(dark ? "light" : "dark")} aria-label={dark ? words.lightBackground : words.darkBackground} title={dark ? words.lightBackground : words.darkBackground}>
-                {dark ? <Sun className="size-5" aria-hidden="true" /> : <Moon className="size-5" aria-hidden="true" />}
-              </button>
               <button type="button" className={iconBtn} onClick={capture} aria-label={words.capture} title={words.capture}>
                 <Camera className="size-5" aria-hidden="true" />
               </button>
@@ -306,6 +308,18 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
               </div>
             );
           })}
+          <div>
+            <p className="text-base text-bone">
+              {words.background} <span className="text-mist">· {words.backgrounds[background]}</span>
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={words.background}>
+              {BACKGROUNDS.map((b) => (
+                <button key={b} type="button" role="radio" aria-checked={background === b} aria-label={words.backgrounds[b]} title={words.backgrounds[b]} data-background={b} onClick={() => setBackground(b)} className={"size-12 rounded-full p-[3px] transition-transform hover:scale-105 " + (background === b ? "bg-rose-gold" : "bg-white/15")}>
+                  <span className="block h-full w-full rounded-full border border-white/10" style={{ background: backgroundCss(b) }} />
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-base text-bone">{words.ambiance}</p>

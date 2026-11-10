@@ -15,7 +15,16 @@ export type LayerRole = (typeof LAYER_ROLES)[number];
 export const AMBIANCES = ["studio", "warm", "spotlight"] as const;
 export type Ambiance = (typeof AMBIANCES)[number];
 
-export type Background = "dark" | "light";
+/** Backgrounds of the viewer: flat colours and studio gradients (lighter in the middle). */
+export const BACKGROUNDS = ["black", "studio-dark", "grey", "white", "studio-light", "cream", "rose"] as const;
+export type Background = (typeof BACKGROUNDS)[number];
+
+/** A background from the settings (the first versions only had "dark" and "light"). */
+export function backgroundOf(value: unknown): Background {
+  if (value === "dark") return "studio-dark";
+  if (value === "light") return "studio-light";
+  return (BACKGROUNDS as readonly unknown[]).includes(value) ? (value as Background) : "studio-dark";
+}
 
 export type LayerSetting = {
   role: LayerRole;
@@ -41,7 +50,7 @@ export type ModelSettings = {
   background: Background;
 };
 
-export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...METALS], view: null, ambiance: "studio", background: "dark" };
+export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...METALS], view: null, ambiance: "studio", background: "studio-dark" };
 
 /** What a visitor receives to show a model. */
 export type PublicModel = {

@@ -8,11 +8,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { CameraControls, ContactShadows } from "@react-three/drei";
-import { Bloom, EffectComposer, ToneMapping } from "@react-three/postprocessing";
+import { Bloom, EffectComposer, N8AO, ToneMapping } from "@react-three/postprocessing";
 import { ToneMappingMode, type EffectComposer as Composer } from "postprocessing";
 import {
   Box3,
-  Color,
   EquirectangularReflectionMapping,
   FloatType,
   HalfFloatType,
@@ -35,8 +34,10 @@ import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import type { Ambiance, Background, LayerSetting, MetalId, ModelSettings, ModelView } from "@/data/models";
+import { AccumulatePass, jitter } from "./accumulate";
+import { BACKGROUND_LOOKS, backgroundOfScene } from "./backgrounds";
 import { diamondEnv } from "./diamondEnv";
-import { enamelMaterial, ghostMaterial, lightStoneMaterial, metalMaterial, refractionMaterial, setMetal, updateRefraction, type RefractionMaterial } from "./materials";
+import { enamelMaterial, gemFrame, ghostMaterial, lightStoneMaterial, metalMaterial, refractionMaterial, setMetal, updateRefraction, type RefractionMaterial } from "./materials";
 
 /* ---------- Loaders (decoders served by the site: /draco/, Meshopt inside the code) ---------- */
 
@@ -68,8 +69,6 @@ function loadHdr(file: string): Promise<Texture> {
   }
   return promise;
 }
-
-export const BACKGROUNDS: Record<Background, string> = { dark: "#0a0a0a", light: "#f4f2ef" };
 
 /** What the viewer around the canvas can ask. */
 export type StageApi = {
@@ -103,6 +102,10 @@ type Props = {
 type LayerMeshes = Map<string, Mesh[]>;
 
 const MIN_DISTANCE = 0.002; // 2 mm from the surface: a stone of 0.8 mm fills most of the view
+/** Bounces of the light inside a stone, while the camera moves and once it is still. */
+const STONE_BOUNCES = { moving: 3, still: 6, phoneMoving: 2, phoneStill: 5 };
+/** Images averaged once the camera stops (progressive rendering). */
+const PROGRESSIVE_FRAMES = { computer: 32, phone: 16 };
 
 /** The point of the jewel under a pixel, read from the GPU (positions drawn in a 1×1 image). */
 function makePicker() {
@@ -141,6 +144,10 @@ export default function Stage(props: Props) {
   const savedView = useRef<ModelView | null>(settings.view);
   const angle = useRef(lightAngle);
   const [frame, setFrame] = useState<Frame | null>(null);
+  // Progressive rendering: started again when the camera moves or something changes (dirty).
+  const [accumulate] = useState(() => new AccumulatePass());
+  const dirty = useRef(true);
+  const lastCamera = useRef("");
 
   useEffect(() => {
     savedView.current = settings.view;
@@ -211,6 +218,7 @@ export default function Stage(props: Props) {
         const { scene, invalidate } = get();
         scene.environment = texture;
         scene.environmentIntensity = AMBIANCE_LOOKS[ambiance].intensity;
+        dirty.current = true;
         invalidate();
       })
       .catch(() => undefined);
@@ -222,12 +230,14 @@ export default function Stage(props: Props) {
   useEffect(() => {
     const { scene, invalidate } = get();
     scene.environmentRotation.set(0, lightAngle, 0);
+    dirty.current = true;
     invalidate();
   }, [lightAngle, get]);
 
   useEffect(() => {
     const { scene, invalidate } = get();
-    scene.background = new Color(BACKGROUNDS[background]);
+    scene.background = backgroundOfScene(background);
+    dirty.current = true;
     invalidate();
   }, [background, get]);
 
@@ -237,6 +247,7 @@ export default function Stage(props: Props) {
     if (!loaded || frame === null) return undefined;
     const { made, refracting } = applyMaterials(loaded, { settings: settings.layers, choices, highlight, phone, simpleStones, ambiance });
     refraction.current = refracting;
+    dirty.current = true;
     get().invalidate();
     return () => {
       for (const m of made) m.dispose();
@@ -262,12 +273,33 @@ export default function Stage(props: Props) {
         cam.updateProjectionMatrix();
       }
     }
+    // Still camera: each new image shifted by a fraction of a pixel and averaged with the previous ones.
+    const key = cam.matrixWorld.elements.join(",") + "|" + cam.near + "|" + cam.far + "|" + cam.aspect + "|" + state.size.width + "|" + state.size.height;
+    const w = state.size.width * state.gl.getPixelRatio();
+    const h = state.size.height * state.gl.getPixelRatio();
+    if (key !== lastCamera.current || dirty.current) {
+      lastCamera.current = key;
+      dirty.current = false;
+      accumulate.reset();
+      cam.clearViewOffset();
+      state.invalidate();
+    } else if (accumulate.count < (phone ? PROGRESSIVE_FRAMES.phone : PROGRESSIVE_FRAMES.computer)) {
+      const [jx, jy] = jitter(accumulate.count);
+      cam.setViewOffset(w, h, jx, jy, w, h);
+      state.invalidate();
+    } else if (cam.view?.enabled) cam.clearViewOffset();
+    // Light paths: short while moving (fluid), longer once still (each averaged image is worth more).
+    const still = accumulate.count > 0 || (!dirty.current && key === lastCamera.current && cam.view?.enabled === true);
+    const bounces = still ? (phone ? STONE_BOUNCES.phoneStill : STONE_BOUNCES.still) : phone ? STONE_BOUNCES.phoneMoving : STONE_BOUNCES.moving;
     if (refraction.current.length > 0) {
-      const w = state.size.width * state.gl.getPixelRatio();
-      const h = state.size.height * state.gl.getPixelRatio();
-      for (const m of refraction.current) updateRefraction(m, cam, w, h, angle.current);
+      for (const m of refraction.current) {
+        updateRefraction(m, cam, w, h, angle.current);
+        m.uniforms.bounces!.value = bounces;
+      }
     }
   });
+
+  useEffect(() => () => accumulate.dispose(), [accumulate]);
 
   /* Double-click or double-tap: glide towards the detail under the finger */
   useEffect(() => {
@@ -409,6 +441,7 @@ export default function Stage(props: Props) {
         },
         target: () => controls.current?.getTarget(new Vector3()).toArray() ?? null,
         center: () => model.current?.sphere.center.toArray() ?? null,
+        refractingStones: () => refraction.current.length,
       };
     }
     return () => {
@@ -428,26 +461,28 @@ export default function Stage(props: Props) {
         <spotLight position={[cx + Math.sin(lightAngle) * radius * 3, cy + radius * 4, cz + Math.cos(lightAngle) * radius * 3]} intensity={300 * radius * radius} angle={0.45} penumbra={0.6} decay={2} color="#fff6ec" />
       ) : null}
       {ambiance === "warm" ? <directionalLight position={[cx + Math.sin(lightAngle + 1) * radius * 3, cy + radius * 2, cz + Math.cos(lightAngle + 1) * radius * 3]} intensity={1.1} color="#ffcf9e" /> : null}
-      {/* The soft shadow under the jewel shows on the light background (on black, it would only draw a darker square). */}
-      {frame && background === "light" ? (
+      {/* A soft shadow on the ground under the jewel (on pure black it would only draw a darker square). */}
+      {frame && background !== "black" ? (
         <ContactShadows
           key={background + frame.key}
           position={[cx, frame.minY - radius * 0.002, cz]}
-          scale={frame.width * 1.5}
+          scale={frame.width * 1.6}
           far={Math.max(frame.height, radius * 0.2) * 1.5}
-          blur={2.4}
-          opacity={0.45}
-          resolution={512}
+          blur={2.2}
+          opacity={BACKGROUND_LOOKS[background].light ? 0.55 : 0.85}
+          resolution={1024}
           frames={1}
           color="#000000"
         />
       ) : null}
-      {!phone ? (
-        <EffectComposer ref={composer} multisampling={4}>
-          <Bloom mipmapBlur luminanceThreshold={1.1} luminanceSmoothing={0.25} intensity={0.22} radius={0.5} />
-          <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-        </EffectComposer>
-      ) : null}
+      {/* No multisampling: the progressive rendering smooths the edges once the camera stops, for much less. */}
+      <EffectComposer ref={composer} multisampling={0}>
+        {/* Soft shadows in the hollows (settings, prongs, links), on computers. */}
+        {!phone ? <N8AO halfRes screenSpaceRadius aoRadius={28} distanceFalloff={0.6} intensity={2.2} quality="medium" /> : <></>}
+        <primitive object={accumulate} />
+        {!phone ? <Bloom mipmapBlur luminanceThreshold={1.1} luminanceSmoothing={0.25} intensity={0.22} radius={0.5} /> : <></>}
+        <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+      </EffectComposer>
     </>
   );
 }
@@ -486,7 +521,8 @@ function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, s
         const color = setting.role === "stone" ? (choices.colors[name] ?? setting.color ?? "#9b111e") : "#ffffff";
         // True refraction (lighter on phones), or a glass of the same index when the device is too slow for it.
         if (!simpleStones) {
-          const material = refractionMaterial(mesh.geometry as BufferGeometry, diamondEnv(ambiance), color, phone ? "light" : "high");
+          const oneStone = (mesh as unknown as InstancedMesh).isInstancedMesh === true;
+          const material = refractionMaterial(mesh.geometry as BufferGeometry, diamondEnv(ambiance), gemFrame(mesh.geometry as BufferGeometry, oneStone, mesh.matrixWorld), color, phone ? "light" : "high");
           refracting.push(material);
           made.push(material);
           mesh.material = material;
