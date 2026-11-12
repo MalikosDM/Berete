@@ -28,7 +28,7 @@ const STLS = ["ZN1059-BJ001(2).stl", "zp1864-BJ001.stl", "0542.stl", "ZR0982-BJ0
 const EXPECTED = {
   "ZN1059-BJ001(2).stl": "1026 rondes 0,8 mm ; 152 rondes 1,9 mm ; plusieurs centaines de taille fantaisie (40 triangles) ; 144 griffes et 38 maillons en métal",
   "zp1864-BJ001.stl": "40 rondes 1,0 mm + quelques petits groupes répétés",
-  "0542.stl": "un grand bloc où la plupart des pierres sont fondues dans le métal (inséparables) ; à part, 7 petites pierres rondes d'environ 1 mm, chacune dessinée autrement (plus de 1000 triangles)",
+  "0542.stl": "un grand bloc où les pierres sont soudées au métal (seul leur dessus reste : table et facettes) : plusieurs centaines de brillants, des tailles émeraude, des pentagones, 2 losanges ; à part, 7 petites pierres rondes d'environ 1 mm, chacune dessinée autrement (plus de 1000 triangles) ; les cônes de la bande « DFB-POKAL » et les carrés du bord de la tête sont du métal ou des sertis vides",
   "ZR0982-BJ001.stl": "1 émeraude centrale 12,5 × 8,1 mm dessinée avec 108 481 triangles, et 2 baguettes effilées de côté (40 triangles, pavillon aux facettes tordues)",
   "ZN1242-bj001.glb": "3601 diamants (图层09), 2 × 199 autres pierres (图层10), maillons or rose (图层05), fleurs or blanc (图层01), 图层04 inconnu",
 };
@@ -374,10 +374,14 @@ for (const name of STLS) {
   models[name] = await upload(file);
 }
 // Stones alone or finely drawn are found by their shape (a table, a point below, facets), not by their copies.
-const stonesFound = (name) => (models[name]?.stats.stones ?? []).reduce((n, s) => n + s.count, 0);
+// Stones soldered to the metal (only their crown left) are found too, and made whole again; never in a file without such a setting.
+const stonesFound = (name, fused = false) => (models[name]?.stats.stones ?? []).filter((s) => Boolean(s.fused) === fused).reduce((n, s) => n + s.count, 0);
 let shapeCheck;
+let fusedCheck;
 if (models["ZR0982-BJ001.stl"] && models["0542.stl"]) {
   shapeCheck = ["Pierres seules ou très finement dessinées reconnues à leur forme : ZR0982 " + stonesFound("ZR0982-BJ001.stl") + " (l'émeraude centrale et 2 baguettes : 3 attendues), 0542 " + stonesFound("0542.stl") + " (7 petites pierres séparées attendues)", stonesFound("ZR0982-BJ001.stl") === 3 && stonesFound("0542.stl") === 7];
+  const others = STLS.filter((n) => n !== "0542.stl" && models[n]).map((n) => n + " " + stonesFound(n, true));
+  fusedCheck = ["Pierres soudées au métal retrouvées et reconstituées : 0542 " + stonesFound("0542.stl", true) + " (plus de 400 attendues) ; aucune dans les autres fichiers (" + others.join(", ") + ")", stonesFound("0542.stl", true) >= 400 && STLS.every((n) => n === "0542.stl" || !models[n] || stonesFound(n, true) === 0)];
 }
 
 // A Rhino file made here (the jeweller has not sent one yet): a metal layer, a stone placed 12 times as a
@@ -448,7 +452,7 @@ for (const [name, model] of Object.entries(models)) {
 
 /* ---------- 3. Links, piece page ---------- */
 
-const checks = [rhinoCheck, mirrorCheck, ...(shapeCheck ? [shapeCheck] : [])];
+const checks = [rhinoCheck, mirrorCheck, ...(shapeCheck ? [shapeCheck] : []), ...(fusedCheck ? [fusedCheck] : [])];
 // The demonstration model was made before the pipeline turned copies seen in a mirror over: the viewer does it when
 // it loads (665 small diamonds and 55 large stones that showed an empty setting).
 {
@@ -581,7 +585,7 @@ lines.push("", "## Pierres détectées", "");
 lines.push("| Fichier | Trouvé par le pipeline | Analyse de départ |");
 lines.push("|---|---|---|");
 for (const [name, m] of Object.entries(models)) {
-  const found = m.stats.stonesMissing ? "aucune pierre séparable : métal seul (message « pierres fondues ou absentes » dans l'admin)" : (m.stats.stones ?? []).length > 0 ? m.stats.stones.map((s) => s.count + " × " + s.material.replace("stone_", "").replace("_", " ") + (s.known ? "" : " (à vérifier)")).join(" ; ") : m.layers.map((l) => l.name + " : " + l.copies + " exemplaire(s), rôle deviné " + l.guess + (l.check ? " (à vérifier)" : "")).join(" ; ");
+  const found = m.stats.stonesMissing ? "aucune pierre séparable : métal seul (message « pierres fondues ou absentes » dans l'admin)" : (m.stats.stones ?? []).length > 0 ? m.stats.stones.map((s) => s.count + " × " + s.material.replace("stone_", "").replace("_", " ") + (s.fused ? " (soudées, reconstituées)" : "") + (s.known ? "" : " (à vérifier)")).join(" ; ") : m.layers.map((l) => l.name + " : " + l.copies + " exemplaire(s), rôle deviné " + l.guess + (l.check ? " (à vérifier)" : "")).join(" ; ");
   lines.push(`| ${name} | ${found} | ${EXPECTED[name] ?? ""} |`);
 }
 lines.push("", "## Chargement et fluidité", "");

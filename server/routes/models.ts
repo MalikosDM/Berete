@@ -354,7 +354,8 @@ models.post("/admin/models/:id/poster", requireAdmin, express.raw({ type: () => 
 
 models.post("/admin/models/:id/reprocess", requireAdmin, async (req, res) => {
   const id = String(req.params.id);
-  const row = await prisma.model3D.update({ where: { id }, data: { status: "queued", progress: 0, error: null } }).catch(() => null);
+  // Its still image is made again from the new version (the admin makes it once the model is shown).
+  const row = await prisma.model3D.update({ where: { id }, data: { status: "queued", progress: 0, error: null, hasPoster: false } }).catch(() => null);
   if (!row) {
     res.status(404).json({ error: "Modèle introuvable." });
     return;

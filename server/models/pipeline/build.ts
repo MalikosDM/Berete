@@ -10,10 +10,13 @@
  *   stone (a table on top, a point or an edge below, flat facets: `looksCut`),
  *   however many triangles the jeweller's export gave it and even alone (the
  *   centre stone of a ring); everything else is metal;
+ * - in such a file, stones fused into the metal (only their crown left, glued
+ *   to it: `fusedStones`) are taken out of it and made whole again;
  * - the other pieces of a layer are joined, in a few blocks.
  * Lengths in mm.
  */
 import { align, alignFree, boundsOf, centered, connectedPieces, extract, isConvex, looksCut, merge, mirrored, renumbered, sameShape, shapeOf, tableShare, type Placement, type Shape, type Soup } from "./geometry.js";
+import { FUSED_SEARCH_FROM, fusedStones, type FusedStone } from "./fused.js";
 import type { Progress, Source } from "./read.js";
 
 export type Instance = { t: [number, number, number]; r: [number, number, number, number]; s: [number, number, number] };
@@ -26,6 +29,8 @@ export type Part = {
   instances: Instance[] | null;
   /** A cut stone: flat facets, never simplified. */
   stone: boolean;
+  /** Stones joined in one mesh: for each vertex, the outward normal of its stone's table (the light is turned for each). */
+  ups?: Float32Array;
 };
 
 export type StoneCount = {
@@ -35,6 +40,8 @@ export type StoneCount = {
   size: string;
   /** Rhino's round brilliant (174 triangles) or fancy cut (40): surely a stone. Otherwise it should be checked. */
   known: boolean;
+  /** Fused into the metal in the file, made whole again. */
+  fused?: boolean;
 };
 
 export type Analysis = {
@@ -63,6 +70,48 @@ function stoneName(triangles: number, shape: Shape): string {
   const [, b, c] = shape.extents;
   if (triangles === 174 || (c > 0 && b / c >= 0.97)) return "stone_round_" + fmt((b + c) / 2) + "mm";
   return "stone_fancy_" + fmt(b) + "x" + fmt(c) + "mm";
+}
+
+/** Fused stones by shape and size, in steps of half a millimetre (hundreds of them, in few layers). */
+function fusedName(stone: FusedStone): string {
+  const size = Math.max(0.5, Math.round(stone.width * 2) / 2);
+  return (stone.round ? "stone_round_" : "stone_fancy_") + fmt(size) + "mm";
+}
+
+/** Fused stones drawn together in one mesh. */
+const FUSED_PER_MESH = 4;
+
+/** Stones in groups of `size`, each of neighbours (in the order of a Z-curve through their centres). */
+function neighbours(stones: FusedStone[], size: number): FusedStone[][] {
+  const centres = stones.map((s) => {
+    const b = boundsOf(s.soup.positions);
+    return [0, 1, 2].map((k) => (b.min[k]! + b.max[k]!) / 2);
+  });
+  const lo = [0, 1, 2].map((k) => Math.min(...centres.map((c) => c[k]!)));
+  const hi = [0, 1, 2].map((k) => Math.max(...centres.map((c) => c[k]!)));
+  const code = (c: number[]) => {
+    const q = [0, 1, 2].map((k) => Math.min(1023, Math.floor(((c[k]! - lo[k]!) / Math.max(1e-9, hi[k]! - lo[k]!)) * 1024)));
+    let z = 0;
+    for (let bit = 9; bit >= 0; bit--) for (let k = 0; k < 3; k++) z = z * 2 + ((q[k]! >> bit) & 1);
+    return z;
+  };
+  const order = stones.map((s, i) => ({ s, z: code(centres[i]!) })).sort((a, b) => a.z - b.z);
+  const out: FusedStone[][] = [];
+  for (let i = 0; i < order.length; i += size) out.push(order.slice(i, i + size).map((o) => o.s));
+  return out;
+}
+
+/** For each vertex of the joined stones, its stone's table direction. */
+function upsOf(stones: FusedStone[]): Float32Array {
+  let n = 0;
+  for (const s of stones) n += s.soup.positions.length;
+  const ups = new Float32Array(n);
+  let o = 0;
+  for (const s of stones) {
+    for (let v = 0; v < s.soup.positions.length; v += 3) ups.set(s.up, o + v);
+    o += s.soup.positions.length;
+  }
+  return ups;
 }
 
 const IDENTITY: [number, number, number, number] = [0, 0, 0, 1];
@@ -304,6 +353,29 @@ export function analyse(source: Source, progress: Progress): Analysis {
       if (c % 200 === 0) report(0.5 + (0.5 * c) / clusters.length);
     }
     for (const [material, soups] of looseStones) parts.push({ material, soup: merge(soups), instances: null, stone: true });
+    // Stones fused into the metal (a file without layers): out of the metal, whole again, joined by kind.
+    if (!source.layered) {
+      const fused = new Map<string, FusedStone[]>();
+      for (const piece of single.get("metal") ?? []) {
+        if (piece.soup.indices.length / 3 < FUSED_SEARCH_FROM) continue;
+        const found = fusedStones(piece.soup);
+        if (found.stones.length === 0) continue;
+        piece.soup = found.metal;
+        for (const stone of found.stones) {
+          const material = fusedName(stone);
+          const list = fused.get(material) ?? [];
+          list.push(stone);
+          fused.set(material, list);
+        }
+      }
+      for (const [material, stones] of fused) {
+        // A few neighbouring stones per mesh: the light traced inside a stone then searches among a few stones, not
+        // hundreds (the viewer traces each pixel of a stone through the mesh it belongs to).
+        for (const group of neighbours(stones, FUSED_PER_MESH)) parts.push({ material, soup: merge(group.map((s) => s.soup)), instances: null, stone: true, ups: upsOf(group) });
+        // Counted apart from the separate stones of the same layer.
+        stoneCounts.set(material + " fused", { material, count: stones.length, triangles: 0, size: material.replace(/^stone_(round|fancy)_/, ""), known: true, fused: true });
+      }
+    }
     for (const [material, pieces] of single) for (const soup of blocks(pieces, axis)) parts.push({ material, soup, instances: null, stone: false });
     report(1);
   }

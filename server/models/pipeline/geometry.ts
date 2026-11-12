@@ -514,7 +514,13 @@ export function compact(positions: Float32Array, indices: Uint32Array): Soup {
   return { positions: pos, indices: out };
 }
 
-export type Shaded = { positions: Float32Array; normals: Float32Array; indices: Uint32Array };
+export type Shaded = {
+  positions: Float32Array;
+  normals: Float32Array;
+  indices: Uint32Array;
+  /** For each new vertex, the vertex of the soup it was made from. */
+  source: Uint32Array;
+};
 
 /**
  * Normals for polished metal: smooth across gentle curves, but a sharp edge
@@ -560,6 +566,7 @@ export function creaseNormals(soup: Soup, angle = 35): Shaded {
   const cos = Math.cos((angle * Math.PI) / 180);
   const outPos: number[] = [];
   const outNor: number[] = [];
+  const outSrc: number[] = [];
   const outIdx = new Uint32Array(idx.length);
   // For each vertex, the normals already made for it and their new numbers.
   const madeStart = new Int32Array(vertexCount).fill(-1);
@@ -605,6 +612,7 @@ export function creaseNormals(soup: Soup, angle = 35): Shaded {
       found = count++;
       outPos.push(p[v * 3]!, p[v * 3 + 1]!, p[v * 3 + 2]!);
       outNor.push(nx, ny, nz);
+      outSrc.push(v);
       const m = madeIndex.length;
       madeIndex.push(found);
       madeNormal.push(nx, ny, nz);
@@ -613,7 +621,7 @@ export function creaseNormals(soup: Soup, angle = 35): Shaded {
     }
     outIdx[k] = found;
   }
-  return { positions: Float32Array.from(outPos), normals: Float32Array.from(outNor), indices: outIdx };
+  return { positions: Float32Array.from(outPos), normals: Float32Array.from(outNor), indices: outIdx, source: Uint32Array.from(outSrc) };
 }
 
 /** Size of the box around positions. */

@@ -14,7 +14,7 @@ import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
  */
 
 type LayerInfo = { name: string; meshes: number; copies: number; triangles: number; size: [number, number, number]; guess: LayerRole; check: boolean };
-type StoneCount = { material: string; count: number; triangles: number; size: string; known: boolean };
+type StoneCount = { material: string; count: number; triangles: number; size: string; known: boolean; fused?: boolean };
 type Stats = { kind?: string; sourceTriangles?: number; pieces?: number; unaligned?: number; size?: [number, number, number]; stones?: StoneCount[]; stonesMissing?: boolean; seconds?: number; versions?: Record<"full" | "light", { bytes: number; triangles: number; drawn: number }> };
 type LinkRow = { id: string; token: string; title: string; expiresAt: string | null; hasPassword: boolean; createdAt: string };
 type ModelRow = {
@@ -155,8 +155,9 @@ function StonesTable({ stats }: { stats: Stats }) {
       <p className="text-base text-bone">Pierres détectées : {count(total)}</p>
       <ul className="mt-2 grid gap-1 text-base text-mist sm:grid-cols-2" data-stones>
         {stones.map((s) => (
-          <li key={s.material}>
+          <li key={s.material + (s.fused ? " fused" : "")}>
             <span className="text-white">{count(s.count)}</span> × {s.material.startsWith("stone_round") ? "rondes" : "fantaisie"} {s.size.replace("x", " × ").replace("mm", " mm")}
+            {s.fused ? <span className="ml-2">(soudées au métal, reconstituées)</span> : null}
             {!s.known ? <span className="ml-2 text-rose-light">(à vérifier)</span> : null}
           </li>
         ))}

@@ -85,9 +85,14 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
   le visualiseur fait de même pour les fichiers optimisés avant (`src/viewer/mirror.ts`) ; dans un STL, les pierres sont reconnues (petites, convexes, avec une table,
   répétées, ou les 174 et 40 triangles des tailles Rhino), et aussi à leur forme (`looksCut` : une table en haut, une pointe
   ou une arête en bas, des facettes ou un cône lisse, jamais deux grandes faces opposées comme une barrette de métal),
-  même seules (la pierre centrale d'une bague) ou dessinées avec 100 000 triangles ; les pierres fondues dans le métal
-  par l'export (une union) ne peuvent pas être séparées ; métal simplifié (0,01 mm pour la version ordinateur, 0,03 mm
-  pour la version téléphone), normales nettes aux arêtes (35°), compression Meshopt. Le fichier d'origine est toujours
+  même seules (la pierre centrale d'une bague) ou dessinées avec 100 000 triangles ; les pierres **soudées au métal** par
+  l'export (une union : seul leur dessus reste, collé au métal, comme dans la bague 0542) sont retrouvées à leur forme
+  (`fused.ts` : une table plate à 4 µm près, entourée de facettes qui descendent vers l'extérieur et finissent sur une arête
+  nette, tournées dans plusieurs directions ; seulement dans un morceau qui contient au moins 4 pierres nettes de même
+  taille, ce qui écarte les reliefs sculptés), retirées du métal et refaites entières (leur dessus tel quel, un rondiste et
+  une culasse à 43 %, enveloppe convexe) ; chacune garde la direction de sa table (`_GEMUP`) pour l'éclairage ; le métal
+  est simplifié (0,01 mm pour la version ordinateur, 0,03 mm pour la version téléphone) sans bouger les bords des trous
+  laissés par ces pierres, normales nettes aux arêtes (35°), compression Meshopt. Le fichier d'origine est toujours
   gardé. En ligne de commande : `npm run models:optimize -- <fichier> <dossier>`.
 - **Les fichiers** sont dans `storage/` (hors git, `MODELS_DIR` pour un autre dossier), derrière `server/models/storage.ts` :
   seul ce fichier change pour les mettre ailleurs (disque du VPS, stockage objet).

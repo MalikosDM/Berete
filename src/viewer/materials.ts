@@ -120,6 +120,30 @@ const TRACE = /* glsl */ `
   }
 `;
 
+/**
+ * How a stone's own space meets the lighting, for the pixel drawn: from the
+ * material (one stone repeated: its table up; several stones joined: the
+ * world), or from the direction of its stone's table, given by its vertices.
+ */
+const TURN_UP = /* glsl */ `
+  mat3 gemOrient;
+  #ifdef GEM_UP
+    varying vec3 vGemUp;
+    // The rotation that turns the direction a (the stone's table) up, toward the top of the lighting.
+    mat3 turnUp(vec3 a) {
+      vec3 v = cross(a, vec3(0.0, 1.0, 0.0));
+      float c = a.y;
+      if (c < -0.9999) return mat3(1.0, 0.0, 0.0, 0.0, -1.0, 0.0, 0.0, 0.0, -1.0);
+      float k = 1.0 / (1.0 + c);
+      return mat3(
+        v.x * v.x * k + c, v.y * v.x * k + v.z, v.z * v.x * k - v.y,
+        v.x * v.y * k - v.z, v.y * v.y * k + c, v.z * v.y * k + v.x,
+        v.x * v.z * k + v.y, v.y * v.z * k - v.x, v.z * v.z * k + c
+      );
+    }
+  #endif
+`;
+
 /** How a stone's own space meets the lighting: its table up (one stone repeated), or the world (several stones joined). */
 export type GemFrame = { orient: Matrix3; epsilon: number };
 
@@ -177,6 +201,9 @@ export function gemFrame(geometry: BufferGeometry, oneStone: boolean, world: Mat
  * (Fresnel, 17 % straight on, all of it at grazing angles). "high" on
  * computers (5 bounces), "light" on phones (4 bounces).
  * The light can be turned: `rotation` turns what the stone sees with it.
+ * Stones joined in one mesh (stones that were fused into the metal of the
+ * file) carry their table's direction on each vertex (`_gemup`): each one
+ * faces the top of the lighting, as a repeated stone does.
  */
 export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame: GemFrame, color = "#ffffff", quality: "high" | "light" = "high"): RefractionMaterial {
   const material = new MeshRefractionMaterial() as RefractionMaterial;
@@ -188,13 +215,18 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
   }
   // The fire: the green ray is traced; red and blue split from it where it leaves the stone (three full traces would
   // cost three times as much, for almost the same colours: most of the fire is made at the last facet).
-  material.defines = { ...material.defines, CHROMATIC_ABERRATIONS: "", FAST_CHROMA: "" };
+  material.defines = { ...material.defines, CHROMATIC_ABERRATIONS: "", FAST_CHROMA: "", ...(geometry.getAttribute("_gemup") ? { GEM_UP: "" } : {}) };
+  material.vertexShader = material.vertexShader.replace(
+    "void main() {",
+    ["#ifdef GEM_UP", "  attribute vec3 _gemup;", "  varying vec3 vGemUp;", "#endif", "void main() {", "  #ifdef GEM_UP", "    vGemUp = _gemup;", "  #endif"].join("\n"),
+  );
   let shader = material.fragmentShader
     .replace("vec3 rayDirectionR = normalize(rayDirectionG + 1.0 * vec3(aberrationStrength / 2.0));", "vec3 rayDirectionR = gemExitR;")
     .replace("vec3 rayDirectionB = normalize(rayDirectionG - 1.0 * vec3(aberrationStrength / 2.0));", "vec3 rayDirectionB = gemExitB;")
     // (The chunk of PMREM maps it includes is not needed for this flat lighting image, and gone from recent three.js.)
     .replace("#include <cube_uv_reflection_fragment>", "")
-    .replace("uniform float bounces;", "uniform float bounces;\n  uniform mat3 envRotation;\n  uniform mat3 gemOrient;\n  uniform float gemEpsilon;\n  uniform float contrast;\n  uniform float gain;\n  uniform float gemDispersion;")
+    .replace("uniform float bounces;", "uniform float bounces;\n  uniform mat3 envRotation;\n  uniform mat3 gemOrientU;\n  uniform float gemEpsilon;\n  uniform float contrast;\n  uniform float gain;\n  uniform float gemDispersion;\n" + TURN_UP)
+    .replace("void main() {", "void main() {\n  #ifdef GEM_UP\n    gemOrient = turnUp(normalize(vGemUp));\n  #else\n    gemOrient = gemOrientU;\n  #endif")
     .replace(
       "vec4 textureGradient(sampler2D envMap, vec3 rayDirection, vec3 directionCamPerfect) {",
       "vec4 textureGradient(sampler2D envMap, vec3 rayDirection, vec3 directionCamPerfect) {\n      rayDirection = envRotation * rayDirection;\n      directionCamPerfect = envRotation * directionCamPerfect;",
@@ -217,7 +249,7 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
   shader = shader.slice(0, from) + TRACE + shader.slice(to);
   material.fragmentShader = shader;
   material.uniforms.envRotation = { value: new Matrix3() };
-  material.uniforms.gemOrient = { value: frame.orient };
+  material.uniforms.gemOrientU = { value: frame.orient };
   material.uniforms.gemEpsilon = { value: frame.epsilon };
   material.uniforms.contrast = { value: 1.25 };
   material.uniforms.gain = { value: 1.2 };

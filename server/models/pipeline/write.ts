@@ -49,7 +49,8 @@ function simplified(part: Part, error: number): Part["soup"] {
   if (part.stone || triangles < SIMPLIFY_FROM) return part.soup;
   // A part smaller than the error would vanish: it is simplified less.
   for (let e = error; e >= error / 30; e /= 3) {
-    const [indices] = MeshoptSimplifier.simplify(part.soup.indices, part.soup.positions, 3, 0, e, ["ErrorAbsolute"]);
+    // The borders stay where they are: the edges of the holes left by fused stones meet the stones exactly.
+    const [indices] = MeshoptSimplifier.simplify(part.soup.indices, part.soup.positions, 3, 0, e, ["ErrorAbsolute", "LockBorder"]);
     if (indices.length >= Math.min(36, part.soup.indices.length)) return compact(part.soup.positions, indices);
   }
   return part.soup;
@@ -86,6 +87,12 @@ export async function writeVersion(analysis: Analysis, version: Version, file: s
       .setAttribute("NORMAL", doc.createAccessor().setType("VEC3").setArray(shaded.normals))
       .setIndices(doc.createAccessor().setType("SCALAR").setArray(indices))
       .setMaterial(placeholder(doc, part.material, part.stone, materials));
+    // Stones joined in one mesh: each vertex says which way its stone's table faces (the viewer turns the light for it).
+    if (part.ups) {
+      const ups = new Float32Array(vertexCount * 3);
+      for (let v = 0; v < vertexCount; v++) ups.set(part.ups.subarray(shaded.source[v]! * 3, shaded.source[v]! * 3 + 3), v * 3);
+      prim.setAttribute("_GEMUP", doc.createAccessor().setType("VEC3").setArray(ups));
+    }
     const mesh = doc.createMesh(part.material).addPrimitive(prim);
     const node = doc.createNode(part.material).setMesh(mesh);
     const count = shaded.indices.length / 3;

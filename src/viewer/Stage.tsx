@@ -521,8 +521,20 @@ export default function Stage(props: Props) {
             inst.getMatrixAt(Math.min(index, inst.count - 1), m);
             p.setFromMatrixPosition(m);
           } else {
-            mesh.geometry.computeBoundingSphere();
-            p.copy(mesh.geometry.boundingSphere!.center);
+            // Stones joined in one mesh: the point of one of them farthest from the middle of the jewel (on its outside).
+            const pos = mesh.geometry.getAttribute("position");
+            const middle = model.current?.sphere.center ?? new Vector3();
+            const q = new Vector3();
+            let far = -1;
+            for (let i = 0; i < pos.count; i++) {
+              q.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld);
+              const d = q.distanceTo(middle);
+              if (d > far) {
+                far = d;
+                p.copy(q);
+              }
+            }
+            return p.toArray();
           }
           return p.applyMatrix4(mesh.matrixWorld).toArray();
         },
@@ -596,6 +608,10 @@ function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, s
     const shown = highlight === null || highlight === name;
     for (const mesh of meshes) {
       mesh.visible = setting.role !== "hide" || highlight === name;
+      // Stones rebuilt from a file where they were fused into the metal (joined by groups spread over the jewel): drawn
+      // after the metal, so that their parts hidden by it (a pavilion in its setting, the stones behind the jewel) are
+      // not traced, the costly part of drawing a stone. Other meshes keep the usual order, nearest first.
+      mesh.renderOrder = mesh.geometry.getAttribute("_gemup") ? 1 : 0;
       if (!shown) {
         mesh.material = ghostMaterial;
         continue;
