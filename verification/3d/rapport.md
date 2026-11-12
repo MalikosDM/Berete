@@ -1,6 +1,6 @@
 # Visualiseur 3D : rapport de vérification
 
-Généré par `npm run verify:3d` le 10/11/2026 02:37:31, sur http://localhost:3001. Machine : Apple M4, rendu par le GPU (Chromium, ANGLE Metal).
+Généré par `npm run verify:3d` le 12/11/2026 03:30:44, sur http://localhost:3001. Machine : Apple M4, rendu par le GPU (Chromium, ANGLE Metal).
 
 Images par seconde : moyenne sur 4 s de rotation automatique. Ordinateur : 1440 × 900, version « full ». iPhone : écran de 390 px émulé, version « light », processeur ralenti 4 fois (le GPU reste celui du Mac, la fluidité sur un vrai iPhone est à confirmer sur l'appareil).
 
@@ -8,11 +8,11 @@ Images par seconde : moyenne sur 4 s de rotation automatique. Ordinateur : 1440 
 
 | Fichier | Original | Full (ordinateur) | Light (téléphone) | Triangles affichés full / light | Traitement |
 |---|---|---|---|---|---|
-| ZN1242-bj001.glb | 37,5 Mo | 8,7 Mo | 2,3 Mo | 2 578 145 / 1 020 971 | 7,8 s (+ envoi 1,3 s) |
-| ZN1059-BJ001(2).stl | 393,5 Mo | 1,9 Mo | 0,9 Mo | 712 251 / 424 651 | 4,6 s (+ envoi 0,6 s) |
-| zp1864-BJ001.stl | 278,3 Mo | 1,7 Mo | 0,6 Mo | 229 732 / 104 386 | 5 s (+ envoi 0,6 s) |
-| 0542.stl | 104,9 Mo | 4,0 Mo | 1,0 Mo | 393 671 / 92 607 | 4,7 s (+ envoi 0,2 s) |
-| ZR0982-BJ001.stl | 20,5 Mo | 0,1 Mo | 0,1 Mo | 21 912 / 16 940 | 0,4 s (+ envoi 0,1 s) |
+| ZN1242-bj001.glb | 37,5 Mo | 8,7 Mo | 2,3 Mo | 2 578 145 / 1 020 971 | 7,6 s (+ envoi 1,5 s) |
+| ZN1059-BJ001(2).stl | 393,5 Mo | 1,9 Mo | 0,9 Mo | 712 251 / 424 651 | 4,4 s (+ envoi 0,6 s) |
+| zp1864-BJ001.stl | 278,3 Mo | 1,7 Mo | 0,6 Mo | 229 732 / 104 386 | 4,7 s (+ envoi 0,4 s) |
+| 0542.stl | 104,9 Mo | 4,0 Mo | 1,0 Mo | 393 671 / 92 607 | 4,2 s (+ envoi 0,2 s) |
+| ZR0982-BJ001.stl | 20,5 Mo | 0,1 Mo | 0,1 Mo | 21 912 / 16 940 | 0,4 s (+ envoi 0,0 s) |
 
 ## Pierres détectées
 
@@ -30,9 +30,9 @@ Chargement : du clic sur le lien au bijou affiché, serveur local ; « 4G » : l
 
 | Fichier | Ordinateur : chargement / images par s | iPhone émulé : chargement (4G) / images par s | Zoom sur une pierre : centre de la vue → pierre | Recentrage tout seul (2,5 s après) |
 |---|---|---|---|---|
-| ZN1242-bj001.glb | 0,9 s / 55 | 1,2 s (4,5 s) / 60 | 2,49 mm (la pierre est à 92,0 mm du centre du bijou ; caméra à 22,9 mm) | 0,000 mm |
-| ZN1059-BJ001(2).stl | 0,9 s / 59 | 1,2 s (3,3 s) / 60 | 0,32 mm (la pierre est à 249,4 mm du centre du bijou ; caméra à 7,7 mm) | 0,000 mm |
-| zp1864-BJ001.stl | 0,9 s / 60 | 1,2 s (2,8 s) / 60 | 0,46 mm (la pierre est à 10,3 mm du centre du bijou ; caméra à 9,7 mm) | 0,000 mm |
+| ZN1242-bj001.glb | 0,8 s / 56 | 1,0 s (4,3 s) / 60 | 2,49 mm (la pierre est à 92,0 mm du centre du bijou ; caméra à 22,9 mm) | 0,000 mm |
+| ZN1059-BJ001(2).stl | 0,9 s / 60 | 1,1 s (3,2 s) / 60 | 0,32 mm (la pierre est à 249,4 mm du centre du bijou ; caméra à 7,7 mm) | 0,000 mm |
+| zp1864-BJ001.stl | 0,8 s / 60 | 1,1 s (2,7 s) / 60 | 0,46 mm (la pierre est à 10,3 mm du centre du bijou ; caméra à 9,7 mm) | 0,000 mm |
 | 0542.stl | 0,9 s / 60 | 1,0 s (3,2 s) / 60 | pas de pierres : zoom sur le métal (caméra à 13,2 mm) | 0,000 mm |
 | ZR0982-BJ001.stl | 0,9 s / 60 | 1,0 s (1,7 s) / 60 | pas de pierres : zoom sur le métal (caméra à 9,0 mm) | 0,000 mm |
 
@@ -43,9 +43,11 @@ Chargement : du clic sur le lien au bijou affiché, serveur local ; « 4G » : l
 - OK — Lien inexistant : page « Ce lien n'existe pas »
 - OK — Mot de passe faux refusé
 - OK — Bon mot de passe : la pièce s'affiche
-- OK — Bouton WhatsApp « I love it » avec le métal : Hello Berete Jewellers, I love the piece "Test" in 18k white gold (Flowers), 18k rose gold (BRT logo) and 18k rose gold (Links). http://localhost:3001/view/uAer
+- OK — Bouton WhatsApp « I love it » avec le métal : Hello Berete Jewellers, I love the piece "Test" in 18k white gold (Flowers), 18k rose gold (BRT logo) and 18k rose gold (Links). http://localhost:3001/view/hcWo
 - OK — Lien privé jamais indexé : meta robots « noindex,nofollow », en-tête « noindex, nofollow »
-- OK — Page de la pièce /pieces/vfb-stuttgart-dfb-pokal-2025 : section « Explore in 3D », WhatsApp « Hello Berete Jewellers, I want the piece "VfB Stuttgart — DFB-Pokal 2025 Ring" in 18k yellow gold (Flowers), 18k rose gold (BRT logo) and 18k rose gold (Links). Can we ta »
+- OK — Bouton « See it in 3D » en haut de la page de la pièce : il amène au visualiseur (haut à 96 px)
+- OK — Page de la pièce /pieces/michy-batshuayi-butterfly-chain : section « Explore in 3D », WhatsApp « Hello Berete Jewellers, I want the piece "Michy Batshuayi — Butterfly Chain" in 18k yellow gold (Flowers), 18k rose gold (BRT logo) and 18k rose gold (Links). Can we talk »
+- OK — Vignette de la pièce dans les créations : repère « 3D »
 - OK — Calques du fichier de test reconnus par leur nom : 图层01 white-gold, 图层05 rose-gold, 图层09 diamond
 - OK — Zoom sur un détail : la vue reste sur le détail, jamais de recentrage sur le bijou
 - OK — Erreurs dans la console (toutes les pages ouvertes) : 0
