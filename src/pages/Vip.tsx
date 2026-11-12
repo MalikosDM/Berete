@@ -142,15 +142,22 @@ function VipPiece({ model }: { model: PublicModel }) {
   return (
     <li data-vip-piece={model.id}>
       <h3 className="title-caps text-[clamp(1.75rem,3.5vw,2.75rem)] tracking-[0.08em] break-words">{model.name}</h3>
-      <Jewel3D model={model} words={t.viewer} onSelection={setSelection} className="mt-6" />
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a href={waLink(clean(t.viewer.loveMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " bg-white text-ink hover:bg-rose-light"}>
-          <BrandIcon name="whatsapp" className="size-5" /> {t.viewer.love}
-        </a>
-        <a href={waLink(clean(t.viewer.changeMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " border border-white/40 text-white hover:border-rose-light hover:text-rose-light"}>
-          <BrandIcon name="whatsapp" className="size-5" /> {t.viewer.change}
-        </a>
-      </div>
+      <Jewel3D
+        model={model}
+        words={t.viewer}
+        onSelection={setSelection}
+        className="mt-6"
+        actions={
+          <>
+            <a href={waLink(clean(t.viewer.loveMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " w-full bg-white py-3 text-center text-ink hover:bg-rose-light"}>
+              <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {t.viewer.love}
+            </a>
+            <a href={waLink(clean(t.viewer.changeMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " w-full border border-white/40 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>
+              <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {t.viewer.change}
+            </a>
+          </>
+        }
+      />
     </li>
   );
 }

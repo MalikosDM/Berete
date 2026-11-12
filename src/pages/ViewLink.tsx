@@ -55,15 +55,23 @@ export default function ViewLink() {
           <h1 className="title-caps mt-4 text-[clamp(2rem,5vw,3.75rem)] tracking-[0.1em] break-words" data-link-title>{answer.title}</h1>
           <p className="mt-4 text-lg text-bone">{w.privateText}</p>
         </div>
-        <Jewel3D model={answer.model} words={w} onSelection={setSelection} eager className="mt-10" />
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <a href={waLink(w.loveMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-love className={button + " bg-white text-ink hover:bg-rose-light"}>
-            <BrandIcon name="whatsapp" className="size-5" /> {w.love}
-          </a>
-          <a href={waLink(w.changeMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-change className={button + " border border-white/40 text-white hover:border-rose-light hover:text-rose-light"}>
-            <BrandIcon name="whatsapp" className="size-5" /> {w.change}
-          </a>
-        </div>
+        <Jewel3D
+          model={answer.model}
+          words={w}
+          onSelection={setSelection}
+          eager
+          className="mt-10"
+          actions={
+            <>
+              <a href={waLink(w.loveMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-love className={button + " w-full bg-white py-3 text-center text-ink hover:bg-rose-light"}>
+                <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {w.love}
+              </a>
+              <a href={waLink(w.changeMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-change className={button + " w-full border border-white/40 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>
+                <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {w.change}
+              </a>
+            </>
+          }
+        />
         {answer.expiresAt ? <p className="mt-6 text-center text-base text-mist">{w.validUntil(new Date(answer.expiresAt).toLocaleDateString(intl, { day: "numeric", month: "long", year: "numeric" }))}</p> : null}
       </>
     );

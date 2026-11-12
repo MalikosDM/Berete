@@ -1,19 +1,22 @@
 /*
  * The 3D viewer of a jewel: the canvas, its buttons (views, reset, turning,
- * background, full screen, image) and, under it, the metal of each metal
- * layer, the colour of coloured stones, the lighting and its direction.
+ * full screen, image) and the panel of choices, beside it on a computer and
+ * under it on a phone: the metal of each metal layer, the colour of coloured
+ * stones, the background, the lighting and its direction, then the buttons
+ * the page gives (WhatsApp).
  * Loaded only when shown (three.js is heavy): see ./index.tsx.
  */
-import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState, type Ref } from "react";
+import { useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
-import { Camera, Maximize, Minimize, Pause, RotateCcw, Rotate3d } from "lucide-react";
+import { Camera, Maximize, Minimize, Pause, RotateCcw, Rotate3d, SlidersHorizontal, Sun } from "lucide-react";
 import { AMBIANCES, BACKGROUNDS, backgroundOf, METALS, type Ambiance, type Background, type MetalId, type ModelView, type PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import Logo from "@/components/Logo";
 import { METAL_LOOKS, STONE_COLORS } from "./materials";
 import { BACKGROUND_LOOKS, backgroundCss, swatchCss } from "./backgrounds";
 import Stage, { type Choices, type StageApi } from "./Stage";
+import { CANVAS_SIZE, PANEL, VIEWER_GRID } from "./layout";
 
 export type ViewerHandle = {
   getView(): ModelView | null;
@@ -33,6 +36,8 @@ type Props = {
   /** Admin: the settings being edited (else those of the model). */
   settings?: PublicModel["settings"];
   onSelection?: (selection: Selection) => void;
+  /** Buttons at the foot of the panel of choices (WhatsApp). */
+  actions?: ReactNode;
   className?: string;
   ref?: Ref<ViewerHandle>;
 };
@@ -52,11 +57,24 @@ function hasWebgl(): boolean {
   }
 }
 
+/** One group of choices in the panel: its name, the current choice beside it, the choices under. */
+function Group({ title, value, layer, children }: { title: string; value?: string; layer?: string; children: ReactNode }) {
+  return (
+    <div className="border-t border-white/10 px-5 py-5 first:border-t-0 sm:px-6" data-metal-layer={layer}>
+      <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <span className="text-sm font-medium uppercase tracking-[0.2em] text-rose-light">{title}</span>
+        {value ? <span className="text-base text-bone">{value}</span> : null}
+      </p>
+      <div className="mt-4">{children}</div>
+    </div>
+  );
+}
+
 function swatchStyle(color: string): React.CSSProperties {
   return { backgroundImage: "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.95) 0%, " + color + " 34%, " + color + " 62%, rgba(0,0,0,0.55) 100%)" };
 }
 
-export default function JewelViewer({ model, words, highlight = null, settings: edited, onSelection, className = "", ref }: Props) {
+export default function JewelViewer({ model, words, highlight = null, settings: edited, onSelection, actions, className = "", ref }: Props) {
   const settings = edited ?? model.settings;
   const phone = useMemo(() => isPhone(), []);
   const webgl = useMemo(() => hasWebgl(), []);
@@ -77,6 +95,22 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   const [present, setPresent] = useState<string[]>([]);
   const wrap = useRef<HTMLDivElement>(null);
   const api = useRef<StageApi | null>(null);
+  const panelTitle = useId();
+  // The hint over the jewel fades at the first touch of it.
+  const [touched, setTouched] = useState(false);
+  // On a computer the panel scrolls by itself when its choices are higher than the jewel: the wheel then scrolls it, not the page.
+  const panelScroll = useRef<HTMLDivElement>(null);
+  const panelContent = useRef<HTMLDivElement>(null);
+  const [panelScrolls, setPanelScrolls] = useState(false);
+  useEffect(() => {
+    const box = panelScroll.current;
+    const content = panelContent.current;
+    if (!box || !content || typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(() => setPanelScrolls(box.scrollHeight > box.clientHeight + 1));
+    observer.observe(box);
+    observer.observe(content);
+    return () => observer.disconnect();
+  }, []);
 
   // The jeweller's lighting and background, when changed in the admin.
   const [given, setGiven] = useState({ ambiance: settings.ambiance, background: settings.background });
@@ -155,11 +189,17 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   const dark = !BACKGROUND_LOOKS[background].light;
   const iconBtn = "inline-flex size-12 items-center justify-center rounded-full border backdrop-blur-sm transition-colors " + (dark ? "border-white/25 bg-ink/60 text-white hover:border-rose-light hover:text-rose-light" : "border-ink/20 bg-white/70 text-ink hover:border-rose-deep hover:text-rose-deep");
   const viewBtn = "inline-flex min-h-12 items-center justify-center rounded-full border px-4 text-base backdrop-blur-sm transition-colors " + (dark ? "border-white/25 bg-ink/60 text-white hover:border-rose-light hover:text-rose-light" : "border-ink/20 bg-white/70 text-ink hover:border-rose-deep hover:text-rose-deep");
-  const chip = (on: boolean) => "inline-flex min-h-12 items-center justify-center rounded-full border px-5 text-base transition-colors " + (on ? "border-rose-light text-rose-light" : "border-white/25 text-white hover:border-rose-light/70");
+  const ring = (on: boolean) => "relative size-12 shrink-0 rounded-full p-[3px] transition-transform hover:scale-105 " + (on ? "bg-rose-gold" : "bg-white/15");
+  const hint = phone ? words.hintTouch : words.hint;
 
   return (
-    <div ref={wrap} data-viewer className={(isFull ? "fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-ink " : "") + className}>
-      <div className={"relative w-full overflow-hidden " + (isFull ? "min-h-[60svh] flex-1" : "aspect-[4/5] sm:aspect-[4/3] lg:aspect-[16/10]")} style={{ background: backgroundCss(background) }}>
+    <div ref={wrap} data-viewer className={VIEWER_GRID + " " + (isFull ? "fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-ink lg:overflow-hidden" : "lg:gap-4 " + className)}>
+      <div
+        onPointerDownCapture={() => setTouched(true)}
+        onWheelCapture={() => setTouched(true)}
+        className={"relative w-full overflow-hidden " + (isFull ? "min-h-[60svh] flex-1 lg:h-full lg:min-h-0" : CANVAS_SIZE)}
+        style={{ background: backgroundCss(background) }}
+      >
         {webgl && status !== "error" ? (
           <Canvas
             key={attempt}
@@ -255,92 +295,119 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
                 {isFull ? <Minimize className="size-5" aria-hidden="true" /> : <Maximize className="size-5" aria-hidden="true" />}
               </button>
             </div>
-            <p className={"pointer-events-none absolute start-4 bottom-4 hidden max-w-[46%] text-base lg:block " + (dark ? "text-mist" : "text-ink/70")}>{words.hint}</p>
+            <p className={"pointer-events-none absolute start-4 bottom-4 hidden max-w-[50%] text-base transition-opacity duration-700 lg:block " + (touched ? "opacity-0 " : "") + (dark ? "text-mist" : "text-ink/70")}>{hint}</p>
           </>
         ) : null}
       </div>
 
-      {/* Choices under the canvas */}
-      {status === "ready" ? (
-        <div className={"grid gap-6 px-1 pt-6 " + (isFull ? "px-5 pb-6" : "")}>
-          {offered.length > 1
-            ? metalLayers.map((name, i) => {
-                const current = metalOf(name);
-                return (
-                  <div key={name} data-metal-layer={name}>
-                    <p className="text-base text-bone">
-                      {labelOf(name, i)} <span className="text-mist">· {words.metals[current]}</span>
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={labelOf(name, i)}>
-                      {offered.map((metal) => (
-                        <button
-                          key={metal}
-                          type="button"
-                          role="radio"
-                          aria-checked={current === metal}
-                          aria-label={words.metals[metal]}
-                          data-metal={metal}
-                          onClick={() => setChoices((c) => ({ ...c, metals: { ...c.metals, [name]: metal } }))}
-                          className={"group relative size-12 rounded-full p-[3px] transition-transform hover:scale-105 " + (current === metal ? "bg-rose-gold" : "bg-white/15")}
-                        >
-                          <span className="block h-full w-full rounded-full border border-ink/40" style={swatchStyle(METAL_LOOKS[metal].swatch)} />
-                          <span className="pointer-events-none absolute -top-11 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-base text-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                            {words.metals[metal]}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })
-            : null}
-          {stoneLayers.map((name) => {
-            const current = choices.colors[name] ?? settings.layers[name]?.color ?? "#9b111e";
-            const colors = [...new Set([settings.layers[name]?.color ?? "#9b111e", ...STONE_COLORS])];
-            return (
-              <div key={name}>
-                <p className="text-base text-bone">{settings.layers[name]?.label || words.stoneColor}</p>
-                <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={words.stoneColor}>
-                  {colors.map((color) => (
-                    <button key={color} type="button" role="radio" aria-checked={current === color} aria-label={color} onClick={() => setChoices((c) => ({ ...c, colors: { ...c.colors, [name]: color } }))} className={"size-12 rounded-full p-[3px] " + (current === color ? "bg-rose-gold" : "bg-white/15")}>
-                      <span className="block h-full w-full rounded-full" style={swatchStyle(color)} />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-          <div>
-            <p className="text-base text-bone">
-              {words.background} <span className="text-mist">· {words.backgrounds[background]}</span>
+      {/* The panel of choices: beside the jewel (computer), under it (phone) */}
+      <div role="group" aria-labelledby={panelTitle} data-viewer-panel className={"relative " + PANEL + (isFull ? " border-x-0 border-b-0 lg:border-y-0 lg:border-e-0 lg:border-s" : " border-t-0 lg:border-t")}>
+        <div ref={panelScroll} data-lenis-prevent={panelScrolls ? "" : undefined} className="lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-contain">
+          <div ref={panelContent} className="flex min-h-full flex-col">
+            <p id={panelTitle} className="eyebrow flex items-center gap-3 border-b border-white/10 px-5 py-4 sm:px-6">
+              <SlidersHorizontal className="size-4" aria-hidden="true" /> {words.customize}
             </p>
-            <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={words.background}>
-              {BACKGROUNDS.map((b) => (
-                <button key={b} type="button" role="radio" aria-checked={background === b} aria-label={words.backgrounds[b]} title={words.backgrounds[b]} data-background={b} onClick={() => setBackground(b)} className={"size-12 rounded-full p-[3px] transition-transform hover:scale-105 " + (background === b ? "bg-rose-gold" : "bg-white/15")}>
-                  <span className="block h-full w-full rounded-full border border-white/10" style={{ background: swatchCss(b) }} />
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-base text-bone">{words.ambiance}</p>
-              <div className="mt-3 flex flex-wrap gap-3" role="radiogroup" aria-label={words.ambiance}>
-                {AMBIANCES.map((a) => (
-                  <button key={a} type="button" role="radio" aria-checked={ambiance === a} data-ambiance={a} onClick={() => setAmbiance(a)} className={chip(ambiance === a)}>
-                    {words.ambiances[a]}
-                  </button>
+
+            {status === "ready" ? (
+              <div>
+                {offered.length > 1
+                  ? metalLayers.map((name, i) => {
+                      const current = metalOf(name);
+                      return (
+                        <Group key={name} layer={name} title={labelOf(name, i)} value={words.metals[current]}>
+                          <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={labelOf(name, i)}>
+                            {offered.map((metal) => (
+                              <button
+                                key={metal}
+                                type="button"
+                                role="radio"
+                                aria-checked={current === metal}
+                                aria-label={words.metals[metal]}
+                                data-metal={metal}
+                                onClick={() => setChoices((c) => ({ ...c, metals: { ...c.metals, [name]: metal } }))}
+                                className={"group " + ring(current === metal)}
+                              >
+                                <span className="block h-full w-full rounded-full border border-ink/40" style={swatchStyle(METAL_LOOKS[metal].swatch)} />
+                                <span className="pointer-events-none absolute -top-11 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3 py-1 text-base text-ink opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                                  {words.metals[metal]}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </Group>
+                      );
+                    })
+                  : null}
+                {stoneLayers.map((name) => {
+                  const current = choices.colors[name] ?? settings.layers[name]?.color ?? "#9b111e";
+                  const colors = [...new Set([settings.layers[name]?.color ?? "#9b111e", ...STONE_COLORS])];
+                  return (
+                    <Group key={name} title={settings.layers[name]?.label || words.stoneColor}>
+                      <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={words.stoneColor}>
+                        {colors.map((color) => (
+                          <button key={color} type="button" role="radio" aria-checked={current === color} aria-label={color} onClick={() => setChoices((c) => ({ ...c, colors: { ...c.colors, [name]: color } }))} className={ring(current === color)}>
+                            <span className="block h-full w-full rounded-full" style={swatchStyle(color)} />
+                          </button>
+                        ))}
+                      </div>
+                    </Group>
+                  );
+                })}
+                <Group title={words.background} value={words.backgrounds[background]}>
+                  <div className="flex flex-wrap gap-3" role="radiogroup" aria-label={words.background}>
+                    {BACKGROUNDS.map((b) => (
+                      <button key={b} type="button" role="radio" aria-checked={background === b} aria-label={words.backgrounds[b]} title={words.backgrounds[b]} data-background={b} onClick={() => setBackground(b)} className={ring(background === b)}>
+                        <span className="block h-full w-full rounded-full border border-white/10" style={{ background: swatchCss(b) }} />
+                      </button>
+                    ))}
+                  </div>
+                </Group>
+                <Group title={words.ambiance}>
+                  <div className="grid grid-cols-3 gap-1 rounded-full border border-white/15 p-1" role="radiogroup" aria-label={words.ambiance}>
+                    {AMBIANCES.map((a) => (
+                      <button key={a} type="button" role="radio" aria-checked={ambiance === a} data-ambiance={a} onClick={() => setAmbiance(a)} className={"min-h-12 min-w-0 rounded-full px-2 text-base transition-colors " + (ambiance === a ? "bg-white font-medium text-ink" : "text-bone hover:text-rose-light")}>
+                        {words.ambiances[a]}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="mt-5 block">
+                    <span className="flex items-center gap-2 text-base text-bone">
+                      <Sun className="size-4 text-rose-light" aria-hidden="true" /> {words.light}
+                    </span>
+                    <input type="range" min={-180} max={180} step={1} value={Math.round((lightAngle * 180) / Math.PI)} onChange={(e) => setLightAngle((Number(e.target.value) * Math.PI) / 180)} className="mt-1 block h-12 w-full cursor-pointer accent-[#e8b4a0]" />
+                  </label>
+                </Group>
+                {/* How to move the jewel: over it on a computer (until it is touched), here on a phone. */}
+                <ul className="grid gap-1 border-t border-white/10 px-5 py-5 text-base text-mist sm:px-6 lg:hidden">
+                  {hint.split(" · ").map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="grid gap-8 px-5 py-6 sm:px-6" aria-hidden="true">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="grid gap-4">
+                    <span className="h-3 w-28 bg-white/10" />
+                    <span className="flex gap-3">
+                      {[0, 1, 2, 3, 4].map((j) => (
+                        <span key={j} className="size-12 rounded-full bg-white/[0.06]" />
+                      ))}
+                    </span>
+                  </div>
                 ))}
               </div>
-            </div>
-            <label className="block text-base text-bone lg:w-80">
-              {words.light}
-              <input type="range" min={-180} max={180} step={1} value={Math.round((lightAngle * 180) / Math.PI)} onChange={(e) => setLightAngle((Number(e.target.value) * Math.PI) / 180)} className="mt-3 block h-12 w-full cursor-pointer accent-[#e8b4a0]" />
-            </label>
+            )}
+
+            {/* When the panel scrolls, the choices fade under the buttons: there are more above them. */}
+            {actions ? (
+              <div className={"relative mt-auto grid gap-3 border-t border-white/10 bg-ink-soft px-5 py-5 sm:px-6 lg:sticky lg:bottom-0" + (panelScrolls ? " lg:before:pointer-events-none lg:before:absolute lg:before:inset-x-0 lg:before:bottom-full lg:before:h-12 lg:before:bg-linear-to-t lg:before:from-ink-soft lg:before:to-transparent" : "")}>
+                {actions}
+              </div>
+            ) : null}
           </div>
-          <p className="text-base text-mist lg:hidden">{phone ? words.hintTouch : words.hint}</p>
         </div>
-      ) : null}
+      </div>
     </div>
   );
 }

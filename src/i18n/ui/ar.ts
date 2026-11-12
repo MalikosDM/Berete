@@ -489,6 +489,7 @@ export const ar: Messages = {
     metal: "المعدن",
     metals: { "yellow-gold": "ذهب أصفر عيار 18", "white-gold": "ذهب أبيض عيار 18", "rose-gold": "ذهب وردي عيار 18", platinum: "بلاتين", "black-rhodium": "روديوم أسود" },
     stoneColor: "لون الأحجار",
+    customize: "خصّصها",
     ambiance: "الإضاءة",
     ambiances: { studio: "استوديو", warm: "دافئة", spotlight: "ضوء مركّز" },
     light: "أدِر الضوء",

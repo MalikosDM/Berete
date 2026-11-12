@@ -439,6 +439,8 @@ export const en = {
     metal: "Metal",
     metals: { "yellow-gold": "18k yellow gold", "white-gold": "18k white gold", "rose-gold": "18k rose gold", platinum: "Platinum", "black-rhodium": "Black rhodium" },
     stoneColor: "Colour of the stones",
+    /** The title of the panel of choices beside the 3D viewer (metals, background, lighting). */
+    customize: "Customise",
     ambiance: "Lighting",
     ambiances: { studio: "Studio", warm: "Warm", spotlight: "Spotlight" },
     light: "Turn the light",

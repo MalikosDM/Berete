@@ -47,13 +47,19 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
           <p className="mt-4 max-w-2xl text-lg text-bone">{t.viewer.intro}</p>
         </div>
       </div>
-      {/* "See it in 3D", at the top of the page, comes here: the viewer whole on the screen. */}
+      {/* "See it in 3D", at the top of the page, comes here: the viewer whole on the screen, its choices and the WhatsApp button beside it. */}
       <div id="piece-3d-viewer" className="mt-10 scroll-mt-24">
-        <Jewel3D model={model} words={t.viewer} onSelection={setSelection} />
+        <Jewel3D
+          model={model}
+          words={t.viewer}
+          onSelection={setSelection}
+          actions={
+            <a href={waLink(t.viewer.wantMessage(piece.title, metals))} target="_blank" rel="noreferrer" data-want-3d className="inline-flex min-h-14 w-full items-center justify-center gap-3 bg-white px-5 py-3 text-center text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+              <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {t.viewer.want}
+            </a>
+          }
+        />
       </div>
-      <a href={waLink(t.viewer.wantMessage(piece.title, metals))} target="_blank" rel="noreferrer" data-want-3d className="mt-8 inline-flex min-h-14 w-full items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light sm:w-auto">
-        <BrandIcon name="whatsapp" className="size-5" /> {t.viewer.want}
-      </a>
     </section>
   );
 }

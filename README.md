@@ -102,6 +102,9 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
     pincement, double-clic / double-tap pour s'approcher d'un détail, **jamais de recentrage tout seul**, vues de face,
     côté, dessus, rotation, plein écran, image PNG. Éclairages HDRI de Poly Haven (CC0) dans `public/hdri/`, décodeur
     Draco dans `public/draco/`.
+  - Les choix (métal de chaque calque, fond, lumière) et les boutons WhatsApp sont dans un panneau « Personnaliser » à
+    droite du bijou sur ordinateur (il défile seul s'il est plus haut que le bijou), sous le bijou sur téléphone
+    (`src/viewer/layout.ts`).
 - **Espace client (VIP)** : onglet « Clients VIP » de l'admin. Chaque client a un espace privé sur le site (`/vip`)
   avec les pièces en 3D choisies pour lui (aussi depuis chaque modèle : « Partager dans l'espace VIP »). Il entre avec
   son **lien personnel** (`/vip/<lien>`, sans code) ou avec son **code d'accès** (montré une seule fois, « Créer un

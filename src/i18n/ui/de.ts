@@ -507,6 +507,7 @@ export const de: Messages = {
     metal: "Metall",
     metals: { "yellow-gold": "18 Karat Gelbgold", "white-gold": "18 Karat Weißgold", "rose-gold": "18 Karat Roségold", platinum: "Platin", "black-rhodium": "Schwarzes Rhodium" },
     stoneColor: "Farbe der Steine",
+    customize: "Personalisieren",
     ambiance: "Licht",
     ambiances: { studio: "Studio", warm: "Warm", spotlight: "Spot" },
     light: "Licht drehen",

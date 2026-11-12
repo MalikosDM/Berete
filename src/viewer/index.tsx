@@ -2,10 +2,11 @@
  * The 3D viewer, loaded only when it comes near the screen: three.js and its
  * tools (about 1 MB) never slow down the pages that do not show a model.
  */
-import { lazy, Suspense, useEffect, useRef, useState, type Ref } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
 import type { PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import type { Selection, ViewerHandle } from "./JewelViewer";
+import { CANVAS_SIZE, PANEL, VIEWER_GRID } from "./layout";
 
 const JewelViewer = lazy(() => import("./JewelViewer"));
 
@@ -17,17 +18,23 @@ type Props = {
   highlight?: string | null;
   settings?: PublicModel["settings"];
   onSelection?: (selection: Selection) => void;
+  /** Buttons at the foot of the panel of choices (WhatsApp): beside the jewel, right under the metals. */
+  actions?: ReactNode;
   className?: string;
   /** Load at once (private link, admin) instead of when it comes near the screen. */
   eager?: boolean;
   ref?: Ref<ViewerHandle>;
 };
 
-function Waiting({ model, words }: { model: PublicModel; words: Messages["viewer"] }) {
+/** In the viewer's place while it loads: the same frame, and the panel of choices beside it (computer). */
+function Waiting({ model, words, className = "" }: { model: PublicModel; words: Messages["viewer"]; className?: string }) {
   return (
-    <div className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden bg-ink sm:aspect-[4/3] lg:aspect-[16/10]" role="status">
-      {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-60" /> : null}
-      <span className="relative text-base text-bone">{words.preparing}</span>
+    <div className={VIEWER_GRID + " lg:gap-4 " + className}>
+      <div className={"relative flex w-full items-center justify-center overflow-hidden bg-ink " + CANVAS_SIZE} role="status">
+        {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-60" /> : null}
+        <span className="relative text-base text-bone">{words.preparing}</span>
+      </div>
+      <div className={"hidden lg:block " + PANEL} aria-hidden="true" />
     </div>
   );
 }
@@ -44,12 +51,12 @@ export function Jewel3D({ eager = false, ...props }: Props) {
   if (!near) {
     return (
       <div ref={spot}>
-        <Waiting model={props.model} words={props.words} />
+        <Waiting model={props.model} words={props.words} className={props.className} />
       </div>
     );
   }
   return (
-    <Suspense fallback={<Waiting model={props.model} words={props.words} />}>
+    <Suspense fallback={<Waiting model={props.model} words={props.words} className={props.className} />}>
       <JewelViewer {...props} />
     </Suspense>
   );

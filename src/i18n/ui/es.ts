@@ -493,6 +493,7 @@ export const es: Messages = {
     metal: "Metal",
     metals: { "yellow-gold": "Oro amarillo de 18 quilates", "white-gold": "Oro blanco de 18 quilates", "rose-gold": "Oro rosa de 18 quilates", platinum: "Platino", "black-rhodium": "Rodio negro" },
     stoneColor: "Color de las piedras",
+    customize: "Personalizar",
     ambiance: "Luz",
     ambiances: { studio: "Estudio", warm: "Cálida", spotlight: "Foco" },
     light: "Girar la luz",

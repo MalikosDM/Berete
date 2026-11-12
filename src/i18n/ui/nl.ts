@@ -493,6 +493,7 @@ export const nl: Messages = {
     metal: "Metaal",
     metals: { "yellow-gold": "18 karaat geelgoud", "white-gold": "18 karaat witgoud", "rose-gold": "18 karaat roségoud", platinum: "Platina", "black-rhodium": "Zwart rodium" },
     stoneColor: "Kleur van de stenen",
+    customize: "Personaliseren",
     ambiance: "Licht",
     ambiances: { studio: "Studio", warm: "Warm", spotlight: "Spot" },
     light: "Licht draaien",

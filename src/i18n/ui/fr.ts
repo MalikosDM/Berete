@@ -512,6 +512,7 @@ export const fr: Messages = {
     metal: "Métal",
     metals: { "yellow-gold": "Or jaune 18 carats", "white-gold": "Or blanc 18 carats", "rose-gold": "Or rose 18 carats", platinum: "Platine", "black-rhodium": "Rhodium noir" },
     stoneColor: "Couleur des pierres",
+    customize: "Personnaliser",
     ambiance: "Lumière",
     ambiances: { studio: "Studio", warm: "Chaude", spotlight: "Projecteur" },
     light: "Tourner la lumière",
