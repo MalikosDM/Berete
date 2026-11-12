@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, Check, Copy, Eye, EyeOff, LoaderCircle, Plus, RefreshCw, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Eye, EyeOff, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Upload } from "lucide-react";
 import { AMBIANCES, BACKGROUNDS, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
 import { bundleOf, loadLocale, useI18n, type Messages } from "@/i18n";
 import { Jewel3D, type ViewerHandle } from "@/viewer";
+import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
 
 /*
  * Admin "3D": send a model of the jeweller (.3dm, .glb, .stl, up to 800 MB,
- * sent in pieces), follow its processing, give each layer its role, choose
- * the metals offered and the first view, attach it to a piece or make a
- * private link for a client. In French, for the owner.
+ * sent in pieces), follow its processing, put it on the page of a piece (one
+ * model per piece), give each layer its role, choose the metals offered and
+ * the first view, share it with VIP clients or by a private link. In French,
+ * for the owner.
  */
 
 type LayerInfo = { name: string; meshes: number; copies: number; triangles: number; size: [number, number, number]; guess: LayerRole; check: boolean };
@@ -39,10 +41,6 @@ const AMBIANCE_NAMES: Record<string, string> = { studio: "Studio", warm: "Chaude
 const BACKGROUND_NAMES: Record<string, string> = { "studio-dark": "Studio sombre", black: "Noir", "studio-light": "Studio clair", white: "Blanc", rose: "Rosé", wood: "Table en noyer", velvet: "Velours noir", satin: "Satin champagne", leather: "Cuir blanc" };
 const STEP_NAMES: Record<string, string> = { read: "lecture du fichier", pieces: "pièces et pierres", full: "version ordinateur", light: "version téléphone" };
 
-const inputCls = "mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
-const btn = "inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-5 text-base font-semibold text-white hover:border-rose-light hover:text-rose-light disabled:opacity-50";
-const btnMain = "inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 text-base font-semibold text-ink hover:bg-rose-light disabled:opacity-60";
-const iconBtn = "inline-flex size-12 shrink-0 items-center justify-center border border-white/30 text-white hover:border-rose-light hover:text-rose-light";
 
 function mb(bytes: number | undefined): string {
   if (!bytes) return "–";
@@ -53,14 +51,64 @@ function count(n: number | undefined): string {
   return n === undefined ? "–" : n.toLocaleString("fr-FR");
 }
 
-async function call(token: string, method: string, url: string, body?: unknown): Promise<Record<string, unknown>> {
-  const headers: Record<string, string> = { Authorization: "Bearer " + token, Accept: "application/json" };
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  const res = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
-  const json = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  if (res.status === 401) throw new Error("expired");
-  if (!res.ok) throw new Error(typeof json.error === "string" ? json.error : "Une erreur est survenue, réessayez.");
-  return json;
+type PieceChoice = { slug: string; title: string };
+
+/** Sends the image of the viewer as the still image of the model (WebP, 1200 px wide at most). */
+async function sendPoster(token: string, id: string, viewer: ViewerHandle | null): Promise<boolean> {
+  const png = viewer?.capture();
+  if (!png) return false;
+  try {
+    const img = new Image();
+    img.src = png;
+    await img.decode();
+    const scale = Math.min(1, 1200 / img.width);
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(img.width * scale);
+    canvas.height = Math.round(img.height * scale);
+    canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/webp", 0.85));
+    if (!blob) return false;
+    const res = await fetch("/api/admin/models/" + id + "/poster", { method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "image/webp" }, body: blob });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/** The pieces of the site, in the order of the admin, to choose where a model is shown. */
+async function piecesOf(token: string): Promise<PieceChoice[]> {
+  const res = await call(token, "GET", "/api/admin/pieces");
+  return ((res.items as PieceChoice[]) ?? []).map((p) => ({ slug: p.slug, title: p.title }));
+}
+
+/** Puts a model on the page of a piece (the model the piece had leaves it), or takes it off ("" ). */
+async function showOnPiece(token: string, model: { id: string; pieceSlug: string | null }, slug: string): Promise<void> {
+  if (slug) await call(token, "PUT", "/api/admin/pieces/" + encodeURIComponent(slug) + "/model", { modelId: model.id });
+  else if (model.pieceSlug) await call(token, "PUT", "/api/admin/pieces/" + encodeURIComponent(model.pieceSlug) + "/model", { modelId: null });
+}
+
+/** The still image of a model, or a 3D mark while it has none. */
+function Poster({ m, className }: { m: { preview: PublicModel | null }; className: string }) {
+  return (
+    <span className={"flex items-center justify-center overflow-hidden bg-ink-soft " + className}>
+      {m.preview?.poster ? <img src={m.preview.poster} alt="" className="h-full w-full object-cover" /> : <Rotate3d className="size-7 text-mist" aria-hidden="true" />}
+    </span>
+  );
+}
+
+/** Where a model is shown: the select of the pieces, and a link to the page. */
+function PieceSelect({ value, pieces, onChange, busy }: { value: string; pieces: PieceChoice[]; onChange: (slug: string) => void; busy?: boolean }) {
+  return (
+    <label className="block text-base text-bone">
+      Page du site où il apparaît
+      <select value={value} onChange={(e) => onChange(e.target.value)} disabled={busy} className={inputCls} data-piece-select>
+        <option value="">Aucune (pas encore sur le site)</option>
+        {pieces.map((p) => (
+          <option key={p.slug} value={p.slug}>{p.title}</option>
+        ))}
+      </select>
+    </label>
+  );
 }
 
 /** Sends a big file in pieces of a few MB; a piece that fails is sent again. */
@@ -134,6 +182,9 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
   const [err, setErr] = useState("");
   const [sending, setSending] = useState<{ name: string; fraction: number } | null>(null);
   const [open, setOpen] = useState<string | null>(null);
+  const [pieces, setPieces] = useState<PieceChoice[]>([]);
+  const [placing, setPlacing] = useState<string | null>(null);
+  const [placed, setPlaced] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -147,6 +198,9 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
 
   useEffect(() => {
     let alive = true;
+    piecesOf(token)
+      .then((p) => alive && setPieces(p))
+      .catch(() => undefined);
     call(token, "GET", "/api/admin/models")
       .then((res) => alive && setItems((res.items as ModelRow[]) ?? []))
       .catch((x: unknown) => {
@@ -194,6 +248,25 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
     }
   };
 
+  // The page of the site where a model is shown, changed from the list (saved at once).
+  const place = async (m: ModelRow, slug: string) => {
+    setPlacing(m.id);
+    setErr("");
+    try {
+      await showOnPiece(token, m, slug);
+      await load();
+      setPlaced(m.id);
+      window.setTimeout(() => setPlaced((x) => (x === m.id ? null : x)), 2500);
+    } catch (x) {
+      if (x instanceof Error && x.message === "expired") return onExpired();
+      setErr(x instanceof Error ? x.message : "Enregistrement impossible.");
+    } finally {
+      setPlacing(null);
+    }
+  };
+
+  const titleOf = (slug: string) => pieces.find((p) => p.slug === slug)?.title ?? slug;
+
   if (open) return <Editor id={open} token={token} onExpired={onExpired} onClose={() => (setOpen(null), void load())} />;
 
   return (
@@ -222,42 +295,62 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
       ) : (
         <ul className="border-t border-white/15">
           {items.map((m) => (
-            <li key={m.id} className="grid gap-3 border-b border-white/15 py-5" data-model-row={m.sourceName} data-status={m.status}>
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="break-words text-lg text-white">{m.name}</p>
-                  <p className="text-base text-mist">
-                    {m.sourceName}
-                    {m.pieceSlug ? " · sur la pièce /" + m.pieceSlug : ""}
-                    {m.links.length > 0 ? " · " + m.links.length + (m.links.length > 1 ? " liens privés" : " lien privé") : ""}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  {m.status === "ready" ? (
-                    <button type="button" className={btn} onClick={() => setOpen(m.id)} data-open-model>
-                      Régler le modèle
+            <li key={m.id} className="grid gap-4 border-b border-white/15 py-6 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6" data-model-row={m.sourceName} data-status={m.status}>
+              <Poster m={m} className="size-28" />
+              <div className="grid min-w-0 gap-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="break-words text-xl text-white">{m.name}</p>
+                    {m.status === "ready" ? (
+                      m.pieceSlug ? (
+                        <a href={"/pieces/" + m.pieceSlug} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-12 items-center gap-2 text-base text-bone hover:text-rose-light" data-model-on-piece={m.pieceSlug}>
+                          Sur la page « {titleOf(m.pieceSlug)} » <ArrowUpRight className="size-4" aria-hidden="true" />
+                        </a>
+                      ) : (
+                        <p className="mt-1 text-base text-rose-light">Pas encore sur le site</p>
+                      )
+                    ) : null}
+                  </div>
+                  <div className="flex gap-2">
+                    {m.status === "ready" ? (
+                      <button type="button" className={btn} onClick={() => setOpen(m.id)} data-open-model>
+                        Régler le modèle
+                      </button>
+                    ) : null}
+                    <button type="button" aria-label="Supprimer le modèle" className={iconBtn} onClick={() => void remove(m)}>
+                      <Trash2 className="size-4" aria-hidden="true" />
                     </button>
-                  ) : null}
-                  <button type="button" aria-label="Supprimer" className={iconBtn} onClick={() => void remove(m)}>
-                    <Trash2 className="size-4" aria-hidden="true" />
-                  </button>
+                  </div>
                 </div>
+                {m.status === "queued" || m.status === "processing" ? (
+                  <div>
+                    <p className="text-base text-bone">
+                      {m.status === "queued" ? "En attente…" : "Optimisation : " + m.progress + " % (" + (STEP_NAMES[m.step] ?? m.step) + ")"}
+                    </p>
+                    <Bar value={m.progress} />
+                  </div>
+                ) : null}
+                {m.status === "failed" ? <p role="alert" className="text-base text-rose-light">Échec du traitement : {m.error}</p> : null}
+                {m.status === "ready" ? (
+                  <>
+                    <div className="grid gap-2 sm:max-w-md">
+                      <PieceSelect value={m.pieceSlug ?? ""} pieces={pieces} busy={placing === m.id} onChange={(slug) => void place(m, slug)} />
+                      {placed === m.id ? <p role="status" className="text-base text-bone">Enregistré.</p> : null}
+                    </div>
+                    {m.stats.stonesMissing ? <p className="text-base text-mist" data-stones-missing>Pierres fondues dans le métal : envoyez le .3dm pour voir les diamants.</p> : null}
+                    <details className="group">
+                      <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-mist hover:text-white">
+                        <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" /> Détails techniques
+                      </summary>
+                      <div className="mt-2 grid gap-3">
+                        <p className="text-base text-mist">Fichier : {m.sourceName}{m.links.length > 0 ? " · " + m.links.length + (m.links.length > 1 ? " liens privés" : " lien privé") : ""}</p>
+                        <Weights m={m} />
+                        {!m.stats.stonesMissing ? <StonesTable stats={m.stats} /> : null}
+                      </div>
+                    </details>
+                  </>
+                ) : null}
               </div>
-              {m.status === "queued" || m.status === "processing" ? (
-                <div>
-                  <p className="text-base text-bone">
-                    {m.status === "queued" ? "En attente…" : "Optimisation : " + m.progress + " % (" + (STEP_NAMES[m.step] ?? m.step) + ")"}
-                  </p>
-                  <Bar value={m.progress} />
-                </div>
-              ) : null}
-              {m.status === "failed" ? <p role="alert" className="text-base text-rose-light">Échec du traitement : {m.error}</p> : null}
-              {m.status === "ready" ? (
-                <>
-                  <Weights m={m} />
-                  <StonesTable stats={m.stats} />
-                </>
-              ) : null}
             </li>
           ))}
         </ul>
@@ -274,7 +367,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   const [name, setName] = useState("");
   const [settings, setSettings] = useState<ModelSettings | null>(null);
   const [pieceSlug, setPieceSlug] = useState("");
-  const [pieces, setPieces] = useState<{ slug: string; title: string }[]>([]);
+  const [pieces, setPieces] = useState<PieceChoice[]>([]);
   const [highlight, setHighlight] = useState<string | null>(null);
   const [words, setWords] = useState<Messages["viewer"]>(t.viewer);
   const [saving, setSaving] = useState(false);
@@ -311,14 +404,36 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         setPieceSlug(m.pieceSlug ?? "");
       })
       .catch(fail);
-    call(token, "GET", "/api/admin/pieces")
-      .then((res) => setPieces(((res.items as { slug: string; title: string }[]) ?? []).map((p) => ({ slug: p.slug, title: p.title }))))
+    piecesOf(token)
+      .then(setPieces)
       .catch(() => undefined);
     // The viewer speaks French here.
     loadLocale("fr")
       .then(() => setWords(bundleOf("fr").ui.viewer))
       .catch(() => undefined);
   }, [id, token, fail]);
+
+  // A model without a still image gets one, from the first view, once drawn: the lists of the admin and the
+  // page of the piece (while the model loads) show it.
+  const noPoster = model !== null && model.preview !== null && model.preview.poster === null;
+  useEffect(() => {
+    if (!noPoster) return undefined;
+    let done = false;
+    let wait = 0;
+    const timer = window.setInterval(() => {
+      if (done || !viewer.current?.isReady()) return;
+      done = true;
+      window.clearInterval(timer);
+      // Time for the progressive rendering to smooth the image.
+      wait = window.setTimeout(() => {
+        void sendPoster(token, id, viewer.current).then((sent) => sent && void load());
+      }, 2500);
+    }, 500);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(wait);
+    };
+  }, [noPoster, id, token, load]);
 
   if (!model || !settings) return <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>;
 
@@ -345,46 +460,38 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   const saveView = async () => {
     const view = viewer.current?.getView();
     if (!view) return;
-    const png = viewer.current?.capture();
-    if (png) {
-      try {
-        const img = new Image();
-        img.src = png;
-        await img.decode();
-        const scale = Math.min(1, 1200 / img.width);
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.round(img.width * scale);
-        canvas.height = Math.round(img.height * scale);
-        canvas.getContext("2d")?.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/webp", 0.85));
-        if (blob) await fetch("/api/admin/models/" + id + "/poster", { method: "POST", headers: { Authorization: "Bearer " + token, "Content-Type": "image/webp" }, body: blob });
-      } catch {
-        /* the view is saved without its image */
-      }
-    }
+    await sendPoster(token, id, viewer.current);
     await save({ view });
   };
 
   const preview = model.preview;
+  const legend = "px-2 text-lg text-white";
   return (
-    <div className="mt-8 grid gap-8" data-model-editor={model.sourceName}>
+    <div className="grid gap-8 pb-28" data-model-editor={model.sourceName}>
       <button type="button" onClick={onClose} className={btn + " justify-self-start"}>
         <ArrowLeft className="size-4" aria-hidden="true" /> Revenir aux modèles
       </button>
-      <div className="grid gap-3">
+
+      <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-base text-bone">
           Nom du modèle
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
         </label>
-        <Weights m={model} />
-        <StonesTable stats={model.stats} />
+        <div className="grid gap-2">
+          <PieceSelect value={pieceSlug} pieces={pieces} onChange={setPieceSlug} />
+          {model.pieceSlug ? (
+            <a href={"/pieces/" + model.pieceSlug} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 text-base text-bone hover:text-rose-light">
+              Voir la page <ArrowUpRight className="size-4" aria-hidden="true" />
+            </a>
+          ) : null}
+        </div>
       </div>
 
       {preview ? <Jewel3D ref={viewer} model={preview} words={words} settings={settings} highlight={highlight} eager /> : null}
 
       {/* Layers */}
       <fieldset className="border border-white/15 p-4 sm:p-5">
-        <legend className="px-2 text-base text-bone">Matières</legend>
+        <legend className={legend}>Matières</legend>
         <p className="text-base text-mist">Choisissez le rôle de chaque calque. « Voir seul » montre un calque.</p>
         <ul className="mt-4 grid gap-4">
           {model.layers.map((layer) => {
@@ -397,7 +504,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
                     {layer.name}
                     {layer.check ? <span className="ml-3 inline-block border border-rose-light/60 px-2 text-base text-rose-light">À vérifier</span> : null}
                     <span className="block text-mist">
-                      {count(layer.copies)} {layer.copies > 1 ? "exemplaires" : "exemplaire"} · proposé : {ROLE_NAMES[layer.guess]}
+                      {count(layer.copies)} {layer.copies > 1 ? "exemplaires" : "exemplaire"}
                     </span>
                   </p>
                   <button type="button" className={btn} aria-pressed={solo} onClick={() => setHighlight(solo ? null : layer.name)}>
@@ -442,9 +549,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </ul>
       </fieldset>
 
-      {/* Metals, lighting, background, piece */}
+      {/* Metals, lighting, background, first view */}
       <fieldset className="grid gap-5 border border-white/15 p-4 sm:p-5">
-        <legend className="px-2 text-base text-bone">Présentation</legend>
+        <legend className={legend}>Présentation</legend>
         <div>
           <p className="text-base text-bone">Métaux proposés au client</p>
           <div className="mt-2 flex flex-wrap gap-x-6">
@@ -456,7 +563,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
             ))}
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-base text-bone">
             Lumière de départ
             <select value={settings.ambiance} onChange={(e) => setSettings({ ...settings, ambiance: e.target.value as ModelSettings["ambiance"] })} className={inputCls}>
@@ -473,38 +580,50 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
               ))}
             </select>
           </label>
-          <label className="block text-base text-bone">
-            Afficher sur la page d'une pièce
-            <select value={pieceSlug} onChange={(e) => setPieceSlug(e.target.value)} className={inputCls} data-piece-select>
-              <option value="">Aucune</option>
-              {pieces.map((p) => (
-                <option key={p.slug} value={p.slug}>{p.title}</option>
-              ))}
-            </select>
-          </label>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
-            Enregistrer la vue
-          </button>
-          {settings.view ? (
-            <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
-              Effacer la vue
+        <div>
+          <p className="text-base text-bone">Vue de départ</p>
+          <p className="text-base text-mist">Tournez le bijou comme vous voulez qu'il apparaisse, puis enregistrez la vue. Elle sert aussi d'image d'aperçu.</p>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
+              Enregistrer la vue
             </button>
-          ) : null}
-          <button type="button" onClick={() => void save()} disabled={saving} className={btnMain} data-save-model>
-            {saving ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Check className="size-4" aria-hidden="true" />} Enregistrer
-          </button>
-          <button type="button" onClick={() => void call(token, "POST", "/api/admin/models/" + id + "/reprocess").then(onClose, fail)} className={btn}>
-            <RefreshCw className="size-4" aria-hidden="true" /> Relancer l'optimisation
-          </button>
+            {settings.view ? (
+              <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
+                Effacer la vue
+              </button>
+            ) : null}
+          </div>
         </div>
-        {note ? <p role="status" className="text-base text-bone">{note}</p> : null}
-        {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
       </fieldset>
 
       <ShareVip model={model} token={token} onError={fail} />
       <Links model={model} token={token} onChange={() => void load()} onError={fail} />
+
+      <details className="group border border-white/15 p-4 sm:p-5">
+        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-lg text-white">
+          <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden="true" /> Détails techniques
+        </summary>
+        <div className="mt-3 grid gap-4">
+          <p className="text-base text-mist">Fichier : {model.sourceName}</p>
+          <Weights m={model} />
+          <StonesTable stats={model.stats} />
+          <button type="button" onClick={() => void call(token, "POST", "/api/admin/models/" + id + "/reprocess").then(onClose, fail)} className={btn + " justify-self-start"}>
+            <RefreshCw className="size-4" aria-hidden="true" /> Relancer l'optimisation
+          </button>
+        </div>
+      </details>
+
+      {/* Always at hand: save the name, the page, the materials and the presentation. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-ink/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-5 py-3 sm:px-8">
+          <button type="button" onClick={() => void save()} disabled={saving} className={btnMain} data-save-model>
+            {saving ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Check className="size-4" aria-hidden="true" />} Enregistrer
+          </button>
+          {note ? <p role="status" className="text-base text-bone">{note}</p> : null}
+          {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
+        </div>
+      </div>
     </div>
   );
 }

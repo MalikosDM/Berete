@@ -1,21 +1,48 @@
 /* The 3D models seen by visitors (server/routes/models.ts). */
+import { useEffect, useState } from "react";
 import type { PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import { listOf } from "@/i18n/format";
+import { afterLoad } from "@/lib/idle";
 import type { Selection } from "@/viewer";
 
 let pieceModels: Promise<Record<string, PublicModel>> | null = null;
 
-/**
- * The model shown on the page of a piece, or null. The list of the pieces that have one is asked
- * once per visit: moving from piece to piece sends no new request.
- */
-export async function pieceModel(slug: string): Promise<PublicModel | null> {
+/** The pieces that have a 3D model, by piece. Asked once per visit: moving from page to page sends no new request. */
+function allPieceModels(): Promise<Record<string, PublicModel>> {
   pieceModels ??= fetch("/api/models/pieces", { headers: { Accept: "application/json" } })
     .then((res) => (res.ok ? (res.json() as Promise<Record<string, PublicModel>>) : {}))
     .catch(() => ({}));
-  const all = await pieceModels;
-  return all[slug] ?? null;
+  return pieceModels;
+}
+
+/** The model shown on the page of a piece, or null. */
+export async function pieceModel(slug: string): Promise<PublicModel | null> {
+  return (await allPieceModels())[slug] ?? null;
+}
+
+/**
+ * The pieces that have a 3D model (null until known), asked once the page has
+ * loaded so that it never delays the photos.
+ */
+export function usePieceModels(): Record<string, PublicModel> | null {
+  const [all, setAll] = useState<Record<string, PublicModel> | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const cancel = afterLoad(() => {
+      void allPieceModels().then((m) => alive && setAll(m));
+    });
+    return () => {
+      alive = false;
+      cancel();
+    };
+  }, []);
+  return all;
+}
+
+/** The model of one piece (null while unknown or when it has none). */
+export function usePieceModel(slug: string): PublicModel | null {
+  return usePieceModels()?.[slug] ?? null;
 }
 
 export type LinkAnswer =

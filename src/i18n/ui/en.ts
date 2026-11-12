@@ -423,6 +423,10 @@ export const en = {
   /** The 3D viewer (pages of pieces, private links) and the page of a private link. */
   viewer: {
     title: "Explore in 3D",
+    /** The button at the top of the page of a piece that has a 3D model. */
+    see: "See it in 3D",
+    /** The mark on the card of a piece that has a 3D model (read aloud). */
+    available: "Available in 3D",
     intro: "Turn it, come close to the smallest stone, try its metals.",
     canvasLabel: (piece: string) => piece + " in 3D",
     loading: (percent: number) => "Loading the 3D model · " + percent + "%",

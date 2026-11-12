@@ -35,8 +35,8 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w640.webp`, `cover.w160.webp`) que le navigateur
   choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
-- **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`) modifie les stories, joueurs, pièces et écrins dans la base,
-  et affiche les messages et demandes de rappel. Au démarrage, l'API ajoute à la base ce qui est nouveau dans `src/data/`
+- **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces, les
+  modèles 3D, les clients VIP, les stories, joueurs et écrins dans la base, et affiche les messages et demandes de rappel. Au démarrage, l'API ajoute à la base ce qui est nouveau dans `src/data/`
   (nouvelles stories, nouvelles photos, nouveaux textes) sans jamais écraser un texte modifié depuis l'admin.
 - **Le numéro WhatsApp, l'email, Instagram** : `src/lib/site.ts` (seul fichier à modifier).
 
@@ -64,11 +64,15 @@ néerlandais (`/nl/...`) et arabe (`/ar/...`, lu de droite à gauche). Le menu d
 
 Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien privé.
 
-- **Admin, onglet « 3D »** : envoyer un fichier `.3dm` (Rhino, le mieux : il garde les calques), `.glb` ou `.stl`,
-  jusqu'à 800 Mo (envoi par morceaux), suivre l'optimisation, donner un rôle à chaque calque (Métal avec son métal
-  par défaut, Diamant, Pierre de couleur avec sa couleur, Émail, Masquer ; « Voir seul » montre un calque), choisir les
-  métaux proposés, la lumière, le fond, « Enregistrer cette vue » (et son image d'attente), rattacher le modèle à une
-  pièce, créer des liens privés (expiration et mot de passe facultatifs) et les copier.
+- **Admin, onglet « Modèles 3D »** : envoyer un fichier `.3dm` (Rhino, le mieux : il garde les calques), `.glb` ou `.stl`,
+  jusqu'à 800 Mo (envoi par morceaux), suivre l'optimisation, choisir **la page du site où il apparaît** (menu de la
+  liste, enregistré tout de suite), donner un rôle à chaque calque (Métal avec son métal par défaut, Diamant, Pierre de
+  couleur avec sa couleur, Émail, Masquer ; « Voir seul » montre un calque), choisir les métaux proposés, la lumière, le
+  fond, « Enregistrer la vue », partager dans l'espace VIP, créer des liens privés (expiration et mot de passe
+  facultatifs) et les copier. Une image d'aperçu est faite toute seule à la première ouverture d'un modèle (puis à
+  chaque « Enregistrer la vue ») : elle sert dans les listes et pendant le chargement sur le site.
+- **Un modèle par pièce**, choisi depuis le modèle ou depuis la pièce (onglet « Pièces », « Modèle 3D sur la page ») :
+  le nouveau remplace l'ancien. Le lien suit la pièce si son adresse change ; une pièce supprimée libère son modèle.
 - **Les rôles des calques** sont devinés (pierre répétée des centaines de fois = diamant, grand volume = métal, nom du
   calque : « Diamonds », « Gold »…) puis **retenus par nom** : un fichier dont les calques portent les mêmes noms reçoit
   les mêmes rôles (table `LayerMemory`). Le fichier de test ZN1242-bj001 est déjà réglé (`server/models/demo.ts`,
@@ -83,8 +87,10 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
 - **Les fichiers** sont dans `storage/` (hors git, `MODELS_DIR` pour un autre dossier), derrière `server/models/storage.ts` :
   seul ce fichier change pour les mettre ailleurs (disque du VPS, stockage objet).
 - **Le visualiseur** (`src/viewer/`, three.js, React Three Fiber, chargé seulement quand il est montré) :
-  - diamants en vraie réfraction (rayons suivis dans la pierre, 7 rebonds, feu couleur par couleur) sous un éclairage de
-    bijoutier qui leur est propre et **attaché à chaque pierre**, sa table vers le haut (comme l'« oriented lighting »
+  - diamants en vraie réfraction (rayons suivis dans la pierre, jusqu'à 6 rebonds, **feu** : le rouge et le bleu
+    sortent de la dernière facette à leur propre angle, indices 2,408 à 2,451) sous un éclairage de bijoutier fin
+    (des centaines de panneaux étroits et de points lumineux, petite zone sombre au-dessus qui dessine les flèches
+    noires d'une vraie pierre) **attaché à chaque pierre**, sa table vers le haut (comme l'« oriented lighting »
     d'iJewel3D : toutes les pierres d'un pavé scintillent) — `materials.ts`, `diamondEnv.ts` ; plus léger sur téléphone,
     verre d'indice 2,42 seulement si un téléphone reste trop lent ;
   - **rendu progressif** : dès que la caméra s'arrête, 32 images décalées d'une fraction de pixel sont moyennées
@@ -101,7 +107,8 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
   son **lien personnel** (`/vip/<lien>`, sans code) ou avec son **code d'accès** (montré une seule fois, « Créer un
   nouveau code » pour en faire un autre). Session de 30 jours (cookie signé), jamais indexé. Le secret qui signe les
   sessions et les adresses des fichiers est gardé dans la base (`server/secret.ts`) ou dans `MODEL_SECRET`.
-- **Où il apparaît** : « Explore in 3D » sur la page d'une pièce qui a un modèle (bouton WhatsApp avec le métal choisi) ;
+- **Où il apparaît** : sur la page d'une pièce qui a un modèle, un bouton « See it in 3D » en haut et la section
+  « Explore in 3D » juste sous l'ouverture (bouton WhatsApp avec le métal choisi), et le repère « 3D » sur sa vignette ;
   `/view/<lien>` pour un client (logo, pièce en 3D, « I love it » / « I'd like a change » sur WhatsApp), jamais indexé.
 - **Vérifier** : `npm run verify:3d` (site construit lancé) envoie les fichiers de test par l'admin, ouvre chaque modèle
   sur ordinateur et iPhone avec le GPU, contrôle les liens et écrit `verification/3d/rapport.md` et ses captures.

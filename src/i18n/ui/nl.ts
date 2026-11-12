@@ -477,6 +477,10 @@ export const nl: Messages = {
   /** De 3D-viewer (pagina's van de stukken, privélinks) en de pagina van een privélink. */
   viewer: {
     title: "Ontdek in 3D",
+    /** The button at the top of the page of a piece that has a 3D model. */
+    see: "Bekijk in 3D",
+    /** The mark on the card of a piece that has a 3D model (read aloud). */
+    available: "Beschikbaar in 3D",
     intro: "Draai het, kom dicht bij de kleinste steen, probeer de metalen.",
     canvasLabel: (piece: string) => piece + " in 3D",
     loading: (percent: number) => "3D-model wordt geladen · " + percent + "%",

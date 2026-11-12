@@ -18,6 +18,8 @@ import Stage, { type Choices, type StageApi } from "./Stage";
 export type ViewerHandle = {
   getView(): ModelView | null;
   capture(): string | null;
+  /** The model is loaded and drawn (the admin then makes its still image, when it has none). */
+  isReady(): boolean;
 };
 
 /** The metal chosen for each metal layer, for the WhatsApp message. */
@@ -84,7 +86,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
     setBackground(backgroundOf(settings.background));
   }
 
-  useImperativeHandle(ref, () => ({ getView: () => api.current?.getView() ?? null, capture: () => api.current?.capture() ?? null }), []);
+  useImperativeHandle(ref, () => ({ getView: () => api.current?.getView() ?? null, capture: () => api.current?.capture() ?? null, isReady: () => readyAt.current > 0 && api.current !== null }), []);
 
   const offered = settings.metals.length > 0 ? METALS.filter((m) => settings.metals.includes(m)) : [...METALS];
   const metalLayers = present.filter((name) => (settings.layers[name]?.role ?? "metal") === "metal");

@@ -4,9 +4,9 @@
  *   GET  /models/piece/:slug          the model shown on the page of one piece (or null)
  *   GET  /view/:token                 a private link (POST with { password } when it has one)
  *   GET  /models/:id/files/:file      full.glb, light.glb, poster.webp (signed address, given by the two above)
- * and the admin (/admin/models..., /admin/links...), behind ADMIN_PASSWORD:
+ * and the admin (/admin/models..., /admin/links..., /admin/pieces/:slug/model), behind ADMIN_PASSWORD:
  *   upload by pieces (big files), processing in the background, layers and
- *   their roles, the piece it belongs to, private links.
+ *   their roles, the piece it is shown on (one model per piece), private links.
  */
 import express, { Router, type Request, type Response } from "express";
 import { createHmac, randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
@@ -302,12 +302,36 @@ models.put("/admin/models/:id", requireAdmin, async (req, res) => {
     res.status(400).json({ error: "Réglages invalides : " + body.error.issues.map((i) => i.path.join(".")).join(", ") });
     return;
   }
-  const row = await prisma.model3D.update({ where: { id: String(req.params.id) }, data: body.data }).catch(() => null);
+  const id = String(req.params.id);
+  // One model per piece: the one chosen here replaces the one the piece had.
+  const slug = body.data.pieceSlug;
+  const row = await prisma
+    .$transaction([...(slug ? [prisma.model3D.updateMany({ where: { pieceSlug: slug, id: { not: id } }, data: { pieceSlug: null } })] : []), prisma.model3D.update({ where: { id }, data: body.data })])
+    .catch(() => null);
   if (!row) {
     res.status(404).json({ error: "Modèle introuvable." });
     return;
   }
   await rememberLayers(body.data.settings);
+  res.json({ ok: true });
+});
+
+/** The model shown on the page of a piece, chosen from the piece (null: none). One model per piece. */
+models.put("/admin/pieces/:slug/model", requireAdmin, async (req, res) => {
+  const slug = String(req.params.slug);
+  const body = z.object({ modelId: z.string().min(1).max(64).nullable() }).safeParse(req.body);
+  if (!body.success || !/^[a-z0-9-]{1,200}$/.test(slug)) {
+    res.status(400).json({ error: "Choix invalide." });
+    return;
+  }
+  const { modelId } = body.data;
+  const done = await prisma
+    .$transaction([prisma.model3D.updateMany({ where: { pieceSlug: slug, ...(modelId ? { id: { not: modelId } } : {}) }, data: { pieceSlug: null } }), ...(modelId ? [prisma.model3D.update({ where: { id: modelId }, data: { pieceSlug: slug } })] : [])])
+    .catch(() => null);
+  if (!done) {
+    res.status(404).json({ error: "Modèle introuvable." });
+    return;
+  }
   res.json({ ok: true });
 });
 

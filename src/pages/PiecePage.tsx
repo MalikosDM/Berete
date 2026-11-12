@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import HorizontalGallery from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
@@ -18,6 +18,7 @@ import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story }
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
+import { usePieceModel } from "@/lib/models";
 import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
@@ -40,6 +41,8 @@ export default function PiecePage() {
   const cat = useCatalogue();
   const [viewer, setViewer] = useState<{ stories: Story[]; step: number } | null>(null);
   const piece = findPiece(cat, slug);
+  // The 3D model the jeweller attached to this piece, if any: shown right under the opening.
+  const model = usePieceModel(piece?.slug ?? slug);
   if (!piece) {
     const renamed = RENAMED_PIECES[slug];
     return renamed ? <Navigate to={"/pieces/" + renamed} replace /> : <NotFound />;
@@ -89,9 +92,15 @@ export default function PiecePage() {
               <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
                 <BrandIcon name="whatsapp" className="size-5" /> {t.piece.want}
               </a>
-              <a href="#piece-details" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
-                {t.piece.details} <ArrowDown className="size-4" aria-hidden="true" />
-              </a>
+              {model ? (
+                <a href="#piece-3d-viewer" data-see-3d className="inline-flex min-h-14 items-center justify-center gap-3 border border-rose-light/70 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                  <Rotate3d className="size-5" aria-hidden="true" /> {t.viewer.see}
+                </a>
+              ) : (
+                <a href="#piece-details" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                  {t.piece.details} <ArrowDown className="size-4" aria-hidden="true" />
+                </a>
+              )}
             </div>
           </div>
           <Link to="/creations" className="mt-8 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-mist hover:text-rose-light">
@@ -100,11 +109,11 @@ export default function PiecePage() {
         </div>
       </section>
 
+      {model ? <Piece3D piece={piece} model={model} /> : null}
+
       <div id="piece-details" className="scroll-mt-24">
         {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={t.piece.details} /> : null}
       </div>
-
-      <Piece3D piece={piece} />
 
       {/* Made for, and the story */}
       <section aria-label={t.piece.madeFor + " · " + t.piece.story} className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">

@@ -477,6 +477,10 @@ export const es: Messages = {
   /** El visor 3D (páginas de las piezas, enlaces privados) y la página de un enlace privado. */
   viewer: {
     title: "Explorar en 3D",
+    /** The button at the top of the page of a piece that has a 3D model. */
+    see: "Verla en 3D",
+    /** The mark on the card of a piece that has a 3D model (read aloud). */
+    available: "Disponible en 3D",
     intro: "Gírela, acérquese a la piedra más pequeña, pruebe sus metales.",
     canvasLabel: (piece: string) => piece + " en 3D",
     loading: (percent: number) => "Cargando el modelo 3D · " + percent + " %",

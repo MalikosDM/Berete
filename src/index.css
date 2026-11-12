@@ -131,6 +131,12 @@ html:is([lang="de"], [lang="nl"]) :is(h1, h2, h3, .title-caps) {
   }
 }
 
+/* Checkboxes and radio buttons in the house colour, not the browser's blue. */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-rose-light);
+}
+
 /* Rose gold: one accent, used sparingly */
 @utility text-rose-gold {
   background-image: linear-gradient(110deg, #9c5b4f 0%, #e8b4a0 35%, #f6d6c8 50%, #e8b4a0 62%, #b76e79 100%);

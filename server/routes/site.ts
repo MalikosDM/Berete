@@ -302,7 +302,12 @@ site.put("/admin/:kind/:id", requireAdmin, async (req, res) => {
   const p = kind.schema.safeParse(req.body);
   if (!p.success) return invalid(res, p.error);
   await guard(res, async () => {
-    await kind.table().update({ where: { id: String(req.params.id) }, data: p.data });
+    const id = String(req.params.id);
+    const before = req.params.kind === "pieces" ? await prisma.piece.findUnique({ where: { id }, select: { slug: true } }) : null;
+    await kind.table().update({ where: { id }, data: p.data });
+    // A piece that changes its address keeps its 3D model.
+    const slug = (p.data as { slug?: string }).slug;
+    if (before && slug && before.slug !== slug) await prisma.model3D.updateMany({ where: { pieceSlug: before.slug }, data: { pieceSlug: slug } });
     res.json({ ok: true });
   });
 });
@@ -311,7 +316,11 @@ site.delete("/admin/:kind/:id", requireAdmin, async (req, res) => {
   const kind = kindOf(req, res);
   if (!kind) return;
   await guard(res, async () => {
-    await kind.table().delete({ where: { id: String(req.params.id) } });
+    const id = String(req.params.id);
+    const before = req.params.kind === "pieces" ? await prisma.piece.findUnique({ where: { id }, select: { slug: true } }) : null;
+    await kind.table().delete({ where: { id } });
+    // Its 3D model stays in the admin, free for another piece.
+    if (before) await prisma.model3D.updateMany({ where: { pieceSlug: before.slug }, data: { pieceSlug: null } });
     res.json({ ok: true });
   });
 });

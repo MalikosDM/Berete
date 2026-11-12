@@ -4,6 +4,7 @@ import { SIZES_FOR } from "@/lib/responsive";
 import type { Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
+import { usePieceModels } from "@/lib/models";
 
 type Props = { piece: Piece; eager?: boolean; priority?: boolean; showType?: boolean; className?: string };
 
@@ -12,6 +13,7 @@ export default function PieceCard({ piece, eager = false, priority = false, show
   const cat = useCatalogue();
   const { t } = useI18n();
   const madeFor = useMadeFor();
+  const in3d = Boolean(usePieceModels()?.[piece.slug]);
   return (
     <Link to={"/pieces/" + piece.slug} data-piece-card={piece.slug} className={"group block " + className}>
       <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
@@ -20,6 +22,13 @@ export default function PieceCard({ piece, eager = false, priority = false, show
         </span>
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-rose-light/15 to-transparent transition-transform duration-[1.6s] ease-out group-hover:translate-x-full" />
         <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
+        {/* The pieces the jeweller attached a 3D model to. */}
+        {in3d ? (
+          <span data-card-3d className="absolute end-3 top-3 border border-rose-light/60 bg-ink/70 px-3 py-1 text-base font-semibold tracking-[0.16em] text-white backdrop-blur-sm">
+            <span aria-hidden="true">3D</span>
+            <span className="sr-only">{t.viewer.available}</span>
+          </span>
+        ) : null}
       </span>
       <span className="mt-5 flex items-start justify-between gap-4">
         <span className="min-w-0">

@@ -424,23 +424,33 @@ const demo = models["ZN1242-bj001.glb"];
   await context.close();
 }
 {
-  // The page of a piece shows "Explore in 3D" while the model is attached to it.
+  // The page of a piece shows "See it in 3D" at its top and "Explore in 3D" under it while a model is attached to it
+  // (chosen from the piece in the admin); its card shows "3D". What was attached before is put back at the end.
   const { items } = await api("GET", "/api/admin/pieces", undefined, token);
-  const piece = items.find((p) => p.type === "bracelet") ?? items[0];
-  const { settings } = await api("GET", "/api/admin/models/" + demo.id, undefined, token);
-  await api("PUT", "/api/admin/models/" + demo.id, { name: demo.name, settings, pieceSlug: piece.slug }, token);
+  const attached = await (await fetch(BASE + "/api/models/pieces")).json();
+  const piece = items.find((p) => !attached[p.slug] && p.type === "chain") ?? items.find((p) => !attached[p.slug]) ?? items[0];
+  const demoBefore = (await api("GET", "/api/admin/models/" + demo.id, undefined, token)).pieceSlug;
+  await api("PUT", "/api/admin/pieces/" + piece.slug + "/model", { modelId: demo.id }, token);
   const { context, page } = await open("desktop", "/pieces/" + piece.slug);
   await page.goto(BASE + "/pieces/" + piece.slug);
-  await page.locator("[data-piece-3d]").scrollIntoViewIfNeeded({ timeout: 30_000 });
+  await page.waitForSelector("[data-see-3d]", { timeout: 30_000 });
+  await page.click("[data-see-3d]");
   await page.waitForSelector("[data-piece-3d] [data-viewer] [data-metal]", { timeout: 120_000 });
   await page.waitForTimeout(1500);
+  const box = await page.locator("#piece-3d-viewer").boundingBox();
+  checks.push(["Bouton « See it in 3D » en haut de la page de la pièce : il amène au visualiseur (haut à " + Math.round(box?.y ?? -1) + " px)", box !== null && box.y >= 0 && box.y < 300]);
   await page.locator('[data-piece-3d] [data-metal-layer="图层01"] [data-metal="yellow-gold"]').click();
   await page.waitForTimeout(500);
   const want = await page.getAttribute("[data-want-3d]", "href");
   checks.push(["Page de la pièce /pieces/" + piece.slug + " : section « Explore in 3D », WhatsApp « " + decodeURIComponent(want.split("text=")[1] ?? "").slice(0, 170) + " »", want.includes("yellow")]);
   await page.locator("[data-piece-3d]").screenshot({ path: path.join(OUT, "page-piece-explore-in-3d.jpg"), type: "jpeg", quality: 85 });
+  await page.goto(BASE + "/creations");
+  // (Attached, not visible: the cards lower in the page fade in only when they reach the screen.)
+  const mark = await page.waitForSelector('[data-piece-card="' + piece.slug + '"] [data-card-3d]', { timeout: 60_000, state: "attached" }).then(() => true, () => false);
+  checks.push(["Vignette de la pièce dans les créations : repère « 3D »", mark]);
   await context.close();
-  await api("PUT", "/api/admin/models/" + demo.id, { name: demo.name, settings, pieceSlug: null }, token);
+  await api("PUT", "/api/admin/pieces/" + piece.slug + "/model", { modelId: null }, token);
+  if (demoBefore) await api("PUT", "/api/admin/pieces/" + demoBefore + "/model", { modelId: demo.id }, token);
 }
 {
   // The layer names of the test model were recognised (remembered from the first time they were set).

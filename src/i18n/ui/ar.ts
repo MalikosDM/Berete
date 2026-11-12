@@ -473,6 +473,10 @@ export const ar: Messages = {
   /** عارض الأبعاد الثلاثية (صفحات القطع والروابط الخاصة) وصفحة الرابط الخاص. */
   viewer: {
     title: "استكشفها بالأبعاد الثلاثية",
+    /** The button at the top of the page of a piece that has a 3D model. */
+    see: "شاهدها بالأبعاد الثلاثية",
+    /** The mark on the card of a piece that has a 3D model (read aloud). */
+    available: "متوفرة بالأبعاد الثلاثية",
     intro: "أدِرها، واقترب من أصغر حجر، وجرّب معادنها.",
     canvasLabel: (piece: string) => piece + " بالأبعاد الثلاثية",
     loading: (percent: number) => "جارٍ تحميل النموذج ثلاثي الأبعاد · " + percent + "٪",

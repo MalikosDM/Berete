@@ -8,7 +8,13 @@ export const btnMain = "inline-flex min-h-12 items-center justify-center gap-2 b
 export const iconBtn = "inline-flex size-12 shrink-0 items-center justify-center border border-white/30 text-white hover:border-rose-light hover:text-rose-light";
 
 /** A model as the admin lists it (server/routes/models.ts, adminView). */
-export type ModelSummary = { id: string; name: string; sourceName: string; status: string; preview: PublicModel | null };
+export type ModelSummary = { id: string; name: string; sourceName: string; status: string; pieceSlug: string | null; preview: PublicModel | null };
+
+/** The models ready to be shown (the others are still being optimised, or failed). */
+export async function readyModels(token: string): Promise<ModelSummary[]> {
+  const res = await adminCall(token, "GET", "/api/admin/models");
+  return ((res.items as ModelSummary[]) ?? []).filter((m) => m.status === "ready");
+}
 
 /** A call to the admin API; "expired" when the session ended. */
 export async function adminCall(token: string, method: string, url: string, body?: unknown): Promise<Record<string, unknown>> {

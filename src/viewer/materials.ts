@@ -80,9 +80,14 @@ const TRACE = /* glsl */ `
     return normalize(gemOrient * stoneDirection);
   }
 
+  // Where the red and the blue leave the stone (the green is returned).
+  vec3 gemExitR;
+  vec3 gemExitB;
+
   vec3 totalInternalReflection(vec3 ro, vec3 rd, vec3 normal, float ior, mat4 modelMatrixInverse) {
     vec3 rayDirection = toStone(refract(rd, normal, 1.0 / ior));
     vec3 rayOrigin = (modelMatrixInverse * vec4(vWorldPosition, 1.0)).xyz + rayDirection * gemEpsilon;
+    bool escaped = false;
     for (float i = 0.0; i < bounces; i++) {
       uvec4 faceIndices = uvec4(0u);
       vec3 faceNormal = vec3(0.0, 0.0, 1.0);
@@ -93,13 +98,25 @@ const TRACE = /* glsl */ `
       vec3 hitPos = rayOrigin + rayDirection * max(dist - gemEpsilon, 0.0);
       vec3 exitDirection = refract(rayDirection, faceNormal, ior);
       if (length(exitDirection) != 0.0) {
+        // The fire: each colour leaves at its own angle (diamond bends blue more than red). Near the critical
+        // angle the colours split widely, or the blue stays inside: the coloured flashes of a real stone.
+        vec3 r = refract(rayDirection, faceNormal, ior * (1.0 - gemDispersion));
+        vec3 b = refract(rayDirection, faceNormal, ior * (1.0 + gemDispersion));
+        gemExitR = toLighting(length(r) != 0.0 ? r : reflect(rayDirection, faceNormal));
+        gemExitB = toLighting(length(b) != 0.0 ? b : reflect(rayDirection, faceNormal));
         rayDirection = exitDirection;
+        escaped = true;
         break;
       }
       rayDirection = reflect(rayDirection, faceNormal);
       rayOrigin = hitPos + rayDirection * gemEpsilon * 2.0;
     }
-    return toLighting(rayDirection);
+    vec3 green = toLighting(rayDirection);
+    if (!escaped) {
+      gemExitR = green;
+      gemExitB = green;
+    }
+    return green;
   }
 `;
 
@@ -169,12 +186,15 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
     bvh.updateFrom(new MeshBVH(geometry.clone().toNonIndexed(), { strategy: SAH }));
     bvhCache.set(geometry, bvh);
   }
-  // The fire: the green ray is traced, red and blue are deduced from it (three full traces cost three times as much).
+  // The fire: the green ray is traced; red and blue split from it where it leaves the stone (three full traces would
+  // cost three times as much, for almost the same colours: most of the fire is made at the last facet).
   material.defines = { ...material.defines, CHROMATIC_ABERRATIONS: "", FAST_CHROMA: "" };
   let shader = material.fragmentShader
+    .replace("vec3 rayDirectionR = normalize(rayDirectionG + 1.0 * vec3(aberrationStrength / 2.0));", "vec3 rayDirectionR = gemExitR;")
+    .replace("vec3 rayDirectionB = normalize(rayDirectionG - 1.0 * vec3(aberrationStrength / 2.0));", "vec3 rayDirectionB = gemExitB;")
     // (The chunk of PMREM maps it includes is not needed for this flat lighting image, and gone from recent three.js.)
     .replace("#include <cube_uv_reflection_fragment>", "")
-    .replace("uniform float bounces;", "uniform float bounces;\n  uniform mat3 envRotation;\n  uniform mat3 gemOrient;\n  uniform float gemEpsilon;\n  uniform float contrast;\n  uniform float gain;")
+    .replace("uniform float bounces;", "uniform float bounces;\n  uniform mat3 envRotation;\n  uniform mat3 gemOrient;\n  uniform float gemEpsilon;\n  uniform float contrast;\n  uniform float gain;\n  uniform float gemDispersion;")
     .replace(
       "vec4 textureGradient(sampler2D envMap, vec3 rayDirection, vec3 directionCamPerfect) {",
       "vec4 textureGradient(sampler2D envMap, vec3 rayDirection, vec3 directionCamPerfect) {\n      rayDirection = envRotation * rayDirection;\n      directionCamPerfect = envRotation * directionCamPerfect;",
@@ -201,6 +221,8 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
   material.uniforms.gemEpsilon = { value: frame.epsilon };
   material.uniforms.contrast = { value: 1.25 };
   material.uniforms.gain = { value: 1.2 };
+  // Diamond: index 2.408 for red, 2.451 for blue, about 0.9 % on each side of 2.418; a little more, as in photographs.
+  material.uniforms.gemDispersion = { value: 0.012 };
   material.uniforms.envMap!.value = env;
   material.uniforms.bvh!.value = bvh;
   material.uniforms.bounces!.value = quality === "high" ? 5 : 4;

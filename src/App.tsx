@@ -72,9 +72,9 @@ export default function App() {
             {pages(l)}
           </Route>
         ))}
-        {/* The back-office, in French for the owner: one address only. */}
-        <Route path="admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
       </Route>
+      {/* The back-office, in French for the owner: one address only, its own sober page without the menu of the site. */}
+      <Route path="admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
     </Routes>
   );
 }

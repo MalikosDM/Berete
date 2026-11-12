@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEvent, type FormEvent, type ReactNode } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
+import Logo from "@/components/Logo";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
+import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
 
 /*
  * Back-office of the site (/admin), in French for the owner. It edits the same
@@ -20,6 +22,8 @@ type Field =
   | { key: string; label: string; type: "select"; options: readonly (readonly [string, string])[] }
   | { key: string; label: string; type: "image" | "media" | "medialist" }
   | { key: string; label: string; type: "specs" | "press" }
+  /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
+  | { key: string; label: string; type: "model3d" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
   | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
 
@@ -79,6 +83,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "featured", label: "Mettre à la une de l'accueil", type: "checkbox" },
       { key: "draft", label: "Brouillon (textes à valider)", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
+      { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
       { key: "specs", label: "Fiche technique (une ligne par info, ex. Or : 18 carats)", type: "specs" },
@@ -106,7 +111,36 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
   },
 };
 
-const TABS: { key: Tab; label: string }[] = [...(Object.keys(KINDS) as Kind[]).map((k) => ({ key: k as Tab, label: KINDS[k].label })), { key: "3d", label: "Modèles 3D" }, { key: "clients", label: "Clients VIP" }, { key: "messages", label: "Messages" }];
+/** The pieces and their 3D first: what the jeweller changes most. */
+const TABS: { key: Tab; label: string }[] = [
+  { key: "pieces", label: KINDS.pieces.label },
+  { key: "3d", label: "Modèles 3D" },
+  { key: "clients", label: "Clients VIP" },
+  { key: "stories", label: KINDS.stories.label },
+  { key: "people", label: KINDS.people.label },
+  { key: "boxes", label: KINDS.boxes.label },
+  { key: "messages", label: "Messages" },
+];
+
+/* The open tab, kept for the visit (a reload stays on it). */
+const TAB_KEY = "bj-admin-tab";
+
+function readTab(): Tab {
+  try {
+    const tab = sessionStorage.getItem(TAB_KEY);
+    return TABS.some((t) => t.key === tab) ? (tab as Tab) : "pieces";
+  } catch {
+    return "pieces";
+  }
+}
+
+function writeTab(tab: Tab): void {
+  try {
+    sessionStorage.setItem(TAB_KEY, tab);
+  } catch {
+    /* storage unavailable */
+  }
+}
 
 /* The session token, kept for the visit. */
 const TOKEN_KEY = "bj-admin-token";
@@ -134,20 +168,7 @@ function subscribeToken(callback: () => void): () => void {
   tokenListeners.add(callback);
   return () => tokenListeners.delete(callback);
 }
-const inputCls = "mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
-const btn = "inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-5 text-base font-semibold text-white hover:border-rose-light hover:text-rose-light disabled:opacity-50";
-const btnMain = "inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 text-base font-semibold text-ink hover:bg-rose-light disabled:opacity-60";
-const iconBtn = "inline-flex size-12 items-center justify-center border border-white/30 text-white hover:border-rose-light hover:text-rose-light";
-
-async function api(token: string, method: string, url: string, body?: unknown): Promise<Rec> {
-  const headers: Record<string, string> = { Authorization: "Bearer " + token, Accept: "application/json" };
-  if (body !== undefined) headers["Content-Type"] = "application/json";
-  const res = await fetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
-  const json = (await res.json().catch(() => ({}))) as Rec;
-  if (res.status === 401) throw new Error("expired");
-  if (!res.ok) throw new Error(typeof json.error === "string" ? json.error : "Une erreur est survenue, réessayez.");
-  return json;
-}
+const api = adminCall as (token: string, method: string, url: string, body?: unknown) => Promise<Rec>;
 
 async function upload(token: string, file: File): Promise<MediaItem> {
   const res = await fetch("/api/admin/upload", {
@@ -319,6 +340,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
         .filter((p) => p.length > 1 && p[0]!.trim())
         .map((p) => ({ label: p[0]!.trim(), value: p.slice(1).join(":").trim() }));
     else if (field.type === "translations") body[field.key] = cleanTranslations(v);
+    else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
         .split("\n")
@@ -330,11 +352,59 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
   return body;
 }
 
-function Editor({ kind, token, initial, onDone, onExpired }: { kind: Kind; token: string; initial: Rec; onDone: (saved: boolean) => void; onExpired: () => void }) {
+/**
+ * The 3D model shown on the page of a piece: none, or one of the models of
+ * the tab "Modèles 3D" (one per piece; a model already on another piece moves).
+ */
+function ModelPicker({ label, models, value, slug, titles, onChange }: { label: string; models: ModelSummary[] | null; value: string; slug: string; titles: Record<string, string>; onChange: (id: string) => void }) {
+  const option = "flex min-h-16 items-center gap-3 border px-3 py-2 text-base text-white has-[:checked]:border-rose-light";
+  return (
+    <fieldset className="border border-white/15 p-4" data-model-picker>
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      <p className="text-base text-mist">Les visiteurs le tournent et changent le métal, en haut de la page de la pièce.</p>
+      {models === null ? (
+        <p className="mt-3 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>
+      ) : models.length === 0 ? (
+        <p className="mt-3 text-base text-mist">Aucun modèle pour l'instant : envoyez-en un dans l'onglet Modèles 3D.</p>
+      ) : (
+        <ul className="mt-3 grid max-h-[26rem] gap-2 overflow-y-auto sm:grid-cols-2">
+          <li>
+            <label className={option + " border-white/10"}>
+              <input type="radio" name="model3d" className="size-5 shrink-0" checked={value === ""} onChange={() => onChange("")} />
+              Pas de modèle 3D
+            </label>
+          </li>
+          {models.map((m) => {
+            const elsewhere = m.pieceSlug && m.pieceSlug !== slug ? titles[m.pieceSlug] ?? m.pieceSlug : null;
+            return (
+              <li key={m.id}>
+                <label className={option + " border-white/10"} data-model-option={m.name}>
+                  <input type="radio" name="model3d" className="size-5 shrink-0" checked={value === m.id} onChange={() => onChange(m.id)} />
+                  <span className="block size-12 shrink-0 overflow-hidden bg-ink-soft">{m.preview?.poster ? <img src={m.preview.poster} alt="" className="h-full w-full object-cover" /> : null}</span>
+                  <span className="min-w-0">
+                    <span className="block break-words">{m.name}</span>
+                    {elsewhere ? <span className="block text-mist">Aujourd'hui sur « {elsewhere} »</span> : null}
+                  </span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </fieldset>
+  );
+}
+
+function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { kind: Kind; token: string; initial: Rec; models: ModelSummary[] | null; titles: Record<string, string>; onDone: (saved: boolean) => void; onExpired: () => void }) {
   const [f, setF] = useState<Rec>(() => toForm(kind, initial));
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  // The 3D model of a piece: null while untouched (then the one it has).
+  const [model3d, setModel3d] = useState<string | null>(null);
   const set = (k: string, v: unknown) => setF((p) => ({ ...p, [k]: v }));
+  const slugBefore = asText(initial.slug);
+  const modelBefore = (slugBefore && models?.find((m) => m.pieceSlug === slugBefore)?.id) || "";
+  const modelChosen = model3d ?? modelBefore;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
@@ -344,6 +414,7 @@ function Editor({ kind, token, initial, onDone, onExpired }: { kind: Kind; token
       const body = toBody(kind, f, initial);
       if (initial.id) await api(token, "PUT", "/api/admin/" + kind + "/" + initial.id, body);
       else await api(token, "POST", "/api/admin/" + kind, body);
+      if (kind === "pieces" && modelChosen !== modelBefore) await api(token, "PUT", "/api/admin/pieces/" + encodeURIComponent(asText(body.slug)) + "/model", { modelId: modelChosen || null });
       onDone(true);
     } catch (x) {
       if (x instanceof Error && x.message === "expired") return onExpired();
@@ -355,6 +426,7 @@ function Editor({ kind, token, initial, onDone, onExpired }: { kind: Kind; token
   const field = (d: Field): ReactNode => {
     const v = f[d.key];
     if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
+    if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
     if (d.type === "medialist") return <MediaField key={d.key} token={token} label={d.label} value={asList(v)} onChange={(l) => set(d.key, l)} />;
@@ -401,6 +473,8 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
   const [items, setItems] = useState<Rec[] | null>(null);
   const [err, setErr] = useState("");
   const [editing, setEditing] = useState<Rec | null>(null);
+  // The pieces show which of them has a 3D model, and choose it.
+  const [models, setModels] = useState<ModelSummary[] | null>(null);
   const name = KINDS[kind].name;
 
   const load = useCallback(async () => {
@@ -414,9 +488,20 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
     }
   }, [kind, token, onExpired]);
 
+  const loadModels = useCallback(() => {
+    if (kind !== "pieces") return;
+    readyModels(token)
+      .then(setModels)
+      .catch(() => setModels([]));
+  }, [kind, token]);
+
   // One Section per tab (key): it loads its list once.
   useEffect(() => {
     let alive = true;
+    if (kind === "pieces")
+      readyModels(token)
+        .then((m) => alive && setModels(m))
+        .catch(() => alive && setModels([]));
     api(token, "GET", "/api/admin/" + kind)
       .then((res) => {
         if (alive) setItems(Array.isArray(res.items) ? (res.items as Rec[]) : []);
@@ -456,7 +541,27 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
     }
   };
 
-  if (editing) return <Editor kind={kind} token={token} initial={editing} onExpired={onExpired} onDone={(saved) => { setEditing(null); if (saved) void load(); }} />;
+  const titles = Object.fromEntries((items ?? []).map((x) => [asText(x.slug), asText(x[name])]));
+  const has3d = new Set((models ?? []).map((m) => m.pieceSlug).filter(Boolean));
+
+  if (editing)
+    return (
+      <Editor
+        kind={kind}
+        token={token}
+        initial={editing}
+        models={models}
+        titles={titles}
+        onExpired={onExpired}
+        onDone={(saved) => {
+          setEditing(null);
+          if (saved) {
+            void load();
+            loadModels();
+          }
+        }}
+      />
+    );
 
   const thumbOf = (item: Rec): string => {
     if (typeof item.cover === "string") return item.cover;
@@ -479,16 +584,17 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
       ) : (
         <ul className="mt-8 border-t border-white/15">
           {items.map((item, i) => (
-            <li key={String(item.id)} className="flex flex-wrap items-center gap-4 border-b border-white/15 py-4">
+            <li key={String(item.id)} className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b border-white/15 py-4 sm:flex" data-admin-row={asText(item.slug)}>
               <span className="size-14 shrink-0 overflow-hidden bg-ink-soft">{thumbOf(item) ? <img src={thumbOf(item)} alt="" className="h-full w-full object-cover" /> : null}</span>
               <span className="min-w-0 flex-1">
-                <span className="block break-words text-lg text-white">
-                  {asText(item[name])}
-                  {item.draft === true ? <span className="ml-3 inline-block border border-rose-light/60 px-2 align-middle text-base text-rose-light">Brouillon</span> : null}
+                <span className="block break-words text-lg text-white">{asText(item[name])}</span>
+                <span className="mt-1 flex flex-wrap items-center gap-2 text-base text-mist">
+                  {has3d.has(asText(item.slug)) ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-3d>3D</span> : null}
+                  {item.draft === true ? <span className="border border-white/25 px-2 text-bone">Brouillon</span> : null}
+                  <span className="break-all">/{asText(item.slug)}{Array.isArray(item.media) ? " · " + item.media.length + " fichiers" : ""}</span>
                 </span>
-                <span className="block text-base text-mist">/{asText(item.slug)}{Array.isArray(item.media) ? " · " + item.media.length + " fichiers" : ""}</span>
               </span>
-              <span className="flex gap-2">
+              <span className="col-span-2 flex gap-2 sm:col-span-1">
                 <button type="button" aria-label="Monter" onClick={() => void move(i, -1)} className={iconBtn}><ArrowUp className="size-4" aria-hidden="true" /></button>
                 <button type="button" aria-label="Descendre" onClick={() => void move(i, 1)} className={iconBtn}><ArrowDown className="size-4" aria-hidden="true" /></button>
                 <button type="button" aria-label="Modifier" onClick={() => setEditing(item)} className={iconBtn}><Pencil className="size-4" aria-hidden="true" /></button>
@@ -551,12 +657,16 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
 
 export default function Admin() {
   const token = useSyncExternalStore(subscribeToken, readToken, () => "");
-  const [tab, setTab] = useState<Tab>("stories");
+  const [tab, setTab] = useState<Tab>(readTab);
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
   const logout = useCallback(() => writeToken(""), []);
+  const open = (next: Tab) => {
+    setTab(next);
+    writeTab(next);
+  };
 
   const login = async (e: FormEvent) => {
     e.preventDefault();
@@ -576,33 +686,63 @@ export default function Admin() {
   };
 
   return (
-    <section className="mx-auto max-w-5xl px-5 pt-36 pb-24 sm:px-8 lg:pt-44">
-      <p className="eyebrow">Back-office</p>
-      <h1 className="title-caps mt-5 text-[clamp(2.25rem,6vw,4.5rem)] tracking-[0.12em]">Administration</h1>
-      {!token ? (
-        <form onSubmit={login} className="mt-10 grid max-w-md gap-5">
-          <label className="block text-base text-bone">
-            Mot de passe
-            <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
-          </label>
-          {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
-          <button type="submit" disabled={busy || !password} className={btnMain}>{busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null} Se connecter</button>
-        </form>
-      ) : (
-        <>
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-            <div role="tablist" aria-label="Contenus" className="flex flex-wrap gap-3">
+    <div className="min-h-svh bg-ink text-white" lang="fr" data-admin>
+      {/* Its own bar: the logo, the site in a new tab, the tabs. */}
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:px-8">
+          <span className="flex min-w-0 items-center gap-4">
+            <Logo variant="mark" className="h-10 w-14 shrink-0" />
+            <span className="eyebrow truncate">Administration</span>
+          </span>
+          <span className="flex gap-2">
+            <a href="/" target="_blank" rel="noreferrer" className={btn + " px-3 sm:px-5"} aria-label="Voir le site">
+              <ArrowUpRight className="size-4" aria-hidden="true" /> <span className="hidden sm:inline">Voir le site</span>
+            </a>
+            {token ? (
+              <button type="button" onClick={logout} className={btn + " px-3 sm:px-5"} aria-label="Se déconnecter">
+                <LogOut className="size-4" aria-hidden="true" /> <span className="hidden sm:inline">Se déconnecter</span>
+              </button>
+            ) : null}
+          </span>
+        </div>
+        {token ? (
+          <nav aria-label="Rubriques" className="mx-auto max-w-6xl">
+            <div role="tablist" className="no-scrollbar flex gap-1 overflow-x-auto px-3 sm:px-6">
               {TABS.map((t) => (
-                <button key={t.key} type="button" role="tab" aria-selected={tab === t.key} onClick={() => setTab(t.key)} className={btn + (tab === t.key ? " border-rose-light text-rose-light" : "")}>
+                <button
+                  key={t.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={tab === t.key}
+                  onClick={() => open(t.key)}
+                  className={"min-h-12 shrink-0 border-b-2 px-3 text-base font-semibold whitespace-nowrap transition-colors " + (tab === t.key ? "border-rose-light text-rose-light" : "border-transparent text-bone hover:text-white")}
+                >
                   {t.label}
                 </button>
               ))}
             </div>
-            <button type="button" onClick={logout} className={btn}><LogOut className="size-4" aria-hidden="true" /> Se déconnecter</button>
-          </div>
-          {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
-        </>
-      )}
-    </section>
+          </nav>
+        ) : null}
+      </header>
+
+      <main className="mx-auto max-w-6xl px-5 pt-8 pb-24 sm:px-8">
+        {!token ? (
+          <form onSubmit={login} className="mx-auto mt-16 grid max-w-md gap-5 border border-white/15 p-6 sm:p-8">
+            <h1 className="title-caps text-3xl tracking-[0.12em]">Se connecter</h1>
+            <label className="block text-base text-bone">
+              Mot de passe
+              <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputCls} />
+            </label>
+            {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
+            <button type="submit" disabled={busy || !password} className={btnMain}>{busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null} Se connecter</button>
+          </form>
+        ) : (
+          <>
+            <h1 className="sr-only">Administration · {TABS.find((t) => t.key === tab)?.label}</h1>
+            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+          </>
+        )}
+      </main>
+    </div>
   );
 }

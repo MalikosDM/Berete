@@ -491,6 +491,10 @@ export const de: Messages = {
   /** Der 3D-Viewer (Seiten der Stücke, private Links) und die Seite eines privaten Links. */
   viewer: {
     title: "In 3D entdecken",
+    /** The button at the top of the page of a piece that has a 3D model. */
+    see: "In 3D ansehen",
+    /** The mark on the card of a piece that has a 3D model (read aloud). */
+    available: "In 3D verfügbar",
     intro: "Drehen Sie es, gehen Sie bis zum kleinsten Stein heran, probieren Sie die Metalle.",
     canvasLabel: (piece: string) => piece + " in 3D",
     loading: (percent: number) => "3D-Modell wird geladen · " + percent + " %",
