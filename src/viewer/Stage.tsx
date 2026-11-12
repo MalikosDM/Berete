@@ -331,17 +331,53 @@ export default function Stage(props: Props) {
     // The element the controls listen on (the box around the canvas, as drei chooses it).
     const { events, gl } = get();
     const holder = (events.connected as HTMLElement | undefined) ?? gl.domElement;
-    // A pinch arrives as a wheel event with the Ctrl key: it is stopped on its way down, before the controls, and sent
-    // again to them without the key (only to them: the page itself does not scroll).
+    const toControls = (deltaY: number, clientX: number, clientY: number) => holder.dispatchEvent(new WheelEvent("wheel", { deltaY, deltaMode: 0, clientX, clientY, cancelable: true }));
+    // Safari sends its own pinch events (gesture…, with the scale of the fingers), and enlarges the whole page when they
+    // are let through: they become the same wheel, towards the fingers. Meanwhile any Ctrl wheel it adds is dropped.
+    let pinching = false;
+    let lastScale = 1;
+    // Chrome and Firefox: a pinch arrives as a wheel event with the Ctrl key. It is stopped on its way down, before the
+    // controls, and sent again to them without the key (only to them: the page itself does not scroll).
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey) return;
       e.preventDefault();
       e.stopPropagation();
+      if (pinching) return;
       const { deltaX, deltaY, deltaMode, clientX, clientY, screenX, screenY } = e;
       holder.dispatchEvent(new WheelEvent("wheel", { deltaX, deltaY, deltaMode, clientX, clientY, screenX, screenY, cancelable: true }));
     };
+    type Gesture = Event & { scale: number; clientX: number; clientY: number };
+    const onGestureStart = (e: Event) => {
+      e.preventDefault();
+      pinching = true;
+      lastScale = 1;
+    };
+    const onGestureChange = (e: Event) => {
+      e.preventDefault();
+      const g = e as Gesture;
+      if (!(g.scale > 0)) return;
+      // Fingers apart by a ratio r: the camera comes r times closer (the wheel of the controls: 0.95 per 12.5 points).
+      const ratio = g.scale / lastScale;
+      lastScale = g.scale;
+      toControls(-243.7 * Math.log(ratio), g.clientX, g.clientY);
+    };
+    const onGestureEnd = (e: Event) => {
+      e.preventDefault();
+      pinching = false;
+    };
     holder.addEventListener("wheel", onWheel, { capture: true, passive: false });
-    return () => holder.removeEventListener("wheel", onWheel, { capture: true });
+    // Not on a touch screen (iPhone, iPad): there the fingers are already followed by the controls themselves.
+    if (navigator.maxTouchPoints === 0) {
+      holder.addEventListener("gesturestart", onGestureStart, { passive: false });
+      holder.addEventListener("gesturechange", onGestureChange, { passive: false });
+      holder.addEventListener("gestureend", onGestureEnd, { passive: false });
+    }
+    return () => {
+      holder.removeEventListener("wheel", onWheel, { capture: true });
+      holder.removeEventListener("gesturestart", onGestureStart);
+      holder.removeEventListener("gesturechange", onGestureChange);
+      holder.removeEventListener("gestureend", onGestureEnd);
+    };
   }, [get]);
 
   /* Double-click or double-tap: glide towards the detail under the finger */

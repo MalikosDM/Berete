@@ -1,6 +1,7 @@
-import { Fragment, lazy, Suspense, type ReactNode } from "react";
+import { Fragment, Suspense, type ReactNode } from "react";
 import { Route, Routes, useParams } from "react-router";
 import Layout from "@/components/Layout";
+import { lazyPart } from "@/lib/lazy";
 import { DEFAULT_LOCALE, LOCALES, Navigate } from "@/i18n";
 import About from "@/pages/About";
 import Atelier, { Boxes } from "@/pages/Atelier";
@@ -15,9 +16,9 @@ import Players, { PlayerPage } from "@/pages/Players";
 import Process from "@/pages/Process";
 
 // The back-office and the private 3D links are loaded only when they are opened.
-const Admin = lazy(() => import("@/pages/Admin"));
-const ViewLink = lazy(() => import("@/pages/ViewLink"));
-const Vip = lazy(() => import("@/pages/Vip"));
+const Admin = lazyPart(() => import("@/pages/Admin"));
+const ViewLink = lazyPart(() => import("@/pages/ViewLink"));
+const Vip = lazyPart(() => import("@/pages/Vip"));
 
 /**
  * A page of one piece, person or collection starts afresh when its address

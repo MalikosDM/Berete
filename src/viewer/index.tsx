@@ -1,14 +1,16 @@
 /*
  * The 3D viewer, loaded only when it comes near the screen: three.js and its
- * tools (about 1 MB) never slow down the pages that do not show a model.
+ * tools (about 1 MB) never slow down the pages that do not show a model. If it
+ * cannot load, it says so in its place (with "Retry"): the page stays.
  */
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { Component, Suspense, useEffect, useRef, useState, type ReactNode, type Ref } from "react";
+import { lazyPart } from "@/lib/lazy";
 import type { PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import type { Selection, ViewerHandle } from "./JewelViewer";
 import { CANVAS_SIZE, PANEL, VIEWER_GRID } from "./layout";
 
-const JewelViewer = lazy(() => import("./JewelViewer"));
+const JewelViewer = lazyPart(() => import("./JewelViewer"));
 
 export type { Selection, ViewerHandle };
 
@@ -26,17 +28,39 @@ type Props = {
   ref?: Ref<ViewerHandle>;
 };
 
-/** In the viewer's place while it loads: the same frame, and the panel of choices beside it (computer). */
-function Waiting({ model, words, className = "" }: { model: PublicModel; words: Messages["viewer"]; className?: string }) {
+/** In the viewer's place while it loads (or when it could not): the same frame, and the panel of choices beside it (computer). */
+function Waiting({ model, words, className = "", failed = false }: { model: PublicModel; words: Messages["viewer"]; className?: string; failed?: boolean }) {
   return (
-    <div className={VIEWER_GRID + " lg:gap-4 " + className}>
+    <div className={VIEWER_GRID + " lg:gap-4 " + className} data-viewer-failed={failed || undefined}>
       <div className={"relative flex w-full items-center justify-center overflow-hidden bg-ink " + CANVAS_SIZE} role="status">
         {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-60" /> : null}
-        <span className="relative text-base text-bone">{words.preparing}</span>
+        {failed ? (
+          <span className="relative flex flex-col items-center gap-4 px-6 text-center">
+            <span className="text-base text-bone">{words.failed}</span>
+            <button type="button" onClick={() => window.location.reload()} className="inline-flex min-h-12 items-center rounded-full border border-white/40 bg-ink/60 px-6 text-base text-white hover:border-rose-light hover:text-rose-light">
+              {words.retry}
+            </button>
+          </span>
+        ) : (
+          <span className="relative text-base text-bone">{words.preparing}</span>
+        )}
       </div>
       <div className={"hidden lg:block " + PANEL} aria-hidden="true" />
     </div>
   );
+}
+
+/** Whatever breaks inside the viewer stays inside it: "could not be loaded" in its place, the rest of the page untouched. */
+class Guard extends Component<{ fallback: ReactNode; children: ReactNode }, { broken: boolean }> {
+  override state = { broken: false };
+
+  static getDerivedStateFromError() {
+    return { broken: true };
+  }
+
+  override render() {
+    return this.state.broken ? this.props.fallback : this.props.children;
+  }
 }
 
 export function Jewel3D({ eager = false, ...props }: Props) {
@@ -56,8 +80,10 @@ export function Jewel3D({ eager = false, ...props }: Props) {
     );
   }
   return (
-    <Suspense fallback={<Waiting model={props.model} words={props.words} className={props.className} />}>
-      <JewelViewer {...props} />
-    </Suspense>
+    <Guard fallback={<Waiting model={props.model} words={props.words} className={props.className} failed />}>
+      <Suspense fallback={<Waiting model={props.model} words={props.words} className={props.className} />}>
+        <JewelViewer {...props} />
+      </Suspense>
+    </Guard>
   );
 }

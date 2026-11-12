@@ -194,7 +194,10 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
 
   return (
     <div ref={wrap} data-viewer className={VIEWER_GRID + " " + (isFull ? "fixed inset-0 z-[100] flex flex-col overflow-y-auto bg-ink lg:overflow-hidden" : "lg:gap-4 " + className)}>
+      {/* The wheel over the jewel brings it closer and never scrolls the page as well (data-lenis-prevent: the smooth
+          scrolling of the site leaves it alone). */}
       <div
+        data-lenis-prevent
         onPointerDownCapture={() => setTouched(true)}
         onWheelCapture={() => setTouched(true)}
         className={"relative w-full overflow-hidden " + (isFull ? "min-h-[60svh] flex-1 lg:h-full lg:min-h-0" : CANVAS_SIZE)}

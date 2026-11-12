@@ -462,6 +462,36 @@ const demo = models["ZN1242-bj001.glb"];
   const want = await page.getAttribute("[data-want-3d]", "href");
   checks.push(["Page de la pièce /pieces/" + piece.slug + " : section « Explore in 3D », WhatsApp « " + decodeURIComponent(want.split("text=")[1] ?? "").slice(0, 170) + " »", want.includes("yellow")]);
   await page.locator("[data-piece-3d]").screenshot({ path: path.join(OUT, "page-piece-explore-in-3d.jpg"), type: "jpeg", quality: 85 });
+  // The wheel (or two fingers on a trackpad) over the jewel brings it closer, and never scrolls the page as well.
+  {
+    const frame = await page.locator("[data-piece-3d] [data-viewer] canvas").boundingBox();
+    const before = await page.evaluate(() => window.scrollY);
+    await page.mouse.move(frame.x + frame.width / 2, frame.y + frame.height / 2);
+    for (let i = 0; i < 4; i++) {
+      await page.mouse.wheel(0, -80);
+      await page.waitForTimeout(60);
+    }
+    await page.waitForTimeout(1200);
+    const moved = Math.round((await page.evaluate(() => window.scrollY)) - before);
+    checks.push(["Molette sur le bijou : il se rapproche, la page ne défile pas (" + moved + " px)", moved === 0]);
+  }
+  // A new version of the site while the page is open: the file of the viewer is gone. The page loads again by itself
+  // and shows the 3D; if the file stays missing (no network), the viewer says so in its place and the page stays.
+  for (const always of [false, true]) {
+    const missing = await context.newPage();
+    let refused = 0;
+    await missing.route(/\/assets\/JewelViewer-[^/]*\.js$/, (route) => (always || refused++ === 0 ? route.fulfill({ status: 404, contentType: "text/html", body: "" }) : route.continue()));
+    await missing.goto(BASE + "/pieces/" + piece.slug);
+    if (always) {
+      const shown = await missing.waitForSelector("[data-viewer-failed]", { timeout: 60_000 }).then(() => true, () => false);
+      const pageText = await missing.evaluate(() => document.body.innerText.length);
+      checks.push(["Fichier de la 3D toujours introuvable : message « " + (await missing.locator("[data-viewer-failed]").innerText().catch(() => "")).split("\n")[0] + " » à sa place, le reste de la page reste affiché", shown && pageText > 500]);
+    } else {
+      const shown = await missing.waitForSelector("[data-piece-3d] [data-viewer] [data-metal]", { timeout: 120_000 }).then(() => true, () => false);
+      checks.push(["Fichier de la 3D introuvable une fois (nouvelle version du site) : la page se recharge seule et la 3D s'affiche", shown]);
+    }
+    await missing.close();
+  }
   await page.goto(BASE + "/creations");
   // (Attached, not visible: the cards lower in the page fade in only when they reach the screen.)
   const mark = await page.waitForSelector('[data-piece-card="' + piece.slug + '"] [data-card-3d]', { timeout: 60_000, state: "attached" }).then(() => true, () => false);
