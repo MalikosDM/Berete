@@ -4,7 +4,9 @@ import { Check, ChevronDown, LoaderCircle, Mail } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
 import ContactBlock from "@/components/ContactBlock";
 import { useI18n } from "@/i18n";
+import WhatsAppHandoff from "@/components/WhatsAppHandoff";
 import { sendMessage } from "@/lib/api";
+import { HAS_SERVER, waLink } from "@/lib/site";
 import { getLenis } from "@/lib/gsap";
 
 export default function Contact() {
@@ -39,8 +41,8 @@ function EmailForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [error, setError] = useState("");
+  // "whatsapp": handed to WhatsApp (no server); "error": the server did not take it, WhatsApp offered instead.
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "whatsapp" | "error">("idle");
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; message?: string }>({});
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
@@ -52,14 +54,17 @@ function EmailForm() {
     setFieldErrors(errs);
     if (errs.name || errs.email || errs.message) return;
 
+    // Without the server, the message opens in WhatsApp, already written (in the click itself, so never blocked).
+    if (!HAS_SERVER) {
+      window.open(waLink(written), "_blank", "noopener");
+      setStatus("whatsapp");
+      return;
+    }
     setStatus("sending");
     const res = await sendMessage({ name: name.trim(), email: email.trim(), message: message.trim(), company, language: locale });
-    if (res.ok) setStatus("sent");
-    else {
-      setError(res.error === "network" ? t.contact.errNetwork : t.contact.errServer);
-      setStatus("error");
-    }
+    setStatus(res.ok ? "sent" : "error");
   };
+  const written = t.contact.emailWhatsapp(name.trim(), email.trim(), message.trim());
 
   const input =
     "mt-2 block w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
@@ -89,6 +94,8 @@ function EmailForm() {
                   <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />
                   {t.contact.emailSent}
                 </p>
+              ) : status === "whatsapp" ? (
+                <WhatsAppHandoff message={written} failed={false} />
               ) : (
                 <form onSubmit={submit} noValidate className="grid gap-6">
                   <div className="grid gap-6 sm:grid-cols-2">
@@ -148,9 +155,9 @@ function EmailForm() {
                       {t.contact.emailButton}
                     </button>
                     {status === "error" ? (
-                      <p role="alert" className="mt-4 text-base text-rose-light">
-                        {error}
-                      </p>
+                      <div className="mt-6">
+                        <WhatsAppHandoff message={written} failed />
+                      </div>
                     ) : null}
                   </div>
                 </form>

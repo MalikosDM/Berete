@@ -5,7 +5,7 @@ import BrandIcon from "@/components/BrandIcon";
 import { useI18n } from "@/i18n";
 import { localizePath } from "@/i18n/locales";
 import { metalsInWords, vipEnter, vipLeave, vipMe, type VipAnswer } from "@/lib/models";
-import { waLink } from "@/lib/site";
+import { HAS_SERVER, waLink } from "@/lib/site";
 import type { PublicModel } from "@/data/models";
 import { Jewel3D, type Selection } from "@/viewer";
 
@@ -62,6 +62,20 @@ export default function Vip() {
 
   const w = t.vip;
   const button = "inline-flex min-h-14 items-center justify-center gap-3 px-7 text-base font-semibold uppercase tracking-[0.12em] transition-colors";
+
+  // The version online without its server: the space opens soon, the pieces come by WhatsApp meanwhile.
+  if (!HAS_SERVER) {
+    return (
+      <section className="mx-auto max-w-xl px-5 pt-40 pb-24 sm:px-8" data-vip-soon>
+        <p className="eyebrow">{w.eyebrow}</p>
+        <h1 className="title-caps mt-4 text-[clamp(2.25rem,5vw,3.75rem)] tracking-[0.1em]">{w.title}</h1>
+        <p className="mt-5 text-lg text-bone">{w.soon}</p>
+        <a href={waLink(w.soonMessage)} target="_blank" rel="noreferrer" className={button + " mt-10 w-full bg-white text-ink hover:bg-rose-light sm:w-auto"}>
+          <BrandIcon name="whatsapp" className="size-5" /> {t.contact.openWhatsapp}
+        </a>
+      </section>
+    );
+  }
 
   if (state.state === "loading") {
     return (

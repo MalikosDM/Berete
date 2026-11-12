@@ -5,7 +5,13 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "rewrites": [{ "source": "/:lang(fr|es|de|nl|ar)/:path*", "destination": "/:lang/404.html" }],
+  "rewrites": [
+    { "source": "/view/:token", "destination": "/app.html" },
+    { "source": "/:lang(fr|es|de|nl|ar)/view/:token", "destination": "/app.html" },
+    { "source": "/vip/:token?", "destination": "/app.html" },
+    { "source": "/:lang(fr|es|de|nl|ar)/vip/:token?", "destination": "/app.html" },
+    { "source": "/:lang(fr|es|de|nl|ar)/:path*", "destination": "/:lang/404.html" }
+  ],
   "headers": [
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
     { "source": "/media/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }] },

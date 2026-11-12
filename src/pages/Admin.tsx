@@ -6,6 +6,7 @@ import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
 import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
+import { HAS_SERVER } from "@/lib/site";
 
 /*
  * Back-office of the site (/admin), in French for the owner. It edits the same
@@ -726,7 +727,15 @@ export default function Admin() {
       </header>
 
       <main className="mx-auto max-w-6xl px-5 pt-8 pb-24 sm:px-8">
-        {!token ? (
+        {!HAS_SERVER ? (
+          // The version online without its server: nothing to log into yet.
+          <div className="mx-auto mt-16 grid max-w-md gap-4 border border-white/15 p-6 sm:p-8" data-admin-offline>
+            <h1 className="title-caps text-3xl tracking-[0.12em]">Pas encore en ligne</h1>
+            <p className="text-base text-bone">
+              Cette version du site n’a pas de serveur : l’administration, les modèles 3D, l’espace VIP et les formulaires en ont besoin. Ils fonctionneront sur le serveur définitif. En attendant, les formulaires du site ouvrent WhatsApp avec la demande déjà écrite.
+            </p>
+          </div>
+        ) : !token ? (
           <form onSubmit={login} className="mx-auto mt-16 grid max-w-md gap-5 border border-white/15 p-6 sm:p-8">
             <h1 className="title-caps text-3xl tracking-[0.12em]">Se connecter</h1>
             <label className="block text-base text-bone">

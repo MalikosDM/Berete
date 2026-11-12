@@ -4,15 +4,18 @@ import type { PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import { listOf } from "@/i18n/format";
 import { afterLoad } from "@/lib/idle";
+import { HAS_SERVER } from "@/lib/site";
 import type { Selection } from "@/viewer";
 
 let pieceModels: Promise<Record<string, PublicModel>> | null = null;
 
 /** The pieces that have a 3D model, by piece. Asked once per visit: moving from page to page sends no new request. */
 function allPieceModels(): Promise<Record<string, PublicModel>> {
-  pieceModels ??= fetch("/api/models/pieces", { headers: { Accept: "application/json" } })
-    .then((res) => (res.ok ? (res.json() as Promise<Record<string, PublicModel>>) : {}))
-    .catch(() => ({}));
+  pieceModels ??= !HAS_SERVER
+    ? Promise.resolve({})
+    : fetch("/api/models/pieces", { headers: { Accept: "application/json" } })
+        .then((res) => (res.ok ? (res.json() as Promise<Record<string, PublicModel>>) : {}))
+        .catch(() => ({}));
   return pieceModels;
 }
 
@@ -54,6 +57,7 @@ export type LinkAnswer =
 
 /** A private link: the model, or why it cannot be shown. */
 export async function openLink(token: string, password?: string): Promise<LinkAnswer> {
+  if (!HAS_SERVER) return { kind: "offline" };
   try {
     const res = await fetch("/api/view/" + encodeURIComponent(token), {
       method: password === undefined ? "GET" : "POST",
@@ -83,6 +87,7 @@ export function metalsInWords(selection: Selection, words: Messages["viewer"], i
 export type VipAnswer = { state: "ok"; name: string; pieces: PublicModel[] } | { state: "out" };
 
 async function vipCall(path: string, body?: object): Promise<Record<string, unknown>> {
+  if (!HAS_SERVER) return { state: "out" };
   try {
     const res = await fetch("/api/vip/" + path, {
       method: body ? "POST" : "GET",

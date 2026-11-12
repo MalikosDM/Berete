@@ -3,8 +3,13 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
+// The version put online without its server (Vercel, until the real server): built on Vercel or with BERETE_STATIC=1.
+// It never asks the API; the forms go through WhatsApp (src/lib/site.ts, HAS_SERVER).
+const hasServer = !(process.env.VERCEL === "1" || process.env.BERETE_STATIC === "1");
+
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  define: { __HAS_SERVER__: JSON.stringify(hasServer) },
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },

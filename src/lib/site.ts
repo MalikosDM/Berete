@@ -7,6 +7,13 @@ export const EMAIL = "";
 export const INSTAGRAM_HANDLE = "beretejewellers";
 export const INSTAGRAM_URL = "https://www.instagram.com/" + INSTAGRAM_HANDLE + "/";
 
+/**
+ * Whether this version of the site has its server (the API: forms, 3D models, client space, admin). The version put
+ * online before the real server (Vercel) has none: it asks nothing of the API, its forms open WhatsApp with the request
+ * already written, the client space and the admin say they open soon.
+ */
+export const HAS_SERVER: boolean = __HAS_SERVER__;
+
 /** A WhatsApp conversation opened with this message (written in the language of the page). */
 export function waLink(message: string): string {
   return "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(message);

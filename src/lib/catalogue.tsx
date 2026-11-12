@@ -4,6 +4,7 @@ import type { Catalogue } from "@/data/types";
 import { bundleOf, useBundleVersion, useLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
 import { afterLoad } from "@/lib/idle";
+import { HAS_SERVER } from "@/lib/site";
 
 /*
  * The catalogue of the site. Pages render at once with the catalogue built
@@ -29,6 +30,8 @@ export function CatalogueProvider({ children }: { children: ReactNode }) {
 
   // Asked once the page is on screen: the built-in catalogue already shows it.
   useEffect(() => {
+    // Without its server, the built-in catalogue is the catalogue.
+    if (!HAS_SERVER) return undefined;
     let alive = true;
     const cancel = afterLoad(() => {
       fetch("/api/catalogue", { headers: { Accept: "application/json" } })

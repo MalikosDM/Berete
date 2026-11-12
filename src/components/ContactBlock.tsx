@@ -3,7 +3,8 @@ import { ArrowRight, Check, LoaderCircle, Mail, MapPin, PhoneCall, RotateCcw } f
 import BrandIcon from "@/components/BrandIcon";
 import Reveal from "@/components/Reveal";
 import { useI18n, type Messages } from "@/i18n";
-import { BUDGETS, EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, PIECE_CHOICES, TIMINGS, waLink } from "@/lib/site";
+import WhatsAppHandoff from "@/components/WhatsAppHandoff";
+import { BUDGETS, EMAIL, HAS_SERVER, INSTAGRAM_HANDLE, INSTAGRAM_URL, PIECE_CHOICES, TIMINGS, waLink } from "@/lib/site";
 import { requestCallback } from "@/lib/api";
 import { useCatalogue } from "@/lib/catalogue";
 
@@ -200,9 +201,10 @@ function CallBack({ pieceName }: { pieceName?: string }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [error, setError] = useState("");
+  // "whatsapp": handed to WhatsApp (no server); "error": the server did not take it, WhatsApp offered instead.
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "whatsapp" | "error">("idle");
   const [fieldError, setFieldError] = useState<{ name?: string; phone?: string }>({});
+  const message = t.contact.callWhatsapp(name.trim(), phone.trim(), pieceName ?? "");
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -211,13 +213,15 @@ function CallBack({ pieceName }: { pieceName?: string }) {
     if (phone.replace(/[^0-9]/g, "").length < 6) errs.phone = t.contact.errPhone;
     setFieldError(errs);
     if (errs.name || errs.phone) return;
+    // Without the server, the request opens in WhatsApp, already written (in the click itself, so never blocked).
+    if (!HAS_SERVER) {
+      window.open(waLink(message), "_blank", "noopener");
+      setStatus("whatsapp");
+      return;
+    }
     setStatus("sending");
     const res = await requestCallback({ name: name.trim(), phone: phone.trim(), interest: pieceName ?? "", language: locale });
-    if (res.ok) setStatus("sent");
-    else {
-      setError(res.error === "network" ? t.contact.errNetwork : t.contact.errServer);
-      setStatus("error");
-    }
+    setStatus(res.ok ? "sent" : "error");
   };
 
   const input =
@@ -248,6 +252,8 @@ function CallBack({ pieceName }: { pieceName?: string }) {
               <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />
               {t.contact.callSent}
             </p>
+          ) : status === "whatsapp" ? (
+            <WhatsAppHandoff message={message} failed={false} />
           ) : (
             <form onSubmit={submit} noValidate className="grid gap-5 sm:grid-cols-2">
               <label className="block text-base text-bone">
@@ -289,9 +295,9 @@ function CallBack({ pieceName }: { pieceName?: string }) {
                   {t.contact.callButton}
                 </button>
                 {status === "error" ? (
-                  <p role="alert" className="mt-4 text-base text-rose-light">
-                    {error}
-                  </p>
+                  <div className="mt-6">
+                    <WhatsAppHandoff message={message} failed />
+                  </div>
                 ) : null}
               </div>
             </form>

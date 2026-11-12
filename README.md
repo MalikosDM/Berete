@@ -154,3 +154,10 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
 `docker compose up` lance la base et le site construit (définir `ADMIN_PASSWORD` dans `.env`). Les modèles 3D sont
 gardés dans le volume `models` (`/app/storage/models`). Facultatif : `MODEL_SECRET` signe les adresses des fichiers 3D (sinon
 elles sont signées à partir d'`ADMIN_PASSWORD`).
+
+**Sans serveur (Vercel, en attendant le vrai serveur)** : `vercel.json` construit le site (`npm run build`) et publie
+`dist/`. Sur Vercel (ou avec `BERETE_STATIC=1 npm run build`), le site est construit sans serveur (`HAS_SERVER` dans
+`src/lib/site.ts`) : il ne demande rien à l'API ; la demande de rappel et le formulaire e-mail ouvrent WhatsApp avec la
+demande déjà écrite ; le lien « Espace client » disparaît du pied de page, `/vip` dit que l'espace ouvre bientôt (bouton
+WhatsApp) et `/admin` qu'il faut le serveur ; la 3D n'apparaît pas. Avec le serveur, si un formulaire ne part pas, il
+propose aussi WhatsApp, la demande déjà écrite.

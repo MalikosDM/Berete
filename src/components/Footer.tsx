@@ -5,7 +5,7 @@ import Logo from "@/components/Logo";
 import { visibleCollections } from "@/data/collections";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
-import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink } from "@/lib/site";
+import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
 
 const linkCls = "inline-flex min-h-12 items-center text-base text-bone transition-colors hover:text-rose-light";
 
@@ -87,11 +87,14 @@ export default function Footer() {
                   {t.footer.contactPage}
                 </Link>
               </li>
-              <li>
-                <Link to="/vip" className={linkCls} data-vip-link>
-                  {t.vip.footerLink}
-                </Link>
-              </li>
+              {/* The client space needs the server: no link to it on the version online without one. */}
+              {HAS_SERVER ? (
+                <li>
+                  <Link to="/vip" className={linkCls} data-vip-link>
+                    {t.vip.footerLink}
+                  </Link>
+                </li>
+              ) : null}
             </ul>
           </div>
           <div className="lg:col-span-3">

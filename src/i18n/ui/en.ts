@@ -331,13 +331,17 @@ export const en = {
     errEmail: "Please enter a valid email address.",
     errMessage: "Please tell us a little more (10 characters minimum).",
     errPhone: "Please enter a valid phone number.",
-    errServer: "Something went wrong. Please try again or message us on WhatsApp.",
-    errNetwork: "Network error. Please try again or message us on WhatsApp.",
     callTitle: "Prefer a call back?",
     callSent: "Thank you. We will call you back shortly.",
     callButton: "Call me back",
     emailTitle: "Prefer email?",
     emailSent: "Thank you. Your message has been received, we will reply personally.",
+    /** The site without its server (online before the real server): the forms go through WhatsApp, already written. */
+    callWhatsapp: (name: string, phone: string, about: string) => "Hello Berete Jewellers, could you call me back? Name: " + name + ". Phone: " + phone + "." + (about ? " About: " + about + "." : ""),
+    emailWhatsapp: (name: string, email: string, idea: string) => "Hello Berete Jewellers, I am " + name + " (" + email + "). My idea: " + idea,
+    readyWhatsapp: "Your request opened in WhatsApp, already written: just send it.",
+    failedWhatsapp: "The form could not be sent. Send your request on WhatsApp instead: it is already written.",
+    sendWhatsapp: "Send on WhatsApp",
     emailButton: "Send message",
   },
 
@@ -494,6 +498,9 @@ export const en = {
     footerLink: "Client space",
     askCode: "Ask for my code on WhatsApp",
     askMessage: "Hello Berete Jewellers, could you send me my access code to my private space?",
+    /** The client space on the site without its server. */
+    soon: "Your private space opens very soon. Until then, write to us on WhatsApp and we will send you your pieces in 3D directly.",
+    soonMessage: "Hello Berete Jewellers, I would like to see my pieces in 3D.",
   },
 };
 

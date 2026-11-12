@@ -14,7 +14,8 @@ type NavLinkItem = { label: string; to: string };
 
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
-    "relative inline-flex min-h-12 items-center text-[0.8125rem] font-medium uppercase tracking-[0.18em] transition-colors",
+    // Never on two lines: on a small laptop (1280 px) the letters and the gaps are a little tighter, as wide as they were from 1536 px.
+    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.8125rem] font-medium uppercase tracking-[0.12em] transition-colors 2xl:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -91,7 +92,7 @@ export default function Navbar() {
           <Logo className="hidden h-14 w-[4.875rem] lg:block" />
         </Link>
 
-        <nav aria-label={t.nav.main} className="hidden items-center gap-8 xl:flex">
+        <nav aria-label={t.nav.main} className="hidden items-center gap-5 xl:flex 2xl:gap-8">
           <div className="group relative">
             <NavLink
               to="/creations"
@@ -137,7 +138,7 @@ export default function Navbar() {
           </a>
           <Link
             to="/contact"
-            className="hidden min-h-12 items-center gap-2 bg-white px-6 text-[0.8125rem] font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-rose-light md:inline-flex"
+            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light md:inline-flex 2xl:px-6 2xl:tracking-[0.18em]"
           >
             {t.common.startPiece}
           </Link>
