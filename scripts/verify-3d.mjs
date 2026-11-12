@@ -28,8 +28,8 @@ const STLS = ["ZN1059-BJ001(2).stl", "zp1864-BJ001.stl", "0542.stl", "ZR0982-BJ0
 const EXPECTED = {
   "ZN1059-BJ001(2).stl": "1026 rondes 0,8 mm ; 152 rondes 1,9 mm ; plusieurs centaines de taille fantaisie (40 triangles) ; 144 griffes et 38 maillons en métal",
   "zp1864-BJ001.stl": "40 rondes 1,0 mm + quelques petits groupes répétés",
-  "0542.stl": "un seul bloc fondu : pas de pierres séparables",
-  "ZR0982-BJ001.stl": "aucune pierre répétée : métal seul",
+  "0542.stl": "un grand bloc où la plupart des pierres sont fondues dans le métal (inséparables) ; à part, 7 petites pierres rondes d'environ 1 mm, chacune dessinée autrement (plus de 1000 triangles)",
+  "ZR0982-BJ001.stl": "1 émeraude centrale 12,5 × 8,1 mm dessinée avec 108 481 triangles, et 2 baguettes effilées de côté (40 triangles, pavillon aux facettes tordues)",
   "ZN1242-bj001.glb": "3601 diamants (图层09), 2 × 199 autres pierres (图层10), maillons or rose (图层05), fleurs or blanc (图层01), 图层04 inconnu",
 };
 const METALS = ["yellow-gold", "white-gold", "rose-gold", "platinum", "black-rhodium"];
@@ -320,7 +320,7 @@ const models = {};
 // The .glb test model through the admin page itself.
 await removeOldTests();
 /** Filled once the test .glb is processed (copies seen in a mirror). */
-let mirrorCheck = ["Pierres en miroir du fichier de test : non contrôlé", false];
+let mirrorCheck;
 const knownIds = (await api("GET", "/api/admin/models", undefined, token)).items.map((m) => m.id);
 {
   const { context, page } = await open("desktop", "/admin");
@@ -372,6 +372,12 @@ for (const name of STLS) {
   const file = path.join(STL_DIR, name);
   if (!fs.existsSync(file)) continue;
   models[name] = await upload(file);
+}
+// Stones alone or finely drawn are found by their shape (a table, a point below, facets), not by their copies.
+const stonesFound = (name) => (models[name]?.stats.stones ?? []).reduce((n, s) => n + s.count, 0);
+let shapeCheck;
+if (models["ZR0982-BJ001.stl"] && models["0542.stl"]) {
+  shapeCheck = ["Pierres seules ou très finement dessinées reconnues à leur forme : ZR0982 " + stonesFound("ZR0982-BJ001.stl") + " (l'émeraude centrale et 2 baguettes : 3 attendues), 0542 " + stonesFound("0542.stl") + " (7 petites pierres séparées attendues)", stonesFound("ZR0982-BJ001.stl") === 3 && stonesFound("0542.stl") === 7];
 }
 
 // A Rhino file made here (the jeweller has not sent one yet): a metal layer, a stone placed 12 times as a
@@ -442,7 +448,7 @@ for (const [name, model] of Object.entries(models)) {
 
 /* ---------- 3. Links, piece page ---------- */
 
-const checks = [rhinoCheck, mirrorCheck];
+const checks = [rhinoCheck, mirrorCheck, ...(shapeCheck ? [shapeCheck] : [])];
 // The demonstration model was made before the pipeline turned copies seen in a mirror over: the viewer does it when
 // it loads (665 small diamonds and 55 large stones that showed an empty setting).
 {

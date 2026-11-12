@@ -812,3 +812,183 @@ export function tableShare(soup: Soup, size: number): number {
   }
   return total > 0 ? Math.max(0, ...planes.map((q) => q.area)) / total : 0;
 }
+
+/** What tells a cut stone from a piece of metal, measured on a piece (see `looksCut`). */
+export type CutMeasure = {
+  /** Flat facets that hold 95 % of the surface (a cut stone: some tens; a smooth metal surface: thousands). */
+  facets: number;
+  /** Share of the surface taken by the largest facet (the table). */
+  table: number;
+  /** Flat surface facing the opposite way, compared with the table (a stone ends in a point or an edge). */
+  opposite: number;
+  /** Thickness along the table's normal, compared with the smallest width across it (a stone is lower than wide). */
+  depth: number;
+  /** Share of vertices outside the plane of a facet (convex: none). */
+  outside: number;
+  /** Narrowest width near the bottom (the last eighth of the thickness), compared with the narrowest width: a stone
+   * ends in a point or an edge (small), a bead or a domed piece of metal stays wide (large). */
+  tip: number;
+  /** Two large facets (5 % of the surface or more) facing exactly opposite ways with the same area (1 for twins): the
+   * two ends of a bar or the two sides of a plate of metal. A stone has none. */
+  twins: number;
+};
+
+/**
+ * The facets of a piece and how they stand. The triangles are grouped by plane, whatever their number: a jeweller's
+ * export can draw each facet of a stone with thousands of triangles. Null when the piece is plainly not faceted (more
+ * than 3000 planes: a smooth surface).
+ */
+export function cutMeasure(soup: Soup, shape: Shape): CutMeasure | null {
+  const p = soup.positions;
+  const idx = soup.indices;
+  const [cx, cy, cz] = shape.center;
+  const size = shape.extents[2];
+  const near = 0.003 * size;
+  type Plane = { nx: number; ny: number; nz: number; d: number; area: number };
+  const planes: Plane[] = [];
+  const cells = new Map<string, Plane[]>();
+  let total = 0;
+  for (let t = 0; t < idx.length; t += 3) {
+    const a = idx[t]! * 3;
+    const b = idx[t + 1]! * 3;
+    const c = idx[t + 2]! * 3;
+    const ux = p[b]! - p[a]!;
+    const uy = p[b + 1]! - p[a + 1]!;
+    const uz = p[b + 2]! - p[a + 2]!;
+    const vx = p[c]! - p[a]!;
+    const vy = p[c + 1]! - p[a + 1]!;
+    const vz = p[c + 2]! - p[a + 2]!;
+    let nx = uy * vz - uz * vy;
+    let ny = uz * vx - ux * vz;
+    let nz = ux * vy - uy * vx;
+    const len = Math.hypot(nx, ny, nz);
+    if (len < 1e-14) continue;
+    const area = len / 2;
+    total += area;
+    nx /= len;
+    ny /= len;
+    nz /= len;
+    const d = nx * (p[a]! - cx) + ny * (p[a + 1]! - cy) + nz * (p[a + 2]! - cz);
+    const key = Math.round(nx * 60) + "," + Math.round(ny * 60) + "," + Math.round(nz * 60);
+    let cell = cells.get(key);
+    if (!cell) {
+      cell = [];
+      cells.set(key, cell);
+    }
+    const plane = cell.find((q) => q.nx * nx + q.ny * ny + q.nz * nz > 0.9998 && Math.abs(q.d - d) < near);
+    if (plane) plane.area += area;
+    else {
+      const made = { nx, ny, nz, d, area };
+      cell.push(made);
+      planes.push(made);
+      if (planes.length > 3000) return null;
+    }
+  }
+  if (total === 0) return null;
+  planes.sort((x, y) => y.area - x.area);
+  let covered = 0;
+  let facets = 0;
+  while (facets < planes.length && covered < 0.95 * total) covered += planes[facets++]!.area;
+  const table = planes[0]!;
+  let twins = 0;
+  const large = planes.filter((q) => q.area >= 0.05 * total);
+  for (const [i, q] of large.entries()) {
+    for (const r of large.slice(i + 1)) if (q.nx * r.nx + q.ny * r.ny + q.nz * r.nz < -0.995) twins = Math.max(twins, Math.min(q.area, r.area) / Math.max(q.area, r.area));
+  }
+  let opposite = 0;
+  for (const q of planes) if (q.nx * table.nx + q.ny * table.ny + q.nz * table.nz < -0.99) opposite += q.area;
+  // Thickness along the table's normal, and widths across it (along the main axes of the piece seen from above).
+  const n = p.length / 3;
+  const ux = Math.abs(table.nx) < 0.9 ? 1 : 0;
+  const uy = ux === 1 ? 0 : 1;
+  // Two directions across the table.
+  let ax = uy * table.nz - 0 * table.ny;
+  let ay = 0 * table.nx - ux * table.nz;
+  let az = ux * table.ny - uy * table.nx;
+  const al = Math.hypot(ax, ay, az) || 1;
+  ax /= al;
+  ay /= al;
+  az /= al;
+  const bx = table.ny * az - table.nz * ay;
+  const by = table.nz * ax - table.nx * az;
+  const bz = table.nx * ay - table.ny * ax;
+  const span = (dx: number, dy: number, dz: number) => {
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (let i = 0; i < n; i++) {
+      const v = p[i * 3]! * dx + p[i * 3 + 1]! * dy + p[i * 3 + 2]! * dz;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    return hi - lo;
+  };
+  let width = Infinity;
+  for (let k = 0; k < 8; k++) {
+    const angle = (k * Math.PI) / 8;
+    const c = Math.cos(angle);
+    const s = Math.sin(angle);
+    width = Math.min(width, span(ax * c + bx * s, ay * c + by * s, az * c + bz * s));
+  }
+  const thickness = span(table.nx, table.ny, table.nz);
+  // The bottom: the vertices in the last eighth of the thickness, away from the table.
+  let top = -Infinity;
+  for (let i = 0; i < n; i++) top = Math.max(top, p[i * 3]! * table.nx + p[i * 3 + 1]! * table.ny + p[i * 3 + 2]! * table.nz);
+  const bottom: number[] = [];
+  for (let i = 0; i < n; i++) if (top - (p[i * 3]! * table.nx + p[i * 3 + 1]! * table.ny + p[i * 3 + 2]! * table.nz) >= 0.875 * thickness) bottom.push(i);
+  let tipWidth = Infinity;
+  for (let k = 0; k < 8; k++) {
+    const angle = (k * Math.PI) / 8;
+    const c = Math.cos(angle);
+    const s2 = Math.sin(angle);
+    const dx = ax * c + bx * s2;
+    const dy = ay * c + by * s2;
+    const dz = az * c + bz * s2;
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const i of bottom) {
+      const v = p[i * 3]! * dx + p[i * 3 + 1]! * dy + p[i * 3 + 2]! * dz;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+    tipWidth = Math.min(tipWidth, bottom.length > 0 ? hi - lo : 0);
+  }
+  // Convex: no vertex beyond the plane of a main facet (1.5 % of the size), on up to 4000 vertices.
+  const main = planes.slice(0, Math.min(facets, 200));
+  const step = Math.max(1, Math.floor(n / 4000));
+  const tolerance = 0.015 * size;
+  let checks = 0;
+  let out = 0;
+  for (const q of main) {
+    let { nx, ny, nz, d } = q;
+    if (d < 0) {
+      nx = -nx;
+      ny = -ny;
+      nz = -nz;
+      d = -d;
+    }
+    for (let i = 0; i < n; i += step) {
+      checks++;
+      if (nx * (p[i * 3]! - cx) + ny * (p[i * 3 + 1]! - cy) + nz * (p[i * 3 + 2]! - cz) - d > tolerance) out++;
+    }
+  }
+  return { facets, table: table.area / total, opposite: opposite / table.area, depth: thickness / Math.max(width, 1e-9), outside: checks > 0 ? out / checks : 1, tip: tipWidth / Math.max(width, 1e-9), twins };
+}
+
+/**
+ * Whether a piece has the shape of a cut stone, however finely it was exported and even if it is the only one of its
+ * kind (the centre stone of a ring). Always: a large flat facet (the table, 4 % of the surface or more) across its
+ * thinnest side, no flat side as large opposite (a plate of metal has two), no two large equal facets facing each other
+ * (the ends of a bar), and a bottom that ends in a point or an edge (the culet; a bead of metal stays round). Then either flat facets (95 % of its surface on at most 160 planes)
+ * and convex (allowing a few twisted facets, as Rhino draws the pavilion of a tapered baguette), or, for the simplified
+ * stones some jewellers place (a smooth cone under the table), strictly convex with a stone's proportions. From 0.4
+ * to 40 mm.
+ */
+export function looksCut(soup: Soup, shape: Shape): boolean {
+  const size = shape.extents[2];
+  if (size < 0.4 || size > 40) return false;
+  const m = cutMeasure(soup, shape);
+  if (m === null || m.table < 0.04 || m.opposite > 0.3 || m.depth > 1.05 || m.tip > 0.45 || m.twins > 0.7) return false;
+  const faceted = m.facets <= 160 && m.outside <= 0.06;
+  const simplified = m.outside <= 0.005 && m.opposite <= 0.1 && m.depth >= 0.4 && m.depth <= 0.9 && size <= 15;
+  return faceted || simplified;
+}

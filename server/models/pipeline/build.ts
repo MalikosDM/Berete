@@ -6,11 +6,14 @@
  *   drawn as one repeated mesh (EXT_mesh_gpu_instancing);
  * - in a file without layers (STL), a small, (almost) convex piece found at
  *   least 3 times, or with the 174 triangles of Rhino's round brilliant or the
- *   40 of its fancy cuts, is a stone; everything else is metal;
+ *   40 of its fancy cuts, is a stone; so is any piece with the shape of a cut
+ *   stone (a table on top, a point or an edge below, flat facets: `looksCut`),
+ *   however many triangles the jeweller's export gave it and even alone (the
+ *   centre stone of a ring); everything else is metal;
  * - the other pieces of a layer are joined, in a few blocks.
  * Lengths in mm.
  */
-import { align, alignFree, boundsOf, centered, connectedPieces, extract, isConvex, merge, mirrored, renumbered, sameShape, shapeOf, tableShare, type Placement, type Shape, type Soup } from "./geometry.js";
+import { align, alignFree, boundsOf, centered, connectedPieces, extract, isConvex, looksCut, merge, mirrored, renumbered, sameShape, shapeOf, tableShare, type Placement, type Shape, type Soup } from "./geometry.js";
 import type { Progress, Source } from "./read.js";
 
 export type Instance = { t: [number, number, number]; r: [number, number, number, number]; s: [number, number, number] };
@@ -238,9 +241,11 @@ export function analyse(source: Source, progress: Progress): Analysis {
       const local = centered(model.soup.positions, model.shape.center);
       const localSoup = { positions: local, indices: model.soup.indices };
       const convex = triangles < STONE_MAX_TRIANGLES && isConvex(localSoup, size);
-      const known = KNOWN_STONES.has(triangles);
-      // A cut stone: convex with a flat table on top (a bead of metal has none).
-      const isStone = convex && (known || (cluster.length >= 3 && tableShare(localSoup, size) >= 0.05));
+      // A cut stone: convex with a flat table on top (a bead of metal has none), or the shape of a cut stone however
+      // finely it was exported (the centre stone of a ring, drawn with 100 000 triangles, is found once).
+      const cut = looksCut(localSoup, { ...model.shape, center: [0, 0, 0] });
+      const known = KNOWN_STONES.has(triangles) || cut;
+      const isStone = cut || (convex && (KNOWN_STONES.has(triangles) || (cluster.length >= 3 && tableShare(localSoup, size) >= 0.05)));
       // Told apart only in a file without layers; in a layered file, the layer says what it is.
       const material = !source.layered ? (isStone ? stoneName(triangles, model.shape) : "metal") : layer.name;
       const stone = isStone;
