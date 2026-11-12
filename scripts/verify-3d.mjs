@@ -202,6 +202,24 @@ async function shoot(profile, model, slug, opts) {
   if (opts.page) await page.screenshot({ path: path.join(dir, slug + "-0-page.jpg"), type: "jpeg", quality: 85, fullPage: false });
   const fps = await measureFps(page);
   const out = { loadSeconds, fps, version: profile === "iphone" ? "light" : "full" };
+  if (profile === "desktop") {
+    // A pinch on the trackpad (a wheel with Ctrl): the camera must come closer, never enlarge the picture (it blurred it).
+    const viewDistance = () => page.evaluate(() => { const v = window.__berete3d.getView(); return Math.hypot(v.position[0] - v.target[0], v.position[1] - v.target[1], v.position[2] - v.target[2]); });
+    const box = await page.locator("[data-viewer] canvas").boundingBox();
+    const before = await viewDistance();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.keyboard.down("Control");
+    for (let i = 0; i < 6; i++) {
+      await page.mouse.wheel(0, -40);
+      await page.waitForTimeout(60);
+    }
+    await page.keyboard.up("Control");
+    await page.waitForTimeout(1200);
+    out.pinch = { before: before * 1000, after: (await viewDistance()) * 1000, zoom: await page.evaluate(() => window.__berete3d.zoom()) };
+    await grab(page, path.join(dir, slug + "-1b-pincement.png"));
+    await page.evaluate(() => window.__berete3d.view("reset"));
+    await page.waitForTimeout(1200);
+  }
   if (profile === "iphone") {
     // The same page over a 4G connection (10 Mbit/s, 80 ms), cache emptied.
     const cdp = await context.newCDPSession(page);
@@ -497,12 +515,17 @@ for (const [name, r] of Object.entries(results)) {
 lines.push("", "## Contrôles", "");
 const recentered = Object.values(results).some((r) => r.desktop.zoom.targetToCentre < r.desktop.zoom.stoneToCentre * 0.5 || r.desktop.zoom.drift > 0.05);
 checks.push(["Zoom sur un détail : la vue reste sur le détail, jamais de recentrage sur le bijou", !recentered]);
+const pinches = Object.values(results).map((r) => r.desktop.pinch);
+checks.push([
+  "Pincement du pavé tactile : la caméra se rapproche (" + pinches.map((p) => fr(p.before) + " → " + fr(p.after) + " mm").join(" ; ") + "), l'image n'est jamais agrandie (flou)",
+  pinches.every((p) => p.after < p.before * 0.95 && p.zoom === 1),
+]);
 checks.push(["Erreurs dans la console (toutes les pages ouvertes) : " + errors.length, errors.length === 0]);
 for (const [text, ok] of checks) lines.push("- " + (ok ? "OK" : "**À REVOIR**") + " — " + text);
 if (errors.length > 0) lines.push("", "```", ...errors.slice(0, 30), "```");
 lines.push("", "## Captures", "");
 lines.push("- `admin-*.jpg` : l'envoi du fichier de test dans l'admin, la liste, les réglages des calques, un calque vu seul.");
-lines.push("- `desktop/` et `iphone/` : pour chaque modèle, `-0-page` (la page du lien privé), `-1-vue-par-defaut`, `-2-zoom` (double-clic puis molette, ou double-tap), `-3-lumiere-*` (bracelet de test), `-4-metal-*`.");
+lines.push("- `desktop/` et `iphone/` : pour chaque modèle, `-0-page` (la page du lien privé), `-1-vue-par-defaut`, `-1b-pincement` (pincement du pavé tactile, ordinateur), `-2-zoom` (double-clic puis molette, ou double-tap), `-3-lumiere-*` (bracelet de test), `-4-metal-*`.");
 lines.push("- `lien-expire.jpg`, `lien-mot-de-passe.jpg`, `page-piece-explore-in-3d.jpg`.");
 fs.writeFileSync(path.join(OUT, "rapport.md"), lines.join("\n") + "\n");
 console.log(lines.join("\n"));

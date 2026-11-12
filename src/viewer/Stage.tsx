@@ -301,7 +301,7 @@ export default function Stage(props: Props) {
       }
     }
     // Still camera: each new image shifted by a fraction of a pixel and averaged with the previous ones.
-    const key = cam.matrixWorld.elements.join(",") + "|" + cam.near + "|" + cam.far + "|" + cam.aspect + "|" + state.size.width + "|" + state.size.height;
+    const key = cam.matrixWorld.elements.join(",") + "|" + cam.near + "|" + cam.far + "|" + cam.aspect + "|" + cam.zoom + "|" + cam.fov + "|" + state.size.width + "|" + state.size.height;
     const w = state.size.width * state.gl.getPixelRatio();
     const h = state.size.height * state.gl.getPixelRatio();
     if (key !== lastCamera.current || dirty.current) {
@@ -324,6 +324,25 @@ export default function Stage(props: Props) {
   });
 
   useEffect(() => () => accumulate.dispose(), [accumulate]);
+
+  /* Pinching on a trackpad brings the camera closer, like the scroll wheel. The controls would enlarge the picture
+     instead (a zoom of the lens): blurred, without the closest-distance limit, and kept by the Face / Side / Top views. */
+  useEffect(() => {
+    // The element the controls listen on (the box around the canvas, as drei chooses it).
+    const { events, gl } = get();
+    const holder = (events.connected as HTMLElement | undefined) ?? gl.domElement;
+    // A pinch arrives as a wheel event with the Ctrl key: it is stopped on its way down, before the controls, and sent
+    // again to them without the key (only to them: the page itself does not scroll).
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const { deltaX, deltaY, deltaMode, clientX, clientY, screenX, screenY } = e;
+      holder.dispatchEvent(new WheelEvent("wheel", { deltaX, deltaY, deltaMode, clientX, clientY, screenX, screenY, cancelable: true }));
+    };
+    holder.addEventListener("wheel", onWheel, { capture: true, passive: false });
+    return () => holder.removeEventListener("wheel", onWheel, { capture: true });
+  }, [get]);
 
   /* Double-click or double-tap: glide towards the detail under the finger */
   useEffect(() => {
@@ -473,6 +492,7 @@ export default function Stage(props: Props) {
           return [((v.x + 1) / 2) * size.width, ((1 - v.y) / 2) * size.height];
         },
         target: () => controls.current?.getTarget(new Vector3()).toArray() ?? null,
+        zoom: () => (get().camera as PerspectiveCamera).zoom,
         center: () => model.current?.sphere.center.toArray() ?? null,
         refractingStones: () => refraction.current.length,
       };
@@ -645,6 +665,7 @@ function SurfaceUnder({ surface, frame, onReady }: { surface: Surface; frame: Fr
 
 /** The first view: the one the jeweller saved, else the whole jewel seen from the front and above, its long side across the screen. */
 function startView(c: CameraControls, box: Box3, camera: PerspectiveCamera, view: ModelView | null, smooth: boolean): void {
+  void c.zoomTo(1, smooth);
   if (view) {
     void c.setLookAt(...view.position, ...view.target, smooth);
     return;
@@ -671,6 +692,7 @@ function fitView(c: CameraControls, box: Box3, camera: PerspectiveCamera, azimut
     distance = Math.max(distance, depth + (Math.abs(corner.dot(right)) * margin) / tanH, depth + (Math.abs(corner.dot(up)) * margin) / tanV);
   }
   const position = center.clone().addScaledVector(toCamera, distance);
+  void c.zoomTo(1, smooth);
   void c.setLookAt(position.x, position.y, position.z, center.x, center.y, center.z, smooth);
 }
 
