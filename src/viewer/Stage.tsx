@@ -43,6 +43,7 @@ import { AccumulatePass, jitter } from "./accumulate";
 import { BACKGROUND_LOOKS, backgroundOfScene, fadeTexture, type Surface } from "./backgrounds";
 import { diamondEnv } from "./diamondEnv";
 import { enamelMaterial, gemFrame, ghostMaterial, lightStoneMaterial, metalMaterial, refractionMaterial, setMetal, updateRefraction, type RefractionMaterial } from "./materials";
+import { splitMirrored } from "./mirror";
 
 /* ---------- Loaders (decoders served by the site: /draco/, Meshopt inside the code) ---------- */
 
@@ -146,6 +147,8 @@ export default function Stage(props: Props) {
   const composer = useRef<Composer>(null);
   const model = useRef<Loaded | null>(null);
   const refraction = useRef<RefractionMaterial[]>([]);
+  // Copies seen in a mirror redrawn the right way round when the model loaded (tests: see ./mirror.ts).
+  const mirrorCopies = useRef(0);
   const savedView = useRef<ModelView | null>(settings.view);
   const angle = useRef(lightAngle);
   const [frame, setFrame] = useState<Frame | null>(null);
@@ -174,6 +177,8 @@ export default function Stage(props: Props) {
         if (!alive) return;
         const { scene, invalidate } = get();
         const root = gltf.scene;
+        // Copies of a stone seen in a mirror would show their inside (a missing diamond): see ./mirror.ts.
+        mirrorCopies.current = splitMirrored(root);
         const byLayer: LayerMeshes = new Map();
         root.traverse((o: Object3D) => {
           const mesh = o as Mesh;
@@ -531,6 +536,7 @@ export default function Stage(props: Props) {
         zoom: () => (get().camera as PerspectiveCamera).zoom,
         center: () => model.current?.sphere.center.toArray() ?? null,
         refractingStones: () => refraction.current.length,
+        mirrorCopies: () => mirrorCopies.current,
       };
     }
     return () => {

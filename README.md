@@ -80,7 +80,9 @@ Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien 
 - **Le pipeline** (`server/models/pipeline/`, lancé dans un processus à part par `server/models/jobs.ts`) : lecture
   (STL lu par morceaux, GLB avec Draco, 3DM avec rhino3dm : calques et blocs), soudure des sommets à 0,0001 mm, découpage
   en morceaux, copies d'une même forme placées sur la première par alignement (Kabsch, aussi en miroir) et dessinées une
-  seule fois (`EXT_mesh_gpu_instancing`) ; dans un STL, les pierres sont reconnues (petites, convexes, avec une table,
+  seule fois (`EXT_mesh_gpu_instancing`) ; les copies vues en miroir (échelle négative, comme dans le fichier iJewel
+  ZN1242 : 720 pierres) ont leur propre forme retournée, sinon le visualiseur les dessine à l'envers (sertissure vide) ;
+  le visualiseur fait de même pour les fichiers optimisés avant (`src/viewer/mirror.ts`) ; dans un STL, les pierres sont reconnues (petites, convexes, avec une table,
   répétées, ou les 174 et 40 triangles des tailles Rhino) ; métal simplifié (0,01 mm pour la version ordinateur, 0,03 mm
   pour la version téléphone), normales nettes aux arêtes (35°), compression Meshopt. Le fichier d'origine est toujours
   gardé. En ligne de commande : `npm run models:optimize -- <fichier> <dossier>`.

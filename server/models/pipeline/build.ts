@@ -114,6 +114,20 @@ function decompose(m: Float32Array): Instance {
   return { t: [m[12]!, m[13]!, m[14]!], r: [x / len, y / len, z / len, w / len], s: [sx, sy, sz] };
 }
 
+/** Determinant of the rotation-and-scale part of a 4×4 matrix (column-major): negative for a mirror image. */
+function det3(m: Float32Array): number {
+  return m[0]! * (m[5]! * m[10]! - m[9]! * m[6]!) - m[4]! * (m[1]! * m[10]! - m[9]! * m[2]!) + m[8]! * (m[1]! * m[6]! - m[5]! * m[2]!);
+}
+
+/** The matrix × a mirror across x: placed on the mirrored mesh (`mirrored`, x negated), it puts the copy back where it was. */
+function timesMirror(m: Float32Array): Float32Array {
+  const out = m.slice();
+  out[0] = -m[0]!;
+  out[1] = -m[1]!;
+  out[2] = -m[2]!;
+  return out;
+}
+
 /** Joins pieces drawn once into blocks, neighbours together (sorted along the longest side of the jewel). */
 function blocks(pieces: Piece[], axis: 0 | 1 | 2): Soup[] {
   const sorted = [...pieces].sort((a, b) => a.shape.center[axis] - b.shape.center[axis]);
@@ -171,7 +185,12 @@ export function analyse(source: Source, progress: Progress): Analysis {
       const triangles = rep.soup.indices.length / 3;
       const shape = shapeOf(rep.soup.positions);
       const stone = triangles < STONE_MAX_TRIANGLES && rep.matrices.length >= 3 && isConvex({ positions: centered(rep.soup.positions, shape.center), indices: rep.soup.indices }, shape.extents[2]);
-      parts.push({ material: layer.name, soup: rep.soup, instances: rep.matrices.map(decompose), stone });
+      // Copies seen in a mirror (a negative scale) get a mirrored mesh of their own: the viewer draws all the copies of
+      // a mesh with the same side of their faces outward, and they would show their inside (a missing stone).
+      const straight = rep.matrices.filter((m) => det3(m) >= 0);
+      const mirror = rep.matrices.filter((m) => det3(m) < 0).map(timesMirror);
+      if (straight.length > 0) parts.push({ material: layer.name, soup: rep.soup, instances: straight.map(decompose), stone });
+      if (mirror.length > 0) parts.push({ material: layer.name, soup: mirrored(rep.soup), instances: mirror.map(decompose), stone });
       pieceCount += rep.matrices.length;
     }
     if (layer.soups.length === 0) continue;

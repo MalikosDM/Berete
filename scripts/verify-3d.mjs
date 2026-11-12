@@ -185,6 +185,28 @@ async function setAllMetals(page, metal) {
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
+/** In a .glb made by the pipeline: the copies of each layer, and how many of them are seen in a mirror (a negative scale). */
+async function stonesOf(file) {
+  const { NodeIO } = await import("@gltf-transform/core");
+  const { ALL_EXTENSIONS } = await import("@gltf-transform/extensions");
+  const { MeshoptDecoder } = await import("meshoptimizer");
+  await MeshoptDecoder.ready;
+  const doc = await new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ "meshopt.decoder": MeshoptDecoder }).read(file);
+  const stones = {};
+  let mirrored = 0;
+  for (const node of doc.getRoot().listNodes()) {
+    const mesh = node.getMesh();
+    if (!mesh) continue;
+    const layer = mesh.listPrimitives()[0]?.getMaterial()?.getName() ?? "";
+    const batch = node.getExtension("EXT_mesh_gpu_instancing");
+    const scale = batch?.getAttribute("SCALE");
+    const count = batch ? batch.getAttribute("TRANSLATION").getCount() : 1;
+    stones[layer] = (stones[layer] ?? 0) + count;
+    for (let i = 0; scale && i < count; i++) if (scale.getElement(i, []).filter((v) => v < 0).length % 2 === 1) mirrored++;
+  }
+  return { stones, mirrored };
+}
+
 /** One model in one profile: load, fps, images. */
 async function shoot(profile, model, slug, opts) {
   const t = await link(model.id, { title: model.name });
@@ -297,6 +319,8 @@ const models = {};
 
 // The .glb test model through the admin page itself.
 await removeOldTests();
+/** Filled once the test .glb is processed (copies seen in a mirror). */
+let mirrorCheck = ["Pierres en miroir du fichier de test : non contrôlé", false];
 const knownIds = (await api("GET", "/api/admin/models", undefined, token)).items.map((m) => m.id);
 {
   const { context, page } = await open("desktop", "/admin");
@@ -324,6 +348,15 @@ const knownIds = (await api("GET", "/api/admin/models", undefined, token)).items
   const fresh = items.find((x) => x.sourceName === "ZN1242-bj001.glb" && !before3.has(x.id) && x.status === "ready");
   const m = await markAsTest(fresh);
   models["ZN1242-bj001.glb"] = { ...m, uploadSeconds: Math.max(0, seconds - (m.stats.seconds ?? 0)), uploadAndProcessSeconds: seconds };
+  // In this file, 665 small diamonds and 55 large stones are copies seen in a mirror: they must come out as copies of
+  // a mirrored mesh (a mirrored copy is drawn inside out by the viewer: an empty setting), and none may be lost.
+  {
+    const counted = await stonesOf(path.join(process.env.MODELS_DIR ?? "storage/models", fresh.id, "full.glb"));
+    mirrorCheck = [
+      "Pierres en miroir du fichier de test (665 + 55) : " + counted.mirrored + " copie(s) encore à l'envers, " + counted.stones["图层09"] + " diamants (图层09) et " + counted.stones["图层10"] + " grosses pierres (图层10) sur 3601 et 199",
+      counted.mirrored === 0 && counted.stones["图层09"] === 3601 && counted.stones["图层10"] === 199,
+    ];
+  }
   // The editor: layers recognised from their names, one layer shown alone. (The new model is first in the list.)
   await page.locator('[data-model-row="ZN1242-bj001.glb"] [data-open-model]').first().click();
   await page.waitForSelector("[data-model-editor] [data-viewer] [data-metal]", { timeout: 120_000 });
@@ -409,7 +442,22 @@ for (const [name, model] of Object.entries(models)) {
 
 /* ---------- 3. Links, piece page ---------- */
 
-const checks = [rhinoCheck];
+const checks = [rhinoCheck, mirrorCheck];
+// The demonstration model was made before the pipeline turned copies seen in a mirror over: the viewer does it when
+// it loads (665 small diamonds and 55 large stones that showed an empty setting).
+{
+  const t = await link("demo-zn1242", { title: "Démo" });
+  const { context, page } = await open("desktop", "/view/" + t);
+  await page.goto(BASE + "/view/" + t + "?debug3d");
+  await ready(page);
+  const turned = await page.evaluate(() => window.__berete3d.mirrorCopies());
+  checks.push(["Modèle de démonstration (fait avant la correction) : " + turned + " pierres en miroir redessinées à l'endroit par le visualiseur (665 + 55 attendues)", turned === 720]);
+  await context.close();
+  // The test link is removed: the demonstration model keeps only the jeweller's links.
+  const made = (await api("GET", "/api/admin/models/demo-zn1242", undefined, token)).links.find((l) => l.token === t);
+  if (made) await api("DELETE", "/api/admin/links/" + made.id, undefined, token);
+}
+
 const demo = models["ZN1242-bj001.glb"];
 {
   const yesterday = new Date(Date.now() - 86400_000).toISOString();
