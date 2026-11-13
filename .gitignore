@@ -5,6 +5,7 @@ dist-server
 server/generated
 dist-ssr
 scripts/.import-media-cache.json
+scripts/.share-images-cache.json
 .local
 test-results
 playwright-report

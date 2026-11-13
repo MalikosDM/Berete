@@ -56,6 +56,11 @@ export interface SeoSettings {
   titleTemplate?: string;
   description?: string;
   image?: string;
+  /** Size of `image` in pixels, written for the link previews (og:image:width / height). */
+  imageWidth?: number;
+  imageHeight?: number;
+  /** Open Graph locale of each language ("en" -> "en_GB"); without it, "fr" becomes "fr_FR". */
+  ogLocales?: Record<string, string>;
   twitter?: string;
   organization?: SeoOrganization;
   alternates?: SeoAlternate[];
@@ -103,6 +108,10 @@ export interface SeoExtras {
   /** The name of the page when the settings have none (a product, an article). */
   title?: string;
   description?: string;
+  /** The image of the link previews of this page (its own photo), and its size in pixels. */
+  image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 
 export interface HeadTag {
@@ -220,7 +229,9 @@ export function isIndexable(settings: SeoSettings, path: string): boolean {
   return !/noindex/i.test(robotsFor(settings, path));
 }
 
-function locale(language: string): string {
+function locale(language: string, settings?: SeoSettings): string {
+  const own = settings?.ogLocales?.[language];
+  if (own) return own;
   const parts = language.split("-");
   const lang = parts[0]!.toLowerCase();
   const region = (parts[1] || lang).toUpperCase();
@@ -391,8 +402,11 @@ export function headFor(settings: SeoSettings, path: string, extras?: SeoExtras,
   const single = !!(extras && (extras.article || extras.product));
   const own = single ? splitLanguage(settings, p).neutral : p;
   const canonical = page.canonical ? absoluteUrl(base, page.canonical) || page.canonical : absoluteUrl(base, own);
-  const imagePath = (extras && extras.product && extras.product.image) || (extras && extras.article && extras.article.image) || page.image || settings.image || "";
+  const ownImage = (extras && extras.product && extras.product.image) || (extras && extras.article && extras.article.image) || (extras && extras.image) || page.image || "";
+  const imagePath = ownImage || settings.image || "";
   const image = imagePath === "" ? "" : absoluteUrl(base, imagePath) || "";
+  // The size is known for the image of the page (extras) and for the image of the site.
+  const imageSize = extras && extras.image && ownImage === extras.image ? [extras.imageWidth, extras.imageHeight] : ownImage === "" ? [settings.imageWidth, settings.imageHeight] : [undefined, undefined];
   const type = extras && extras.product ? "product" : extras && extras.article ? "article" : page.type || "website";
   const tags: HeadTag[] = [];
   const meta = (attrs: Record<string, string>) => tags.push({ tag: "meta", attrs: Object.assign({ "data-seo": "" }, attrs) });
@@ -408,15 +422,27 @@ export function headFor(settings: SeoSettings, path: string, extras?: SeoExtras,
   if (description !== "") meta({ property: "og:description", content: description });
   if (canonical !== "") meta({ property: "og:url", content: canonical });
   meta({ property: "og:site_name", content: settings.siteName });
-  meta({ property: "og:locale", content: locale(languageFor(settings, p)) });
+  const language = languageFor(settings, p);
+  meta({ property: "og:locale", content: locale(language, settings) });
+  if (!single) {
+    for (const a of settings.alternates || []) if (a.lang !== language) meta({ property: "og:locale:alternate", content: locale(a.lang, settings) });
+  }
   if (image !== "") {
     meta({ property: "og:image", content: image });
+    if (/\.jpe?g$/i.test(imagePath)) meta({ property: "og:image:type", content: "image/jpeg" });
+    if (imageSize[0] && imageSize[1]) {
+      meta({ property: "og:image:width", content: String(imageSize[0]) });
+      meta({ property: "og:image:height", content: String(imageSize[1]) });
+    }
     meta({ property: "og:image:alt", content: title });
   }
   meta({ name: "twitter:card", content: image !== "" ? "summary_large_image" : "summary" });
   meta({ name: "twitter:title", content: title });
   if (description !== "") meta({ name: "twitter:description", content: description });
-  if (image !== "") meta({ name: "twitter:image", content: image });
+  if (image !== "") {
+    meta({ name: "twitter:image", content: image });
+    meta({ name: "twitter:image:alt", content: title });
+  }
   if (settings.twitter) meta({ name: "twitter:site", content: settings.twitter.startsWith("@") ? settings.twitter : "@" + settings.twitter });
 
   const alternates = settings.alternates || [];

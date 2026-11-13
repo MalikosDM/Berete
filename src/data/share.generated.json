@@ -1,0 +1,204 @@
+{
+ "brand": {
+  "src": "/media/share/brand.jpg",
+  "width": 1200,
+  "height": 630
+ },
+ "pieces": {
+  "vfb-stuttgart-dfb-pokal-2025": {
+   "src": "/media/share/pieces/vfb-stuttgart-dfb-pokal-2025.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "campione-d-italia-2023-2024": {
+   "src": "/media/share/pieces/campione-d-italia-2023-2024.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "tanguy-nianzou-nz-ring": {
+   "src": "/media/share/pieces/tanguy-nianzou-nz-ring.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-signet-ring": {
+   "src": "/media/share/pieces/marcus-thuram-signet-ring.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "kevin-schade-dragon-ball-pendant": {
+   "src": "/media/share/pieces/kevin-schade-dragon-ball-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "kenan-yildiz-celebration-pendant": {
+   "src": "/media/share/pieces/kenan-yildiz-celebration-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "noah-okafor-jersey-pendant": {
+   "src": "/media/share/pieces/noah-okafor-jersey-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "noah-okafor-oka-pendant": {
+   "src": "/media/share/pieces/noah-okafor-oka-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "noah-okafor-octagon-pendant": {
+   "src": "/media/share/pieces/noah-okafor-octagon-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-t-serpent-pendant": {
+   "src": "/media/share/pieces/marcus-thuram-t-serpent-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-t-monster-pendant": {
+   "src": "/media/share/pieces/marcus-thuram-t-monster-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-thorned-t-pendant": {
+   "src": "/media/share/pieces/marcus-thuram-thorned-t-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-jesus-piece": {
+   "src": "/media/share/pieces/marcus-thuram-jesus-piece.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-snowflake-pendant": {
+   "src": "/media/share/pieces/marcus-thuram-snowflake-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "angelo-stiller-as-pendant": {
+   "src": "/media/share/pieces/angelo-stiller-as-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "jamie-leweling-jl-pendant": {
+   "src": "/media/share/pieces/jamie-leweling-jl-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "deniz-undav-l-pendant": {
+   "src": "/media/share/pieces/deniz-undav-l-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "samuel-ballet-jesus-piece": {
+   "src": "/media/share/pieces/samuel-ballet-jesus-piece.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "malik-tillman-cross-pendant": {
+   "src": "/media/share/pieces/malik-tillman-cross-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "malik-tillman-tm-pendant": {
+   "src": "/media/share/pieces/malik-tillman-tm-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "tanguy-nianzou-fam-medallion": {
+   "src": "/media/share/pieces/tanguy-nianzou-fam-medallion.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "tanguy-nianzou-nz-pendant": {
+   "src": "/media/share/pieces/tanguy-nianzou-nz-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "eljero-elia-clover-medallion": {
+   "src": "/media/share/pieces/eljero-elia-clover-medallion.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "sidney-eweka-999-pendant": {
+   "src": "/media/share/pieces/sidney-eweka-999-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "jeff-chabot-jc-pendant": {
+   "src": "/media/share/pieces/jeff-chabot-jc-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "lois-openda-script-pendant": {
+   "src": "/media/share/pieces/lois-openda-script-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "the-hand": {
+   "src": "/media/share/pieces/the-hand.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "flaneur-medallion": {
+   "src": "/media/share/pieces/flaneur-medallion.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "jack-nameplate-pendant": {
+   "src": "/media/share/pieces/jack-nameplate-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "tulips-on-tour-medallion": {
+   "src": "/media/share/pieces/tulips-on-tour-medallion.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "michy-batshuayi-butterfly-chain": {
+   "src": "/media/share/pieces/michy-batshuayi-butterfly-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-ruby-t-necklace": {
+   "src": "/media/share/pieces/marcus-thuram-ruby-t-necklace.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-infinity-chain": {
+   "src": "/media/share/pieces/marcus-thuram-infinity-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "kevin-schade-twisted-chain": {
+   "src": "/media/share/pieces/kevin-schade-twisted-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "the-safi-link": {
+   "src": "/media/share/pieces/the-safi-link.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "sirius": {
+   "src": "/media/share/pieces/sirius.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "marcus-thuram-skeleton-watch": {
+   "src": "/media/share/pieces/marcus-thuram-skeleton-watch.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "tajon-buchanan-iced-watch": {
+   "src": "/media/share/pieces/tajon-buchanan-iced-watch.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "radja-nainggolan-iced-watch": {
+   "src": "/media/share/pieces/radja-nainggolan-iced-watch.jpg",
+   "width": 1200,
+   "height": 630
+  }
+ }
+}

@@ -3,7 +3,10 @@
   "language": "en",
   "titleTemplate": "%s — Berete Jewellers",
   "description": "Custom high jewellery made in Dubai: diamond pendants, chains, championship rings and watches for clubs, footballers and stars.",
-  "image": "/media/home/frames-desktop/0001.webp",
+  "image": "/media/share/brand.jpg",
+  "imageWidth": 1200,
+  "imageHeight": 630,
+  "ogLocales": { "en": "en_GB", "fr": "fr_FR", "es": "es_ES", "de": "de_DE", "nl": "nl_NL", "ar": "ar_AE" },
   "organization": {
     "type": "Organization",
     "name": "Berete Jewellers",

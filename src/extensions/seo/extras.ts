@@ -1,5 +1,6 @@
 // The title and description of the pages that show one piece or one person, in the language of the address.
 import { defaultCatalogue } from "@/data/catalogue";
+import share from "@/data/share.generated.json";
 import { madeFor } from "@/data/relations";
 import type { Catalogue } from "@/data/types";
 import { bundleOf, LOCALE_INFO, localeOfPath, stripLocale } from "@/i18n";
@@ -25,7 +26,13 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
     const found = c.pieces.find((x) => x.slug === piece[1]);
     if (!found) return undefined;
     const who = madeFor(c, found, t.common.privateCollector, (names) => listOf(LOCALE_INFO[locale].intl, names));
-    return { title: found.title, description: clip(t.seo.pieceDescription(found.title, t.types[found.type], who) + " " + found.line + " " + found.story) };
+    // Its main photo on black (scripts/share-images.ts); a piece added since then shares the image of the site.
+    const image = (share.pieces as Record<string, { src: string; width: number; height: number } | undefined>)[found.slug];
+    return {
+      title: found.title,
+      description: clip(t.seo.pieceDescription(found.title, t.types[found.type], who) + " " + found.line + " " + found.story),
+      ...(image ? { image: image.src, imageWidth: image.width, imageHeight: image.height } : {}),
+    };
   }
   const person = /^\/players\/([a-z0-9-]+)$/.exec(neutral);
   if (person) {
