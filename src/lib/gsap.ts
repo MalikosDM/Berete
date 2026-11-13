@@ -53,8 +53,23 @@ type ScrollToOptions = {
   onComplete?: () => void;
 };
 
+/* While the page scrolls by itself (the magnet of a film), the bars that follow the visitor's direction ignore it. */
+let autoUntil = 0;
+
+// Any gesture of the visitor takes the scroll back at once.
+if (typeof window !== "undefined") {
+  const stop = () => (autoUntil = 0);
+  for (const type of ["wheel", "touchstart", "pointerdown", "keydown"]) window.addEventListener(type, stop, { passive: true, capture: true });
+}
+
+/** Whether the page is being scrolled by the site, not by the visitor. */
+export function isAutoScrolling(): boolean {
+  return typeof performance !== "undefined" && performance.now() < autoUntil;
+}
+
 export function scrollToY(y: number, opts: ScrollToOptions = {}): void {
   const { duration = 1, immediate = false, onComplete } = opts;
+  autoUntil = typeof performance !== "undefined" ? performance.now() + (immediate ? 100 : duration * 1000 + 150) : 0;
   const lenis = getLenis();
   if (lenis) {
     lenis.scrollTo(y, {
@@ -62,7 +77,10 @@ export function scrollToY(y: number, opts: ScrollToOptions = {}): void {
       immediate,
       force: true,
       easing: (t: number) => 1 - Math.pow(1 - t, 3),
-      onComplete: () => onComplete?.(),
+      onComplete: () => {
+        autoUntil = 0;
+        onComplete?.();
+      },
     });
     return;
   }

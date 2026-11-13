@@ -19,6 +19,8 @@ export type ScrollStep = {
   to: number;
   content: ReactNode;
   align?: "left" | "center" | "right";
+  /** Classes of the box that places the text (padding, alignment), in place of the ones of `align`. */
+  box?: string;
 };
 
 type ScrollVideoProps = {
@@ -48,6 +50,17 @@ function stepOpacity(p: number, s: ScrollStep): number {
   if (s.from > 0.001) o = Math.min(o, (p - s.from) / FADE);
   if (s.to < 0.999) o = Math.min(o, (s.to - p) / FADE);
   return clamp(o);
+}
+
+/** The usual padding of a text over the film: room for the navigation at the top, for the bar of buttons at the bottom on phones. */
+const PADDING = "px-5 pt-40 pb-32 sm:px-8 md:pb-20 lg:px-12 ";
+
+/**
+ * A soft dark halo behind each text: whatever the frame shows behind it (the white gold of the ring...), the words stay
+ * readable. Wider than the text, fading to nothing at its edges.
+ */
+function Halo() {
+  return <span aria-hidden="true" data-text-halo className="pointer-events-none absolute -inset-x-[14vw] -inset-y-[12vh] -z-10 bg-[radial-gradient(closest-side,rgba(10,10,10,0.82),rgba(10,10,10,0.55)_50%,rgba(10,10,10,0)_100%)]" />;
 }
 
 const ALIGN: Record<NonNullable<ScrollStep["align"]>, { box: string; inner: string }> = {
@@ -333,8 +346,11 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
             <div key={i} className="relative h-svh overflow-hidden">
               <img src={stills[i]} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
               {scrims}
-              <div className={"absolute inset-0 flex px-5 pt-40 pb-32 sm:px-8 md:pb-20 lg:px-12 " + a.box}>
-                <div className={a.inner}>{s.content}</div>
+              <div className={"absolute inset-0 flex " + (s.box ?? PADDING + a.box)}>
+                <div className={"relative isolate " + a.inner}>
+                  <Halo />
+                  {s.content}
+                </div>
               </div>
             </div>
           );
@@ -381,7 +397,8 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
           return (
             <div
               key={i}
-              className={"absolute inset-0 flex px-5 pt-40 pb-32 sm:px-8 md:pb-20 lg:px-12 " + a.box}
+              data-film-step={i}
+              className={"absolute inset-0 flex " + (s.box ?? PADDING + a.box)}
               style={{
                 opacity: o,
                 transform: "translate3d(0," + Math.round((1 - o) * 28) + "px,0)",
@@ -389,7 +406,10 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
                 pointerEvents: o > 0.6 ? "auto" : "none",
               }}
             >
-              <div className={a.inner}>{s.content}</div>
+              <div className={"relative isolate " + a.inner}>
+                <Halo />
+                {s.content}
+              </div>
             </div>
           );
         })}

@@ -8,7 +8,8 @@ import { useCatalogue } from "@/lib/catalogue";
 
 /**
  * The collections of the house, one large tile per type of jewel with at
- * least two pieces: its finest photo, its name, the number of pieces.
+ * least two pieces: its finest photo, cropped on the jewel, then its name and
+ * the number of pieces.
  */
 export default function CollectionTiles() {
   const { t } = useI18n();
@@ -33,19 +34,20 @@ export default function CollectionTiles() {
       <ul className="grid gap-px bg-white/10 md:grid-cols-2">
         {tiles.map(({ collection, pieces, hero }, i) => {
           const name = collectionWords(t, collection.slug, collection).name;
+          // An odd number of tiles: the first one spans the two columns, in a wider frame.
+          const wide = tiles.length % 2 === 1 && i === 0;
           return (
-          <li key={collection.slug} className={"bg-ink " + (tiles.length % 2 === 1 && i === 0 ? "md:col-span-2" : "")}>
+          <li key={collection.slug} className={"bg-ink " + (wide ? "md:col-span-2" : "")}>
             <Reveal className="h-full">
-              <Link
-                to={"/creations/" + collection.slug}
-                data-collection-tile={collection.slug}
-                className="group relative flex h-[78svh] flex-col justify-end overflow-hidden bg-ink md:h-[88svh]"
-              >
-                <span className="absolute inset-0 flex items-center justify-center p-8 pb-40 transition-transform duration-[2.4s] ease-out group-hover:scale-110 sm:p-12 sm:pb-44">
-                  <MediaView item={hero.cover} alt={t.collections.tileAlt(name, hero.title)} fit="contain" sizes="(max-width: 767px) 84vw, 50vw" />
+              <Link to={"/creations/" + collection.slug} data-collection-tile={collection.slug} className="group flex h-full flex-col bg-ink">
+                {/* The photo fills its frame, cropped on the jewel (the covers are framed on it): no empty black around it. */}
+                <span className={"relative block aspect-[4/5] overflow-hidden sm:aspect-square " + (wide ? "md:aspect-[2/1]" : "")}>
+                  <span className="absolute inset-0 transition-transform duration-[2.4s] ease-out group-hover:scale-105">
+                    <MediaView item={hero.cover} alt={t.collections.tileAlt(name, hero.title)} fit="cover" sizes="(max-width: 767px) 100vw, 50vw" />
+                  </span>
+                  <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-t from-ink to-transparent" />
                 </span>
-                <span aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-ink via-ink/80 to-transparent" />
-                <span className="relative block p-6 sm:p-10">
+                <span className="relative block px-6 pt-2 pb-8 sm:px-10 sm:pb-10">
                   <span className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
                     <span className="title-caps block text-[clamp(2.25rem,5vw,4.5rem)] tracking-[0.1em] text-white transition-colors duration-500 group-hover:text-rose-light">{name}</span>
                     <span className="shrink-0 font-display text-2xl" data-count>
