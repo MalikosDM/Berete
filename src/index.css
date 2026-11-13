@@ -5,6 +5,29 @@
 @source not "../dist-ssr";
 @source not "../dist-server";
 
+/*
+ * While the fonts of the site load, the text is drawn with a system font sized like them (same width of the lines):
+ * when the real font arrives, the words stay on the same lines and nothing on the page jumps (CLS).
+ * Measured on the widths of Cormorant Garamond 300 / Times New Roman and Manrope 400 / Arial.
+ */
+@font-face {
+  font-family: "Cormorant Fallback";
+  src: local("Times New Roman"), local("Times");
+  size-adjust: 95.3%;
+  ascent-override: 97%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Manrope Fallback";
+  src: local("Arial"), local("Helvetica");
+  size-adjust: 98.1%;
+  ascent-override: 109%;
+  descent-override: 31%;
+  line-gap-override: 0%;
+}
+
 @theme {
   --color-ink: #0a0a0a;
   --color-ink-soft: #141313;
@@ -17,8 +40,8 @@
   --color-rose: #b76e79;
 
   /* The Arabic pages add Amiri and IBM Plex Sans Arabic (below, html[lang="ar"]). */
-  --font-display: "Cormorant Garamond", "Times New Roman", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Cormorant Fallback", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", "Manrope Fallback", ui-sans-serif, system-ui, sans-serif;
 
   --animate-sheen: sheen 7s ease-in-out infinite;
   --animate-draw: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -53,8 +76,8 @@
 /* Its letters come from Amiri and IBM Plex Sans Arabic (the Latin fonts have none). Only the Arabic
    pages name them: elsewhere, the word العربية of the language menu would download a whole font. */
 html[lang="ar"] {
-  --font-display: "Cormorant Garamond", "Amiri", "Times New Roman", ui-serif, Georgia, serif;
-  --font-sans: "Manrope", "IBM Plex Sans Arabic", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Cormorant Garamond", "Amiri", "Cormorant Fallback", "Times New Roman", ui-serif, Georgia, serif;
+  --font-sans: "Manrope", "IBM Plex Sans Arabic", "Manrope Fallback", ui-sans-serif, system-ui, sans-serif;
 }
 
 html[lang="ar"] * {
