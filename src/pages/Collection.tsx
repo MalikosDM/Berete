@@ -110,7 +110,7 @@ function CollectionPage({ collection }: { collection: Collection }) {
             </ul>
           </div>
           <div className="lg:ps-12">
-            <p className="title-caps text-[clamp(2rem,4vw,3.25rem)] tracking-[0.1em]">{t.collections.ctaTitle}</p>
+            <h2 className="title-caps text-[clamp(2rem,4vw,3.25rem)] tracking-[0.1em]">{t.collections.ctaTitle}</h2>
             <p className="mt-6 max-w-md text-lg text-bone">{t.collections.ctaText}</p>
             <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="mt-10 inline-flex min-h-14 items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light">
               <BrandIcon name="whatsapp" className="size-5" /> {t.collections.ctaButton}

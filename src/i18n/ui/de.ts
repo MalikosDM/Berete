@@ -58,6 +58,7 @@ export const de: Messages = {
 
   whatsapp: {
     hello: "Hallo Berete Jewellers, ich möchte ein Schmuckstück nach Maß in Auftrag geben.",
+    createBox: "Hallo Berete Jewellers, ich möchte mein eigenes Etui gestalten.",
     piece: (name: string) => "Hallo Berete Jewellers, ich hätte gern ein Stück wie „" + name + "“. Können wir darüber sprechen?",
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["Hallo Berete Jewellers, ich möchte ein Schmuckstück in Auftrag geben.", "Stück: " + type, "Budget: " + budget, "Zeitrahmen: " + timing, ...(pieceName ? ["Inspiriert von: „" + pieceName + "“"] : [])].join("\n"),
@@ -129,6 +130,12 @@ export const de: Messages = {
     closeTop: "Ringkopf aufsetzen",
     liftTopLabel: "Den Kopf des Rings anheben",
     closeTopLabel: "Den Kopf des Rings wieder aufsetzen",
+    special: {
+      eyebrow: "Sonderprojekt",
+      title: "Meisterringe",
+      lead: "Zwei Ringe für zwei Mannschaften, Inter Mailand und den VfB Stuttgart. Beide öffnen sich zur Trophäe.",
+      discover: "Den Ring entdecken",
+    },
     wornBy: "Getragen von",
     players: "Die Spieler",
     inside: "Einblick ins Haus",
@@ -176,6 +183,10 @@ export const de: Messages = {
     },
     want: "Ich möchte ein Stück wie dieses",
     details: "Die Details",
+    upClose: "Aus der Nähe",
+    detailsEyebrow: "Jedes Symbol hat eine Bedeutung",
+    seePhoto: "Foto ansehen",
+    seenNote: "Metall und Steine: nach den Fotos, vom Atelier noch zu bestätigen.",
     madeFor: "Gefertigt für",
     theClub: "Der Verein",
     theProfile: "Das Profil",
@@ -221,6 +232,7 @@ export const de: Messages = {
     listLabel: "Liste der Spieler",
     groups: { player: "Spieler", club: "Vereine", personality: "Persönlichkeiten" },
     portrait: (name: string) => "Porträt " + ofName(name),
+    instagramOf: (name: string) => name + " auf Instagram",
     club: "Verein",
     personality: "Persönlichkeit",
     number: "Nr.",
@@ -237,7 +249,7 @@ export const de: Messages = {
     bar: "Storys",
     previous: "Vorherige Storys",
     next: "Nächste Storys",
-    open: (title: string) => "Story öffnen: " + title,
+    open: (title: string) => title + ", Story öffnen",
     dialog: (title: string) => "Story: " + title,
     alt: (title: string, index: number) => title + ", Story " + index,
     play: "Video abspielen",
@@ -275,6 +287,8 @@ export const de: Messages = {
     listLabel: "Etuis nach Maß",
     open: (name: string) => name + " im Vollbild öffnen",
     photos: (count: number) => n(count, "# Foto", "# Fotos"),
+    create: "Ihr eigenes Etui gestalten",
+    closing: "Erzählen Sie uns Ihre Idee: Wir entwerfen das Etui mit Ihnen.",
   },
 
   process: {

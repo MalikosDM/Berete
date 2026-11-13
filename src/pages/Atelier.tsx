@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Maximize2, X } from "lucide-react";
+import BrandIcon from "@/components/BrandIcon";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
@@ -8,6 +9,7 @@ import type { Box, MediaItem } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis, gsap, useReducedMotion } from "@/lib/gsap";
+import { waLink } from "@/lib/site";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
 
@@ -61,7 +63,7 @@ export default function Atelier() {
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
               </div>
               <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-5 pb-28 sm:px-8 md:pb-20 lg:px-12">
-                <p className="text-rose-gold font-display text-5xl font-light md:text-7xl">{String(i + 1).padStart(2, "0")}</p>
+                <span aria-hidden="true" className="text-rose-gold block font-display text-5xl font-light md:text-7xl">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className={"title-caps mt-4 text-[clamp(2rem,6vw,5rem)] text-white " + shadow}>{step.title}</h3>
                 <div className="rule-rose my-6 max-w-xs" aria-hidden="true" />
                 <p className={"max-w-xl text-lg text-bone " + shadow}>{step.text}</p>
@@ -130,6 +132,22 @@ function BoxViewer({ box, onClose }: { box: Box; onClose: () => void }) {
   );
 }
 
+/** "Create your own box": a WhatsApp conversation, the request already written. */
+function CreateBox() {
+  const { t } = useI18n();
+  return (
+    <a
+      href={waLink(t.whatsapp.createBox)}
+      target="_blank"
+      rel="noreferrer"
+      data-create-box
+      className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light"
+    >
+      <BrandIcon name="whatsapp" className="size-5" /> {t.boxes.create}
+    </a>
+  );
+}
+
 export function Boxes() {
   const { t } = useI18n();
   const { boxes } = useCatalogue();
@@ -137,7 +155,9 @@ export function Boxes() {
 
   return (
     <div className="pb-24">
-      <PageIntro eyebrow={t.boxes.eyebrow} title={t.boxes.title} lead={t.boxes.lead} />
+      <PageIntro eyebrow={t.boxes.eyebrow} title={t.boxes.title} lead={t.boxes.lead}>
+        <CreateBox />
+      </PageIntro>
 
       <section aria-label={t.boxes.listLabel} className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
         <ul className="grid gap-16 md:grid-cols-2 md:gap-12">
@@ -152,7 +172,7 @@ export function Boxes() {
                     <Maximize2 className="size-5" aria-hidden="true" />
                   </span>
                 </button>
-                <p className="text-rose-gold mt-6 font-display text-3xl">{String(i + 1).padStart(2, "0")}</p>
+                <span aria-hidden="true" className="text-rose-gold mt-6 block font-display text-3xl">{String(i + 1).padStart(2, "0")}</span>
                 <h2 className="title-caps mt-2 text-3xl text-white md:text-4xl">{box.name}</h2>
                 <p className="mt-4 max-w-md text-lg text-bone">{box.description}</p>
                 {box.images.length > 1 ? <p className="mt-2 text-base text-mist">{t.boxes.photos(box.images.length)}</p> : null}
@@ -166,9 +186,10 @@ export function Boxes() {
           ))}
         </ul>
         <div className="rule-rose my-20" aria-hidden="true" />
-        <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.boxes.lead}</p>
-        <div className="mt-10 flex justify-center">
-          <Link to="/contact" className="inline-flex min-h-12 items-center gap-3 bg-white px-8 text-base font-semibold text-ink hover:bg-rose-light">
+        <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.boxes.closing}</p>
+        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+          <CreateBox />
+          <Link to="/contact" className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
             {t.common.startPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>

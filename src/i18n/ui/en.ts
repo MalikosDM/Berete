@@ -8,6 +8,10 @@ import { plural } from "../format";
 
 const n = (count: number, one: string, other: string) => plural("en", count, { one, other });
 
+const PRIVATE_COLLECTOR = "A private collector";
+/** "A private collector" in the middle of a sentence: "Made for a private collector". */
+const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "a private collector" : who);
+
 export const en = {
   site: {
     skip: "Skip to content",
@@ -37,8 +41,8 @@ export const en = {
     back: "Back",
     yourPiece: "Your piece",
     yourStory: "Your story, in diamonds",
-    madeFor: (who: string) => "Made for " + who,
-    privateCollector: "A private collector",
+    madeFor: (who: string) => "Made for " + inSentence(who),
+    privateCollector: PRIVATE_COLLECTOR,
     newPiecesTitle: "New pieces are being crafted",
     newPiecesText: "This collection will be revealed soon. Start yours in the meantime.",
   },
@@ -46,6 +50,7 @@ export const en = {
   /** The messages written for the visitor in WhatsApp. */
   whatsapp: {
     hello: "Hello Berete Jewellers, I would like to start a custom piece.",
+    createBox: "Hello Berete Jewellers, I'd like to create my own box.",
     piece: (name: string) => 'Hello Berete Jewellers, I want a piece like "' + name + '". Can we talk about it?',
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["Hello Berete Jewellers, I would like to start a piece.", "Piece: " + type, "Budget: " + budget, "Timing: " + timing, ...(pieceName ? ['Inspired by: "' + pieceName + '"'] : [])].join("\n"),
@@ -119,6 +124,13 @@ export const en = {
     closeTop: "Close the top",
     liftTopLabel: "Lift the top of the ring",
     closeTopLabel: "Close the top of the ring",
+    /** The special project after the film: the championship rings of Inter Milan and VfB Stuttgart. */
+    special: {
+      eyebrow: "Special project",
+      title: "Championship rings",
+      lead: "Two rings made for two squads, Inter Milan and VfB Stuttgart. Both open onto the trophy.",
+      discover: "Discover the ring",
+    },
     wornBy: "Worn by",
     players: "The players",
     inside: "Inside the house",
@@ -166,6 +178,13 @@ export const en = {
     },
     want: "I want a piece like this",
     details: "The details",
+    /** The title of the photos of a piece that has "The details" (its symbols, one by one). */
+    upClose: "Up close",
+    /** Above the title "The details". */
+    detailsEyebrow: "Every symbol has a meaning",
+    seePhoto: "See the photo",
+    /** Under the technical sheet of a draft: the row "Metal and stones" comes from the photos. */
+    seenNote: "Metal and stones: as seen in the photos, to be confirmed by the atelier.",
     madeFor: "Made for",
     theClub: "The club",
     theProfile: "The profile",
@@ -210,6 +229,7 @@ export const en = {
     listLabel: "Players list",
     groups: { player: "Players", club: "Clubs", personality: "Personalities" },
     portrait: (name: string) => "Portrait of " + name,
+    instagramOf: (name: string) => name + " on Instagram",
     club: "Club",
     personality: "Personality",
     number: "No.",
@@ -226,7 +246,7 @@ export const en = {
     bar: "Stories",
     previous: "Previous stories",
     next: "Next stories",
-    open: (title: string) => "Open the story " + title,
+    open: (title: string) => title + ", open the story",
     dialog: (title: string) => "Story: " + title,
     /** The text of a photo or video of a story without its own: "Kevin Schade, story 3". */
     alt: (title: string, index: number) => title + ", story " + index,
@@ -266,6 +286,8 @@ export const en = {
     listLabel: "Custom boxes",
     open: (name: string) => "Open " + name + " full screen",
     photos: (count: number) => n(count, "# photo", "# photos"),
+    create: "Create your own box",
+    closing: "Tell us your idea: we draw the box with you.",
   },
 
   process: {
@@ -421,7 +443,7 @@ export const en = {
 
   /** The title and description of the pages of one piece or one person (search engines, shares). */
   seo: {
-    pieceDescription: (title: string, type: string, who: string) => title + ": " + type.toLowerCase() + " made for " + who + " by Berete Jewellers, Dubai.",
+    pieceDescription: (title: string, type: string, who: string) => title + ": " + type.toLowerCase() + " made for " + inSentence(who) + " by Berete Jewellers, Dubai.",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", Player" : kind === "club" ? ", Club" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
       "The stories and the custom pieces of " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "personality" : "player") + ") with Berete Jewellers, custom high jewellery made in Dubai.",

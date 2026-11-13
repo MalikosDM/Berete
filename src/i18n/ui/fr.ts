@@ -65,6 +65,7 @@ export const fr: Messages = {
 
   whatsapp: {
     hello: "Bonjour Berete Jewellers, je souhaiterais créer une pièce sur mesure.",
+    createBox: "Bonjour Berete Jewellers, j’aimerais créer mon propre écrin.",
     piece: (name: string) => "Bonjour Berete Jewellers, je souhaiterais une pièce dans l’esprit de « " + name + " ». Pourrions-nous en parler ?",
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["Bonjour Berete Jewellers, je souhaiterais créer une pièce.", "Pièce : " + type, "Budget : " + budget, "Délai : " + timing, ...(pieceName ? ["Inspiration : « " + pieceName + " »"] : [])].join("\n"),
@@ -136,6 +137,12 @@ export const fr: Messages = {
     closeTop: "Refermer le plateau",
     liftTopLabel: "Soulever le plateau de la bague",
     closeTopLabel: "Refermer le plateau de la bague",
+    special: {
+      eyebrow: "Projet spécial",
+      title: "Bagues de champions",
+      lead: "Deux bagues faites pour deux équipes, l’Inter Milan et le VfB Stuttgart. Toutes deux s’ouvrent sur le trophée.",
+      discover: "Découvrir la bague",
+    },
     wornBy: "Portées par",
     players: "Les joueurs",
     inside: "Au cœur de la maison",
@@ -182,6 +189,10 @@ export const fr: Messages = {
     },
     want: "Je souhaite une pièce comme celle-ci",
     details: "Les détails",
+    upClose: "De près",
+    detailsEyebrow: "Chaque symbole a un sens",
+    seePhoto: "Voir la photo",
+    seenNote: "Métal et pierres : d’après les photos, à confirmer par l’atelier.",
     madeFor: "Réalisée pour",
     theClub: "Le club",
     theProfile: "Le profil",
@@ -226,6 +237,7 @@ export const fr: Messages = {
     listLabel: "Liste des joueurs",
     groups: { player: "Joueurs", club: "Clubs", personality: "Personnalités" },
     portrait: (name: string) => "Portrait " + ofName(name),
+    instagramOf: (name: string) => name + " sur Instagram",
     club: "Club",
     personality: "Personnalité",
     number: "N°",
@@ -242,7 +254,7 @@ export const fr: Messages = {
     bar: "Stories",
     previous: "Stories précédentes",
     next: "Stories suivantes",
-    open: (title: string) => "Ouvrir la story « " + title + " »",
+    open: (title: string) => title + ", ouvrir la story",
     dialog: (title: string) => "Story : " + title,
     alt: (title: string, index: number) => title + ", story " + index,
     play: "Lire la vidéo",
@@ -280,6 +292,8 @@ export const fr: Messages = {
     listLabel: "Écrins sur mesure",
     open: (name: string) => "Afficher en plein écran : " + name,
     photos: (count: number) => n(count, { one: "# photo", other: "# photos" }),
+    create: "Créer votre écrin",
+    closing: "Dites-nous votre idée : nous dessinons l’écrin avec vous.",
   },
 
   process: {

@@ -47,6 +47,7 @@ export const nl: Messages = {
 
   whatsapp: {
     hello: "Hallo Berete Jewellers, ik zou graag een juweel op maat laten maken.",
+    createBox: "Hallo Berete Jewellers, ik wil graag mijn eigen etui ontwerpen.",
     piece: (name: string) => "Hallo Berete Jewellers, ik zou graag een juweel zoals “" + name + "” willen. Kunnen we het erover hebben?",
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["Hallo Berete Jewellers, ik zou graag een juweel laten maken.", "Juweel: " + type, "Budget: " + budget, "Termijn: " + timing, ...(pieceName ? ["Geïnspireerd door: “" + pieceName + "”"] : [])].join("\n"),
@@ -118,6 +119,12 @@ export const nl: Messages = {
     closeTop: "Bovenstuk sluiten",
     liftTopLabel: "Het bovenstuk van de ring optillen",
     closeTopLabel: "Het bovenstuk van de ring sluiten",
+    special: {
+      eyebrow: "Speciaal project",
+      title: "Kampioensringen",
+      lead: "Twee ringen voor twee ploegen, Inter Milaan en VfB Stuttgart. Beide gaan open op de trofee.",
+      discover: "Ontdek de ring",
+    },
     wornBy: "Gedragen door",
     players: "De spelers",
     inside: "In het huis",
@@ -164,6 +171,10 @@ export const nl: Messages = {
     },
     want: "Ik wil graag een juweel zoals dit",
     details: "De details",
+    upClose: "Van dichtbij",
+    detailsEyebrow: "Elk symbool heeft een betekenis",
+    seePhoto: "Bekijk de foto",
+    seenNote: "Metaal en stenen: zoals te zien op de foto’s, nog te bevestigen door het atelier.",
     madeFor: "Gemaakt voor",
     theClub: "De club",
     theProfile: "Het profiel",
@@ -208,6 +219,7 @@ export const nl: Messages = {
     listLabel: "Lijst van spelers",
     groups: { player: "Spelers", club: "Clubs", personality: "Persoonlijkheden" },
     portrait: (name: string) => "Portret van " + name,
+    instagramOf: (name: string) => name + " op Instagram",
     club: "Club",
     personality: "Persoonlijkheid",
     number: "Nr.",
@@ -224,7 +236,7 @@ export const nl: Messages = {
     bar: "Stories",
     previous: "Vorige stories",
     next: "Volgende stories",
-    open: (title: string) => "Story openen: " + title,
+    open: (title: string) => title + ", story openen",
     dialog: (title: string) => "Story: " + title,
     alt: (title: string, index: number) => title + ", story " + index,
     play: "Video afspelen",
@@ -262,6 +274,8 @@ export const nl: Messages = {
     listLabel: "Etuis op maat",
     open: (name: string) => name + " op volledig scherm openen",
     photos: (count: number) => n(count, "# foto", "# foto’s"),
+    create: "Ontwerp uw eigen etui",
+    closing: "Vertel ons uw idee: we ontwerpen het etui samen met u.",
   },
 
   process: {

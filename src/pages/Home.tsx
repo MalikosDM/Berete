@@ -5,12 +5,14 @@ import ContactBlock from "@/components/ContactBlock";
 import CollectionTiles from "@/components/CollectionTiles";
 import { MediaView } from "@/components/Media";
 import PiecesShowcase from "@/components/PiecesShowcase";
+import PlayerWall, { facesFirst } from "@/components/PlayerWall";
 import Reveal from "@/components/Reveal";
 import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
+import SpecialProject from "@/components/SpecialProject";
 import SplitHeading from "@/components/SplitHeading";
 import StoriesBar from "@/components/stories/StoriesBar";
 import { media } from "@/data/catalogue";
-import { INTER } from "@/data/pieces";
+import { SPECIAL_PROJECT } from "@/data/pieces";
 import { Link, useI18n, type Messages } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
@@ -31,23 +33,26 @@ const homeSteps = (t: Messages): ScrollStep[] => [
     from: 0,
     to: 0.05,
     align: "left",
+    // Phones: the opening text starts under the bar of stories (navigation 4.5rem + bubbles and names) and sits at the
+    // bottom of the screen when there is room; it never goes up under the bar ("safe"). Computers: centred.
+    box: "px-5 pt-[12.75rem] pb-5 [align-items:safe_flex-end] [@media(max-height:600px)]:pt-[12.5rem] [@media(max-height:600px)]:pb-3 justify-start text-start sm:px-8 sm:pt-[14rem] md:items-center md:pt-[15.5rem] md:pb-20 lg:px-12",
     content: (
-      <div className={"max-w-4xl " + shadow}>
-        <p className="flex flex-col gap-4 font-display text-base uppercase tracking-[0.3em] text-white md:text-lg">
+      <div className={"max-w-4xl " + shadow} data-home-hero>
+        <p className="flex flex-col gap-3 font-display text-base uppercase tracking-[0.2em] text-white md:gap-4 md:text-lg md:tracking-[0.3em] [@media(max-height:600px)]:gap-2">
           <span>{t.home.kicker}</span>
-          <span aria-hidden="true" className="bg-rose-gold block h-px w-24" />
+          <span aria-hidden="true" className="bg-rose-gold block h-px w-24 [@media(max-height:600px)]:hidden" />
         </p>
-        <h1 className="mt-8 max-w-3xl font-display text-[clamp(2.5rem,6vw,4.5rem)] font-light uppercase leading-[1.05] tracking-[0.06em] text-white">{t.home.title}</h1>
-        <p className="mt-5 text-lg text-bone md:text-xl">{t.site.tagline}</p>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Link to="/creations" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/70 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base">
+        <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.75rem,8.2vw,2.75rem)] font-light uppercase leading-[1.05] tracking-[0.05em] text-white [text-wrap:balance] md:mt-8 md:text-[clamp(2.5rem,6vw,4.5rem)] md:tracking-[0.06em] [@media(max-height:600px)]:mt-3 [@media(max-height:600px)]:text-[1.625rem]">{t.home.title}</h1>
+        <p className="mt-3 text-lg text-bone md:mt-5 md:text-xl [@media(max-height:600px)]:mt-2">{t.site.tagline}</p>
+        <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 md:mt-10 [@media(max-height:600px)]:mt-4">
+          <Link to="/creations" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/70 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
             {t.home.discover}
           </Link>
-          <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-7 text-sm font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-rose-light max-sm:text-base">
+          <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-7 text-sm font-semibold uppercase tracking-[0.18em] text-ink transition-colors hover:bg-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
             {t.common.startPiece}
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
-          <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base">
+          <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
             <BrandIcon name="whatsapp" className="size-5" />
             {t.common.whatsapp}
           </a>
@@ -76,12 +81,11 @@ const homeSteps = (t: Messages): ScrollStep[] => [
   },
 ];
 
-/* A selection of pieces for the row of the home page (the collections show all of them). */
+/* A selection of pieces for the row of the home page (the collections show all of them; the two championship rings have their own section). */
 const SELECTION = [
   "kevin-schade-dragon-ball-pendant",
   "michy-batshuayi-butterfly-chain",
   "marcus-thuram-t-serpent-pendant",
-  INTER,
   "noah-okafor-jersey-pendant",
   "kenan-yildiz-celebration-pendant",
   "marcus-thuram-ruby-t-necklace",
@@ -94,9 +98,11 @@ export default function Home() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const [ringOpen, setRingOpen] = useState(false);
-  const featured = cat.pieces.find((p) => p.featured) ?? cat.pieces[0];
+  // The featured capsule, unless it is one of the rings of the special project (already shown above it).
+  const chosen = cat.pieces.find((p) => p.featured) ?? cat.pieces[0];
+  const featured = chosen && !SPECIAL_PROJECT.some((r) => r.slug === chosen.slug) ? chosen : undefined;
   const opened = featured?.gallery[0];
-  const players = cat.people.filter((p) => p.kind === "player");
+  const players = facesFirst(cat.people.filter((p) => p.kind === "player"), cat);
   const setting = media.videos["atelier/setting"];
   const box = cat.boxes[0];
 
@@ -104,6 +110,8 @@ export default function Home() {
     <>
       <StoriesBar />
       <ScrollVideo media={media.scroll.home!} steps={homeSteps(t)} label={t.home.filmLabel} />
+
+      <SpecialProject />
 
       <CollectionTiles />
 
@@ -165,16 +173,9 @@ export default function Home() {
               {t.common.allPlayers} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
           </div>
-          <ul className="mt-14 flex flex-wrap items-baseline gap-x-10 gap-y-4">
-            {players.map((p) => (
-              <li key={p.slug}>
-                <Link to={"/players/" + p.slug} className="group inline-flex min-h-12 items-baseline">
-                  {p.number !== null ? <span className="text-rose-gold me-3 font-display text-xl">{p.number}</span> : null}
-                  <span className="font-display text-[clamp(1.75rem,4vw,3.25rem)] font-light uppercase tracking-[0.06em] text-white transition-colors group-hover:text-rose-light">{p.name}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-14">
+            <PlayerWall people={players} compact />
+          </div>
         </div>
       </section>
 
@@ -186,7 +187,7 @@ export default function Home() {
           <Reveal className="bg-ink">
             <Link to="/atelier" className="group flex h-full flex-col p-6 sm:p-8">
               <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{setting ? <MediaView item={setting} alt={t.home.atelierAlt} fit="cover" sizes="(max-width: 1023px) 100vw, 33vw" /> : null}</div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.atelierTitle}</p>
+              <h3 className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.atelierTitle}</h3>
               <p className="mt-3 text-lg text-bone">{t.home.atelierText}</p>
               <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.enter} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>
@@ -194,7 +195,7 @@ export default function Home() {
           <Reveal className="bg-ink" delay={0.08}>
             <Link to="/boxes" className="group flex h-full flex-col p-6 sm:p-8">
               <div className="aspect-[4/5] w-full overflow-hidden bg-ink-soft">{box?.images[1] ?? box?.images[0] ? <MediaView item={(box.images[1] ?? box.images[0])!} fit="cover" sizes="(max-width: 1023px) 100vw, 33vw" className="transition-transform duration-[1.4s] group-hover:scale-105" /> : null}</div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.boxesTitle}</p>
+              <h3 className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.boxesTitle}</h3>
               <p className="mt-3 text-lg text-bone">{t.home.boxesText}</p>
               <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.discoverShort} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>
@@ -213,7 +214,7 @@ export default function Home() {
                   ))}
                 </ol>
               </div>
-              <p className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.processTitle}</p>
+              <h3 className="title-caps mt-8 text-3xl tracking-[0.14em]">{t.home.processTitle}</h3>
               <p className="mt-3 text-lg text-bone">{t.home.processText}</p>
               <span className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] group-hover:text-rose-light">{t.home.follow} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" /></span>
             </Link>

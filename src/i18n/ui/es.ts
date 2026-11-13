@@ -47,6 +47,7 @@ export const es: Messages = {
 
   whatsapp: {
     hello: "Hola, Berete Jewellers. Me gustaría encargar una pieza a medida.",
+    createBox: "Hola, Berete Jewellers. Me gustaría crear mi propio estuche.",
     piece: (name: string) => "Hola, Berete Jewellers. Me gustaría una pieza como “" + name + "”. ¿Podríamos hablarlo?",
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["Hola, Berete Jewellers. Me gustaría empezar una pieza.", "Pieza: " + type, "Presupuesto: " + budget, "Plazo: " + timing, ...(pieceName ? ["Inspirada en: “" + pieceName + "”"] : [])].join("\n"),
@@ -118,6 +119,12 @@ export const es: Messages = {
     closeTop: "Cerrar la tapa",
     liftTopLabel: "Levantar la tapa del anillo",
     closeTopLabel: "Cerrar la tapa del anillo",
+    special: {
+      eyebrow: "Proyecto especial",
+      title: "Anillos de campeones",
+      lead: "Dos anillos hechos para dos equipos, el Inter de Milán y el VfB Stuttgart. Ambos se abren sobre el trofeo.",
+      discover: "Descubrir el anillo",
+    },
     wornBy: "Lucidas por",
     players: "Los jugadores",
     inside: "Dentro de la casa",
@@ -164,6 +171,10 @@ export const es: Messages = {
     },
     want: "Quiero una pieza como esta",
     details: "Los detalles",
+    upClose: "De cerca",
+    detailsEyebrow: "Cada símbolo tiene un significado",
+    seePhoto: "Ver la foto",
+    seenNote: "Metal y piedras: según las fotos, pendiente de confirmación por el taller.",
     madeFor: "Creada para",
     theClub: "El club",
     theProfile: "El perfil",
@@ -208,6 +219,7 @@ export const es: Messages = {
     listLabel: "Lista de jugadores",
     groups: { player: "Jugadores", club: "Clubes", personality: "Personalidades" },
     portrait: (name: string) => "Retrato de " + name,
+    instagramOf: (name: string) => name + " en Instagram",
     club: "Club",
     personality: "Personalidad",
     number: "Dorsal",
@@ -224,7 +236,7 @@ export const es: Messages = {
     bar: "Historias",
     previous: "Historias anteriores",
     next: "Historias siguientes",
-    open: (title: string) => "Abrir la historia: " + title,
+    open: (title: string) => title + ", abrir la historia",
     dialog: (title: string) => "Historia: " + title,
     alt: (title: string, index: number) => title + ", historia " + index,
     play: "Reproducir el vídeo",
@@ -262,6 +274,8 @@ export const es: Messages = {
     listLabel: "Estuches a medida",
     open: (name: string) => "Ver " + name + " en pantalla completa",
     photos: (count: number) => n(count, "# foto", "# fotos"),
+    create: "Cree su propio estuche",
+    closing: "Cuéntenos su idea: diseñamos el estuche con usted.",
   },
 
   process: {

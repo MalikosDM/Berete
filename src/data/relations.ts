@@ -1,4 +1,5 @@
 /* The links between stories, people and pieces, computed from the catalogue. */
+import { media } from "./sources.js";
 import type { Catalogue, MediaItem, Person, Piece, PieceType, Story } from "./types.js";
 
 export const TYPE_LABELS: Record<PieceType, string> = {
@@ -36,25 +37,30 @@ export function pieceVisualFor(piece: Piece, person: Person | null): MediaItem {
   return piece.cover;
 }
 
-/** Portrait of a person: their photo, else the cover of their first story, else their own piece. */
-export function portraitOf(cat: Catalogue, person: Person): string {
+/**
+ * Portrait of a person: their profile photo (admin), else the best photo of them found in the stories, cropped on them
+ * (scripts/piece-media.mjs, PORTRAITS); "" when there is none: the site shows their initials. Never a photo of a jewel.
+ */
+export function portraitOf(_cat: Catalogue, person: Person): string {
   if (person.portrait) return person.portrait;
-  const story = storiesOf(cat, person.slug).find((s) => s.cover !== "");
-  if (story) return story.cover;
-  for (const piece of piecesOf(cat, person.slug)) {
-    const own = piece.gallery.find((m) => m.caption?.startsWith(person.name));
-    if (own) return own.src;
-  }
-  return "";
+  return media.stills?.["portraits/" + person.slug]?.src ?? "";
 }
 
-/** Who a piece was made for, in a few words: "Kevin Schade", "VfB Stuttgart", "A private collector". */
+/** The Instagram profile of a person, or null. */
+export function instagramOf(person: Person): string | null {
+  return person.instagram ? "https://www.instagram.com/" + encodeURIComponent(person.instagram) + "/" : null;
+}
+
+/**
+ * Who a piece was made for, in a few words: "Kevin Schade", "VfB Stuttgart", "A private collector". A client named on
+ * the site comes first (the Inter ring was made for the club, its players come after).
+ */
 export function madeFor(cat: Catalogue, piece: Piece, privateCollector = "A private collector", join: (names: string[]) => string = (names) => names.join(", ")): string {
+  if (piece.clientPublic && piece.client) return piece.client;
   const people = peopleOf(cat, piece);
   const named = people.filter((p) => p.kind !== "club");
   if (named.length > 0) return join(named.map((p) => p.name));
   if (people.length > 0) return join(people.map((p) => p.name));
-  if (piece.clientPublic && piece.client) return piece.client;
   return privateCollector;
 }
 

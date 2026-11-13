@@ -89,6 +89,7 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
       handover: p.handover.map(m),
       making,
       specs: p.specs.map((s) => ({ label: v.text(s.label, "text"), value: v.text(s.value, "text") })),
+      details: p.details.map((d) => ({ ...d, title: v.text(d.title, "text"), text: v.text(d.text, "text") })),
       press: p.press.map((x) => ({ ...x, title: v.text(x.title, "text") })),
     };
   });

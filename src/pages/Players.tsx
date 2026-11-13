@@ -1,34 +1,22 @@
 import { useState } from "react";
 import { useParams } from "react-router";
-import { ArrowLeft, ArrowRight, ArrowUpRight, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
 import { Img, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PageIntro from "@/components/PageIntro";
+import PlayerWall, { PlayerPortrait } from "@/components/PlayerWall";
 import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
-import { findPerson, initials, membersOf, pieceVisualFor, piecesOf, portraitOf, storiesOf } from "@/data/relations";
-import type { Person, PersonKind } from "@/data/types";
+import { findPerson, instagramOf, membersOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
+import type { PersonKind } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import NotFound from "@/pages/NotFound";
 
 const GROUPS: PersonKind[] = ["player", "club", "personality"];
-
-function Portrait({ person, className = "", big = false }: { person: Person; className?: string; big?: boolean }) {
-  const { t } = useI18n();
-  const cat = useCatalogue();
-  const src = portraitOf(cat, person);
-  if (!src) {
-    return (
-      <span aria-hidden="true" className={"flex items-center justify-center bg-ink-soft " + className}>
-        <span className={"text-rose-gold font-display font-light " + (big ? "text-[clamp(5rem,14vw,10rem)]" : "text-2xl")}>{initials(person.name)}</span>
-      </span>
-    );
-  }
-  return <Img src={src} srcSet={coverSrcSet(src)} sizes={big ? "(max-width: 1023px) 100vw, 40vw" : "96px"} alt={t.players.portrait(person.name)} loading="lazy" decoding="async" className={"object-cover " + className} />;
-}
 
 export default function Players() {
   const { t } = useI18n();
@@ -42,25 +30,9 @@ export default function Players() {
           const list = people.filter((p) => p.kind === kind);
           if (list.length === 0) return null;
           return (
-            <div key={kind} className="mt-16 first:mt-0">
-              <h2 className="eyebrow mb-6">{t.players.groups[kind]}</h2>
-              <ul className="border-t border-white/15">
-                {list.map((p) => (
-                  <li key={p.slug} className="border-b border-white/15">
-                    <Link to={"/players/" + p.slug} className="group grid min-h-24 grid-cols-[4.5rem_1fr] items-center gap-x-5 gap-y-2 py-6 sm:grid-cols-[6rem_1fr_auto] lg:py-8">
-                      <Portrait person={p} className="aspect-square w-full rounded-full transition-[filter] duration-500 md:grayscale md:group-hover:grayscale-0" />
-                      <span className="min-w-0">
-                        <span className="text-rose-gold font-display text-xl">{p.number !== null ? String(p.number).padStart(2, "0") : ""}</span>
-                        <span className="block font-display text-[clamp(1.875rem,6.5vw,6rem)] leading-[0.95] font-light uppercase tracking-[0.03em] break-words text-white transition-colors duration-500 group-hover:text-rose-light group-focus-visible:text-rose-light">{p.name}</span>
-                      </span>
-                      <span className="col-start-2 flex items-center gap-4 text-base text-bone sm:col-start-auto">
-                        {p.club}
-                        <ArrowUpRight className="size-6 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
-                      </span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+            <div key={kind} className="mt-20 first:mt-0">
+              <h2 className="eyebrow mb-8">{t.players.groups[kind]}</h2>
+              <PlayerWall people={list} />
             </div>
           );
         })}
@@ -81,12 +53,13 @@ export function PlayerPage() {
   const pieces = piecesOf(cat, person.slug);
   const members = membersOf(cat, person);
   const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
+  const instagram = instagramOf(person);
 
   return (
     <>
       <section className="mx-auto grid max-w-[1600px] gap-12 px-5 pt-32 pb-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:pt-40 lg:pb-28">
         <div className="lg:col-span-5">
-          <Portrait person={person} big className="aspect-[4/5] w-full" />
+          <PlayerPortrait person={person} big sizes="(max-width: 1023px) 100vw, 40vw" className="aspect-[4/5] w-full" />
         </div>
         <div className="flex flex-col justify-center lg:col-span-6 lg:col-start-7">
           <Link to="/players" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-bone hover:text-rose-light">
@@ -105,6 +78,11 @@ export function PlayerPage() {
           <p className="mt-8 max-w-xl text-lg text-bone">
             {person.bio || (pieces.length > 0 ? t.players.bioWithPieces(person.name) : t.players.bioStories(person.name))}
           </p>
+          {instagram ? (
+            <a href={instagram} target="_blank" rel="noreferrer" data-player-instagram className="mt-6 inline-flex min-h-12 w-fit items-center gap-3 text-base font-semibold text-white hover:text-rose-light">
+              <BrandIcon name="instagram" className="size-5" /> @{person.instagram}
+            </a>
+          ) : null}
           {stories.length > 0 ? (
             <button
               type="button"
@@ -160,7 +138,6 @@ export function PlayerPage() {
                     setOpen(i);
                   }}
                   className="group block w-full text-start"
-                  aria-label={t.stories.open(s.title)}
                 >
                   <span className="relative block aspect-square overflow-hidden rounded-full bg-rose-gold p-[2px]">
                     <span className="block h-full w-full overflow-hidden rounded-full border-2 border-ink">

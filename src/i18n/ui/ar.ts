@@ -43,6 +43,7 @@ export const ar: Messages = {
 
   whatsapp: {
     hello: "مرحباً Berete Jewellers، أود البدء في تصميم قطعة حسب الطلب.",
+    createBox: "مرحباً Berete Jewellers، أودّ تصميم علبتي الخاصة.",
     piece: (name: string) => "مرحباً Berete Jewellers، أرغب في قطعة مثل «" + name + "». هل يمكننا التحدث بشأنها؟",
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
       ["مرحباً Berete Jewellers، أود البدء في تصميم قطعة.", "القطعة: " + type, "الميزانية: " + budget, "التوقيت: " + timing, ...(pieceName ? ["مستوحاة من: «" + pieceName + "»"] : [])].join("\n"),
@@ -114,6 +115,12 @@ export const ar: Messages = {
     closeTop: "إغلاق الغطاء",
     liftTopLabel: "رفع غطاء الخاتم",
     closeTopLabel: "إغلاق غطاء الخاتم",
+    special: {
+      eyebrow: "مشروع خاص",
+      title: "خواتم الأبطال",
+      lead: "خاتمان صُنعا لفريقين، إنتر ميلان وفي إف بي شتوتغارت. كلاهما ينفتح على الكأس.",
+      discover: "اكتشفوا الخاتم",
+    },
     wornBy: "يرتديها",
     players: "اللاعبون",
     inside: "داخل الدار",
@@ -160,6 +167,10 @@ export const ar: Messages = {
     },
     want: "أرغب في قطعة مثل هذه",
     details: "التفاصيل",
+    upClose: "عن قرب",
+    detailsEyebrow: "لكل رمز معنى",
+    seePhoto: "مشاهدة الصورة",
+    seenNote: "المعدن والأحجار: كما تظهر في الصور، بانتظار تأكيد المشغل.",
     madeFor: "صُنعت خصيصاً من أجل",
     theClub: "النادي",
     theProfile: "الملف الشخصي",
@@ -204,6 +215,7 @@ export const ar: Messages = {
     listLabel: "قائمة اللاعبين",
     groups: { player: "اللاعبون", club: "الأندية", personality: "الشخصيات" },
     portrait: (name: string) => "صورة " + name,
+    instagramOf: (name: string) => name + " على Instagram",
     club: "نادٍ",
     personality: "شخصية",
     number: "الرقم",
@@ -220,7 +232,7 @@ export const ar: Messages = {
     bar: "القصص",
     previous: "القصص السابقة",
     next: "القصص التالية",
-    open: (title: string) => "فتح القصة: " + title,
+    open: (title: string) => title + "، فتح القصة",
     dialog: (title: string) => "القصة: " + title,
     alt: (title: string, index: number) => title + "، القصة " + index,
     play: "تشغيل الفيديو",
@@ -258,6 +270,8 @@ export const ar: Messages = {
     listLabel: "علب حسب الطلب",
     open: (name: string) => "عرض " + name + " بملء الشاشة",
     photos: (count: number) => n(count, { zero: "# صورة", one: "صورة واحدة", two: "صورتان", few: "# صور", many: "# صورة", other: "# صورة" }),
+    create: "صمّموا علبتكم الخاصة",
+    closing: "أخبرونا بفكرتكم: نرسم العلبة معكم.",
   },
 
   process: {

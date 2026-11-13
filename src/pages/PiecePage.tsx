@@ -13,12 +13,12 @@ import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import { media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
-import { RENAMED_PIECES } from "@/data/pieces";
+import { RENAMED_PIECES, SEEN_LABEL } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
-import { useCatalogue } from "@/lib/catalogue";
+import { useCatalogue, useRawCatalogue } from "@/lib/catalogue";
 import { usePieceModel } from "@/lib/models";
 import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
@@ -40,6 +40,7 @@ export default function PiecePage() {
   const { t, intl } = useI18n();
   const madeFor = useMadeFor();
   const cat = useCatalogue();
+  const raw = useRawCatalogue();
   const [viewer, setViewer] = useState<{ stories: Story[]; step: number } | null>(null);
   const piece = findPiece(cat, slug);
   // The 3D model the jeweller attached to this piece, if any: shown right under the opening.
@@ -56,6 +57,9 @@ export default function PiecePage() {
   const similar = similarPieces(cat, piece, 4);
   const seenIn = storiesOfPiece(cat, piece);
   const wa = waLink(t.whatsapp.piece(piece.title));
+  // The rows of the sheet by their English label (the page shows them translated): the row "Metal and stones" says what the photos show.
+  const sheetRows = raw.pieces.find((p) => p.slug === piece.slug)?.specs.map((s) => s.label) ?? [];
+  const seenRow = sheetRows.includes(SEEN_LABEL);
 
   // Opens stories on the first photo or video of this piece, when they show it.
   const openStories = (stories: Story[]) => {
@@ -113,7 +117,8 @@ export default function PiecePage() {
       {model ? <Piece3D piece={piece} model={model} /> : null}
 
       <div id="piece-details" className="scroll-mt-24">
-        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={t.piece.details} /> : null}
+        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} /> : null}
+        {piece.details.length > 0 ? <DetailsSection piece={piece} /> : null}
       </div>
 
       {/* Made for, and the story */}
@@ -129,7 +134,7 @@ export default function PiecePage() {
                   <li key={person.slug} className="flex items-center gap-5">
                     <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
                       <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
-                        {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span className="font-display text-xl text-white">{initials(person.name)}</span>}
+                        {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span aria-hidden="true" className="font-display text-xl text-white">{initials(person.name)}</span>}
                       </span>
                     </Link>
                     <div className="min-w-0">
@@ -174,7 +179,7 @@ export default function PiecePage() {
 
         <div className="lg:col-span-6 lg:col-start-7">
           <h2 className="eyebrow">{t.piece.story}</h2>
-          {piece.line ? <p className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</p> : null}
+          {piece.line ? <h3 className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</h3> : null}
           {piece.story ? <p className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">{piece.story}</p> : null}
         </div>
       </section>
@@ -209,13 +214,15 @@ export default function PiecePage() {
         <div className="lg:col-span-6">
           <h2 id="sheet-title" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">{t.piece.sheet}</h2>
           <dl className="mt-8 border-t border-white/15">
-            {piece.specs.map((s) => (
-              <div key={s.label} className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-3 sm:gap-6">
+            {piece.specs.map((s, i) => (
+              <div key={s.label} data-spec={sheetRows[i] === SEEN_LABEL ? "seen" : undefined} className="grid gap-2 border-b border-white/15 py-5 sm:grid-cols-3 sm:gap-6">
                 <dt className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{s.label}</dt>
                 <dd className="text-lg text-white sm:col-span-2">{s.value}</dd>
               </div>
             ))}
           </dl>
+          {/* What the photos show, written before the jeweller confirms it: said as such while the piece is a draft. */}
+          {piece.draft && seenRow ? <p data-seen-note className="mt-4 text-base text-mist">{t.piece.seenNote}</p> : null}
           {box ? (
             <Link to="/boxes" data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
               <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" sizes={SIZES_FOR.thumb} /> : null}</span>
@@ -308,6 +315,58 @@ export default function PiecePage() {
 }
 
 /**
+ * "The details": each symbol of the piece and what it stands for, numbered; a detail shown by a photo of the piece opens
+ * it in full screen.
+ */
+function DetailsSection({ piece }: { piece: Piece }) {
+  const { t } = useI18n();
+  const photos = [piece.cover, ...piece.gallery].filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i);
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section aria-labelledby="details-title" data-details className="border-t border-white/10">
+      <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <p className="eyebrow">{t.piece.detailsEyebrow}</p>
+        <h2 id="details-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
+          {t.piece.details}
+        </h2>
+        <ol className="mt-14 grid gap-x-12 gap-y-12 border-t border-white/15 pt-12 md:grid-cols-2 xl:grid-cols-3">
+          {piece.details.map((d, i) => {
+            const index = d.photo ? photos.findIndex((m) => m.src === d.photo) : -1;
+            const photo = index >= 0 ? photos[index] : undefined;
+            return (
+              <li key={d.title + i} data-detail={i + 1} className="flex gap-5">
+                <span className="text-rose-gold w-10 shrink-0 font-display text-2xl leading-none">{String(i + 1).padStart(2, "0")}</span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="title-caps text-2xl leading-tight tracking-[0.08em] text-white">{d.title}</h3>
+                  <p className="mt-3 text-lg text-bone">{d.text}</p>
+                  {photo ? (
+                    <button
+                      type="button"
+                      data-detail-photo
+                      onClick={() => setOpen(index)}
+                      aria-label={t.piece.seePhoto + " · " + d.title}
+                      className="group mt-5 flex min-h-12 items-center gap-4 text-start text-base font-semibold text-white hover:text-rose-light"
+                    >
+                      <span className="block size-20 shrink-0 overflow-hidden border border-white/15 bg-ink-soft">
+                        <MediaView item={photo} alt="" fit="cover" sizes="80px" className="transition-transform duration-700 group-hover:scale-110" />
+                      </span>
+                      <span className="inline-flex items-center gap-2">
+                        {t.piece.seePhoto} <ZoomIn className="size-4" aria-hidden="true" />
+                      </span>
+                    </button>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+      {open !== null ? createPortal(<Lightbox items={photos} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
+    </section>
+  );
+}
+
+/**
  * "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. The photos
  * of the piece (its first sketch...) open in full screen.
  */
@@ -333,12 +392,12 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
           const picture = (
             <>
               {item ? (
-                <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
+                // Inside its button (a photo of this piece), the photo is named by the button.
+                <MediaView item={item} alt={own ? "" : (item.alt ?? STEPS[step].title)} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
               ) : (
                 <span className="flex h-full w-full items-center justify-center p-8">
-                  <span aria-hidden="true" className="font-display text-[5rem] leading-none font-light text-white/10">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
+                  {/* A faint number in the place of a photo: drawn by the style sheet, it is decoration, not text. */}
+                  <span aria-hidden="true" data-n={String(i + 1).padStart(2, "0")} className="font-display text-[5rem] leading-none font-light text-white/10 before:content-[attr(data-n)]" />
                 </span>
               )}
               {label ? <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
@@ -351,7 +410,8 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
                   <button
                     type="button"
                     onClick={() => setOpen(viewable.indexOf(own))}
-                    aria-label={t.gallery.open(own.alt ?? STEPS[step].title)}
+                    // The name read aloud starts with the words shown on the photo ("The first sketch").
+                    aria-label={(label ? label + " · " : "") + t.gallery.open(own.alt ?? STEPS[step].title)}
                     data-making-open={step}
                     className="group relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink-soft text-start"
                   >

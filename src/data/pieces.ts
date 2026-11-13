@@ -2,8 +2,9 @@
  * The pieces and the boxes. Every piece was found in the client's stories
  * and folders (see scripts/piece-media.mjs for the photos made from them).
  * The texts only describe what the photos show; they are drafts (draft: true)
- * until the client validates them. Nothing here is a figure the client gave
- * (carats, weights, prices): those stay "Shared on request".
+ * until the client validates them. Nothing here is a figure (carats, weights,
+ * prices): "seen" is the metal and the stones the photos show, the row "Metal
+ * and stones" of the technical sheet, left out when the photos say nothing sure.
  */
 import { group, list, sketch, st, still } from "./sources.js";
 import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
@@ -13,7 +14,8 @@ export const INTER = "campione-d-italia-2023-2024";
 export const DAILY_MAIL_ARTICLE =
   "https://www.dailymail.co.uk/sport/football/article-13472573/Marko-Arnautovic-Marcus-Thuram-Hakan-Calhanoglu-commission-diamond-rings-Inter-Milan-teammates-clubs-20th-Scudetto-title.html";
 
-const TO_CONFIRM = "Shared on request";
+/** The row of the technical sheet that says what the photos show (a draft until the jeweller confirms it). */
+export const SEEN_LABEL = "Metal and stones";
 
 /** Pieces renamed since the first version of the site: old address -> new address. */
 export const RENAMED_PIECES: Record<string, string> = {
@@ -38,6 +40,10 @@ type PieceInput = {
   gallery: Maybe[];
   handover?: Maybe[];
   specs: [label: string, value: string][];
+  /** The symbols of the piece: [title, text, the photo that shows it]. */
+  details?: [title: string, text: string, photo: Maybe][];
+  /** The metal and the stones seen in the photos (row "Metal and stones"), to be confirmed by the jeweller. No figure. */
+  seen?: string;
   press?: Press[];
   boxSlug?: string;
   featured?: boolean;
@@ -64,7 +70,8 @@ function piece(p: PieceInput): Piece {
     cover: p.cover ?? { type: "image", src: "" },
     gallery: list(...p.gallery).slice(0, 10),
     handover: list(...(p.handover ?? [])),
-    specs: [...p.specs.map(([label, value]) => ({ label, value })), { label: "Metal and stones", value: TO_CONFIRM }],
+    specs: [...p.specs.map(([label, value]) => ({ label, value })), ...(p.seen ? [{ label: SEEN_LABEL, value: p.seen }] : [])],
+    details: (p.details ?? []).map(([title, text, photo]) => ({ title, text, photo: photo?.src || null })),
     press: p.press ?? [],
     people: p.people ?? [],
     boxSlug: p.boxSlug ?? null,
@@ -75,6 +82,8 @@ function piece(p: PieceInput): Piece {
 }
 
 const at = (alt: string, caption?: string): Partial<MediaItem> => (caption ? { alt, caption } : { alt });
+/** A jewel shot on black: the page blends it in, without a frame. */
+const onBlack = (texts: Partial<MediaItem>): Partial<MediaItem> => ({ ...texts, onBlack: true });
 
 /* ---------- Photos of the site folders ---------- */
 
@@ -95,10 +104,31 @@ const vfbPhotos = group("pieces/" + VFB, [
 ]);
 
 const interPhotos = group("pieces/" + INTER, [
-  at("Campione d'Italia championship ring with a diamond-set 20"),
+  at("The Serie A logo and the number 20 in rose gold, on the side of the Campione d'Italia ring"),
   { ...at("Tray of Campione d'Italia rings made for the whole squad", "A ring for the whole squad"), onBlack: false },
   { ...at("A Campione d'Italia ring held in a white glove", "Checked before the handover"), onBlack: false },
 ]);
+
+/** The photos of the Inter ring that show its details (stories of Inter Milan). */
+// Studio photos on black: blended into the page.
+const inter = {
+  emblem: st("inter-milan", 2, onBlack(at("The Inter emblem set in diamonds on a blue ground, inside a ring of stars", "The emblem"))),
+  stars: st("inter-milan", 9, onBlack(at("Close-up of the stars and of the black and blue stones around the emblem", "The stars"))),
+  flag: st("inter-milan", 7, onBlack(at("Forza Inter above the Italian flag, on the side of the ring", "Forza Inter"))),
+  side: st("inter-milan", 4, onBlack(at("Campione d'Italia written on the side of the ring", "On the side"))),
+  serieA: st("inter-milan", 10, onBlack(at("The Serie A logo with the 20, next to the words Campione d'Italia", "The Serie A logo"))),
+  cup: st("inter-milan", 8, onBlack(at("The top of the ring lifted off, next to the cup it covers", "The top lifts off"))),
+  pendant: st("inter-milan", 5, onBlack(at("The top of the ring with its bail, worn as a pendant", "Worn as a pendant"))),
+};
+
+/**
+ * The "Special project" of the home page: the two championship rings side by side, both opening onto their trophy.
+ * closed / open: the photos of the ring shut and with its top lifted (addresses of photos of the piece).
+ */
+export const SPECIAL_PROJECT: { slug: string; trophy: string; closed: string; open: string }[] = [
+  { slug: INTER, trophy: "Campione d'Italia 2023/2024", closed: inter.emblem?.src ?? "", open: inter.cup?.src ?? "" },
+  { slug: VFB, trophy: "DFB-Pokal 2025", closed: vfbPhotos[0]?.src ?? "", open: vfbPhotos[1]?.src ?? "" },
+];
 
 /* ---------- The pieces ---------- */
 
@@ -123,6 +153,7 @@ export const PIECES: Piece[] = [
       ["Personalisation", "Name and number of each player"],
       ["Series", "Made for the squad"],
     ],
+    seen: "Rose and white gold tones · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
     featured: true,
     making: { delivery: vfbPhotos[8] },
   }),
@@ -130,23 +161,23 @@ export const PIECES: Piece[] = [
     slug: INTER,
     title: "Inter Milan — Campione d'Italia Ring",
     type: "ring",
-    line: "A diamond-set 20 for the twentieth title.",
+    line: "Twenty stars for twenty titles.",
     story:
       "Twenty titles, one number. A series of rings made for the whole squad after Inter's twentieth league title: the club emblem in diamonds on a deep blue ground, a band of stars around it, and the words Campione d'Italia on the side. The top lifts off to reveal a sculpted cup, and can be worn on its own as a pendant.",
     people: ["inter-milan", "marcus-thuram"],
     client: "Inter Milan",
     cover: interPhotos[0],
     gallery: [
-      st("inter-milan", 2, at("The Inter emblem set in diamonds on a blue ground", "The emblem")),
-      st("inter-milan", 8, at("The top of the ring lifted off, next to the cup it covers", "The top lifts off")),
-      st("inter-milan", 5, at("The top of the ring with its bail, worn as a pendant", "Worn as a pendant")),
-      st("inter-milan", 4, at("Campione d'Italia written on the side of the ring", "On the side")),
-      st("inter-milan", 10, at("Side of the ring with its sculpted number")),
-      st("inter-milan", 7, at("The ring seen from below")),
+      inter.emblem,
+      inter.stars,
+      inter.flag,
+      inter.side,
+      inter.serieA,
+      inter.cup,
+      inter.pendant,
       interPhotos[1],
       interPhotos[2],
       still("pieces/" + INTER + "/film", at("Film of the Campione d'Italia ring")),
-      st("inter-milan", 15, at("Rows of Campione d'Italia rings", "The series")),
     ],
     handover: [st("inter-squad", 2, at("Inter players with their rings", "Handover to the squad")), st("inter-squad", 5, at("An Inter player receives his ring"))],
     press: [
@@ -162,6 +193,19 @@ export const PIECES: Piece[] = [
       ["Top", "Removable, can be worn as a pendant"],
       ["Series", "Made for the whole squad"],
     ],
+    // What the jeweller told about the ring (meeting of 9 November 2026), each detail with the photo that shows it.
+    details: [
+      ["Six months of work", "The ring took six months of work.", null],
+      ["Twenty stars, twenty diamonds", "One star and one diamond for each of the club's twenty league titles.", inter.emblem],
+      ["The colours of the shirt", "Black, blue, black, blue: the stripes of the Inter shirt run all around the emblem.", inter.stars],
+      ["The Italian flag", "The green, white and red of the Italian flag, on the side of the ring.", inter.flag],
+      ["Forza Inter", "Above the flag, the cry of the supporters: Forza Inter.", inter.flag],
+      ["The Serie A logo", "The logo of the Serie A, with the number 20 added to it.", interPhotos[0]],
+      ["Campione d'Italia", "Inter Milan Campione d'Italia, written around the ring.", inter.side],
+      ["The hidden cup", "The top lifts off and reveals the cup hidden underneath.", inter.cup],
+      ["A ring, then a pendant", "The top can also be worn on its own, as a pendant.", inter.pendant],
+    ],
+    seen: "White gold tone, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
     boxSlug: "campione-d-italia-case",
     making: { delivery: still("boxes/campione-d-italia-case/01", at("The ring in its Campione d'Italia case")) },
   }),
@@ -191,8 +235,8 @@ export const PIECES: Piece[] = [
     gallery: [st("marcus-thuram", 5, at("Film of the signet ring on the hand"))],
     specs: [
       ["Type", "Signet ring"],
-      ["Setting", "Diamonds over the whole surface"],
     ],
+    seen: "White gold tone · round diamonds in pavé, baguettes along the edge, a pear-shaped stone",
   }),
 
   /* Pendants */
@@ -218,8 +262,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant on a Cuban chain"],
       ["Motif", "A hero, a dragon and the dragon balls"],
-      ["Colours", "White diamonds, blue stones, rose gold"],
     ],
+    seen: "White and rose gold tones · round diamonds in pavé; blue round, baguette and square stones",
     boxSlug: "dragon-ball-trunk",
     making: {
       sketch: st("kevin-schade", 8, at("The first hand drawing of the Dragon Ball pendant", "The first drawing")),
@@ -248,8 +292,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant"],
       ["Motif", "Two crossed hands, his celebration"],
-      ["Setting", "Pavé, baguette-cut stones at the cuffs"],
     ],
+    seen: "White gold tone · round diamonds in pavé, baguettes at the cuffs, step-cut stones on the bail",
     making: { sketch: st("kenan-yildiz", 1, at("3D model of the pendant", "The 3D design")) },
   }),
   piece({
@@ -272,8 +316,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A jersey, arms crossed, with the Swiss cross"],
-      ["Setting", "Pavé, triangle-cut stones, green stones"],
     ],
+    seen: "White and rose gold tones · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
   }),
   piece({
     slug: "noah-okafor-oka-pendant",
@@ -294,8 +338,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Nameplate pendant"],
       ["Motif", "The letters OKA and a football"],
-      ["Colours", "White diamonds, rose gold"],
     ],
+    seen: "White and rose gold tones · round diamonds, baguettes",
   }),
   piece({
     slug: "noah-okafor-octagon-pendant",
@@ -316,8 +360,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant with tennis chains"],
       ["Shape", "Octagon"],
-      ["Setting", "Baguette-cut and pear-shaped diamonds"],
     ],
+    seen: "White and rose gold tones · baguette diamonds in a herringbone, round and pear-shaped diamonds",
     boxSlug: "okafor-trunk",
     making: { delivery: still("boxes/okafor-trunk/01", at("The trunk with a photograph in its lid")) },
   }),
@@ -344,8 +388,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A gothic T and a serpent"],
-      ["Setting", "Baguettes, pear-shaped scales, red stone eye"],
     ],
+    seen: "White and rose gold tones · round diamonds in pavé, baguettes, triangle, pear and marquise diamonds, a large red pear-shaped stone",
     making: { raw: atelier[0] ? { ...atelier[0], alt: "The T-Serpent pendant before the setting", caption: "This piece, before the setting" } : null },
   }),
   piece({
@@ -366,6 +410,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A dripping T, a sculpted hand"],
     ],
+    seen: "White gold tone · round diamonds in pavé",
   }),
   piece({
     slug: "marcus-thuram-thorned-t-pendant",
@@ -384,6 +429,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A dripping T and rose gold thorns"],
     ],
+    seen: "White gold tone, rose gold thorns · round diamonds in pavé",
   }),
   piece({
     slug: "marcus-thuram-jesus-piece",
@@ -404,6 +450,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A face crowned with red stones"],
     ],
+    seen: "White gold tone, rose gold crown · round diamonds in pavé, red pear-shaped stones",
   }),
   piece({
     slug: "marcus-thuram-snowflake-pendant",
@@ -418,6 +465,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A six-branched snowflake"],
     ],
+    seen: "White gold tone · round diamonds in pavé",
   }),
   piece({
     slug: "angelo-stiller-as-pendant",
@@ -443,9 +491,9 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant on a tennis chain"],
       ["Motif", "The initials AS in a shield"],
-      ["Setting", "Baguette and round diamonds"],
       ["Signature", "BRT mark in rose gold, on the back"],
     ],
+    seen: "White gold tone · baguette diamonds in a herringbone, round diamonds",
   }),
   piece({
     slug: "jamie-leweling-jl-pendant",
@@ -462,8 +510,8 @@ export const PIECES: Piece[] = [
     ],
     specs: [
       ["Type", "Initials pendant"],
-      ["Setting", "Baguette-cut diamonds, round stones on the edge"],
     ],
+    seen: "Rose and white gold tones · step-cut diamonds, round stones on the edge",
   }),
   piece({
     slug: "deniz-undav-l-pendant",
@@ -478,6 +526,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "The letter L and a cherub"],
     ],
+    seen: "White gold tone, rose gold cherub · round diamonds in pavé",
   }),
   piece({
     slug: "samuel-ballet-jesus-piece",
@@ -498,9 +547,9 @@ export const PIECES: Piece[] = [
     ],
     specs: [
       ["Type", "Pendant"],
-      ["Setting", "Pavé, pear and marquise-cut crown"],
-      ["Signature", "BRT mark engraved on the back"],
+      ["Signature", "BRT mark on the back"],
     ],
+    seen: "Rose gold tone, white gold crown · round diamonds in pavé, pear-shaped diamonds in the crown",
   }),
   piece({
     slug: "malik-tillman-cross-pendant",
@@ -523,9 +572,9 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant on a link chain"],
       ["Motif", "A cross"],
-      ["Setting", "Round diamonds in their own settings, baguettes"],
       ["Signature", "BRT mark on the back"],
     ],
+    seen: "White gold tone · round diamonds in halo and bezel settings, a frame of baguettes",
     making: { delivery: st("malik-tillman", 1, at("Malik Tillman discovering his cross at the house", "Handed over at the house")) },
   }),
   piece({
@@ -546,6 +595,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant on a Cuban chain"],
       ["Motif", "The initials TM in gothic letters"],
     ],
+    seen: "Rose and white gold tones · round diamonds, claw-set and in pavé",
   }),
   piece({
     slug: "tanguy-nianzou-fam-medallion",
@@ -566,8 +616,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Medallion pendant on a Cuban chain"],
       ["Motif", "The word FAM among roses"],
-      ["Setting", "Pavé, marquise-cut diamonds in the flowers"],
     ],
+    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds in the flowers",
     boxSlug: "nz-travel-case",
     making: { delivery: still("boxes/nz-travel-case/01", at("The NZ travel case")) },
   }),
@@ -584,6 +634,7 @@ export const PIECES: Piece[] = [
       ["Type", "Initials pendant on a Cuban chain"],
       ["Motif", "The letters NZ"],
     ],
+    seen: "Rose and white gold tones · round diamonds in pavé",
   }),
   piece({
     slug: "eljero-elia-clover-medallion",
@@ -605,6 +656,7 @@ export const PIECES: Piece[] = [
       ["Type", "Medallion pendant"],
       ["Motif", "A four-leaf clover"],
     ],
+    seen: "Yellow gold tone · round diamonds in pavé",
   }),
   piece({
     slug: "sidney-eweka-999-pendant",
@@ -625,6 +677,7 @@ export const PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "The number 999 under a star"],
     ],
+    seen: "White and gold tones · round diamonds in pavé",
     making: { sketch: st("sidney-eweka", 5, at("The 3D design of the 999 pendant", "The 3D design")) },
   }),
   piece({
@@ -645,6 +698,7 @@ export const PIECES: Piece[] = [
       ["Type", "Initials pendant"],
       ["Motif", "The letters J and C, interlaced"],
     ],
+    seen: "White gold tone · round diamonds in pavé",
   }),
   piece({
     slug: "lois-openda-script-pendant",
@@ -658,8 +712,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Pendant"],
       ["Motif", "Script letters and a cross"],
-      ["Setting", "Pavé, baguette cross, pear-shaped diamonds"],
     ],
+    seen: "Rose gold tone · round diamonds in pavé, pear-shaped diamonds, a cross of baguettes",
   }),
   piece({
     slug: "the-hand",
@@ -681,6 +735,7 @@ export const PIECES: Piece[] = [
       ["Motif", "A hand"],
       ["Signature", "BRT mark engraved"],
     ],
+    seen: "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone",
   }),
   piece({
     slug: "flaneur-medallion",
@@ -694,6 +749,7 @@ export const PIECES: Piece[] = [
       ["Type", "Medallion pendant"],
       ["Motif", "A walker under an umbrella"],
     ],
+    seen: "Rose gold tone · round white stones in pavé",
   }),
   piece({
     slug: "jack-nameplate-pendant",
@@ -756,9 +812,9 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Chain and pendant"],
       ["Motif", "Butterflies, a face with butterfly wings"],
-      ["Colours", "Rose gold, white diamonds, purple stones"],
       ["Signature", "BRT mark on the back of the pendant"],
     ],
+    seen: "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones",
     boxSlug: "butterfly-trunk",
     making: {
       raw: st("michy-batshuayi", 10, at("The pendant in the making", "This piece, in the making")),
@@ -787,9 +843,9 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Necklace with a drop"],
       ["Motif", "Gothic T and infinity links"],
-      ["Setting", "Baguettes, pavé, red pear-shaped stone"],
       ["Signature", "BRT mark on the clasp"],
     ],
+    seen: "White gold tone, rose gold details · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds, a large red pear-shaped stone",
   }),
   piece({
     slug: "marcus-thuram-infinity-chain",
@@ -808,6 +864,7 @@ export const PIECES: Piece[] = [
       ["Type", "Chain"],
       ["Links", "Infinity links"],
     ],
+    seen: "White and rose gold tones · round diamonds in pavé",
   }),
   piece({
     slug: "kevin-schade-twisted-chain",
@@ -827,6 +884,7 @@ export const PIECES: Piece[] = [
       ["Type", "Chain"],
       ["Links", "Twisted, with diamond flowers"],
     ],
+    seen: "Rose gold tone · round diamonds in pavé and in flowers, marquise-cut leaves",
   }),
   piece({
     slug: "the-safi-link",
@@ -841,6 +899,7 @@ export const PIECES: Piece[] = [
       ["Type", "Chain"],
       ["Links", "Flowers of marquise-cut diamonds"],
     ],
+    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
   }),
   piece({
     slug: "sirius",
@@ -854,6 +913,7 @@ export const PIECES: Piece[] = [
       ["Type", "Chain and nameplate"],
       ["Box", "Sirius trunk"],
     ],
+    seen: "Rose gold tone, white gold lettering · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
     boxSlug: "sirius",
     making: { delivery: st("collectors", 52, at("The Sirius chain in its trunk", "In its trunk")) },
   }),
@@ -871,8 +931,8 @@ export const PIECES: Piece[] = [
     specs: [
       ["Type", "Watch"],
       ["Dial", "Skeleton"],
-      ["Setting", "Case and bracelet set with diamonds"],
     ],
+    seen: "White gold tone · round diamonds in pavé on the case, the bracelet and the numerals",
   }),
   piece({
     slug: "tajon-buchanan-iced-watch",
@@ -889,8 +949,8 @@ export const PIECES: Piece[] = [
     ],
     specs: [
       ["Type", "Watch"],
-      ["Setting", "Case, dial and bracelet set with diamonds"],
     ],
+    seen: "White gold tone · round diamonds in pavé on the case, the dial and the bracelet",
   }),
   piece({
     slug: "radja-nainggolan-iced-watch",
@@ -903,8 +963,8 @@ export const PIECES: Piece[] = [
     gallery: [st("radja-nainggolan", 1, at("Film of the iced watch on the wrist"))],
     specs: [
       ["Type", "Watch"],
-      ["Setting", "Dial and bracelet set with diamonds"],
     ],
+    seen: "White gold tone · round stones in pavé on the dial and the bracelet",
   }),
 ];
 
