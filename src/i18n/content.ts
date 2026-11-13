@@ -16,9 +16,12 @@ export type Visitor = {
   text: (source: string, kind: TextKind, own?: string) => string;
   /** The text of a story photo without its own: "Kevin Schade, story 3". */
   storyAlt: (title: string, index: number) => string;
+  /** The text of the first sketch of a piece (src/data/pieces.ts), with the title of the piece. */
+  sketchAlt: (title: string) => string;
 };
 
 const STORY_ALT = /^(.*), story (\d+)$/;
+const SKETCH_ALT = "Illustration of the first sketch of ";
 /** The caption of a player's own ring: "Deniz Undav · 26". */
 const NAMED_NUMBER = /^(.+) · (\d+)$/;
 
@@ -67,11 +70,17 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
   );
 
   const pieces = cat.pieces.map((p): Piece => {
+    const title = v.text(p.title, "text", ownOf(p.translations, "title", locale));
     const making: Piece["making"] = {};
-    for (const [step, item] of Object.entries(p.making) as [keyof Piece["making"], MediaItem | undefined][]) if (item) making[step] = m(item);
+    for (const [step, item] of Object.entries(p.making) as [keyof Piece["making"], MediaItem | undefined][]) {
+      if (!item) continue;
+      // The first sketch says the title of the piece: one sentence per language, with the translated title.
+      if (item.alt === SKETCH_ALT + p.title) making[step] = { ...m({ ...item, alt: undefined }), alt: v.sketchAlt(title) };
+      else making[step] = m(item);
+    }
     return {
       ...p,
-      title: v.text(p.title, "text", ownOf(p.translations, "title", locale)),
+      title,
       line: p.line ? v.text(p.line, "text", ownOf(p.translations, "line", locale)) : p.line,
       story: p.story ? v.text(p.story, "text", ownOf(p.translations, "story", locale)) : p.story,
       client: p.client ? v.text(p.client, "name") : p.client,
@@ -97,13 +106,14 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
 }
 
 /** The catalogue in this language, with this dictionary (English text -> translation). */
-export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Record<string, string>, storyAlt: Visitor["storyAlt"]): Catalogue {
+export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Record<string, string>, storyAlt: Visitor["storyAlt"], sketchAlt: Visitor["sketchAlt"]): Catalogue {
   if (locale === "en") return cat;
   return mapTexts(
     cat,
     {
       text: (source, _kind, own) => own ?? dictionary[source] ?? source,
       storyAlt,
+      sketchAlt,
     },
     locale,
   );
@@ -119,6 +129,7 @@ export function catalogueTexts(cat: Catalogue): { text: string[]; name: string[]
       return source;
     },
     storyAlt: (title, index) => title + ", story " + index,
+    sketchAlt: (title) => SKETCH_ALT + title,
   });
   for (const t of text) name.delete(t);
   return { text: [...text], name: [...name] };

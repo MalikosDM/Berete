@@ -49,7 +49,7 @@ export function CatalogueProvider({ children }: { children: ReactNode }) {
 
   const localized = useMemo(() => {
     const bundle = bundleOf(locale);
-    return localizeCatalogue(catalogue, locale, bundle.content, bundle.ui.stories.alt);
+    return localizeCatalogue(catalogue, locale, bundle.content, bundle.ui.stories.alt, bundle.ui.piece.sketchAlt);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- version: a language has just been loaded
   }, [catalogue, locale, version]);
 

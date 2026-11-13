@@ -114,6 +114,7 @@ const content: Record<string, string> = {
   "Diamonds over the whole surface": "الألماس على كامل السطح",
   "The first hand drawing of the Dragon Ball pendant": "الرسم اليدوي الأول لقلادة دراغون بول",
   "The first drawing": "الرسم الأول",
+  "The first sketch": "المخطط الأول",
   "The drawings of the versions that were not chosen": "رسومات النسخ التي لم يقع عليها الاختيار",
   "Versions on paper": "نسخ على الورق",
   "From the 3D model to the stones set by hand": "من النموذج ثلاثي الأبعاد إلى الأحجار المرصعة باليد",

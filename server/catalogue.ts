@@ -89,6 +89,22 @@ export function mergeImported(current: MediaItem[], defaults: MediaItem[]): Medi
   return [...defaults, ...current.filter((m) => !m.src.startsWith(IMPORTED))];
 }
 
+/**
+ * The steps of "How it was made" of a piece edited from /admin: a step brought
+ * by the import (a file of /media/, or none yet) follows the catalogue, a
+ * photo chosen in the admin stays.
+ */
+function mergeMaking(current: Making, defaults: Making): Making {
+  let out = current;
+  for (const step of MAKING_STEPS) {
+    const want = defaults[step];
+    const have = current[step];
+    if (!want || (have && (!have.src.startsWith(IMPORTED) || fileKey(have) === fileKey(want)))) continue;
+    out = { ...out, [step]: want };
+  }
+  return out;
+}
+
 /* ---------- Rows <-> catalogue types ---------- */
 
 type StoryRow = Awaited<ReturnType<typeof prisma.story.findMany>>[number];
@@ -274,11 +290,14 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     const cover = mediaOne(row.cover);
     const nextCover = cover.src === "" || (cover.src.startsWith(IMPORTED) && fileKey(cover) !== fileKey(p.cover)) ? p.cover : cover;
     const texts = textUpdate(pieceTexts(toPiece(row)), pieceTexts(p), row.seedHash);
-    if (gallery !== currentGallery || handover !== currentHandover || nextCover !== cover || texts) {
+    // A piece that follows the catalogue gets its steps with its texts; an edited one still gets the imported photos.
+    const currentMaking = makingOf(row.making);
+    const making = texts ? currentMaking : mergeMaking(currentMaking, p.making);
+    if (gallery !== currentGallery || handover !== currentHandover || nextCover !== cover || making !== currentMaking || texts) {
       await prisma.piece.update({
         where: { id: row.id },
         // A piece that follows the catalogue also follows its order.
-        data: { gallery, handover, cover: nextCover, ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
+        data: { gallery, handover, cover: nextCover, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
       });
     }
   }

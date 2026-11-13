@@ -166,6 +166,7 @@ export const de: Messages = {
   },
 
   piece: {
+    sketchAlt: (title: string) => "Illustration der ersten Skizze von " + title,
     steps: {
       sketch: { title: "Skizze", text: "Die Idee wird von Hand gezeichnet und dann modelliert, bis jede Proportion stimmt." },
       raw: { title: "Rohling", text: "Das Metall wird gegossen und montiert, bevor auch nur ein Stein gefasst wird." },

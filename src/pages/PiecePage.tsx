@@ -1,8 +1,9 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useParams } from "react-router";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
-import HorizontalGallery from "@/components/HorizontalGallery";
+import HorizontalGallery, { Lightbox } from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
@@ -306,10 +307,16 @@ export default function PiecePage() {
   );
 }
 
-/** "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. */
+/**
+ * "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. The photos
+ * of the piece (its first sketch...) open in full screen.
+ */
 function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem }) {
   const { t } = useI18n();
   const STEPS: Record<MakingStep, { title: string; text: string }> = t.piece.steps;
+  const owned = MAKING_STEPS.map((step) => piece.making[step] ?? (step === "delivery" ? boxImage : undefined));
+  const viewable = owned.filter((m): m is MediaItem => m !== undefined);
+  const [open, setOpen] = useState<number | null>(null);
   return (
     <section aria-labelledby="making-title" data-making className="border-y border-white/10 py-24 lg:py-32">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
@@ -320,24 +327,42 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
       </div>
       <ol className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:mx-auto lg:grid lg:max-w-[1600px] lg:grid-cols-5 lg:gap-6 lg:overflow-visible lg:px-12">
         {MAKING_STEPS.map((step, i) => {
-          const own = piece.making[step] ?? (step === "delivery" ? boxImage : undefined);
+          const own = owned[i];
           const item = own ?? atelierFor(step);
           const label = own ? (own.caption ?? t.piece.thisPiece) : item ? t.piece.inAtelier : null;
+          const picture = (
+            <>
+              {item ? (
+                <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center p-8">
+                  <span aria-hidden="true" className="font-display text-[5rem] leading-none font-light text-white/10">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </span>
+              )}
+              {label ? <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
+            </>
+          );
           return (
             <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
               <Reveal delay={i * 0.08}>
-                <span className="relative block aspect-[3/4] overflow-hidden border border-white/10 bg-ink-soft">
-                  {item ? (
-                    <MediaView item={item} alt={item.alt ?? STEPS[step].title} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
-                  ) : (
-                    <span className="flex h-full w-full items-center justify-center p-8">
-                      <span aria-hidden="true" className="font-display text-[5rem] leading-none font-light text-white/10">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
+                {own ? (
+                  <button
+                    type="button"
+                    onClick={() => setOpen(viewable.indexOf(own))}
+                    aria-label={t.gallery.open(own.alt ?? STEPS[step].title)}
+                    data-making-open={step}
+                    className="group relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink-soft text-start"
+                  >
+                    {picture}
+                    <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                      <ZoomIn className="size-5" aria-hidden="true" />
                     </span>
-                  )}
-                  {label ? <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
-                </span>
+                  </button>
+                ) : (
+                  <span className="relative block aspect-[3/4] overflow-hidden border border-white/10 bg-ink-soft">{picture}</span>
+                )}
                 <p className="mt-5 flex items-baseline gap-3">
                   <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
                   <span className="title-caps text-2xl tracking-[0.12em] text-white">{STEPS[step].title}</span>
@@ -349,6 +374,7 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
         })}
         <li aria-hidden="true" className="w-1 shrink-0 lg:hidden" />
       </ol>
+      {open !== null ? createPortal(<Lightbox items={viewable} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </section>
   );
 }

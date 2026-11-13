@@ -135,4 +135,6 @@ export type GeneratedMedia = {
   /** Photos made from the stories and the Boutique folder (scripts/piece-media.mjs), by key. */
   stills: Record<string, MediaItem>;
   scroll: Record<string, ScrollMedia>;
+  /** The first sketch of each piece (step "Sketch" of "How it was made"), by slug of the piece. */
+  sketches?: Record<string, MediaItem>;
 };

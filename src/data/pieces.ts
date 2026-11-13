@@ -5,7 +5,7 @@
  * until the client validates them. Nothing here is a figure the client gave
  * (carats, weights, prices): those stay "Shared on request".
  */
-import { group, list, st, still } from "./sources.js";
+import { group, list, sketch, st, still } from "./sources.js";
 import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
 
 export const VFB = "vfb-stuttgart-dfb-pokal-2025";
@@ -44,9 +44,15 @@ type PieceInput = {
   making?: Partial<Record<MakingStep, Maybe>>;
 };
 
+/** The text of a first sketch: the site translates it with the title of the piece (src/i18n/content.ts). */
+export const sketchAlt = (title: string) => "Illustration of the first sketch of " + title;
+
 function piece(p: PieceInput): Piece {
   const making: Making = {};
   for (const [step, item] of Object.entries(p.making ?? {}) as [MakingStep, Maybe][]) if (item) making[step] = item;
+  // The first sketch from the folder of sketches, unless the piece already has its own.
+  making.sketch ??= sketch(p.slug, at(sketchAlt(p.title), "The first sketch")) ?? undefined;
+  if (!making.sketch) delete making.sketch;
   return {
     slug: p.slug,
     title: p.title,

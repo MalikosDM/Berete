@@ -150,6 +150,7 @@ export const ar: Messages = {
   },
 
   piece: {
+    sketchAlt: (title: string) => "رسم توضيحي للمخطط الأول لقطعة " + title,
     steps: {
       sketch: { title: "الرسم", text: "تُرسم الفكرة باليد، ثم يُصاغ نموذجها حتى تستقيم كل النسب." },
       raw: { title: "القطعة الخام", text: "يُصب المعدن ويُجمَّع، قبل ترصيع أي حجر." },

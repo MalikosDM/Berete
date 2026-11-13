@@ -172,6 +172,7 @@ export const fr: Messages = {
   },
 
   piece: {
+    sketchAlt: (title: string) => "Illustration du premier croquis de " + title,
     steps: {
       sketch: { title: "Esquisse", text: "L’idée est dessinée à la main, puis modélisée jusqu’à ce que chaque proportion soit juste." },
       raw: { title: "Pièce brute", text: "Le métal est coulé et assemblé, avant que la moindre pierre ne soit sertie." },

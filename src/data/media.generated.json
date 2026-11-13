@@ -542,5 +542,223 @@
       "video": "/media/process/scrub.mp4",
       "poster": "/media/process/frames-desktop/0001.webp"
     }
+  },
+  "sketches": {
+    "angelo-stiller-as-pendant": {
+      "type": "image",
+      "src": "/media/sketches/angelo-stiller-as-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "campione-d-italia-2023-2024": {
+      "type": "image",
+      "src": "/media/sketches/campione-d-italia-2023-2024.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "deniz-undav-l-pendant": {
+      "type": "image",
+      "src": "/media/sketches/deniz-undav-l-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "eljero-elia-clover-medallion": {
+      "type": "image",
+      "src": "/media/sketches/eljero-elia-clover-medallion.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "flaneur-medallion": {
+      "type": "image",
+      "src": "/media/sketches/flaneur-medallion.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "jack-nameplate-pendant": {
+      "type": "image",
+      "src": "/media/sketches/jack-nameplate-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "jamie-leweling-jl-pendant": {
+      "type": "image",
+      "src": "/media/sketches/jamie-leweling-jl-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "jeff-chabot-jc-pendant": {
+      "type": "image",
+      "src": "/media/sketches/jeff-chabot-jc-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "kevin-schade-twisted-chain": {
+      "type": "image",
+      "src": "/media/sketches/kevin-schade-twisted-chain.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "lois-openda-script-pendant": {
+      "type": "image",
+      "src": "/media/sketches/lois-openda-script-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "malik-tillman-cross-pendant": {
+      "type": "image",
+      "src": "/media/sketches/malik-tillman-cross-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "malik-tillman-tm-pendant": {
+      "type": "image",
+      "src": "/media/sketches/malik-tillman-tm-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-infinity-chain": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-infinity-chain.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-jesus-piece": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-jesus-piece.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-ruby-t-necklace": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-ruby-t-necklace.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-signet-ring": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-signet-ring.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-skeleton-watch": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-skeleton-watch.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-snowflake-pendant": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-snowflake-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-t-monster-pendant": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-t-monster-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-t-serpent-pendant": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-t-serpent-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "marcus-thuram-thorned-t-pendant": {
+      "type": "image",
+      "src": "/media/sketches/marcus-thuram-thorned-t-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "michy-batshuayi-butterfly-chain": {
+      "type": "image",
+      "src": "/media/sketches/michy-batshuayi-butterfly-chain.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "noah-okafor-jersey-pendant": {
+      "type": "image",
+      "src": "/media/sketches/noah-okafor-jersey-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "noah-okafor-octagon-pendant": {
+      "type": "image",
+      "src": "/media/sketches/noah-okafor-octagon-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "noah-okafor-oka-pendant": {
+      "type": "image",
+      "src": "/media/sketches/noah-okafor-oka-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "radja-nainggolan-iced-watch": {
+      "type": "image",
+      "src": "/media/sketches/radja-nainggolan-iced-watch.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "samuel-ballet-jesus-piece": {
+      "type": "image",
+      "src": "/media/sketches/samuel-ballet-jesus-piece.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "sirius": {
+      "type": "image",
+      "src": "/media/sketches/sirius.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "tajon-buchanan-iced-watch": {
+      "type": "image",
+      "src": "/media/sketches/tajon-buchanan-iced-watch.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "tanguy-nianzou-fam-medallion": {
+      "type": "image",
+      "src": "/media/sketches/tanguy-nianzou-fam-medallion.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "tanguy-nianzou-nz-pendant": {
+      "type": "image",
+      "src": "/media/sketches/tanguy-nianzou-nz-pendant.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "tanguy-nianzou-nz-ring": {
+      "type": "image",
+      "src": "/media/sketches/tanguy-nianzou-nz-ring.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "the-hand": {
+      "type": "image",
+      "src": "/media/sketches/the-hand.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "the-safi-link": {
+      "type": "image",
+      "src": "/media/sketches/the-safi-link.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "tulips-on-tour-medallion": {
+      "type": "image",
+      "src": "/media/sketches/tulips-on-tour-medallion.webp",
+      "width": 1080,
+      "height": 1446
+    },
+    "vfb-stuttgart-dfb-pokal-2025": {
+      "type": "image",
+      "src": "/media/sketches/vfb-stuttgart-dfb-pokal-2025.webp",
+      "width": 1080,
+      "height": 1446
+    }
   }
 }

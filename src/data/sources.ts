@@ -21,6 +21,12 @@ export function still(key: string, texts: Partial<MediaItem> = {}): MediaItem | 
   return m ? { ...m, ...texts } : null;
 }
 
+/** The first sketch of a piece (scripts/import-media.mjs, folder "Berete - Croquis"), or null when there is none. */
+export function sketch(slug: string, texts: Partial<MediaItem> = {}): MediaItem | null {
+  const m = media.sketches?.[slug];
+  return m ? { ...m, ...texts } : null;
+}
+
 /** File number `n` of a story ("kevin-schade", 21), or null when it is missing. */
 export function st(slug: string, n: number, texts: Partial<MediaItem> = {}): MediaItem | null {
   const found = storyFiles.find((s) => s.slug === slug)?.media.find((m) => m.n === n);

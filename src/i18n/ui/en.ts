@@ -155,6 +155,8 @@ export const en = {
   },
 
   piece: {
+    /** Text of the first sketch of a piece (step "Sketch"). */
+    sketchAlt: (title: string) => "Illustration of the first sketch of " + title,
     steps: {
       sketch: { title: "Sketch", text: "The idea is drawn by hand, then modelled until every proportion is right." },
       raw: { title: "Raw piece", text: "The metal is cast and assembled, before a single stone is set." },

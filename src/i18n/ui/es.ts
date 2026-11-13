@@ -154,6 +154,7 @@ export const es: Messages = {
   },
 
   piece: {
+    sketchAlt: (title: string) => "Ilustración del primer boceto de " + title,
     steps: {
       sketch: { title: "Boceto", text: "La idea se dibuja a mano y después se modela hasta que cada proporción es justa." },
       raw: { title: "Pieza en bruto", text: "El metal se funde y se ensambla antes de engastar una sola piedra." },

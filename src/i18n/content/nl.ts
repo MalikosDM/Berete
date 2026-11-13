@@ -114,6 +114,7 @@ const content: Record<string, string> = {
   "Diamonds over the whole surface": "Diamanten over het hele oppervlak",
   "The first hand drawing of the Dragon Ball pendant": "De eerste, met de hand getekende schets van de Dragon Ball-hanger",
   "The first drawing": "De eerste tekening",
+  "The first sketch": "De eerste schets",
   "The drawings of the versions that were not chosen": "De tekeningen van de versies die niet werden gekozen",
   "Versions on paper": "Versies op papier",
   "From the 3D model to the stones set by hand": "Van het 3D-model tot de met de hand gezette stenen",

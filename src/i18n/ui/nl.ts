@@ -154,6 +154,7 @@ export const nl: Messages = {
   },
 
   piece: {
+    sketchAlt: (title: string) => "Illustratie van de eerste schets van " + title,
     steps: {
       sketch: { title: "Schets", text: "Het idee wordt met de hand getekend en daarna gemodelleerd tot elke verhouding klopt." },
       raw: { title: "Ruw stuk", text: "Het metaal wordt gegoten en samengesteld, nog voordat er één steen wordt gezet." },

@@ -31,6 +31,9 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   et écrit `public/media/` ainsi que `src/data/stories.generated.json` et `src/data/media.generated.json`.
   Les photos principales tirées des stories (image d'une vidéo, recadrage sur le bijou) et les photos des écrins
   sont décrites dans `scripts/piece-media.mjs`.
+  Les croquis (`Berete - Croquis`, un fichier `<slug-de-la-pièce>.jpg` par pièce, les fichiers qui commencent par `_` sont
+  ignorés) deviennent `public/media/sketches/<slug>.webp` et l'étape « Sketch » de « How it was made », sauf pour une
+  pièce qui a déjà la sienne (`src/data/pieces.ts`) ; dans la page, les photos des étapes s'ouvrent en grand au clic.
   On peut le relancer après avoir ajouté des fichiers : rien n'est créé en double, seuls les nouveaux fichiers sont traités.
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w640.webp`, `cover.w160.webp`) que le navigateur

@@ -126,7 +126,8 @@ type LightboxProps = {
   onClose: () => void;
 };
 
-function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
+/** The photos in full screen, one at a time: zoom on the point clicked, arrows, Escape. Also used by "How it was made". */
+export function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
   const { t, dir } = useI18n();
   const [zoomed, setZoomed] = useState(false);
   const [origin, setOrigin] = useState("50% 50%");

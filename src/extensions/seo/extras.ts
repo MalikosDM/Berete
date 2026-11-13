@@ -18,7 +18,7 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
   const locale = localeOfPath(p);
   const bundle = bundleOf(locale);
   const t = bundle.ui;
-  const c = cat ?? localizeCatalogue(defaultCatalogue, locale, bundle.content, t.stories.alt);
+  const c = cat ?? localizeCatalogue(defaultCatalogue, locale, bundle.content, t.stories.alt, t.piece.sketchAlt);
   const neutral = stripLocale(p);
   const piece = /^\/pieces\/([a-z0-9-]+)$/.exec(neutral);
   if (piece) {

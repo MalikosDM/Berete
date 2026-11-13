@@ -9,7 +9,7 @@
  * source disappeared are removed.
  *
  *   npm run import-media                 # everything
- *   npm run import-media -- --only=stories,site,scroll,brand
+ *   npm run import-media -- --only=stories,site,scroll,brand,sketches
  *   npm run import-media -- --force      # re-encode everything
  *
  * Source folders (override with the environment variables):
@@ -17,6 +17,8 @@
  *   BERETE_SITE_DIR     ~/Desktop/01 Audiovisuel/Berete - Envoi ODORO
  *   BERETE_LOGO_FILE    ~/Desktop/berete_jewellers-cropped.svg
  *   BERETE_BOUTIQUE_DIR ~/Desktop/02 Projets/Sites clients/Boutique Bijoutier
+ *   BERETE_SKETCHES_DIR ~/Desktop/Berete - Croquis  (one "<slug of the piece>.jpg"
+ *                       per piece: step "Sketch" of "How it was made")
  *
  * The main photos of the pieces taken from the stories (frames, crops) and
  * the photos of the boxes are listed in scripts/piece-media.mjs.
@@ -43,6 +45,7 @@ const STORIES_DIR = process.env.BERETE_STORIES_DIR ?? join(DESKTOP, "Berete - St
 const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DESKTOP, "01 Audiovisuel", "Berete - Envoi ODORO");
 const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DESKTOP, "berete_jewellers-cropped.svg");
 const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DESKTOP, "02 Projets", "Sites clients", "Boutique Bijoutier");
+const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DESKTOP, "Berete - Croquis");
 
 const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
@@ -420,6 +423,28 @@ async function importStills() {
   return Object.fromEntries([...STILLS, ...BOUTIQUE_VIDEOS].filter((s) => stills[s.key]).map((s) => [s.key, stills[s.key]]));
 }
 
+/* ---------- Sketches: step "Sketch" of "How it was made", one per piece ---------- */
+
+/**
+ * "<slug of the piece>.jpg" -> public/media/sketches/<slug>.webp, encoded like
+ * every photo. Files starting with "_" (an overview of the folder) are skipped.
+ */
+async function importSketches() {
+  if (!existsSync(SKETCHES_DIR)) {
+    console.warn("Sketches folder not found, skipped: " + SKETCHES_DIR);
+    return null;
+  }
+  console.log("Sketches: " + SKETCHES_DIR);
+  const files = (await readdir(SKETCHES_DIR)).filter((n) => IMAGE_EXT.test(n) && !n.startsWith("_") && !n.startsWith(".")).sort();
+  const sketches = {};
+  await pool(files, cpus().length, async (name) => {
+    const slug = slugify(name.replace(IMAGE_EXT, ""));
+    sketches[slug] = await photo(join(SKETCHES_DIR, name), join(MEDIA, "sketches", slug + ".webp"));
+  });
+  // In the order of the slugs, whatever finished first.
+  return Object.fromEntries(Object.keys(sketches).sort().map((slug) => [slug, sketches[slug]]));
+}
+
 /* ---------- Scroll-driven videos: WebP frame sequences + an all-intra fallback ---------- */
 
 async function frameSet(src, dir, start, set, crop) {
@@ -552,7 +577,7 @@ if (runs("stories")) {
 }
 
 const mediaFile = join(DATA, "media.generated.json");
-let media = { groups: {}, videos: {}, stills: {}, scroll: {} };
+let media = { groups: {}, videos: {}, stills: {}, scroll: {}, sketches: {} };
 try {
   media = { ...media, ...JSON.parse(await readFile(mediaFile, "utf8")) };
 } catch {
@@ -566,6 +591,13 @@ if (runs("site")) {
     console.log("Photos of the pieces and boxes (scripts/piece-media.mjs)");
     media.stills = await importStills();
     pruneDirs.push(join(MEDIA, "atelier"), join(MEDIA, "pieces"), join(MEDIA, "boxes"));
+  }
+}
+if (runs("sketches")) {
+  const sketches = await importSketches();
+  if (sketches !== null) {
+    media.sketches = sketches;
+    pruneDirs.push(join(MEDIA, "sketches"));
   }
 }
 if (runs("scroll")) {
