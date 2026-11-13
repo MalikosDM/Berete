@@ -24,6 +24,21 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   (liens entre stories, joueurs et pièces).
 - **Les pièces** : 39 pièces trouvées dans les stories et les dossiers. Leurs textes sont des brouillons
   (`draft: true`, « Brouillon » dans l'admin) à faire valider par le client ; aucun chiffre n'est inventé.
+  La ligne « Metal and stones » de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
+  montrent (couleur du métal, tailles et couleurs des pierres, sans carats ni poids) ; elle est absente quand les photos
+  ne permettent rien de sûr, et tant que la pièce est en brouillon la page précise « d'après les photos, à confirmer ».
+- **« The details »** (`details` d'une pièce) : un symbole par ligne, avec la photo de la pièce qui le montre (elle
+  s'ouvre en grand au clic). Rempli pour la bague Inter d'après la réunion avec Yoni. Dans l'admin : « Titre | Texte |
+  n° de la photo » (1 = photo d'ouverture, 2 = 1re photo des détails…).
+- **L'accueil** : le film, puis le « Special project » (les bagues Inter et VfB côte à côte, `SPECIAL_PROJECT` dans
+  `src/data/pieces.ts` : elles s'ouvrent sur le trophée au survol ou avec « Lift the top »), les collections, la capsule à
+  la une (si elle n'est pas déjà l'une des deux bagues), la sélection, le mur des joueurs. La barre des stories se cache
+  quand on descend, revient dès qu'on remonte (pas quand le film glisse tout seul vers une phrase) et jamais sur le pied
+  de page. Chaque phrase du film a un halo sombre derrière elle.
+- **Les joueurs** : un mur de portraits (photo, nom, club, Instagram) sur `/players` et sur l'accueil. La photo : celle
+  envoyée dans l'admin (« Photo de profil »), sinon la meilleure photo des stories recadrée sur la personne (`PORTRAITS`
+  dans `scripts/piece-media.mjs`, faite par `npm run import-media`), sinon ses initiales en or rose. Le pseudo
+  Instagram se met dans l'admin (aucun n'est rempli d'office).
 - **Les collections** : `/creations/pendants`, `/chains`, `/rings`, `/watches`, `/bracelets`.
   L'accueil montre une tuile par type qui a au moins 2 pièces.
 - **Les médias** sont produits par `npm run import-media`, qui relit les dossiers du Bureau
@@ -61,7 +76,14 @@ néerlandais (`/nl/...`) et arabe (`/ar/...`, lu de droite à gauche). Le menu d
 - **WhatsApp et formulaires** : les messages préremplis sont écrits dans la langue de la page ; les messages et demandes
   de rappel indiquent dans l'admin la langue du visiteur.
 - **Google** : chaque langue a ses pages pré-rendues, son plan du site et ses liens `hreflang`. Pour que ces liens
-  figurent dans les pages construites, définir l'adresse publique au moment du build : `SITE_URL=https://… npm run build`.
+  figurent dans les pages construites, définir l'adresse publique au moment du build : `SITE_URL=https://… npm run build`
+  (sur Vercel, l'adresse du projet est prise d'office).
+- **Aperçus de liens** (WhatsApp, Instagram, iMessage) : chaque page a une image de partage 1200 × 630 (`og:image`,
+  `twitter:image`, carte « summary_large_image ») : la photo principale de la pièce sur fond noir avec le logo pour une
+  page pièce, le logo en or rose avec une bague pour les autres. Elles sont faites par `npm run media:share`
+  (`scripts/share-images.ts`, dans `public/media/share/`, à relancer après de nouvelles pièces) ; sans mots, elles
+  servent à toutes les langues. `og:locale` suit la langue (en_GB, fr_FR, es_ES, de_DE, nl_NL, ar_AE). Comme les liens
+  `hreflang`, l'image n'est écrite dans la page que si `SITE_URL` est connu au build.
 
 ## Visualiseur 3D
 
@@ -138,6 +160,9 @@ npm run i18n:check      # aucune traduction ne manque (fr, es, de, nl, ar)
 npm run build && npm run build:server
 npm start               # site construit + API sur http://localhost:3001
 npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px), captures dans verification/
+                        # tests/home.spec.ts tourne aussi sur iPhone SE (320 px) et iPhone 15 Pro Max (430 px) :
+                        # haut de l'accueil sous les stories, phrases du film, Special project, bague Inter, joueurs,
+                        # écrins, aperçus de liens, sauts de mise en page (< 0,05) et axe-core sur l'accueil
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
@@ -153,7 +178,9 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
   chargée, puis se chargent quand on s'en approche ; le navigateur choisit la copie la plus légère qui reste nette
   (`sizes`, `src/lib/responsive.ts`).
 - **Les polices** sont servies par le site (paquets `@fontsource`, `src/main.tsx`) ; les polices arabes ne se
-  téléchargent que sur les pages en arabe.
+  téléchargent que sur les pages en arabe. Celles du premier écran sont demandées avec la page (`preloadFonts` dans
+  `vite.config.ts`) et, en attendant, le texte s'affiche dans une police système à la même largeur (`Cormorant Fallback`,
+  `Manrope Fallback` dans `src/index.css`) : rien ne saute quand la vraie police arrive.
 - Mesurer sur le site construit (`http://localhost:3001`), pas sur la version de travail : la note varie de quelques
   points d'une mesure à l'autre.
 

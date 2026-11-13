@@ -12,7 +12,12 @@ export function watch(page: Page): Problems {
   page.on("console", (m) => {
     if (m.type() === "error") problems.errors.push("console: " + m.text());
   });
-  page.on("pageerror", (e) => problems.errors.push("page error: " + e.message));
+  page.on("pageerror", (e) => {
+    // Safari (WebKit) reports a request of the site cut short by leaving the page as "access control checks": the
+    // next page.goto came before the background request (live catalogue, 3D models) had its answer. Not an error.
+    if (/\/api\/\S* due to access control checks/.test(e.message)) return;
+    problems.errors.push("page error: " + e.message);
+  });
   page.on("response", (r) => {
     if (r.status() >= 400) problems.errors.push("HTTP " + r.status() + ": " + r.url());
   });
@@ -74,7 +79,8 @@ export async function overflow(page: Page): Promise<string[]> {
       const r = el.getBoundingClientRect();
       if (r.width === 0 || r.height === 0) continue;
       const s = getComputedStyle(el);
-      if (s.visibility === "hidden" || s.position === "fixed") continue;
+      // A hidden hint (shown on hover only, like the names of the buttons of the 3D viewer) is not seen sticking out.
+      if (s.visibility === "hidden" || s.position === "fixed" || s.opacity === "0") continue;
       if ((r.right > vw + 1 || r.left < -1) && !clipped(el)) out.push(el.tagName.toLowerCase() + "." + String(el.className).slice(0, 60) + " → " + Math.round(r.left) + ".." + Math.round(r.right));
       if (out.length > 5) break;
     }

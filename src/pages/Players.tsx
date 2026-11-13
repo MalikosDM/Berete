@@ -144,7 +144,7 @@ export function PlayerPage() {
                       <Img src={s.cover} srcSet={coverSrcSet(s.cover)} sizes="(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 20vw" alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                     </span>
                   </span>
-                  <span className="mt-3 block text-center text-base font-medium text-white group-hover:text-rose-light">{s.title}</span>
+                  <span data-story-title className="mt-3 block text-center text-base font-medium text-white group-hover:text-rose-light">{s.title}</span>
                   <span className="block text-center text-base text-mist">
                     {t.players.moments(s.media.length)}
                   </span>

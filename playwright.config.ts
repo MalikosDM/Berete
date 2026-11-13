@@ -23,5 +23,8 @@ export default defineConfig({
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
     { name: "iphone", use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } } },
+    // The smallest and the largest iPhones, for the home page and the new sections (tests/home.spec.ts).
+    { name: "iphone-se", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone SE"], viewport: { width: 320, height: 568 } } },
+    { name: "iphone-pro-max", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone 15 Pro Max"], viewport: { width: 430, height: 932 } } },
   ],
 });

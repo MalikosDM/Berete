@@ -256,7 +256,7 @@ test("player pages show their stories and all their pieces", async ({ page }) =>
   for (const person of cat.people) {
     await page.goto("/players/" + person.slug);
     if (expected[person.slug]) {
-      const stories = await page.locator("[data-player-story]").evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace("Open the story ", "")));
+      const stories = await page.locator("[data-player-story] [data-story-title]").evaluateAll((els) => els.map((e) => e.textContent));
       expect(stories, person.slug).toEqual(expected[person.slug]);
     }
     // Player -> pieces: every piece made for this person, and nothing else.
@@ -319,7 +319,8 @@ test("the 30 stories, in order, every step shown, videos playing", async ({ page
   await page.goto("/");
   const bubbles = page.locator("[data-story-bubble]");
   await expect(bubbles).toHaveCount(30);
-  const titles = await bubbles.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace("Open the story ", "")));
+  // The name read aloud starts with the title shown under the bubble.
+  const titles = await bubbles.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace(/, open the story$/, "")));
   expect(titles).toEqual(STORY_TITLES);
 
   // Covers: swipe the bar to its end, as a visitor would, so the lazy ones load; then check them all.
