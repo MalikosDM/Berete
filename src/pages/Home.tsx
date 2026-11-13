@@ -35,6 +35,8 @@ const homeSteps = (t: Messages): ScrollStep[] => [
     align: "left",
     // Phones: the opening text starts under the bar of stories (navigation 4.5rem + bubbles and names) and sits at the
     // bottom of the screen when there is room; it never goes up under the bar ("safe"). Computers: centred.
+    // Wide enough for the three buttons on one line, with room to spare while the fonts load (no jump).
+    inner: "max-w-4xl",
     box: "px-5 pt-[12.75rem] pb-5 [align-items:safe_flex-end] [@media(max-height:600px)]:pt-[12.5rem] [@media(max-height:600px)]:pb-3 justify-start text-start sm:px-8 sm:pt-[14rem] md:items-center md:pt-[15.5rem] md:pb-20 lg:px-12",
     content: (
       <div className={"max-w-4xl " + shadow} data-home-hero>

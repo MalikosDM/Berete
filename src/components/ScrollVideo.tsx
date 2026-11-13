@@ -21,6 +21,8 @@ export type ScrollStep = {
   align?: "left" | "center" | "right";
   /** Classes of the box that places the text (padding, alignment), in place of the ones of `align`. */
   box?: string;
+  /** Classes of the block of text (its width), in place of the ones of `align`. */
+  inner?: string;
 };
 
 type ScrollVideoProps = {
@@ -347,7 +349,7 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
               <img src={stills[i]} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover" />
               {scrims}
               <div className={"absolute inset-0 flex " + (s.box ?? PADDING + a.box)}>
-                <div className={"relative isolate " + a.inner}>
+                <div className={"relative isolate " + (s.inner ?? a.inner)}>
                   <Halo />
                   {s.content}
                 </div>
@@ -406,7 +408,7 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
                 pointerEvents: o > 0.6 ? "auto" : "none",
               }}
             >
-              <div className={"relative isolate " + a.inner}>
+              <div className={"relative isolate " + (s.inner ?? a.inner)}>
                 <Halo />
                 {s.content}
               </div>
