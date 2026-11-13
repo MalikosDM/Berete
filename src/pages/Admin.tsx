@@ -22,7 +22,7 @@ type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
   | { key: string; label: string; type: "select"; options: readonly (readonly [string, string])[] }
   | { key: string; label: string; type: "image" | "media" | "medialist" }
-  | { key: string; label: string; type: "specs" | "press" }
+  | { key: string; label: string; type: "specs" | "press" | "details" }
   /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
   | { key: string; label: string; type: "model3d" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
@@ -62,11 +62,12 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "kind", label: "Type", type: "select", options: [["player", "Joueur"], ["club", "Club"], ["personality", "Personnalité"]] },
       { key: "number", label: "Numéro", type: "number" },
       { key: "club", label: "Club", type: "text" },
-      { key: "portrait", label: "Portrait", type: "image" },
+      { key: "portrait", label: "Photo de profil (vide : une photo des stories recadrée sur la personne, sinon ses initiales)", type: "image" },
+      { key: "instagram", label: "Instagram (le pseudo seul, sans @ ; vide : pas de lien)", type: "text" },
       { key: "bio", label: "Texte", type: "textarea" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["bio", "Texte", true]] },
     ],
-    empty: { name: "", slug: "", kind: "player", number: null, club: "", portrait: "", bio: "" },
+    empty: { name: "", slug: "", kind: "player", number: null, club: "", portrait: "", instagram: "", bio: "" },
   },
   pieces: {
     label: "Pièces",
@@ -87,13 +88,14 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
-      { key: "specs", label: "Fiche technique (une ligne par info, ex. Or : 18 carats)", type: "specs" },
+      { key: "specs", label: "Fiche technique (une ligne par info, ex. Or : 18 carats ; « Metal and stones » : d'après les photos, à faire valider par Yoni)", type: "specs" },
+      { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },
       { key: "press", label: "Presse (une ligne : Média | Titre | Lien)", type: "press" },
       { key: "people", label: "Joueurs liés (adresses web, séparées par des virgules)", type: "slugs" },
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins",
@@ -319,8 +321,17 @@ function toForm(kind: Kind, item: Rec): Rec {
     if (field.type === "slugs") f[field.key] = Array.isArray(v) ? v.join(", ") : asText(v);
     if (field.type === "specs") f[field.key] = Array.isArray(v) ? (v as { label: string; value: string }[]).map((s) => s.label + " : " + s.value).join("\n") : "";
     if (field.type === "press") f[field.key] = Array.isArray(v) ? (v as { outlet: string; title: string; url: string | null }[]).map((p) => [p.outlet, p.title, p.url ?? ""].join(" | ")).join("\n") : "";
+    if (field.type === "details") {
+      const photos = photosOf(f);
+      f[field.key] = Array.isArray(v) ? (v as { title: string; text: string; photo: string | null }[]).map((d) => [d.title, d.text, d.photo && photos.includes(d.photo) ? String(photos.indexOf(d.photo) + 1) : ""].join(" | ").replace(/ \| $/, "")).join("\n") : "";
+    }
   }
   return f;
+}
+
+/** The photos of a piece, as numbered in "Les détails": its opening photo, then the photos of the details. */
+function photosOf(f: Rec): string[] {
+  return asList([f.cover, ...asList(f.gallery)]).map((m) => m.src);
 }
 
 function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
@@ -340,6 +351,12 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
         .map((l) => l.split(":"))
         .filter((p) => p.length > 1 && p[0]!.trim())
         .map((p) => ({ label: p[0]!.trim(), value: p.slice(1).join(":").trim() }));
+    else if (field.type === "details")
+      body[field.key] = asText(v)
+        .split("\n")
+        .map((l) => l.split("|").map((x) => x.trim()))
+        .filter((p) => p[0])
+        .map((p) => ({ title: p[0] ?? "", text: p[1] ?? "", photo: photosOf(f)[Number(p[2]) - 1] ?? null }));
     else if (field.type === "translations") body[field.key] = cleanTranslations(v);
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
@@ -448,7 +465,7 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
           </select>
         </label>
       );
-    const area = d.type === "textarea" || d.type === "specs" || d.type === "press";
+    const area = d.type === "textarea" || d.type === "specs" || d.type === "press" || d.type === "details";
     return (
       <label key={d.key} className="block text-base text-bone">
         {d.label}

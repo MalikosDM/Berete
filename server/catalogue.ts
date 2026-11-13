@@ -16,7 +16,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
-import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
+import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Detail, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
 import { prisma } from "./db.js";
 
 const IMPORTED = "/media/";
@@ -42,6 +42,7 @@ export const TranslationsSchema = z
   .object({ fr: z.record(z.string().max(40), z.string().max(5000)), es: z.record(z.string().max(40), z.string().max(5000)), de: z.record(z.string().max(40), z.string().max(5000)), nl: z.record(z.string().max(40), z.string().max(5000)), ar: z.record(z.string().max(40), z.string().max(5000)) })
   .partial();
 export const SpecSchema = z.object({ label: z.string().max(100), value: z.string().max(300) });
+export const DetailSchema = z.object({ title: z.string().max(200), text: z.string().max(1000), photo: z.string().max(500).nullable() });
 export const PressSchema = z.object({
   outlet: z.string().max(200),
   title: z.string().max(300),
@@ -130,6 +131,7 @@ export const toPerson = (r: PersonRow): Person => ({
   number: r.number,
   club: r.club,
   portrait: r.portrait,
+  instagram: r.instagram,
   bio: r.bio,
   translations: translationsOf(r.translations),
 });
@@ -146,6 +148,7 @@ export const toPiece = (r: PieceRow): Piece => ({
   gallery: mediaList(r.gallery),
   handover: mediaList(r.handover),
   specs: list<Spec>(SpecSchema, r.specs),
+  details: list<Detail>(DetailSchema, r.details),
   press: list<Press>(PressSchema, r.press),
   people: r.people,
   boxSlug: r.boxSlug,
@@ -191,7 +194,8 @@ const fingerprint = (v: unknown) => createHash("sha1").update(stable(v)).digest(
 
 /* The texts of each kind: what the admin edits, apart from the imported media. */
 const storyTexts = (s: Story) => ({ title: s.title, people: s.people, pieceSlug: s.pieceSlug, articleUrl: s.articleUrl });
-const personTexts = (p: Person) => ({ name: p.name, kind: p.kind, number: p.number, club: p.club, portrait: p.portrait, bio: p.bio });
+// A field added later counts only when it is filled: the fingerprints of the rows written before it stay the same.
+const personTexts = (p: Person) => ({ name: p.name, kind: p.kind, number: p.number, club: p.club, portrait: p.portrait, instagram: p.instagram || undefined, bio: p.bio });
 const pieceTexts = (p: Piece) => ({
   title: p.title,
   type: p.type,
@@ -200,6 +204,7 @@ const pieceTexts = (p: Piece) => ({
   client: p.client,
   clientPublic: p.clientPublic,
   specs: p.specs,
+  details: p.details.length > 0 ? p.details : undefined,
   press: p.press,
   people: p.people,
   boxSlug: p.boxSlug,

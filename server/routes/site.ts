@@ -2,7 +2,7 @@ import express, { Router, type NextFunction, type Request, type Response } from 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { PIECE_TYPES } from "../../src/data/types.js";
-import { MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
+import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
 
 /**
@@ -170,6 +170,18 @@ const optText = (max: number) =>
     .nullable()
     .optional()
     .transform((v) => (v && v.trim() !== "" ? v.trim() : null));
+
+/** "@name", "instagram.com/name/" or "https://www.instagram.com/name?igsh=…" -> "name"; null when nothing is left. */
+function instagramHandle(v: string | null): string | null {
+  if (!v) return null;
+  const handle = v
+    .replace(/^https?:\/\//i, "")
+    .replace(/^(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .split(/[/?#]/)[0]!
+    .trim();
+  return /^[A-Za-z0-9._]{1,30}$/.test(handle) ? handle : null;
+}
 const Slugs = z.array(Slug).max(100).default([]);
 
 const StoryIn = z.object({
@@ -190,6 +202,10 @@ const PersonIn = z.object({
   number: z.number().int().min(0).max(999).nullable().default(null),
   club: optText(200),
   portrait: optText(500),
+  /** The username alone: "@name" or a profile address become "name". */
+  instagram: optText(200)
+    .refine((v) => v === null || instagramHandle(v) !== null, { message: "Instagram : le pseudo seul, sans espace (ex. beretejewellers)." })
+    .transform((v) => instagramHandle(v)),
   bio: z.string().max(5000).default(""),
   translations: TranslationsSchema.default({}),
 });
@@ -206,6 +222,7 @@ const PieceIn = z.object({
   gallery: MediaListSchema.default([]),
   handover: MediaListSchema.default([]),
   specs: z.array(SpecSchema).max(40).default([]),
+  details: z.array(DetailSchema).max(30).default([]),
   press: z.array(PressSchema).max(20).default([]),
   people: Slugs,
   boxSlug: optText(200),

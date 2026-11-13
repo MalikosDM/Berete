@@ -41,6 +41,8 @@ model Person {
   number    Int?
   club      String?
   portrait  String?
+  /// Instagram username, without the @.
+  instagram String?
   bio       String   @default("")
   translations Json   @default("{}")
   seedHash  String?
@@ -62,6 +64,8 @@ model Piece {
   gallery      Json     @default("[]")
   handover     Json     @default("[]")
   specs        Json     @default("[]")
+  /// The symbols of the piece, one by one ("The details": Detail, src/data/types.ts).
+  details      Json     @default("[]")
   press        Json     @default("[]")
   people       String[] @default([])
   boxSlug      String?

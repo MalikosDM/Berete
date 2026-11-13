@@ -19,6 +19,7 @@ const person = (slug: string, name: string, extra: Partial<Person> = {}): Person
   number: null,
   club: null,
   portrait: null,
+  instagram: null,
   bio: "",
   ...extra,
 });

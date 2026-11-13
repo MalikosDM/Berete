@@ -52,8 +52,10 @@ export type Person = {
   kind: PersonKind;
   number: number | null;
   club: string | null;
-  /** Portrait photo. Empty: the cover of the person's first story is used. */
+  /** Profile photo (uploaded in the admin). Empty: the best photo of the person found in the stories, else initials. */
   portrait: string | null;
+  /** Instagram username, without the @. Empty: no link. */
+  instagram: string | null;
   bio: string;
   translations?: Translations;
 };
@@ -68,6 +70,11 @@ export type MakingStep = (typeof MAKING_STEPS)[number];
 export type Making = Partial<Record<MakingStep, MediaItem>>;
 
 export type Spec = { label: string; value: string };
+/**
+ * One symbol of a piece and its meaning ("The details" of the page), with the photo of the gallery that shows it (its
+ * address), if one does.
+ */
+export type Detail = { title: string; text: string; photo: string | null };
 export type Press = { outlet: string; title: string; url: string | null; image: string | null };
 
 export type Piece = {
@@ -87,6 +94,8 @@ export type Piece = {
   /** Handover to the client: team photo, showcase... */
   handover: MediaItem[];
   specs: Spec[];
+  /** The symbols of the piece, one by one ("The details"). */
+  details: Detail[];
   press: Press[];
   /** Slugs of the people who wear or received it. */
   people: string[];
@@ -137,4 +146,6 @@ export type GeneratedMedia = {
   scroll: Record<string, ScrollMedia>;
   /** The first sketch of each piece (step "Sketch" of "How it was made"), by slug of the piece. */
   sketches?: Record<string, MediaItem>;
+  /** A photo of each person, cropped on them, until a profile photo is uploaded (scripts/portraits.mjs), by slug. */
+  portraits?: Record<string, MediaItem>;
 };
