@@ -499,6 +499,102 @@
       "width": 720,
       "height": 1280
     },
+    "portraits/kenan-yildiz": {
+      "type": "image",
+      "src": "/media/portraits/kenan-yildiz.webp",
+      "width": 600,
+      "height": 750
+    },
+    "portraits/noah-okafor": {
+      "type": "image",
+      "src": "/media/portraits/noah-okafor.webp",
+      "width": 956,
+      "height": 1194
+    },
+    "portraits/kevin-schade": {
+      "type": "image",
+      "src": "/media/portraits/kevin-schade.webp",
+      "width": 1074,
+      "height": 1342
+    },
+    "portraits/marcus-thuram": {
+      "type": "image",
+      "src": "/media/portraits/marcus-thuram.webp",
+      "width": 1080,
+      "height": 1350
+    },
+    "portraits/michy-batshuayi": {
+      "type": "image",
+      "src": "/media/portraits/michy-batshuayi.webp",
+      "width": 400,
+      "height": 500
+    },
+    "portraits/radja-nainggolan": {
+      "type": "image",
+      "src": "/media/portraits/radja-nainggolan.webp",
+      "width": 560,
+      "height": 700
+    },
+    "portraits/jamie-leweling": {
+      "type": "image",
+      "src": "/media/portraits/jamie-leweling.webp",
+      "width": 1080,
+      "height": 1350
+    },
+    "portraits/deniz-undav": {
+      "type": "image",
+      "src": "/media/portraits/deniz-undav.webp",
+      "width": 908,
+      "height": 1134
+    },
+    "portraits/samuel-ballet": {
+      "type": "image",
+      "src": "/media/portraits/samuel-ballet.webp",
+      "width": 720,
+      "height": 900
+    },
+    "portraits/keita-losene": {
+      "type": "image",
+      "src": "/media/portraits/keita-losene.webp",
+      "width": 764,
+      "height": 954
+    },
+    "portraits/sambi-lokonga": {
+      "type": "image",
+      "src": "/media/portraits/sambi-lokonga.webp",
+      "width": 860,
+      "height": 1074
+    },
+    "portraits/tanguy-nianzou": {
+      "type": "image",
+      "src": "/media/portraits/tanguy-nianzou.webp",
+      "width": 764,
+      "height": 954
+    },
+    "portraits/tajon-buchanan": {
+      "type": "image",
+      "src": "/media/portraits/tajon-buchanan.webp",
+      "width": 668,
+      "height": 836
+    },
+    "portraits/jeff-chabot": {
+      "type": "image",
+      "src": "/media/portraits/jeff-chabot.webp",
+      "width": 1034,
+      "height": 1294
+    },
+    "portraits/inter-milan": {
+      "type": "image",
+      "src": "/media/portraits/inter-milan.webp",
+      "width": 1080,
+      "height": 1350
+    },
+    "portraits/vfb-stuttgart": {
+      "type": "image",
+      "src": "/media/portraits/vfb-stuttgart.webp",
+      "width": 1080,
+      "height": 1350
+    },
     "pieces/campione-d-italia-2023-2024/film": {
       "type": "video",
       "src": "/media/pieces/campione-d-italia-2023-2024/film.mp4",

@@ -32,7 +32,7 @@ import { cpus, homedir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
-import { BOUTIQUE_VIDEOS, STILLS } from "./piece-media.mjs";
+import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = join(ROOT, "public");
@@ -401,7 +401,7 @@ async function still(src, out, { at, crop, mask = [] }) {
 async function importStills() {
   const stills = {};
   const jobs = [];
-  for (const s of STILLS) {
+  for (const s of [...STILLS, ...PORTRAITS]) {
     const src = await sourceOf(s.from);
     if (!src) {
       console.warn("  ! source not found for " + s.key + " (" + s.from + ")");
@@ -420,7 +420,7 @@ async function importStills() {
   await pool(jobs.filter((j) => !j.heavy), cpus().length, (j) => j.go());
   await pool(jobs.filter((j) => j.heavy), 1, (j) => j.go());
   // Same order as the list, whatever finished first.
-  return Object.fromEntries([...STILLS, ...BOUTIQUE_VIDEOS].filter((s) => stills[s.key]).map((s) => [s.key, stills[s.key]]));
+  return Object.fromEntries([...STILLS, ...PORTRAITS, ...BOUTIQUE_VIDEOS].filter((s) => stills[s.key]).map((s) => [s.key, stills[s.key]]));
 }
 
 /* ---------- Sketches: step "Sketch" of "How it was made", one per piece ---------- */
@@ -590,7 +590,7 @@ if (runs("site")) {
     media.videos = site.videos;
     console.log("Photos of the pieces and boxes (scripts/piece-media.mjs)");
     media.stills = await importStills();
-    pruneDirs.push(join(MEDIA, "atelier"), join(MEDIA, "pieces"), join(MEDIA, "boxes"));
+    pruneDirs.push(join(MEDIA, "atelier"), join(MEDIA, "pieces"), join(MEDIA, "boxes"), join(MEDIA, "portraits"));
   }
 }
 if (runs("sketches")) {

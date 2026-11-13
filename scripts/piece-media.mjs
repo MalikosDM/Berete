@@ -63,3 +63,28 @@ export const STILLS = [
 
 /** Videos of the Boutique Bijoutier folder used by a piece. */
 export const BOUTIQUE_VIDEOS = [{ key: "pieces/campione-d-italia-2023-2024/film", from: "boutique:AQPbTPEbLa2mtO0lX01iqssJKPfRi3dlxNOaFjMg7RC8VLi5bRTvNzi9M7" }];
+
+/**
+ * A photo of each person cropped on them (4:5), for the wall of the players until a profile photo is uploaded in the
+ * admin: the best photo of the stories where the person is clearly seen. Not listed: no photo shows them (Angelo
+ * Stiller, Malik Tillman, Eljero Elia, Maximilian Mittelstädt, Chris Führich, Atakan Karazor), or only a blurry or
+ * faceless one (Loïs Openda, Sidney Eweka): the site shows their initials.
+ */
+export const PORTRAITS = [
+  { key: "portraits/kenan-yildiz", from: "story:01/06", at: 0, crop: [0.0833, 0.2266, 0.8333, 0.5859] },
+  { key: "portraits/noah-okafor", from: "story:19/01", crop: [0.0463, 0.2604, 0.7407, 0.5208] },
+  { key: "portraits/kevin-schade", from: "story:03/01", crop: [0.0556, 0.0938, 0.8333, 0.5859] },
+  { key: "portraits/marcus-thuram", from: "story:20/01", crop: [0.0, 0.0208, 0.9259, 0.651] },
+  { key: "portraits/michy-batshuayi", from: "story:07/01", at: 0, crop: [0.2639, 0.2344, 0.5556, 0.3906] },
+  { key: "portraits/radja-nainggolan", from: "story:08/01", at: 0, crop: [0.0, 0.0703, 0.7778, 0.5469] },
+  { key: "portraits/jamie-leweling", from: "story:12/02", crop: [0.0, 0.0417, 1.0, 0.7031] },
+  { key: "portraits/deniz-undav", from: "story:13/03", crop: [0.037, 0.1042, 0.7037, 0.4948] },
+  { key: "portraits/samuel-ballet", from: "story:15/03", at: 0, crop: [0.0, 0.0625, 1.0, 0.7031] },
+  { key: "portraits/keita-losene", from: "story:16/02", crop: [0.0, 0.3385, 0.5926, 0.4167] },
+  { key: "portraits/sambi-lokonga", from: "story:22/01", crop: [0.0463, 0.1719, 0.6667, 0.4688] },
+  { key: "portraits/tanguy-nianzou", from: "story:23/04", crop: [0.4074, 0.1198, 0.5926, 0.4167] },
+  { key: "portraits/tajon-buchanan", from: "story:25/03", crop: [0.0787, 0.1406, 0.5185, 0.3646] },
+  { key: "portraits/jeff-chabot", from: "story:30/02", crop: [0.0972, 0.0938, 0.8333, 0.5859] },
+  { key: "portraits/inter-milan", from: "story:21/02", crop: [0.037, 0.1979, 0.9259, 0.651] },
+  { key: "portraits/vfb-stuttgart", from: "site:04/09", crop: [0.0, 0.1319, 0.9259, 0.8681] },
+];
