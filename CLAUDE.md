@@ -97,6 +97,24 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Photo actuelle gardée (pas de photo propre du bijou seul) : JL (photo coupée en bas), Loïs Openda, Flâneur,
       chaîne torsadée de Kevin Schade, les 3 montres. Demander à Yoni des photos sur fond noir de ces pièces.
 
+## Passe « making-of : Entrer dans l'atelier » — état au 19/11/2026
+- [x] **Vidéos web** : `npm run import-media -- --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à
+      l'œil). Les dossiers « Videos HD/ » annoncés **n'existent pas encore** sur le disque : on prend la meilleure copie de
+      « Videos/ » (sans « (720p) » quand elle existe) ; dès qu'un « Videos HD/ » arrive, relancer la commande (il passe
+      avant, et un fichier nommé « …Craftsmanship… / …Process… / Final Product Video / Final cut » est pris d'office).
+      Le dossier 08 « Fabrication atelier (divers) » contient les making-of de VfB (HD), T-Serpent et Samuel Ballet.
+      Ordinateur : H.264 jusqu'à 1080p ; mobile : copie légère (720p/540p) ; 6 images d'aperçu ; `public/media/films`.
+- [x] **Page pièce** : passage « Enter the Atelier » / « Entrer dans l'atelier » après les photos, atelier plein écran
+      (`src/components/AtelierRoom.tsx`) : fabrication puis « The Final Reveal », son coupé au départ, lecture après le
+      clic seulement, sortie bouton / Échap / geste retour. Sans vidéo de fabrication : pas de passage.
+- [x] **Page The Atelier** : section « Every Piece, Its Making-of » (vignettes des pièces publiées, même atelier, lien
+      « Enter the World »). Admin : « L'atelier de la pièce » (vidéos ou aucune, image d'aperçu).
+- Making-of en ligne (11) : Dragon Ball (HD), VfB (HD), croix Tillman (HD), Inter, OKA, octogone Okafor, Ruby T,
+  T-Serpent, Samuel Ballet, Tulips (vidéo téléphone à l'établi), AS (vidéo téléphone, polissage). Sans fabrication : Kenan
+  Yildiz, The Hand, Butterfly, maillot d'Okafor (pièce finie seule, prête), Safi Link et les autres (aucune vidéo).
+- [ ] Yoni : envoyer les vidéos HD d'origine (la plupart des making-of sont en 720p) et les making-of manquants
+      (Butterfly, maillot d'Okafor, Kenan, The Hand, Safi Link…) ; confirmer que 08/v21 est bien le Jesus piece de Samuel Ballet.
+
 ## Passe « portraits et univers immersifs » — état au 19/11/2026
 - [x] **Portraits** : 17 joueurs avec une photo HD en maillot (Eljero Elia sans maillot, avec son trèfle), cadrée sur
       le visage et le maillot (4:5), étalonnage de série léger, champ « Photo de profil » de l'admin rempli ; photos en plus

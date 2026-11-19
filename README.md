@@ -54,6 +54,15 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   `src/data/cutouts.generated.json`), seul ou en **vitrine multi-vues** (`src/components/Showcase.tsx`, règles dans
   `src/data/showcase.ts`) ; une pièce sans détourage garde sa photo. Admin : « Vitrine de l'ouverture » dans la fiche de la
   pièce, onglet « Détourages » pour tout vérifier et exclure une vue.
+- **L'atelier d'une pièce** (« Enter the Atelier » / « Entrer dans l'atelier ») : après les photos de la pièce, un passage
+  ouvre en plein écran son atelier (`src/components/AtelierRoom.tsx`) : sa vidéo de fabrication, puis la pièce finie
+  (« The Final Reveal »), son coupé au départ, lecture seulement après le clic, sortie par le bouton, Échap ou le geste
+  retour. La page The Atelier rassemble les making-of de toutes les pièces publiées. Vidéos : `npm run import-media --
+  --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à l'œil le 19/11/2026 ; un fichier de « Videos HD/ »
+  passe toujours avant), H.264 1080p max pour ordinateur, copie légère pour mobile, 6 images d'aperçu, dans
+  `public/media/films` (`media.films` de `src/data/media.generated.json`, règles dans `src/data/atelier.ts`). Admin :
+  « L'atelier de la pièce » (vidéo de fabrication, vidéo de la pièce finie, ou aucune, et l'image d'aperçu). Sans vidéo
+  de fabrication, pas de passage.
 - **Le bouton de chaque pièce** est « Enter the World » / « Entrer dans l'univers » (cartes, sélection, écrins).
   La ligne « Precious Materials » (avant « Metal and stones ») de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
   montrent (couleur du métal, tailles et couleurs des pierres, sans carats ni poids) ; elle est absente quand les photos
