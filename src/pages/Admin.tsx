@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import Logo from "@/components/Logo";
+import Universe from "@/components/Universe";
+import { HOUSE_PHOTO_PLACES } from "@/data/house";
+import { cleanTheme, LIGHT_NAMES, MOTION_NAMES, resolveTheme, TEXTURE_NAMES, THEME_LIGHTS, THEME_MOTIONS, THEME_PRESETS, THEME_TEXTURES, type PieceTheme } from "@/data/themes";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 import Clients from "@/pages/admin/Clients";
@@ -16,13 +19,15 @@ import { HAS_SERVER } from "@/lib/site";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "messages" | "3d" | "clients";
+type Tab = Kind | "messages" | "3d" | "clients" | "house";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
   | { key: string; label: string; type: "select"; options: readonly (readonly [string, string])[] }
   | { key: string; label: string; type: "image" | "media" | "medialist" }
   | { key: string; label: string; type: "specs" | "press" | "details" }
+  /** The universe of the page of a piece (src/data/themes.ts). */
+  | { key: string; label: string; type: "theme" }
   /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
   | { key: string; label: string; type: "model3d" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
@@ -52,7 +57,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
     empty: { title: "", slug: "", cover: "", media: [], people: [], pieceSlug: "", articleUrl: "" },
   },
   people: {
-    label: "Joueurs",
+    label: "Le Cercle Berete",
     add: "Ajouter un joueur",
     edit: "Modifier le joueur",
     name: "name",
@@ -84,21 +89,23 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "clientPublic", label: "Afficher le client", type: "checkbox" },
       { key: "featured", label: "Mettre à la une de l'accueil", type: "checkbox" },
       { key: "draft", label: "Brouillon (textes à valider)", type: "checkbox" },
+      { key: "published", label: "Publiée sur le site (décochée : la pièce n'apparaît nulle part sur le site ; son ancienne adresse mène à la page de son joueur)", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
+      { key: "theme", label: "Univers de la page (le fond, les couleurs, la lumière et l'animation de la page de la pièce)", type: "theme" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
-      { key: "specs", label: "Fiche technique (une ligne par info, ex. Or : 18 carats ; « Metal and stones » : d'après les photos, à faire valider par Yoni)", type: "specs" },
+      { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Or : 18 carats ; « Precious Materials » : d'après les photos, à faire valider par Yoni)", type: "specs" },
       { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },
       { key: "press", label: "Presse (une ligne : Média | Titre | Lien)", type: "press" },
       { key: "people", label: "Joueurs liés (adresses web, séparées par des virgules)", type: "slugs" },
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
-    label: "Écrins",
+    label: "Écrins Signature",
     add: "Ajouter un écrin",
     edit: "Modifier l'écrin",
     name: "name",
@@ -122,6 +129,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "stories", label: KINDS.stories.label },
   { key: "people", label: KINDS.people.label },
   { key: "boxes", label: KINDS.boxes.label },
+  { key: "house", label: "La Maison" },
   { key: "messages", label: "Messages" },
 ];
 
@@ -358,6 +366,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
         .filter((p) => p[0])
         .map((p) => ({ title: p[0] ?? "", text: p[1] ?? "", photo: photosOf(f)[Number(p[2]) - 1] ?? null }));
     else if (field.type === "translations") body[field.key] = cleanTranslations(v);
+    else if (field.type === "theme") body[field.key] = cleanTheme(v);
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
@@ -444,6 +453,7 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
   const field = (d: Field): ReactNode => {
     const v = f[d.key];
     if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
+    if (d.type === "theme") return <ThemeField key={d.key} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
     if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
@@ -608,6 +618,7 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
                 <span className="block break-words text-lg text-white">{asText(item[name])}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-2 text-base text-mist">
                   {has3d.has(asText(item.slug)) ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-3d>3D</span> : null}
+                  {item.published === false ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-unpublished>Non publiée</span> : null}
                   {item.draft === true ? <span className="border border-white/25 px-2 text-bone">Brouillon</span> : null}
                   <span className="break-all">/{asText(item.slug)}{Array.isArray(item.media) ? " · " + item.media.length + " fichiers" : ""}</span>
                 </span>
@@ -622,6 +633,124 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+/**
+ * The universe of the page of a piece: a preset of the house, then, if wanted, its colours, texture, light and motion.
+ * The small window shows it as the page will.
+ */
+function ThemeField({ label, value, onChange }: { label: string; value: PieceTheme | null; onChange: (v: PieceTheme | null) => void }) {
+  const resolved = resolveTheme(value);
+  const set = (patch: Partial<PieceTheme>) => onChange({ ...(value ?? { preset: resolved.preset }), ...patch });
+  const colours: [keyof PieceTheme & ("base" | "tint" | "glow"), string][] = [
+    ["base", "Fond (presque noir)"],
+    ["tint", "Couleur de l'univers"],
+    ["glow", "Couleur de la lumière"],
+  ];
+  return (
+    <fieldset data-theme-field className="grid gap-4 border border-white/15 p-4 sm:p-5">
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      <div className="relative isolate h-40 overflow-hidden border border-white/10" aria-hidden="true">
+        <Universe theme={resolved} />
+      </div>
+      <label className="block text-base text-bone">
+        Univers
+        <select value={resolved.preset} onChange={(e) => onChange({ preset: e.target.value })} className={inputCls}>
+          {Object.entries(THEME_PRESETS).map(([key, p]) => (
+            <option key={key} value={key}>{p.name}</option>
+          ))}
+        </select>
+      </label>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {colours.map(([key, name]) => (
+          <label key={key} className="block text-base text-bone">
+            {name}
+            <input type="color" value={resolved[key]} onChange={(e) => set({ [key]: e.target.value })} className="mt-2 block h-12 w-full cursor-pointer border border-white/20 bg-transparent" />
+          </label>
+        ))}
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        <label className="block text-base text-bone">
+          Texture
+          <select value={resolved.texture} onChange={(e) => set({ texture: e.target.value as PieceTheme["texture"] })} className={inputCls}>
+            {THEME_TEXTURES.map((x) => (
+              <option key={x} value={x}>{TEXTURE_NAMES[x]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-base text-bone">
+          Lumière
+          <select value={resolved.light} onChange={(e) => set({ light: e.target.value as PieceTheme["light"] })} className={inputCls}>
+            {THEME_LIGHTS.map((x) => (
+              <option key={x} value={x}>{LIGHT_NAMES[x]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-base text-bone">
+          Animation
+          <select value={resolved.motion} onChange={(e) => set({ motion: e.target.value as PieceTheme["motion"] })} className={inputCls}>
+            {THEME_MOTIONS.map((x) => (
+              <option key={x} value={x}>{MOTION_NAMES[x]}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p className="text-base text-mist">Les boutons et les liens restent en or rose ; les couleurs de l'univers vivent seulement dans le fond, toujours sombres pour que les textes restent lisibles.</p>
+      <button type="button" onClick={() => onChange(null)} className={btn + " w-fit"}>Revenir à l'univers de la Maison</button>
+    </fieldset>
+  );
+}
+
+/**
+ * The personal photos of Yoni on the page The House: one place per chapter, quote and the portrait. A place without a
+ * photo shows nothing on the site. A photo dropped in the folder "Berete - La Maison" is used when none is sent here.
+ */
+function HouseTab({ token, onExpired }: { token: string; onExpired: () => void }) {
+  const [photos, setPhotos] = useState<Record<string, MediaItem> | null>(null);
+  const [err, setErr] = useState("");
+  const [saved, setSaved] = useState("");
+  useEffect(() => {
+    api(token, "GET", "/api/admin/house")
+      .then((res) => setPhotos((res.photos as Record<string, MediaItem>) ?? {}))
+      .catch((x: unknown) => {
+        if (x instanceof Error && x.message === "expired") onExpired();
+        else setErr(x instanceof Error ? x.message : "Chargement impossible.");
+      });
+  }, [token, onExpired]);
+  const save = async (key: string, photo: MediaItem | null) => {
+    setErr("");
+    setSaved("");
+    try {
+      await api(token, "PUT", "/api/admin/house/" + key, { photo });
+      setPhotos((p) => {
+        const next = { ...(p ?? {}) };
+        if (photo) next[key] = photo;
+        else delete next[key];
+        return next;
+      });
+      setSaved(key);
+    } catch (x) {
+      if (x instanceof Error && x.message === "expired") return onExpired();
+      setErr(x instanceof Error ? x.message : "Enregistrement impossible.");
+    }
+  };
+  if (photos === null) return err ? <p role="alert" className="mt-8 text-base text-rose-light">{err}</p> : <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>;
+  return (
+    <div className="mt-8 grid gap-6" data-house-admin>
+      <p className="max-w-3xl text-base text-bone">
+        Les photos personnelles de Yoni sur la page « La Maison ». Un emplacement sans photo n'affiche rien sur le site (aucun cadre vide). On peut aussi déposer les photos dans le dossier « Berete - La Maison » du Bureau (voir le fichier LISEZ-MOI qui s'y trouve).
+      </p>
+      {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
+      <ul className="grid gap-6 md:grid-cols-2">
+        {HOUSE_PHOTO_PLACES.map((place) => (
+          <li key={place.key} data-house-place={place.key} className="border border-white/15 p-4">
+            <MediaField token={token} single imagesOnly label={place.name} value={photos[place.key] ? [photos[place.key]!] : []} onChange={(l) => void save(place.key, l[0] ? { ...l[0], type: "image" } : null)} />
+            {saved === place.key ? <p className="mt-2 text-base text-rose-light">Enregistré.</p> : null}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -765,7 +894,7 @@ export default function Admin() {
         ) : (
           <>
             <h1 className="sr-only">Administration · {TABS.find((t) => t.key === tab)?.label}</h1>
-            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
           </>
         )}
       </main>
