@@ -3,6 +3,7 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, 
 import Logo from "@/components/Logo";
 import Universe, { universeProps } from "@/components/Universe";
 import { HOUSE_PHOTO_PLACES } from "@/data/house";
+import { cleanShowcase, CUTOUTS, cutoutSrc, resolveShowcase, SHOWCASE_BY_DEFAULT, type CutoutView, type PieceShowcase } from "@/data/showcase";
 import {
   BACKDROPS,
   cleanTheme,
@@ -36,7 +37,7 @@ import { HAS_SERVER } from "@/lib/site";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "messages" | "3d" | "clients" | "house";
+type Tab = Kind | "messages" | "3d" | "clients" | "house" | "cutouts";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -45,6 +46,8 @@ type Field =
   | { key: string; label: string; type: "specs" | "press" | "details" }
   /** The universe of the page of a piece (src/data/themes.ts). */
   | { key: string; label: string; type: "theme" }
+  /** How the opening shows the jewel: one cut-out view or a showcase (src/data/showcase.ts). */
+  | { key: string; label: string; type: "showcase" }
   /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
   | { key: string; label: string; type: "model3d" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
@@ -109,6 +112,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "published", label: "Publiée sur le site (décochée : la pièce n'apparaît nulle part sur le site ; son ancienne adresse mène à la page de son joueur)", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
       { key: "theme", label: "Univers de la page (le fond, la police du titre, l'entrée et les effets de la page de la pièce)", type: "theme" },
+      { key: "showcase", label: "Vitrine de l'ouverture (le bijou détouré : une vue ou plusieurs vues)", type: "showcase" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
@@ -119,7 +123,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins Signature",
@@ -146,6 +150,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "stories", label: KINDS.stories.label },
   { key: "people", label: KINDS.people.label },
   { key: "boxes", label: KINDS.boxes.label },
+  { key: "cutouts", label: "Détourages" },
   { key: "house", label: "La Maison" },
   { key: "messages", label: "Messages" },
 ];
@@ -384,6 +389,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
         .map((p) => ({ title: p[0] ?? "", text: p[1] ?? "", photo: photosOf(f)[Number(p[2]) - 1] ?? null }));
     else if (field.type === "translations") body[field.key] = cleanTranslations(v);
     else if (field.type === "theme") body[field.key] = cleanTheme(v);
+    else if (field.type === "showcase") body[field.key] = cleanShowcase(v);
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
@@ -471,6 +477,7 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
     const v = f[d.key];
     if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
     if (d.type === "theme") return <ThemeField key={d.key} token={token} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
+    if (d.type === "showcase") return <ShowcaseField key={d.key} label={d.label} slug={asText(f.slug)} value={cleanShowcase(v)} onChange={(c) => set(d.key, c)} />;
     if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
@@ -797,6 +804,187 @@ function ThemeField({ token, label, value, onChange }: { token: string; label: s
   );
 }
 
+/** A cut-out view on a checkerboard (or on black): what the jewel looks like with nothing behind it. */
+function CutoutThumb({ slug, view, black = false, className = "" }: { slug: string; view: CutoutView; black?: boolean; className?: string }) {
+  const w = view.widths.find((x) => x >= 480) ?? view.widths[view.widths.length - 1]!;
+  const checker = "repeating-conic-gradient(#d4d4d4 0% 25%, #f4f4f4 0% 50%) 50% / 18px 18px";
+  return (
+    <span className={"block overflow-hidden " + className} style={{ background: black ? "#0a0a0a" : checker }}>
+      <img src={cutoutSrc(slug, view, w)} alt="" loading="lazy" className="h-full w-full object-contain" />
+    </span>
+  );
+}
+
+const KIND_NAMES: Record<CutoutView["kind"], string> = { face: "Face", profile: "Profil", back: "Dos", detail: "Détail", worn: "Portée" };
+
+/**
+ * The opening of a piece: its jewel cut out, in one view or in a showcase of several views; which views, in which order
+ * (the first one is the main one). Without a choice: the showcase for the five priority universes and wherever there are
+ * at least 3 clean views, else the main view alone. A piece without a cutout keeps its photo.
+ */
+function ShowcaseField({ label, slug, value, onChange }: { label: string; slug: string; value: PieceShowcase | null; onChange: (v: PieceShowcase | null) => void }) {
+  const all = CUTOUTS[slug] ?? [];
+  const excluded = new Set(value?.excluded ?? []);
+  const resolved = resolveShowcase(slug, value);
+  const chosen = value?.views ?? resolved.views.map((v) => v.id);
+  const set = (patch: Partial<PieceShowcase>) => onChange(cleanShowcase({ ...(value ?? {}), ...patch }));
+  const toggle = (id: string) => set({ views: chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id] });
+  const move = (id: string, dir: -1 | 1) => {
+    const i = chosen.indexOf(id);
+    const j = i + dir;
+    if (i < 0 || j < 0 || j >= chosen.length) return;
+    const next = [...chosen];
+    [next[i], next[j]] = [next[j]!, next[i]!];
+    set({ views: next });
+  };
+  const ordered = [...chosen.map((id) => all.find((v) => v.id === id)).filter((v): v is CutoutView => !!v), ...all.filter((v) => !chosen.includes(v.id))];
+  const auto = SHOWCASE_BY_DEFAULT.has(slug) || all.filter((v) => v.clean && !excluded.has(v.id)).length >= 3 ? "la vitrine multi-vues" : "une seule vue";
+  return (
+    <fieldset data-showcase-field className="grid gap-4 border border-white/15 p-4 sm:p-5">
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      {all.length === 0 ? (
+        <p className="text-base text-mist">Pas encore de détourage pour cette pièce : la page montre sa photo d&apos;ouverture.</p>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-x-6 gap-y-2" role="radiogroup" aria-label="Affichage">
+            {[
+              ["auto", "Automatique (" + auto + ")"],
+              ["single", "Une vue"],
+              ["multi", "Vitrine multi-vues"],
+            ].map(([key, name]) => (
+              <label key={key} className="flex min-h-12 items-center gap-3 text-base text-bone">
+                <input
+                  type="radio"
+                  name={"showcase-" + slug}
+                  checked={(value?.mode ?? "auto") === key}
+                  onChange={() => set({ mode: key === "auto" ? undefined : (key as "single" | "multi") })}
+                  className="size-5 accent-[#b76e79]"
+                />
+                {name}
+              </label>
+            ))}
+          </div>
+          <p className="text-base text-mist">Vues utilisées, dans leur ordre (la première est la vue principale) :</p>
+          <ul className="grid gap-3 sm:grid-cols-2">
+            {ordered.map((v) => {
+              const used = chosen.includes(v.id);
+              const out = excluded.has(v.id);
+              return (
+                <li key={v.id} data-showcase-choice={v.id} className={"flex items-center gap-3 border border-white/10 p-2 " + (used && !out ? "" : "opacity-55")}>
+                  <CutoutThumb slug={slug} view={v} className="size-20 shrink-0" />
+                  <div className="min-w-0 flex-1 text-base text-bone">
+                    <label className="flex min-h-12 items-center gap-3">
+                      <input type="checkbox" checked={used} disabled={out} onChange={() => toggle(v.id)} className="size-5 accent-[#b76e79]" />
+                      {KIND_NAMES[v.kind]} · {v.id}
+                    </label>
+                    {out ? <span className="block text-mist">Exclue (page Détourages)</span> : !v.clean ? <span className="block text-mist">À revoir : {v.note}</span> : null}
+                  </div>
+                  {used && !out ? (
+                    <span className="flex flex-col">
+                      <button type="button" onClick={() => move(v.id, -1)} aria-label={"Monter la vue " + v.id} className={iconBtn}>
+                        <ArrowUp className="size-4" aria-hidden="true" />
+                      </button>
+                      <button type="button" onClick={() => move(v.id, 1)} aria-label={"Descendre la vue " + v.id} className={iconBtn}>
+                        <ArrowDown className="size-4" aria-hidden="true" />
+                      </button>
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+          <button type="button" onClick={() => onChange(excluded.size ? { excluded: [...excluded] } : null)} className={btn + " w-fit"}>
+            Revenir au choix automatique
+          </button>
+        </>
+      )}
+    </fieldset>
+  );
+}
+
+/**
+ * The page "Détourages": every cut-out view of every piece, on a checkerboard and on black, to check them at a glance;
+ * a view excluded here is never shown on the site (and comes back with "Rétablir").
+ */
+function CutoutsTab({ token, onExpired }: { token: string; onExpired: () => void }) {
+  const [pieces, setPieces] = useState<Rec[] | null>(null);
+  const [err, setErr] = useState("");
+  const [busy, setBusy] = useState("");
+  useEffect(() => {
+    api(token, "GET", "/api/admin/pieces")
+      .then((res) => setPieces((res.items as Rec[]) ?? []))
+      .catch((x: unknown) => {
+        if (x instanceof Error && x.message === "expired") onExpired();
+        else setErr(x instanceof Error ? x.message : "Chargement impossible.");
+      });
+  }, [token, onExpired]);
+  const exclude = async (slug: string, id: string, out: boolean) => {
+    const piece = pieces?.find((p) => p.slug === slug);
+    const before = cleanShowcase(piece?.showcase)?.excluded ?? [];
+    const excluded = out ? [...new Set([...before, id])] : before.filter((x) => x !== id);
+    setBusy(slug + "/" + id);
+    setErr("");
+    try {
+      const res = await api(token, "PUT", "/api/admin/cutouts/" + encodeURIComponent(slug), { excluded });
+      setPieces((list) => (list ?? []).map((p) => (p.slug === slug ? { ...p, showcase: res.showcase ?? null } : p)));
+    } catch (x) {
+      if (x instanceof Error && x.message === "expired") return onExpired();
+      setErr(x instanceof Error ? x.message : "Enregistrement impossible.");
+    } finally {
+      setBusy("");
+    }
+  };
+  const slugs = Object.keys(CUTOUTS);
+  const total = slugs.reduce((n, s) => n + (CUTOUTS[s]?.length ?? 0), 0);
+  return (
+    <section aria-label="Détourages" className="grid gap-8">
+      <p className="max-w-3xl text-base text-bone">
+        Les {total} vues détourées des {slugs.length} pièces, chacune sur damier (le fond doit avoir disparu) et sur noir (aucun liseré). Une vue exclue
+        n&apos;apparaît plus nulle part sur le site ; « Rétablir » la remet. Les pièces absentes de cette liste gardent leur photo d&apos;ouverture.
+      </p>
+      {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
+      {pieces === null ? (
+        <p className="text-base text-mist">Chargement…</p>
+      ) : (
+        slugs.map((slug) => {
+          const piece = pieces.find((p) => p.slug === slug);
+          const excluded = new Set(cleanShowcase(piece?.showcase)?.excluded ?? []);
+          const mode = resolveShowcase(slug, cleanShowcase(piece?.showcase)).mode;
+          return (
+            <article key={slug} data-cutouts-piece={slug} className="border-t border-white/15 pt-6">
+              <h3 className="text-xl text-white">
+                {asText(piece?.title) || slug}{" "}
+                <span className="text-base text-mist">· {mode === "multi" ? "vitrine multi-vues" : mode === "single" ? "une vue" : "photo"}</span>
+              </h3>
+              <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {(CUTOUTS[slug] ?? []).map((v) => {
+                  const out = excluded.has(v.id);
+                  return (
+                    <li key={v.id} data-cutout={slug + "/" + v.id} data-cutout-excluded={out ? "" : undefined} className={"grid gap-2 border border-white/10 p-3 " + (out ? "opacity-50" : "")}>
+                      <div className="grid grid-cols-2 gap-2">
+                        <CutoutThumb slug={slug} view={v} className="aspect-square" />
+                        <CutoutThumb slug={slug} view={v} black className="aspect-square" />
+                      </div>
+                      <p className="text-base text-bone">
+                        {KIND_NAMES[v.kind]} · {v.id}
+                        {v.fade ? <span className="text-mist"> · fondu {v.fade.map((f) => ({ top: "en haut", bottom: "en bas", left: "à gauche", right: "à droite" })[f] ?? f).join(", ")}</span> : null}
+                      </p>
+                      {v.note ? <p className="text-base text-mist">{v.note}</p> : null}
+                      <button type="button" disabled={busy === slug + "/" + v.id} onClick={() => exclude(slug, v.id, !out)} className={(out ? btnMain : btn) + " w-full justify-center"}>
+                        {out ? "Rétablir" : "Exclure"}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </article>
+          );
+        })
+      )}
+    </section>
+  );
+}
+
 /**
  * The personal photos of Yoni on the page The House: one place per chapter, quote and the portrait. A place without a
  * photo shows nothing on the site. A photo dropped in the folder "Berete - La Maison" is used when none is sent here.
@@ -834,7 +1022,7 @@ function HouseTab({ token, onExpired }: { token: string; onExpired: () => void }
   return (
     <div className="mt-8 grid gap-6" data-house-admin>
       <p className="max-w-3xl text-base text-bone">
-        Les photos personnelles de Yoni sur la page « La Maison ». Un emplacement sans photo n'affiche rien sur le site (aucun cadre vide). On peut aussi déposer les photos dans le dossier « Berete - La Maison » du Bureau (voir le fichier LISEZ-MOI qui s'y trouve).
+        Les photos personnelles de Yoni sur la page « La Maison ». Un emplacement sans photo n'affiche rien sur le site (aucun cadre vide). On peut aussi déposer les photos dans le dossier « Berete - La Maison » du disque externe (voir le fichier LISEZ-MOI qui s'y trouve).
       </p>
       {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
       <ul className="grid gap-6 md:grid-cols-2">
@@ -988,7 +1176,7 @@ export default function Admin() {
         ) : (
           <>
             <h1 className="sr-only">Administration · {TABS.find((t) => t.key === tab)?.label}</h1>
-            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
           </>
         )}
       </main>
