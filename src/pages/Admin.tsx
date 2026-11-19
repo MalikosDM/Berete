@@ -1,9 +1,26 @@
 import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import Logo from "@/components/Logo";
-import Universe from "@/components/Universe";
+import Universe, { universeProps } from "@/components/Universe";
 import { HOUSE_PHOTO_PLACES } from "@/data/house";
-import { cleanTheme, LIGHT_NAMES, MOTION_NAMES, resolveTheme, TEXTURE_NAMES, THEME_LIGHTS, THEME_MOTIONS, THEME_PRESETS, THEME_TEXTURES, type PieceTheme } from "@/data/themes";
+import {
+  BACKDROPS,
+  cleanTheme,
+  EFFECT_NAMES,
+  ENTRANCE_NAMES,
+  LIGHT_NAMES,
+  resolveTheme,
+  TEXTURE_NAMES,
+  THEME_EFFECTS,
+  THEME_ENTRANCES,
+  THEME_FONT_KEYS,
+  THEME_FONTS,
+  THEME_LIGHTS,
+  THEME_PRESETS,
+  THEME_TEXTURES,
+  type PieceTheme,
+  type ThemeFontSpec,
+} from "@/data/themes";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
 import Clients from "@/pages/admin/Clients";
@@ -91,7 +108,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "draft", label: "Brouillon (textes à valider)", type: "checkbox" },
       { key: "published", label: "Publiée sur le site (décochée : la pièce n'apparaît nulle part sur le site ; son ancienne adresse mène à la page de son joueur)", type: "checkbox" },
       { key: "cover", label: "Photo d'ouverture", type: "media" },
-      { key: "theme", label: "Univers de la page (le fond, les couleurs, la lumière et l'animation de la page de la pièce)", type: "theme" },
+      { key: "theme", label: "Univers de la page (le fond, la police du titre, l'entrée et les effets de la page de la pièce)", type: "theme" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
@@ -453,7 +470,7 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
   const field = (d: Field): ReactNode => {
     const v = f[d.key];
     if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
-    if (d.type === "theme") return <ThemeField key={d.key} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
+    if (d.type === "theme") return <ThemeField key={d.key} token={token} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
     if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
@@ -638,23 +655,52 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
 }
 
 /**
- * The universe of the page of a piece: a preset of the house, then, if wanted, its colours, texture, light and motion.
- * The small window shows it as the page will.
+ * The universe of the page of a piece: a preset of the house, then, if wanted, each of its parts: the backdrop (an AI
+ * background of the house, an image sent here, or none: a procedural composition), the typography of the title, the
+ * entrance, the effects, a watermark, the colours, the texture and the light. The small window shows it as the page will
+ * (its entrance plays again on demand); the effects that move with the scroll live on the page only.
  */
-function ThemeField({ label, value, onChange }: { label: string; value: PieceTheme | null; onChange: (v: PieceTheme | null) => void }) {
+function ThemeField({ token, label, value, onChange }: { token: string; label: string; value: PieceTheme | null; onChange: (v: PieceTheme | null) => void }) {
   const resolved = resolveTheme(value);
+  const [replay, setReplay] = useState(0);
   const set = (patch: Partial<PieceTheme>) => onChange({ ...(value ?? { preset: resolved.preset }), ...patch });
+  const font = THEME_FONTS[resolved.font] as ThemeFontSpec;
+  const uploaded = resolved.backdrop && !BACKDROPS[resolved.backdrop] ? resolved.backdrop : "";
   const colours: [keyof PieceTheme & ("base" | "tint" | "glow"), string][] = [
     ["base", "Fond (presque noir)"],
     ["tint", "Couleur de l'univers"],
-    ["glow", "Couleur de la lumière"],
+    ["glow", "Couleur de la lumière et des effets"],
   ];
+  const toggle = (e: (typeof THEME_EFFECTS)[number]) => set({ effects: resolved.effects.includes(e) ? resolved.effects.filter((x) => x !== e) : [...resolved.effects, e] });
   return (
     <fieldset data-theme-field className="grid gap-4 border border-white/15 p-4 sm:p-5">
       <legend className="px-2 text-base text-bone">{label}</legend>
-      <div className="relative isolate h-40 overflow-hidden border border-white/10" aria-hidden="true">
-        <Universe theme={resolved} />
+      <div
+        key={resolved.preset + resolved.entrance + resolved.backdrop + replay}
+        data-entering=""
+        data-entrance={resolved.entrance}
+        {...universeProps(resolved)}
+        className="relative isolate h-56 overflow-hidden border border-white/10 sm:h-64"
+        aria-hidden="true"
+      >
+        <Universe theme={resolved} preview />
+        <p
+          data-theme-preview-title
+          className="absolute inset-x-4 bottom-4 text-white [text-shadow:0_2px_20px_rgba(0,0,0,0.8)]"
+          style={{
+            fontFamily: font.family ? '"' + font.family + '", var(--font-display)' : "var(--font-display)",
+            fontWeight: font.weight,
+            fontStyle: font.italic ? "italic" : "normal",
+            textTransform: font.caps ? "uppercase" : "none",
+            letterSpacing: font.tracking,
+            fontSize: "calc(1.75rem * " + font.scale + ")",
+            lineHeight: 1.1,
+          }}
+        >
+          Le titre de la pièce
+        </p>
       </div>
+      <button type="button" onClick={() => setReplay((r) => r + 1)} className={btn + " w-fit"}>Rejouer l&apos;entrée</button>
       <label className="block text-base text-bone">
         Univers
         <select value={resolved.preset} onChange={(e) => onChange({ preset: e.target.value })} className={inputCls}>
@@ -663,6 +709,59 @@ function ThemeField({ label, value, onChange }: { label: string; value: PieceThe
           ))}
         </select>
       </label>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block text-base text-bone">
+          Fond
+          <select value={uploaded ? "__image" : resolved.backdrop} onChange={(e) => e.target.value !== "__image" && set({ backdrop: e.target.value })} className={inputCls}>
+            <option value="">Composition (lumière, matière, particules)</option>
+            {Object.entries(BACKDROPS).map(([key, b]) => (
+              <option key={key} value={key}>Fond IA : {b.name}</option>
+            ))}
+            {uploaded ? <option value="__image">Image envoyée</option> : null}
+          </select>
+        </label>
+        <label className="block text-base text-bone">
+          Typographie du titre
+          <select value={resolved.font} onChange={(e) => set({ font: e.target.value as PieceTheme["font"] })} className={inputCls}>
+            {THEME_FONT_KEYS.map((k) => (
+              <option key={k} value={k}>{(THEME_FONTS[k] as ThemeFontSpec).name}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <MediaField
+        token={token}
+        single
+        imagesOnly
+        label="Ou une image de fond envoyée (sombre, au moins 2000 px de large)"
+        value={uploaded ? [{ type: "image", src: uploaded }] : []}
+        onChange={(l) => set({ backdrop: l[0]?.src ?? "" })}
+      />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block text-base text-bone">
+          Effet d&apos;entrée (la première visite)
+          <select value={resolved.entrance} onChange={(e) => set({ entrance: e.target.value as PieceTheme["entrance"] })} className={inputCls}>
+            {THEME_ENTRANCES.map((x) => (
+              <option key={x} value={x}>{ENTRANCE_NAMES[x]}</option>
+            ))}
+          </select>
+        </label>
+        <label className="block text-base text-bone">
+          Filigrane (un signe, 4 caractères au plus)
+          <input value={resolved.mark} maxLength={4} onChange={(e) => set({ mark: e.target.value })} placeholder="力, 20, OKA…" className={inputCls} />
+        </label>
+      </div>
+      <fieldset className="grid gap-2">
+        <legend className="text-base text-bone">Effets (au scroll et en fond)</legend>
+        <div className="grid gap-x-6 gap-y-1 sm:grid-cols-2">
+          {THEME_EFFECTS.map((x) => (
+            <label key={x} className="flex min-h-12 items-center gap-3 text-base text-bone">
+              <input type="checkbox" checked={resolved.effects.includes(x)} onChange={() => toggle(x)} className="size-5 accent-[#b76e79]" />
+              {EFFECT_NAMES[x]}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="grid gap-4 sm:grid-cols-3">
         {colours.map(([key, name]) => (
           <label key={key} className="block text-base text-bone">
@@ -671,7 +770,7 @@ function ThemeField({ label, value, onChange }: { label: string; value: PieceThe
           </label>
         ))}
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-base text-bone">
           Texture
           <select value={resolved.texture} onChange={(e) => set({ texture: e.target.value as PieceTheme["texture"] })} className={inputCls}>
@@ -688,17 +787,12 @@ function ThemeField({ label, value, onChange }: { label: string; value: PieceThe
             ))}
           </select>
         </label>
-        <label className="block text-base text-bone">
-          Animation
-          <select value={resolved.motion} onChange={(e) => set({ motion: e.target.value as PieceTheme["motion"] })} className={inputCls}>
-            {THEME_MOTIONS.map((x) => (
-              <option key={x} value={x}>{MOTION_NAMES[x]}</option>
-            ))}
-          </select>
-        </label>
       </div>
-      <p className="text-base text-mist">Les boutons et les liens restent en or rose ; les couleurs de l'univers vivent seulement dans le fond, toujours sombres pour que les textes restent lisibles.</p>
-      <button type="button" onClick={() => onChange(null)} className={btn + " w-fit"}>Revenir à l'univers de la Maison</button>
+      <p className="text-base text-mist">
+        Les boutons et les liens restent en or rose ; l&apos;univers vit dans le fond, le titre et les effets, toujours sombre derrière les textes pour qu&apos;ils restent lisibles.
+        L&apos;entrée se joue à la première visite de la page, jamais au retour, et rien ne bouge pour les visiteurs qui demandent moins d&apos;animations.
+      </p>
+      <button type="button" onClick={() => onChange(null)} className={btn + " w-fit"}>Revenir à l&apos;univers de la Maison</button>
     </fieldset>
   );
 }
