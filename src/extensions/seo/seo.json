@@ -2,11 +2,18 @@
   "siteName": "Berete Jewellers",
   "language": "en",
   "titleTemplate": "%s — Berete Jewellers",
-  "description": "Custom high jewellery made in Dubai: diamond pendants, chains, championship rings and watches for clubs, footballers and stars.",
+  "description": "One-of-one high jewellery for those who define their own legacy: diamond pendants, chains, championship rings and watches, created in Dubai.",
   "image": "/media/share/brand.jpg",
   "imageWidth": 1200,
   "imageHeight": 630,
-  "ogLocales": { "en": "en_GB", "fr": "fr_FR", "es": "es_ES", "de": "de_DE", "nl": "nl_NL", "ar": "ar_AE" },
+  "ogLocales": {
+    "en": "en_GB",
+    "fr": "fr_FR",
+    "es": "es_ES",
+    "de": "de_DE",
+    "nl": "nl_NL",
+    "ar": "ar_AE"
+  },
   "organization": {
     "type": "Organization",
     "name": "Berete Jewellers",
@@ -17,12 +24,12 @@
   },
   "pages": {
     "/": {
-      "title": "Berete Jewellers — Custom High Jewellery, Dubai",
-      "description": "Custom high jewellery made in Dubai: diamond chains, pendants and championship rings for clubs, footballers and stars. Made by us. Inspired by you."
+      "title": "Berete Jewellers — The Art of Individuality, Dubai",
+      "description": "One-of-one high jewellery for those who define their own legacy. Pendants, chains and championship rings created in Dubai. Made by us. Inspired by you."
     },
     "/creations": {
-      "title": "Creations: Pendants, Chains, Rings and Watches",
-      "description": "Every Berete Jewellers piece, filterable by type: diamond pendants, chains, championship and signet rings and watches, each one made to measure in Dubai."
+      "title": "The Creations: Pendants, Chains, Rings and Watches",
+      "description": "Every creation. A universe of its own. The pendants, chains, championship rings and watches of Berete Jewellers, each one created in Dubai."
     },
     "/creations/pendants": {
       "title": "Pendants: Custom Diamond Pendants",
@@ -30,11 +37,11 @@
     },
     "/creations/chains": {
       "title": "Chains: Custom Diamond Chains",
-      "description": "The chains of Berete Jewellers: butterfly links, infinity knots and diamond flowers, drawn link by link and made to measure in Dubai."
+      "description": "The chains of Berete Jewellers: butterfly links, gothic stations and diamond flowers, drawn link by link and created in Dubai."
     },
     "/creations/rings": {
-      "title": "Rings: Championship and Signet Rings",
-      "description": "Championship rings for VfB Stuttgart and Inter Milan, and signet rings set with diamonds: the rings of Berete Jewellers, made in Dubai."
+      "title": "Rings: Victory, Immortalised",
+      "description": "More than a symbol of victory. A legacy immortalised in gold and diamonds: the championship rings of VfB Stuttgart and Inter Milan by Berete Jewellers."
     },
     "/creations/watches": {
       "title": "Watches Set with Diamonds",
@@ -48,29 +55,29 @@
     },
     "/pieces/:slug": {},
     "/players": {
-      "title": "Players, Clubs and Personalities",
-      "description": "The footballers, clubs and personalities who wear Berete Jewellers: their stories and the custom pieces made for them."
+      "title": "The Berete Circle",
+      "description": "Exceptional individuals. Extraordinary creations. The athletes, iconic clubs and cultural icons who wear Berete Jewellers, and the creations made for them."
     },
     "/players/:slug": {},
     "/atelier": {
-      "title": "The Atelier in Dubai",
-      "description": "Inside the Berete Jewellers atelier in Dubai: casting, assembly, polishing and stone setting, every piece made by hand."
+      "title": "The Atelier",
+      "description": "Where imagination meets mastery: inside the Berete Jewellers atelier, from the birth of form to the final refinement, every piece made by hand."
     },
     "/boxes": {
-      "title": "Custom Boxes and Trunks",
-      "description": "Custom boxes and trunks made to measure for selected Berete Jewellers pieces, available as an option."
+      "title": "Signature Trunks",
+      "description": "Every exceptional creation deserves an extraordinary presentation. The Signature Trunks and bespoke presentation cases of Berete Jewellers."
     },
     "/process": {
-      "title": "The Process, Step by Step",
-      "description": "Six clear steps from your first message to the handover: design deposit, validation, creation followed on WhatsApp, photoshoot and delivery."
+      "title": "The Bespoke Journey",
+      "description": "Six chapters. One vision. From the private consultation to the final presentation, with every payment stage explained clearly from the start."
     },
     "/about": {
-      "title": "Our Story",
-      "description": "The story of Berete Jewellers, a Dubai house creating custom high jewellery for champions."
+      "title": "The House — Yoni Berete, Founder & Creative Director",
+      "description": "An independent vision of contemporary high jewellery. The story of Yoni Berete, founder of Berete Jewellers: two worlds, one legacy, a singular vision."
     },
     "/contact": {
-      "title": "Contact: Start Your Piece",
-      "description": "Start your custom piece with Berete Jewellers: chat on WhatsApp, build your request in three clicks or ask for a call back."
+      "title": "Private Enquiries",
+      "description": "Every masterpiece begins with a conversation. Begin your creation with Berete Jewellers: a private conversation on WhatsApp, a consultation in three steps or a private call."
     },
     "/legal": {
       "title": "Legal Notice",
