@@ -1555,3 +1555,113 @@ html[lang="ar"] [data-piece] [data-u-title] {
     rotate: none !important;
   }
 }
+
+/* ---------- The atelier of a piece, full screen (src/components/AtelierRoom.tsx) ---------- */
+
+/* The lamp over the bench: a warm light from above, breathing slowly. */
+.atelier-room .ar-lamp {
+  background:
+    radial-gradient(ellipse 60% 45% at 50% -8%, rgb(255 214 170 / 0.24), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 12% 30%, rgb(232 180 160 / 0.08), transparent 70%),
+    radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, rgb(0 0 0 / 0.7) 100%);
+  animation: ar-lamp 7s ease-in-out infinite alternate;
+}
+@keyframes ar-lamp {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* The bench: dark wood, its grain, the edge catching the light of the lamp. */
+.atelier-room .ar-bench {
+  background:
+    linear-gradient(to bottom, rgb(232 180 160 / 0.22), transparent 2px),
+    repeating-linear-gradient(178deg, rgb(255 255 255 / 0.025) 0 2px, transparent 2px 9px),
+    linear-gradient(to bottom, #3a2519, #1c110b 55%, #0b0705);
+  box-shadow: 0 -30px 60px rgb(0 0 0 / 0.55);
+  opacity: 0.9;
+}
+/* The grain of the room. */
+.atelier-room .ar-grain {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* The film stands on the bench: its shadow, a thin rose gold edge (computers). */
+@media (min-width: 1024px) {
+  .atelier-room .ar-frame {
+    box-shadow:
+      0 40px 80px -20px rgb(0 0 0 / 0.85),
+      0 0 0 1px rgb(0 0 0 / 0.6),
+      0 0 120px -30px rgb(232 180 160 / 0.25);
+  }
+}
+/* The bar of the film: rose gold up to where it plays. */
+.atelier-room .ar-seek {
+  appearance: none;
+  background: transparent;
+}
+.atelier-room .ar-seek::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--color-rose-light) var(--p, 0%), rgb(255 255 255 / 0.3) var(--p, 0%));
+}
+.atelier-room .ar-seek::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--color-rose-light) var(--p, 0%), rgb(255 255 255 / 0.3) var(--p, 0%));
+}
+.atelier-room .ar-seek::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgb(232 180 160 / 0.35);
+}
+.atelier-room .ar-seek::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+}
+.atelier-room .ar-seek:focus-visible {
+  outline: 2px solid var(--color-rose-light);
+  outline-offset: 2px;
+}
+/* The room opens from the dark; the title of the finished piece rises. */
+.atelier-room {
+  animation: ar-open 0.5s ease-out both;
+}
+@keyframes ar-open {
+  from {
+    opacity: 0;
+  }
+}
+.atelier-room .ar-rise {
+  animation: ar-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes ar-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    letter-spacing: 0.3em;
+  }
+}
+/* The passage of a piece page towards its atelier (src/components/AtelierPassage.tsx). */
+.atelier-passage {
+  background:
+    radial-gradient(ellipse 55% 70% at 72% 0%, rgb(255 214 170 / 0.12), transparent 70%),
+    linear-gradient(to bottom, rgb(11 8 6 / 0.55), rgb(11 8 6 / 0.85));
+}
+@media (prefers-reduced-motion: reduce) {
+  .atelier-room,
+  .atelier-room .ar-lamp,
+  .atelier-room .ar-rise {
+    animation: none;
+  }
+}

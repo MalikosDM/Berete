@@ -7,6 +7,7 @@
  * and stones" of the technical sheet, left out when the photos say nothing sure.
  */
 import { group, list, sketch, st, still, yoni } from "./sources.js";
+import type { PieceAtelier } from "./atelier.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
@@ -64,6 +65,7 @@ type PieceInput = {
   /** The universe of the page (src/data/themes.ts). */
   theme?: PieceTheme;
   showcase?: PieceShowcase;
+  atelier?: PieceAtelier;
   cover: Maybe;
   gallery: Maybe[];
   handover?: Maybe[];
@@ -108,6 +110,7 @@ function piece(p: PieceInput): Piece {
     published: p.published ?? !REMOVED_PIECES.includes(p.slug),
     theme: p.theme ?? null,
     showcase: p.showcase ?? null,
+    atelier: p.atelier ?? null,
     making,
   };
 }

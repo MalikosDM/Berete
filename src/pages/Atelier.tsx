@@ -1,17 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, Maximize2, X, ZoomIn } from "lucide-react";
+import { ArrowRight, Maximize2, Play, X, ZoomIn } from "lucide-react";
+import AtelierRoom from "@/components/AtelierRoom";
+import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
 import { Lightbox } from "@/components/HorizontalGallery";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
+import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
 import { media } from "@/data/catalogue";
 import { FEATURED_BOX } from "@/data/pieces";
-import type { Box, MediaItem } from "@/data/types";
-import { Link, useI18n } from "@/i18n";
+import type { Box, MediaItem, Piece } from "@/data/types";
+import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis, gsap, useReducedMotion } from "@/lib/gsap";
+import { srcSetOf } from "@/lib/responsive";
 import { waLink } from "@/lib/site";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
@@ -78,6 +82,8 @@ export default function Atelier() {
         })}
       </section>
 
+      <AtelierFilms />
+
       <section className="relative z-20 bg-ink px-5 py-24 text-center sm:px-8 md:py-32">
         <Reveal>
           <p className="eyebrow">{t.common.yourPiece}</p>
@@ -94,6 +100,71 @@ export default function Atelier() {
         </Reveal>
       </section>
     </div>
+  );
+}
+
+/* ---------- The making-of of every piece ---------- */
+
+/**
+ * The making-of of every published piece that has one (src/data/atelier.ts), as thumbnails: its image, its name, for
+ * whom. Each opens the same atelier as its page, full screen, with "Enter the World" towards the piece. The drafts
+ * (unpublished) are not in the catalogue of the visitors, so not here.
+ */
+function AtelierFilms() {
+  const { t } = useI18n();
+  const cat = useCatalogue();
+  const madeFor = useMadeFor();
+  const [open, setOpen] = useState<{ piece: Piece; atelier: ResolvedAtelier } | null>(null);
+  const films = cat.pieces.flatMap((piece) => {
+    const atelier = piece.published === false ? null : resolveAtelier(piece.slug, piece.atelier);
+    return atelier ? [{ piece, atelier }] : [];
+  });
+  if (films.length === 0) return null;
+  return (
+    <section aria-labelledby="atelier-films-title" data-atelier-films className="atelier-passage relative z-20 border-t border-white/10 bg-ink">
+      <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <Reveal>
+          <p className="eyebrow">{t.films.sectionEyebrow}</p>
+          <h2 id="atelier-films-title" className="title-caps mt-5 max-w-4xl text-[clamp(2rem,5vw,4.25rem)] leading-[1.08] tracking-[0.1em] text-white [text-wrap:balance]">
+            {t.films.sectionTitle}
+          </h2>
+          <p className="mt-6 max-w-xl text-lg text-bone">{t.films.sectionLead}</p>
+        </Reveal>
+        <ul className="mt-14 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+          {films.map(({ piece, atelier }, i) => (
+            <li key={piece.slug} data-atelier-film={piece.slug}>
+              <Reveal delay={(i % 4) * 0.06}>
+                <button type="button" onClick={() => setOpen({ piece, atelier })} aria-label={t.films.open(piece.title)} className="group block w-full text-start">
+                  <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-black">
+                    {atelier.poster ? (
+                      <Img
+                        src={atelier.poster}
+                        srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
+                        sizes="(max-width: 767px) 46vw, (max-width: 1279px) 30vw, 22vw"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+                      />
+                    ) : null}
+                    <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-transparent" />
+                    <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                      <Play className="size-5 translate-x-px fill-current" />
+                    </span>
+                    <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-1 text-base text-bone tabular-nums">
+                      {filmTime(atelier.making.duration)}
+                    </span>
+                  </span>
+                  <span className="title-caps mt-4 block text-base leading-snug tracking-[0.1em] text-white group-hover:text-rose-light sm:text-lg">{piece.title}</span>
+                  <span className="mt-1 block text-base text-mist">{t.common.madeFor(madeFor(cat, piece))}</span>
+                </button>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpen(null)} /> : null}
+    </section>
   );
 }
 

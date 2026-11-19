@@ -1,3 +1,4 @@
+import type { Film, FilmKind, PieceAtelier } from "./atelier.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 
@@ -116,6 +117,8 @@ export type Piece = {
   theme: PieceTheme | null;
   /** How its opening shows the jewel: one cut-out view or a showcase of several (src/data/showcase.ts); null: by the rule. */
   showcase: PieceShowcase | null;
+  /** Its atelier: the making-of and the finished piece played full screen (src/data/atelier.ts); null: its own films. */
+  atelier: PieceAtelier | null;
   making: Making;
   translations?: Translations;
 };
@@ -174,4 +177,6 @@ export type GeneratedMedia = {
    * portrait, the others go to "In Pictures" on their page.
    */
   players?: Record<string, MediaItem[]>;
+  /** The films of "Enter the Atelier" (scripts/film-media.mjs), by piece then kind: its making-of, its finished piece. */
+  films?: Record<string, Partial<Record<FilmKind, Film>>>;
 };

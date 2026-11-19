@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
+import AtelierPassage from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
 import HorizontalGallery, { Lightbox } from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
@@ -17,6 +18,7 @@ import { defaultCatalogue, media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { resolveAtelier } from "@/data/atelier";
 import { resolveShowcase } from "@/data/showcase";
 import { resolveTheme } from "@/data/themes";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
@@ -81,6 +83,8 @@ export default function PiecePage() {
   const theme = resolveTheme(piece.theme);
   // The jewel of the opening: cut out, in one view or a showcase of several; else its photo.
   const opening = resolveShowcase(piece.slug, piece.showcase);
+  // Its atelier (its making-of, then the finished piece): a passage after its photos, when it has a making-of.
+  const atelier = resolveAtelier(piece.slug, piece.atelier);
 
   return (
     // The page of each piece is its own element (key): entering another piece is entering another world, with its
@@ -148,6 +152,7 @@ export default function PiecePage() {
 
       <div id="piece-details" className="scroll-mt-24">
         {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} bare /> : null}
+        {atelier ? <AtelierPassage piece={piece} madeFor={madeFor(cat, piece)} atelier={atelier} /> : null}
         {piece.details.length > 0 ? <DetailsSection piece={piece} /> : null}
       </div>
 

@@ -543,6 +543,30 @@ export const en = {
     soon: "Your private space opens very soon. Until then, write to us on WhatsApp and we will send you your pieces in 3D directly.",
     soonMessage: "Hello Berete Jewellers, I would like to see my pieces in 3D.",
   },
+
+  /** "Enter the Atelier": the films of a piece, its making-of then the finished piece (src/components/AtelierRoom.tsx). */
+  films: {
+    eyebrow: "Behind the Piece",
+    enter: "Enter the Atelier",
+    lead: (title: string, reveal: boolean) => "Step behind the bench and watch " + title + " come to life" + (reveal ? ", then discover it in The Final Reveal." : "."),
+    making: "The Making",
+    reveal: "The Final Reveal",
+    dialog: (title: string) => "The atelier of " + title,
+    play: "Play",
+    pause: "Pause",
+    soundOn: "Turn the sound on",
+    soundOff: "Turn the sound off",
+    silent: "Silent film",
+    seek: (film: string) => "Position in " + film,
+    leave: "Leave the atelier",
+    replay: "Watch again",
+    next: "Next: The Final Reveal",
+    loading: "Loading the film",
+    open: (title: string) => "Enter the atelier of " + title,
+    sectionEyebrow: "From the Bench",
+    sectionTitle: "Every Piece, Its Making-of",
+    sectionLead: "Each creation, filmed at the bench. Open its atelier, then enter its world.",
+  },
 };
 
 /** The shape every language must fill: the same entries, with its own words. */
