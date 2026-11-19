@@ -78,6 +78,8 @@ model Piece {
   theme        Json?
   /// How its opening shows the jewel (PieceShowcase, src/data/showcase.ts): one view, the showcase, the views; null: by the rule.
   showcase     Json?
+  /// Its atelier (PieceAtelier, src/data/atelier.ts): the making-of and the finished piece played full screen; null: its own.
+  atelier      Json?
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
   translations Json   @default("{}")

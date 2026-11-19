@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { HOUSE_PHOTO_PLACES } from "../../src/data/house.js";
 import { publicCatalogue } from "../../src/data/relations.js";
+import { cleanAtelier } from "../../src/data/atelier.js";
 import { cleanShowcase } from "../../src/data/showcase.js";
 import { cleanTheme } from "../../src/data/themes.js";
 import { PIECE_TYPES } from "../../src/data/types.js";
@@ -245,6 +246,11 @@ const PieceIn = z.object({
     .unknown()
     .optional()
     .transform((v) => cleanShowcase(v) ?? Prisma.DbNull),
+  /** Its atelier: the film of each kind (or none) and the image before it plays; none: its own films. */
+  atelier: z
+    .unknown()
+    .optional()
+    .transform((v) => cleanAtelier(v) ?? Prisma.DbNull),
   making: MakingSchema.optional(),
   translations: TranslationsSchema.default({}),
 });

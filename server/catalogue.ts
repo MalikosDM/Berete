@@ -18,6 +18,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
+import { cleanAtelier } from "../src/data/atelier.js";
 import { cleanShowcase } from "../src/data/showcase.js";
 import { cleanTheme } from "../src/data/themes.js";
 import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Detail, type HousePhotos, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
@@ -162,6 +163,7 @@ export const toPiece = (r: PieceRow): Piece => ({
   published: r.published,
   theme: cleanTheme(r.theme),
   showcase: cleanShowcase(r.showcase),
+  atelier: cleanAtelier(r.atelier),
   making: makingOf(r.making),
   translations: translationsOf(r.translations),
 });
@@ -234,6 +236,7 @@ const pieceTexts = (p: Piece) => ({
   published: p.published === false ? false : undefined,
   theme: p.theme ?? undefined,
   showcase: p.showcase ?? undefined,
+  atelier: p.atelier ?? undefined,
   making: p.making,
 });
 const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceSlug: b.pieceSlug });
@@ -309,7 +312,7 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
   for (const [i, p] of cat.pieces.entries()) {
     const row = await prisma.piece.findUnique({ where: { slug: p.slug } });
     if (row === null) {
-      await once("piece:" + p.slug, seeded, () => prisma.piece.create({ data: { ...p, theme: p.theme ?? Prisma.DbNull, showcase: p.showcase ?? Prisma.DbNull, sortOrder: i + 1, seedHash: fingerprint(pieceTexts(p)) } }));
+      await once("piece:" + p.slug, seeded, () => prisma.piece.create({ data: { ...p, theme: p.theme ?? Prisma.DbNull, showcase: p.showcase ?? Prisma.DbNull, atelier: p.atelier ?? Prisma.DbNull, sortOrder: i + 1, seedHash: fingerprint(pieceTexts(p)) } }));
       continue;
     }
     await mark("piece:" + p.slug, seeded);

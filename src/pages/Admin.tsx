@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEven
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import Logo from "@/components/Logo";
 import Universe, { universeProps } from "@/components/Universe";
+import { cleanAtelier, filmId, FILMS, filmTime, resolveAtelier, type Film, type FilmKind, type PieceAtelier } from "@/data/atelier";
 import { HOUSE_PHOTO_PLACES } from "@/data/house";
 import { cleanShowcase, CUTOUTS, cutoutSrc, resolveShowcase, SHOWCASE_BY_DEFAULT, type CutoutView, type PieceShowcase } from "@/data/showcase";
 import {
@@ -48,6 +49,8 @@ type Field =
   | { key: string; label: string; type: "theme" }
   /** How the opening shows the jewel: one cut-out view or a showcase (src/data/showcase.ts). */
   | { key: string; label: string; type: "showcase" }
+  /** Its atelier: the making-of and the finished piece played full screen, and their image (src/data/atelier.ts). */
+  | { key: string; label: string; type: "atelier" }
   /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
   | { key: string; label: string; type: "model3d" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
@@ -113,6 +116,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "cover", label: "Photo d'ouverture", type: "media" },
       { key: "theme", label: "Univers de la page (le fond, la police du titre, l'entrée et les effets de la page de la pièce)", type: "theme" },
       { key: "showcase", label: "Vitrine de l'ouverture (le bijou détouré : une vue ou plusieurs vues)", type: "showcase" },
+      { key: "atelier", label: "L'atelier de la pièce (« Entrer dans l'atelier » : la vidéo de fabrication, puis la pièce finie)", type: "atelier" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos des détails", type: "medialist" },
       { key: "handover", label: "Remise au client", type: "medialist" },
@@ -123,7 +127,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, atelier: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins Signature",
@@ -390,6 +394,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
     else if (field.type === "translations") body[field.key] = cleanTranslations(v);
     else if (field.type === "theme") body[field.key] = cleanTheme(v);
     else if (field.type === "showcase") body[field.key] = cleanShowcase(v);
+    else if (field.type === "atelier") body[field.key] = cleanAtelier(v);
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
@@ -477,6 +482,7 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
     const v = f[d.key];
     if (d.type === "translations") return <TranslationsField key={d.key} label={d.label} fields={d.fields} value={asTranslations(v)} source={f} onChange={(t) => set(d.key, t)} />;
     if (d.type === "theme") return <ThemeField key={d.key} token={token} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
+    if (d.type === "atelier") return <AtelierField key={d.key} label={d.label} slug={asText(f.slug)} titles={titles} value={cleanAtelier(v)} onChange={(a) => set(d.key, a)} />;
     if (d.type === "showcase") return <ShowcaseField key={d.key} label={d.label} slug={asText(f.slug)} value={cleanShowcase(v)} onChange={(c) => set(d.key, c)} />;
     if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
@@ -812,6 +818,93 @@ function CutoutThumb({ slug, view, black = false, className = "" }: { slug: stri
     <span className={"block overflow-hidden " + className} style={{ background: black ? "#0a0a0a" : checker }}>
       <img src={cutoutSrc(slug, view, w)} alt="" loading="lazy" className="h-full w-full object-contain" />
     </span>
+  );
+}
+
+const FILM_NAMES: Record<FilmKind, string> = { making: "Fabrication", reveal: "Pièce finie" };
+
+/**
+ * The atelier of a piece ("Entrer dans l'atelier" on its page, and its place on the page The Atelier): its film of
+ * fabrication and its film of the finished piece, each one its own (automatic), another prepared film or none, and the
+ * image shown before it plays. Without a film of fabrication, the page shows no passage to the atelier.
+ */
+function AtelierField({ label, slug, titles, value, onChange }: { label: string; slug: string; titles: Record<string, string>; value: PieceAtelier | null; onChange: (v: PieceAtelier | null) => void }) {
+  const set = (patch: Partial<PieceAtelier>) => {
+    const next: Record<string, unknown> = { ...(value ?? {}), ...patch };
+    for (const k of Object.keys(patch)) if (patch[k as keyof PieceAtelier] === undefined) delete next[k];
+    onChange(cleanAtelier(next));
+  };
+  const resolved = resolveAtelier(slug, value);
+  const describe = (f: Film) => filmTime(f.duration) + " · " + f.source + (f.audio ? "" : " · sans son");
+  const all = Object.entries(FILMS).flatMap(([s, kinds]) => (Object.entries(kinds) as [FilmKind, Film][]).map(([k, f]) => ({ id: filmId(s, k), slug: s, kind: k, film: f })));
+  const slugs = [...new Set(all.map((x) => x.slug))];
+  const choice = (kind: FilmKind) => {
+    const own = FILMS[slug]?.[kind];
+    const v = value?.[kind];
+    const current = v === null ? null : v ? all.find((x) => x.id === v)?.film ?? null : own ?? null;
+    return (
+      <div key={kind} data-atelier-choice={kind} className="grid content-start gap-3">
+        <label className="grid gap-2 text-base text-bone">
+          {kind === "making" ? "Vidéo de fabrication" : "Vidéo de la pièce finie (« La Révélation finale »)"}
+          <select
+            value={v === null ? "none" : (v ?? "")}
+            onChange={(e) => set({ [kind]: e.target.value === "" ? undefined : e.target.value === "none" ? null : e.target.value })}
+            className={inputCls}
+          >
+            <option value="">{"Automatique : " + (own ? "sa vidéo (" + describe(own) + ")" : "aucune vidéo préparée")}</option>
+            <option value="none">Aucune</option>
+            {slugs.map((s) => (
+              <optgroup key={s} label={titles[s] ?? s}>
+                {all
+                  .filter((x) => x.slug === s)
+                  .map((x) => (
+                    <option key={x.id} value={x.id}>
+                      {FILM_NAMES[x.kind] + " · " + describe(x.film)}
+                    </option>
+                  ))}
+              </optgroup>
+            ))}
+          </select>
+        </label>
+        {current ? (
+          // The film chosen, to check it (it loads only when played).
+          <video src={current.mobile} poster={current.posters[current.poster]} controls muted playsInline preload="none" className="aspect-[9/16] w-36 bg-black object-contain" />
+        ) : null}
+      </div>
+    );
+  };
+  return (
+    <fieldset data-atelier-field className="grid gap-5 border border-white/15 p-4 sm:p-5">
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      <p className="text-base text-mist">
+        {resolved
+          ? "Sur la page : le passage « Entrer dans l'atelier » après les photos, puis la vidéo de fabrication" + (resolved.reveal ? " et la pièce finie." : " (pas de vidéo de la pièce finie).") + " Elle apparaît aussi sur la page The Atelier."
+          : "Pas de vidéo de fabrication : la page ne montre pas de passage vers l'atelier, et la pièce n'est pas sur la page The Atelier."}
+      </p>
+      <div className="grid gap-6 sm:grid-cols-2">{(["making", "reveal"] as const).map(choice)}</div>
+      {resolved ? (
+        <div className="grid gap-3">
+          <p className="text-base text-bone">Image avant la lecture (une image de la vidéo de fabrication) :</p>
+          <div className="flex flex-wrap gap-3" role="radiogroup" aria-label="Image avant la lecture">
+            {resolved.making.posters.map((src, i) => {
+              const chosen = (value?.poster ?? resolved.making.posters[resolved.making.poster]) === src;
+              return (
+                <label key={src} data-atelier-poster={i + 1} className={"relative block w-24 cursor-pointer border-2 " + (chosen ? "border-rose-light" : "border-transparent opacity-70 hover:opacity-100")}>
+                  <input type="radio" name={"atelier-poster-" + slug} checked={chosen} onChange={() => set({ poster: i === resolved.making.poster && !value?.poster ? undefined : src })} className="sr-only" />
+                  <img src={src.replace(/\.webp$/, ".w160.webp")} alt={"Image " + (i + 1)} loading="lazy" className="aspect-[9/16] w-full bg-black object-cover" onError={(e) => (e.currentTarget.src = src)} />
+                  {i === resolved.making.poster ? <span className="absolute inset-x-0 bottom-0 bg-black/75 px-1 text-center text-sm text-bone">auto</span> : null}
+                </label>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+      {value ? (
+        <button type="button" onClick={() => onChange(null)} className={btn + " w-fit"}>
+          Revenir au choix automatique
+        </button>
+      ) : null}
+    </fieldset>
   );
 }
 
