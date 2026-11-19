@@ -21,6 +21,6 @@ export function waLink(message: string): string {
 
 /* ---------- Contact configurator: the answers, whose words are in src/i18n (contact.pieceChoices...) ---------- */
 
-export const PIECE_CHOICES = ["chain", "pendant", "ring", "other"] as const;
+export const PIECE_CHOICES = ["chain", "pendant", "ring", "bracelet", "watch", "other"] as const;
 export const BUDGETS = ["10k", "25k", "50k", "50k+", "unsure"] as const;
 export const TIMINGS = ["asap", "quarter", "flexible"] as const;
