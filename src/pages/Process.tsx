@@ -50,7 +50,7 @@ export default function Process() {
   const steps = stepsOf(t);
   return (
     <>
-      <ScrollVideo media={media.scroll.process!} steps={filmSteps(t, steps)} label={t.process.filmLabel} overlay={(p) => <Payment progress={p} steps={steps} />} showProgress={false} />
+      <ScrollVideo media={media.scroll.process!} steps={filmSteps(t, steps)} label={t.process.filmLabel} overlay={(p) => <Payment progress={p} steps={steps} />} showProgress={false} magnet="strong" />
       <StepsOverview steps={steps} />
       <Closing />
     </>

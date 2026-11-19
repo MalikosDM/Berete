@@ -34,8 +34,11 @@ type ScrollVideoProps = {
   heightVh?: number;
   /** Extra layer over the film, receives the progress 0 to 1. */
   overlay?: (p: number) => ReactNode;
-  /** Gentle magnet towards each text step, cancelled by any new scroll. */
-  magnet?: boolean;
+  /**
+   * A magnet towards the texts, cancelled by any new gesture. true: gentle, towards a text that is close. "strong": every
+   * pause in the film glides to the heart of the nearest text (the first one and the last one let the visitor go on).
+   */
+  magnet?: boolean | "strong";
   showProgress?: boolean;
 };
 
@@ -274,33 +277,64 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
 
   useEffect(() => {
     if (reduced || !magnet) return undefined;
+    const strong = magnet === "strong";
     let timer = 0;
     let active = false;
+    // Where each text reads fully (between its fades), and its heart.
+    const windows = () =>
+      stepsRef.current
+        .map((s) => {
+          const a = s.from <= 0.001 ? 0 : s.from + FADE + 0.006;
+          const b = s.to >= 0.999 ? 1 : s.to - FADE - 0.006;
+          return { a, b, first: s.from <= 0.001, last: s.to >= 0.999 };
+        })
+        .filter((w) => w.a <= w.b);
+    const gentle = (p: number): number | null => {
+      let target: number | null = null;
+      let best = Infinity;
+      for (const w of windows()) {
+        if (p >= w.a && p <= w.b) return null;
+        const d = p < w.a ? w.a - p : p - w.b;
+        if (d < best) {
+          best = d;
+          target = p < w.a ? w.a : w.b;
+        }
+      }
+      return best > 0.08 ? null : target;
+    };
+    const firm = (p: number): number | null => {
+      // The opening of the film is a place too: just under it, the page goes back up to it.
+      let target: number | null = 0;
+      let best = p;
+      for (const w of windows()) {
+        // The first text (the title) and the last one hold the visitor only until their window: inside it, the page is
+        // free, so that one can always leave the film, up or down.
+        if ((w.first || w.last) && p >= w.a && p <= w.b) return null;
+        const heart = w.first ? w.a : w.last ? Math.min(w.b, w.a + 0.02) : (w.a + w.b) / 2;
+        const d = Math.abs(p - heart);
+        if (d < best) {
+          best = d;
+          target = heart;
+        }
+      }
+      return best < 0.004 ? null : target;
+    };
     const check = () => {
       const st = stRef.current;
       if (!st) return;
       const p = st.progress;
       if (p <= 0.003 || p >= 0.997) return;
-      let target: number | null = null;
-      let best = Infinity;
-      for (const s of stepsRef.current) {
-        const a = s.from <= 0.001 ? 0 : s.from + FADE + 0.006;
-        const b = s.to >= 0.999 ? 1 : s.to - FADE - 0.006;
-        if (a > b) continue;
-        if (p >= a && p <= b) return;
-        const d = p < a ? a - p : p - b;
-        if (d < best) {
-          best = d;
-          target = p < a ? a : b;
-        }
-      }
-      if (target === null || best > 0.08) return;
+      const target = strong ? firm(p) : gentle(p);
+      if (target === null) return;
       active = true;
-      scrollToY(st.start + target * (st.end - st.start), { duration: 0.9, onComplete: () => (active = false) });
+      // A short way glides quickly, a long one a little longer: always a glide, never a jump.
+      const px = Math.abs(target - p) * (st.end - st.start);
+      const duration = strong ? Math.min(1.2, Math.max(0.55, 0.45 + px / 1600)) : 0.9;
+      scrollToY(st.start + target * (st.end - st.start), { duration, onComplete: () => (active = false) });
     };
     const onScroll = () => {
       window.clearTimeout(timer);
-      if (!active) timer = window.setTimeout(check, 180);
+      if (!active) timer = window.setTimeout(check, strong ? 140 : 180);
     };
     // Any new gesture cancels the glide at once: the magnet never fights the visitor.
     const cancel = () => {
