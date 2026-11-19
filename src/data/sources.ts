@@ -27,6 +27,17 @@ export function sketch(slug: string, texts: Partial<MediaItem> = {}): MediaItem 
   return m ? { ...m, ...texts } : null;
 }
 
+/**
+ * A high-resolution photo or video sent by Yoni (scripts/hd-media.mjs): the folder of the site and the file ("p07",
+ * "v01"), or null when it is missing. Shot on black: blended into the page, unless `texts` says otherwise.
+ */
+export function yoni(dir: string, file: string, texts: Partial<MediaItem> = {}): MediaItem | null {
+  // "p6" and "p06" name the same file.
+  const key = file.replace(/^(\d\d-)?([pv])(\d+)$/, (_all, pre: string | undefined, kind: string, n: string) => (pre ?? "") + kind + n.padStart(2, "0"));
+  const m = media.hd?.[dir]?.[key];
+  return m ? { onBlack: true, ...m, ...texts } : null;
+}
+
 /** File number `n` of a story ("kevin-schade", 21), or null when it is missing. */
 export function st(slug: string, n: number, texts: Partial<MediaItem> = {}): MediaItem | null {
   const found = storyFiles.find((s) => s.slug === slug)?.media.find((m) => m.n === n);

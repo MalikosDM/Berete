@@ -4,7 +4,8 @@ import path from "node:path";
 import compression from "compression";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
-import { syncCatalogue } from "./catalogue.js";
+import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
+import { readCatalogue, syncCatalogue } from "./catalogue.js";
 import { seedDemo } from "./models/demo.js";
 import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
@@ -69,8 +70,9 @@ app.use(express.static(dist, { redirect: false, setHeaders: (res, file) => res.s
 
 // The old addresses of the site lead to the new ones (permanent redirects, in every language):
 // /pieces and /capsules/... to /creations, a piece under /creations/<slug> to /pieces/<slug>,
-// a renamed piece to its new address.
-app.get(/^(?!\/api\/).*/, (req, res, next) => {
+// a renamed piece to its new address, an unpublished piece to the page of its player (else /creations),
+// the page of a person who left the circle (all their pieces unpublished) to /players.
+app.get(/^(?!\/api\/).*/, async (req, res, next) => {
   const parts = req.path.replace(/\/+$/, "").split("/").slice(1);
   const prefix = LANGUAGES.includes(parts[0] ?? "") ? "/" + parts.shift() : "";
   const [section = "", slug = "", ...rest] = parts;
@@ -78,6 +80,15 @@ app.get(/^(?!\/api\/).*/, (req, res, next) => {
   if ((section === "pieces" && slug === "") || section === "capsules") target = "/creations";
   else if (section === "creations" && slug !== "" && rest.length === 0) target = "/pieces/" + (RENAMED_PIECES[slug] ?? slug);
   else if (section === "pieces" && rest.length === 0 && RENAMED_PIECES[slug]) target = "/pieces/" + RENAMED_PIECES[slug];
+  else if ((section === "pieces" || section === "players") && slug !== "" && rest.length === 0) {
+    // Only an address without its page comes here: the catalogue of the base says where it leads.
+    try {
+      const full = await readCatalogue();
+      target = section === "pieces" ? removedPieceTarget(full, slug) : leftTheCircle(full, slug) ? "/players" : null;
+    } catch {
+      target = null;
+    }
+  }
   if (!target) return next();
   const page = path.join(dist, prefix + target + ".html");
   if (!page.startsWith(dist + path.sep)) return next();

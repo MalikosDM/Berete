@@ -11,12 +11,16 @@
  *   (seedHash: fingerprint of the texts last written from the catalogue).
  *   Texts edited from /admin are never overwritten.
  * - a piece renamed in the catalogue (RENAMED_PIECES) keeps its row.
+ * - the universe of a piece (theme) follows the catalogue with its texts; a piece edited from /admin that has none yet
+ *   receives the one of the catalogue.
  */
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
-import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Detail, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
+import { cleanTheme } from "../src/data/themes.js";
+import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Detail, type HousePhotos, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
+import { Prisma } from "./generated/prisma/client.js";
 import { prisma } from "./db.js";
 
 const IMPORTED = "/media/";
@@ -154,6 +158,8 @@ export const toPiece = (r: PieceRow): Piece => ({
   boxSlug: r.boxSlug,
   featured: r.featured,
   draft: r.draft,
+  published: r.published,
+  theme: cleanTheme(r.theme),
   making: makingOf(r.making),
   translations: translationsOf(r.translations),
 });
@@ -169,14 +175,27 @@ export const toBox = (r: BoxRow): Box => ({
 
 const order = [{ sortOrder: "asc" as const }, { createdAt: "asc" as const }];
 
+/** The photos of The House sent from /admin, by place. */
+export async function readHouse(): Promise<HousePhotos> {
+  const rows = await prisma.housePhoto.findMany();
+  const out: HousePhotos = {};
+  for (const r of rows) {
+    const photo = MediaItemSchema.safeParse(r.photo);
+    if (photo.success) out[r.key] = photo.data;
+  }
+  return out;
+}
+
+/** The whole catalogue, unpublished pieces included (the admin, the redirects). */
 export async function readCatalogue(): Promise<Catalogue> {
-  const [stories, people, pieces, boxes] = await Promise.all([
+  const [stories, people, pieces, boxes, house] = await Promise.all([
     prisma.story.findMany({ orderBy: order }),
     prisma.person.findMany({ orderBy: order }),
     prisma.piece.findMany({ orderBy: order }),
     prisma.box.findMany({ orderBy: order }),
+    readHouse(),
   ]);
-  return { stories: stories.map(toStory), people: people.map(toPerson), pieces: pieces.map(toPiece), boxes: boxes.map(toBox) };
+  return { stories: stories.map(toStory), people: people.map(toPerson), pieces: pieces.map(toPiece), boxes: boxes.map(toBox), house };
 }
 
 /* ---------- Sync from src/data/catalogue.ts ---------- */
@@ -210,6 +229,8 @@ const pieceTexts = (p: Piece) => ({
   boxSlug: p.boxSlug,
   featured: p.featured,
   draft: p.draft,
+  published: p.published === false ? false : undefined,
+  theme: p.theme ?? undefined,
   making: p.making,
 });
 const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceSlug: b.pieceSlug });
@@ -222,7 +243,8 @@ const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceS
 function textUpdate<T>(current: T, wanted: T, seedHash: string | null): { texts: T; seedHash: string } | null {
   const target = fingerprint(wanted);
   if (seedHash === target) return null;
-  const untouched = seedHash === null || fingerprint(current) === seedHash;
+  // Already the texts of the catalogue (a column added by a migration, for instance): they follow it from now on.
+  const untouched = seedHash === null || fingerprint(current) === seedHash || fingerprint(current) === target;
   return untouched ? { texts: wanted, seedHash: target } : null;
 }
 
@@ -284,7 +306,7 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
   for (const [i, p] of cat.pieces.entries()) {
     const row = await prisma.piece.findUnique({ where: { slug: p.slug } });
     if (row === null) {
-      await once("piece:" + p.slug, seeded, () => prisma.piece.create({ data: { ...p, sortOrder: i + 1, seedHash: fingerprint(pieceTexts(p)) } }));
+      await once("piece:" + p.slug, seeded, () => prisma.piece.create({ data: { ...p, theme: p.theme ?? Prisma.DbNull, sortOrder: i + 1, seedHash: fingerprint(pieceTexts(p)) } }));
       continue;
     }
     await mark("piece:" + p.slug, seeded);
@@ -298,11 +320,13 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     // A piece that follows the catalogue gets its steps with its texts; an edited one still gets the imported photos.
     const currentMaking = makingOf(row.making);
     const making = texts ? currentMaking : mergeMaking(currentMaking, p.making);
-    if (gallery !== currentGallery || handover !== currentHandover || nextCover !== cover || making !== currentMaking || texts) {
+    // A piece edited from the admin keeps its texts, but receives its universe if it has none yet.
+    const theme = !texts && row.theme === null && p.theme ? { theme: p.theme } : {};
+    if (gallery !== currentGallery || handover !== currentHandover || nextCover !== cover || making !== currentMaking || texts || "theme" in theme) {
       await prisma.piece.update({
         where: { id: row.id },
         // A piece that follows the catalogue also follows its order.
-        data: { gallery, handover, cover: nextCover, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
+        data: { gallery, handover, cover: nextCover, ...theme, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
       });
     }
   }

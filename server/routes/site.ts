@@ -1,13 +1,17 @@
 import express, { Router, type NextFunction, type Request, type Response } from "express";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
+import { HOUSE_PHOTO_PLACES } from "../../src/data/house.js";
+import { publicCatalogue } from "../../src/data/relations.js";
+import { cleanTheme } from "../../src/data/themes.js";
 import { PIECE_TYPES } from "../../src/data/types.js";
-import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
+import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, readHouse, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 /**
  * The API of the site, mounted on /api:
- *   GET  /catalogue          stories, people, pieces and boxes
+ *   GET  /catalogue          stories, people, the published pieces, boxes and the photos of The House
  *   POST /contact            { name, email, message }
  *   POST /callback           { name, phone, interest }
  *   GET  /media/:id          a file uploaded from /admin
@@ -21,7 +25,8 @@ site.get("/health", (_req, res) => {
 
 site.get("/catalogue", async (_req, res) => {
   res.setHeader("Cache-Control", "no-cache");
-  res.json(await readCatalogue());
+  // The visitors never receive the unpublished pieces (removed from the catalogue, drafts): the admin reads them.
+  res.json(publicCatalogue(await readCatalogue()));
 });
 
 /* ---------- Visitors ---------- */
@@ -228,6 +233,12 @@ const PieceIn = z.object({
   boxSlug: optText(200),
   featured: z.boolean().default(false),
   draft: z.boolean().default(false),
+  published: z.boolean().default(true),
+  /** The universe of the page: only the known parts are kept; none: the universe of the house. */
+  theme: z
+    .unknown()
+    .optional()
+    .transform((v) => cleanTheme(v) ?? Prisma.DbNull),
   making: MakingSchema.optional(),
   translations: TranslationsSchema.default({}),
 });
@@ -282,6 +293,27 @@ async function guard(res: Response, run: () => Promise<void>): Promise<void> {
     throw error;
   }
 }
+
+/* The photos of The House (before the editors: "house" is not one of their kinds). */
+
+const HOUSE_KEYS = new Set(HOUSE_PHOTO_PLACES.map((p) => p.key));
+
+site.get("/admin/house", requireAdmin, async (_req, res) => {
+  res.json({ places: HOUSE_PHOTO_PLACES, photos: await readHouse() });
+});
+
+site.put("/admin/house/:key", requireAdmin, async (req, res) => {
+  const key = String(req.params.key);
+  if (!HOUSE_KEYS.has(key)) {
+    res.status(404).json({ error: "Emplacement inconnu." });
+    return;
+  }
+  const p = z.object({ photo: MediaItemSchema.nullable() }).safeParse(req.body);
+  if (!p.success) return invalid(res, p.error);
+  if (p.data.photo === null) await prisma.housePhoto.deleteMany({ where: { key } });
+  else await prisma.housePhoto.upsert({ where: { key }, create: { key, photo: p.data.photo }, update: { photo: p.data.photo } });
+  res.json({ ok: true });
+});
 
 site.get("/admin/:kind", requireAdmin, async (req, res) => {
   const kind = kindOf(req, res);

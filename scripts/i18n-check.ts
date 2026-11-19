@@ -1,5 +1,5 @@
 // Checks that every language of the site is complete (npm run i18n:check).
-//   - every text of the built-in catalogue has its translation in content/<lang>.ts
+//   - every text of the built-in catalogue the visitors see (published pieces) has its translation in content/<lang>.ts
 //     (the proper names only in the languages that write them in another script);
 //   - every page of seo.json has its title and description in ui/<lang>.ts (seoPages);
 //   - no translation is left that no text uses any more.
@@ -8,6 +8,7 @@
 // npx tsx scripts/i18n-check.ts --source out.json writes the texts to translate.
 import { writeFileSync } from "node:fs";
 import { defaultCatalogue } from "../src/data/catalogue.js";
+import { publicCatalogue } from "../src/data/relations.js";
 import seo from "../src/extensions/seo/seo.json" with { type: "json" };
 import { catalogueTexts } from "../src/i18n/content.js";
 import ar from "../src/i18n/content/ar.js";
@@ -24,7 +25,10 @@ import { nl as nlUi } from "../src/i18n/ui/nl.js";
 /** The languages whose script is not the Latin one: the names are written in it too. */
 const OWN_SCRIPT = new Set(["ar"]);
 
-const texts = catalogueTexts(defaultCatalogue);
+// The texts the visitors see (published pieces) must be translated; the translations of an unpublished piece are kept
+// (it may be published again) without being required.
+const texts = catalogueTexts(publicCatalogue(defaultCatalogue));
+const allTexts = catalogueTexts(defaultCatalogue);
 const pages = Object.entries((seo as { pages: Record<string, { title?: string; description?: string; robots?: string }> }).pages)
   .filter(([path, page]) => !path.includes(":") && !path.includes("*") && path !== "/admin" && (page.title || page.description))
   .map(([path, page]) => ({ path, title: page.title ?? "", description: page.description ?? "" }));
@@ -48,7 +52,7 @@ const languages = [
 let problems = 0;
 for (const { code, content, ui } of languages) {
   const wanted = [...texts.text, ...(OWN_SCRIPT.has(code) ? texts.name : [])];
-  const known = new Set([...texts.text, ...texts.name]);
+  const known = new Set([...allTexts.text, ...allTexts.name]);
   const missing = wanted.filter((t) => typeof content[t] !== "string" || content[t]!.trim() === "");
   const unused = Object.keys(content).filter((k) => !known.has(k));
   const seoMissing = pages.filter((p) => !ui.seoPages[p.path] || (p.title && !ui.seoPages[p.path]!.title) || (p.description && !ui.seoPages[p.path]!.description)).map((p) => p.path);

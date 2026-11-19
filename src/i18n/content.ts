@@ -103,7 +103,7 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
     }),
   );
 
-  return { stories, people, pieces, boxes };
+  return { ...cat, stories, people, pieces, boxes };
 }
 
 /** The catalogue in this language, with this dictionary (English text -> translation). */

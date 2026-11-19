@@ -1,3 +1,5 @@
+import type { PieceTheme } from "./themes.js";
+
 /*
  * The one data model of the site: stories, people (players, clubs,
  * personalities), pieces and boxes. The front, the API and the admin all use
@@ -39,7 +41,7 @@ export type Story = {
   people: string[];
   /** A piece shown in the story: adds a "View the piece" button. */
   pieceSlug: string | null;
-  /** An article about the story: the main button becomes "Read the article". */
+  /** An article about the story: the main button becomes "Read the Feature". */
   articleUrl: string | null;
   translations?: Translations;
 };
@@ -63,7 +65,7 @@ export type Person = {
 export const PIECE_TYPES = ["chain", "pendant", "ring", "bracelet", "watch"] as const;
 export type PieceType = (typeof PIECE_TYPES)[number];
 
-/** The steps of "How it was made", in order. */
+/** The steps of "The Making of a Masterpiece", in order. */
 export const MAKING_STEPS = ["sketch", "raw", "setting", "polishing", "delivery"] as const;
 export type MakingStep = (typeof MAKING_STEPS)[number];
 /** Photos or videos of this piece for some steps; the others show the atelier. */
@@ -71,7 +73,7 @@ export type Making = Partial<Record<MakingStep, MediaItem>>;
 
 export type Spec = { label: string; value: string };
 /**
- * One symbol of a piece and its meaning ("The details" of the page), with the photo of the gallery that shows it (its
+ * One symbol of a piece and its meaning ("The Art of Detail" of the page), with the photo of the gallery that shows it (its
  * address), if one does.
  */
 export type Detail = { title: string; text: string; photo: string | null };
@@ -104,6 +106,13 @@ export type Piece = {
   featured: boolean;
   /** Provisional texts, to be checked with the client. */
   draft: boolean;
+  /**
+   * Shown on the site. An unpublished piece is kept (the admin can publish it again) but appears nowhere: its address
+   * leads to the page of its player, else to the creations.
+   */
+  published: boolean;
+  /** The universe of its page (src/data/themes.ts); null: the universe of the house. */
+  theme: PieceTheme | null;
   making: Making;
   translations?: Translations;
 };
@@ -118,11 +127,16 @@ export type Box = {
   translations?: Translations;
 };
 
+/** The personal photos of Yoni on the page The House, by chapter (src/data/house.ts); a chapter without one shows none. */
+export type HousePhotos = Record<string, MediaItem>;
+
 export type Catalogue = {
   stories: Story[];
   people: Person[];
   pieces: Piece[];
   boxes: Box[];
+  /** Sent by the API (photos uploaded in the admin); the site falls back to the photos of the folder (media.house). */
+  house?: HousePhotos;
 };
 
 /* Shapes of the files written by scripts/import-media.mjs. */
@@ -144,8 +158,12 @@ export type GeneratedMedia = {
   /** Photos made from the stories and the Boutique folder (scripts/piece-media.mjs), by key. */
   stills: Record<string, MediaItem>;
   scroll: Record<string, ScrollMedia>;
-  /** The first sketch of each piece (step "Sketch" of "How it was made"), by slug of the piece. */
+  /** The first sketch of each piece (step "The Vision" of "The Making of a Masterpiece"), by slug of the piece. */
   sketches?: Record<string, MediaItem>;
   /** A photo of each person, cropped on them, until a profile photo is uploaded (scripts/portraits.mjs), by slug. */
   portraits?: Record<string, MediaItem>;
+  /** The high-resolution photos and videos of Yoni (scripts/hd-media.mjs), by folder then file ("p07", "v01"). */
+  hd?: Record<string, Record<string, MediaItem>>;
+  /** The personal photos of Yoni for The House, by chapter (folder "Berete - La Maison"). */
+  house?: HousePhotos;
 };

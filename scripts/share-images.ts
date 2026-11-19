@@ -13,6 +13,7 @@ import path from "node:path";
 import { chromium } from "@playwright/test";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { SPECIAL_PROJECT } from "../src/data/pieces.js";
+import { publicCatalogue } from "../src/data/relations.js";
 import type { MediaItem } from "../src/data/types.js";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
@@ -107,7 +108,8 @@ if (!ringPhoto) throw new Error("share-images: no photo for the brand image");
 const brand = await render("brand.jpg", brandHtml(ringPhoto), fingerprint(LAYOUT, "brand", fileStamp(ringPhoto)));
 
 const pieces: Record<string, Share> = {};
-for (const p of defaultCatalogue.pieces) {
+// The published pieces only: an unpublished one has no page (its share image is removed below).
+for (const p of publicCatalogue(defaultCatalogue).pieces) {
   const photo = stillOf(p.cover);
   if (!photo) {
     console.warn("  ! no main photo for " + p.slug + ": the brand image is used");

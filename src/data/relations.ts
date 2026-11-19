@@ -10,6 +10,43 @@ export const TYPE_LABELS: Record<PieceType, string> = {
   watch: "Watch",
 };
 
+/**
+ * The catalogue the visitors see: the published pieces only. An unpublished piece (removed from the catalogue, or a
+ * draft waiting for its name) is kept in the admin but appears nowhere: not in the lists, the similar pieces, the
+ * stories ("Enter the World"), the boxes, the search engines. A person whose pieces are all unpublished leaves the circle
+ * of the house (their page leads to /players); people who never had a piece (stories only) stay.
+ */
+export function publicCatalogue(cat: Catalogue): Catalogue {
+  const hidden = new Set(cat.pieces.filter((p) => p.published === false).map((p) => p.slug));
+  if (hidden.size === 0) return cat;
+  const pieces = cat.pieces.filter((p) => !hidden.has(p.slug));
+  const gone = new Set(cat.people.filter((person) => cat.pieces.some((p) => p.people.includes(person.slug)) && !pieces.some((p) => p.people.includes(person.slug))).map((p) => p.slug));
+  return {
+    ...cat,
+    pieces: pieces.map((p) => (p.people.some((x) => gone.has(x)) ? { ...p, people: p.people.filter((x) => !gone.has(x)) } : p)),
+    people: cat.people.filter((p) => !gone.has(p.slug)),
+    stories: cat.stories.map((s) => (s.pieceSlug && hidden.has(s.pieceSlug)) || s.people.some((x) => gone.has(x)) ? { ...s, pieceSlug: s.pieceSlug && hidden.has(s.pieceSlug) ? null : s.pieceSlug, people: s.people.filter((x) => !gone.has(x)) } : s),
+    boxes: cat.boxes.map((b) => (b.pieceSlug && hidden.has(b.pieceSlug) ? { ...b, pieceSlug: null } : b)),
+  };
+}
+
+/**
+ * Where the old address of an unpublished piece leads: the page of its first player still in the circle, else the
+ * creations (also for an unknown address). In the language of the address (prefix "/fr" or "").
+ */
+export function removedPieceTarget(full: Catalogue, slug: string): string | null {
+  const piece = full.pieces.find((p) => p.slug === slug);
+  if (!piece || piece.published !== false) return null;
+  const shown = publicCatalogue(full);
+  const person = piece.people.map((x) => shown.people.find((p) => p.slug === x)).find((p) => p !== undefined && p.kind !== "club" && shown.pieces.some((q) => q.people.includes(p.slug)));
+  return person ? "/players/" + person.slug : "/creations";
+}
+
+/** Whether a person left the circle (all their pieces unpublished): their page leads to /players. */
+export function leftTheCircle(full: Catalogue, slug: string): boolean {
+  return full.people.some((p) => p.slug === slug) && !publicCatalogue(full).people.some((p) => p.slug === slug);
+}
+
 export function storiesOf(cat: Catalogue, personSlug: string): Story[] {
   return cat.stories.filter((s) => s.people.includes(personSlug));
 }
@@ -69,7 +106,7 @@ export function mediaOfPiece(piece: Piece): MediaItem[] {
   return [piece.cover, ...piece.gallery, ...piece.handover, ...Object.values(piece.making).filter((m): m is MediaItem => m !== undefined)];
 }
 
-/** The piece shown in each photo or video of the stories (by file), for "See the piece". */
+/** The piece shown in each photo or video of the stories (by file), for "Enter the World". */
 export function pieceByMedia(cat: Catalogue): Map<string, string> {
   const map = new Map<string, string>();
   for (const piece of cat.pieces) {

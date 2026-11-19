@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { defaultCatalogue } from "@/data/catalogue";
+import { publicCatalogue } from "@/data/relations";
 import type { Catalogue } from "@/data/types";
 import { bundleOf, useBundleVersion, useLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
@@ -11,11 +12,13 @@ import { HAS_SERVER } from "@/lib/site";
  * into the site (also used by the prerender), then show the live one from
  * the API (/api/catalogue), with the edits of /admin, asked once the page
  * has loaded.
- * Pages receive it in the language of the address (useCatalogue).
+ * Pages receive it in the language of the address (useCatalogue), with the published pieces only (publicCatalogue):
+ * an unpublished piece is seen in the admin alone.
  */
 
-const RawContext = createContext<Catalogue>(defaultCatalogue);
-const LocalizedContext = createContext<Catalogue>(defaultCatalogue);
+const builtIn = publicCatalogue(defaultCatalogue);
+const RawContext = createContext<Catalogue>(builtIn);
+const LocalizedContext = createContext<Catalogue>(builtIn);
 
 function isCatalogue(v: unknown): v is Catalogue {
   if (v === null || typeof v !== "object") return false;
@@ -24,7 +27,7 @@ function isCatalogue(v: unknown): v is Catalogue {
 }
 
 export function CatalogueProvider({ children }: { children: ReactNode }) {
-  const [catalogue, setCatalogue] = useState<Catalogue>(defaultCatalogue);
+  const [catalogue, setCatalogue] = useState<Catalogue>(builtIn);
   const locale = useLocale();
   const version = useBundleVersion();
 
@@ -37,7 +40,7 @@ export function CatalogueProvider({ children }: { children: ReactNode }) {
       fetch("/api/catalogue", { headers: { Accept: "application/json" } })
         .then((res) => (res.ok ? res.json() : null))
         .then((json: unknown) => {
-          if (alive && isCatalogue(json) && json.stories.length + json.pieces.length > 0) setCatalogue(json);
+          if (alive && isCatalogue(json) && json.stories.length + json.pieces.length > 0) setCatalogue(publicCatalogue(json));
         })
         .catch(() => undefined);
     });

@@ -1,7 +1,7 @@
 // The title and description of the pages that show one piece or one person, in the language of the address.
 import { defaultCatalogue } from "@/data/catalogue";
 import share from "@/data/share.generated.json";
-import { madeFor } from "@/data/relations";
+import { madeFor, publicCatalogue } from "@/data/relations";
 import type { Catalogue } from "@/data/types";
 import { bundleOf, LOCALE_INFO, localeOfPath, stripLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
@@ -19,7 +19,7 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
   const locale = localeOfPath(p);
   const bundle = bundleOf(locale);
   const t = bundle.ui;
-  const c = cat ?? localizeCatalogue(defaultCatalogue, locale, bundle.content, t.stories.alt, t.piece.sketchAlt);
+  const c = cat ?? localizeCatalogue(publicCatalogue(defaultCatalogue), locale, bundle.content, t.stories.alt, t.piece.sketchAlt);
   const neutral = stripLocale(p);
   const piece = /^\/pieces\/([a-z0-9-]+)$/.exec(neutral);
   if (piece) {
@@ -43,7 +43,7 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
   return undefined;
 }
 
-/** Every page of one piece or one person (without language), for the prerender. */
-export function dynamicPaths(cat: Catalogue = defaultCatalogue): string[] {
+/** Every page of one piece or one person the visitors see (without language), for the prerender and the sitemap. */
+export function dynamicPaths(cat: Catalogue = publicCatalogue(defaultCatalogue)): string[] {
   return [...cat.pieces.map((x) => "/pieces/" + x.slug), ...cat.people.map((x) => "/players/" + x.slug)];
 }

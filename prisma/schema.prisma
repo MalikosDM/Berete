@@ -72,6 +72,10 @@ model Piece {
   featured     Boolean  @default(false)
   /// Provisional texts, to be checked with the client.
   draft        Boolean  @default(false)
+  /// Shown on the site. Unpublished: kept here (the admin can publish it again), shown nowhere on the site.
+  published    Boolean  @default(true)
+  /// The universe of its page (PieceTheme, src/data/themes.ts); null: the universe of the house.
+  theme        Json?
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
   translations Json   @default("{}")
@@ -93,6 +97,14 @@ model Box {
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+/// The personal photos of Yoni on the page The House, one per place ("portrait", "citation-1", "chapitre-03"...:
+/// src/data/house.ts). photo: MediaItem (src/data/types.ts).
+model HousePhoto {
+  key       String   @id
+  photo     Json
+  updatedAt DateTime @updatedAt
 }
 
 /// Files uploaded from /admin, served at /api/media/:id.
