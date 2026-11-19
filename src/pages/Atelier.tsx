@@ -131,34 +131,33 @@ function AtelierFilms() {
           <p className="mt-6 max-w-xl text-lg text-bone">{t.films.sectionLead}</p>
         </Reveal>
         <ul className="mt-14 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-          {films.map(({ piece, atelier }, i) => (
+          {films.map(({ piece, atelier }) => (
             <li key={piece.slug} data-atelier-film={piece.slug}>
-              <Reveal delay={(i % 4) * 0.06}>
-                <button type="button" onClick={() => setOpen({ piece, atelier })} aria-label={t.films.open(piece.title)} className="group block w-full text-start">
-                  <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-black">
-                    {atelier.poster ? (
-                      <Img
-                        src={atelier.poster}
-                        srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
-                        sizes="(max-width: 767px) 46vw, (max-width: 1279px) 30vw, 22vw"
-                        alt=""
-                        loading="lazy"
-                        decoding="async"
-                        className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
-                      />
-                    ) : null}
-                    <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-transparent" />
-                    <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
-                      <Play className="size-5 translate-x-px fill-current" />
-                    </span>
-                    <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-1 text-base text-bone tabular-nums">
-                      {filmTime(atelier.making.duration)}
-                    </span>
+              {/* A button: never hidden by an animation (a keyboard reaches each one). */}
+              <button type="button" onClick={() => setOpen({ piece, atelier })} aria-label={t.films.open(piece.title)} className="group block w-full text-start">
+                <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-black">
+                  {atelier.poster ? (
+                    <Img
+                      src={atelier.poster}
+                      srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
+                      sizes="(max-width: 767px) 46vw, (max-width: 1279px) 30vw, 22vw"
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
+                    />
+                  ) : null}
+                  <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-transparent" />
+                  <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                    <Play className="size-5 translate-x-px fill-current" />
                   </span>
-                  <span className="title-caps mt-4 block text-base leading-snug tracking-[0.1em] text-white group-hover:text-rose-light sm:text-lg">{piece.title}</span>
-                  <span className="mt-1 block text-base text-mist">{t.common.madeFor(madeFor(cat, piece))}</span>
-                </button>
-              </Reveal>
+                  <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-1 text-base text-bone tabular-nums">
+                    {filmTime(atelier.making.duration)}
+                  </span>
+                </span>
+                <span className="title-caps mt-4 block text-base leading-snug tracking-[0.1em] text-white group-hover:text-rose-light sm:text-lg">{piece.title}</span>
+                <span className="mt-1 block text-base text-mist">{t.common.madeFor(madeFor(cat, piece))}</span>
+              </button>
             </li>
           ))}
         </ul>

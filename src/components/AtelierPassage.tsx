@@ -24,7 +24,8 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
   return (
     <section aria-labelledby="atelier-passage-title" data-atelier-passage className="atelier-passage relative overflow-hidden border-y border-white/10">
       <div className="mx-auto grid max-w-[1600px] items-center gap-12 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-32">
-        <Reveal className="lg:col-span-5">
+        {/* The way in is never hidden by an animation (a keyboard reaches it at once). */}
+        <div className="lg:col-span-5">
           <p className="eyebrow">{t.films.eyebrow}</p>
           <h2 id="atelier-passage-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] leading-[1.08] tracking-[0.12em] text-white [text-wrap:balance]">
             {t.films.enter}
@@ -47,7 +48,7 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
           >
             <Play className="size-5 fill-current" aria-hidden="true" /> {t.films.enter}
           </button>
-        </Reveal>
+        </div>
 
         <Reveal className="lg:col-span-6 lg:col-start-7" delay={0.1}>
           {/* The image of the making-of: a second way in, for the pointer (the button above is the way in for the keyboard). */}

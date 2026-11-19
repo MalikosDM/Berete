@@ -27,6 +27,8 @@ for (const slug of PIECES) {
     const problems = watch(page);
     const phone = info.project.name !== "desktop";
     await page.goto("/fr/pieces/" + slug);
+    // The page ready (its entrance over: the page may come back to its top before).
+    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     const passage = page.locator("[data-atelier-passage]");
     await passage.scrollIntoViewIfNeeded();
     await expect(passage.getByRole("heading", { name: "Entrer dans l’atelier" })).toBeVisible();
@@ -71,6 +73,7 @@ for (const slug of PIECES) {
 test("after the making-of comes The Final Reveal, then the end", async ({ page }, info) => {
   const slug = "campione-d-italia-2023-2024";
   await page.goto("/pieces/" + slug);
+  await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
   await page.locator("[data-atelier-passage]").scrollIntoViewIfNeeded();
   await page.locator("[data-enter-atelier]").click();
   const room = page.locator("[data-atelier-room]");
