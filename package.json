@@ -21,7 +21,8 @@
     "verify:3d": "node scripts/verify-3d.mjs",
     "models:optimize": "tsx scripts/model-optimize.ts",
     "media:share": "tsx scripts/share-images.ts",
-    "redirects": "tsx scripts/vercel-redirects.ts"
+    "redirects": "tsx scripts/vercel-redirects.ts",
+    "universes": "node scripts/universe-media.mjs"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",
@@ -55,6 +56,23 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@fontsource/big-shoulders-display": "5.3.0",
+    "@fontsource/bodoni-moda": "5.3.0",
+    "@fontsource/cinzel": "5.3.0",
+    "@fontsource/fraunces": "5.3.0",
+    "@fontsource/grenze-gotisch": "5.3.0",
+    "@fontsource/italiana": "5.3.0",
+    "@fontsource/kaushan-script": "5.3.0",
+    "@fontsource/marcellus-sc": "5.3.0",
+    "@fontsource/michroma": "5.3.0",
+    "@fontsource/pirata-one": "5.3.0",
+    "@fontsource/poiret-one": "5.3.0",
+    "@fontsource/reggae-one": "5.3.1",
+    "@fontsource/shojumaru": "5.3.0",
+    "@fontsource/syncopate": "5.3.0",
+    "@fontsource/tenor-sans": "5.3.0",
+    "@fontsource/yuji-boku": "5.3.1",
+    "@fontsource/yuji-syuku": "5.3.1",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/compression": "^1.8.1",

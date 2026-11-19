@@ -4,6 +4,18 @@ import { prefersReducedMotion } from "@/lib/gsap";
 
 const KEY = "bj-intro-seen";
 
+/**
+ * The intro is leaving (or there is none): what waited for it starts (the entrance of a universe, src/index.css and
+ * src/components/Universe.tsx). index.html marks the page with data-intro before its first paint.
+ */
+function introDone(): undefined {
+  const html = document.documentElement;
+  if (!html.hasAttribute("data-intro")) return undefined;
+  html.removeAttribute("data-intro");
+  window.dispatchEvent(new Event("berete:intro-done"));
+  return undefined;
+}
+
 const LINES = [
   "M14 4 H50",
   "M14 4 L2 16",
@@ -18,12 +30,12 @@ export default function Preloader() {
   const [state, setState] = useState<"off" | "on" | "leaving">("off");
 
   useEffect(() => {
-    if (prefersReducedMotion()) return;
+    if (prefersReducedMotion()) return introDone();
     try {
-      if (sessionStorage.getItem(KEY)) return;
+      if (sessionStorage.getItem(KEY)) return introDone();
       sessionStorage.setItem(KEY, "1");
     } catch {
-      return;
+      return introDone();
     }
     // First visit of the session: the intro starts on the next frame.
     const id = window.requestAnimationFrame(() => setState("on"));
@@ -32,7 +44,10 @@ export default function Preloader() {
 
   useEffect(() => {
     if (state !== "on") return undefined;
-    const a = window.setTimeout(() => setState("leaving"), 2600);
+    const a = window.setTimeout(() => {
+      setState("leaving");
+      introDone();
+    }, 2600);
     const b = window.setTimeout(() => setState("off"), 3300);
     return () => {
       window.clearTimeout(a);

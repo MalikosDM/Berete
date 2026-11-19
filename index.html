@@ -7,6 +7,13 @@
     <title>Berete Jewellers — Custom High Jewellery, Dubai</title>
     <meta name="description" content="Berete Jewellers, Dubai. Custom high jewellery for champions: diamond chains, pendants and championship rings for clubs, footballers and stars. Made by us. Inspired by you." />
     <link rel="icon" type="image/svg+xml" href="/media/brand/logo-mark.svg" />
+    <!-- The first visit of the session opens on the intro of the house (src/components/Preloader.tsx): until it leaves,
+         the entrance of a universe waits (src/index.css, html[data-intro]). -->
+    <script>
+      try {
+        if (!sessionStorage.getItem("bj-intro-seen") && !matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.setAttribute("data-intro", "");
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

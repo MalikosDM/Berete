@@ -112,6 +112,8 @@ export interface SeoExtras {
   image?: string;
   imageWidth?: number;
   imageHeight?: number;
+  /** Files the page needs at once (the title font of a piece), announced early: <link rel="preload">. */
+  preloads?: { href: string; as: "font" | "image"; type?: string }[];
 }
 
 export interface HeadTag {
@@ -455,6 +457,10 @@ export function headFor(settings: SeoSettings, path: string, extras?: SeoExtras,
     }
     const fallback = alternates.find((a) => normalizePath(a.prefix || "/") === "/");
     if (fallback) link({ rel: "alternate", hreflang: "x-default", href: absoluteUrl(base, neutral) });
+  }
+
+  for (const pre of (extras && extras.preloads) || []) {
+    link({ rel: "preload", href: pre.href, as: pre.as, ...(pre.type ? { type: pre.type } : {}), ...(pre.as === "font" ? { crossorigin: "anonymous" } : {}) });
   }
 
   const graph = structuredData(settings, p, extras, origin);

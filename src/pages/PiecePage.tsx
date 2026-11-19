@@ -11,7 +11,7 @@ import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
-import Universe from "@/components/Universe";
+import Universe, { universeProps } from "@/components/Universe";
 import { defaultCatalogue, media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
@@ -76,21 +76,33 @@ export default function PiecePage() {
     setViewer({ stories, step });
   };
 
+  const theme = resolveTheme(piece.theme);
+
   return (
-    <article data-piece={piece.slug} data-draft={piece.draft ? "true" : undefined} className="relative *:relative">
-      {/* The universe of the piece: its background, behind the whole page (src/data/themes.ts). Every block of the page
+    // The page of each piece is its own element (key): entering another piece is entering another world, with its
+    // entrance (data-entering, removed on a return: src/components/Universe.tsx).
+    <article
+      key={piece.slug}
+      data-piece={piece.slug}
+      data-draft={piece.draft ? "true" : undefined}
+      data-entering=""
+      data-entrance={theme.entrance}
+      {...universeProps(theme)}
+      className="relative *:relative"
+    >
+      {/* The universe of the piece: its world, behind the whole page (src/data/themes.ts). Every block of the page
           is positioned, so it is drawn over it; no isolation, so the full-screen layers (stories, photos, 3D) still
           come over the menu. */}
-      <Universe theme={resolveTheme(piece.theme)} />
+      <Universe theme={theme} slug={piece.slug} />
       {/* Opening: the jewel, full screen */}
       <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
-        <div className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
+        <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
           <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
         </div>
         <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
           <div className="flex flex-col gap-8">
-            <div className={shadow}>
+            <div data-piece-text className={shadow}>
               {historic ? <p className="mb-3 text-base font-semibold uppercase tracking-[0.24em] text-rose-light">{t.piece.historic}</p> : null}
               <p className="eyebrow">
                 <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center hover:text-white">
@@ -98,7 +110,7 @@ export default function PiecePage() {
                 </Link>
                 <span className="text-mist"> · {t.common.madeFor(madeFor(cat, piece))}</span>
               </p>
-              <h1 id="piece-title" className="title-caps mt-3 text-[clamp(2.25rem,4.2vw,4.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance]">
+              <h1 id="piece-title" data-u-title className="title-caps mt-3 text-[clamp(2.25rem,4.2vw,4.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance]">
                 {piece.title}
               </h1>
               {piece.line ? <p className="mt-5 max-w-2xl text-lg text-bone md:text-xl">{piece.line}</p> : null}

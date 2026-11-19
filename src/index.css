@@ -298,13 +298,108 @@ html.lenis body {
 
 /*
  * ---------- The universe of a piece (src/components/Universe.tsx, src/data/themes.ts) ----------
- * Behind the page of a piece: its deep background (base and tint), its light, its texture and a slow motion. The colours
- * of the universe stay in the depths; the veil keeps the texts on a dark ground (contrast AA). Everything that moves is a
- * transform or an opacity (light on the phone), and nothing moves when the visitor asks for reduced motion.
+ * The world of the piece, behind its page: the deep base, the full-screen backdrop, the light, the texture, a
+ * watermark, the smoke or the stars, the canvas of the effects, and the veil that keeps the texts on a dark ground
+ * (contrast AA). The entrance plays while the page holds [data-entering] (the first visit of the piece). Everything that
+ * moves is a transform or an opacity, and nothing moves when the visitor asks for reduced motion.
  */
+
+/* The title fonts of the universes (free licence, OFL: public/fonts/universe/LICENSES.txt), loaded only by the page
+   that uses one (and announced early by its <link rel="preload">). */
+@font-face {
+  font-family: "Shojumaru";
+  src: url("/fonts/universe/shojumaru-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Italiana";
+  src: url("/fonts/universe/italiana-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel";
+  src: url("/fonts/universe/cinzel-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Grenze Gotisch";
+  src: url("/fonts/universe/grenze-gotisch-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Big Shoulders Display";
+  src: url("/fonts/universe/big-shoulders-display-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Pirata One";
+  src: url("/fonts/universe/pirata-one-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Marcellus SC";
+  src: url("/fonts/universe/marcellus-sc-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bodoni Moda";
+  src: url("/fonts/universe/bodoni-moda-latin-500-italic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Michroma";
+  src: url("/fonts/universe/michroma-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poiret One";
+  src: url("/fonts/universe/poiret-one-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/universe/fraunces-latin-600-italic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Syncopate";
+  src: url("/fonts/universe/syncopate-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tenor Sans";
+  src: url("/fonts/universe/tenor-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+/* The watermark 力 ("power") of the energy universe, in a Japanese brush. */
+@font-face {
+  font-family: "Universe Brush";
+  src: url("/fonts/universe/yuji-boku-115-400-normal.woff2") format("woff2");
+  unicode-range: U+529B;
+  font-display: swap;
+}
+
 .universe {
-  --u-at-x: 72%;
-  --u-at-y: 40%;
+  /* Where the piece is: the right of a computer screen (the left in Arabic), the top of a phone. */
+  --u-at-n: 0.72;
+  --u-at-x: calc(var(--u-at-n) * 100%);
+  --u-at-y: 46%;
+  --u-scroll: 0;
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -314,33 +409,44 @@ html.lenis body {
 }
 @media (max-width: 1023px) {
   .universe {
-    --u-at-x: 50%;
-    --u-at-y: 27%;
+    --u-at-n: 0.5;
+    --u-at-y: 30%;
   }
 }
 [dir="rtl"] .universe {
-  --u-at-x: 28%;
+  --u-at-n: 0.28;
 }
 @media (max-width: 1023px) {
   [dir="rtl"] .universe {
-    --u-at-x: 50%;
+    --u-at-n: 0.5;
   }
+}
+.universe[data-preview] {
+  --u-at-n: 0.5;
+  --u-at-y: 50%;
 }
 .universe-stage {
   position: sticky;
   top: 0;
   height: 100svh;
   overflow: hidden;
-  animation: u-enter 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.universe[data-preview] .universe-stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
 }
 .universe-stage > * {
   position: absolute;
   inset: 0;
 }
+[data-entering] .universe-stage {
+  animation: u-enter 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
 @keyframes u-enter {
   from {
     opacity: 0;
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
   to {
     opacity: 1;
@@ -353,6 +459,62 @@ html.lenis body {
     radial-gradient(110% 75% at var(--u-at-x) 16%, color-mix(in oklab, var(--u-tint) 92%, transparent) 0%, transparent 62%),
     radial-gradient(80% 60% at 8% 96%, color-mix(in oklab, var(--u-tint) 55%, transparent) 0%, transparent 70%),
     var(--u-base);
+}
+
+/* The backdrop: an AI background, its heart behind the piece; it goes back into the depth during the scroll. */
+.u-backdrop {
+  overflow: hidden;
+  opacity: calc(1 - var(--u-scroll) * 0.62);
+  transform: translate3d(0, calc(var(--u-scroll) * -2.5%), 0) scale(calc(1 + var(--u-scroll) * 0.05));
+  transform-origin: var(--u-at-x) 40%;
+}
+.u-backdrop img {
+  position: absolute;
+  top: 50%;
+  left: var(--u-at-x);
+  max-width: none;
+  height: auto;
+  /* As wide as needed to cover the screen with its heart (--u-fx) on the piece (--u-at-n). */
+  width: max(100%, calc(100svh * var(--u-ratio, 1.75)), calc(100% * var(--u-at-n) / var(--u-fx, 0.5)), calc(100% * (1 - var(--u-at-n)) / (1 - var(--u-fx, 0.5))));
+  transform: translate(calc(var(--u-fx, 0.5) * -100%), -50%);
+}
+.universe[data-preview] .u-backdrop img {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+  transform: none;
+}
+@media (max-aspect-ratio: 4/5) {
+  .u-backdrop img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 32%;
+    transform: none;
+  }
+}
+.u-backdrop[data-uploaded] img {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: none;
+}
+[data-entering] .u-backdrop img {
+  animation: u-ignite 1.8s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+@keyframes u-ignite {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* The light */
@@ -516,9 +678,6 @@ html.lenis body {
   mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-500 -500 1000 1000' fill='none' stroke='%23000'><circle r='480' stroke-width='1.2'/><circle r='392' stroke-width='2' stroke-dasharray='2 19'/><circle r='300' stroke-width='1.2'/><circle r='226' stroke-width='7' stroke-dasharray='1.2 22'/><circle r='140' stroke-width='1.2'/></svg>") var(--u-at-x) var(--u-at-y) / min(130vmax, 1500px) no-repeat;
   transform-origin: var(--u-at-x) var(--u-at-y);
 }
-[data-texture="clockwork"][data-motion="rotate"] .u-texture {
-  animation: u-spin 240s linear infinite;
-}
 [data-texture="rain"] .u-texture {
   top: -160px;
   background: color-mix(in oklab, var(--u-glow) 18%, transparent);
@@ -545,164 +704,768 @@ html.lenis body {
   opacity: 0.55;
 }
 
-/* The motion */
-.u-motion span {
-  position: absolute;
-  left: var(--x);
-  top: var(--y);
-  width: var(--s);
-  height: var(--s);
-  border-radius: 9999px;
-  background: var(--u-glow);
-  box-shadow: 0 0 calc(var(--s) * 3) color-mix(in oklab, var(--u-glow) 60%, transparent);
-  opacity: 0;
-  animation: u-drift var(--t) ease-in-out var(--d) infinite;
+[data-texture="clockwork"] .u-texture {
+  animation: u-spin 240s linear infinite;
 }
-[data-motion="rise"] .u-motion span {
-  top: 100%;
-  animation-name: u-rise;
+/* The origins of Noah Okafor: Swiss crosses and Nigerian woven motifs, drifting with the scroll. */
+[data-texture="origins"] .u-texture {
+  inset: -10% 0;
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='132' height='132'><g fill='none' stroke-width='2'><path d='M20 26h12M26 20v12' stroke='%23ffffff' stroke-width='3.2'/><path d='M86 92h12M92 86v12' stroke='%23ffffff' stroke-width='3.2'/><path d='M0 66l11-11 11 11 11-11 11 11 11-11 11 11' stroke='%2334b36a'/><path d='M66 132l11-11 11 11 11-11 11 11 11-11 11 11' stroke='%2334b36a'/><path d='M100 20l8 8-8 8-8-8z' stroke='%2334b36a'/><path d='M34 98l6 6-6 6-6-6z' stroke='%23ffffff'/></g></svg>") 0 0 / 132px 132px repeat;
+  -webkit-mask-image: radial-gradient(70% 80% at var(--u-at-x) 60%, transparent 18%, #000 52%, transparent 92%);
+  mask-image: radial-gradient(70% 80% at var(--u-at-x) 60%, transparent 18%, #000 52%, transparent 92%);
+  opacity: 0.1;
+  transform: translate3d(0, calc(var(--u-scroll) * -70px), 0);
 }
-[data-motion="sparkle"] .u-motion span {
-  width: calc(var(--s) * 3.2);
-  height: calc(var(--s) * 3.2);
-  border-radius: 0;
-  box-shadow: none;
-  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
-  animation-name: u-sparkle;
-  animation-duration: calc(var(--t) / 3);
-}
-[data-motion="flutter"] .u-motion span {
-  width: calc(var(--s) * 3);
-  height: calc(var(--s) * 1.8);
-  border-radius: 60% 40% 60% 40%;
-  animation-name: u-flutter;
-}
-[data-motion="pulse"] .u-motion span {
+
+/* The watermark: a glyph or a number, very large, in the depth. */
+.u-mark {
+  inset: auto;
   left: var(--u-at-x);
   top: var(--u-at-y);
-  width: 44vmin;
-  height: 44vmin;
-  margin: -22vmin 0 0 -22vmin;
-  background: none;
-  border: 1px solid color-mix(in oklab, var(--u-glow) 45%, transparent);
-  box-shadow: 0 0 40px color-mix(in oklab, var(--u-glow) 18%, transparent);
-  animation: u-pulse 5.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  transform: translate(-50%, -50%);
+  translate: 0 calc(var(--u-scroll) * -10svh);
+  font-family: var(--u-font-family, var(--font-display));
+  font-size: min(70svh, 56vw);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--u-glow);
+  opacity: 0.07;
+  mix-blend-mode: screen;
 }
-[data-motion="pulse"] .u-motion span:nth-child(2) {
-  animation-delay: -1.8s;
+.u-mark[data-brush] {
+  left: calc(var(--u-at-x) + 15%);
+  top: 54%;
+  font-family: "Universe Brush", serif;
+  font-size: min(92svh, 64vw);
+  opacity: 0.16;
 }
-[data-motion="pulse"] .u-motion span:nth-child(3) {
-  animation-delay: -3.6s;
+[dir="rtl"] .u-mark[data-brush] {
+  left: calc(var(--u-at-x) - 15%);
 }
-[data-motion="pulse"] .u-motion span:nth-child(n + 4) {
-  display: none;
-}
-@keyframes u-drift {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
+@media (max-width: 1023px) {
+  .u-mark {
+    font-size: min(46svh, 90vw);
   }
-  20% {
-    opacity: 0.55;
-  }
-  80% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(18px, -90px, 0);
-  }
-}
-@keyframes u-rise {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  15% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(-12px, -80svh, 0);
+  .u-mark[data-brush],
+  [dir="rtl"] .u-mark[data-brush] {
+    left: 50%;
+    top: 30%;
+    font-size: min(60svh, 110vw);
+    opacity: 0.13;
   }
 }
-@keyframes u-sparkle {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.2) rotate(0deg);
-  }
-  50% {
-    opacity: 0.85;
-    transform: scale(1) rotate(45deg);
-  }
+[data-entering] .u-mark {
+  animation: u-mark-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
 }
-@keyframes u-flutter {
-  0% {
+@keyframes u-mark-in {
+  from {
     opacity: 0;
-    transform: translate3d(0, 0, 0) rotate(-10deg) scaleX(1);
-  }
-  15% {
-    opacity: 0.6;
-  }
-  30% {
-    transform: translate3d(14px, -40px, 0) rotate(8deg) scaleX(0.4);
-  }
-  55% {
-    transform: translate3d(-10px, -90px, 0) rotate(-6deg) scaleX(1);
-  }
-  80% {
-    opacity: 0.4;
-    transform: translate3d(16px, -140px, 0) rotate(10deg) scaleX(0.5);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(0, -180px, 0) rotate(-4deg) scaleX(1);
-  }
-}
-@keyframes u-pulse {
-  0% {
-    opacity: 0;
-    transform: scale(0.35);
-  }
-  20% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(2.4);
-  }
-}
-@media (max-width: 767px) {
-  .u-motion span:nth-child(n + 11) {
-    display: none;
+    transform: translate(-50%, -50%) scale(1.25);
   }
 }
 
-/* The veil: the texts always on a dark ground */
+/* Smoke: soft clouds in the colour of the light, drifting slowly. */
+.u-smoke > span {
+  position: absolute;
+  width: 80vmax;
+  height: 46vmax;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--u-glow) 20%, transparent), transparent);
+  opacity: 0.55;
+  animation: u-smoke 28s ease-in-out infinite alternate;
+}
+.u-smoke > span:nth-child(1) {
+  left: calc(var(--u-at-x) - 60vmax);
+  top: 46%;
+}
+.u-smoke > span:nth-child(2) {
+  left: calc(var(--u-at-x) - 10vmax);
+  top: 58%;
+  animation-duration: 34s;
+  animation-direction: alternate-reverse;
+}
+.u-smoke > span:nth-child(3) {
+  left: -20vmax;
+  top: 70%;
+  animation-duration: 40s;
+}
+@media (max-width: 767px) {
+  .u-smoke > span:nth-child(3) {
+    display: none;
+  }
+}
+@keyframes u-smoke {
+  from {
+    transform: translate3d(-8%, 3%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(8%, -5%, 0) scale(1.18);
+  }
+}
+
+/* Iridescent reflections: a slow wheel of soft colours around the piece, turned by the scroll. */
+.u-iris {
+  inset: -35%;
+  background: conic-gradient(from 0deg at 50% 50%, #ffc2e8, #e2c4ff, #fff0c2, #c9f2dc, #ffd2c2, #ffc2e8);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 34%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 0%, transparent 34%);
+  translate: calc((var(--u-at-x) - 50%) / 1.7) calc((var(--u-at-y) - 50%) / 1.7);
+  rotate: calc(var(--u-scroll) * 50deg);
+  opacity: 0.09;
+  mix-blend-mode: screen;
+  animation: u-spin 70s linear infinite;
+}
+
+/* Rain: fine lines falling slant, in the colour of the light. */
+.u-rain {
+  top: -160px;
+  background: color-mix(in oklab, var(--u-glow) 20%, transparent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><g stroke='%23000' stroke-width='1.2' stroke-linecap='round'><line x1='20' y1='10' x2='14' y2='40'/><line x1='90' y1='60' x2='84' y2='90'/><line x1='140' y1='20' x2='134' y2='50'/><line x1='56' y1='112' x2='50' y2='142'/><line x1='120' y1='118' x2='114' y2='148'/></g></svg>") 0 0 / 160px 160px repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><g stroke='%23000' stroke-width='1.2' stroke-linecap='round'><line x1='20' y1='10' x2='14' y2='40'/><line x1='90' y1='60' x2='84' y2='90'/><line x1='140' y1='20' x2='134' y2='50'/><line x1='56' y1='112' x2='50' y2='142'/><line x1='120' y1='118' x2='114' y2='148'/></g></svg>") 0 0 / 160px 160px repeat;
+  animation: u-rain 2.1s linear infinite;
+}
+[data-entering] .u-rain {
+  animation:
+    u-rain 2.1s linear infinite,
+    u-ignite 1.8s ease-out both;
+}
+
+/* The twenty stars of Inter Milan, on an arc above the ring: they light up one by one at the entrance. */
+.u-twenty {
+  inset: auto;
+  left: var(--u-at-x);
+  top: 7%;
+  width: min(42vw, 600px);
+  height: min(15vw, 220px);
+  transform: translateX(-50%);
+}
+@media (max-width: 1023px) {
+  .u-twenty {
+    top: 9%;
+    width: 82vw;
+    height: 24vw;
+  }
+}
+.u-twenty > span {
+  position: absolute;
+  width: clamp(10px, 1.15vw, 17px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--u-glow) 55%, transparent), transparent);
+  animation: u-twinkle 5s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.31s);
+}
+.u-twenty > span::before {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  background: linear-gradient(180deg, #fff8e2, var(--u-glow));
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+[data-entering] .u-twenty > span {
+  animation: u-star-on 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.4) both;
+  animation-delay: calc(0.45s + var(--i) * 0.07s);
+}
+@keyframes u-twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+@keyframes u-star-on {
+  from {
+    opacity: 0.08;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The canvas of the effects (src/components/universe/fx.ts): around the piece, never behind the texts. */
+.u-fx {
+  width: 100%;
+  height: 100%;
+  opacity: calc(1 - var(--u-scroll) * 0.4);
+  -webkit-mask-image: linear-gradient(90deg, transparent 22%, #000 52%);
+  mask-image: linear-gradient(90deg, transparent 22%, #000 52%);
+}
+[dir="rtl"] .u-fx {
+  -webkit-mask-image: linear-gradient(270deg, transparent 22%, #000 52%);
+  mask-image: linear-gradient(270deg, transparent 22%, #000 52%);
+}
+@media (max-width: 1023px) {
+  .u-fx,
+  [dir="rtl"] .u-fx {
+    -webkit-mask-image: linear-gradient(to bottom, #000 42%, transparent 60%);
+    mask-image: linear-gradient(to bottom, #000 42%, transparent 60%);
+  }
+}
+
+/* The veil: the texts always on a dark ground, whatever the backdrop shows; darker once the opening has passed. */
 .u-veil {
   background:
-    linear-gradient(90deg, color-mix(in oklab, var(--u-base) 74%, transparent) 0%, transparent 46%),
-    linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
+    linear-gradient(90deg, color-mix(in oklab, var(--u-base) 84%, transparent) 0%, color-mix(in oklab, var(--u-base) 55%, transparent) 30%, transparent 52%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 50%, transparent) 0%, transparent 16%, transparent 60%, color-mix(in oklab, var(--u-base) 70%, transparent) 100%),
+    radial-gradient(130% 100% at var(--u-at-x) 45%, transparent 55%, color-mix(in oklab, var(--u-base) 60%, transparent) 100%);
 }
 [dir="rtl"] .u-veil {
   background:
-    linear-gradient(270deg, color-mix(in oklab, var(--u-base) 74%, transparent) 0%, transparent 46%),
-    linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
+    linear-gradient(270deg, color-mix(in oklab, var(--u-base) 84%, transparent) 0%, color-mix(in oklab, var(--u-base) 55%, transparent) 30%, transparent 52%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 50%, transparent) 0%, transparent 16%, transparent 60%, color-mix(in oklab, var(--u-base) 70%, transparent) 100%),
+    radial-gradient(130% 100% at var(--u-at-x) 45%, transparent 55%, color-mix(in oklab, var(--u-base) 60%, transparent) 100%);
 }
 @media (max-width: 1023px) {
   .u-veil,
   [dir="rtl"] .u-veil {
-    background: linear-gradient(to bottom, transparent 42%, color-mix(in oklab, var(--u-base) 72%, transparent) 72%);
+    background:
+      linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 55%, transparent) 0%, transparent 13%, transparent 36%, color-mix(in oklab, var(--u-base) 86%, transparent) 60%, color-mix(in oklab, var(--u-base) 93%, transparent) 100%),
+      radial-gradient(120% 80% at 50% 30%, transparent 50%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
   }
+}
+/* Over an AI background, the column of the texts is darker still. */
+.universe[data-backdrop] .u-veil {
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--u-base) 92%, transparent) 0%, color-mix(in oklab, var(--u-base) 80%, transparent) 30%, color-mix(in oklab, var(--u-base) 35%, transparent) 46%, transparent 60%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 55%, transparent) 0%, transparent 16%, transparent 60%, color-mix(in oklab, var(--u-base) 75%, transparent) 100%),
+    radial-gradient(130% 100% at var(--u-at-x) 45%, transparent 55%, color-mix(in oklab, var(--u-base) 60%, transparent) 100%);
+}
+[dir="rtl"] .universe[data-backdrop] .u-veil {
+  background:
+    linear-gradient(270deg, color-mix(in oklab, var(--u-base) 92%, transparent) 0%, color-mix(in oklab, var(--u-base) 80%, transparent) 30%, color-mix(in oklab, var(--u-base) 35%, transparent) 46%, transparent 60%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 55%, transparent) 0%, transparent 16%, transparent 60%, color-mix(in oklab, var(--u-base) 75%, transparent) 100%),
+    radial-gradient(130% 100% at var(--u-at-x) 45%, transparent 55%, color-mix(in oklab, var(--u-base) 60%, transparent) 100%);
+}
+@media (max-width: 1023px) {
+  .universe[data-backdrop] .u-veil,
+  [dir="rtl"] .universe[data-backdrop] .u-veil {
+    background:
+      linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 55%, transparent) 0%, transparent 13%, transparent 34%, color-mix(in oklab, var(--u-base) 90%, transparent) 56%, color-mix(in oklab, var(--u-base) 96%, transparent) 100%),
+      radial-gradient(120% 80% at 50% 30%, transparent 50%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
+  }
+}
+.u-veil::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--u-base);
+  opacity: calc(var(--u-scroll) * 0.4);
+}
+
+/* ---------- The entrance (the first visit of the piece) ---------- */
+
+/* It waits for the intro of the house to leave (the first page of a visit, src/components/Preloader.tsx). */
+html[data-intro] [data-entering],
+html[data-intro] [data-entering] *,
+html[data-intro] [data-entering] [data-piece-cover]::after {
+  animation-play-state: paused !important;
+}
+
+.u-entrance,
+.u-entrance > * {
+  display: none;
+}
+[data-entering] .u-entrance {
+  display: block;
+}
+.u-entrance > *,
+.u-burst > i,
+.u-curtain > i {
+  position: absolute;
+}
+.u-entrance > * {
+  inset: 0;
+}
+
+/* Flash of energy and shockwave. */
+[data-entering] [data-entrance="flash"] :is(.u-flash, .u-shock, .u-burst) {
+  display: block;
+}
+.u-flash {
+  background: radial-gradient(55% 55% at var(--u-at-x) var(--u-at-y), #fff 0%, color-mix(in oklab, var(--u-glow) 80%, #fff) 16%, color-mix(in oklab, var(--u-glow) 38%, transparent) 42%, transparent 72%);
+  mix-blend-mode: screen;
+  animation: u-flash 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+}
+@keyframes u-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+.u-entrance .u-shock {
+  inset: auto;
+  left: var(--u-at-x);
+  top: var(--u-at-y);
+  width: 36vmin;
+  height: 36vmin;
+  margin: -18vmin 0 0 -18vmin;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--u-glow) 70%, #fff);
+  box-shadow:
+    0 0 40px var(--u-glow),
+    inset 0 0 30px var(--u-glow);
+  animation: u-shock 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) 0.35s both;
+}
+@keyframes u-shock {
+  from {
+    opacity: 1;
+    transform: scale(0.05);
+  }
+  to {
+    opacity: 0;
+    transform: scale(4.2);
+  }
+}
+
+/* The burst: sparks (flash, stars), butterflies (flutter) or petals (bloom) flying out of the piece. */
+[data-entering] :is([data-entrance="stars"], [data-entrance="flutter"], [data-entrance="bloom"]) .u-burst {
+  display: block;
+}
+.u-entrance .u-burst {
+  inset: auto;
+  left: var(--u-at-x);
+  top: var(--u-at-y);
+  width: 0;
+  height: 0;
+}
+.u-burst > i {
+  left: 0;
+  top: 0;
+  width: calc(9px * var(--s));
+  height: calc(9px * var(--s));
+  margin: calc(-4.5px * var(--s));
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--u-glow) 40%, transparent 70%);
+  animation: u-burst 1.5s cubic-bezier(0.15, 0.65, 0.3, 1) both;
+  animation-delay: calc(0.2s + var(--t));
+}
+[data-entrance="flutter"] .u-burst > i {
+  width: calc(24px * var(--s));
+  height: calc(18px * var(--s));
+  border-radius: 0;
+  background:
+    radial-gradient(48% 60% at 25% 45%, color-mix(in oklab, #ffd6f2 80%, transparent) 0 55%, transparent 60%),
+    radial-gradient(48% 60% at 75% 45%, color-mix(in oklab, #e6d2ff 80%, transparent) 0 55%, transparent 60%);
+  animation:
+    u-burst 2.1s cubic-bezier(0.2, 0.6, 0.3, 1) both,
+    u-flap 0.16s ease-in-out infinite alternate;
+  animation-delay: calc(0.25s + var(--t)), 0s;
+}
+[data-entrance="bloom"] .u-burst > i {
+  width: calc(14px * var(--s));
+  height: calc(20px * var(--s));
+  border-radius: 50% 0;
+  background: linear-gradient(135deg, color-mix(in oklab, var(--u-glow) 90%, #fff), color-mix(in oklab, var(--u-tint) 60%, var(--u-glow)));
+  animation-duration: 2s;
+}
+[data-entrance="stars"] .u-burst > i {
+  clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  width: calc(16px * var(--s));
+  height: calc(16px * var(--s));
+  background: #fff;
+}
+@keyframes u-burst {
+  0% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(var(--d)) rotate(calc(var(--a) * -1)) translateY(-6vmin);
+  }
+}
+@keyframes u-flap {
+  to {
+    scale: 0.25 1;
+  }
+}
+
+/* The red smoke clears and reveals the piece under the spotlight. */
+[data-entering] [data-entrance="smoke"] .u-curtain {
+  display: block;
+}
+.u-curtain > i {
+  width: 95vmax;
+  height: 70vmax;
+  left: calc(var(--u-at-x) - 47.5vmax);
+  top: calc(var(--u-at-y) - 35vmax);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--u-glow) 50%, #1c0204) 0%, color-mix(in oklab, var(--u-glow) 32%, transparent) 42%, transparent 74%);
+  animation: u-curtain 2.1s cubic-bezier(0.35, 0.05, 0.2, 1) both;
+}
+.u-curtain > i:nth-child(1) {
+  --dx: -38vmax;
+  --dy: -8vmax;
+}
+.u-curtain > i:nth-child(2) {
+  --dx: 36vmax;
+  --dy: -12vmax;
+  animation-delay: 0.08s;
+}
+.u-curtain > i:nth-child(3) {
+  --dx: -20vmax;
+  --dy: 24vmax;
+  animation-delay: 0.16s;
+}
+.u-curtain > i:nth-child(4) {
+  --dx: 26vmax;
+  --dy: 22vmax;
+  animation-delay: 0.04s;
+}
+.u-curtain > i:nth-child(5) {
+  --dx: 0;
+  --dy: -30vmax;
+  animation-delay: 0.12s;
+}
+@keyframes u-curtain {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(0.85);
+  }
+  35% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx), var(--dy), 0) scale(1.6);
+  }
+}
+[data-entering] [data-entrance="smoke"] .u-light {
+  animation: u-light-on 1.3s steps(1, end) 0.7s both;
+}
+@keyframes u-light-on {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  30% {
+    opacity: 0.15;
+  }
+  45% {
+    opacity: 1;
+  }
+}
+
+/* The lights of the tunnel switch on (and the camera moves forward), the spotlight switches on. */
+[data-entering] :is([data-entrance="tunnel"], [data-entrance="spotlight"]) .u-dark {
+  display: block;
+}
+.u-dark {
+  background: var(--u-base);
+  animation: u-lights 1.5s steps(1, end) both;
+}
+[data-entrance="spotlight"] .u-dark {
+  animation-name: u-spot;
+  animation-duration: 1.2s;
+}
+@keyframes u-lights {
+  0% {
+    opacity: 1;
+  }
+  16% {
+    opacity: 0.55;
+  }
+  24% {
+    opacity: 0.95;
+  }
+  38% {
+    opacity: 0.25;
+  }
+  46% {
+    opacity: 0.7;
+  }
+  60%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes u-spot {
+  0% {
+    opacity: 1;
+  }
+  22% {
+    opacity: 0.45;
+  }
+  32% {
+    opacity: 0.85;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+[data-entering] [data-entrance="tunnel"] .universe-stage {
+  animation: u-dolly 1.9s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+@keyframes u-dolly {
+  from {
+    transform: scale(1.16);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* Rain begins, with a distant light. */
+[data-entering] [data-entrance="rain"] .u-flash {
+  display: block;
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0.3), transparent 70%);
+  animation: u-thunder 1.8s linear both;
+}
+@keyframes u-thunder {
+  0%,
+  8% {
+    opacity: 0;
+  }
+  11% {
+    opacity: 0.9;
+  }
+  15% {
+    opacity: 0.1;
+  }
+  21% {
+    opacity: 0.6;
+  }
+  45%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The wheels of the watch start turning. */
+[data-entering] [data-entrance="tick"] [data-texture="clockwork"] .u-texture,
+[data-entering][data-entrance="tick"] [data-texture="clockwork"] .u-texture {
+  animation: u-tick 2s cubic-bezier(0.1, 0.7, 0.2, 1) both;
+}
+@keyframes u-tick {
+  from {
+    transform: rotate(-150deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* The piece and its texts arrive with the world (the texts readable at once). The photo itself moves, never its box:
+   a box that moves would isolate the photo, and its black would no longer melt into the world. */
+[data-entering] [data-piece-cover] > :is(img, video) {
+  animation: u-piece-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+}
+[data-entering][data-entrance="smoke"] [data-piece-cover] > :is(img, video) {
+  animation-duration: 1.4s;
+  animation-delay: 0.7s;
+}
+[data-entering][data-entrance="flash"] [data-piece-cover] > :is(img, video) {
+  animation-name: u-piece-flash;
+  animation-delay: 0.18s;
+}
+[data-entering][data-entrance="tunnel"] [data-piece-cover] > :is(img, video) {
+  animation-delay: 0.6s;
+}
+[data-entering] [data-piece-text] {
+  animation: u-text-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
+}
+@keyframes u-piece-in {
+  from {
+    opacity: 0.01;
+    transform: translate3d(0, 3%, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes u-piece-flash {
+  0% {
+    opacity: 0.01;
+    transform: scale(0.82);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes u-text-in {
+  from {
+    opacity: 0.01;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* A glint of light crosses the piece (the dark parts stay dark: an overlay blend). */
+[data-piece-cover]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 38%, rgb(255 255 255 / 0.75) 50%, transparent 62%) 0 0 / 300% 100% no-repeat;
+  mix-blend-mode: overlay;
+  /* Feathered: no edge of a box over the world. */
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent);
+}
+[data-entering]:is([data-entrance="glint"], [data-entrance="tick"], [data-entrance="flash"], [data-entrance="spotlight"]) [data-piece-cover]::after {
+  animation: u-sweep 1.3s cubic-bezier(0.3, 0.1, 0.3, 1) 0.9s both;
+}
+@keyframes u-sweep {
+  from {
+    opacity: 1;
+    background-position: 100% 0;
+  }
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    background-position: 0 0;
+  }
+}
+
+/* The impact of an opened photo (energy universe), over everything for an instant. */
+.u-impact {
+  position: fixed;
+  z-index: 400;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  pointer-events: none;
+  border: 2px solid #fff;
+  box-shadow:
+    0 0 30px var(--u-glow),
+    0 0 80px var(--u-glow),
+    inset 0 0 20px var(--u-glow);
+  animation: u-impact 0.6s cubic-bezier(0.15, 0.7, 0.3, 1) both;
+}
+.u-impact::before {
+  content: "";
+  position: absolute;
+  inset: -300%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.75), color-mix(in oklab, var(--u-glow) 50%, transparent) 40%, transparent 70%);
+  animation: u-impact-flash 0.45s ease-out both;
+}
+@keyframes u-impact {
+  from {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(16);
+  }
+}
+@keyframes u-impact-flash {
+  from {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* A jewel shot on black melts into its world: the near-blacks of the photo go to black (a levels of 7 %). */
+[data-piece] img.mix-blend-lighten {
+  filter: contrast(1.18) brightness(0.92);
+}
+
+/* ---------- The title of the piece, in the typography of its universe ---------- */
+
+[data-piece] [data-u-title] {
+  font-family: var(--u-font-family, var(--font-display));
+  font-weight: var(--u-font-weight, 300);
+  font-style: var(--u-font-style, normal);
+  text-transform: var(--u-font-case, uppercase);
+  letter-spacing: var(--u-font-tracking, 0.06em);
+  font-size: calc(clamp(2.25rem, 4.2vw, 4.5rem) * var(--u-font-scale, 1));
+  line-height: 1.08;
+}
+html[lang="ar"] [data-piece] [data-u-title] {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0;
+  font-size: clamp(2.25rem, 4.2vw, 4.5rem);
+}
+/* Engraved in gold, like a trophy. */
+[data-font="trophee"] [data-u-title] {
+  background: linear-gradient(180deg, #fff8e4 0%, #f2dca6 36%, #cfa862 52%, #f7e8c2 70%, #dcb878 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.7)) drop-shadow(0 0 24px rgb(0 0 0 / 0.7));
+}
+/* Pearly, like a wing. */
+[data-font="aerien"] [data-u-title] {
+  background: linear-gradient(100deg, #ffffff 0%, #f4e2ff 30%, #ffe4f2 55%, #fff4dc 80%, #ffffff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 22px rgb(0 0 0 / 0.75));
+}
+/* Charged with energy, or lit in red: the glow of the universe around white letters. */
+:is([data-font="pinceau"], [data-font="gothique-allemande"]) [data-u-title] {
+  color: #fff;
+  text-shadow:
+    0 0 18px color-mix(in oklab, var(--u-glow) 65%, transparent),
+    0 0 48px color-mix(in oklab, var(--u-glow) 30%, transparent),
+    0 2px 30px rgb(0 0 0 / 0.85);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .universe,
-  .universe * {
+  .universe *,
+  [data-piece-cover] > *,
+  [data-piece-text],
+  [data-piece-cover]::after {
     animation: none !important;
   }
-  .u-motion {
-    display: none;
+  .u-entrance,
+  .u-fx {
+    display: none !important;
+  }
+  .u-backdrop,
+  .u-mark,
+  .u-iris,
+  [data-texture="origins"] .u-texture {
+    translate: none !important;
+    rotate: none !important;
   }
 }

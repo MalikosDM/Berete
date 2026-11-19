@@ -1,0 +1,513 @@
+/*
+ * The effects of a universe (src/data/themes.ts), drawn in one canvas behind the content: dust, embers, diamond glints,
+ * lightning, speed lines, butterflies of light, confetti, petals, stars. Loaded after the content of the page
+ * (src/components/Universe.tsx); every effect answers the speed of the scroll, lightly.
+ *
+ * Light on purpose: one canvas, a few dozen particles (fewer than half on a phone, at the pixel density of the screen up
+ * to 1.5, 1 on a phone), drawing only while the page is on screen and visible, never when the visitor asks for reduced
+ * motion (the module is not even loaded).
+ */
+
+export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean };
+
+type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; spin: number; angle: number; hue: number; color: string; kind: number };
+
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
+const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const rgba = ([r, g, b]: [number, number, number], a: number) => "rgba(" + r + "," + g + "," + b + "," + a.toFixed(3) + ")";
+const mix = (a: [number, number, number], b: [number, number, number], t: number): [number, number, number] => [
+  Math.round(a[0] + (b[0] - a[0]) * t),
+  Math.round(a[1] + (b[1] - a[1]) * t),
+  Math.round(a[2] + (b[2] - a[2]) * t),
+];
+
+/** A soft round sprite, drawn once, for the glows. */
+function sprite(color: [number, number, number]): HTMLCanvasElement {
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const g = c.getContext("2d")!;
+  const grad = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, rgba(color, 1));
+  grad.addColorStop(0.35, rgba(color, 0.45));
+  grad.addColorStop(1, rgba(color, 0));
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 64, 64);
+  return c;
+}
+
+const TULIPS: [number, number, number][] = [
+  [226, 72, 92],
+  [242, 140, 160],
+  [246, 168, 92],
+  [244, 214, 120],
+  [176, 112, 196],
+];
+
+export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () => void; impact: (x: number, y: number) => void } {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return { stop: () => undefined, impact: () => undefined };
+  const phone = window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+  const density = phone ? 0.4 : 1;
+  const dprMax = phone ? 1 : 1.5;
+  const has = (e: string) => opts.effects.includes(e);
+  const glow = hexToRgb(opts.glow);
+  const white: [number, number, number] = [255, 255, 255];
+  const light = mix(glow, white, 0.55);
+  const glowSprite = sprite(glow);
+  const lightSprite = sprite(light);
+  const rtl = document.documentElement.dir === "rtl";
+
+  let w = 0;
+  let h = 0;
+  let dpr = 1;
+  // The heart of the scene: where the piece is (the right of a computer screen, the top of a phone).
+  let cx = 0;
+  let cy = 0;
+  const resize = () => {
+    dpr = Math.min(window.devicePixelRatio || 1, dprMax);
+    w = canvas.clientWidth;
+    h = canvas.clientHeight;
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const wide = w >= 1024;
+    cx = wide ? (rtl ? 0.28 : 0.72) * w : 0.5 * w;
+    cy = wide ? 0.48 * h : 0.3 * h;
+  };
+  resize();
+
+  const area = () => (w * h) / (1440 * 900);
+  const count = (n: number) => Math.max(3, Math.round(n * density * clamp(area(), 0.35, 1.6)));
+
+  const dust: P[] = [];
+  const embers: P[] = [];
+  const glints: P[] = [];
+  const flyers: P[] = []; // butterflies
+  const falling: P[] = []; // confetti and petals
+  const stars: P[] = [];
+  const rings: P[] = [];
+  const sparks: P[] = [];
+  let bolt: { pts: [number, number][][]; life: number } | null = null;
+  let nextBolt = performance.now() + rand(1500, 3500);
+  let shooting: P | null = null;
+  let nextShooting = performance.now() + rand(3000, 7000);
+  let lines: { a: number; r: number; l: number; wd: number }[] = [];
+
+  const newDust = (anywhere: boolean): P => ({ x: rand(0, w), y: anywhere ? rand(0, h) : h + 10, vx: rand(-0.08, 0.08), vy: rand(-0.25, -0.06), life: 0, max: rand(500, 1100), size: rand(0.6, 1.8), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+  const newEmber = (anywhere: boolean): P => {
+    const near = Math.random() < 0.55;
+    return {
+      x: near ? cx + rand(-0.22, 0.22) * w : rand(0, w),
+      y: anywhere ? rand(0.1, 1) * h : h + rand(0, 40),
+      vx: rand(-0.3, 0.3),
+      vy: rand(-1.1, -0.35),
+      life: 0,
+      max: rand(160, 420),
+      size: rand(0.8, 2.4),
+      spin: rand(0, Math.PI * 2),
+      angle: rand(0.01, 0.04),
+      hue: 0,
+      color: "",
+      kind: 0,
+    };
+  };
+  const newGlint = (): P => {
+    const near = Math.random() < 0.7;
+    return { x: near ? cx + rand(-0.16, 0.16) * Math.max(w, 600) : rand(0, w), y: near ? cy + rand(-0.26, 0.26) * h : rand(0, h), vx: 0, vy: 0, life: 0, max: rand(50, 90), size: rand(5, 13), spin: rand(0, Math.PI), angle: 0, hue: 0, color: "", kind: 0 };
+  };
+  const newFlyer = (burst: boolean): P => {
+    const dir = Math.random() < 0.5 ? -1 : 1;
+    return {
+      x: burst ? cx + rand(-60, 60) : rand(0.1, 0.9) * w,
+      y: burst ? cy + rand(-40, 60) : h + 20,
+      vx: dir * rand(0.3, 1.2),
+      vy: rand(-1.6, -0.6),
+      life: 0,
+      max: rand(260, 520),
+      size: rand(7, 15) * (phone ? 0.8 : 1),
+      spin: rand(0, Math.PI * 2),
+      angle: 0,
+      hue: rand(0, 360),
+      color: "",
+      kind: 0,
+    };
+  };
+  const confettiColors = [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
+  const petalColors = opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
+  const newFalling = (anywhere: boolean, petal: boolean): P => ({
+    x: rand(-0.05, 1.05) * w,
+    y: anywhere ? rand(-0.1, 1) * h : rand(-60, -10),
+    vx: rand(-0.4, 0.4),
+    vy: petal ? rand(0.35, 0.9) : rand(0.5, 1.3),
+    life: 0,
+    max: 99999,
+    size: petal ? rand(6, 12) : rand(4, 8),
+    spin: rand(0, Math.PI * 2),
+    angle: rand(-0.04, 0.04),
+    hue: rand(0, Math.PI * 2),
+    color: petal ? petalColors[Math.floor(Math.random() * petalColors.length)]! : confettiColors[Math.floor(Math.random() * confettiColors.length)]!,
+    kind: petal ? 1 : 0,
+  });
+
+  const fill = () => {
+    if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
+    if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
+    if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, false));
+    if (has("petals")) while (falling.filter((p) => p.kind === 1).length < count(22)) falling.push(newFalling(true, true));
+    if (has("stars")) while (stars.length < count(110)) stars.push({ ...newDust(true), size: rand(0.5, 1.6), spin: rand(0, Math.PI * 2), angle: rand(0.01, 0.04) });
+  };
+  fill();
+  if (has("butterflies")) for (let i = 0; i < count(6); i++) flyers.push({ ...newFlyer(false), y: rand(0.3, 1) * h });
+
+  /* ---------- Lightning: a branching bolt from the heart of the scene ---------- */
+
+  function makeBolt() {
+    const pts: [number, number][][] = [];
+    const branch = (x: number, y: number, a: number, len: number, depth: number) => {
+      const seg: [number, number][] = [[x, y]];
+      const n = 10;
+      for (let i = 1; i <= n; i++) {
+        a += rand(-0.45, 0.45);
+        x += Math.cos(a) * (len / n);
+        y += Math.sin(a) * (len / n);
+        seg.push([x, y]);
+        if (depth < 2 && Math.random() < 0.18) branch(x, y, a + rand(-0.9, 0.9), len * rand(0.25, 0.45), depth + 1);
+      }
+      pts.push(seg);
+    };
+    const a = rand(0, Math.PI * 2);
+    const r = Math.min(w, h) * rand(0.08, 0.16);
+    branch(cx + Math.cos(a) * r, cy + Math.sin(a) * r, a, Math.max(w, h) * rand(0.3, 0.5), 0);
+    bolt = { pts, life: 0 };
+  }
+
+  /* ---------- Speed lines: around the piece, as strong as the scroll is fast ---------- */
+
+  const makeLines = () => {
+    lines = Array.from({ length: phone ? 26 : 54 }, () => ({ a: rand(0, Math.PI * 2), r: rand(0.16, 0.3), l: rand(0.25, 0.9), wd: rand(0.6, 2.2) }));
+  };
+  makeLines();
+  const restLines = opts.preset === "tunnel" ? 0.09 : 0;
+
+  /* ---------- The loop ---------- */
+
+  let raf = 0;
+  let running = false;
+  let lastY = window.scrollY;
+  let speed = 0; // px per frame, smoothed
+  let frame = 0;
+  let visible = true;
+  let onScreen = true;
+
+  const draw = (now: number) => {
+    raf = 0;
+    if (!running) return;
+    frame++;
+    const dy = window.scrollY - lastY;
+    lastY = window.scrollY;
+    speed += (Math.abs(dy) - speed) * 0.18;
+    const boost = clamp(speed / 26, 0, 1);
+    ctx.clearRect(0, 0, w, h);
+    ctx.globalCompositeOperation = "lighter";
+
+    if (has("stars")) {
+      for (const s of stars) {
+        s.spin += s.angle;
+        const a = 0.25 + 0.75 * (0.5 + 0.5 * Math.sin(s.spin));
+        ctx.fillStyle = rgba(light, a * 0.8);
+        ctx.fillRect(s.x, s.y, s.size, s.size);
+      }
+      if (!shooting && now > nextShooting) {
+        shooting = { x: rand(0.1, 0.7) * w, y: rand(0.02, 0.3) * h, vx: rand(9, 14), vy: rand(2.5, 4.5), life: 0, max: 46, size: 1, spin: 0, angle: 0, hue: 0, color: "", kind: 0 };
+        nextShooting = now + rand(5000, 10000);
+      }
+      if (shooting) {
+        shooting.life++;
+        shooting.x += shooting.vx;
+        shooting.y += shooting.vy;
+        const t = shooting.life / shooting.max;
+        const grad = ctx.createLinearGradient(shooting.x, shooting.y, shooting.x - shooting.vx * 9, shooting.y - shooting.vy * 9);
+        grad.addColorStop(0, rgba(white, 0.9 * (1 - t)));
+        grad.addColorStop(1, rgba(white, 0));
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(shooting.x, shooting.y);
+        ctx.lineTo(shooting.x - shooting.vx * 9, shooting.y - shooting.vy * 9);
+        ctx.stroke();
+        if (shooting.life >= shooting.max) shooting = null;
+      }
+    }
+
+    if (has("speedlines")) {
+      const strength = Math.max(restLines, boost * 0.55);
+      if (strength > 0.01) {
+        if (frame % 3 === 0) for (const l of lines) l.a += rand(-0.01, 0.01);
+        if (frame % 9 === 0 && boost > 0.2) makeLines();
+        const R = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy));
+        ctx.lineCap = "round";
+        for (const l of lines) {
+          const r0 = R * l.r;
+          const r1 = r0 + R * l.l;
+          const x0 = cx + Math.cos(l.a) * r0;
+          const y0 = cy + Math.sin(l.a) * r0;
+          const grad = ctx.createLinearGradient(x0, y0, cx + Math.cos(l.a) * r1, cy + Math.sin(l.a) * r1);
+          grad.addColorStop(0, rgba(light, 0));
+          grad.addColorStop(0.4, rgba(light, strength * 0.55));
+          grad.addColorStop(1, rgba(light, 0));
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = l.wd;
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.lineTo(cx + Math.cos(l.a) * r1, cy + Math.sin(l.a) * r1);
+          ctx.stroke();
+        }
+      }
+    }
+
+    if (has("dust")) {
+      for (let i = dust.length - 1; i >= 0; i--) {
+        const p = dust[i]!;
+        p.life++;
+        p.x += p.vx;
+        p.y += p.vy * (1 + boost * 3);
+        const a = Math.min(1, p.life / 80, (p.max - p.life) / 80) * 0.5;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.drawImage(lightSprite, p.x - p.size * 3, p.y - p.size * 3, p.size * 6, p.size * 6);
+        if (p.life > p.max || p.y < -20) dust[i] = newDust(false);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("embers")) {
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const p = embers[i]!;
+        p.life++;
+        p.spin += p.angle;
+        p.x += p.vx + Math.sin(p.spin) * 0.35;
+        p.y += p.vy * (1 + boost * 2.5);
+        const flicker = 0.65 + 0.35 * Math.sin(p.life * 0.3 + p.spin * 7);
+        const a = Math.min(1, p.life / 30, (p.max - p.life) / 60) * flicker;
+        ctx.globalAlpha = Math.max(0, a);
+        const s = p.size * (1 + boost * 0.6);
+        ctx.drawImage(glowSprite, p.x - s * 4, p.y - s * 4, s * 8, s * 8);
+        ctx.fillStyle = rgba(light, Math.max(0, a));
+        ctx.fillRect(p.x - s * 0.4, p.y - s * 0.4, s * 0.8, s * 0.8);
+        if (p.life > p.max || p.y < -30) embers[i] = newEmber(false);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("lightning")) {
+      if (!bolt && now > nextBolt) {
+        makeBolt();
+        nextBolt = now + (phone ? rand(5000, 9000) : rand(2600, 6000));
+      }
+      if (bolt) {
+        bolt.life++;
+        const a = bolt.life < 3 ? 1 : bolt.life < 6 ? 0.35 : bolt.life < 9 ? 0.85 : Math.max(0, 1 - (bolt.life - 9) / 10);
+        for (const pass of [
+          { width: 7, alpha: 0.12 * a, color: glow },
+          { width: 2.6, alpha: 0.35 * a, color: light },
+          { width: 1, alpha: 0.9 * a, color: white },
+        ]) {
+          ctx.strokeStyle = rgba(pass.color, pass.alpha);
+          ctx.lineWidth = pass.width;
+          ctx.lineJoin = "round";
+          for (const seg of bolt.pts) {
+            ctx.beginPath();
+            ctx.moveTo(seg[0]![0], seg[0]![1]);
+            for (let k = 1; k < seg.length; k++) ctx.lineTo(seg[k]![0], seg[k]![1]);
+            ctx.stroke();
+          }
+        }
+        if (bolt.life > 20) bolt = null;
+      }
+    }
+
+    if (has("butterflies")) {
+      // The scroll lets them fly away: a few at rest, more when the visitor moves.
+      if (flyers.length < count(18) && (Math.random() < 0.004 + boost * 0.12)) flyers.push(newFlyer(boost > 0.15 && Math.random() < 0.5));
+      for (let i = flyers.length - 1; i >= 0; i--) {
+        const p = flyers[i]!;
+        p.life++;
+        p.spin += 0.32 + boost * 0.2;
+        p.x += p.vx + Math.sin(p.life * 0.04) * 0.6;
+        p.y += p.vy * (1 + boost * 1.4);
+        const a = Math.min(1, p.life / 40, (p.max - p.life) / 70) * 0.85;
+        if (a > 0) {
+          const flap = 0.25 + 0.75 * Math.abs(Math.sin(p.spin));
+          const hue = (p.hue + p.life * 0.6) % 360;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(Math.atan2(p.vy, p.vx) + Math.PI / 2);
+          ctx.globalAlpha = a;
+          ctx.drawImage(lightSprite, -p.size * 1.6, -p.size * 1.6, p.size * 3.2, p.size * 3.2);
+          for (const side of [-1, 1]) {
+            ctx.fillStyle = "hsla(" + hue + ",80%,82%," + (0.55 * a).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.ellipse(side * p.size * 0.55 * flap, -p.size * 0.2, p.size * 0.6 * flap, p.size * 0.75, side * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "hsla(" + ((hue + 40) % 360) + ",80%,86%," + (0.45 * a).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.ellipse(side * p.size * 0.42 * flap, p.size * 0.45, p.size * 0.42 * flap, p.size * 0.5, -side * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+        if (p.life > p.max || p.y < -40 || p.x < -40 || p.x > w + 40) flyers.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("glints")) {
+      if (glints.length < (phone ? 3 : 6) && Math.random() < 0.05 + boost * 0.1) glints.push(newGlint());
+      for (let i = glints.length - 1; i >= 0; i--) {
+        const p = glints[i]!;
+        p.life++;
+        const t = p.life / p.max;
+        const s = p.size * Math.sin(Math.PI * t);
+        const a = Math.sin(Math.PI * t) * 0.9;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.spin + t * 0.6);
+        ctx.globalAlpha = a;
+        ctx.drawImage(lightSprite, -s * 1.2, -s * 1.2, s * 2.4, s * 2.4);
+        ctx.fillStyle = rgba(white, 0.95);
+        ctx.beginPath();
+        ctx.moveTo(0, -s * 2);
+        ctx.quadraticCurveTo(0, 0, s * 2, 0);
+        ctx.quadraticCurveTo(0, 0, 0, s * 2);
+        ctx.quadraticCurveTo(0, 0, -s * 2, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -s * 2);
+        ctx.fill();
+        ctx.restore();
+        if (p.life >= p.max) glints.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Confetti and petals fall in their own colours, not in light.
+    ctx.globalCompositeOperation = "source-over";
+    if (has("confetti") || has("petals")) {
+      for (let i = falling.length - 1; i >= 0; i--) {
+        const p = falling[i]!;
+        p.hue += 0.05;
+        p.spin += p.angle * (1 + boost * 3);
+        p.x += p.vx + Math.sin(p.hue) * 0.5;
+        p.y += p.vy * (1 + boost * 2.2);
+        const turn = Math.cos(p.spin * 2.2);
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.spin);
+        ctx.globalAlpha = 0.75;
+        ctx.fillStyle = p.color;
+        if (p.kind === 1) {
+          ctx.scale(1, Math.abs(turn) * 0.7 + 0.3);
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size);
+          ctx.bezierCurveTo(p.size * 0.9, -p.size * 0.5, p.size * 0.7, p.size * 0.7, 0, p.size);
+          ctx.bezierCurveTo(-p.size * 0.7, p.size * 0.7, -p.size * 0.9, -p.size * 0.5, 0, -p.size);
+          ctx.fill();
+        } else {
+          ctx.fillRect(-p.size / 2, (-p.size / 4) * Math.abs(turn), p.size, (p.size / 2) * Math.abs(turn) + 0.6);
+        }
+        ctx.restore();
+        if (p.y > h + 30) falling[i] = newFalling(false, p.kind === 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // The impact of an opened photo: a ring of light and sparks.
+    if (rings.length || sparks.length) {
+      ctx.globalCompositeOperation = "lighter";
+      for (let i = rings.length - 1; i >= 0; i--) {
+        const r = rings[i]!;
+        r.life++;
+        const t = r.life / r.max;
+        ctx.strokeStyle = rgba(light, (1 - t) * 0.8);
+        ctx.lineWidth = 3 * (1 - t) + 0.5;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.size + t * Math.max(w, h) * 0.45, 0, Math.PI * 2);
+        ctx.stroke();
+        if (r.life >= r.max) rings.splice(i, 1);
+      }
+      for (let i = sparks.length - 1; i >= 0; i--) {
+        const p = sparks[i]!;
+        p.life++;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+        const a = 1 - p.life / p.max;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.drawImage(glowSprite, p.x - 6, p.y - 6, 12, 12);
+        if (p.life >= p.max) sparks.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+    ctx.globalCompositeOperation = "source-over";
+    raf = window.requestAnimationFrame(draw);
+  };
+
+  const start = () => {
+    if (running || !visible || !onScreen) return;
+    running = true;
+    lastY = window.scrollY;
+    raf = window.requestAnimationFrame(draw);
+  };
+  const pause = () => {
+    running = false;
+    if (raf) window.cancelAnimationFrame(raf);
+    raf = 0;
+  };
+
+  const onVisibility = () => {
+    visible = document.visibilityState === "visible";
+    if (visible) start();
+    else pause();
+  };
+  const io = new IntersectionObserver(([entry]) => {
+    onScreen = !!entry?.isIntersecting;
+    if (onScreen) start();
+    else pause();
+  });
+  io.observe(canvas);
+  const ro = new ResizeObserver(() => {
+    resize();
+    makeLines();
+  });
+  ro.observe(canvas);
+  document.addEventListener("visibilitychange", onVisibility);
+  canvas.dataset.running = "";
+  start();
+
+  return {
+    stop: () => {
+      pause();
+      io.disconnect();
+      ro.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
+      delete canvas.dataset.running;
+      ctx.clearRect(0, 0, w, h);
+    },
+    impact: (x: number, y: number) => {
+      if (!opts.impact) return;
+      const r = canvas.getBoundingClientRect();
+      const px = x - r.left;
+      const py = y - r.top;
+      rings.push({ x: px, y: py, vx: 0, vy: 0, life: 0, max: 34, size: 10, spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+      for (let i = 0; i < (phone ? 14 : 30); i++) {
+        const a = rand(0, Math.PI * 2);
+        const v = rand(3, 11);
+        sparks.push({ x: px, y: py, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: rand(26, 50), size: 1, spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+      }
+      start();
+    },
+  };
+}

@@ -2,6 +2,7 @@
 import { defaultCatalogue } from "@/data/catalogue";
 import share from "@/data/share.generated.json";
 import { madeFor, publicCatalogue } from "@/data/relations";
+import { resolveTheme, titleFontFile } from "@/data/themes";
 import type { Catalogue } from "@/data/types";
 import { bundleOf, LOCALE_INFO, localeOfPath, stripLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
@@ -28,7 +29,10 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
     const who = madeFor(c, found, t.common.privateCollector, (names) => listOf(LOCALE_INFO[locale].intl, names));
     // Its main photo on black (scripts/share-images.ts); a piece added since then shares the image of the site.
     const image = (share.pieces as Record<string, { src: string; width: number; height: number } | undefined>)[found.slug];
+    // The title font of its universe, loaded with the page (no change of the title once it is drawn).
+    const font = locale === "ar" ? null : titleFontFile(resolveTheme(found.theme));
     return {
+      ...(font ? { preloads: [{ href: font, as: "font" as const, type: "font/woff2" }] } : {}),
       title: found.title,
       description: clip(t.seo.pieceDescription(found.title, t.types[found.type], who) + " " + found.line + " " + found.story),
       ...(image ? { image: image.src, imageWidth: image.width, imageHeight: image.height } : {}),

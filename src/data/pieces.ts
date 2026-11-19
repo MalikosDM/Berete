@@ -310,7 +310,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "Two hands crossed in the gesture of his goal celebration, sculpted in volume and paved with white diamonds, with baguette-cut stones at the cuffs. A round medallion sits on the bail.",
     people: ["kenan-yildiz"],
-    theme: { preset: "facettes" },
+    theme: { preset: "bianconero" },
     cover: yoni("kenan-yildiz-celebration-pendant", "p07", at("Kenan Yildiz's pendant: two crossed hands paved with diamonds")),
     gallery: [
       yoni("kenan-yildiz-celebration-pendant", "p06", at("The celebration pendant from another angle")),
@@ -336,7 +336,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "A jersey sculpted in volume, arms crossed like its owner on the pitch, entirely set with diamonds. The Swiss cross sits on the chest and green stones run along the sleeve. Below, triangle-cut stones form the base, and the pendant hangs from a chain of diamond flowers.",
     people: ["noah-okafor"],
-    theme: { preset: "terrain" },
+    theme: { preset: "tunnel" },
     cover: yoni("noah-okafor-jersey-pendant", "p20", at("Noah Okafor's jersey pendant on a chain of diamond flowers")),
     gallery: [
       yoni("noah-okafor-jersey-pendant", "p18", at("The Swiss cross on the chest", "The Swiss cross")),
@@ -365,7 +365,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "The letters OKA in white diamonds, crossed by rose gold patches, with a sculpted football in rose gold set on the letters. It hangs from a diamond-set Cuban chain.",
     people: ["noah-okafor"],
-    theme: { preset: "terrain", tint: "#1f1410" },
+    theme: { preset: "tunnel", mark: "OKA" },
     cover: yoni("noah-okafor-oka-pendant", "p17", at("The OKA nameplate pendant of Noah Okafor on its Cuban chain")),
     gallery: [
       yoni("noah-okafor-oka-pendant", "p03", at("Close-up of the rose gold football", "The ball")),
@@ -393,7 +393,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "An octagonal pendant built from baguette-cut diamonds, crossed by lines of rose gold and set with pear-shaped stones. It is worn over several tennis chains, which came in a trunk with a photograph set in its lid.",
     people: ["noah-okafor"],
-    theme: { preset: "facettes" },
+    theme: { preset: "tunnel" },
     cover: yoni("noah-okafor-octagon-pendant", "p09", at("Noah Okafor's octagon pendant of baguette diamonds")),
     gallery: [
       yoni("noah-okafor-octagon-pendant", "p02", at("The octagon pendant on its tennis chain")),
@@ -424,7 +424,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "A gothic T of white diamonds and baguettes, with a rose gold serpent coiled around it. Its scales are pear-shaped diamonds, each in its own setting, and its eye is a red pear-shaped stone.",
     people: ["marcus-thuram"],
-    theme: { preset: "serpent" },
+    theme: { preset: "serpent", mark: "T" },
     cover: yoni("marcus-thuram-t-serpent-pendant", "p08", at("Marcus Thuram's T-Serpent pendant: a diamond T with a rose gold serpent")),
     gallery: [
       yoni("marcus-thuram-t-serpent-pendant", "p12", at("The serpent coiled around the T")),
@@ -474,7 +474,7 @@ const SITE_PIECES: Piece[] = [
     line: "A T in diamonds, wound with rose gold thorns.",
     story: "A dripping T paved with white diamonds, wound with branches of rose gold thorns from top to bottom.",
     people: ["marcus-thuram"],
-    theme: { preset: "roses", tint: "#2a1216" },
+    theme: { preset: "roses", tint: "#2a1216", font: "gothique", mark: "T" },
     cover: still("pieces/marcus-thuram-thorned-t-pendant/cover", at("Marcus Thuram's T pendant wound with rose gold thorns")),
     gallery: [
       st("thuram-ss23", 5, at("Film of the thorned T pendant")),
@@ -531,7 +531,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "His initials A and S, drawn into a shield and set with baguette and round diamonds. The back carries the BRT mark in rose gold. It hangs from a diamond tennis chain.",
     people: ["angelo-stiller"],
-    theme: { preset: "facettes", tint: "#2a0d10" },
+    theme: { preset: "stuttgart", mark: "AS" },
     cover: yoni("angelo-stiller-as-pendant", "p11", at("AS pendant, front view")),
     gallery: [
       yoni("angelo-stiller-as-pendant", "p07", at("Angelo Stiller's AS pendant on a diamond tennis chain")),
@@ -561,7 +561,7 @@ const SITE_PIECES: Piece[] = [
     line: "His initials, in baguettes framed with rose gold.",
     story: "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.",
     people: ["jamie-leweling"],
-    theme: { preset: "facettes", tint: "#2a0d10" },
+    theme: { preset: "stuttgart", mark: "JL" },
     cover: still("pieces/jamie-leweling-jl-pendant/cover", at("Jamie Leweling's JL pendant on its chain")),
     gallery: [
       st("jamie-leweling", 1, at("Film of the JL pendant")),
@@ -580,7 +580,7 @@ const SITE_PIECES: Piece[] = [
     line: "A letter in diamonds, an angel in rose gold.",
     story: "A tall letter L paved with white diamonds, with a cherub in rose gold resting in its corner.",
     people: ["deniz-undav"],
-    theme: { preset: "sacre" },
+    theme: { preset: "sacre", tint: "#331013", mark: "L" },
     cover: still("pieces/deniz-undav-l-pendant/cover", { ...at("Deniz Undav's L pendant with a rose gold cherub"), onBlack: true }),
     gallery: [st("deniz-undav", 3, at("Deniz Undav wearing the pendant, the DFB-Pokal in his arms", "Worn by Deniz Undav"))],
     specs: [
@@ -653,7 +653,7 @@ const SITE_PIECES: Piece[] = [
     line: "A gothic T over an M.",
     story: "His initials in gothic letters, the T set over the M, both set with diamonds. It is worn on a diamond-set Cuban chain in rose gold.",
     people: ["malik-tillman"],
-    theme: { preset: "facettes", tint: "#2a1a16", glow: "#e8b4a0" },
+    theme: { preset: "facettes", tint: "#2a1a16", glow: "#e8b4a0", font: "gothique", mark: "TM" },
     cover: still("pieces/malik-tillman-tm-pendant/cover", at("Malik Tillman's TM pendant")),
     gallery: [
       st("malik-tillman-ii", 4, at("The TM pendant held up in the light")),
@@ -675,7 +675,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "A round medallion paved with diamonds, its edge ribbed like a coin. The word FAM stands out in polished letters among rose gold roses, and marquise-cut diamonds are set in the flowers, one for each member of the family. It hangs from a diamond-set Cuban chain.",
     people: ["tanguy-nianzou"],
-    theme: { preset: "roses" },
+    theme: { preset: "roses", mark: "FAM" },
     cover: still("pieces/tanguy-nianzou-fam-medallion/cover", at("Tanguy Nianzou's FAM medallion on its Cuban chain")),
     gallery: [
       st("nz", 6, at("Close-up of the rose gold roses and a marquise diamond", "The roses")),
@@ -779,7 +779,7 @@ const SITE_PIECES: Piece[] = [
     line: "Script letters and a cross of baguettes.",
     story: "Script letters drawn in rose gold over a field of white diamonds, with a cross of baguette-cut stones at the centre and pear-shaped diamonds around.",
     people: ["lois-openda"],
-    theme: { preset: "sacre", tint: "#2b1913" },
+    theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
     cover: still("pieces/lois-openda-nameplate-pendant/cover", at("Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes")),
     gallery: [st("lois-openda", 2, at("Film of the pendant and its chain"))],
     specs: [
@@ -915,7 +915,7 @@ const SITE_PIECES: Piece[] = [
     story:
       "A necklace of diamond links shaped like infinity knots, with gothic T stations along the chain. At the front, a large T in baguettes with rose gold scrolls opens onto a drop that ends with a pear-shaped red stone framed in diamonds. The clasp carries the BRT mark, and the back of the T is engraved with a pattern of flowers.",
     people: ["marcus-thuram"],
-    theme: { preset: "velours" },
+    theme: { preset: "velours", font: "gothique", mark: "T" },
     cover: yoni("marcus-thuram-ruby-t-necklace", "p02", at("Marcus Thuram's T necklace: a gothic T with rose gold scrolls")),
     gallery: [
       yoni("marcus-thuram-ruby-t-necklace", "p03", at("The baguettes of the T, up close", "Baguettes")),
@@ -962,7 +962,7 @@ const SITE_PIECES: Piece[] = [
     line: "Twisted links, set with diamond flowers.",
     story: "A chain of twisted links in rose and yellow gold tones, set with diamond flowers along its length.",
     people: ["kevin-schade"],
-    theme: { preset: "maison", texture: "silk" },
+    theme: { preset: "maison", texture: "silk", font: "bodoni", entrance: "glint" },
     cover: st("kevin-schade", 3, at("Kevin Schade's twisted link chain laid in its box")),
     gallery: [
       st("kevin-schade", 14, at("Film of the twisted chain and its diamond flowers")),
@@ -983,7 +983,7 @@ const SITE_PIECES: Piece[] = [
     line: "Flowers of marquise diamonds, link after link.",
     story: "A chain whose links are flowers of marquise-cut diamonds in rose and white tones. The house introduced it as The Safi Link.",
     people: ["noah-okafor"],
-    theme: { preset: "roses" },
+    theme: { preset: "roses", glow: "#f6e2da" },
     cover: yoni("the-safi-link", "p07", at("The Safi Link chain on a black bust")),
     gallery: [
       yoni("the-safi-link", "p03", at("A flower of marquise and pear-shaped diamonds", "The flower")),

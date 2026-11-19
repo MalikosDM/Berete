@@ -1,0 +1,79 @@
+{
+ "backdrops": {
+  "dragon": {
+   "name": "Aura d'énergie (Dragon Ball)",
+   "ratio": 1.75,
+   "focusX": 0.5,
+   "focusY": 0.48,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ]
+  },
+  "butterfly": {
+   "name": "Métamorphose (chrysalide et papillons)",
+   "ratio": 1.75,
+   "focusX": 0.66,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ]
+  },
+  "inter": {
+   "name": "Stade de nuit (Inter Milan)",
+   "ratio": 1.75,
+   "focusX": 0.5,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ]
+  },
+  "vfb": {
+   "name": "Finale, fumée rouge (VfB Stuttgart)",
+   "ratio": 1.75,
+   "focusX": 0.5,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ]
+  },
+  "tunnel": {
+   "name": "Tunnel du vestiaire (Noah Okafor)",
+   "ratio": 1.75,
+   "focusX": 0.5,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ]
+  }
+ }
+}

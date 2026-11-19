@@ -85,7 +85,11 @@ export default function HorizontalGallery({
             >
               <button
                 type="button"
-                onClick={() => setOpenIndex(i)}
+                onClick={(e) => {
+                  // The universe of the piece may answer the opening of a photo (an impact: src/components/Universe.tsx).
+                  window.dispatchEvent(new CustomEvent("universe:impact", { detail: { x: e.clientX, y: e.clientY } }));
+                  setOpenIndex(i);
+                }}
                 className={"group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden " + (bare ? "" : "bg-ink")}
                 aria-label={t.gallery.open(item.alt ?? title)}
               >
