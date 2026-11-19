@@ -22,7 +22,8 @@
     "models:optimize": "tsx scripts/model-optimize.ts",
     "media:share": "tsx scripts/share-images.ts",
     "redirects": "tsx scripts/vercel-redirects.ts",
-    "universes": "node scripts/universe-media.mjs"
+    "universes": "node scripts/universe-media.mjs",
+    "cutouts": "node scripts/cutouts.mjs"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",

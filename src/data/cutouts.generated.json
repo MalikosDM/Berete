@@ -1,0 +1,945 @@
+{
+ "views": {
+  "kevin-schade-dragon-ball-pendant": [
+   {
+    "id": "p19",
+    "kind": "face",
+    "width": 1600,
+    "height": 2498,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 19.jpg",
+    "note": ""
+   },
+   {
+    "id": "p18",
+    "kind": "detail",
+    "width": 1600,
+    "height": 2324,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 18.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "back",
+    "width": 1600,
+    "height": 2570,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 06.jpg",
+    "note": ""
+   }
+  ],
+  "michy-batshuayi-butterfly-chain": [
+   {
+    "id": "p54",
+    "kind": "face",
+    "width": 1600,
+    "height": 2159,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
+    "note": ""
+   },
+   {
+    "id": "p68",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1550,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 68.jpg",
+    "note": ""
+   },
+   {
+    "id": "p60",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1285,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 60.jpg",
+    "note": ""
+   }
+  ],
+  "campione-d-italia-2023-2024": [
+   {
+    "id": "p40",
+    "kind": "face",
+    "width": 1600,
+    "height": 2013,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 40.jpg",
+    "note": ""
+   },
+   {
+    "id": "p43",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1569,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 43.jpg",
+    "note": ""
+   },
+   {
+    "id": "p15",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1705,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 15.jpg",
+    "note": ""
+   },
+   {
+    "id": "p44",
+    "kind": "detail",
+    "width": 1600,
+    "height": 2225,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 44.jpg",
+    "note": ""
+   },
+   {
+    "id": "p11",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1845,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 11.jpg",
+    "note": ""
+   }
+  ],
+  "vfb-stuttgart-dfb-pokal-2025": [
+   {
+    "id": "p13",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1668,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 13.jpg",
+    "note": ""
+   },
+   {
+    "id": "p17",
+    "kind": "face",
+    "width": 1600,
+    "height": 1960,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 17.jpg",
+    "note": ""
+   },
+   {
+    "id": "p16",
+    "kind": "profile",
+    "width": 1600,
+    "height": 2129,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 16.jpg",
+    "note": ""
+   },
+   {
+    "id": "p12",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1891,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 12.jpg",
+    "note": ""
+   },
+   {
+    "id": "p14",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1675,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 14.jpg",
+    "note": ""
+   }
+  ],
+  "noah-okafor-jersey-pendant": [
+   {
+    "id": "p20",
+    "kind": "face",
+    "width": 1600,
+    "height": 2635,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/32 Pendentif or rose ecusson/32 Pendentif or rose ecusson - 20.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "back",
+    "width": 1600,
+    "height": 2335,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/32 Pendentif or rose ecusson/32 Pendentif or rose ecusson - 06.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "worn",
+    "width": 1600,
+    "height": 2915,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/32 Pendentif or rose ecusson/32 Pendentif or rose ecusson - 02.jpg",
+    "note": ""
+   }
+  ],
+  "noah-okafor-oka-pendant": [
+   {
+    "id": "p17",
+    "kind": "face",
+    "width": 1600,
+    "height": 1452,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/34 Chaine cubaine glacee (2)/34 Chaine cubaine glacee (2) - 17.jpg",
+    "note": ""
+   },
+   {
+    "id": "p05",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1598,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/34 Chaine cubaine glacee (2)/34 Chaine cubaine glacee (2) - 05.jpg",
+    "note": "le « O » touche le bord de la photo : fondu à gauche"
+   }
+  ],
+  "noah-okafor-octagon-pendant": [
+   {
+    "id": "p09",
+    "kind": "face",
+    "width": 1600,
+    "height": 2445,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 09.jpg",
+    "note": ""
+   },
+   {
+    "id": "p10",
+    "kind": "back",
+    "width": 1600,
+    "height": 2297,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 10.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "detail",
+    "width": 1600,
+    "height": 2333,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 02.jpg",
+    "note": ""
+   },
+   {
+    "id": "p01",
+    "kind": "worn",
+    "width": 1600,
+    "height": 2241,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 01.jpg",
+    "note": ""
+   }
+  ],
+  "kenan-yildiz-celebration-pendant": [
+   {
+    "id": "p07",
+    "kind": "face",
+    "width": 1593,
+    "height": 2122,
+    "widths": [
+     480,
+     960,
+     1593
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 07.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1893,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 06.jpg",
+    "note": ""
+   },
+   {
+    "id": "p04",
+    "kind": "detail",
+    "width": 1549,
+    "height": 2120,
+    "widths": [
+     480,
+     960,
+     1549
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 04.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "profile",
+    "width": 1066,
+    "height": 2473,
+    "widths": [
+     480,
+     960,
+     1066
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 02.jpg",
+    "note": ""
+   }
+  ],
+  "marcus-thuram-t-serpent-pendant": [
+   {
+    "id": "p08",
+    "kind": "face",
+    "width": 1600,
+    "height": 2609,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/27 Pendentif croix/27 Pendentif croix - 08.jpg",
+    "note": ""
+   }
+  ],
+  "angelo-stiller-as-pendant": [
+   {
+    "id": "p11",
+    "kind": "face",
+    "width": 1600,
+    "height": 2626,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 11.jpg",
+    "note": ""
+   },
+   {
+    "id": "p10",
+    "kind": "back",
+    "width": 1600,
+    "height": 2966,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 10.jpg",
+    "note": ""
+   },
+   {
+    "id": "p07",
+    "kind": "detail",
+    "width": 1600,
+    "height": 2344,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 07.jpg",
+    "note": ""
+   },
+   {
+    "id": "p03",
+    "kind": "worn",
+    "width": 1600,
+    "height": 1949,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 03.jpg",
+    "note": ""
+   }
+  ],
+  "malik-tillman-cross-pendant": [
+   {
+    "id": "p17",
+    "kind": "face",
+    "width": 1600,
+    "height": 2389,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/21 Collier croix perles/21 Collier croix perles - 17.jpg",
+    "note": ""
+   },
+   {
+    "id": "p03",
+    "kind": "back",
+    "width": 1600,
+    "height": 2521,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/21 Collier croix perles/21 Collier croix perles - 03.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "worn",
+    "width": 1600,
+    "height": 1895,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/21 Collier croix perles/21 Collier croix perles - 06.jpg",
+    "note": ""
+   }
+  ],
+  "the-hand": [
+   {
+    "id": "p07",
+    "kind": "face",
+    "width": 1191,
+    "height": 2869,
+    "widths": [
+     480,
+     960,
+     1191
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/12 Pendentif main OK or rose/12 Pendentif main OK or rose - 07.jpg",
+    "note": ""
+   },
+   {
+    "id": "p04",
+    "kind": "detail",
+    "width": 1341,
+    "height": 3234,
+    "widths": [
+     480,
+     960,
+     1341
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/12 Pendentif main OK or rose/12 Pendentif main OK or rose - 04.jpg",
+    "note": ""
+   }
+  ],
+  "tulips-on-tour-medallion": [
+   {
+    "id": "p21",
+    "kind": "face",
+    "width": 1600,
+    "height": 2356,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/24 Bague rubis et baguettes/24 Bague rubis et baguettes - 21.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "back",
+    "width": 1600,
+    "height": 2284,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/24 Bague rubis et baguettes/24 Bague rubis et baguettes - 06.jpg",
+    "note": ""
+   }
+  ],
+  "marcus-thuram-ruby-t-necklace": [
+   {
+    "id": "p02",
+    "kind": "face",
+    "width": 1600,
+    "height": 2402,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 02.jpg",
+    "note": ""
+   },
+   {
+    "id": "p01",
+    "kind": "profile",
+    "width": 1600,
+    "height": 2400,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 01.jpg",
+    "note": ""
+   },
+   {
+    "id": "p12",
+    "kind": "detail",
+    "width": 1600,
+    "height": 2948,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 12.jpg",
+    "note": ""
+   }
+  ],
+  "the-safi-link": [
+   {
+    "id": "p07",
+    "kind": "face",
+    "width": 1600,
+    "height": 1760,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 07.jpg",
+    "note": ""
+   },
+   {
+    "id": "p05",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1740,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 05.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1549,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 02.jpg",
+    "note": ""
+   }
+  ],
+  "marcus-thuram-thorned-t-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 615,
+    "height": 849,
+    "widths": [
+     480,
+     615
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "site /media/pieces/marcus-thuram-thorned-t-pendant/cover.webp",
+    "note": ""
+   }
+  ],
+  "deniz-undav-l-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 1008,
+    "height": 1784,
+    "widths": [
+     480,
+     960,
+     1008
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/pieces/deniz-undav-l-pendant/cover.webp",
+    "note": ""
+   }
+  ],
+  "samuel-ballet-jesus-piece": [
+   {
+    "id": "s02",
+    "kind": "face",
+    "width": 1127,
+    "height": 2037,
+    "widths": [
+     480,
+     960,
+     1127
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/stories/samuel-ballet/02.webp",
+    "note": ""
+   },
+   {
+    "id": "s06",
+    "kind": "back",
+    "width": 959,
+    "height": 1779,
+    "widths": [
+     480,
+     959
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/stories/samuel-ballet/06.webp",
+    "note": ""
+   }
+  ],
+  "malik-tillman-tm-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 753,
+    "height": 974,
+    "widths": [
+     480,
+     753
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/pieces/malik-tillman-tm-pendant/cover.webp",
+    "note": ""
+   }
+  ],
+  "tanguy-nianzou-fam-medallion": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 529,
+    "height": 702,
+    "widths": [
+     480,
+     529
+    ],
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "site /media/pieces/tanguy-nianzou-fam-medallion/cover.webp",
+    "note": ""
+   }
+  ],
+  "eljero-elia-clover-medallion": [
+   {
+    "id": "s04",
+    "kind": "face",
+    "width": 689,
+    "height": 2001,
+    "widths": [
+     480,
+     689
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/stories/eljero-elia/04.webp",
+    "note": ""
+   },
+   {
+    "id": "s05",
+    "kind": "profile",
+    "width": 488,
+    "height": 1876,
+    "widths": [
+     480,
+     488
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/stories/eljero-elia/05.webp",
+    "note": ""
+   }
+  ],
+  "sirius": [
+   {
+    "id": "s01",
+    "kind": "face",
+    "width": 1123,
+    "height": 1262,
+    "widths": [
+     480,
+     960,
+     1123
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "site /media/pieces/sirius/01.webp",
+    "note": ""
+   }
+  ]
+ }
+}
