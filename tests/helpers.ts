@@ -121,7 +121,8 @@ export async function checkPage(page: Page, info: TestInfo, path: string, name: 
   for (let y = 0; y < height; y += vh) await scrollTo(page, y);
   for (const [i, y] of positions.entries()) {
     await scrollTo(page, y);
-    await page.screenshot({ path: shotPath(info, name + (shots > 1 ? "-" + (i + 1) : "")), type: "jpeg", quality: 60 });
+    // A page with a 3D viewer draws slowly without a graphics card (the test browser): more time for its screenshots.
+    await page.screenshot({ path: shotPath(info, name + (shots > 1 ? "-" + (i + 1) : "")), type: "jpeg", quality: 60, timeout: 45_000 });
   }
   await scrollTo(page, 0);
   expect(await overflow(page), "horizontal overflow on " + path).toEqual([]);

@@ -49,6 +49,11 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   - Tout se règle dans l'admin (« Univers de la page » : univers, fond IA ou image envoyée, police, entrée, effets,
     filigrane, couleurs, texture, lumière, avec un aperçu et « Rejouer l'entrée »). Sans thème : l'univers de la Maison.
     L'accent reste l'or rose ; rien ne bouge avec « réduire les animations ».
+- **L'ouverture d'une pièce** : son bijou détouré (`npm run cutouts` : photos HD du disque, détourage de macOS affiné
+  par `scripts/cutouts.py`, fondu d'une chaîne qui sort de la photo, WebP transparents dans `public/media/cutouts`,
+  `src/data/cutouts.generated.json`), seul ou en **vitrine multi-vues** (`src/components/Showcase.tsx`, règles dans
+  `src/data/showcase.ts`) ; une pièce sans détourage garde sa photo. Admin : « Vitrine de l'ouverture » dans la fiche de la
+  pièce, onglet « Détourages » pour tout vérifier et exclure une vue.
 - **Le bouton de chaque pièce** est « Enter the World » / « Entrer dans l'univers » (cartes, sélection, écrins).
   La ligne « Precious Materials » (avant « Metal and stones ») de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
   montrent (couleur du métal, tailles et couleurs des pierres, sans carats ni poids) ; elle est absente quand les photos

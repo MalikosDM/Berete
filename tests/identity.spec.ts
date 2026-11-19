@@ -6,6 +6,7 @@ import { defaultCatalogue } from "../src/data/catalogue";
 import { HOUSE_PHOTO_PLACES } from "../src/data/house";
 import { REMOVED_PIECES } from "../src/data/pieces";
 import { removedPieceTarget } from "../src/data/relations";
+import { CUTOUTS, resolveShowcase } from "../src/data/showcase";
 import { resolveTheme } from "../src/data/themes";
 import { fr as houseFr } from "../src/i18n/house/fr";
 import { getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
@@ -211,10 +212,10 @@ test("each piece enters its own world: its universe, readable texts (AA), still 
   for (const piece of cat.pieces) {
     await page.goto("/pieces/" + piece.slug, { waitUntil: "load" });
     // Once its entrance has played.
-    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 8000 });
+    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     await page.waitForTimeout(400);
     await expect(page.locator("[data-universe]"), piece.slug).toHaveAttribute("data-universe", resolveTheme(piece.theme).preset);
-    await page.screenshot({ path: shotPath(info, "univers-" + piece.slug), type: "jpeg", quality: 62 });
+    await page.screenshot({ path: shotPath(info, "univers-" + piece.slug), type: "jpeg", quality: 62, timeout: 45_000 });
     // The texts of the opening, hidden, to measure the background they sit on.
     const opening = page.locator("[data-piece-opening]");
     // (a title painted with a gradient, gold or pearl, is text too: its gradient goes with it).
@@ -266,7 +267,7 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
     await page.waitForTimeout(700);
     await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-1"), type: "jpeg", quality: 62 });
     // The entrance ends; the backdrop is there, the effects run.
-    await expect(article, slug).not.toHaveAttribute("data-entering", "", { timeout: 8000 });
+    await expect(article, slug).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     // Its file: landscape on a computer, the portrait crop on a phone.
     await expect.poll(() => page.locator(".u-backdrop img").evaluate((i: HTMLImageElement) => (i.complete && i.naturalWidth > 0 ? i.currentSrc : "")), { message: slug + " backdrop" }).toMatch(
       new RegExp("/media/universes/" + backdrop + (info.project.name === "desktop" ? "-\\d+" : "-m-\\d+") + "\\.(avif|webp)$"),
@@ -286,6 +287,67 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
   await first.click();
   await expect(page.locator("body > .u-impact")).toHaveCount(1);
   await page.keyboard.press("Escape");
+  expect(problems.errors).toEqual([]);
+});
+
+test("the opening: every jewel whole on screen (cut out, one view or a showcase), a click or a swipe changes the view", async ({ page }, info) => {
+  const problems = watch(page);
+  await skipIntro(page);
+  const cat = await getCatalogue(page);
+  const cut: string[] = [];
+  for (const piece of cat.pieces) {
+    await page.goto("/pieces/" + piece.slug, { waitUntil: "load" });
+    await expect(page.locator("article[data-piece]"), piece.slug).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
+    const shown = resolveShowcase(piece.slug, piece.showcase);
+    await expect(page.locator("[data-showcase]"), piece.slug).toHaveCount(shown.mode === "photo" ? 0 : 1);
+    if (shown.mode !== "photo") await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase", shown.mode);
+    await page.waitForTimeout(500);
+    // The drawn image of each visible view (object-fit: contain) inside the screen: under the menu, above the bottom bar.
+    const out = await page.evaluate(() => {
+      const visible = (el: Element) => el.getClientRects().length > 0 && (el as HTMLElement).offsetParent !== null;
+      const header = document.querySelector("header")!.getBoundingClientRect().bottom;
+      const bar = [...document.querySelectorAll("div.fixed.bottom-0")].find(visible);
+      const floor = bar ? bar.getBoundingClientRect().top : innerHeight;
+      const imgs = [...document.querySelectorAll<HTMLImageElement>("[data-piece-cover] img")].filter((i) => visible(i) && i.complete && !i.closest('[data-showcase-slide]:not([data-showcase-slide="0"])'));
+      return imgs.flatMap((img) => {
+        const b = img.getBoundingClientRect();
+        const k = Math.min(b.width / img.naturalWidth, b.height / img.naturalHeight);
+        const w = img.naturalWidth * k;
+        const h = img.naturalHeight * k;
+        const r = { left: b.left + (b.width - w) / 2, top: b.top + (b.height - h) / 2, right: b.left + (b.width + w) / 2, bottom: b.top + (b.height + h) / 2 };
+        const bad = [r.top < header + 6 && "top", r.bottom > floor - 6 && "bottom", r.left < 6 && "left", r.right > innerWidth - 6 && "right"].filter(Boolean);
+        return bad.length ? [img.closest("[data-showcase-view]")?.getAttribute("data-showcase-view") ?? "photo", ...bad] : [];
+      });
+    });
+    if (out.length) cut.push(piece.slug + ": " + out.join(" "));
+    // The dots of a phone never over the title.
+    const dots = page.locator("[data-showcase-dots]");
+    if ((await dots.count()) && (await dots.isVisible())) expect((await dots.boundingBox())!.y + 48, piece.slug).toBeLessThanOrEqual((await page.locator("[data-u-title]").boundingBox())!.y);
+  }
+  expect(cut, "jewels cut by the screen").toEqual([]);
+
+  await page.goto("/pieces/vfb-stuttgart-dfb-pokal-2025", { waitUntil: "load" });
+  await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
+  if (info.project.name === "desktop") {
+    // A click on a view around: it takes the middle, the main one takes its place.
+    const main = await page.locator('[data-place="0"]').getAttribute("data-showcase-view");
+    const other = page.locator('[data-place="2"]');
+    const id = await other.getAttribute("data-showcase-view");
+    await other.click();
+    await expect(page.locator('[data-place="0"]')).toHaveAttribute("data-showcase-view", id!);
+    await expect(page.locator('[data-showcase-view="' + main + '"]')).toHaveAttribute("data-place", "2");
+    await page.waitForTimeout(1200);
+    await page.screenshot({ path: shotPath(info, "vitrine-clic"), type: "jpeg", quality: 62 });
+  } else {
+    // A swipe (the track scrolls): the dot follows; a dot brings its view.
+    const track = page.locator("[data-showcase-track]");
+    await track.evaluate((t) => t.scrollTo({ left: t.clientWidth, behavior: "auto" }));
+    await expect(page.locator("[data-showcase-dots] button").nth(1)).toHaveAttribute("aria-current", "true");
+    await page.locator("[data-showcase-dots] button").nth(2).click();
+    await expect.poll(() => track.evaluate((t) => Math.round(Math.abs(t.scrollLeft) / t.clientWidth))).toBe(2);
+    await expect(page.locator("[data-showcase-dots] button").nth(2)).toHaveAttribute("aria-current", "true");
+    await page.screenshot({ path: shotPath(info, "vitrine-glisser"), type: "jpeg", quality: 62 });
+  }
   expect(problems.errors).toEqual([]);
 });
 
@@ -322,6 +384,8 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   const theme = page.locator("[data-theme-field]");
   await expect(theme).toBeVisible();
   await expect(theme.locator("select").first()).toHaveValue("energie");
+  // Its showcase: automatic (the showcase of the priority universes), its views in their order.
+  await expect(page.locator("[data-showcase-field] [data-showcase-choice]")).toHaveCount(CUTOUTS["kevin-schade-dragon-ball-pendant"]!.length);
   await expect(page.getByLabel(/Publiée sur le site/)).toBeChecked();
   await theme.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1600);
@@ -343,5 +407,19 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await portrait.getByRole("button", { name: "Retirer" }).click();
   await expect(portrait.getByText("Enregistré.")).toBeVisible();
   await expect(portrait.locator("img")).toHaveCount(0);
+  // The cutouts: every view on a checkerboard and on black; one excluded, gone from the page, then brought back.
+  await page.getByRole("tab", { name: "Détourages" }).click();
+  await expect(page.locator("[data-cutouts-piece]")).toHaveCount(Object.keys(CUTOUTS).length);
+  await page.screenshot({ path: shotPath(info, "admin-5-detourages"), type: "jpeg", quality: 70 });
+  const view = page.locator("[data-cutout='kevin-schade-dragon-ball-pendant/p18']");
+  await view.getByRole("button", { name: "Exclure" }).click();
+  await expect(view).toHaveAttribute("data-cutout-excluded", "");
+  const piecePage = await page.context().newPage();
+  await piecePage.goto("/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
+  await expect(piecePage.locator("[data-showcase]")).toHaveCount(1);
+  await expect(piecePage.locator('[data-showcase-view="p18"]')).toHaveCount(0, { timeout: 20_000 });
+  await piecePage.close();
+  await view.getByRole("button", { name: "Rétablir" }).click();
+  await expect(view).not.toHaveAttribute("data-cutout-excluded", "");
   expect(problems.errors).toEqual([]);
 });
