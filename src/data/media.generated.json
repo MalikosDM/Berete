@@ -609,14 +609,14 @@
     "home": {
       "desktop": {
         "count": 332,
-        "width": 1280,
-        "height": 720,
+        "width": 1920,
+        "height": 1080,
         "path": "/media/home/frames-desktop/"
       },
       "mobile": {
         "count": 166,
-        "width": 504,
-        "height": 896,
+        "width": 608,
+        "height": 1080,
         "path": "/media/home/frames-mobile/"
       },
       "video": "/media/home/scrub.mp4",
@@ -625,14 +625,14 @@
     "process": {
       "desktop": {
         "count": 361,
-        "width": 1280,
-        "height": 720,
+        "width": 1920,
+        "height": 1080,
         "path": "/media/process/frames-desktop/"
       },
       "mobile": {
         "count": 181,
-        "width": 504,
-        "height": 896,
+        "width": 608,
+        "height": 1080,
         "path": "/media/process/frames-mobile/"
       },
       "video": "/media/process/scrub.mp4",

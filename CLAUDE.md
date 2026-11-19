@@ -113,7 +113,7 @@ fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, emai
 - [x] Saut de mise en page au chargement (CLS 0,15 sur /fr → 0) ; étiquettes des boutons pour lecteur d'écran ;
   « Made for a private collector ».
 - 18 photos principales de pièces sur 35 font moins de 900 px de large (captures de stories) : floues sur grand écran.
-- Images du film de l'accueil en 1280 × 720 : un peu douces sur grand écran (la vidéo source est en 1080p).
+- [x] Films de l'accueil et de /process en pleine résolution (1920 × 1080, téléphones 608 × 1080) : nets sur grand écran (19/11/2026).
 - Les messages des formulaires (contact, rappel) restent dans l'admin : aucune alerte à Yoni → ajouter une alerte.
 - Admin : pas de limite d'essais de mot de passe, session sans expiration.
 - Toute la version Vercel est en « noindex » (vercel.json) : à retirer le jour du lancement.

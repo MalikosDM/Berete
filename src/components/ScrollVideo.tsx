@@ -146,6 +146,9 @@ export default function ScrollVideo({ media, steps, label, heightVh = 700, overl
       const dh = img.naturalHeight * scale;
       ctx.fillStyle = "#0a0a0a";
       ctx.fillRect(0, 0, w, h);
+      // The best scaling the browser has (the default one is the fastest, and the softest).
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
       ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
     },
     [set.count],

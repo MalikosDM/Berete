@@ -67,9 +67,10 @@ const VIDEO = { maxW: 720, maxH: 1280, crf: 26, audio: "128k", maxFps: 30 };
 const PHOTO = { maxW: 1080, quality: 80 };
 const POSTER = { maxW: 720, quality: 72 };
 const FRAMES = {
-  desktop: { w: 1280, h: 720, quality: 65, fps: 24 },
-  // Portrait phones: the centre of the frame, at half the frame rate.
-  mobile: { w: 504, h: 896, quality: 55, fps: 12 },
+  // The full resolution of the films (1920 x 1080): drawn on large and retina screens, a smaller frame looks soft.
+  desktop: { w: 1920, h: 1080, quality: 75, fps: 24 },
+  // Portrait phones: the centre of the frame at its own size (608 x 1080), at half the frame rate.
+  mobile: { w: 608, h: 1080, quality: 65, fps: 12 },
 };
 // A warm black and white, so the blue bench of the atelier stays in the palette.
 const WARM_BW = "format=gray,format=rgb24,colorchannelmixer=rr=1:gg=0.93:bb=0.82";
