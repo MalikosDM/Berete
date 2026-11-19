@@ -22,9 +22,10 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 ## Règles non négociables
 - Couleurs : noir #0A0A0A, blanc #FFFFFF / #F4F2EF, accent unique **or rose métallique** (#9C5B4F → #E8B4A0 → #B76E79)
   pour les boutons, liens et traits. **Aucun bleu** dans l'interface (le bleu des photos Inter est normal).
-  Exception voulue par Yoni : chaque pièce a son **univers** (fond, couleurs, texture, lumière, animation :
-  `src/data/themes.ts`) ; ses couleurs vivent seulement dans le fond de sa page, toujours sombres (textes en contraste
-  AA), et l'univers Inter a un **fond bleu nuit très sombre** (identité de la pièce).
+  Exception voulue par Yoni : chaque pièce a son **univers** (`src/data/themes.ts`, modifiable dans l'admin) : fond
+  plein écran (fond IA, sinon composition), police du titre, entrée cinématique (une seule fois par visite), effets au
+  scroll, filigrane. Ses couleurs vivent seulement dans le fond, le titre et les effets, toujours sombres derrière les
+  textes (contraste AA) ; boutons et liens restent en or rose. L'univers Inter a un **fond bleu nuit** (stade de nuit).
 - Lisibilité mobile : texte ≥ 16 px, contrastes AA, boutons ≥ 48 px.
 - Vidéos de l'accueil et de /process pilotées par le scroll (jamais d'autoplay ni de boucle).
 - Ne jamais inventer de chiffres (carats, poids, prix, heures) : textes des pièces = brouillons à faire valider par Yoni.
@@ -44,6 +45,10 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
   icloud/` (35 dossiers « NN Nom », noms donnés d'après les photos, pas par Yoni ; `00 Contexte Yoni` = ses textes :
   wording, biographie, citations, pièces à retirer). Choix des photos : `scripts/hd-media.mjs`, puis
   `npm run import-media -- --only=hd`. Ne jamais modifier ces fichiers.
+- Photos des joueurs en maillot : `00 Contexte Yoni/Photos joueurs en maillot/` (un dossier par joueur, cadrages dans
+  `scripts/player-media.mjs`, puis `npm run import-media -- --only=players`). Fonds IA des univers :
+  `00 Contexte Yoni/Univers IA (propositions)/` → `npm run universes` (agrandis à 2560 px par Swin2SR, originaux
+  agrandis dans `.local/universes`, jamais dans Git ; polices libres copiées dans `public/fonts/universe`).
 - Photos personnelles de Yoni pour La Maison : `~/Desktop/Berete - La Maison/` (voir LISEZ-MOI), ou l'admin.
 - Médias des stories (Instagram, triés) : `~/Desktop/Berete - Stories/` (30 dossiers « NN Nom », couvertures dans
   `00 Couvertures`). Relancer `npm run import-media` après ajout.
@@ -68,6 +73,20 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Un univers par pièce** (29 pièces publiées) : thème modifiable dans l'admin (« Univers de la page »).
 - [ ] Yoni : nommer les 15 brouillons (liste dans le rapport du 19/11), envoyer ses photos personnelles pour La Maison,
       relire les textes (dont les traductions), confirmer les droits Dragon Ball.
+
+## Passe « portraits et univers immersifs » — état au 19/11/2026
+- [x] **Portraits** : 17 joueurs avec une photo HD en maillot (Eljero Elia sans maillot, avec son trèfle), cadrée sur
+      le visage et le maillot (4:5), étalonnage de série léger, champ « Photo de profil » de l'admin rempli ; photos en plus
+      dans « En images » sur leur page. Gardés : Angelo Stiller (initiales : photo trop petite, de dos), Sambi Lokonga et
+      Tanguy Nianzou (captures de stories). Keita Losene (MMA) dans « Athlètes », sans club.
+- [x] **Univers immersifs** sur les 29 pièces publiées : 5 fonds IA (Dragon Ball, Butterfly, Inter, VfB, tunnel
+      d'Okafor pour ses 3 pièces) ; 13 polices de titre libres ; entrées (flash d'énergie, fumée qui se dissipe, vingt
+      étoiles, envol de papillons, lumières du tunnel, projecteur, éclat, pétales, pluie, rouages) ; effets au scroll
+      (braises, éclairs, lignes de vitesse, papillons, confettis, pétales, étoiles, brume) ; impact à l'ouverture d'une
+      photo (Dragon Ball) ; filigranes (力, OKA, T, AS, JL, L, TM, FAM). Admin « Univers de la page » : univers, fond (IA,
+      image envoyée ou composition), police, entrée, effets, filigrane, couleurs, texture, lumière, « Rejouer l'entrée ».
+- [ ] Yoni : valider les fonds IA et l'ambiance de chaque univers ; droits des photos des joueurs (photos d'agences et
+      de clubs) ; photo HD d'Angelo Stiller ; fonds IA des 22 autres pièces à générer (idées dans le rapport du 19/11).
 
 ## Ce que Yoni a demandé le 9/11 — état au 13/11/2026
 - [x] Stories façon Instagram, pages pièces avec histoire et fabrication, 6 langues, page Process, contact WhatsApp.

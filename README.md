@@ -32,13 +32,23 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni (`REMOVED_PIECES`) et les 15
   **brouillons** créés depuis ses dossiers de photos qui ne correspondent à aucune pièce (`DRAFTS` dans
   `src/data/pieces.ts` : titre provisoire = nom du dossier, « Made for » à valider, galerie déjà remplie).
-- **L'univers de chaque pièce** (`theme` d'une pièce, `src/data/themes.ts`, dessiné par `src/components/Universe.tsx` et
-  `.universe` dans `src/index.css`) : la page garde sa structure, mais son fond, ses couleurs, sa texture, sa lumière et
-  une animation lente suivent l'identité de la pièce (énergie pour Dragon Ball, métamorphose pour Butterfly, bleu nuit et
-  rayures pour l'Inter…). Un préréglage (16 univers) et, au besoin, ses couleurs, sa texture, sa lumière, son animation :
-  modifiables dans l'admin (« Univers de la page », avec un aperçu). Sans thème : l'univers de la Maison. L'accent reste
-  l'or rose, les textes restent sur un fond sombre (contrôlé en AA par les tests), rien ne bouge avec « réduire les
-  animations ».
+- **L'univers de chaque pièce** (`theme` d'une pièce, `src/data/themes.ts`, dessiné par `src/components/Universe.tsx`,
+  `src/components/universe/fx.ts` et `.universe` dans `src/index.css`) : la page garde sa structure, mais on entre dans le
+  monde de la pièce.
+  - **Fond plein écran** : un fond IA quand il existe (`npm run universes` : les propositions du disque externe agrandies à
+    2560 px par `scripts/universe-upscale.py` (Swin2SR, torch + transformers), puis AVIF/WebP en 3 largeurs et un cadrage
+    portrait pour téléphone, `src/data/universes.generated.json`), sinon une composition (couleurs, lumière, texture,
+    brume, particules). Il recule dans la profondeur pendant le scroll ; un voile garde les textes en AA.
+  - **Police du titre** : 13 polices libres (OFL, `public/fonts/universe`, licences dans `LICENSES.txt`), annoncées par un
+    `<link rel="preload">` sur la page de la pièce (aucun saut du titre).
+  - **Entrée cinématique** (1 à 2 s, CSS, `[data-entering]`) : jouée à la première visite de la pièce dans la session,
+    jamais au retour ; elle attend la fin de l'intro du site (`html[data-intro]`) ; les textes sont lisibles tout de suite.
+  - **Effets** : un canvas chargé après le contenu (braises, éclairs, lignes de vitesse, papillons, confettis, pétales,
+    étoiles, poussière, éclats), qui répond à la vitesse du scroll, moins de la moitié des particules sur téléphone ; plus
+    des couches CSS (brume, reflets irisés, pluie, vingt étoiles de l'Inter) et l'impact à l'ouverture d'une photo.
+  - Tout se règle dans l'admin (« Univers de la page » : univers, fond IA ou image envoyée, police, entrée, effets,
+    filigrane, couleurs, texture, lumière, avec un aperçu et « Rejouer l'entrée »). Sans thème : l'univers de la Maison.
+    L'accent reste l'or rose ; rien ne bouge avec « réduire les animations ».
 - **Le bouton de chaque pièce** est « Enter the World » / « Entrer dans l'univers » (cartes, sélection, écrins).
   La ligne « Precious Materials » (avant « Metal and stones ») de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
   montrent (couleur du métal, tailles et couleurs des pierres, sans carats ni poids) ; elle est absente quand les photos
@@ -52,9 +62,13 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   quand on descend, revient dès qu'on remonte (pas quand le film glisse tout seul vers une phrase) et jamais sur le pied
   de page. Chaque phrase du film a un halo sombre derrière elle.
 - **Les joueurs** : un mur de portraits (photo, nom, club, Instagram) sur `/players` et sur l'accueil. La photo : celle
-  envoyée dans l'admin (« Photo de profil »), sinon la meilleure photo des stories recadrée sur la personne (`PORTRAITS`
-  dans `scripts/piece-media.mjs`, faite par `npm run import-media`), sinon ses initiales en or rose. Le pseudo
-  Instagram se met dans l'admin (aucun n'est rempli d'office).
+  de l'admin (« Photo de profil » ; par défaut sa photo en maillot), sinon sa photo en maillot, sinon la meilleure photo
+  des stories recadrée sur la personne (`PORTRAITS` dans `scripts/piece-media.mjs`), sinon ses initiales en or rose. Les
+  photos en maillot envoyées par Yoni (disque externe, `00 Contexte Yoni/Photos joueurs en maillot`, `BERETE_PLAYERS_DIR`)
+  sont choisies et recadrées en 4:5 dans `scripts/player-media.mjs` (la première = le portrait, les autres vont dans
+  « In Pictures » sur la page du joueur), avec un même étalonnage léger pour toute la série :
+  `npm run import-media -- --only=players` → `public/media/players/<slug>.webp`, `<slug>-2.webp`… (1080 × 1350 au plus).
+  Le pseudo Instagram se met dans l'admin (aucun n'est rempli d'office).
 - **La Maison** (`/about`, `src/pages/About.tsx`) : l'histoire de Yoni Berete en 12 chapitres, son texte français tel
   quel (`src/i18n/house/fr.ts`, tiré de son fichier), traduit dans les autres langues (`src/i18n/house/<langue>.ts`), et
   ses trois citations (01 L'Identité, 02 La Philosophie, 03 Le Parcours). Chaque chapitre, chaque citation et le haut de

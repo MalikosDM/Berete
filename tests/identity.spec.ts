@@ -205,16 +205,22 @@ const contrast = (a: number, b: number) => (Math.max(a, b) + 0.05) / (Math.min(a
 
 test("each piece enters its own world: its universe, readable texts (AA), still when motion is reduced", async ({ page }, info) => {
   const problems = watch(page);
+  await skipIntro(page);
   const cat = await getCatalogue(page);
   const low: string[] = [];
   for (const piece of cat.pieces) {
     await page.goto("/pieces/" + piece.slug, { waitUntil: "load" });
-    await page.waitForTimeout(2100);
+    // Once its entrance has played.
+    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 8000 });
+    await page.waitForTimeout(400);
     await expect(page.locator("[data-universe]"), piece.slug).toHaveAttribute("data-universe", resolveTheme(piece.theme).preset);
     await page.screenshot({ path: shotPath(info, "univers-" + piece.slug), type: "jpeg", quality: 62 });
     // The texts of the opening, hidden, to measure the background they sit on.
     const opening = page.locator("[data-piece-opening]");
-    await page.addStyleTag({ content: "[data-piece-opening] p, [data-piece-opening] h1, [data-piece-opening] p * { color: transparent !important; text-shadow: none !important; }" });
+    // (a title painted with a gradient, gold or pearl, is text too: its gradient goes with it).
+    await page.addStyleTag({
+      content: "[data-piece-opening] p, [data-piece-opening] h1, [data-piece-opening] p * { color: transparent !important; text-shadow: none !important; background: none !important; filter: none !important; }",
+    });
     await page.waitForTimeout(100);
     // The lightest texts of the opening (mist and rose gold) against the lightest part of their background.
     const textLum = luminance(0xe8, 0xb4, 0xa0);
@@ -230,7 +236,56 @@ test("each piece enters its own world: its universe, readable texts (AA), still 
   await page.goto("/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
   expect(await page.locator(".universe-stage").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
   expect(await page.locator(".u-light").evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
-  await expect(page.locator(".u-motion")).toBeHidden();
+  expect(await page.locator("[data-piece-cover] img").first().evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  await expect(page.locator(".u-entrance")).toBeHidden();
+  await expect(page.locator(".u-fx")).toBeHidden();
+  await page.waitForTimeout(1500);
+  expect(await page.locator(".u-fx").evaluate((el) => el.hasAttribute("data-running"))).toBe(false);
+  expect(problems.errors).toEqual([]);
+});
+
+test("entering the world: the AI backdrop, the title typography, a cinematic entrance once per visit, the effects", async ({ page }, info) => {
+  const problems = watch(page);
+  await skipIntro(page);
+  const cases: [slug: string, backdrop: string, font: string][] = [
+    ["kevin-schade-dragon-ball-pendant", "dragon", "Shojumaru"],
+    ["michy-batshuayi-butterfly-chain", "butterfly", "Italiana"],
+    ["campione-d-italia-2023-2024", "inter", "Cinzel"],
+    ["vfb-stuttgart-dfb-pokal-2025", "vfb", "Grenze Gotisch"],
+    ["noah-okafor-jersey-pendant", "tunnel", "Big Shoulders Display"],
+  ];
+  for (const [slug, backdrop, font] of cases) {
+    await page.goto("/pieces/" + slug, { waitUntil: "load" });
+    const article = page.locator("article[data-piece]");
+    await expect(article, slug).toHaveAttribute("data-entering", "");
+    await expect(page.locator(".universe"), slug).toHaveAttribute("data-backdrop", backdrop);
+    // The title font, announced in the page and really loaded (never a fallback that would change the title).
+    await expect(page.locator(`link[rel="preload"][as="font"][href^="/fonts/universe/"]`), slug).toHaveCount(1);
+    expect(await page.locator("[data-u-title]").evaluate((el) => getComputedStyle(el).fontFamily), slug).toContain(font);
+    await expect.poll(() => page.evaluate((f) => [...document.fonts].some((x) => x.family.replace(/"/g, "") === f && x.status === "loaded"), font), { message: slug + " font" }).toBe(true);
+    await page.waitForTimeout(700);
+    await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-1"), type: "jpeg", quality: 62 });
+    // The entrance ends; the backdrop is there, the effects run.
+    await expect(article, slug).not.toHaveAttribute("data-entering", "", { timeout: 8000 });
+    // Its file: landscape on a computer, the portrait crop on a phone.
+    await expect.poll(() => page.locator(".u-backdrop img").evaluate((i: HTMLImageElement) => (i.complete && i.naturalWidth > 0 ? i.currentSrc : "")), { message: slug + " backdrop" }).toMatch(
+      new RegExp("/media/universes/" + backdrop + (info.project.name === "desktop" ? "-\\d+" : "-m-\\d+") + "\\.(avif|webp)$"),
+    );
+    await expect(page.locator(".u-fx"), slug).toHaveAttribute("data-running", "", { timeout: 10_000 });
+    await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-2"), type: "jpeg", quality: 62 });
+  }
+  // A return to a piece already entered: no entrance again.
+  await page.goto("/pieces/campione-d-italia-2023-2024", { waitUntil: "load" });
+  await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 1500 });
+  await expect(page.locator(".u-twenty > span")).toHaveCount(20);
+  // Dragon Ball: the watermark 力, and opening a photo strikes like an impact.
+  await page.goto("/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
+  await expect(page.locator(".u-mark[data-brush]")).toHaveText("力");
+  const first = page.locator("#piece-details button").first();
+  await first.scrollIntoViewIfNeeded();
+  await first.click();
+  await expect(page.locator("body > .u-impact")).toHaveCount(1);
+  await page.keyboard.press("Escape");
   expect(problems.errors).toEqual([]);
 });
 
