@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Maximize2, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ArrowRight, Maximize2, X, ZoomIn } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
+import { Lightbox } from "@/components/HorizontalGallery";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import { media } from "@/data/catalogue";
+import { FEATURED_BOX } from "@/data/pieces";
 import type { Box, MediaItem } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -19,7 +22,9 @@ export default function Atelier() {
   const STEPS = t.atelier.steps;
   const reduced = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
-  const setting = media.videos["atelier/setting"];
+  // The opening film: a horizontal shot of a piece assembled at the bench (Yoni's films, scripts/hd-media.mjs), in the
+  // warm black and white of the atelier; the earlier vertical film when it is missing.
+  const setting = media.hd?.["atelier"]?.["v12"] ?? media.videos["atelier/setting"];
   const photos: MediaItem[] = media.groups["atelier"] ?? [];
 
   // Each step opens through a mask, with a light parallax.
@@ -148,10 +153,59 @@ function CreateBox() {
   );
 }
 
+/**
+ * The trunk of the house shown first (FEATURED_BOX, src/data/pieces.ts): all its photos, each opening full screen, and
+ * the invitation to commission one.
+ */
+function FeaturedTrunk({ box }: { box: Box }) {
+  const { t } = useI18n();
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section aria-labelledby="featured-trunk-title" data-featured-box={box.slug} className="mx-auto max-w-[1600px] px-5 pb-24 sm:px-8 lg:px-12 lg:pb-36">
+      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-7">
+          {box.images.map((m, i) => (
+            <li key={m.src} className={i === 0 ? "col-span-2 row-span-2" : ""}>
+              <button
+                type="button"
+                onClick={() => setOpen(i)}
+                aria-label={t.gallery.open(m.alt ?? box.name)}
+                data-trunk-photo={i + 1}
+                className="group relative block aspect-[2/3] h-full w-full cursor-zoom-in overflow-hidden bg-ink-soft"
+              >
+                <MediaView item={m} alt="" fit="cover" priority={i === 0} sizes={i === 0 ? "(max-width: 1023px) 100vw, 38vw" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 19vw"} className="transition duration-700 group-hover:scale-[1.04]" />
+                {i === 0 ? (
+                  <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white">
+                    <ZoomIn className="size-5" aria-hidden="true" />
+                  </span>
+                ) : null}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="self-start lg:sticky lg:top-28 lg:col-span-5">
+          <p className="eyebrow">{box.name}</p>
+          <h2 id="featured-trunk-title" className="title-caps mt-5 text-[clamp(2rem,4.4vw,3.75rem)] leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">
+            {t.boxes.closing}
+          </h2>
+          <p className="mt-8 max-w-xl text-lg leading-relaxed text-bone">{box.description}</p>
+          <p className="mt-3 text-base text-mist">{t.boxes.photos(box.images.length)}</p>
+          <div className="mt-10">
+            <CreateBox />
+          </div>
+        </div>
+      </div>
+      {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
+    </section>
+  );
+}
+
 export function Boxes() {
   const { t } = useI18n();
-  const { boxes } = useCatalogue();
+  const { boxes: all } = useCatalogue();
   const [open, setOpen] = useState<Box | null>(null);
+  const featured = all.find((b) => b.slug === FEATURED_BOX);
+  const boxes = all.filter((b) => b !== featured);
 
   return (
     <div className="pb-24">
@@ -159,7 +213,10 @@ export function Boxes() {
         <CreateBox />
       </PageIntro>
 
-      <section aria-label={t.boxes.listLabel} className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+      {featured ? <FeaturedTrunk box={featured} /> : null}
+
+      <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+        <h2 id="boxes-list-title" className="eyebrow mb-12">{t.boxes.listLabel}</h2>
         <ul className="grid gap-16 md:grid-cols-2 md:gap-12">
           {boxes.map((box, i) => (
             <li key={box.slug} className={i % 2 === 1 ? "md:mt-32" : ""}>
@@ -173,7 +230,7 @@ export function Boxes() {
                   </span>
                 </button>
                 <span aria-hidden="true" className="text-rose-gold mt-6 block font-display text-3xl">{String(i + 1).padStart(2, "0")}</span>
-                <h2 className="title-caps mt-2 text-3xl text-white md:text-4xl">{box.name}</h2>
+                <h3 className="title-caps mt-2 text-3xl text-white md:text-4xl">{box.name}</h3>
                 <p className="mt-4 max-w-md text-lg text-bone">{box.description}</p>
                 {box.images.length > 1 ? <p className="mt-2 text-base text-mist">{t.boxes.photos(box.images.length)}</p> : null}
                 {box.pieceSlug ? (
@@ -186,7 +243,7 @@ export function Boxes() {
           ))}
         </ul>
         <div className="rule-rose my-20" aria-hidden="true" />
-        <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.boxes.closing}</p>
+        <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.common.yourStory}</p>
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <CreateBox />
           <Link to="/contact" className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">

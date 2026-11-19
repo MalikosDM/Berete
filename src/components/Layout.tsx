@@ -44,22 +44,23 @@ export default function Layout() {
           (showBar ? "visible translate-y-0" : "invisible translate-y-full")
         }
       >
-        <div className="grid grid-cols-2 gap-3">
+        {/* WhatsApp as wide as its name; the invitation to create takes the rest (its words are long: one or two lines). */}
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
           <a
             href={waLink(t.whatsapp.hello)}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-[52px] items-center justify-center gap-2 border border-white/40 text-base font-medium text-white transition-colors active:bg-white/10"
+            className="flex min-h-[52px] items-center justify-center gap-2 border border-white/40 px-4 text-base font-medium text-white transition-colors active:bg-white/10"
           >
-            <BrandIcon name="whatsapp" className="size-5" />
+            <BrandIcon name="whatsapp" className="size-5 shrink-0" />
             {t.common.whatsapp}
           </a>
           <Link
             to="/contact"
-            className="flex min-h-[52px] items-center justify-center gap-2 bg-white text-base font-semibold text-ink transition-colors active:bg-bone"
+            className="flex min-h-[52px] items-center justify-center gap-2 bg-white px-3 py-1 text-center text-base leading-tight font-semibold text-ink transition-colors active:bg-bone"
           >
             {t.common.startPiece}
-            <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+            <ArrowRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>
       </div>

@@ -15,7 +15,7 @@ type NavLinkItem = { label: string; to: string };
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
     // Never on two lines: on a small laptop (1280 px) the letters and the gaps are a little tighter, as wide as they were from 1536 px.
-    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.8125rem] font-medium uppercase tracking-[0.12em] transition-colors 2xl:tracking-[0.18em]",
+    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.8125rem] font-medium uppercase tracking-[0.12em] transition-colors ultra:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -92,7 +92,8 @@ export default function Navbar() {
           <Logo className="hidden h-14 w-[4.875rem] lg:block" />
         </Link>
 
-        <nav aria-label={t.nav.main} className="hidden items-center gap-5 xl:flex 2xl:gap-8">
+        {/* The names of the menu are long (The Berete Circle, The Bespoke Journey…): the whole menu from 1440 px, else the menu button. */}
+        <nav aria-label={t.nav.main} data-desktop-nav className="hidden items-center gap-5 nav:flex wide:gap-7">
           <div className="group relative">
             <NavLink
               to="/creations"
@@ -138,7 +139,8 @@ export default function Navbar() {
           </a>
           <Link
             to="/contact"
-            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light md:inline-flex 2xl:px-6 2xl:tracking-[0.18em]"
+            // Beside the whole menu, from 1800 px only (the menu already leads to Private Enquiries).
+            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light md:inline-flex nav:hidden wide:inline-flex ultra:px-6 ultra:tracking-[0.18em]"
           >
             {t.common.startPiece}
           </Link>
@@ -148,7 +150,7 @@ export default function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
-            className="inline-flex size-12 items-center justify-center text-white xl:hidden"
+            className="inline-flex size-12 items-center justify-center text-white nav:hidden"
           >
             {open ? <X className="size-6" aria-hidden="true" /> : <Menu className="size-6" aria-hidden="true" />}
           </button>
@@ -159,7 +161,7 @@ export default function Navbar() {
         id="mobile-menu"
         data-lenis-prevent
         className={[
-          "fixed inset-x-0 bottom-0 top-18 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 lg:top-22 xl:hidden",
+          "fixed inset-x-0 bottom-0 top-18 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 lg:top-22 nav:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         ].join(" ")}
       >

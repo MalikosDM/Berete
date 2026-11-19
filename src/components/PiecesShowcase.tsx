@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MediaView } from "@/components/Media";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -112,6 +112,10 @@ export default function PiecesShowcase({
                 </span>
                 <span className="mt-3 block text-base text-mist">
                   {t.types[p.type]}
+                </span>
+                <span data-enter-world className="mt-auto inline-flex min-h-12 items-center gap-2 pt-4 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
+                  {t.common.enterWorld}
+                  <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                 </span>
               </span>
             </Link>

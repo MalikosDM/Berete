@@ -11,10 +11,12 @@ import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
-import { media } from "@/data/catalogue";
+import Universe from "@/components/Universe";
+import { defaultCatalogue, media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
-import { RENAMED_PIECES, SEEN_LABEL } from "@/data/pieces";
-import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
+import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { resolveTheme } from "@/data/themes";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
@@ -46,8 +48,9 @@ export default function PiecePage() {
   // The 3D model the jeweller attached to this piece, if any: shown right under the opening.
   const model = usePieceModel(piece?.slug ?? slug);
   if (!piece) {
-    const renamed = RENAMED_PIECES[slug];
-    return renamed ? <Navigate to={"/pieces/" + renamed} replace /> : <NotFound />;
+    // A renamed piece leads to its new address; an unpublished one to its player, else to the creations.
+    const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug);
+    return target ? <Navigate to={target} replace /> : <NotFound />;
   }
 
   const collection = collectionOf(piece.type);
@@ -57,9 +60,11 @@ export default function PiecePage() {
   const similar = similarPieces(cat, piece, 4);
   const seenIn = storiesOfPiece(cat, piece);
   const wa = waLink(t.whatsapp.piece(piece.title));
-  // The rows of the sheet by their English label (the page shows them translated): the row "Metal and stones" says what the photos show.
-  const sheetRows = raw.pieces.find((p) => p.slug === piece.slug)?.specs.map((s) => s.label) ?? [];
+  // The rows of the sheet by their English label (the page shows them translated): the row "Precious Materials" says what the photos show.
+  const sheetRows = (raw.pieces.find((p) => p.slug === piece.slug)?.specs.map((s) => s.label) ?? []).map((l) => (l === OLD_SEEN_LABEL ? SEEN_LABEL : l));
   const seenRow = sheetRows.includes(SEEN_LABEL);
+  // The championship rings of the special project: "Historic Commissions".
+  const historic = SPECIAL_PROJECT.some((r) => r.slug === piece.slug);
 
   // Opens stories on the first photo or video of this piece, when they show it.
   const openStories = (stories: Story[]) => {
@@ -72,9 +77,13 @@ export default function PiecePage() {
   };
 
   return (
-    <article data-piece={piece.slug} data-draft={piece.draft ? "true" : undefined}>
+    <article data-piece={piece.slug} data-draft={piece.draft ? "true" : undefined} className="relative *:relative">
+      {/* The universe of the piece: its background, behind the whole page (src/data/themes.ts). Every block of the page
+          is positioned, so it is drawn over it; no isolation, so the full-screen layers (stories, photos, 3D) still
+          come over the menu. */}
+      <Universe theme={resolveTheme(piece.theme)} />
       {/* Opening: the jewel, full screen */}
-      <section aria-labelledby="piece-title" className="relative isolate flex min-h-svh flex-col overflow-hidden bg-ink lg:grid lg:grid-cols-12 lg:items-end">
+      <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
         <div className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
           <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
@@ -82,6 +91,7 @@ export default function PiecePage() {
         <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
           <div className="flex flex-col gap-8">
             <div className={shadow}>
+              {historic ? <p className="mb-3 text-base font-semibold uppercase tracking-[0.24em] text-rose-light">{t.piece.historic}</p> : null}
               <p className="eyebrow">
                 <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center hover:text-white">
                   {collectionName}
@@ -117,7 +127,7 @@ export default function PiecePage() {
       {model ? <Piece3D piece={piece} model={model} /> : null}
 
       <div id="piece-details" className="scroll-mt-24">
-        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} /> : null}
+        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} bare /> : null}
         {piece.details.length > 0 ? <DetailsSection piece={piece} /> : null}
       </div>
 
@@ -289,7 +299,7 @@ export default function PiecePage() {
       ) : null}
 
       {/* The call to action */}
-      <section aria-labelledby="want-title" className="border-t border-white/10 bg-ink-soft">
+      <section aria-labelledby="want-title" className="border-t border-white/10 bg-black/35">
         <div className="mx-auto flex max-w-[1600px] flex-col items-start gap-10 px-5 py-24 sm:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-12 lg:py-32">
           <div className="max-w-3xl">
             <p className="eyebrow">{t.common.yourPiece}</p>
@@ -309,13 +319,14 @@ export default function PiecePage() {
         </div>
       </section>
 
-      {viewer ? <StoryViewer stories={viewer.stories} start={0} startStep={viewer.step} onClose={() => setViewer(null)} /> : null}
+      {/* Out of the page (its blocks are positioned over the universe): over everything, the menu included. */}
+      {viewer ? createPortal(<StoryViewer stories={viewer.stories} start={0} startStep={viewer.step} onClose={() => setViewer(null)} />, document.body) : null}
     </article>
   );
 }
 
 /**
- * "The details": each symbol of the piece and what it stands for, numbered; a detail shown by a photo of the piece opens
+ * "The Art of Detail": each symbol of the piece and what it stands for, numbered; a detail shown by a photo of the piece opens
  * it in full screen.
  */
 function DetailsSection({ piece }: { piece: Piece }) {
@@ -367,7 +378,7 @@ function DetailsSection({ piece }: { piece: Piece }) {
 }
 
 /**
- * "How it was made": the five steps, with the photos of this piece when there are some, else the atelier. The photos
+ * "The Making of a Masterpiece": the five steps, with the photos of this piece when there are some, else the atelier. The photos
  * of the piece (its first sketch...) open in full screen.
  */
 function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem }) {

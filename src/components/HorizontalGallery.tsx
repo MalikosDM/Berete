@@ -8,11 +8,14 @@ import { gsap, getLenis, useReducedMotion } from "@/lib/gsap";
 type HorizontalGalleryProps = {
   items: MediaItem[];
   title?: string;
+  /** Without its own black background: the photos melt into the background of the page (the universe of a piece). */
+  bare?: boolean;
 };
 
 export default function HorizontalGallery({
   items,
   title: ownTitle,
+  bare = false,
 }: HorizontalGalleryProps) {
   const { t, dir } = useI18n();
   const title = ownTitle ?? t.gallery.title;
@@ -57,7 +60,7 @@ export default function HorizontalGallery({
       <section
         ref={sectionRef}
         aria-label={title}
-        className="relative overflow-hidden bg-ink py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0"
+        className={"relative overflow-hidden py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0 " + (bare ? "" : "bg-ink")}
       >
         <div className="mx-auto mb-10 flex w-full max-w-[1600px] items-end justify-between gap-6 px-5 sm:px-8 lg:mb-14 lg:px-12">
           <h2 className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.16em]">
@@ -83,7 +86,7 @@ export default function HorizontalGallery({
               <button
                 type="button"
                 onClick={() => setOpenIndex(i)}
-                className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
+                className={"group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden " + (bare ? "" : "bg-ink")}
                 aria-label={t.gallery.open(item.alt ?? title)}
               >
                 <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]">
@@ -126,7 +129,7 @@ type LightboxProps = {
   onClose: () => void;
 };
 
-/** The photos in full screen, one at a time: zoom on the point clicked, arrows, Escape. Also used by "How it was made". */
+/** The photos in full screen, one at a time: zoom on the point clicked, arrows, Escape. Also used by "The Making of a Masterpiece". */
 export function Lightbox({ items, index, onIndex, onClose }: LightboxProps) {
   const { t, dir } = useI18n();
   const [zoomed, setZoomed] = useState(false);

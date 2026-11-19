@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { MediaView } from "@/components/Media";
 import { SIZES_FOR } from "@/lib/responsive";
 import type { Piece } from "@/data/types";
@@ -36,6 +36,11 @@ export default function PieceCard({ piece, eager = false, priority = false, show
           <span className="mt-2 block text-base text-mist">
             {showType ? t.types[piece.type] + " · " : ""}
             {t.common.madeFor(madeFor(cat, piece))}
+          </span>
+          {/* The signature button of every piece. */}
+          <span data-enter-world className="mt-4 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors group-hover:text-rose-light">
+            {t.common.enterWorld}
+            <ArrowRight className="size-4 transition-transform duration-500 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
           </span>
         </span>
         <ArrowUpRight className="mt-1 size-6 shrink-0 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />

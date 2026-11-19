@@ -29,6 +29,10 @@
 }
 
 @theme {
+  /* The whole menu of the computer from 1440 px (its names are long), the button beside it from 1800 px. */
+  --breakpoint-nav: 90rem;
+  --breakpoint-wide: 112.5rem;
+  --breakpoint-ultra: 120rem;
   --color-ink: #0a0a0a;
   --color-ink-soft: #141313;
   --color-ink-line: #2a2626;
@@ -289,5 +293,416 @@ html.lenis body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * ---------- The universe of a piece (src/components/Universe.tsx, src/data/themes.ts) ----------
+ * Behind the page of a piece: its deep background (base and tint), its light, its texture and a slow motion. The colours
+ * of the universe stay in the depths; the veil keeps the texts on a dark ground (contrast AA). Everything that moves is a
+ * transform or an opacity (light on the phone), and nothing moves when the visitor asks for reduced motion.
+ */
+.universe {
+  --u-at-x: 72%;
+  --u-at-y: 40%;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: clip;
+  background: var(--u-base);
+}
+@media (max-width: 1023px) {
+  .universe {
+    --u-at-x: 50%;
+    --u-at-y: 27%;
+  }
+}
+[dir="rtl"] .universe {
+  --u-at-x: 28%;
+}
+@media (max-width: 1023px) {
+  [dir="rtl"] .universe {
+    --u-at-x: 50%;
+  }
+}
+.universe-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  animation: u-enter 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+.universe-stage > * {
+  position: absolute;
+  inset: 0;
+}
+@keyframes u-enter {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.u-base {
+  background:
+    radial-gradient(110% 75% at var(--u-at-x) 16%, color-mix(in oklab, var(--u-tint) 92%, transparent) 0%, transparent 62%),
+    radial-gradient(80% 60% at 8% 96%, color-mix(in oklab, var(--u-tint) 55%, transparent) 0%, transparent 70%),
+    var(--u-base);
+}
+
+/* The light */
+.u-light {
+  transform-origin: var(--u-at-x) var(--u-at-y);
+}
+[data-light="halo"] .u-light {
+  background: radial-gradient(42% 38% at var(--u-at-x) var(--u-at-y), color-mix(in oklab, var(--u-glow) 22%, transparent), transparent 70%);
+  animation: u-breathe 9s ease-in-out infinite;
+}
+[data-light="spotlight"] .u-light {
+  background:
+    radial-gradient(30% 85% at var(--u-at-x) -8%, color-mix(in oklab, var(--u-glow) 22%, transparent), transparent 72%),
+    radial-gradient(28% 22% at var(--u-at-x) var(--u-at-y), color-mix(in oklab, var(--u-glow) 12%, transparent), transparent 70%);
+  transform-origin: var(--u-at-x) 0;
+  animation: u-sway 14s ease-in-out infinite;
+}
+[data-light="beam"] .u-light {
+  inset: 0 -12%;
+  background: repeating-linear-gradient(98deg, transparent 0 5%, color-mix(in oklab, var(--u-glow) 10%, transparent) 6% 8%, transparent 9% 15%);
+  -webkit-mask-image: radial-gradient(60% 95% at var(--u-at-x) -10%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(60% 95% at var(--u-at-x) -10%, #000 0%, transparent 78%);
+  animation: u-beam 18s ease-in-out infinite alternate;
+}
+[data-light="aura"] .u-light {
+  background: radial-gradient(36% 34% at var(--u-at-x) var(--u-at-y), color-mix(in oklab, var(--u-glow) 30%, transparent), transparent 70%);
+  animation: u-aura 4.5s ease-in-out infinite;
+}
+[data-light="ember"] .u-light {
+  background:
+    radial-gradient(70% 45% at 60% 108%, color-mix(in oklab, var(--u-glow) 24%, transparent), transparent 70%),
+    radial-gradient(30% 26% at var(--u-at-x) var(--u-at-y), color-mix(in oklab, var(--u-glow) 12%, transparent), transparent 70%);
+  animation: u-ember 7s ease-in-out infinite;
+}
+@keyframes u-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+@keyframes u-sway {
+  0%,
+  100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+@keyframes u-beam {
+  from {
+    transform: translateX(-3%);
+  }
+  to {
+    transform: translateX(3%);
+  }
+}
+@keyframes u-aura {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+@keyframes u-ember {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.7;
+  }
+}
+@keyframes u-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The texture */
+[data-texture="grain"] .u-texture {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: 0.06;
+}
+/* A sheen that glides: a larger layer moved by a transform (no repaint of the page at every frame). */
+[data-texture="silk"] .u-texture {
+  inset: -40%;
+  background: linear-gradient(115deg, transparent 22%, color-mix(in oklab, var(--u-glow) 9%, transparent) 36%, transparent 48%, color-mix(in oklab, var(--u-glow) 6%, transparent) 60%, transparent 74%);
+  animation: u-silk 24s ease-in-out infinite alternate;
+}
+@keyframes u-silk {
+  from {
+    transform: translate3d(-12%, -6%, 0);
+  }
+  to {
+    transform: translate3d(12%, 6%, 0);
+  }
+}
+[data-texture="rays"] .u-texture {
+  inset: -30%;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, color-mix(in oklab, var(--u-glow) 11%, transparent) 0deg 0.7deg, transparent 0.7deg 6deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 8%, #000 22%, transparent 62%);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 8%, #000 22%, transparent 62%);
+  /* Its centre on the light (the layer is 1.6 times the stage). */
+  translate: calc((var(--u-at-x) - 50%) / 1.6) calc((var(--u-at-y) - 50%) / 1.6);
+  animation: u-spin 160s linear infinite;
+}
+[data-texture="stripes"] .u-texture {
+  background: repeating-linear-gradient(90deg, rgb(0 0 0 / 0.32) 0 64px, color-mix(in oklab, var(--u-tint) 75%, transparent) 64px 128px);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 90%);
+  mask-image: linear-gradient(to bottom, #000, transparent 90%);
+  opacity: 0.55;
+}
+[data-texture="scales"] .u-texture {
+  background-image:
+    radial-gradient(circle at 50% 0%, transparent 60%, color-mix(in oklab, var(--u-glow) 13%, transparent) 63%, transparent 69%),
+    radial-gradient(circle at 50% 0%, transparent 60%, color-mix(in oklab, var(--u-glow) 13%, transparent) 63%, transparent 69%);
+  background-size: 46px 32px;
+  background-position:
+    0 0,
+    23px 16px;
+  -webkit-mask-image: radial-gradient(55% 60% at var(--u-at-x) var(--u-at-y), #000, transparent 80%);
+  mask-image: radial-gradient(55% 60% at var(--u-at-x) var(--u-at-y), #000, transparent 80%);
+  opacity: 0.6;
+}
+[data-texture="petals"] .u-texture {
+  background: color-mix(in oklab, var(--u-glow) 13%, transparent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><g fill='%23000'><path d='M40 34c16-20 38-11 33 9-4 17-25 24-33-9z'/><path d='M158 52c18-13 37 1 28 18-8 15-29 15-28-18z'/><path d='M96 158c11-22 35-17 33 2-2 18-22 24-33-2z'/><path d='M196 182c13-15 31-7 26 9-4 13-20 17-26-9z'/><path d='M18 196c10-12 25-6 21 7-3 11-16 14-21-7z'/></g></svg>") 0 0 / 240px 240px repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><g fill='%23000'><path d='M40 34c16-20 38-11 33 9-4 17-25 24-33-9z'/><path d='M158 52c18-13 37 1 28 18-8 15-29 15-28-18z'/><path d='M96 158c11-22 35-17 33 2-2 18-22 24-33-2z'/><path d='M196 182c13-15 31-7 26 9-4 13-20 17-26-9z'/><path d='M18 196c10-12 25-6 21 7-3 11-16 14-21-7z'/></g></svg>") 0 0 / 240px 240px repeat;
+  opacity: 0.8;
+}
+[data-texture="facets"] .u-texture {
+  background: conic-gradient(from 45deg at 50% 50%, color-mix(in oklab, var(--u-glow) 7%, transparent) 0 25%, transparent 0 50%, color-mix(in oklab, var(--u-glow) 4%, transparent) 0 75%, transparent 0);
+  background-size: 150px 150px;
+  -webkit-mask-image: radial-gradient(60% 70% at var(--u-at-x) var(--u-at-y), #000, transparent 85%);
+  mask-image: radial-gradient(60% 70% at var(--u-at-x) var(--u-at-y), #000, transparent 85%);
+}
+[data-texture="pitch"] .u-texture {
+  inset: 30% -20% -10%;
+  background: color-mix(in oklab, var(--u-glow) 14%, transparent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 640' fill='none' stroke='%23000' stroke-width='2.5'><rect x='20' y='20' width='960' height='600'/><line x1='500' y1='20' x2='500' y2='620'/><circle cx='500' cy='320' r='92'/><circle cx='500' cy='320' r='5' fill='%23000'/><rect x='20' y='170' width='150' height='300'/><rect x='830' y='170' width='150' height='300'/><rect x='20' y='250' width='55' height='140'/><rect x='925' y='250' width='55' height='140'/><path d='M170 262a75 75 0 0 1 0 116M830 262a75 75 0 0 0 0 116'/></svg>") center / 100% 100% no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 640' fill='none' stroke='%23000' stroke-width='2.5'><rect x='20' y='20' width='960' height='600'/><line x1='500' y1='20' x2='500' y2='620'/><circle cx='500' cy='320' r='92'/><circle cx='500' cy='320' r='5' fill='%23000'/><rect x='20' y='170' width='150' height='300'/><rect x='830' y='170' width='150' height='300'/><rect x='20' y='250' width='55' height='140'/><rect x='925' y='250' width='55' height='140'/><path d='M170 262a75 75 0 0 1 0 116M830 262a75 75 0 0 0 0 116'/></svg>") center / 100% 100% no-repeat;
+  transform: perspective(900px) rotateX(58deg);
+  transform-origin: 50% 100%;
+}
+[data-texture="clockwork"] .u-texture {
+  background: color-mix(in oklab, var(--u-glow) 12%, transparent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-500 -500 1000 1000' fill='none' stroke='%23000'><circle r='480' stroke-width='1.2'/><circle r='392' stroke-width='2' stroke-dasharray='2 19'/><circle r='300' stroke-width='1.2'/><circle r='226' stroke-width='7' stroke-dasharray='1.2 22'/><circle r='140' stroke-width='1.2'/></svg>") var(--u-at-x) var(--u-at-y) / min(130vmax, 1500px) no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-500 -500 1000 1000' fill='none' stroke='%23000'><circle r='480' stroke-width='1.2'/><circle r='392' stroke-width='2' stroke-dasharray='2 19'/><circle r='300' stroke-width='1.2'/><circle r='226' stroke-width='7' stroke-dasharray='1.2 22'/><circle r='140' stroke-width='1.2'/></svg>") var(--u-at-x) var(--u-at-y) / min(130vmax, 1500px) no-repeat;
+  transform-origin: var(--u-at-x) var(--u-at-y);
+}
+[data-texture="clockwork"][data-motion="rotate"] .u-texture {
+  animation: u-spin 240s linear infinite;
+}
+[data-texture="rain"] .u-texture {
+  top: -160px;
+  background: color-mix(in oklab, var(--u-glow) 18%, transparent);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><g stroke='%23000' stroke-width='1.2' stroke-linecap='round'><line x1='20' y1='10' x2='14' y2='40'/><line x1='90' y1='60' x2='84' y2='90'/><line x1='140' y1='20' x2='134' y2='50'/><line x1='56' y1='112' x2='50' y2='142'/><line x1='120' y1='118' x2='114' y2='148'/></g></svg>") 0 0 / 160px 160px repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><g stroke='%23000' stroke-width='1.2' stroke-linecap='round'><line x1='20' y1='10' x2='14' y2='40'/><line x1='90' y1='60' x2='84' y2='90'/><line x1='140' y1='20' x2='134' y2='50'/><line x1='56' y1='112' x2='50' y2='142'/><line x1='120' y1='118' x2='114' y2='148'/></g></svg>") 0 0 / 160px 160px repeat;
+  animation: u-rain 2.4s linear infinite;
+}
+@keyframes u-rain {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-32px, 160px, 0);
+  }
+}
+[data-texture="stars"] .u-texture {
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 18%, color-mix(in oklab, var(--u-glow) 80%, transparent), transparent),
+    radial-gradient(1px 1px at 38% 72%, color-mix(in oklab, var(--u-glow) 70%, transparent), transparent),
+    radial-gradient(1.6px 1.6px at 64% 32%, color-mix(in oklab, var(--u-glow) 75%, transparent), transparent),
+    radial-gradient(1px 1px at 86% 64%, color-mix(in oklab, var(--u-glow) 60%, transparent), transparent),
+    radial-gradient(1.3px 1.3px at 52% 92%, color-mix(in oklab, var(--u-glow) 70%, transparent), transparent);
+  background-size: 300px 300px;
+  opacity: 0.55;
+}
+
+/* The motion */
+.u-motion span {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 9999px;
+  background: var(--u-glow);
+  box-shadow: 0 0 calc(var(--s) * 3) color-mix(in oklab, var(--u-glow) 60%, transparent);
+  opacity: 0;
+  animation: u-drift var(--t) ease-in-out var(--d) infinite;
+}
+[data-motion="rise"] .u-motion span {
+  top: 100%;
+  animation-name: u-rise;
+}
+[data-motion="sparkle"] .u-motion span {
+  width: calc(var(--s) * 3.2);
+  height: calc(var(--s) * 3.2);
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  animation-name: u-sparkle;
+  animation-duration: calc(var(--t) / 3);
+}
+[data-motion="flutter"] .u-motion span {
+  width: calc(var(--s) * 3);
+  height: calc(var(--s) * 1.8);
+  border-radius: 60% 40% 60% 40%;
+  animation-name: u-flutter;
+}
+[data-motion="pulse"] .u-motion span {
+  left: var(--u-at-x);
+  top: var(--u-at-y);
+  width: 44vmin;
+  height: 44vmin;
+  margin: -22vmin 0 0 -22vmin;
+  background: none;
+  border: 1px solid color-mix(in oklab, var(--u-glow) 45%, transparent);
+  box-shadow: 0 0 40px color-mix(in oklab, var(--u-glow) 18%, transparent);
+  animation: u-pulse 5.4s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+}
+[data-motion="pulse"] .u-motion span:nth-child(2) {
+  animation-delay: -1.8s;
+}
+[data-motion="pulse"] .u-motion span:nth-child(3) {
+  animation-delay: -3.6s;
+}
+[data-motion="pulse"] .u-motion span:nth-child(n + 4) {
+  display: none;
+}
+@keyframes u-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    opacity: 0.55;
+  }
+  80% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(18px, -90px, 0);
+  }
+}
+@keyframes u-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  15% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-12px, -80svh, 0);
+  }
+}
+@keyframes u-sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0deg);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1) rotate(45deg);
+  }
+}
+@keyframes u-flutter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(-10deg) scaleX(1);
+  }
+  15% {
+    opacity: 0.6;
+  }
+  30% {
+    transform: translate3d(14px, -40px, 0) rotate(8deg) scaleX(0.4);
+  }
+  55% {
+    transform: translate3d(-10px, -90px, 0) rotate(-6deg) scaleX(1);
+  }
+  80% {
+    opacity: 0.4;
+    transform: translate3d(16px, -140px, 0) rotate(10deg) scaleX(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -180px, 0) rotate(-4deg) scaleX(1);
+  }
+}
+@keyframes u-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+@media (max-width: 767px) {
+  .u-motion span:nth-child(n + 11) {
+    display: none;
+  }
+}
+
+/* The veil: the texts always on a dark ground */
+.u-veil {
+  background:
+    linear-gradient(90deg, color-mix(in oklab, var(--u-base) 74%, transparent) 0%, transparent 46%),
+    linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
+}
+[dir="rtl"] .u-veil {
+  background:
+    linear-gradient(270deg, color-mix(in oklab, var(--u-base) 74%, transparent) 0%, transparent 46%),
+    linear-gradient(to bottom, transparent 55%, color-mix(in oklab, var(--u-base) 55%, transparent) 100%);
+}
+@media (max-width: 1023px) {
+  .u-veil,
+  [dir="rtl"] .u-veil {
+    background: linear-gradient(to bottom, transparent 42%, color-mix(in oklab, var(--u-base) 72%, transparent) 72%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .universe,
+  .universe * {
+    animation: none !important;
+  }
+  .u-motion {
+    display: none;
   }
 }

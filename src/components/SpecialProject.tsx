@@ -61,7 +61,7 @@ function Ring({ piece, trophy, closed, open }: { piece: Piece; trophy: string; c
 
 /**
  * The special project of the house, right after the film of the home page: the championship rings of Inter Milan and
- * VfB Stuttgart side by side. Both open onto their trophy (hover, or "Lift the top" on a phone); each leads to its page.
+ * VfB Stuttgart side by side. Both open onto their trophy (hover, or "Reveal the Secret" on a phone); each leads to its page.
  */
 export default function SpecialProject() {
   const { t } = useI18n();

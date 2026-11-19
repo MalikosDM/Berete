@@ -10,9 +10,10 @@ import PlayerWall, { PlayerPortrait } from "@/components/PlayerWall";
 import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
-import { findPerson, instagramOf, membersOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
+import { defaultCatalogue } from "@/data/catalogue";
+import { findPerson, instagramOf, leftTheCircle, membersOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
 import type { PersonKind } from "@/data/types";
-import { Link, useI18n } from "@/i18n";
+import { Link, Navigate, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import NotFound from "@/pages/NotFound";
 
@@ -47,7 +48,8 @@ export function PlayerPage() {
   const cat = useCatalogue();
   const [open, setOpen] = useState<number | null>(null);
   const person = findPerson(cat, slug);
-  if (!person) return <NotFound />;
+  // A person whose pieces are all unpublished left the circle: their page leads to it.
+  if (!person) return leftTheCircle(defaultCatalogue, slug) ? <Navigate to="/players" replace /> : <NotFound />;
 
   const stories = storiesOf(cat, person.slug);
   const pieces = piecesOf(cat, person.slug);

@@ -45,7 +45,7 @@ const homeSteps = (t: Messages): ScrollStep[] => [
           <span aria-hidden="true" className="bg-rose-gold block h-px w-24 [@media(max-height:600px)]:hidden" />
         </p>
         <h1 className="mt-4 max-w-3xl font-display text-[clamp(1.75rem,8.2vw,2.75rem)] font-light uppercase leading-[1.05] tracking-[0.05em] text-white [text-wrap:balance] md:mt-8 md:text-[clamp(2.5rem,6vw,4.5rem)] md:tracking-[0.06em] [@media(max-height:600px)]:mt-3 [@media(max-height:600px)]:text-[1.625rem]">{t.home.title}</h1>
-        <p className="mt-3 text-lg text-bone md:mt-5 md:text-xl [@media(max-height:600px)]:mt-2">{t.site.tagline}</p>
+        <p className="mt-3 max-w-2xl text-lg text-bone md:mt-5 md:text-xl [@media(max-height:600px)]:mt-2 [@media(max-height:600px)]:text-base">{t.home.intro}</p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3 md:mt-10 [@media(max-height:600px)]:mt-4">
           <Link to="/creations" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/70 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
             {t.home.discover}
