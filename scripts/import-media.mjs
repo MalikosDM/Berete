@@ -9,7 +9,7 @@
  * source disappeared are removed.
  *
  *   npm run import-media                 # everything
- *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,house,players
+ *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,films,house,players
  *   npm run import-media -- --force      # re-encode everything
  *
  * Source folders: all on the external disk (BERETE_DISK, default "/Volumes/Disque externe"), each one overridable with
@@ -25,7 +25,8 @@
  *                       "<place>.jpg" per place, "portrait", "citation-1", "chapitre-03"..., src/data/house.ts;
  *                       section "house")
  *   BERETE_HD_DIR       <disk>/Berete - Dossiers icloud  (the high-resolution
- *                       photos and videos of Yoni, chosen in scripts/hd-media.mjs; section "hd")
+ *                       photos and videos of Yoni, chosen in scripts/hd-media.mjs; section "hd"; the films of the
+ *                       atelier, making-of and finished piece, chosen in scripts/film-media.mjs; section "films")
  *   BERETE_PLAYERS_DIR  <BERETE_HD_DIR>/00 Contexte Yoni/Photos joueurs en maillot  (the players in their jersey, one
  *                       folder per person; photos and crops chosen in scripts/player-media.mjs; section "players")
  *
@@ -43,6 +44,8 @@ import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
 import { HD } from "./hd-media.mjs";
+import { FILMS, KIND_WORDS } from "./film-media.mjs";
+import sharp from "sharp";
 import { PLAYERS } from "./player-media.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -563,6 +566,141 @@ async function importHd() {
   return out;
 }
 
+/* ---------- The films of "Enter the Atelier": making-of and finished piece (scripts/film-media.mjs) ---------- */
+
+/**
+ * Computers: the film at its own size, up to 1080 x 1920 (a light 720p copy stays 720p: nothing is invented); phones: a
+ * lighter copy, 720p from a high-quality film, else 540p. H.264 with its sound (AAC), the index at the start of the file
+ * (+faststart: the film starts as soon as its first seconds arrive, the rest follows) and a key frame every 2 seconds.
+ */
+const FILM = {
+  desktop: { short: 1080, long: 1920, crf: 23, maxrate: (short) => (short > 720 ? "4500k" : "2500k"), audio: "128k" },
+  mobile: { crf: 24, maxrate: (short) => (short > 540 ? "1500k" : "1200k"), audio: "96k" },
+  maxFps: 30,
+  /** Frames offered as the image of the film (the admin chooses one; by default the sharpest well-lit one). */
+  posters: 6,
+  posterLong: 1280,
+};
+
+async function filmDir(folder) {
+  return (await listDir(HD_DIR)).find((n) => n.startsWith(folder + " ")) ?? null;
+}
+
+/** "25/v02" or "01/f" -> the best copy of that film on disk ("Videos HD/", else "Videos/", else its "(720p)"), or null. */
+async function filmSource(ref) {
+  const [folder, item = ""] = ref.split("/");
+  const dir = await filmDir(folder);
+  if (!dir) return null;
+  if (item === "f") {
+    const files = (await listDir(join(HD_DIR, dir, "Fabrication"))).filter((f) => VIDEO_EXT.test(f)).sort();
+    return files[0] ? join(HD_DIR, dir, "Fabrication", files[0]) : null;
+  }
+  const n = pad2(Number(item.slice(1)));
+  const hd = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && new RegExp(" - video " + n + "(?!\\d)", "i").test(f)).sort()[0];
+  if (hd) return join(HD_DIR, dir, "Videos HD", hd);
+  const files = await listDir(join(HD_DIR, dir, "Videos"));
+  const full = files.find((f) => new RegExp(" - video " + n + "\\.(mp4|mov|m4v)$", "i").test(f));
+  const light = files.find((f) => new RegExp(" - video " + n + " \\(720p\\)\\.(mp4|mov|m4v)$", "i").test(f));
+  const file = full ?? light;
+  return file ? join(HD_DIR, dir, "Videos", file) : null;
+}
+
+/** The film of "Videos HD/" of a folder named after its kind (its original name kept), or null. */
+async function namedFilm(folder, kind) {
+  const dir = await filmDir(folder);
+  if (!dir) return null;
+  const file = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && KIND_WORDS[kind].test(f)).sort()[0];
+  return file ? join(HD_DIR, dir, "Videos HD", file) : null;
+}
+
+/** The scale filter: the short side at most `short`, the long side at most `long`, never larger than the film. */
+const fit = (short, long) => "scale=w='trunc(iw*min(1,min(" + short + "/min(iw,ih)," + long + "/max(iw,ih)))/2)*2':h=-2:flags=lanczos";
+
+async function filmCopy(src, out, info, { short, long, crf, maxrate, audio }) {
+  const filters = [fit(short, long)];
+  const fps = info.fps > FILM.maxFps + 0.5 ? FILM.maxFps : Math.round(info.fps) || 30;
+  if (info.fps > FILM.maxFps + 0.5) filters.push("fps=" + FILM.maxFps);
+  filters.push("format=yuv420p");
+  const vf = filters.join(",");
+  const rate = maxrate(Math.min(info.width, info.height, short));
+  const argv = ["-i", src, "-map", "0:v:0"];
+  if (info.hasAudio) argv.push("-map", "0:a:0");
+  argv.push("-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(crf), "-maxrate", rate, "-bufsize", parseInt(rate, 10) * 2 + "k", "-g", String(fps * 2), "-keyint_min", String(fps), "-profile:v", "high");
+  if (info.hasAudio) argv.push("-c:a", "aac", "-b:a", audio, "-ac", "2");
+  else argv.push("-an");
+  argv.push("-movflags", "+faststart");
+  await produce(out, src, "film:" + [vf, crf, rate, audio, info.hasAudio].join(":"), argv);
+  return probe(out);
+}
+
+async function film(src, base, { light, label, pick }) {
+  const info = await probe(src);
+  const shortSide = Math.min(info.width, info.height);
+  const mobileShort = shortSide > 720 ? 720 : 540;
+  const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9) });
+  // A film no page shows yet (a draft, a finished piece without its making-of): its light copy serves everywhere.
+  const desktop = light ? null : await filmCopy(src, base + ".mp4", info, FILM.desktop);
+  const main = desktop ?? mobile;
+  // Its images: frames spread over the film, from the original (sharp), the sharpest well-lit one first by default.
+  const posters = [];
+  const scores = [];
+  for (let i = 0; i < FILM.posters; i += 1) {
+    const at = info.duration * (0.1 + (0.8 * i) / (FILM.posters - 1));
+    const out = base + "-" + (i + 1) + ".webp";
+    const vf = "scale=w='trunc(iw*min(1," + FILM.posterLong + "/max(iw,ih))/2)*2':h=-2:flags=lanczos";
+    await produce(out, src, "film-poster:" + at.toFixed(2) + ":" + vf, ["-ss", at.toFixed(2), "-i", src, "-frames:v", "1", "-vf", vf, "-c:v", "libwebp", "-quality", "80"]);
+    const stats = await sharp(out).stats();
+    const light = (stats.channels[0].mean + stats.channels[1].mean + stats.channels[2].mean) / 3;
+    scores.push(stats.sharpness * Math.min(1, Math.max(0.15, (light - 18) / 50)));
+    posters.push(webPath(out));
+  }
+  const poster = pick >= 1 && pick <= posters.length ? pick - 1 : scores.indexOf(Math.max(...scores));
+  return {
+    src: webPath(desktop ? base + ".mp4" : base + ".m.mp4"),
+    mobile: webPath(base + ".m.mp4"),
+    width: main.width,
+    height: main.height,
+    duration: Math.round(main.duration * 100) / 100,
+    audio: main.hasAudio,
+    posters,
+    poster,
+    source: label + " · " + (shortSide >= 1080 ? "HD " + shortSide + "p" : shortSide + "p"),
+    light,
+  };
+}
+
+async function importFilms() {
+  if (!existsSync(HD_DIR)) {
+    console.warn("HD folder not found, skipped: " + HD_DIR);
+    return null;
+  }
+  console.log("Films of the atelier: " + HD_DIR);
+  const out = {};
+  const jobs = [];
+  for (const entry of FILMS) {
+    const found = {};
+    for (const kind of ["making", "reveal"]) {
+      const named = entry.folder ? await namedFilm(entry.folder, kind) : null;
+      const file = named ?? (entry[kind] ? await filmSource(entry[kind]) : null);
+      if (!file) {
+        if (entry[kind]) console.warn("  ! not found: " + entry[kind] + " (" + entry.slug + ", " + kind + ")");
+        continue;
+      }
+      found[kind] = { file, label: named ? entry.folder + "/" + named.split("/").pop() : entry[kind] };
+    }
+    for (const [kind, { file, label }] of Object.entries(found)) {
+      const light = entry.draft === true || (kind === "reveal" && !found.making);
+      const pick = entry.poster?.[kind];
+      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick })));
+    }
+  }
+  await pool(jobs, Math.max(1, Math.floor(cpus().length / 4)), (go) => go());
+  // In the order of the list, the making-of first, whatever finished first.
+  return Object.fromEntries(
+    FILMS.filter((e) => out[e.slug]).map((e) => [e.slug, Object.fromEntries(["making", "reveal"].filter((k) => out[e.slug][k]).map((k) => [k, out[e.slug][k]]))]),
+  );
+}
+
 /* ---------- The House: the personal photos of Yoni, one per place of the page (src/data/house.ts) ---------- */
 
 async function importHouse() {
@@ -792,6 +930,7 @@ const SOURCES = [
   ["sketches", SKETCHES_DIR],
   ["house", HOUSE_DIR],
   ["hd", HD_DIR],
+  ["films", HD_DIR],
   ["players", PLAYERS_DIR],
 ];
 const missing = [...new Set(SOURCES.filter(([section, path]) => runs(section) && !existsSync(path)).map(([, path]) => path))];
@@ -860,6 +999,13 @@ if (runs("hd")) {
   if (hd !== null) {
     media.hd = hd;
     pruneDirs.push(join(MEDIA, "hd"));
+  }
+}
+if (runs("films")) {
+  const films = await importFilms();
+  if (films !== null) {
+    media.films = films;
+    pruneDirs.push(join(MEDIA, "films"));
   }
 }
 if (runs("scroll")) {
