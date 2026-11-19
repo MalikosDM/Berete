@@ -9,7 +9,8 @@
  *
  *   npm run universes
  *
- * BERETE_UNIVERSE_DIR gives another folder of AI backgrounds.
+ * The AI backgrounds are read on the external disk (BERETE_DISK, default "/Volumes/Disque externe"); BERETE_UNIVERSE_DIR
+ * gives another folder.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -19,7 +20,8 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const SOURCE = process.env.BERETE_UNIVERSE_DIR ?? "/Volumes/Disque externe/Berete - Dossiers icloud/00 Contexte Yoni/Univers IA (propositions)";
+const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
+const SOURCE = process.env.BERETE_UNIVERSE_DIR ?? join(DISK, "Berete - Dossiers icloud", "00 Contexte Yoni", "Univers IA (propositions)");
 const MASTERS = join(ROOT, ".local", "universes");
 const OUT = join(ROOT, "public", "media", "universes");
 const FONTS = join(ROOT, "public", "fonts", "universe");

@@ -12,17 +12,19 @@
  *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,house,players
  *   npm run import-media -- --force      # re-encode everything
  *
- * Source folders (override with the environment variables):
- *   BERETE_STORIES_DIR  ~/Desktop/Berete - Stories
- *   BERETE_SITE_DIR     ~/Desktop/01 Audiovisuel/Berete - Envoi ODORO
- *   BERETE_LOGO_FILE    ~/Desktop/berete_jewellers-cropped.svg
- *   BERETE_BOUTIQUE_DIR ~/Desktop/02 Projets/Sites clients/Boutique Bijoutier
- *   BERETE_SKETCHES_DIR ~/Desktop/Berete - Croquis  (one "<slug of the piece>.jpg"
+ * Source folders: all on the external disk (BERETE_DISK, default "/Volumes/Disque externe"), each one overridable with
+ * its environment variable. The disk must be connected: a missing source stops the run before anything is written
+ * (a missing folder would otherwise empty its part of public/media).
+ *   BERETE_STORIES_DIR  <disk>/Berete - Stories  (the Instagram highlights, one "NN Name" folder each, "00 Couvertures")
+ *   BERETE_SITE_DIR     <disk>/Berete - Envoi ODORO  (the photos and films of the site)
+ *   BERETE_LOGO_FILE    <disk>/Berete - Stories/berete_jewellers-cropped.svg
+ *   BERETE_BOUTIQUE_DIR <disk>/Berete - Boutique Bijoutier (export ODORO)
+ *   BERETE_SKETCHES_DIR <disk>/Berete - Croquis  (one "<slug of the piece>.jpg"
  *                       per piece: step "Sketch" of "How it was made")
- *   BERETE_HOUSE_DIR    ~/Desktop/Berete - La Maison  (the personal photos of Yoni for The House: one
+ *   BERETE_HOUSE_DIR    <disk>/Berete - La Maison  (the personal photos of Yoni for The House: one
  *                       "<place>.jpg" per place, "portrait", "citation-1", "chapitre-03"..., src/data/house.ts;
  *                       section "house")
- *   BERETE_HD_DIR       /Volumes/Disque externe/Berete - Dossiers icloud  (the high-resolution
+ *   BERETE_HD_DIR       <disk>/Berete - Dossiers icloud  (the high-resolution
  *                       photos and videos of Yoni, chosen in scripts/hd-media.mjs; section "hd")
  *   BERETE_PLAYERS_DIR  <BERETE_HD_DIR>/00 Contexte Yoni/Photos joueurs en maillot  (the players in their jersey, one
  *                       folder per person; photos and crops chosen in scripts/player-media.mjs; section "players")
@@ -35,7 +37,7 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
-import { cpus, homedir, tmpdir } from "node:os";
+import { cpus, tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
@@ -49,14 +51,15 @@ const MEDIA = join(PUBLIC, "media");
 const DATA = join(ROOT, "src", "data");
 const CACHE_FILE = join(ROOT, "scripts", ".import-media-cache.json");
 
-const DESKTOP = join(homedir(), "Desktop");
-const STORIES_DIR = process.env.BERETE_STORIES_DIR ?? join(DESKTOP, "Berete - Stories");
-const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DESKTOP, "01 Audiovisuel", "Berete - Envoi ODORO");
-const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DESKTOP, "berete_jewellers-cropped.svg");
-const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DESKTOP, "02 Projets", "Sites clients", "Boutique Bijoutier");
-const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DESKTOP, "Berete - Croquis");
-const HOUSE_DIR = process.env.BERETE_HOUSE_DIR ?? join(DESKTOP, "Berete - La Maison");
-const HD_DIR = process.env.BERETE_HD_DIR ?? join("/Volumes", "Disque externe", "Berete - Dossiers icloud");
+/** The external disk that holds every file of the project (since 19/11/2026: CLAUDE.md, "Où sont les fichiers"). */
+const DISK = process.env.BERETE_DISK ?? join("/Volumes", "Disque externe");
+const STORIES_DIR = process.env.BERETE_STORIES_DIR ?? join(DISK, "Berete - Stories");
+const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DISK, "Berete - Envoi ODORO");
+const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DISK, "Berete - Stories", "berete_jewellers-cropped.svg");
+const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DISK, "Berete - Boutique Bijoutier (export ODORO)");
+const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DISK, "Berete - Croquis");
+const HOUSE_DIR = process.env.BERETE_HOUSE_DIR ?? join(DISK, "Berete - La Maison");
+const HD_DIR = process.env.BERETE_HD_DIR ?? join(DISK, "Berete - Dossiers icloud");
 const PLAYERS_DIR = process.env.BERETE_PLAYERS_DIR ?? join(HD_DIR, "00 Contexte Yoni", "Photos joueurs en maillot");
 
 const args = process.argv.slice(2);
@@ -777,6 +780,26 @@ async function writeJson(file, value) {
 }
 
 /* ---------- Main ---------- */
+
+// Every source the asked sections read must be there (the disk connected), before anything is written: a section whose
+// folder is missing would otherwise empty its part of public/media.
+const SOURCES = [
+  ["brand", LOGO_FILE],
+  ["stories", STORIES_DIR],
+  ["site", SITE_DIR],
+  ["site", BOUTIQUE_DIR],
+  ["scroll", SITE_DIR],
+  ["sketches", SKETCHES_DIR],
+  ["house", HOUSE_DIR],
+  ["hd", HD_DIR],
+  ["players", PLAYERS_DIR],
+];
+const missing = [...new Set(SOURCES.filter(([section, path]) => runs(section) && !existsSync(path)).map(([, path]) => path))];
+if (missing.length > 0) {
+  console.error("Source not found, nothing was changed:\n  " + missing.join("\n  "));
+  if (!existsSync(DISK)) console.error("The external disk is not connected (" + DISK + "): plug it in, or set BERETE_DISK.");
+  process.exit(1);
+}
 
 const pruneDirs = [];
 await mkdir(DATA, { recursive: true });

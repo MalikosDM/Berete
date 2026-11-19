@@ -3,7 +3,7 @@
  * of his personal photos. Every chapter, the three quotes and the portrait have a place for a photo, shown only when
  * there is one (never an empty frame). A photo is added either from the admin (tab "La Maison") or by dropping a file
  * named after its place ("portrait.jpg", "citation-1.jpg", "chapitre-03.jpg"...) in the folder "Berete - La Maison" of
- * the Desktop, then npm run import-media.
+ * the external disk, then npm run import-media.
  */
 import { media } from "./sources.js";
 import type { Catalogue, MediaItem } from "./types.js";

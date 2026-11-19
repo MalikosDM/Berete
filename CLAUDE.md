@@ -41,6 +41,13 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - Mise en ligne : un envoi sur GitHub (main) met à jour le site Vercel tout seul : https://berete-nxsp.vercel.app
 
 ## Où sont les fichiers (Mac de Malik)
+- **Depuis le 19/11/2026, tous les fichiers du projet sont sur le disque externe** `/Volumes/Disque externe/` (plus rien
+  sur le Bureau) : `Berete - Dossiers icloud`, `Berete - Stories`, `Berete - Croquis`, `Berete - La Maison`,
+  `Berete - 3D`, `Berete - Envoi ODORO`, `Berete - Boutique Bijoutier (export ODORO)`, `Berete - Telechargements`
+  (photos WhatsApp de Yoni, photos joueurs SnapInsta, ancienne archive du repo). Le logo est dans
+  `Berete - Stories/berete_jewellers-cropped.svg`. Les scripts (`import-media`, `universes`, `verify:3d`) lisent ces
+  dossiers par défaut (`BERETE_DISK` pour un autre disque) : **brancher le disque avant de les lancer** ; sans lui,
+  `npm run import-media` s'arrête sans rien modifier.
 - Photos et vidéos HD envoyées par Yoni (19/11/2026) : disque externe `/Volumes/Disque externe/Berete - Dossiers
   icloud/` (35 dossiers « NN Nom », noms donnés d'après les photos, pas par Yoni ; `00 Contexte Yoni` = ses textes :
   wording, biographie, citations, pièces à retirer). Choix des photos : `scripts/hd-media.mjs`, puis
@@ -49,13 +56,15 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
   `scripts/player-media.mjs`, puis `npm run import-media -- --only=players`). Fonds IA des univers :
   `00 Contexte Yoni/Univers IA (propositions)/` → `npm run universes` (agrandis à 2560 px par Swin2SR, originaux
   agrandis dans `.local/universes`, jamais dans Git ; polices libres copiées dans `public/fonts/universe`).
-- Photos personnelles de Yoni pour La Maison : `~/Desktop/Berete - La Maison/` (voir LISEZ-MOI), ou l'admin.
-- Médias des stories (Instagram, triés) : `~/Desktop/Berete - Stories/` (30 dossiers « NN Nom », couvertures dans
+- Photos personnelles de Yoni pour La Maison : `Berete - La Maison/` (voir LISEZ-MOI), ou l'admin.
+- Médias des stories (Instagram, triés) : `Berete - Stories/` (30 dossiers « NN Nom », couvertures dans
   `00 Couvertures`). Relancer `npm run import-media` après ajout.
-- Photos et vidéos du site : `~/Desktop/01 Audiovisuel/Berete - Envoi ODORO/`. Logo : `~/Desktop/berete_jewellers-cropped.svg`.
-- Fichiers 3D de Yoni : `~/Downloads/*.stl` (ZN1059 collier, zp1864 pendentif, 0542, ZR0982 bague) et
-  `~/Desktop/Berete - 3D/fichiers de test/ZN1242-bj001.glb` (bracelet iJewel3D). Ses fichiers sortent de **Rhino** :
-  demander les **.3dm** (gardent métal et pierres séparés).
+- Photos et vidéos du site : `Berete - Envoi ODORO/`. Photos de la boutique : `Berete - Boutique Bijoutier (export ODORO)/`.
+  Croquis : `Berete - Croquis/`.
+- Fichiers 3D de Yoni : `Berete - 3D/fichiers de test/ZN1242-bj001.glb` (bracelet iJewel3D). Les 4 STL (ZN1059 collier,
+  zp1864 pendentif, 0542, ZR0982 bague) ne sont plus sur le Mac ni sur le disque : les remettre dans `Berete - 3D/`
+  (`npm run verify:3d` les y cherche ; une copie de chacun reste dans `storage/models/*/original.stl`, importée dans l'admin). Ses fichiers sortent de
+  **Rhino** : demander les **.3dm** (gardent métal et pierres séparés).
 
 ## Passe « identité Berete » (fichiers de Yoni du 19/11/2026) — état au 19/11/2026
 - [x] **Wording** de Yoni sur tout le site (menu, accueil, Créations, pièces, The Berete Circle, Championship rings,

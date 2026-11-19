@@ -12,7 +12,9 @@
  *     page writes an error in its console;
  *   - writes verification/3d/rapport.md.
  * Needs the site and its API running (npm run build && npm start, or BASE_URL=http://localhost:5173 with npm run dev:server).
- * Files: MODELS_GLB (default: the test file on the Desktop), MODELS_STL_DIR (default: ~/Downloads).
+ * Files: on the external disk (BERETE_DISK, default "/Volumes/Disque externe"), folder "Berete - 3D":
+ * MODELS_GLB (default: "fichiers de test/ZN1242-bj001.glb"), MODELS_STL_DIR (default: the folder itself, where the
+ * STL files of Yoni go; a missing one is skipped).
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -21,8 +23,13 @@ import { chromium, devices } from "@playwright/test";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3001";
 const OUT = path.resolve("verification/3d");
-const GLB = process.env.MODELS_GLB ?? path.join(os.homedir(), "Desktop/Berete - 3D/fichiers de test/ZN1242-bj001.glb");
-const STL_DIR = process.env.MODELS_STL_DIR ?? path.join(os.homedir(), "Downloads");
+const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
+const GLB = process.env.MODELS_GLB ?? path.join(DISK, "Berete - 3D", "fichiers de test", "ZN1242-bj001.glb");
+const STL_DIR = process.env.MODELS_STL_DIR ?? path.join(DISK, "Berete - 3D");
+if (!fs.existsSync(GLB)) {
+  console.error("Test file not found: " + GLB + (fs.existsSync(DISK) ? "" : "\nThe external disk is not connected (" + DISK + "): plug it in, or set BERETE_DISK."));
+  process.exit(1);
+}
 const STLS = ["ZN1059-BJ001(2).stl", "zp1864-BJ001.stl", "0542.stl", "ZR0982-BJ001.stl"];
 /** What Malik counted in each file, to compare with what the pipeline finds. */
 const EXPECTED = {

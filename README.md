@@ -74,14 +74,16 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   ses trois citations (01 L'Identité, 02 La Philosophie, 03 Le Parcours). Chaque chapitre, chaque citation et le haut de
   la page ont une place pour une photo personnelle (`src/data/house.ts`), invisible tant qu'elle est vide : onglet « La
   Maison » de l'admin, ou un fichier `portrait.jpg`, `citation-1.jpg`, `chapitre-03.jpg`… dans
-  `~/Desktop/Berete - La Maison` puis `npm run import-media -- --only=house`.
+  `Berete - La Maison` (disque externe) puis `npm run import-media -- --only=house`.
 - **Signature Trunks** (`/boxes`) : l'écrin Signature Trunk en tête (`FEATURED_BOX`, ses 10 photos qui s'ouvrent en
   grand), puis les autres écrins ; « Commission Your Signature Trunk » ouvre WhatsApp, le message déjà écrit.
 - **Les collections** : `/creations/pendants`, `/chains`, `/rings`, `/watches`, `/bracelets`.
   L'accueil montre une tuile par type qui a au moins 2 pièces.
-- **Les médias** sont produits par `npm run import-media`, qui relit les dossiers du Bureau
-  (`Berete - Stories`, `01 Audiovisuel/Berete - Envoi ODORO`, `02 Projets/Sites clients/Boutique Bijoutier`, le logo)
-  et écrit `public/media/` ainsi que `src/data/stories.generated.json` et `src/data/media.generated.json`.
+- **Les médias** sont produits par `npm run import-media`, qui relit les dossiers du disque externe
+  `/Volumes/Disque externe` (`BERETE_DISK` pour un autre chemin : `Berete - Stories` et le logo qui s'y trouve,
+  `Berete - Envoi ODORO`, `Berete - Boutique Bijoutier (export ODORO)`, `Berete - Croquis`, `Berete - La Maison`,
+  `Berete - Dossiers icloud`). Sans le disque, il s'arrête sans rien modifier (un dossier manquant viderait sa partie de
+  `public/media/`). Il écrit `public/media/` ainsi que `src/data/stories.generated.json` et `src/data/media.generated.json`.
   Les photos principales tirées des stories (image d'une vidéo, recadrage sur le bijou) et les photos des écrins
   sont décrites dans `scripts/piece-media.mjs`.
   Les croquis (`Berete - Croquis`, un fichier `<slug-de-la-pièce>.jpg` par pièce, les fichiers qui commencent par `_` sont
