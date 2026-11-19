@@ -166,4 +166,9 @@ export type GeneratedMedia = {
   hd?: Record<string, Record<string, MediaItem>>;
   /** The personal photos of Yoni for The House, by chapter (folder "Berete - La Maison"). */
   house?: HousePhotos;
+  /**
+   * The photos of each person in their jersey (scripts/player-media.mjs), by slug, cropped 4:5: the first is their
+   * portrait, the others go to "In Pictures" on their page.
+   */
+  players?: Record<string, MediaItem[]>;
 };

@@ -5,7 +5,7 @@
  * catalogue (server/catalogue.ts), then the admin can edit it.
  */
 import { BOXES, DAILY_MAIL_ARTICLE, INTER, PIECES } from "./pieces.js";
-import { storyFiles } from "./sources.js";
+import { media, storyFiles } from "./sources.js";
 import type { Catalogue, Person, Story } from "./types.js";
 
 export { media } from "./sources.js";
@@ -18,7 +18,8 @@ const person = (slug: string, name: string, extra: Partial<Person> = {}): Person
   kind: "player",
   number: null,
   club: null,
-  portrait: null,
+  // Their photo in their jersey, when Yoni sent one (scripts/player-media.mjs); the admin can change it.
+  portrait: media.players?.[slug]?.[0]?.src ?? null,
   instagram: null,
   bio: "",
   ...extra,

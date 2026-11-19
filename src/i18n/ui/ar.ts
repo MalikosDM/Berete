@@ -219,6 +219,8 @@ export const ar: Messages = {
     listLabel: "دائرة Berete",
     groups: { player: "الرياضيون", club: "أندية عريقة", personality: "رموز ثقافية" },
     portrait: (name: string) => "صورة " + name,
+    photos: "بالصور",
+    photo: (name: string, index: number) => name + "، الصورة " + index,
     instagramOf: (name: string) => name + " على Instagram",
     club: "نادٍ عريق",
     personality: "رمز ثقافي",
@@ -485,7 +487,7 @@ export const ar: Messages = {
     pieceDescription: (title: string, type: string, who: string) => title + ": " + type + " من إبداع Berete Jewellers في دبي، حصرياً من أجل " + who + ".",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? "، رياضي" : kind === "club" ? "، نادٍ عريق" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
-      "القصص والقطع المصممة حسب الطلب التي جمعت " + name + " (" + (kind === "club" ? "نادٍ" : kind === "personality" ? "شخصية" : "لاعب") + ") بدار Berete Jewellers، للمجوهرات الراقية المصنوعة في دبي.",
+      "القصص والقطع المصممة حسب الطلب التي جمعت " + name + " (" + (kind === "club" ? "نادٍ" : kind === "personality" ? "شخصية" : "رياضي") + ") بدار Berete Jewellers، للمجوهرات الراقية المصنوعة في دبي.",
   },
 
   /** عارض الأبعاد الثلاثية (صفحات القطع والروابط الخاصة) وصفحة الرابط الخاص. */

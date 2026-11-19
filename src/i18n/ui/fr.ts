@@ -236,6 +236,8 @@ export const fr: Messages = {
     listLabel: "Le Cercle Berete",
     groups: { player: "Athlètes", club: "Clubs emblématiques", personality: "Figures emblématiques" },
     portrait: (name: string) => "Portrait " + ofName(name),
+    photos: "En images",
+    photo: (name: string, index: number) => name + ", photo " + index,
     instagramOf: (name: string) => name + " sur Instagram",
     club: "Club emblématique",
     personality: "Figure emblématique",
@@ -503,7 +505,7 @@ export const fr: Messages = {
       title + " : " + type.toLowerCase() + (FEMININE.has(type.toLowerCase()) ? " créée" : " créé") + " exclusivement pour " + named(who) + " par Berete Jewellers, à Dubaï.",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", athlète" : kind === "club" ? ", club emblématique" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
-      "Les stories et les pièces sur mesure " + ofName(name) + " (" + (kind === "club" ? "club" : kind === "personality" ? "personnalité" : "joueur") + ") avec Berete Jewellers, haute joaillerie sur mesure réalisée à Dubaï.",
+      "Les stories et les pièces sur mesure " + ofName(name) + " (" + (kind === "club" ? "club" : kind === "personality" ? "personnalité" : "athlète") + ") avec Berete Jewellers, haute joaillerie sur mesure réalisée à Dubaï.",
   },
 
   /** Le visualiseur 3D (pages des pièces, liens privés) et la page d’un lien privé. */

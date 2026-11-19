@@ -236,6 +236,9 @@ export const en = {
     listLabel: "The Berete Circle",
     groups: { player: "Athletes", club: "Iconic Clubs", personality: "Cultural Icons" },
     portrait: (name: string) => "Portrait of " + name,
+    /** The other photos of a person on their page, and the text of each. */
+    photos: "In Pictures",
+    photo: (name: string, index: number) => name + ", photo " + index,
     instagramOf: (name: string) => name + " on Instagram",
     club: "Iconic Club",
     personality: "Cultural Icon",
@@ -454,7 +457,7 @@ export const en = {
     pieceDescription: (title: string, type: string, who: string) => title + ": " + type.toLowerCase() + " created exclusively for " + inSentence(who) + " by Berete Jewellers, Dubai.",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", Athlete" : kind === "club" ? ", Iconic Club" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
-      "The stories and the custom pieces of " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "personality" : "player") + ") with Berete Jewellers, custom high jewellery made in Dubai.",
+      "The stories and the custom pieces of " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "personality" : "athlete") + ") with Berete Jewellers, custom high jewellery made in Dubai.",
   },
   /** The 3D viewer (pages of pieces, private links) and the page of a private link. */
   viewer: {

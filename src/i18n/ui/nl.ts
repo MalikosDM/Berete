@@ -223,6 +223,8 @@ export const nl: Messages = {
     listLabel: "De Kring van Berete",
     groups: { player: "Atleten", club: "Iconische clubs", personality: "Culturele iconen" },
     portrait: (name: string) => "Portret van " + name,
+    photos: "In beeld",
+    photo: (name: string, index: number) => name + ", foto " + index,
     instagramOf: (name: string) => name + " op Instagram",
     club: "Iconische club",
     personality: "Cultureel icoon",
@@ -489,7 +491,7 @@ export const nl: Messages = {
     pieceDescription: (title: string, type: string, who: string) => title + ": een " + type.toLowerCase() + " exclusief gecreëerd voor " + inSentence(who) + " door Berete Jewellers in Dubai.",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", atleet" : kind === "club" ? ", iconische club" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
-      "De stories en de juwelen op maat van " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "persoonlijkheid" : "speler") + ") bij Berete Jewellers, haute joaillerie op maat uit Dubai.",
+      "De stories en de juwelen op maat van " + name + " (" + (kind === "club" ? "club" : kind === "personality" ? "persoonlijkheid" : "atleet") + ") bij Berete Jewellers, haute joaillerie op maat uit Dubai.",
   },
 
   /** De 3D-viewer (pagina's van de stukken, privélinks) en de pagina van een privélink. */

@@ -6,6 +6,7 @@
  * have no copies and stay as they are; a missing copy falls back to the photo
  * itself (Img, src/components/Media.tsx).
  */
+import { media } from "@/data/sources";
 
 /** The same widths and margin as scripts/media-sizes.mjs. */
 const SIZES = [160, 640, 1080];
@@ -39,7 +40,18 @@ export function srcSetOf(src: string, width: number | undefined): string | undef
 /** The width of a story cover (scripts/import-media.mjs makes them 400 px wide). */
 const STORY_COVER_WIDTH = 400;
 
-/** The srcset of a story cover (also the portrait of most people), else none. */
+/** The widths of the portraits of the people (photos in their jersey, crops of the stories), by address. */
+const PORTRAIT_WIDTHS = new Map<string, number | undefined>([
+  ...Object.values(media.players ?? {})
+    .flat()
+    .map((m): [string, number | undefined] => [m.src, m.width]),
+  ...Object.entries(media.stills ?? {})
+    .filter(([key]) => key.startsWith("portraits/"))
+    .map(([, m]): [string, number | undefined] => [m.src, m.width]),
+]);
+
+/** The srcset of a story cover or of the portrait of a person, else none. */
 export function coverSrcSet(src: string): string | undefined {
-  return /^\/media\/stories\/[^/]+\/cover\.webp$/.test(src) ? srcSetOf(src, STORY_COVER_WIDTH) : undefined;
+  if (/^\/media\/stories\/[^/]+\/cover\.webp$/.test(src)) return srcSetOf(src, STORY_COVER_WIDTH);
+  return srcSetOf(src, PORTRAIT_WIDTHS.get(src));
 }

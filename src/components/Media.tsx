@@ -1,18 +1,24 @@
-import { useEffect, useRef, useState, type ImgHTMLAttributes, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type ImgHTMLAttributes, type RefObject } from "react";
 import Logo from "@/components/Logo";
 import type { MediaItem } from "@/data/types";
 import { afterLoad } from "@/lib/idle";
 import { SIZES_FOR, srcSetOf } from "@/lib/responsive";
 
-type ImgProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & { src: string; alt: string };
+type ImgProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & { src: string; alt: string; fade?: boolean };
 
 /**
  * An image that never shows a broken icon: a missing file becomes black with the logo as a watermark.
  * When one of its smaller copies (srcSet) is missing, it shows the photo itself.
+ * `fade`: hidden until it has loaded, then fades in (its box keeps its size meanwhile: nothing moves).
  */
-export function Img({ src, alt, className = "", srcSet, sizes, ...rest }: ImgProps) {
+export function Img({ src, alt, className = "", srcSet, sizes, fade = false, onLoad, ...rest }: ImgProps) {
   const [failed, setFailed] = useState<string | null>(null);
   const [plain, setPlain] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState<string | null>(null);
+  // A photo already in the cache may have loaded before React listened.
+  const seen = useCallback((el: HTMLImageElement | null) => {
+    if (el?.complete && el.naturalWidth > 0) setLoaded(el.getAttribute("src"));
+  }, []);
   if (!src || failed === src) {
     const a11y = alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true as const };
     return (
@@ -22,7 +28,22 @@ export function Img({ src, alt, className = "", srcSet, sizes, ...rest }: ImgPro
     );
   }
   const copies = srcSet && plain !== src ? { srcSet, sizes } : {};
-  return <img {...rest} {...copies} src={src} alt={alt} onError={() => (copies.srcSet ? setPlain(src) : setFailed(src))} className={className} />;
+  const look = fade ? (loaded === src ? " opacity-100" : " opacity-0") + (className.includes("transition") ? "" : " transition-opacity duration-700") : "";
+  return (
+    <img
+      {...rest}
+      {...copies}
+      ref={fade ? seen : undefined}
+      src={src}
+      alt={alt}
+      onLoad={(e) => {
+        setLoaded(src);
+        onLoad?.(e);
+      }}
+      onError={() => (copies.srcSet ? setPlain(src) : setFailed(src))}
+      className={className + look}
+    />
+  );
 }
 
 /** Forces a video into the muted, inline state browsers require to play it by itself. */
@@ -77,9 +98,9 @@ export function LoopVideo({ item, label, className = "" }: { item: MediaItem; la
  * `eager`: a photo of the top of the page, put in the page at once. The others
  * wait until the page has loaded (or until they are on screen), then load as
  * the visitor comes near them. `priority`: the one main photo of the page,
- * downloaded before anything else.
+ * downloaded before anything else. `fade`: a photo fades in once loaded.
  */
-export function MediaView({ item, alt, className = "", eager = false, priority = false, fit, sizes = SIZES_FOR.half }: { item: MediaItem; alt?: string; className?: string; eager?: boolean; priority?: boolean; fit?: "contain" | "cover"; sizes?: string }) {
+export function MediaView({ item, alt, className = "", eager = false, priority = false, fit, sizes = SIZES_FOR.half, fade = false }: { item: MediaItem; alt?: string; className?: string; eager?: boolean; priority?: boolean; fit?: "contain" | "cover"; sizes?: string; fade?: boolean }) {
   const [spot, ready] = useWhenNeeded(eager || priority);
   const label = alt ?? item.alt ?? "";
   const mode = fit ?? (item.onBlack ? "contain" : "cover");
@@ -98,6 +119,7 @@ export function MediaView({ item, alt, className = "", eager = false, priority =
       fetchPriority={priority ? "high" : undefined}
       decoding="async"
       draggable={false}
+      fade={fade}
       className={"h-full w-full select-none " + look + className}
     />
   );

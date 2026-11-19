@@ -75,12 +75,19 @@ export function pieceVisualFor(piece: Piece, person: Person | null): MediaItem {
 }
 
 /**
- * Portrait of a person: their profile photo (admin), else the best photo of them found in the stories, cropped on them
+ * Portrait of a person: their profile photo (admin; by default their photo in their jersey, scripts/player-media.mjs),
+ * else that photo in their jersey, else the best photo of them found in the stories, cropped on them
  * (scripts/piece-media.mjs, PORTRAITS); "" when there is none: the site shows their initials. Never a photo of a jewel.
  */
 export function portraitOf(_cat: Catalogue, person: Person): string {
   if (person.portrait) return person.portrait;
-  return media.stills?.["portraits/" + person.slug]?.src ?? "";
+  return media.players?.[person.slug]?.[0]?.src ?? media.stills?.["portraits/" + person.slug]?.src ?? "";
+}
+
+/** The other photos of a person in their jersey ("In Pictures" on their page): all of them but the portrait shown. */
+export function photosOf(cat: Catalogue, person: Person): MediaItem[] {
+  const shown = portraitOf(cat, person);
+  return (media.players?.[person.slug] ?? []).filter((m) => m.src !== shown);
 }
 
 /** The Instagram profile of a person, or null. */

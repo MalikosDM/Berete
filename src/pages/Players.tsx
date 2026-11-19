@@ -11,7 +11,7 @@ import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import { defaultCatalogue } from "@/data/catalogue";
-import { findPerson, instagramOf, leftTheCircle, membersOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
+import { findPerson, instagramOf, leftTheCircle, membersOf, photosOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
 import type { PersonKind } from "@/data/types";
 import { Link, Navigate, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -54,6 +54,7 @@ export function PlayerPage() {
   const stories = storiesOf(cat, person.slug);
   const pieces = piecesOf(cat, person.slug);
   const members = membersOf(cat, person);
+  const photos = photosOf(cat, person);
   const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
   const instagram = instagramOf(person);
 
@@ -61,7 +62,7 @@ export function PlayerPage() {
     <>
       <section className="mx-auto grid max-w-[1600px] gap-12 px-5 pt-32 pb-20 sm:px-8 lg:grid-cols-12 lg:px-12 lg:pt-40 lg:pb-28">
         <div className="lg:col-span-5">
-          <PlayerPortrait person={person} big sizes="(max-width: 1023px) 100vw, 40vw" className="aspect-[4/5] w-full" />
+          <PlayerPortrait person={person} big priority sizes="(max-width: 1023px) 100vw, 40vw" className="aspect-[4/5] w-full" />
         </div>
         <div className="flex flex-col justify-center lg:col-span-6 lg:col-start-7">
           <Link to="/players" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-bone hover:text-rose-light">
@@ -122,6 +123,19 @@ export function PlayerPage() {
                 </li>
               );
             })}
+          </ul>
+        </section>
+      ) : null}
+
+      {photos.length > 0 ? (
+        <section aria-labelledby="player-photos" className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+          <h2 id="player-photos" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.players.photos}</h2>
+          <ul data-player-photos className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
+            {photos.map((m, i) => (
+              <li key={m.src} className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
+                <MediaView item={m} alt={t.players.photo(person.name, i + 1)} fit="cover" fade sizes="(max-width: 1023px) 50vw, 33vw" />
+              </li>
+            ))}
           </ul>
         </section>
       ) : null}

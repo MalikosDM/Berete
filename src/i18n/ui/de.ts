@@ -236,6 +236,8 @@ export const de: Messages = {
     listLabel: "Der Berete-Kreis",
     groups: { player: "Athleten", club: "Legendäre Vereine", personality: "Kulturikonen" },
     portrait: (name: string) => "Porträt " + ofName(name),
+    photos: "In Bildern",
+    photo: (name: string, index: number) => name + ", Foto " + index,
     instagramOf: (name: string) => name + " auf Instagram",
     club: "Legendärer Verein",
     personality: "Kulturikone",
@@ -504,7 +506,7 @@ export const de: Messages = {
     pieceDescription: (title: string, type: string, who: string) => title + ": " + type + " von Berete Jewellers aus Dubai, exklusiv geschaffen für " + named(who, "acc") + ".",
     personTitle: (name: string, kind: "player" | "club" | "personality") => name + (kind === "player" ? ", Athlet" : kind === "club" ? ", legendärer Verein" : ""),
     personDescription: (name: string, kind: "player" | "club" | "personality") =>
-      "Die Storys und die maßgefertigten Stücke " + ofName(name) + " (" + (kind === "club" ? "Verein" : kind === "personality" ? "Persönlichkeit" : "Spieler") + ") bei Berete Jewellers, Haute Joaillerie nach Maß aus Dubai.",
+      "Die Storys und die maßgefertigten Stücke " + ofName(name) + " (" + (kind === "club" ? "Verein" : kind === "personality" ? "Persönlichkeit" : "Athlet") + ") bei Berete Jewellers, Haute Joaillerie nach Maß aus Dubai.",
   },
 
   /** Der 3D-Viewer (Seiten der Stücke, private Links) und die Seite eines privaten Links. */

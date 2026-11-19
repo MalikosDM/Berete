@@ -2810,5 +2810,203 @@
         "audio": false
       }
     }
+  },
+  "players": {
+    "atakan-karazor": [
+      {
+        "type": "image",
+        "src": "/media/players/atakan-karazor.webp",
+        "width": 1000,
+        "height": 1250
+      }
+    ],
+    "chris-fuehrich": [
+      {
+        "type": "image",
+        "src": "/media/players/chris-fuehrich.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "deniz-undav": [
+      {
+        "type": "image",
+        "src": "/media/players/deniz-undav.webp",
+        "width": 1008,
+        "height": 1260
+      }
+    ],
+    "eljero-elia": [
+      {
+        "type": "image",
+        "src": "/media/players/eljero-elia.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "jamie-leweling": [
+      {
+        "type": "image",
+        "src": "/media/players/jamie-leweling.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/jamie-leweling-2.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "keita-losene": [
+      {
+        "type": "image",
+        "src": "/media/players/keita-losene.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/keita-losene-2.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/keita-losene-3.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "kenan-yildiz": [
+      {
+        "type": "image",
+        "src": "/media/players/kenan-yildiz.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/kenan-yildiz-2.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "kevin-schade": [
+      {
+        "type": "image",
+        "src": "/media/players/kevin-schade.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/kevin-schade-2.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "lois-openda": [
+      {
+        "type": "image",
+        "src": "/media/players/lois-openda.webp",
+        "width": 840,
+        "height": 1050
+      }
+    ],
+    "malik-tillman": [
+      {
+        "type": "image",
+        "src": "/media/players/malik-tillman.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/malik-tillman-2.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "marcus-thuram": [
+      {
+        "type": "image",
+        "src": "/media/players/marcus-thuram.webp",
+        "width": 792,
+        "height": 990
+      },
+      {
+        "type": "image",
+        "src": "/media/players/marcus-thuram-2.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      {
+        "type": "image",
+        "src": "/media/players/marcus-thuram-3.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "maximilian-mittelstaedt": [
+      {
+        "type": "image",
+        "src": "/media/players/maximilian-mittelstaedt.webp",
+        "width": 936,
+        "height": 1170
+      },
+      {
+        "type": "image",
+        "src": "/media/players/maximilian-mittelstaedt-2.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "michy-batshuayi": [
+      {
+        "type": "image",
+        "src": "/media/players/michy-batshuayi.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "noah-okafor": [
+      {
+        "type": "image",
+        "src": "/media/players/noah-okafor.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ],
+    "radja-nainggolan": [
+      {
+        "type": "image",
+        "src": "/media/players/radja-nainggolan.webp",
+        "width": 952,
+        "height": 1190
+      },
+      {
+        "type": "image",
+        "src": "/media/players/radja-nainggolan-2.webp",
+        "width": 1072,
+        "height": 1340
+      }
+    ],
+    "samuel-ballet": [
+      {
+        "type": "image",
+        "src": "/media/players/samuel-ballet.webp",
+        "width": 992,
+        "height": 1240
+      }
+    ],
+    "tajon-buchanan": [
+      {
+        "type": "image",
+        "src": "/media/players/tajon-buchanan.webp",
+        "width": 1080,
+        "height": 1350
+      }
+    ]
   }
 }

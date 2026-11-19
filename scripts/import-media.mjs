@@ -9,7 +9,7 @@
  * source disappeared are removed.
  *
  *   npm run import-media                 # everything
- *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,house
+ *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,house,players
  *   npm run import-media -- --force      # re-encode everything
  *
  * Source folders (override with the environment variables):
@@ -24,6 +24,8 @@
  *                       section "house")
  *   BERETE_HD_DIR       /Volumes/Disque externe/Berete - Dossiers icloud  (the high-resolution
  *                       photos and videos of Yoni, chosen in scripts/hd-media.mjs; section "hd")
+ *   BERETE_PLAYERS_DIR  <BERETE_HD_DIR>/00 Contexte Yoni/Photos joueurs en maillot  (the players in their jersey, one
+ *                       folder per person; photos and crops chosen in scripts/player-media.mjs; section "players")
  *
  * The main photos of the pieces taken from the stories (frames, crops) and
  * the photos of the boxes are listed in scripts/piece-media.mjs.
@@ -39,6 +41,7 @@ import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
 import { HD } from "./hd-media.mjs";
+import { PLAYERS } from "./player-media.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = join(ROOT, "public");
@@ -54,6 +57,7 @@ const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DESKTOP, "02 Projet
 const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DESKTOP, "Berete - Croquis");
 const HOUSE_DIR = process.env.BERETE_HOUSE_DIR ?? join(DESKTOP, "Berete - La Maison");
 const HD_DIR = process.env.BERETE_HD_DIR ?? join("/Volumes", "Disque externe", "Berete - Dossiers icloud");
+const PLAYERS_DIR = process.env.BERETE_PLAYERS_DIR ?? join(HD_DIR, "00 Contexte Yoni", "Photos joueurs en maillot");
 
 const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
@@ -577,6 +581,88 @@ async function importHouse() {
   return Object.fromEntries(Object.keys(photos).sort().map((k) => [k, photos[k]]));
 }
 
+/* ---------- The players: their portraits, from the photos of Yoni in their jersey (scripts/player-media.mjs) ---------- */
+
+/** 4:5, at most 1080 x 1350, never larger than the part of the photo kept. */
+const PLAYER_PHOTO = { maxW: 1080, quality: 82 };
+/**
+ * One light look for the whole series: deeper blacks, a little warmth (the rose gold of the site) in the shadows and the
+ * middle tones only, so that the whites and the colours of the jerseys stay theirs, a soft vignette, and a touch of
+ * sharpness after the resize.
+ */
+const PLAYER_GRADE = "curves=all='0/0 0.07/0.035 0.5/0.5 0.93/0.95 1/1',colorbalance=rs=0.025:bs=-0.025:rm=0.012:bm=-0.012,eq=saturation=0.97,vignette=angle=PI/7,unsharp=5:5:0.3:5:5:0";
+
+/** The part of a photo kept (fractions of it), in pixels: exactly 4:5 and inside the photo; and the size of the file. */
+function portraitBox(width, height, [x, y, w, h]) {
+  let cw = Math.round(w * width);
+  let ch = Math.round(h * height);
+  if (cw * 5 > ch * 4) cw = Math.floor((ch * 4) / 5);
+  else ch = Math.floor((cw * 5) / 4);
+  const left = Math.max(0, Math.min(width - cw, Math.round(x * width)));
+  const top = Math.max(0, Math.min(height - ch, Math.round(y * height)));
+  // A multiple of 8 wide: its height (5/4 of it) is then whole and even.
+  const outW = Math.min(PLAYER_PHOTO.maxW, Math.floor(cw / 8) * 8);
+  return { crop: cw + ":" + ch + ":" + left + ":" + top, scale: outW + ":" + (outW * 5) / 4 };
+}
+
+async function playerPhoto(src, out, crop) {
+  const recipe = "player:" + crop.join(",") + ":" + PLAYER_PHOTO.maxW + ":" + PLAYER_PHOTO.quality + ":" + PLAYER_GRADE;
+  if (await upToDate(out, src, recipe)) {
+    produced.add(out);
+    skipped += 1;
+  } else {
+    let input = src;
+    // An iPhone photo (HEIC) goes through a JPEG first (sips, macOS), at its full size.
+    if (/\.heic$/i.test(src)) {
+      input = join(tmpdir(), "berete-" + process.pid + "-" + Math.random().toString(36).slice(2) + ".jpg");
+      await run("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "95", src, "--out", input]);
+    }
+    try {
+      const { width, height } = await probe(input);
+      const box = portraitBox(width, height, crop);
+      const vf = "crop=" + box.crop + ",scale=" + box.scale + ":flags=lanczos," + PLAYER_GRADE;
+      await produce(out, src, recipe, ["-i", input, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PLAYER_PHOTO.quality), "-compression_level", "6"]);
+    } finally {
+      if (input !== src) await rm(input, { force: true });
+    }
+  }
+  const p = await probe(out);
+  return { type: "image", src: webPath(out), width: p.width, height: p.height };
+}
+
+/** By person: the main portrait first ("<slug>.webp"), then the other photos ("<slug>-2.webp"...). */
+async function importPlayers() {
+  if (!existsSync(PLAYERS_DIR)) {
+    console.warn("Players folder not found, skipped: " + PLAYERS_DIR);
+    return null;
+  }
+  console.log("Players: " + PLAYERS_DIR);
+  const folders = new Map((await readdir(PLAYERS_DIR, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => [slugify(e.name), e.name]));
+  const found = {};
+  const jobs = [];
+  for (const { slug, photos } of PLAYERS) {
+    const folder = folders.get(slug);
+    if (!folder) {
+      console.warn("  ! folder not found for " + slug);
+      continue;
+    }
+    const files = await readdir(join(PLAYERS_DIR, folder));
+    const list = (found[slug] = []);
+    photos.forEach((photo, i) => {
+      const name = files.find((f) => new RegExp(" - " + pad2(photo.n) + "\\.(jpe?g|png|webp|heic)$", "i").test(f));
+      if (!name) {
+        console.warn("  ! not found: " + folder + " - " + pad2(photo.n));
+        return;
+      }
+      const out = join(MEDIA, "players", slug + (i === 0 ? "" : "-" + (i + 1)) + ".webp");
+      jobs.push(async () => (list[i] = await playerPhoto(join(PLAYERS_DIR, folder, name), out, photo.crop)));
+    });
+  }
+  await pool(jobs, cpus().length, (j) => j());
+  // In the order of the list, whatever finished first.
+  return Object.fromEntries(PLAYERS.map(({ slug }) => [slug, (found[slug] ?? []).filter(Boolean)]).filter(([, list]) => list.length > 0));
+}
+
 /* ---------- Scroll-driven videos: WebP frame sequences + an all-intra fallback ---------- */
 
 async function frameSet(src, dir, start, set, crop) {
@@ -737,6 +823,13 @@ if (runs("house")) {
   if (house !== null) {
     media.house = house;
     pruneDirs.push(join(MEDIA, "house"));
+  }
+}
+if (runs("players")) {
+  const players = await importPlayers();
+  if (players !== null) {
+    media.players = players;
+    pruneDirs.push(join(MEDIA, "players"));
   }
 }
 if (runs("hd")) {

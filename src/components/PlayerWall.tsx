@@ -7,10 +7,11 @@ import { useCatalogue } from "@/lib/catalogue";
 import { coverSrcSet } from "@/lib/responsive";
 
 /**
- * The photo of a person: their profile photo, else the best photo of them from the stories (cropped on them), else
- * their initials in rose gold.
+ * The photo of a person (4:5): their profile photo (by default their photo in their jersey), else the best photo of them
+ * from the stories (cropped on them), else their initials in rose gold. It fades in once loaded, in a box of fixed size.
+ * `priority`: the portrait at the top of their page, downloaded first.
  */
-export function PlayerPortrait({ person, className = "", sizes = "96px", big = false }: { person: Person; className?: string; sizes?: string; big?: boolean }) {
+export function PlayerPortrait({ person, className = "", sizes = "96px", big = false, priority = false }: { person: Person; className?: string; sizes?: string; big?: boolean; priority?: boolean }) {
   const { t } = useI18n();
   const cat = useCatalogue();
   const src = portraitOf(cat, person);
@@ -21,7 +22,19 @@ export function PlayerPortrait({ person, className = "", sizes = "96px", big = f
       </span>
     );
   }
-  return <Img src={src} srcSet={coverSrcSet(src)} sizes={sizes} alt={t.players.portrait(person.name)} loading="lazy" decoding="async" className={"object-cover " + className} />;
+  return (
+    <Img
+      src={src}
+      srcSet={coverSrcSet(src)}
+      sizes={sizes}
+      alt={t.players.portrait(person.name)}
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
+      decoding="async"
+      fade
+      className={"object-cover " + className}
+    />
+  );
 }
 
 /** People with a photo first, in their order: the wall of the home page starts with faces. */
@@ -46,7 +59,7 @@ export default function PlayerWall({ people, compact = false }: { people: Person
           <li key={p.slug} data-player-card={p.slug} className="group relative">
             <Link to={"/players/" + p.slug} className="block">
               <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
-                <PlayerPortrait person={p} sizes={sizes} className="h-full w-full transition-transform duration-700 group-hover:scale-105" />
+                <PlayerPortrait person={p} sizes={sizes} className="h-full w-full transition-[opacity,transform] duration-700 group-hover:scale-105" />
                 <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-t from-ink/60 to-transparent" />
               </span>
               {/* Three narrow columns on phones: the names in plain letters, so that long names keep whole words. */}
