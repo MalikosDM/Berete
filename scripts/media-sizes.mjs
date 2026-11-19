@@ -16,6 +16,7 @@ const MEDIA = fileURLToPath(new URL("../public/media", import.meta.url));
 export const SIZES = [
   { width: 160, quality: 75 },
   { width: 640, quality: 78 },
+  { width: 1080, quality: 80 },
 ];
 /** A copy is made only for a photo at least this much wider (a copy almost as big would not help). */
 export const MARGIN = 1.25;

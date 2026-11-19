@@ -856,5 +856,1959 @@
       "width": 1080,
       "height": 1446
     }
+  },
+  "hd": {
+    "kenan-yildiz-celebration-pendant": {
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p01.webp",
+        "width": 1151,
+        "height": 2048
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/kenan-yildiz-celebration-pendant/v01.mp4",
+        "poster": "/media/hd/kenan-yildiz-celebration-pendant/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "the-hand": {
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p01.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p05.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/the-hand/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/the-hand/v01.mp4",
+        "poster": "/media/hd/the-hand/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "kevin-schade-dragon-ball-pendant": {
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p19": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p19.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p09.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p14": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p14.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p15.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p20.webp",
+        "width": 1439,
+        "height": 2160
+      },
+      "p21": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/p21.webp",
+        "width": 1440,
+        "height": 1920
+      }
+    },
+    "the-safi-link": {
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p05.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/the-safi-link/p01.webp",
+        "width": 1440,
+        "height": 2160
+      }
+    },
+    "noah-okafor-octagon-pendant": {
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p09.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p01.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p10.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/p11.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    },
+    "angelo-stiller-as-pendant": {
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p05.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p01.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p10.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/p12.webp",
+        "width": 1440,
+        "height": 1920
+      },
+      "v04": {
+        "type": "video",
+        "src": "/media/hd/angelo-stiller-as-pendant/v04.mp4",
+        "poster": "/media/hd/angelo-stiller-as-pendant/v04-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "malik-tillman-cross-pendant": {
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p17.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p13": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p13.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p14": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p14.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p01.webp",
+        "width": 1366,
+        "height": 2048
+      },
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/p20.webp",
+        "width": 1440,
+        "height": 1352
+      },
+      "v03": {
+        "type": "video",
+        "src": "/media/hd/malik-tillman-cross-pendant/v03.mp4",
+        "poster": "/media/hd/malik-tillman-cross-pendant/v03-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 9.41,
+        "audio": false
+      }
+    },
+    "michy-batshuayi-butterfly-chain": {
+      "p54": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p54.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p68": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p68.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p62": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p62.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p74": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p74.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p65": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p65.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p57": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p57.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p69": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p69.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p66": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p66.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p60": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p60.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p17.webp",
+        "width": 1440,
+        "height": 1920
+      },
+      "p76": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p76.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    },
+    "tulips-on-tour-medallion": {
+      "p21": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p21.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p16": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p16.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p13": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p13.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p20.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p05.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p25": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/p25.webp",
+        "width": 1440,
+        "height": 1920
+      },
+      "v13": {
+        "type": "video",
+        "src": "/media/hd/tulips-on-tour-medallion/v13.mp4",
+        "poster": "/media/hd/tulips-on-tour-medallion/v13-poster.webp",
+        "width": 1280,
+        "height": 720,
+        "duration": 7.28,
+        "audio": false
+      }
+    },
+    "campione-d-italia-2023-2024": {
+      "p40": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p40.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p52": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p52.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p53": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p53.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p15.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p43": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p43.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p44": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p44.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p60": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p60.webp",
+        "width": 1440,
+        "height": 960
+      },
+      "p64": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p64.webp",
+        "width": 1440,
+        "height": 1920
+      },
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p17.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p25": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p25.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p28": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p28.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p20.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p22": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/p22.webp",
+        "width": 1440,
+        "height": 2160
+      }
+    },
+    "marcus-thuram-ruby-t-necklace": {
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p03.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p10.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p05.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/p01.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "v03": {
+        "type": "video",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/v03.mp4",
+        "poster": "/media/hd/marcus-thuram-ruby-t-necklace/v03-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 9.13,
+        "audio": false
+      }
+    },
+    "marcus-thuram-t-serpent-pendant": {
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p08.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p01.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/v01.mp4",
+        "poster": "/media/hd/marcus-thuram-t-serpent-pendant/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 7.2,
+        "audio": false
+      },
+      "v03": {
+        "type": "video",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/v03.mp4",
+        "poster": "/media/hd/marcus-thuram-t-serpent-pendant/v03-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12.01,
+        "audio": false
+      },
+      "08-p02": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/08-p02.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    },
+    "vfb-stuttgart-dfb-pokal-2025": {
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p17.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p13": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p13.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p14": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p14.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p15.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p16": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p16.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p20.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p06.webp",
+        "width": 1439,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p19": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p19.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p22": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p22.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p07.webp",
+        "width": 1440,
+        "height": 810
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p04.webp",
+        "width": 1080,
+        "height": 1920
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p05.webp",
+        "width": 963,
+        "height": 1633
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/p08.webp",
+        "width": 1216,
+        "height": 2160
+      }
+    },
+    "noah-okafor-jersey-pendant": {
+      "p20": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p20.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p15.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p07.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p06.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p12.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p10.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p11.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p16": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p16.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p01.webp",
+        "width": 1124,
+        "height": 2048
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p02.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p21": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/p21.webp",
+        "width": 1080,
+        "height": 1440
+      }
+    },
+    "noah-okafor-oka-pendant": {
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p17.webp",
+        "width": 1440,
+        "height": 1528
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p03.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p05.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p06.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p04.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p09.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p14": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p14.webp",
+        "width": 1440,
+        "height": 1800
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p01.webp",
+        "width": 1366,
+        "height": 2048
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p02.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/p18.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "v02": {
+        "type": "video",
+        "src": "/media/hd/noah-okafor-oka-pendant/v02.mp4",
+        "poster": "/media/hd/noah-okafor-oka-pendant/v02-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "boxes/dragon-ball-trunk": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/boxes/dragon-ball-trunk/p01.webp",
+        "width": 1440,
+        "height": 960
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/boxes/dragon-ball-trunk/p02.webp",
+        "width": 1440,
+        "height": 960
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/boxes/dragon-ball-trunk/p04.webp",
+        "width": 1440,
+        "height": 2160
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/boxes/dragon-ball-trunk/p05.webp",
+        "width": 1440,
+        "height": 2047
+      }
+    },
+    "boxes/tulips-on-tour": {
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/boxes/tulips-on-tour/p02.webp",
+        "width": 1440,
+        "height": 971
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/boxes/tulips-on-tour/p01.webp",
+        "width": 1440,
+        "height": 830
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/boxes/tulips-on-tour/p03.webp",
+        "width": 1440,
+        "height": 960
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/boxes/tulips-on-tour/p04.webp",
+        "width": 1440,
+        "height": 2160
+      }
+    },
+    "boxes/signature-trunk": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p01.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p02.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p03.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p04.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p05.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p06.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p08.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p09.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p10.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/boxes/signature-trunk/p07.webp",
+        "width": 1066,
+        "height": 1600
+      }
+    },
+    "atelier": {
+      "v12": {
+        "type": "video",
+        "src": "/media/hd/atelier/v12.mp4",
+        "poster": "/media/hd/atelier/v12-poster.webp",
+        "width": 1280,
+        "height": 720,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "chaine-cubaine-glacee-or-rose": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "01-p02": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/01-p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "01-p04": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/01-p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "01-p06": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/01-p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "01-p07": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/01-p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "01-f": {
+        "type": "video",
+        "src": "/media/hd/chaine-cubaine-glacee-or-rose/01-f.mp4",
+        "poster": "/media/hd/chaine-cubaine-glacee-or-rose/01-f-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "chaine-tennis-2-rangs": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/chaine-tennis-2-rangs/p06.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "pendentif-initiales-de": {
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/pendentif-initiales-de/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "v02": {
+        "type": "video",
+        "src": "/media/hd/pendentif-initiales-de/v02.mp4",
+        "poster": "/media/hd/pendentif-initiales-de/v02-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "pendentif-croix-christ-or-rose": {
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/v01.mp4",
+        "poster": "/media/hd/pendentif-croix-christ-or-rose/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      },
+      "v02": {
+        "type": "video",
+        "src": "/media/hd/pendentif-croix-christ-or-rose/v02.mp4",
+        "poster": "/media/hd/pendentif-croix-christ-or-rose/v02-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "croix-baguettes": {
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p12.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p09.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p11.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p08.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p10.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/croix-baguettes/p01.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "collier-or-rose-fermoir-croix": {
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p08.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p09.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p10.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p11.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/collier-or-rose-fermoir-croix/p12.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "chaine-diamants": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/chaine-diamants/p01.webp",
+        "width": 1080,
+        "height": 1279
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/chaine-diamants/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/chaine-diamants/p03.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "bague-eternity-diamants-ovales": {
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/bague-eternity-diamants-ovales/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/bague-eternity-diamants-ovales/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/bague-eternity-diamants-ovales/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/bague-eternity-diamants-ovales/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/bague-eternity-diamants-ovales/p05.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "pendentif-nom-en-lettres": {
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p21": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p21.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p15.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p13": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p13.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p12": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p12.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p18.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p16": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p16.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p22": {
+        "type": "image",
+        "src": "/media/hd/pendentif-nom-en-lettres/p22.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/pendentif-nom-en-lettres/v01.mp4",
+        "poster": "/media/hd/pendentif-nom-en-lettres/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "bracelet-or-rose-brt-a-pics": {
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p10.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p11.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p13": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p13.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p18": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p18.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/bracelet-or-rose-brt-a-pics/p17.webp",
+        "width": 1080,
+        "height": 1620
+      }
+    },
+    "pendentif-tete-animal": {
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p10.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p08.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p05.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p09.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/pendentif-tete-animal/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/pendentif-tete-animal/v01.mp4",
+        "poster": "/media/hd/pendentif-tete-animal/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      },
+      "v02": {
+        "type": "video",
+        "src": "/media/hd/pendentif-tete-animal/v02.mp4",
+        "poster": "/media/hd/pendentif-tete-animal/v02-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      },
+      "v07": {
+        "type": "video",
+        "src": "/media/hd/pendentif-tete-animal/v07.mp4",
+        "poster": "/media/hd/pendentif-tete-animal/v07-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 11.67,
+        "audio": false
+      }
+    },
+    "medaille-gravee-nathalie-jose": {
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p01.webp",
+        "width": 1080,
+        "height": 1440
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p04.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p09.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p15.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p16": {
+        "type": "image",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/p16.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/medaille-gravee-nathalie-jose/v01.mp4",
+        "poster": "/media/hd/medaille-gravee-nathalie-jose/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "chaine-cubaine-baguettes": {
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p06.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p07.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p08.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p09.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p11.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-baguettes/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/chaine-cubaine-baguettes/v01.mp4",
+        "poster": "/media/hd/chaine-cubaine-baguettes/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "bracelet-tennis-baguettes-or-rose": {
+      "p11": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p11.webp",
+        "width": 1080,
+        "height": 1349
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p10.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p03.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p04.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p05.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      "p06": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p06.webp",
+        "width": 1080,
+        "height": 1350
+      },
+      "p07": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p07.webp",
+        "width": 1080,
+        "height": 1349
+      },
+      "p09": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p09.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "p08": {
+        "type": "image",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/p08.webp",
+        "width": 1066,
+        "height": 1600
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/bracelet-tennis-baguettes-or-rose/v01.mp4",
+        "poster": "/media/hd/bracelet-tennis-baguettes-or-rose/v01-poster.webp",
+        "width": 720,
+        "height": 1280,
+        "duration": 12,
+        "audio": false
+      }
+    },
+    "chaine-cubaine-glacee": {
+      "p02": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee/p02.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p01": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee/p01.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p03": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee/p03.webp",
+        "width": 1080,
+        "height": 1620
+      },
+      "p04": {
+        "type": "image",
+        "src": "/media/hd/chaine-cubaine-glacee/p04.webp",
+        "width": 1080,
+        "height": 810
+      },
+      "v01": {
+        "type": "video",
+        "src": "/media/hd/chaine-cubaine-glacee/v01.mp4",
+        "poster": "/media/hd/chaine-cubaine-glacee/v01-poster.webp",
+        "width": 848,
+        "height": 480,
+        "duration": 6,
+        "audio": false
+      }
+    }
   }
 }

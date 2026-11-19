@@ -8,7 +8,7 @@
  */
 
 /** The same widths and margin as scripts/media-sizes.mjs. */
-const SIZES = [160, 640];
+const SIZES = [160, 640, 1080];
 const MARGIN = 1.25;
 
 /** Common widths on screen, for `sizes`. */

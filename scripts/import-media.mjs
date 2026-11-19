@@ -9,7 +9,7 @@
  * source disappeared are removed.
  *
  *   npm run import-media                 # everything
- *   npm run import-media -- --only=stories,site,scroll,brand,sketches
+ *   npm run import-media -- --only=stories,site,scroll,brand,sketches,hd,house
  *   npm run import-media -- --force      # re-encode everything
  *
  * Source folders (override with the environment variables):
@@ -19,6 +19,11 @@
  *   BERETE_BOUTIQUE_DIR ~/Desktop/02 Projets/Sites clients/Boutique Bijoutier
  *   BERETE_SKETCHES_DIR ~/Desktop/Berete - Croquis  (one "<slug of the piece>.jpg"
  *                       per piece: step "Sketch" of "How it was made")
+ *   BERETE_HOUSE_DIR    ~/Desktop/Berete - La Maison  (the personal photos of Yoni for The House: one
+ *                       "<place>.jpg" per place, "portrait", "citation-1", "chapitre-03"..., src/data/house.ts;
+ *                       section "house")
+ *   BERETE_HD_DIR       /Volumes/Disque externe/Berete - Dossiers icloud  (the high-resolution
+ *                       photos and videos of Yoni, chosen in scripts/hd-media.mjs; section "hd")
  *
  * The main photos of the pieces taken from the stories (frames, crops) and
  * the photos of the boxes are listed in scripts/piece-media.mjs.
@@ -28,11 +33,12 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
-import { cpus, homedir } from "node:os";
+import { cpus, homedir, tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
+import { HD } from "./hd-media.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const PUBLIC = join(ROOT, "public");
@@ -46,6 +52,8 @@ const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DESKTOP, "01 Audiovisuel", 
 const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DESKTOP, "berete_jewellers-cropped.svg");
 const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DESKTOP, "02 Projets", "Sites clients", "Boutique Bijoutier");
 const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DESKTOP, "Berete - Croquis");
+const HOUSE_DIR = process.env.BERETE_HOUSE_DIR ?? join(DESKTOP, "Berete - La Maison");
+const HD_DIR = process.env.BERETE_HD_DIR ?? join("/Volumes", "Disque externe", "Berete - Dossiers icloud");
 
 const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
@@ -445,6 +453,129 @@ async function importSketches() {
   return Object.fromEntries(Object.keys(sketches).sort().map((slug) => [slug, sketches[slug]]));
 }
 
+/* ---------- High-resolution photos and videos of Yoni (scripts/hd-media.mjs) ---------- */
+
+/** Photos: sharp on a large screen (the browser takes a smaller copy when it is enough, scripts/media-sizes.mjs). */
+const HD_PHOTO = { maxW: 1440, maxH: 2160, quality: 78 };
+/** The photos of a draft (unpublished, seen in the admin): smaller. */
+const HD_DRAFT_PHOTO = { maxW: 1080, maxH: 1620, quality: 78 };
+/** Videos: H.264, 720p (enough for a gallery, light on a phone), silent, 12 seconds at most, about 1.2 Mbit/s at most. */
+const HD_VIDEO = { long: 1280, short: 720, crf: 28, maxrate: "1200k", maxFps: 30, maxSeconds: 12 };
+
+/** "p7", "v1" or "f" of folder "NN" -> the file on disk, or null. */
+async function hdSource(folder, ref) {
+  const dir = (await listDir(HD_DIR)).find((n) => n.startsWith(folder + " "));
+  if (!dir) return null;
+  const kind = ref[0];
+  const n = pad2(Number(ref.slice(1)));
+  const sub = kind === "p" ? "Photos" : kind === "v" ? "Videos" : "Fabrication";
+  const files = await listDir(join(HD_DIR, dir, sub));
+  const pattern = kind === "p" ? new RegExp(" - " + n + "\\.(jpe?g|png|heic)$", "i") : kind === "v" ? new RegExp(" - video " + n + "( \\(720p\\))?\\.(mp4|mov|m4v)$", "i") : VIDEO_EXT;
+  const file = files.find((f) => pattern.test(f));
+  return file ? join(HD_DIR, dir, sub, file) : null;
+}
+
+const hdName = (ref) => (ref === "f" ? "f" : ref[0] + pad2(Number(ref.slice(1))));
+
+async function hdPhoto(src, out, filter = "", draft = false) {
+  const size = draft ? HD_DRAFT_PHOTO : HD_PHOTO;
+  const scale = "scale=w='min(" + size.maxW + ",iw)':h='min(" + size.maxH + ",ih)':force_original_aspect_ratio=decrease:flags=lanczos";
+  const vf = filter ? filter + "," + scale : scale;
+  const recipe = "hd-photo:" + vf + ":" + size.quality;
+  let input = src;
+  // An iPhone photo (HEIC, made of tiles) goes through a JPEG first (sips, macOS): ffmpeg cannot filter its tiles simply.
+  if (/\.heic$/i.test(src) && !(await upToDate(out, src, recipe))) {
+    input = join(tmpdir(), "berete-" + process.pid + "-" + Math.random().toString(36).slice(2) + ".jpg");
+    await run("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "95", "-Z", "2400", src, "--out", input]);
+  }
+  try {
+    await produce(out, src, recipe, ["-i", input, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(size.quality), "-compression_level", "6"]);
+  } finally {
+    if (input !== src) await rm(input, { force: true });
+  }
+  const p = await probe(out);
+  return { type: "image", src: webPath(out), width: p.width, height: p.height };
+}
+
+async function hdVideo(src, out, filter = "") {
+  const info = await probe(src);
+  const { long, short } = HD_VIDEO;
+  // The long side and the short side at most HD_VIDEO's (the frames are already turned upright).
+  const filters = [
+    "scale=w='if(gt(iw,ih),min(iw," + long + "),-2)':h='if(gt(iw,ih),-2,min(ih," + long + "))'",
+    "scale=w='if(gt(iw,ih),-2,min(iw," + short + "))':h='if(gt(iw,ih),min(ih," + short + "),-2)':flags=lanczos",
+  ];
+  if (filter) filters.unshift(filter);
+  if (info.fps > HD_VIDEO.maxFps + 0.5) filters.push("fps=" + HD_VIDEO.maxFps);
+  filters.push("format=yuv420p");
+  const vf = filters.join(",");
+  await produce(out, src, "hd-video:" + JSON.stringify(HD_VIDEO) + ":" + vf, ["-i", src, "-t", String(HD_VIDEO.maxSeconds), "-map", "0:v:0", "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(HD_VIDEO.crf), "-maxrate", HD_VIDEO.maxrate, "-bufsize", "2400k", "-profile:v", "high", "-an", "-movflags", "+faststart"]);
+  const p = await probe(out);
+  return {
+    type: "video",
+    src: webPath(out),
+    poster: await poster(out, out.replace(/\.mp4$/, "-poster.webp")),
+    width: p.width,
+    height: p.height,
+    duration: Math.round(p.duration * 100) / 100,
+    audio: false,
+  };
+}
+
+async function importHd() {
+  if (!existsSync(HD_DIR)) {
+    console.warn("HD folder not found, skipped: " + HD_DIR);
+    return null;
+  }
+  console.log("High-resolution photos and videos: " + HD_DIR);
+  const out = {};
+  const jobs = [];
+  // A folder of the site fed by two folders of Yoni: the files of the second one are named "<its number>-p02".
+  const firstFolder = {};
+  for (const entry of HD) firstFolder[entry.dir] ??= entry.folder;
+  for (const entry of HD) {
+    const group = (out[entry.dir] ??= {});
+    for (const ref of entry.items) {
+      const src = await hdSource(entry.folder, ref);
+      if (!src) {
+        console.warn("  ! not found: folder " + entry.folder + ", " + ref);
+        continue;
+      }
+      const isVideo = ref[0] !== "p";
+      const name = (entry.folder === firstFolder[entry.dir] ? "" : entry.folder + "-") + hdName(ref);
+      const file = join(MEDIA, "hd", entry.dir, name + (isVideo ? ".mp4" : ".webp"));
+      group[name] = null;
+      jobs.push({ heavy: isVideo, go: async () => (group[name] = isVideo ? await hdVideo(src, file, entry.filter) : await hdPhoto(src, file, entry.filter, entry.draft === true)) });
+    }
+  }
+  const cores = cpus().length;
+  await pool(jobs.filter((j) => !j.heavy), cores, (j) => j.go());
+  await pool(jobs.filter((j) => j.heavy), Math.max(1, Math.floor(cores / 4)), (j) => j.go());
+  for (const group of Object.values(out)) for (const [k, v] of Object.entries(group)) if (!v) delete group[k];
+  return out;
+}
+
+/* ---------- The House: the personal photos of Yoni, one per place of the page (src/data/house.ts) ---------- */
+
+async function importHouse() {
+  if (!existsSync(HOUSE_DIR)) {
+    console.warn("House folder not found, skipped: " + HOUSE_DIR);
+    return null;
+  }
+  console.log("The House: " + HOUSE_DIR);
+  const files = (await readdir(HOUSE_DIR)).filter((n) => IMAGE_EXT.test(n) && !n.startsWith(".")).sort();
+  const photos = {};
+  await pool(files, cpus().length, async (name) => {
+    const key = slugify(name.replace(IMAGE_EXT, ""));
+    if (!/^(portrait|citation-[1-3]|chapitre-\d{2})$/.test(key)) {
+      console.warn("  ! ignored (not a place of the page): " + name);
+      return;
+    }
+    photos[key] = await hdPhoto(join(HOUSE_DIR, name), join(MEDIA, "house", key + ".webp"));
+  });
+  return Object.fromEntries(Object.keys(photos).sort().map((k) => [k, photos[k]]));
+}
+
 /* ---------- Scroll-driven videos: WebP frame sequences + an all-intra fallback ---------- */
 
 async function frameSet(src, dir, start, set, crop) {
@@ -598,6 +729,20 @@ if (runs("sketches")) {
   if (sketches !== null) {
     media.sketches = sketches;
     pruneDirs.push(join(MEDIA, "sketches"));
+  }
+}
+if (runs("house")) {
+  const house = await importHouse();
+  if (house !== null) {
+    media.house = house;
+    pruneDirs.push(join(MEDIA, "house"));
+  }
+}
+if (runs("hd")) {
+  const hd = await importHd();
+  if (hd !== null) {
+    media.hd = hd;
+    pruneDirs.push(join(MEDIA, "hd"));
   }
 }
 if (runs("scroll")) {
