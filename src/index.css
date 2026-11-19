@@ -891,6 +891,11 @@ html.lenis body {
   }
 }
 
+/* Deep in the page the world rests: its slow motions pause (the backdrop is dim behind the texts there). */
+.universe[data-deep] :is(.u-light, .u-texture, .u-iris, .u-rain, .u-smoke > span, .u-twenty > span) {
+  animation-play-state: paused;
+}
+
 /* The canvas of the effects (src/components/universe/fx.ts): around the piece, never behind the texts. */
 .u-fx {
   width: 100%;
@@ -1324,6 +1329,32 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
     transform: none;
   }
 }
+/* The views of the showcase arrive one by one (src/components/Showcase.tsx). */
+[data-entering] .sv-float > img {
+  animation: u-view-in 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.35s + var(--i, 0) * 0.22s);
+}
+[data-entering][data-entrance="smoke"] .sv-float > img {
+  animation-delay: calc(0.75s + var(--i, 0) * 0.22s);
+}
+[data-entering][data-entrance="flash"] .sv-float > img {
+  animation-name: u-piece-flash;
+  animation-delay: calc(0.18s + var(--i, 0) * 0.22s);
+}
+[data-entering][data-entrance="tunnel"] .sv-float > img {
+  animation-delay: calc(0.6s + var(--i, 0) * 0.22s);
+}
+@keyframes u-view-in {
+  from {
+    opacity: 0.01;
+    transform: translate3d(0, 4%, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* A glint of light crosses the piece (the dark parts stay dark: an overlay blend). */
 [data-piece-cover]::after {
   content: "";
@@ -1404,6 +1435,51 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   filter: contrast(1.18) brightness(0.92);
 }
 
+/* ---------- The showcase of a piece (src/components/Showcase.tsx) ---------- */
+
+/* Each view moves from place to place (the middle, around it) by a transform: an exchange, never a jump. */
+.sv-view {
+  transform-origin: 50% 50%;
+  transition:
+    transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.6s ease;
+}
+.sv-view:not([data-place="0"]) {
+  opacity: 0.86;
+}
+.sv-view:not([data-place="0"]):hover {
+  opacity: 1;
+}
+.sv-view:focus-visible {
+  outline: none;
+}
+.sv-view:focus-visible .sv-float {
+  outline: 2px solid #e8b4a0;
+  outline-offset: -6%;
+  border-radius: 12px;
+}
+/* The relief: a view follows the mouse by its depth (--d), the main one more than the ones behind. */
+.sv-par {
+  transform: translate3d(calc(var(--mx, 0) * var(--d, 0px)), calc(var(--my, 0) * var(--d, 0px)), 0);
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* A light floating, each view at its own time (paused off screen). */
+.sv-float {
+  animation: sv-float 7s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i, 0) * -1.9s);
+}
+[data-showcase][data-idle] .sv-float {
+  animation-play-state: paused;
+}
+@keyframes sv-float {
+  from {
+    transform: translate3d(0, -0.8%, 0);
+  }
+  to {
+    transform: translate3d(0, 0.8%, 0);
+  }
+}
+
 /* ---------- The title of the piece, in the typography of its universe ---------- */
 
 [data-piece] [data-u-title] {
@@ -1460,6 +1536,16 @@ html[lang="ar"] [data-piece] [data-u-title] {
   .u-entrance,
   .u-fx {
     display: none !important;
+  }
+  .sv-float,
+  .sv-float > img {
+    animation: none !important;
+  }
+  .sv-par {
+    transform: none !important;
+  }
+  .sv-view {
+    transition-duration: 0.01s !important;
   }
   .u-backdrop,
   .u-mark,

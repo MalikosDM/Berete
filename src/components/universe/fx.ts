@@ -207,6 +207,16 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const draw = (now: number) => {
     raf = 0;
     if (!running) return;
+    // Deep in the page the world rests (its backdrop is dim behind the texts): nothing is drawn, a look now and then.
+    if (window.scrollY > window.innerHeight * 1.1) {
+      ctx.clearRect(0, 0, w, h);
+      lastY = window.scrollY;
+      speed = 0;
+      raf = window.setTimeout(() => {
+        raf = window.requestAnimationFrame(draw);
+      }, 300) as unknown as number;
+      return;
+    }
     frame++;
     const dy = window.scrollY - lastY;
     lastY = window.scrollY;
@@ -463,7 +473,10 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   };
   const pause = () => {
     running = false;
-    if (raf) window.cancelAnimationFrame(raf);
+    if (raf) {
+      window.cancelAnimationFrame(raf);
+      window.clearTimeout(raf);
+    }
     raf = 0;
   };
 

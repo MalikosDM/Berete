@@ -112,6 +112,8 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
     const update = () => {
       frame = 0;
       el.style.setProperty("--u-scroll", String(Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.9))).toFixed(3)));
+      // Deep in the page (the texts, the photos), the world rests: its slow motions pause (src/index.css), its effects stop.
+      el.toggleAttribute("data-deep", window.scrollY > window.innerHeight * 1.1);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(update);

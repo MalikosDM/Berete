@@ -166,6 +166,12 @@ export const es: Messages = {
   },
 
   piece: {
+    /** The views of the showcase of a piece (src/components/Showcase.tsx). */
+    views: { face: "frontal", profile: "de perfil", back: "trasera", detail: "de detalle", worn: "puesta" },
+    showView: (view: string) => "Ver la vista " + view,
+    viewOf: (n: number, total: number) => "Vista " + n + " de " + total,
+    viewsLabel: "Las vistas de la pieza",
+    viewAlt: (title: string, view: string) => title + ", vista " + view,
     sketchAlt: (title: string) => "Ilustración del primer boceto de " + title,
     steps: {
       sketch: { title: "La visión", text: "La idea se dibuja a mano y después se modela hasta que cada proporción es justa." },

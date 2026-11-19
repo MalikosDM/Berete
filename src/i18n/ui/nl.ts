@@ -164,6 +164,12 @@ export const nl: Messages = {
   },
 
   piece: {
+    /** The views of the showcase of a piece (src/components/Showcase.tsx). */
+    views: { face: "voorkant", profile: "profiel", back: "achterkant", detail: "detail", worn: "gedragen" },
+    showView: (view: string) => "Toon het aanzicht: " + view,
+    viewOf: (n: number, total: number) => "Aanzicht " + n + " van " + total,
+    viewsLabel: "De aanzichten van het stuk",
+    viewAlt: (title: string, view: string) => title + ", aanzicht: " + view,
     sketchAlt: (title: string) => "Illustratie van de eerste schets van " + title,
     steps: {
       sketch: { title: "De visie", text: "Het idee wordt met de hand getekend en daarna gemodelleerd tot elke verhouding klopt." },

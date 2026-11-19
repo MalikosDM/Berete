@@ -1,3 +1,4 @@
+import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 
 /*
@@ -113,6 +114,8 @@ export type Piece = {
   published: boolean;
   /** The universe of its page (src/data/themes.ts); null: the universe of the house. */
   theme: PieceTheme | null;
+  /** How its opening shows the jewel: one cut-out view or a showcase of several (src/data/showcase.ts); null: by the rule. */
+  showcase: PieceShowcase | null;
   making: Making;
   translations?: Translations;
 };

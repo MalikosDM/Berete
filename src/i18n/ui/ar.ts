@@ -160,6 +160,12 @@ export const ar: Messages = {
   },
 
   piece: {
+    /** The views of the showcase of a piece (src/components/Showcase.tsx). */
+    views: { face: "الأمام", profile: "الجانب", back: "الخلف", detail: "التفاصيل", worn: "مرتداة" },
+    showView: (view: string) => "عرض منظر " + view,
+    viewOf: (n: number, total: number) => "المنظر " + n + " من " + total,
+    viewsLabel: "مناظر القطعة",
+    viewAlt: (title: string, view: string) => title + "، منظر " + view,
     sketchAlt: (title: string) => "رسم توضيحي للمخطط الأول لقطعة " + title,
     steps: {
       sketch: { title: "الرؤية", text: "تُرسم الفكرة باليد، ثم يُصاغ نموذجها حتى تستقيم كل النسب." },

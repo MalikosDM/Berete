@@ -76,6 +76,8 @@ model Piece {
   published    Boolean  @default(true)
   /// The universe of its page (PieceTheme, src/data/themes.ts); null: the universe of the house.
   theme        Json?
+  /// How its opening shows the jewel (PieceShowcase, src/data/showcase.ts): one view, the showcase, the views; null: by the rule.
+  showcase     Json?
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
   translations Json   @default("{}")

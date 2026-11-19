@@ -3,6 +3,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { HOUSE_PHOTO_PLACES } from "../../src/data/house.js";
 import { publicCatalogue } from "../../src/data/relations.js";
+import { cleanShowcase } from "../../src/data/showcase.js";
 import { cleanTheme } from "../../src/data/themes.js";
 import { PIECE_TYPES } from "../../src/data/types.js";
 import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, readHouse, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
@@ -239,6 +240,11 @@ const PieceIn = z.object({
     .unknown()
     .optional()
     .transform((v) => cleanTheme(v) ?? Prisma.DbNull),
+  /** How the opening shows the jewel: one view or the showcase, the views and their order; none: by the rule. */
+  showcase: z
+    .unknown()
+    .optional()
+    .transform((v) => cleanShowcase(v) ?? Prisma.DbNull),
   making: MakingSchema.optional(),
   translations: TranslationsSchema.default({}),
 });
@@ -313,6 +319,21 @@ site.put("/admin/house/:key", requireAdmin, async (req, res) => {
   if (p.data.photo === null) await prisma.housePhoto.deleteMany({ where: { key } });
   else await prisma.housePhoto.upsert({ where: { key }, create: { key, photo: p.data.photo }, update: { photo: p.data.photo } });
   res.json({ ok: true });
+});
+
+/* The page "Détourages": a cut-out view excluded (or brought back) everywhere, without touching the rest of the piece. */
+
+site.put("/admin/cutouts/:slug", requireAdmin, async (req, res) => {
+  const p = z.object({ excluded: z.array(z.string().regex(/^[a-z0-9-]{1,40}$/)).max(40) }).safeParse(req.body);
+  if (!p.success) return invalid(res, p.error);
+  const piece = await prisma.piece.findUnique({ where: { slug: String(req.params.slug) }, select: { id: true, showcase: true } });
+  if (!piece) {
+    res.status(404).json({ error: "Pièce introuvable." });
+    return;
+  }
+  const next = cleanShowcase({ ...(cleanShowcase(piece.showcase) ?? {}), excluded: p.data.excluded });
+  await prisma.piece.update({ where: { id: piece.id }, data: { showcase: next ?? Prisma.DbNull } });
+  res.json({ ok: true, showcase: next });
 });
 
 site.get("/admin/:kind", requireAdmin, async (req, res) => {

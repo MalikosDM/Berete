@@ -172,6 +172,12 @@ export const en = {
   },
 
   piece: {
+    /** The views of the showcase of a piece (src/components/Showcase.tsx). */
+    views: { face: "front", profile: "profile", back: "back", detail: "detail", worn: "worn" },
+    showView: (view: string) => "Show the " + view + " view",
+    viewOf: (n: number, total: number) => "View " + n + " of " + total,
+    viewsLabel: "The views of the piece",
+    viewAlt: (title: string, view: string) => title + ", " + view + " view",
     /** Text of the first sketch of a piece (step "Sketch"). */
     sketchAlt: (title: string) => "Illustration of the first sketch of " + title,
     steps: {

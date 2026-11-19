@@ -9,6 +9,7 @@ import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
+import Showcase from "@/components/Showcase";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import Universe, { universeProps } from "@/components/Universe";
@@ -16,6 +17,7 @@ import { defaultCatalogue, media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { resolveShowcase } from "@/data/showcase";
 import { resolveTheme } from "@/data/themes";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
@@ -77,6 +79,8 @@ export default function PiecePage() {
   };
 
   const theme = resolveTheme(piece.theme);
+  // The jewel of the opening: cut out, in one view or a showcase of several; else its photo.
+  const opening = resolveShowcase(piece.slug, piece.showcase);
 
   return (
     // The page of each piece is its own element (key): entering another piece is entering another world, with its
@@ -98,7 +102,11 @@ export default function PiecePage() {
       <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
         <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
-          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
+          {opening.mode === "photo" ? (
+            <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
+          ) : (
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} />
+          )}
         </div>
         <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
           <div className="flex flex-col gap-8">
