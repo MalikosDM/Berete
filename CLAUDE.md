@@ -4,8 +4,10 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 `README.md` ; ici : le client, les décisions, ce qui reste à faire. Mettre à jour la section « État » à chaque grosse étape.
 
 ## Le client et le projet
-- **Berete Jewellers** (Instagram @beretejewellers) : haute joaillerie sur mesure basée à **Dubaï** (jamais la Belgique ni
-  Anvers). Fondateur : **Yoni**. Clients : footballeurs, clubs (Inter Milan, VfB Stuttgart), personnalités.
+- **Berete Jewellers** (Instagram @beretejewellers) : haute joaillerie sur mesure, **la maison est basée à Dubaï**.
+  Fondateur : **Yoni Berete** (Fondateur & Directeur artistique). Clients : footballeurs, clubs (Inter Milan, VfB
+  Stuttgart), personnalités. La Belgique, Bruxelles et Anvers apparaissent **uniquement dans son histoire** (page La
+  Maison, sa biographie à lui, voulue ainsi) ; ailleurs, la maison reste à Dubaï.
 - Site fait par **Malik** (développeur, Marseille). Démarré sur ODORO (son générateur de sites), puis exporté ici et
   poursuivi avec Claude Code. Repo : github.com/MalikosDM/Berete.
 - Réunion de validation avec Yoni le **9 novembre 2026** : site **approuvé** (stories façon Instagram, pages pièces,
@@ -18,22 +20,54 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - Toujours vérifier soi-même (Playwright, ordinateur 1440 px + iPhone 390 px) avant de dire que c'est fini.
 
 ## Règles non négociables
-- Couleurs : noir #0A0A0A, blanc #FFFFFF / #F4F2EF, accent unique **or rose métallique** (#9C5B4F → #E8B4A0 → #B76E79).
-  **Aucun bleu** dans l'interface (le bleu des photos Inter est normal).
+- Couleurs : noir #0A0A0A, blanc #FFFFFF / #F4F2EF, accent unique **or rose métallique** (#9C5B4F → #E8B4A0 → #B76E79)
+  pour les boutons, liens et traits. **Aucun bleu** dans l'interface (le bleu des photos Inter est normal).
+  Exception voulue par Yoni : chaque pièce a son **univers** (fond, couleurs, texture, lumière, animation :
+  `src/data/themes.ts`) ; ses couleurs vivent seulement dans le fond de sa page, toujours sombres (textes en contraste
+  AA), et l'univers Inter a un **fond bleu nuit très sombre** (identité de la pièce).
 - Lisibilité mobile : texte ≥ 16 px, contrastes AA, boutons ≥ 48 px.
 - Vidéos de l'accueil et de /process pilotées par le scroll (jamais d'autoplay ni de boucle).
 - Ne jamais inventer de chiffres (carats, poids, prix, heures) : textes des pièces = brouillons à faire valider par Yoni.
 - Ne jamais utiliser le dossier « 99 - NE PAS ENVOYER (a valider) ». Visuels Dragon Ball / Goku : **droits à confirmer
   par Yoni** avant la mise en ligne publique.
 - Numéro WhatsApp, email, Instagram : uniquement dans `src/lib/site.ts`.
+- Textes du site : le fichier de Yoni « 01 Wording du site (EN-FR) » fait foi (anglais et français exacts) ; les 4 autres
+  langues traduisent l'anglais. Signatures à garder : « Made by us. Inspired by you. » / « Créé par nous. Inspiré par
+  vous. », « Your story, in diamonds. » / « Votre histoire, en diamants. ». Bouton de chaque pièce : « Enter the World » /
+  « Entrer dans l'univers ». Catégories Pendants/Chains/Rings/Watches inchangées.
+- Une pièce retirée n'est jamais supprimée : elle passe en « non publiée » (case dans l'admin), son adresse redirige
+  (301) vers son joueur, sinon /creations (`npm run redirects` pour Vercel).
+- Mise en ligne : un envoi sur GitHub (main) met à jour le site Vercel tout seul : https://berete-nxsp.vercel.app
 
 ## Où sont les fichiers (Mac de Malik)
+- Photos et vidéos HD envoyées par Yoni (19/11/2026) : disque externe `/Volumes/Disque externe/Berete - Dossiers
+  icloud/` (35 dossiers « NN Nom », noms donnés d'après les photos, pas par Yoni ; `00 Contexte Yoni` = ses textes :
+  wording, biographie, citations, pièces à retirer). Choix des photos : `scripts/hd-media.mjs`, puis
+  `npm run import-media -- --only=hd`. Ne jamais modifier ces fichiers.
+- Photos personnelles de Yoni pour La Maison : `~/Desktop/Berete - La Maison/` (voir LISEZ-MOI), ou l'admin.
 - Médias des stories (Instagram, triés) : `~/Desktop/Berete - Stories/` (30 dossiers « NN Nom », couvertures dans
   `00 Couvertures`). Relancer `npm run import-media` après ajout.
 - Photos et vidéos du site : `~/Desktop/01 Audiovisuel/Berete - Envoi ODORO/`. Logo : `~/Desktop/berete_jewellers-cropped.svg`.
 - Fichiers 3D de Yoni : `~/Downloads/*.stl` (ZN1059 collier, zp1864 pendentif, 0542, ZR0982 bague) et
   `~/Desktop/Berete - 3D/fichiers de test/ZN1242-bj001.glb` (bracelet iJewel3D). Ses fichiers sortent de **Rhino** :
   demander les **.3dm** (gardent métal et pierres séparés).
+
+## Passe « identité Berete » (fichiers de Yoni du 19/11/2026) — état au 19/11/2026
+- [x] **Wording** de Yoni sur tout le site (menu, accueil, Créations, pièces, The Berete Circle, Championship rings,
+      The Atelier, Signature Trunks, The Bespoke Journey, The House, Private Enquiries, phrases d'introduction, titres
+      Google et aperçus de liens), anglais et français exacts, espagnol, allemand, néerlandais et arabe traduits (à faire
+      relire par des natifs, surtout l'arabe). Adresses inchangées (/players, /boxes, /process, /about, /contact).
+- [x] **10 pièces retirées** (Jack ; Thuram Infinity, Snowflake, Jesus Piece, Signet, T-Monster ; Jeff Chabot JC ;
+      Nianzou NZ pendentif et bague ; Eweka 999) : non publiées, invisibles partout, adresses redirigées (301).
+      Jeff Chabot et Sidney Eweka sortent du Cercle (page redirigée vers /players).
+- [x] **La Maison** : biographie de Yoni en 12 chapitres (texte français tel quel), 3 citations (01 L'Identité,
+      02 La Philosophie, 03 Le Parcours), emplacement photo par chapitre (invisible tant que vide).
+- [x] **Photos HD** : 15 pièces du site passées en HD (photos fond noir en premier), 15 brouillons non publiés créés
+      pour les dossiers sans pièce (titre = nom du dossier, « Made for » à valider), écrin Signature Trunk (dossier 35)
+      en tête de Signature Trunks, vidéo d'ouverture de l'Atelier remplacée par un vrai plan horizontal (dossier 24).
+- [x] **Un univers par pièce** (29 pièces publiées) : thème modifiable dans l'admin (« Univers de la page »).
+- [ ] Yoni : nommer les 15 brouillons (liste dans le rapport du 19/11), envoyer ses photos personnelles pour La Maison,
+      relire les textes (dont les traductions), confirmer les droits Dragon Ball.
 
 ## Ce que Yoni a demandé le 9/11 — état au 13/11/2026
 - [x] Stories façon Instagram, pages pièces avec histoire et fabrication, 6 langues, page Process, contact WhatsApp.
@@ -52,11 +86,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       les stories, initiales en or rose pour les 8 autres), nom, club, Instagram. Admin : « Photo de profil » et
       « Instagram » (aucun pseudo rempli : à saisir). Reste : photos de remise des bagues aux joueurs de l'Inter (Yoni).
 - [x] Page Boxes : bouton **« Create your own box »** en haut et en bas (WhatsApp pré-rempli).
-- [ ] Atelier : remplacer la vidéo d'ouverture (verticale, pixelisée) ; revoir la vidéo IA verticale.
-- [ ] Photos des pièces : **haute résolution et fond noir en premier**, anciennes / basse résolution en bas.
-- [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon le type de bijou (fait) ; ajouter
-      Bracelet et Watch au configurateur de contact.
-- [ ] About : biographie et photo de Yoni (il les envoie).
+- [x] Atelier : vidéo d'ouverture remplacée (plan horizontal net, noir et blanc chaud). [ ] Revoir la vidéo IA verticale.
+- [x] Photos des pièces : **haute résolution et fond noir en premier** pour les 15 pièces dont Yoni a envoyé les photos.
+- [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon le type de bijou (fait) ; Bracelet et
+      Montre ajoutés au configurateur de contact (fait).
+- [x] La Maison : biographie (fait). [ ] Photos personnelles de Yoni (il les envoie).
 - [ ] Étapes « croquis → 3D » de chaque pièce (Yoni envoie ses étapes).
 - [ ] Vidéos IA à refaire par Malik : mécanisme bague → pendentif (plus clair), explication de la bague Inter en voix
       off grave, en anglais, sans longue intro.
@@ -64,8 +98,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       de domaine de Yoni (chez one.com).
 
 ## Attendu de Yoni (bloque le lancement)
-Photos et vidéos haute résolution (Google Drive), biographie + photo, photos des étapes de fabrication, 2-3 fichiers 3D
-(.3dm de préférence), photos de remise Inter, vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
+Photos personnelles pour La Maison, vrais noms des 15 pièces brouillons (et leurs destinataires), photos des étapes de
+fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
 
 ## Points relevés à l'analyse du 12/11/2026 (à corriger)
 - [x] iPhone (SE, 13, 15 Pro Max) : titre, phrase et 3 boutons entiers sous les bulles, noms qui ne se touchent plus ;

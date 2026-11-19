@@ -22,9 +22,25 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
 - **Une seule source de données** : `src/data/` — `catalogue.ts` (joueurs, stories), `pieces.ts`
   (les pièces et les écrins), `collections.ts` (une collection par type de bijou), `relations.ts`
   (liens entre stories, joueurs et pièces).
-- **Les pièces** : 39 pièces trouvées dans les stories et les dossiers. Leurs textes sont des brouillons
-  (`draft: true`, « Brouillon » dans l'admin) à faire valider par le client ; aucun chiffre n'est inventé.
-  La ligne « Metal and stones » de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
+- **Les pièces** : 29 pièces publiées, trouvées dans les stories, les dossiers et les photos HD de Yoni. Leurs textes
+  sont des brouillons (`draft: true`, « Brouillon » dans l'admin) à faire valider par le client ; aucun chiffre n'est inventé.
+- **Pièces non publiées** (`published: false`, case « Publiée sur le site » dans l'admin) : gardées dans la base mais
+  invisibles partout sur le site (listes, pièces similaires, stories, écrins, plan du site, aperçus ; `publicCatalogue`
+  dans `src/data/relations.ts`, aussi appliqué par l'API `/api/catalogue`). Leur adresse redirige (301) vers la page de
+  leur joueur s'il a encore des pièces, sinon vers `/creations` ; un joueur dont toutes les pièces sont non publiées sort
+  du Cercle (sa page mène à `/players`). Le serveur le fait depuis la base ; pour Vercel, `npm run redirects` écrit les
+  mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni (`REMOVED_PIECES`) et les 15
+  **brouillons** créés depuis ses dossiers de photos qui ne correspondent à aucune pièce (`DRAFTS` dans
+  `src/data/pieces.ts` : titre provisoire = nom du dossier, « Made for » à valider, galerie déjà remplie).
+- **L'univers de chaque pièce** (`theme` d'une pièce, `src/data/themes.ts`, dessiné par `src/components/Universe.tsx` et
+  `.universe` dans `src/index.css`) : la page garde sa structure, mais son fond, ses couleurs, sa texture, sa lumière et
+  une animation lente suivent l'identité de la pièce (énergie pour Dragon Ball, métamorphose pour Butterfly, bleu nuit et
+  rayures pour l'Inter…). Un préréglage (16 univers) et, au besoin, ses couleurs, sa texture, sa lumière, son animation :
+  modifiables dans l'admin (« Univers de la page », avec un aperçu). Sans thème : l'univers de la Maison. L'accent reste
+  l'or rose, les textes restent sur un fond sombre (contrôlé en AA par les tests), rien ne bouge avec « réduire les
+  animations ».
+- **Le bouton de chaque pièce** est « Enter the World » / « Entrer dans l'univers » (cartes, sélection, écrins).
+  La ligne « Precious Materials » (avant « Metal and stones ») de la fiche technique (`seen` dans `src/data/pieces.ts`) dit seulement ce que les photos
   montrent (couleur du métal, tailles et couleurs des pierres, sans carats ni poids) ; elle est absente quand les photos
   ne permettent rien de sûr, et tant que la pièce est en brouillon la page précise « d'après les photos, à confirmer ».
 - **« The details »** (`details` d'une pièce) : un symbole par ligne, avec la photo de la pièce qui le montre (elle
@@ -39,6 +55,14 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   envoyée dans l'admin (« Photo de profil »), sinon la meilleure photo des stories recadrée sur la personne (`PORTRAITS`
   dans `scripts/piece-media.mjs`, faite par `npm run import-media`), sinon ses initiales en or rose. Le pseudo
   Instagram se met dans l'admin (aucun n'est rempli d'office).
+- **La Maison** (`/about`, `src/pages/About.tsx`) : l'histoire de Yoni Berete en 12 chapitres, son texte français tel
+  quel (`src/i18n/house/fr.ts`, tiré de son fichier), traduit dans les autres langues (`src/i18n/house/<langue>.ts`), et
+  ses trois citations (01 L'Identité, 02 La Philosophie, 03 Le Parcours). Chaque chapitre, chaque citation et le haut de
+  la page ont une place pour une photo personnelle (`src/data/house.ts`), invisible tant qu'elle est vide : onglet « La
+  Maison » de l'admin, ou un fichier `portrait.jpg`, `citation-1.jpg`, `chapitre-03.jpg`… dans
+  `~/Desktop/Berete - La Maison` puis `npm run import-media -- --only=house`.
+- **Signature Trunks** (`/boxes`) : l'écrin Signature Trunk en tête (`FEATURED_BOX`, ses 10 photos qui s'ouvrent en
+  grand), puis les autres écrins ; « Commission Your Signature Trunk » ouvre WhatsApp, le message déjà écrit.
 - **Les collections** : `/creations/pendants`, `/chains`, `/rings`, `/watches`, `/bracelets`.
   L'accueil montre une tuile par type qui a au moins 2 pièces.
 - **Les médias** sont produits par `npm run import-media`, qui relit les dossiers du Bureau
@@ -51,9 +75,15 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   pièce qui a déjà la sienne (`src/data/pieces.ts`) ; dans la page, les photos des étapes s'ouvrent en grand au clic.
   On peut le relancer après avoir ajouté des fichiers : rien n'est créé en double, seuls les nouveaux fichiers sont traités.
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
-  À la fin, il prépare des copies plus légères de chaque photo (`cover.w640.webp`, `cover.w160.webp`) que le navigateur
-  choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
-- **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces, les
+  Les **photos et vidéos HD de Yoni** (disque externe « Berete - Dossiers icloud », `BERETE_HD_DIR`) sont choisies
+  dossier par dossier dans `scripts/hd-media.mjs` (section `hd` : `npm run import-media -- --only=hd`) : photos 1440 px
+  de large (1080 px pour les brouillons), vidéos MP4 H.264 720p, muettes, 12 secondes au plus, avec leur image d'attente ;
+  les originaux ne vont jamais dans Git. `yoni(<dossier>, "p07")` dans `src/data/pieces.ts` les place dans une pièce.
+  À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
+  `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
+- **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces (dont
+  « Publiée sur le site » et « Univers de la page » ; les non publiées sont marquées « Non publiée »), les photos de La
+  Maison, les
   modèles 3D, les clients VIP, les stories, joueurs et écrins dans la base, et affiche les messages et demandes de rappel. Au démarrage, l'API ajoute à la base ce qui est nouveau dans `src/data/`
   (nouvelles stories, nouvelles photos, nouveaux textes) sans jamais écraser un texte modifié depuis l'admin.
 - **Le numéro WhatsApp, l'email, Instagram** : `src/lib/site.ts` (seul fichier à modifier).
@@ -166,6 +196,10 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
+                        # tests/identity.spec.ts : pièces retirées (301) et brouillons absents du site, nouveaux noms
+                        # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
+                        # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
+                        # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)
 ```
 
 ## Vitesse (Lighthouse)
@@ -185,6 +219,9 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
   points d'une mesure à l'autre.
 
 ## Mettre en ligne
+
+**Le site en ligne** : chaque envoi sur GitHub (branche `main`) met à jour la version Vercel toute seule :
+https://berete-nxsp.vercel.app (fermée aux moteurs de recherche, `noindex` de `vercel.json`, jusqu'au lancement).
 
 `docker compose up` lance la base et le site construit (définir `ADMIN_PASSWORD` dans `.env`). Les modèles 3D sont
 gardés dans le volume `models` (`/app/storage/models`). Facultatif : `MODEL_SECRET` signe les adresses des fichiers 3D (sinon

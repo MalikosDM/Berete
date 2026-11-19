@@ -135,18 +135,19 @@ test("special project: the Inter and VfB rings side by side, both open onto the 
   expect(problems.errors).toEqual([]);
 });
 
-test("Inter ring: made for Inter Milan, Marcus Thuram linked, the details open their photos", async ({ page }, info) => {
+test("Inter ring: created exclusively for Inter Milan, a historic commission, Marcus Thuram linked, the details open their photos", async ({ page }, info) => {
   const problems = watch(page);
   await page.goto("/pieces/" + INTER, { waitUntil: "load" });
   await page.waitForTimeout(1500);
-  await expect(page.locator("#piece-title").locator("xpath=..")).toContainText("Made for Inter Milan");
+  await expect(page.locator("#piece-title").locator("xpath=..")).toContainText("Created exclusively for Inter Milan");
+  await expect(page.locator("#piece-title").locator("xpath=..")).toContainText("Historic Commissions");
   await expect(page.locator("[data-made-for-person='marcus-thuram']")).toHaveCount(1);
   await page.screenshot({ path: shotPath(info, "inter-1-ouverture"), type: "jpeg", quality: 70 });
   const details = page.locator("[data-details]");
   await details.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1200);
   await expect(details.locator("[data-detail]")).toHaveCount(9);
-  for (const words of ["Six months", "Twenty stars", "Black, blue, black, blue", "Italian flag", "Forza Inter", "Serie A", "Campione d'Italia", "cup", "pendant"]) await expect(details).toContainText(words);
+  for (const words of ["Six Months of Craftsmanship", "The Secret Within", "Beyond a Ring", "Twenty stars", "Black, blue, black, blue", "Italian flag", "Forza Inter", "Serie A", "Campione d'Italia", "cup", "pendant"]) await expect(details).toContainText(words);
   await details.screenshot({ path: shotPath(info, "inter-2-details"), type: "jpeg", quality: 70 });
   const photos = details.locator("[data-detail-photo]");
   expect(await photos.count()).toBeGreaterThanOrEqual(8);
@@ -195,21 +196,35 @@ test("players: a wall of portraits on /players and on the home page", async ({ p
   expect(problems.errors).toEqual([]);
 });
 
-test("boxes: Create your own box, at the top and at the bottom, opens WhatsApp already written", async ({ page }, info) => {
+test("Signature Trunks: the featured trunk and its 10 photos, Commission Your Signature Trunk at the top, beside it and at the bottom", async ({ page }, info) => {
   const problems = watch(page);
   await page.goto("/boxes", { waitUntil: "load" });
   await page.waitForTimeout(1500);
+  await expect(page.locator("h1")).toContainText("Signature Trunks");
+  await expect(page.getByText("Every exceptional creation deserves an extraordinary presentation.")).toBeVisible();
   const buttons = page.locator("[data-create-box]");
-  await expect(buttons).toHaveCount(2);
-  for (let i = 0; i < 2; i++) {
-    await expect(buttons.nth(i)).toHaveText(/Create your own box/);
-    expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("I'd like to create my own box");
+  await expect(buttons).toHaveCount(3);
+  for (let i = 0; i < 3; i++) {
+    await expect(buttons.nth(i)).toHaveText(/Commission Your Signature Trunk/);
+    expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("commission my own Signature Trunk");
   }
   await expect(buttons.nth(0)).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "boxes-1-haut"), type: "jpeg", quality: 70 });
-  await buttons.nth(1).scrollIntoViewIfNeeded();
+  // The featured trunk: its 10 photos, each opening full screen, and "An Extension of Your Creation".
+  const featured = page.locator("[data-featured-box='signature-trunk']");
+  await featured.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+  await expect(featured.locator("[data-trunk-photo]")).toHaveCount(10);
+  await expect(featured).toContainText("An Extension of Your Creation");
+  await page.screenshot({ path: shotPath(info, "boxes-2-signature-trunk"), type: "jpeg", quality: 70 });
+  await featured.locator("[data-trunk-photo='4']").click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.waitForTimeout(700);
+  await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });
+  await page.keyboard.press("Escape");
+  await buttons.nth(2).scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
-  await page.screenshot({ path: shotPath(info, "boxes-2-bas"), type: "jpeg", quality: 70 });
+  await page.screenshot({ path: shotPath(info, "boxes-4-bas"), type: "jpeg", quality: 70 });
   expect(problems.errors).toEqual([]);
 });
 

@@ -34,7 +34,7 @@ test("main pages: no error, no 404, no overflow, own title", async ({ page }, in
     const name = path === "/" ? "home" : path.slice(1);
     titles.set(path, await checkPage(page, info, path, name, path === "/" || path === "/process" ? 6 : 3));
   }
-  expect(titles.get("/")).toBe("Berete Jewellers — Custom High Jewellery, Dubai");
+  expect(titles.get("/")).toBe("Berete Jewellers — The Art of Individuality, Dubai");
   expect(new Set(titles.values()).size, "every page has its own title").toBe(titles.size);
 });
 
@@ -112,8 +112,10 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
 const SHOWCASE = ["kevin-schade-dragon-ball-pendant", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-chain"];
 const CHUNK = 8;
 
-for (let i = 0; i < PIECES.length; i += CHUNK) {
-  const slugs = PIECES.slice(i, i + CHUNK).map((p) => p.slug);
+// The published pieces (the others have no page: tests/identity.spec.ts checks their redirects).
+const PUBLISHED = PIECES.filter((p) => p.published);
+for (let i = 0; i < PUBLISHED.length; i += CHUNK) {
+  const slugs = PUBLISHED.slice(i, i + CHUNK).map((p) => p.slug);
   test("piece pages " + (i + 1) + " to " + (i + slugs.length) + ": opening, gallery, made for, making, similar, WhatsApp", async ({ page }, info) => {
     const cat = await getCatalogue(page);
     for (const slug of slugs) {
@@ -142,7 +144,7 @@ test("home collections lead to every type page, every card to its piece", async 
   await page.goto("/");
   const tiles = page.locator("[data-collection-tile]");
   expect(await tiles.evaluateAll((els) => els.map((e) => e.getAttribute("data-collection-tile")))).toEqual(expected.map((c) => c.slug));
-  for (const c of expected) await expect(page.locator('[data-collection-tile="' + c.slug + '"]')).toContainText(String(count(c.type)) + " pieces");
+  for (const c of expected) await expect(page.locator('[data-collection-tile="' + c.slug + '"]')).toContainText(String(count(c.type)) + " creations");
   await page.locator("[data-collections]").evaluate((el) => el.scrollIntoView({ block: "start" }));
   await page.waitForTimeout(1500);
   await page.screenshot({ path: shotPath(info, "home-collections"), type: "jpeg", quality: 60 });
@@ -251,7 +253,6 @@ test("player pages show their stories and all their pieces", async ({ page }) =>
     "jamie-leweling": ["Jamie Leweling"],
     "maximilian-mittelstaedt": [],
     "vfb-stuttgart": [],
-    "sidney-eweka": ["Sidney Eweka"],
   };
   for (const person of cat.people) {
     await page.goto("/players/" + person.slug);
@@ -388,7 +389,7 @@ test("story viewer: buttons, pause, close", async ({ page }) => {
   await page.goto("/");
   await page.locator('[data-story-bubble="press"]').click();
   const dialog = page.locator('[role="dialog"][data-story="press"]');
-  await expect(dialog.getByRole("link", { name: /Read the article/ })).toBeVisible();
+  await expect(dialog.getByRole("link", { name: /Read the Feature/ })).toBeVisible();
   await expect(dialog.getByRole("link", { name: /Want yours\? WhatsApp/ })).toHaveAttribute("href", /wa\.me\/971XXXXXXXXX/);
   // Long press pauses the photo timer.
   const bar = dialog.locator("[data-progress]");
@@ -462,7 +463,7 @@ test("contact: call back request reaches the admin", async ({ page }) => {
   await page.goto("/contact");
   // The block fades in when it reaches the screen.
   await page.locator("button[aria-controls=callback-form]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.getByRole("button", { name: /Prefer a call back/i }).click();
+  await page.getByRole("button", { name: /Request a Private Call/i }).click();
   const form = page.locator("#callback-form");
   await form.getByLabel("Name").fill("Test Verification");
   await form.getByLabel("Phone number").fill("+971500000000");
