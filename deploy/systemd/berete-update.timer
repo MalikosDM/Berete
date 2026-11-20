@@ -1,0 +1,10 @@
+[Unit]
+Description=Berete Jewellers : regarde toutes les 2 minutes s'il y a une nouvelle version sur GitHub
+
+[Timer]
+OnBootSec=3min
+OnUnitInactiveSec=2min
+RandomizedDelaySec=15s
+
+[Install]
+WantedBy=timers.target

@@ -1,24 +1,89 @@
+# The whole site on one machine (the VPS, or this Mac to try it): the base, the site with its admin, 3D viewer and client
+# space, and Caddy in front (HTTPS certificate obtained and renewed on its own). The settings are read from .env
+# (template: deploy/env.example; on the VPS, written by deploy/install.sh).
+#   docker compose up -d --build     build and start everything
+#   docker compose logs -f app       what the site says
+name: berete
+
+x-logging: &logging
+  # The logs never fill the disk: 3 files of 10 MB per service.
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   db:
     image: postgres:17-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-      POSTGRES_DB: app
+      POSTGRES_USER: berete
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD manque dans .env}
+      POSTGRES_DB: berete
     volumes:
       - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U berete -d berete"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    logging: *logging
+
   app:
-    build: .
+    build:
+      context: .
+      args:
+        SITE_URL: https://${SITE_DOMAIN:-localhost}
+    image: berete-app:latest
+    restart: unless-stopped
+    # Reaps the processes of the 3D processing (server/models/jobs.ts).
+    init: true
     environment:
-      DATABASE_URL: postgresql://app:app@db:5432/app
+      DATABASE_URL: postgresql://berete:${POSTGRES_PASSWORD}@db:5432/berete
       PORT: "3001"
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
-    ports:
-      - "3001:3001"
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD manque dans .env}
+      MODEL_SECRET: ${MODEL_SECRET:-}
+      SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+      SITE_INDEXING: ${SITE_INDEXING:-off}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      ALERT_TO: ${ALERT_TO:-}
+      ALERT_FROM: ${ALERT_FROM:-}
+      # A big 3D file (several hundred MB) is processed in its own process, with room enough.
+      NODE_OPTIONS: --max-old-space-size=4096
     volumes:
-      - models:/app/storage/models
+      # The photos and videos of the site, as they are in git (1 GB: kept out of the image, which stays light).
+      - ./public/media:/app/dist/media:ro
+      # The 3D files sent from the admin (originals and optimised versions): a folder of the machine, saved every night.
+      - ${DATA_DIR:-./.data}/storage:/data/storage
+    # Only for the machine itself (checks, backups): the visitors come through Caddy.
+    ports:
+      - "127.0.0.1:${APP_PORT:-3001}:3001"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    logging: *logging
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+    logging: *logging
+
 volumes:
   db-data:
-  models:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,9 @@
+[Unit]
+Description=Berete Jewellers : sauvegarde de la base et des fichiers 3D
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /srv/berete/deploy/backup.sh
+Nice=10
+IOSchedulingClass=idle

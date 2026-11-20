@@ -1,0 +1,25 @@
+# What the image of the site never takes (Dockerfile): the installed packages of the Mac, the history, the local base,
+# the 3D files of the Mac (except the test model), the checks and every secret. The photos and videos of the site
+# (public/media, 1 GB) stay beside the image: docker-compose.yml lends them to the site (dist/media).
+public/media
+node_modules
+.git
+.github
+.local
+.data
+.vercel
+.env
+.env.*
+!.env.example
+dist
+dist-ssr
+dist-server
+server/generated
+storage/*
+!storage/demo/
+verification
+test-results
+playwright-report
+scripts/.import-media-cache.json
+scripts/.share-images-cache.json
+**/.DS_Store

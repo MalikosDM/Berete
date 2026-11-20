@@ -15,3 +15,5 @@ playwright-report
 # 3D models (server/models/storage.ts): kept outside git, except the optimised test model
 storage/*
 !storage/demo/
+# The data of the site run with Docker on this Mac (docker compose: base, 3D files)
+.data

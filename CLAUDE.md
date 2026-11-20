@@ -132,6 +132,28 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : valider les fonds IA et l'ambiance de chaque univers ; droits des photos des joueurs (photos d'agences et
       de clubs) ; photo HD d'Angelo Stiller ; fonds IA des 22 autres pièces à générer (idées dans le rapport du 19/11).
 
+## Passe « mise en ligne sur VPS » (tout en un) — état au 20/11/2026
+- [x] **Tout sur une machine** (`docker-compose.yml`) : base PostgreSQL 17, site construit (`Dockerfile` : pages, API,
+      admin, visualiseur 3D, espace VIP), Caddy devant (`deploy/Caddyfile` : HTTPS tout seul, `www.` → sans `www.`).
+      Photos et vidéos du site (1 Go) gardées hors de l'image, prêtées au site depuis le code (`public/media`).
+- [x] **Installation en une commande** depuis le Mac : `npm run vps -- install [domaine]` (`deploy/install.sh`) : système à
+      jour, Docker, swap, pare-feu, fail2ban, mises à jour de sécurité, SSH par clé, code dans `/srv/berete`, réglages dans
+      `/srv/berete/.env` (mots de passe tirés au hasard), données dans `/srv/berete-data`. Sans domaine : `<IP>.sslip.io`.
+- [x] **Mise à jour toute seule** à chaque envoi sur GitHub (le VPS regarde toutes les 2 min, `deploy/update.sh` :
+      construit à côté, bascule, revient à l'ancienne version si la nouvelle ne démarre pas). Vercel continue en parallèle.
+- [x] **Sauvegardes** chaque nuit (3 h 30 Dubaï, 14 jours : base + fichiers 3D, `deploy/backup.sh`, `deploy/restore.sh`) ;
+      copie sur le disque externe : `npm run vps -- backup`.
+- [x] **Protections** (`server/security.ts`) : en-têtes, `noindex` jusqu'au lancement, limites d'essais (admin, formulaires,
+      codes VIP, liens 3D). Commandes : `npm run vps -- status | admin | 3d | domain | set | launch | private | logs`.
+- [x] Testé en entier sur le Mac avec Docker (https://localhost:8443) : tous les tests du site, admin, 3D envoyée.
+      Attention : le Mac n'a que ~5 Go libres ; une construction Docker en prend ~4 (`docker builder prune -af` après).
+- [x] Clé SSH du Mac pour le VPS : `~/.ssh/berete_vps` (la clé publique va dans le panneau Hostinger à la création).
+- [ ] Malik : acheter le VPS (Ubuntu 24.04, clé `berete_vps.pub`), donner l'IP → ajouter `Host berete-vps` dans
+      `~/.ssh/config`, puis `npm run vps -- install`, `npm run vps -- 3d`.
+- [ ] Yoni : accès DNS chez one.com (A `@` et `www` vers l'IP), boîte e-mail pour les alertes (SMTP one.com :
+      `send.one.com`, port 465), puis `npm run vps -- domain <domaine>` et `set SMTP_…`.
+- [ ] Avant d'ouvrir au public : repo GitHub en privé (`npm run vps -- private` d'abord), droits Dragon Ball, `launch`.
+
 ## Ce que Yoni a demandé le 9/11 — état au 13/11/2026
 - [x] Stories façon Instagram, pages pièces avec histoire et fabrication, 6 langues, page Process, contact WhatsApp.
 - [x] Visualiseur 3D maison (remplace iJewel3D) : métaux par calque, lumières, zoom sans recentrage, liens privés,
@@ -177,9 +199,11 @@ fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, emai
   « Made for a private collector ».
 - 18 photos principales de pièces sur 35 font moins de 900 px de large (captures de stories) : floues sur grand écran.
 - [x] Films de l'accueil et de /process en pleine résolution (1920 × 1080, téléphones 608 × 1080) : nets sur grand écran (19/11/2026).
-- Les messages des formulaires (contact, rappel) restent dans l'admin : aucune alerte à Yoni → ajouter une alerte.
-- Admin : pas de limite d'essais de mot de passe, session sans expiration.
-- Toute la version Vercel est en « noindex » (vercel.json) : à retirer le jour du lancement.
+- [x] Alerte e-mail à la maison pour chaque message et demande de rappel (`server/alerts.ts`) : prête, inactive tant que
+  la boîte e-mail (SMTP) n'est pas réglée sur le VPS (20/11/2026).
+- [x] Admin : 5 essais de mot de passe puis 15 min d'attente, session de 12 h (20/11/2026).
+- Toute la version Vercel est en « noindex » (vercel.json) ; le VPS aussi (`SITE_INDEXING=off`) : `npm run vps -- launch`
+  le jour du lancement.
 - Le repo GitHub est **public** (code, photos des clients, fichier 3D de Yoni) : le passer en privé.
 
 ## À vérifier avec Yoni (photos regardées le 13/11/2026)

@@ -250,16 +250,55 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
 
 ## Mettre en ligne
 
-**Le site en ligne** : chaque envoi sur GitHub (branche `main`) met à jour la version Vercel toute seule :
-https://berete-nxsp.vercel.app (fermée aux moteurs de recherche, `noindex` de `vercel.json`, jusqu'au lancement).
+**Aujourd'hui (Vercel, sans serveur)** : chaque envoi sur GitHub (branche `main`) met à jour la version Vercel toute
+seule : https://berete-nxsp.vercel.app (fermée aux moteurs de recherche, `noindex` de `vercel.json`, jusqu'au lancement).
+`vercel.json` construit le site (`npm run build`) et publie `dist/`. Sur Vercel (ou avec `BERETE_STATIC=1 npm run build`),
+le site est construit sans serveur (`HAS_SERVER` dans `src/lib/site.ts`) : il ne demande rien à l'API ; la demande de
+rappel et le formulaire e-mail ouvrent WhatsApp avec la demande déjà écrite ; le lien « Espace client » disparaît du pied
+de page, `/vip` dit que l'espace ouvre bientôt (bouton WhatsApp) et `/admin` qu'il faut le serveur ; la 3D n'apparaît pas.
+Avec le serveur, si un formulaire ne part pas, il propose aussi WhatsApp, la demande déjà écrite.
 
-`docker compose up` lance la base et le site construit (définir `ADMIN_PASSWORD` dans `.env`). Les modèles 3D sont
-gardés dans le volume `models` (`/app/storage/models`). Facultatif : `MODEL_SECRET` signe les adresses des fichiers 3D (sinon
-elles sont signées à partir d'`ADMIN_PASSWORD`).
+**Le VPS (tout en un : site, admin, 3D, espace VIP)** : `docker-compose.yml` lance sur une seule machine la base
+(PostgreSQL 17), le site construit (`Dockerfile` : pages, photos et vidéos, API, admin, visualiseur, espace client) et
+Caddy devant (`deploy/Caddyfile` : HTTPS obtenu et renouvelé tout seul, `www.` mène à l'adresse sans `www.`, le visiteur
+attend quelques secondes au lieu d'une erreur pendant une mise à jour). Prévu pour un VPS Ubuntu 22.04 ou 24.04 réservé au
+site (KVM 2 : 2 processeurs, 8 Go). Tout se pilote depuis le Mac (`deploy/vps.sh`) :
 
-**Sans serveur (Vercel, en attendant le vrai serveur)** : `vercel.json` construit le site (`npm run build`) et publie
-`dist/`. Sur Vercel (ou avec `BERETE_STATIC=1 npm run build`), le site est construit sans serveur (`HAS_SERVER` dans
-`src/lib/site.ts`) : il ne demande rien à l'API ; la demande de rappel et le formulaire e-mail ouvrent WhatsApp avec la
-demande déjà écrite ; le lien « Espace client » disparaît du pied de page, `/vip` dit que l'espace ouvre bientôt (bouton
-WhatsApp) et `/admin` qu'il faut le serveur ; la 3D n'apparaît pas. Avec le serveur, si un formulaire ne part pas, il
-propose aussi WhatsApp, la demande déjà écrite.
+```sh
+npm run vps -- install [domaine]   # installe tout sur le VPS neuf (deploy/install.sh), en une fois
+npm run vps -- status              # en ligne ? version, disque, dernières sauvegardes
+npm run vps -- admin               # adresse et mot de passe de l'admin
+npm run vps -- 3d                  # envoie les modèles 3D du Mac (base locale + storage/) au VPS
+npm run vps -- domain exemple.com  # l'adresse du site (quand le DNS pointe vers le VPS)
+npm run vps -- set ALERT_TO=…      # un réglage de .env, puis le site redémarre avec
+npm run vps -- launch              # ouvre le site aux moteurs de recherche (le jour du lancement)
+npm run vps -- backup              # copie les sauvegardes du VPS sur le disque externe
+npm run vps -- private             # le VPS lit GitHub avec sa propre clé (avant de passer le dépôt en privé)
+```
+
+- **Accès** : le nom SSH `berete-vps` (`~/.ssh/config`, clé `~/.ssh/berete_vps`), ou `BERETE_VPS=root@<IP>`.
+- **L'installation** (`deploy/install.sh`, relançable sans rien perdre) : système à jour, Docker, 4 Go de swap, pare-feu
+  (SSH, 80, 443), mises à jour de sécurité automatiques, fail2ban, connexion SSH par clé seulement (si une clé est déjà
+  posée), le code dans `/srv/berete` (copie légère de GitHub ; dépôt privé : une clé du VPS ajoutée à GitHub en lecture
+  seule, par le GitHub CLI du Mac), les réglages dans `/srv/berete/.env` (modèle : `deploy/env.example` ; mots de passe
+  de l'admin et de la base tirés au hasard), les fichiers 3D et les sauvegardes dans `/srv/berete-data`. Sans domaine,
+  le site répond à `<IP avec des tirets>.sslip.io`, en HTTPS.
+- **Mises à jour** : toutes les 2 minutes, le VPS regarde GitHub (`deploy/update.sh`, `berete-update.timer`). Une
+  nouvelle version est construite pendant que l'ancienne sert encore, puis prend sa place ; si elle ne démarre pas,
+  l'ancienne revient et cette version n'est plus retentée. Journal : `/var/log/berete-deploy.log`. La base est mise à jour
+  au démarrage (`prisma migrate deploy`).
+- **Sauvegardes** : chaque nuit à 3 h 30 (heure de Dubaï), la base entière et les fichiers 3D, gardés 14 jours dans
+  `/srv/berete-data/backups` (`deploy/backup.sh`) ; `deploy/restore.sh <date>` remet la base d'un jour (la base du moment
+  est d'abord sauvegardée). Les photos et vidéos du site sont dans git.
+- **Protections** (`server/security.ts`) : adresse réelle du visiteur derrière Caddy, en-têtes de sécurité, `noindex`
+  partout tant que `SITE_INDEXING` n'est pas `on` ; admin : 5 mots de passe faux par visiteur, puis 15 minutes d'attente,
+  session de 12 heures (un nouveau mot de passe ferme toutes les sessions) ; formulaires : 5 envois en 10 minutes par
+  visiteur ; codes de l'espace client et mots de passe des liens 3D : 10 essais faux en 15 minutes. La machine elle-même
+  (contrôles, tests) n'est jamais limitée. `GET /api/health` répond quand la base répond.
+- **Alertes** (`server/alerts.ts`) : un e-mail à la maison pour chaque message et demande de rappel (ils restent aussi
+  dans l'admin), par la boîte e-mail du domaine : `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `ALERT_TO`.
+- **Domaine** (chez one.com) : un enregistrement A pour `@` et un pour `www` vers l'IP du VPS (retirer un éventuel AAAA
+  qui pointe ailleurs ; ne pas toucher aux MX de la boîte e-mail), puis `npm run vps -- domain <domaine>`.
+- **Essayer sur le Mac** : Docker Desktop, un fichier de réglages de test (`.data/test.env` : `POSTGRES_PASSWORD`,
+  `ADMIN_PASSWORD`, `HTTP_PORT=8080`, `HTTPS_PORT=8443`, `APP_PORT=3101`), puis
+  `COMPOSE_ENV_FILES=.data/test.env docker compose up -d --build` : https://localhost:8443 (certificat local).

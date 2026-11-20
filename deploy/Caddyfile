@@ -1,0 +1,18 @@
+# The door of the site on the internet (docker-compose.yml, service "caddy"): HTTPS for the address of the site
+# (SITE_DOMAIN in .env), certificate obtained and renewed on its own; www. leads to the address without it.
+
+{$SITE_DOMAIN} {
+	reverse_proxy app:3001 {
+		# While a new version starts (a few seconds, deploy/update.sh), the visitor waits instead of seeing an error.
+		lb_try_duration 30s
+		lb_try_interval 500ms
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
+
+www.{$SITE_DOMAIN} {
+	redir https://{$SITE_DOMAIN}{uri} permanent
+}
