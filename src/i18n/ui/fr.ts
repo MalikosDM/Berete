@@ -183,7 +183,7 @@ export const fr: Messages = {
     viewOf: (n: number, total: number) => "Vue " + n + " sur " + total,
     viewsLabel: "Les vues de la pièce",
     viewAlt: (title: string, view: string) => title + ", vue " + view,
-    sketchAlt: (title: string) => "Illustration du premier croquis de " + title,
+    sketchAlt: (title: string) => "La main de Yoni Berete dessinant le premier croquis de " + title,
     steps: {
       sketch: { title: "La Vision", text: "L’idée est dessinée à la main, puis modélisée jusqu’à ce que chaque proportion soit juste." },
       raw: { title: "La sculpture de la matière", text: "Le métal est coulé et assemblé, avant que la moindre pierre ne soit sertie." },

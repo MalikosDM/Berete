@@ -134,7 +134,6 @@ const content: Record<string, string> = {
   "Pendant on a Cuban chain": "قلادة على سلسلة كوبية",
   "A hero, a dragon and the dragon balls": "بطل، وتنين، وكرات التنين",
   "Colours": "الألوان",
-  "3D model of the pendant": "النموذج ثلاثي الأبعاد للقلادة",
   "The 3D design": "التصميم ثلاثي الأبعاد",
   "Kenan Yildiz — Celebration Pendant": "كينان يلدز — قلادة الاحتفال",
   "His celebration, crossed in diamonds.": "احتفاله، بيدين متقاطعتين من الألماس.",

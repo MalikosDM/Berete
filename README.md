@@ -100,9 +100,13 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   `public/media/`). Il écrit `public/media/` ainsi que `src/data/stories.generated.json` et `src/data/media.generated.json`.
   Les photos principales tirées des stories (image d'une vidéo, recadrage sur le bijou) et les photos des écrins
   sont décrites dans `scripts/piece-media.mjs`.
-  Les croquis (`Berete - Croquis`, un fichier `<slug-de-la-pièce>.jpg` par pièce, les fichiers qui commencent par `_` sont
-  ignorés) deviennent `public/media/sketches/<slug>.webp` et l'étape « Sketch » de « How it was made », sauf pour une
-  pièce qui a déjà la sienne (`src/data/pieces.ts`) ; dans la page, les photos des étapes s'ouvrent en grand au clic.
+  Les croquis : la main de Yoni qui dessine la pièce (`Berete - Croquis/Croquis main de Yoni (site)`, `BERETE_SKETCHES_DIR`,
+  un fichier `<slug-de-la-pièce>.jpg` par pièce en 3:4 ; les fichiers qui commencent par `_` sont ignorés) deviennent
+  `public/media/sketches/<slug>.webp` (1434 × 1920 pour le plein écran, copies 1080, 640 et 160 px, chargées à
+  l'approche) et l'étape « The Vision » de « The Making of a Masterpiece » : elle passe avant l'image donnée par la pièce
+  (`src/data/pieces.ts`). Une pièce sans fichier dans ce dossier garde son croquis d'avant (`Berete - Croquis`,
+  `BERETE_OLD_SKETCHES_DIR`), sinon son image (Dragon Ball : son premier dessin, tiré des stories). Dans la page, les
+  photos des étapes s'ouvrent en grand au clic. Vérifié par `tests/sketches.spec.ts`.
   On peut le relancer après avoir ajouté des fichiers : rien n'est créé en double, seuls les nouveaux fichiers sont traités.
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
   Les **photos et vidéos HD de Yoni** (disque externe « Berete - Dossiers icloud », `BERETE_HD_DIR`) sont choisies

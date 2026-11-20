@@ -172,7 +172,7 @@ export const es: Messages = {
     viewOf: (n: number, total: number) => "Vista " + n + " de " + total,
     viewsLabel: "Las vistas de la pieza",
     viewAlt: (title: string, view: string) => title + ", vista " + view,
-    sketchAlt: (title: string) => "Ilustración del primer boceto de " + title,
+    sketchAlt: (title: string) => "La mano de Yoni Berete dibujando el primer boceto de " + title,
     steps: {
       sketch: { title: "La visión", text: "La idea se dibuja a mano y después se modela hasta que cada proporción es justa." },
       raw: { title: "Esculpir la forma", text: "El metal se funde y se ensambla antes de engastar una sola piedra." },

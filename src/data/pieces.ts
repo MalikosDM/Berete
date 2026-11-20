@@ -81,13 +81,14 @@ type PieceInput = {
 };
 
 /** The text of a first sketch: the site translates it with the title of the piece (src/i18n/content.ts). */
-export const sketchAlt = (title: string) => "Illustration of the first sketch of " + title;
+export const sketchAlt = (title: string) => "Yoni Berete's hand drawing the first sketch of " + title;
 
 function piece(p: PieceInput): Piece {
   const making: Making = {};
   for (const [step, item] of Object.entries(p.making ?? {}) as [MakingStep, Maybe][]) if (item) making[step] = item;
-  // The first sketch from the folder of sketches, unless the piece already has its own.
-  making.sketch ??= sketch(p.slug, at(sketchAlt(p.title), "The first sketch")) ?? undefined;
+  // The first sketch from the folder of sketches (the hand of Yoni drawing the piece, since 20/11/2026), else the image
+  // the piece gives for this step (Dragon Ball: its first hand drawing, from the stories).
+  making.sketch = sketch(p.slug, at(sketchAlt(p.title), "The first sketch")) ?? making.sketch;
   if (!making.sketch) delete making.sketch;
   return {
     slug: p.slug,
@@ -332,7 +333,8 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "Two crossed hands, his celebration"],
     ],
     seen: "White gold tone · round diamonds in pavé, baguettes at the cuffs, step-cut stones on the bail",
-    making: { sketch: st("kenan-yildiz", 1, at("3D model of the pendant", "The 3D design")), raw: yoni("kenan-yildiz-celebration-pendant", "p04", RAW()) },
+    // Its first step: the hand of Yoni drawing it (folder of sketches; before 20/11/2026, the 3D model of story 1).
+    making: { raw: yoni("kenan-yildiz-celebration-pendant", "p04", RAW()) },
   }),
   piece({
     slug: "noah-okafor-jersey-pendant",

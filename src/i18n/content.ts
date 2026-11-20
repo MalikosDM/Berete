@@ -21,7 +21,9 @@ export type Visitor = {
 };
 
 const STORY_ALT = /^(.*), story (\d+)$/;
-const SKETCH_ALT = "Illustration of the first sketch of ";
+const SKETCH_ALT = "Yoni Berete's hand drawing the first sketch of ";
+/** Its words before 20/11/2026 (still in a base not saved again since). */
+const OLD_SKETCH_ALT = "Illustration of the first sketch of ";
 /** The caption of a player's own ring: "Deniz Undav · 26". */
 const NAMED_NUMBER = /^(.+) · (\d+)$/;
 
@@ -75,7 +77,7 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
     for (const [step, item] of Object.entries(p.making) as [keyof Piece["making"], MediaItem | undefined][]) {
       if (!item) continue;
       // The first sketch says the title of the piece: one sentence per language, with the translated title.
-      if (item.alt === SKETCH_ALT + p.title) making[step] = { ...m({ ...item, alt: undefined }), alt: v.sketchAlt(title) };
+      if (item.alt === SKETCH_ALT + p.title || item.alt === OLD_SKETCH_ALT + p.title) making[step] = { ...m({ ...item, alt: undefined }), alt: v.sketchAlt(title) };
       else making[step] = m(item);
     }
     return {

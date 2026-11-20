@@ -166,7 +166,7 @@ export const ar: Messages = {
     viewOf: (n: number, total: number) => "المنظر " + n + " من " + total,
     viewsLabel: "مناظر القطعة",
     viewAlt: (title: string, view: string) => title + "، منظر " + view,
-    sketchAlt: (title: string) => "رسم توضيحي للمخطط الأول لقطعة " + title,
+    sketchAlt: (title: string) => "يد يوني بيريتي ترسم المخطط الأول لقطعة " + title,
     steps: {
       sketch: { title: "الرؤية", text: "تُرسم الفكرة باليد، ثم يُصاغ نموذجها حتى تستقيم كل النسب." },
       raw: { title: "نحت الشكل", text: "يُصب المعدن ويُجمَّع، قبل ترصيع أي حجر." },

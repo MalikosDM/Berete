@@ -179,7 +179,7 @@ export const en = {
     viewsLabel: "The views of the piece",
     viewAlt: (title: string, view: string) => title + ", " + view + " view",
     /** Text of the first sketch of a piece (step "Sketch"). */
-    sketchAlt: (title: string) => "Illustration of the first sketch of " + title,
+    sketchAlt: (title: string) => "Yoni Berete's hand drawing the first sketch of " + title,
     steps: {
       sketch: { title: "The Vision", text: "The idea is drawn by hand, then modelled until every proportion is right." },
       raw: { title: "Sculpting the Form", text: "The metal is cast and assembled, before a single stone is set." },

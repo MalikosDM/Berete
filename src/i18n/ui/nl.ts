@@ -170,7 +170,7 @@ export const nl: Messages = {
     viewOf: (n: number, total: number) => "Aanzicht " + n + " van " + total,
     viewsLabel: "De aanzichten van het stuk",
     viewAlt: (title: string, view: string) => title + ", aanzicht: " + view,
-    sketchAlt: (title: string) => "Illustratie van de eerste schets van " + title,
+    sketchAlt: (title: string) => "De hand van Yoni Berete tekent de eerste schets van " + title,
     steps: {
       sketch: { title: "De visie", text: "Het idee wordt met de hand getekend en daarna gemodelleerd tot elke verhouding klopt." },
       raw: { title: "Het beeldhouwen van de vorm", text: "Het metaal wordt gegoten en samengesteld, nog voordat er één steen wordt gezet." },

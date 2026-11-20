@@ -182,7 +182,7 @@ export const de: Messages = {
     viewOf: (n: number, total: number) => "Ansicht " + n + " von " + total,
     viewsLabel: "Die Ansichten des Stücks",
     viewAlt: (title: string, view: string) => title + ", Ansicht: " + view,
-    sketchAlt: (title: string) => "Illustration der ersten Skizze von " + title,
+    sketchAlt: (title: string) => "Die Hand von Yoni Berete zeichnet die erste Skizze von " + title,
     steps: {
       sketch: { title: "Die Vision", text: "Die Idee wird von Hand gezeichnet und dann modelliert, bis jede Proportion stimmt." },
       raw: { title: "Die Formgebung", text: "Das Metall wird gegossen und montiert, bevor auch nur ein Stein gefasst wird." },

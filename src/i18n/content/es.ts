@@ -133,7 +133,6 @@ const content: Record<string, string> = {
   "Pendant on a Cuban chain": "Colgante con cadena cubana",
   "A hero, a dragon and the dragon balls": "Un héroe, un dragón y las esferas del dragón",
   "Colours": "Colores",
-  "3D model of the pendant": "Modelo 3D del colgante",
   "The 3D design": "El diseño en 3D",
   "Kenan Yildiz — Celebration Pendant": "Kenan Yildiz — Colgante Celebración",
   "His celebration, crossed in diamonds.": "Su celebración, con las manos cruzadas en diamantes.",

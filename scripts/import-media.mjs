@@ -19,8 +19,11 @@
  *   BERETE_SITE_DIR     <disk>/Berete - Envoi ODORO  (the photos and films of the site)
  *   BERETE_LOGO_FILE    <disk>/Berete - Stories/berete_jewellers-cropped.svg
  *   BERETE_BOUTIQUE_DIR <disk>/Berete - Boutique Bijoutier (export ODORO)
- *   BERETE_SKETCHES_DIR <disk>/Berete - Croquis  (one "<slug of the piece>.jpg"
- *                       per piece: step "Sketch" of "How it was made")
+ *   BERETE_SKETCHES_DIR <disk>/Berete - Croquis/Croquis main de Yoni (site)  (one "<slug of the piece>.jpg" per
+ *                       piece, the hand of Yoni drawing it in his atelier: step "The Original Vision" of "The Making of
+ *                       a Masterpiece"; section "sketches")
+ *   BERETE_OLD_SKETCHES_DIR <disk>/Berete - Croquis  (the first sketches, before 20/11/2026: kept for a piece the
+ *                       folder above does not have)
  *   BERETE_HOUSE_DIR    <disk>/Berete - La Maison  (the personal photos of Yoni for The House: one
  *                       "<place>.jpg" per place, "portrait", "citation-1", "chapitre-03"..., src/data/house.ts;
  *                       section "house")
@@ -60,7 +63,8 @@ const STORIES_DIR = process.env.BERETE_STORIES_DIR ?? join(DISK, "Berete - Stori
 const SITE_DIR = process.env.BERETE_SITE_DIR ?? join(DISK, "Berete - Envoi ODORO");
 const LOGO_FILE = process.env.BERETE_LOGO_FILE ?? join(DISK, "Berete - Stories", "berete_jewellers-cropped.svg");
 const BOUTIQUE_DIR = process.env.BERETE_BOUTIQUE_DIR ?? join(DISK, "Berete - Boutique Bijoutier (export ODORO)");
-const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DISK, "Berete - Croquis");
+const SKETCHES_DIR = process.env.BERETE_SKETCHES_DIR ?? join(DISK, "Berete - Croquis", "Croquis main de Yoni (site)");
+const OLD_SKETCHES_DIR = process.env.BERETE_OLD_SKETCHES_DIR ?? join(DISK, "Berete - Croquis");
 const HOUSE_DIR = process.env.BERETE_HOUSE_DIR ?? join(DISK, "Berete - La Maison");
 const HD_DIR = process.env.BERETE_HD_DIR ?? join(DISK, "Berete - Dossiers icloud");
 const PLAYERS_DIR = process.env.BERETE_PLAYERS_DIR ?? join(HD_DIR, "00 Contexte Yoni", "Photos joueurs en maillot");
@@ -442,11 +446,30 @@ async function importStills() {
   return Object.fromEntries([...STILLS, ...PORTRAITS, ...BOUTIQUE_VIDEOS].filter((s) => stills[s.key]).map((s) => [s.key, stills[s.key]]));
 }
 
-/* ---------- Sketches: step "Sketch" of "How it was made", one per piece ---------- */
+/* ---------- Sketches: step "The Original Vision" of "The Making of a Masterpiece", one per piece ---------- */
 
 /**
- * "<slug of the piece>.jpg" -> public/media/sketches/<slug>.webp, encoded like
- * every photo. Files starting with "_" (an overview of the folder) are skipped.
+ * The hand of Yoni drawing the piece (3:4, about 3600 x 4800): sharp on a phone, on a retina screen and in full screen.
+ * The browser takes a lighter copy when it is enough (w1080, w640, w160: scripts/media-sizes.mjs).
+ */
+const SKETCH = { maxW: 1440, maxH: 1920, quality: 80 };
+
+async function sketchPhoto(src, out) {
+  const vf = "scale=w='min(" + SKETCH.maxW + ",iw)':h='min(" + SKETCH.maxH + ",ih)':force_original_aspect_ratio=decrease:flags=lanczos";
+  await produce(out, src, "sketch:" + vf + ":" + SKETCH.quality, ["-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(SKETCH.quality), "-compression_level", "6"]);
+  const p = await probe(out);
+  return { type: "image", src: webPath(out), width: p.width, height: p.height };
+}
+
+/** The "<slug>.jpg" files of a folder of sketches (files starting with "_", an overview of the folder, are skipped). */
+async function sketchFiles(dir) {
+  if (!existsSync(dir)) return [];
+  return (await readdir(dir)).filter((n) => IMAGE_EXT.test(n) && !n.startsWith("_") && !n.startsWith(".")).sort();
+}
+
+/**
+ * "<slug of the piece>.jpg" -> public/media/sketches/<slug>.webp. The hand of Yoni (BERETE_SKETCHES_DIR) first; a piece
+ * it does not have keeps its first sketch of before (BERETE_OLD_SKETCHES_DIR), encoded as it was.
  */
 async function importSketches() {
   if (!existsSync(SKETCHES_DIR)) {
@@ -454,11 +477,23 @@ async function importSketches() {
     return null;
   }
   console.log("Sketches: " + SKETCHES_DIR);
-  const files = (await readdir(SKETCHES_DIR)).filter((n) => IMAGE_EXT.test(n) && !n.startsWith("_") && !n.startsWith(".")).sort();
-  const sketches = {};
-  await pool(files, cpus().length, async (name) => {
+  const jobs = new Map();
+  for (const name of await sketchFiles(SKETCHES_DIR)) {
     const slug = slugify(name.replace(IMAGE_EXT, ""));
-    sketches[slug] = await photo(join(SKETCHES_DIR, name), join(MEDIA, "sketches", slug + ".webp"));
+    jobs.set(slug, () => sketchPhoto(join(SKETCHES_DIR, name), join(MEDIA, "sketches", slug + ".webp")));
+  }
+  const hands = jobs.size;
+  const older = [];
+  for (const name of await sketchFiles(OLD_SKETCHES_DIR)) {
+    const slug = slugify(name.replace(IMAGE_EXT, ""));
+    if (jobs.has(slug)) continue;
+    older.push(slug);
+    jobs.set(slug, () => photo(join(OLD_SKETCHES_DIR, name), join(MEDIA, "sketches", slug + ".webp")));
+  }
+  console.log("  " + hands + " drawn by the hand of Yoni" + (older.length ? ", " + older.length + " kept from before: " + older.join(", ") : ""));
+  const sketches = {};
+  await pool([...jobs.keys()], cpus().length, async (slug) => {
+    sketches[slug] = await jobs.get(slug)();
   });
   // In the order of the slugs, whatever finished first.
   return Object.fromEntries(Object.keys(sketches).sort().map((slug) => [slug, sketches[slug]]));
