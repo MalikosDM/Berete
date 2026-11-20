@@ -481,6 +481,8 @@ export const en = {
     noWebgl: "This browser cannot show 3D. Try another one, or ask us for photos on WhatsApp.",
     hint: "Drag to turn · Scroll to zoom where you point · Right-click to move · Double-click a detail to come closer",
     hintTouch: "One finger to turn · Pinch to zoom · Two fingers to move · Double-tap a detail to come closer",
+    detailHint: "Drag to turn the piece · Click it, then scroll to zoom",
+    detailHintTouch: "One finger to turn the piece · Pinch to zoom",
     metal: "Metal",
     metals: { "yellow-gold": "18k yellow gold", "white-gold": "18k white gold", "rose-gold": "18k rose gold", platinum: "Platinum", "black-rhodium": "Black rhodium" },
     stoneColor: "Colour of the stones",
@@ -566,6 +568,10 @@ export const en = {
     sectionEyebrow: "From the Bench",
     sectionTitle: "Every Piece, Its Making-of",
     sectionLead: "Each creation, filmed at the bench. Open its atelier, then enter its world.",
+    /** The film of the finished piece that opens its page (src/components/PieceFilm.tsx). */
+    intro: (title: string) => "The film of " + title,
+    skip: "See the piece",
+    watch: "Watch the film",
   },
 };
 

@@ -8,6 +8,7 @@
  * Writes src/data/universes.generated.json.
  *
  *   npm run universes
+ *   npm run universes -- --only=genkidama     one background only (the others and the fonts stay as they are)
  *
  * The AI backgrounds are read on the external disk (BERETE_DISK, default "/Volumes/Disque externe"); BERETE_UNIVERSE_DIR
  * gives another folder.
@@ -42,6 +43,19 @@ const BACKDROPS = [
   { id: "inter", file: "Inter Milan - stade de nuit.png", name: "Stade de nuit (Inter Milan)", focus: [0.5, 0.5], mobile: [0.5, 0.42] },
   { id: "vfb", file: "VfB Stuttgart - finale fumee rouge.png", name: "Finale, fumée rouge (VfB Stuttgart)", focus: [0.5, 0.5], mobile: [0.5, 0.4] },
   { id: "tunnel", file: "Noah Okafor - tunnel vestiaire.png", name: "Tunnel du vestiaire (Noah Okafor)", focus: [0.5, 0.55], mobile: [0.5, 0.5] },
+  // Black, the sphere of light at the top (20/11/2026: large enough as they are, never enlarged; a portrait of its own
+  // for phones). core: the centre and the radius of the sphere (share of the width), for its glow and the particles
+  // that rise to it (src/components/Universe.tsx, "genkidama").
+  {
+    id: "genkidama",
+    file: "dragon-ball-genkidama-desktop.jpg",
+    mobileFile: "dragon-ball-genkidama-mobile.jpg",
+    name: "Genkidama, sphère de lumière (Dragon Ball)",
+    focus: [0.5, 0.42],
+    mobile: [0.5, 0.5],
+    core: [0.5, 0.148, 0.15],
+    mobileCore: [0.5, 0.223, 0.26],
+  },
 ];
 
 /** The title fonts: package, file (latin letters only: the titles of the site), and the part of Yuji Boku that holds 力. */
@@ -67,6 +81,8 @@ async function master(b) {
   if (existsSync(file)) return file;
   const src = join(SOURCE, b.file);
   if (!existsSync(src)) throw new Error("AI background not found: " + src);
+  // Already wider than the largest file of the site: used as it is.
+  if (((await sharp(src).metadata()).width ?? 0) >= WIDTHS[WIDTHS.length - 1]) return src;
   await mkdir(MASTERS, { recursive: true });
   console.log("Enlarging " + b.file + " (a few minutes)");
   const r = spawnSync("python3", ["-I", join(ROOT, "scripts", "universe-upscale.py"), src, file], { stdio: "inherit" });
@@ -83,6 +99,14 @@ async function backdrop(b) {
   const file = await master(b);
   const { width, height } = await sharp(file).metadata();
   for (const w of WIDTHS) await write(sharp(file).resize({ width: w }), join(OUT, b.id + "-" + w));
+  if (b.mobileFile) {
+    // Its own portrait for phones: 9:16, from the middle of it.
+    const src = join(SOURCE, b.mobileFile);
+    if (!existsSync(src)) throw new Error("AI background not found: " + src);
+    for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
+    console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, core: b.core, mobileCore: b.mobileCore };
+  }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;
   const h = Math.floor(Math.min(height, (fy * height) / MOBILE_AT_Y, ((1 - fy) * height) / (1 - MOBILE_AT_Y)));
@@ -111,8 +135,18 @@ async function fonts() {
 }
 
 await mkdir(OUT, { recursive: true });
-const backdrops = {};
-for (const b of BACKDROPS) backdrops[b.id] = await backdrop(b);
-await fonts();
+const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7).split(",") ?? null;
+let backdrops = {};
+if (only) {
+  try {
+    backdrops = JSON.parse(await readFile(DATA, "utf8")).backdrops ?? {};
+  } catch {
+    /* first run */
+  }
+}
+for (const b of BACKDROPS) if (!only || only.includes(b.id)) backdrops[b.id] = await backdrop(b);
+// In the order of the list.
+backdrops = Object.fromEntries(BACKDROPS.filter((b) => backdrops[b.id]).map((b) => [b.id, backdrops[b.id]]));
+if (!only) await fonts();
 await writeFile(DATA, JSON.stringify({ backdrops }, null, 1) + "\n");
 console.log("  = src/data/universes.generated.json");

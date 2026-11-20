@@ -1,6 +1,7 @@
 /*
  * The effects of a universe (src/data/themes.ts), drawn in one canvas behind the content: dust, embers, diamond glints,
- * lightning, speed lines, butterflies of light, confetti, petals, stars. Loaded after the content of the page
+ * lightning, speed lines, butterflies of light, confetti, petals, stars, the light rising to the sphere of the Genkidama.
+ * Loaded after the content of the page
  * (src/components/Universe.tsx); every effect answers the speed of the scroll, lightly.
  *
  * Light on purpose: one canvas, a few dozen particles (fewer than half on a phone, at the pixel density of the screen up
@@ -8,7 +9,11 @@
  * motion (the module is not even loaded).
  */
 
-export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean };
+/**
+ * core: the sphere of light of the backdrop (Genkidama), where its particles go (its centre and its size, read on the
+ * page). fixed: the world behind a layer that covers the screen (a story): drawn whatever the scroll of the page.
+ */
+export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean; core?: HTMLElement | null; fixed?: boolean };
 
 type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; spin: number; angle: number; hue: number; color: string; kind: number };
 
@@ -81,6 +86,19 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   };
   resize();
 
+  // The sphere of the Genkidama, in the coordinates of the canvas (read again now and then: it moves with the scroll).
+  const sphere = { x: 0.5 * w, y: 0.15 * h, r: Math.min(w, h) * 0.12 };
+  const readSphere = () => {
+    if (!opts.core) return;
+    const c = canvas.getBoundingClientRect();
+    const r = opts.core.getBoundingClientRect();
+    if (r.width <= 0) return;
+    sphere.x = r.left + r.width / 2 - c.left;
+    sphere.y = r.top + r.height / 2 - c.top;
+    sphere.r = r.width / 2;
+  };
+  readSphere();
+
   const area = () => (w * h) / (1440 * 900);
   const count = (n: number) => Math.max(3, Math.round(n * density * clamp(area(), 0.35, 1.6)));
 
@@ -92,6 +110,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const stars: P[] = [];
   const rings: P[] = [];
   const sparks: P[] = [];
+  const genki: P[] = [];
   let bolt: { pts: [number, number][][]; life: number } | null = null;
   let nextBolt = performance.now() + rand(1500, 3500);
   let shooting: P | null = null;
@@ -154,7 +173,28 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     kind: petal ? 1 : 0,
   });
 
+  /** A grain of light of the Genkidama: born low on the screen, it rises to the sphere and melts into it. */
+  const newGenki = (anywhere: boolean): P => {
+    const spread = Math.max(w * 0.5, sphere.r * 3);
+    const below = sphere.y + sphere.r * 1.3;
+    return {
+      x: sphere.x + rand(-1, 1) * spread * (0.35 + Math.random() * 0.65),
+      y: anywhere ? rand(below, h) : h + rand(0, 40),
+      vx: 0,
+      vy: 0,
+      life: 0,
+      max: rand(700, 1500),
+      size: rand(0.6, 1.9),
+      spin: rand(0, Math.PI * 2),
+      angle: rand(0.25, 0.6),
+      hue: 0,
+      color: "",
+      kind: 0,
+    };
+  };
+
   const fill = () => {
+    if (has("genkidama")) while (genki.length < count(84)) genki.push(newGenki(true));
     if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
     if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
     if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, false));
@@ -208,7 +248,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     raf = 0;
     if (!running) return;
     // Deep in the page the world rests (its backdrop is dim behind the texts): nothing is drawn, a look now and then.
-    if (window.scrollY > window.innerHeight * 1.1) {
+    if (!opts.fixed && window.scrollY > window.innerHeight * 1.1) {
       ctx.clearRect(0, 0, w, h);
       lastY = window.scrollY;
       speed = 0;
@@ -278,6 +318,31 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
           ctx.stroke();
         }
       }
+    }
+
+    if (has("genkidama")) {
+      if (frame % 12 === 1) readSphere();
+      const far = Math.hypot(w, h);
+      for (let i = genki.length - 1; i >= 0; i--) {
+        const p = genki[i]!;
+        p.life++;
+        p.spin += 0.02;
+        const dx = sphere.x - p.x;
+        const dy = sphere.y - p.y;
+        const d = Math.hypot(dx, dy) || 1;
+        // Slow far away, a little faster near the sphere; a gentle sway across the way.
+        const v = p.angle * (1 + (1 - Math.min(1, d / far)) * 1.4) * (1 + boost);
+        p.x += (dx / d) * v + (-dy / d) * Math.sin(p.spin + p.life * 0.01) * 0.18;
+        p.y += (dy / d) * v + (dx / d) * Math.sin(p.spin + p.life * 0.01) * 0.18;
+        const inside = d < sphere.r * 1.15 ? Math.max(0, (d - sphere.r * 0.7) / (sphere.r * 0.45)) : 1;
+        const a = Math.min(1, p.life / 60, (p.max - p.life) / 60) * inside * 0.85;
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.drawImage(lightSprite, p.x - p.size * 3.2, p.y - p.size * 3.2, p.size * 6.4, p.size * 6.4);
+        ctx.fillStyle = rgba(white, Math.max(0, a));
+        ctx.fillRect(p.x - p.size * 0.35, p.y - p.size * 0.35, p.size * 0.7, p.size * 0.7);
+        if (d < sphere.r * 0.7 || p.life > p.max) genki[i] = newGenki(false);
+      }
+      ctx.globalAlpha = 1;
     }
 
     if (has("dust")) {
@@ -493,6 +558,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   io.observe(canvas);
   const ro = new ResizeObserver(() => {
     resize();
+    readSphere();
     makeLines();
   });
   ro.observe(canvas);

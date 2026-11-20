@@ -7,12 +7,14 @@ import { Component, Suspense, useEffect, useRef, useState, type ReactNode, type 
 import { lazyPart } from "@/lib/lazy";
 import type { PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
+import type { DetailMark } from "./DetailViewer";
 import type { Selection, ViewerHandle } from "./JewelViewer";
 import { CANVAS_SIZE, PANEL, VIEWER_GRID } from "./layout";
 
 const JewelViewer = lazyPart(() => import("./JewelViewer"));
+const DetailViewer = lazyPart(() => import("./DetailViewer"));
 
-export type { Selection, ViewerHandle };
+export type { DetailMark, Selection, ViewerHandle };
 
 type Props = {
   model: PublicModel;
@@ -83,6 +85,45 @@ export function Jewel3D({ eager = false, ...props }: Props) {
     <Guard fallback={<Waiting model={props.model} words={props.words} className={props.className} failed />}>
       <Suspense fallback={<Waiting model={props.model} words={props.words} className={props.className} />}>
         <JewelViewer {...props} />
+      </Suspense>
+    </Guard>
+  );
+}
+
+/** The frame of "The Art of Detail" in 3D while it loads: the same size, the saved image of the jewel. */
+function DetailWaiting({ model, words, className = "", failed = false }: { model: PublicModel; words: Messages["viewer"]; className?: string; failed?: boolean }) {
+  return (
+    <div className={"relative flex w-full items-center justify-center overflow-hidden bg-ink " + className} role="status" data-viewer-failed={failed || undefined}>
+      {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-50" /> : null}
+      <span className="relative px-6 text-center text-base text-bone">{failed ? words.failed : words.preparing}</span>
+    </div>
+  );
+}
+
+/** "The Art of Detail" in 3D (./DetailViewer.tsx), loaded when it comes near the screen (at once in the admin). */
+export function Detail3D(props: {
+  model: PublicModel;
+  marks: DetailMark[];
+  words: Messages["viewer"];
+  mode?: "page" | "admin";
+  onPick?: (at: [number, number, number]) => void;
+  active?: number | null;
+  className?: string;
+}) {
+  const spot = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(() => props.mode === "admin" || typeof IntersectionObserver === "undefined");
+  useEffect(() => {
+    if (near || !spot.current) return undefined;
+    const io = new IntersectionObserver(([entry]) => entry?.isIntersecting && setNear(true), { rootMargin: "400px 0px" });
+    io.observe(spot.current);
+    return () => io.disconnect();
+  }, [near]);
+  const waiting = <DetailWaiting model={props.model} words={props.words} className={props.className} />;
+  if (!near) return <div ref={spot}>{waiting}</div>;
+  return (
+    <Guard fallback={<DetailWaiting model={props.model} words={props.words} className={props.className} failed />}>
+      <Suspense fallback={waiting}>
+        <DetailViewer {...props} />
       </Suspense>
     </Guard>
   );

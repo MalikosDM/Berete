@@ -90,7 +90,11 @@ function useEntrance(ref: React.RefObject<HTMLElement | null>, slug: string | un
 
 type Fx = { stop: () => void; impact: (x: number, y: number) => void };
 
-export default function Universe({ theme, slug, preview = false }: { theme: ResolvedTheme; slug?: string; preview?: boolean }) {
+/**
+ * preview: the admin (a small frame, nothing moves). fixed: the world behind another layer that covers the screen (a story
+ * of the piece, src/components/stories/StoryViewer.tsx): the whole screen, no entrance, the effects without the scroll.
+ */
+export default function Universe({ theme, slug, preview = false, fixed = false }: { theme: ResolvedTheme; slug?: string; preview?: boolean; fixed?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fxRef = useRef<Fx | null>(null);
@@ -98,14 +102,17 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
   const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
-  const canvasEffects = effects.filter((e) => ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "petals", "stars"].includes(e));
+  const canvasEffects = effects.filter((e) => ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "petals", "stars", "genkidama"].includes(e));
+  // The sphere of light of the backdrop (Genkidama): its glow, and where the particles of light go.
+  const core = backdrop?.core && effects.includes("genkidama") ? backdrop.core : null;
+  const mobileCore = backdrop?.mobileCore ?? core;
   const fxKey = canvasEffects.join(" ") + "|" + theme.glow + "|" + theme.preset;
 
-  useEntrance(ref, preview ? undefined : slug);
+  useEntrance(ref, preview || fixed ? undefined : slug);
 
   // The backdrop goes back into the depth once the opening has passed: the texts below read on a calm ground.
   useEffect(() => {
-    if (preview) return undefined;
+    if (preview || fixed) return undefined;
     const el = ref.current;
     if (!el) return undefined;
     let frame = 0;
@@ -124,7 +131,7 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
       window.removeEventListener("scroll", onScroll);
       if (frame) window.cancelAnimationFrame(frame);
     };
-  }, [preview]);
+  }, [preview, fixed]);
 
   // The effects: a small module, loaded once the page is there (never before the content), not at all when the visitor
   // asks for reduced motion.
@@ -137,7 +144,8 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
       () => {
         void import("./universe/fx").then((m) => {
           if (cancelled) return;
-          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") });
+          const coreEl = canvas.parentElement?.querySelector<HTMLElement>(".u-genki-core") ?? null;
+          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, fixed });
         });
       },
       { delay: 200, onGesture: true },
@@ -150,11 +158,11 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
     };
     // fxKey stands for the effects and their colours.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preview, fxKey]);
+  }, [preview, fixed, fxKey]);
 
   // The impact: opening a photo strikes like a blow (src/components/HorizontalGallery.tsx sends "universe:impact").
   useEffect(() => {
-    if (preview || !effects.includes("impact")) return undefined;
+    if (preview || fixed || !effects.includes("impact")) return undefined;
     const onImpact = (e: Event) => {
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       const { x, y } = (e as CustomEvent<{ x: number; y: number }>).detail;
@@ -163,7 +171,7 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
     };
     window.addEventListener("universe:impact", onImpact);
     return () => window.removeEventListener("universe:impact", onImpact);
-  }, [preview, effects]);
+  }, [preview, fixed, effects]);
 
   useEffect(() => {
     if (!impact) return undefined;
@@ -191,7 +199,8 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
       data-entrance={theme.entrance}
       data-effects={effects.join(" ")}
       data-backdrop={theme.backdrop || undefined}
-      data-preview={preview ? "" : undefined}
+      data-preview={preview || fixed ? "" : undefined}
+      data-fixed={fixed ? "" : undefined}
       style={vars}
     >
       <div className="universe-stage">
@@ -207,6 +216,15 @@ export default function Universe({ theme, slug, preview = false }: { theme: Reso
           <picture className="u-backdrop" data-uploaded="">
             <img src={uploaded} alt="" decoding="async" fetchPriority="low" />
           </picture>
+        ) : null}
+        {core && mobileCore ? (
+          // Laid over the image exactly (src/index.css): the glow of the sphere breathes, the particles go to its heart.
+          <div className="u-genki" style={{ "--g-x": core[0], "--g-y": core[1], "--g-r": core[2], "--g-mx": mobileCore[0], "--g-my": mobileCore[1], "--g-mr": mobileCore[2] } as CSSProperties}>
+            <div className="u-genki-box">
+              <span className="u-genki-glow" />
+              <span className="u-genki-core" />
+            </div>
+          </div>
         ) : null}
         <div className="u-light" />
         <div className="u-texture" />

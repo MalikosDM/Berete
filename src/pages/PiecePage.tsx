@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
@@ -8,6 +8,7 @@ import HorizontalGallery, { Lightbox } from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
+import PieceFilm from "@/components/PieceFilm";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import Showcase from "@/components/Showcase";
@@ -18,14 +19,19 @@ import { defaultCatalogue, media } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
-import { resolveAtelier } from "@/data/atelier";
+import { resolveAtelier, resolveReveal } from "@/data/atelier";
+import { pointsFor } from "@/data/details3d";
+import type { PublicModel } from "@/data/models";
 import { resolveShowcase } from "@/data/showcase";
 import { resolveTheme } from "@/data/themes";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue, useRawCatalogue } from "@/lib/catalogue";
+import { clubLogo } from "@/lib/clubs";
+import { filmSeen, markFilmSeen } from "@/lib/films";
 import { usePieceModel } from "@/lib/models";
+import { Detail3D, type DetailMark } from "@/viewer";
 import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
@@ -51,6 +57,19 @@ export default function PiecePage() {
   const piece = findPiece(cat, slug);
   // The 3D model the jeweller attached to this piece, if any: shown right under the opening.
   const model = usePieceModel(piece?.slug ?? slug);
+  // The film of the finished piece: the first thing seen on entering the piece, once per visit (src/components/PieceFilm.tsx).
+  const reveal = piece ? resolveReveal(piece.slug, piece.atelier) : null;
+  const [filmOpen, setFilmOpen] = useState(false);
+  const hasReveal = reveal !== null;
+  const pieceSlug = piece?.slug;
+  useLayoutEffect(() => {
+    if (!pieceSlug || !hasReveal || filmSeen(pieceSlug) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    markFilmSeen(pieceSlug);
+    // Before the first paint of the piece: the film comes first (the page written by the server has none).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilmOpen(true);
+    return () => setFilmOpen(false);
+  }, [pieceSlug, hasReveal]);
   if (!piece) {
     // A renamed piece leads to its new address; an unpublished one to its player, else to the creations.
     const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug);
@@ -131,6 +150,11 @@ export default function PiecePage() {
               <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
                 <BrandIcon name="whatsapp" className="size-5" /> {t.piece.want}
               </a>
+              {reveal ? (
+                <button type="button" onClick={() => setFilmOpen(true)} data-watch-film className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                  <Play className="size-4 fill-current" aria-hidden="true" /> {t.films.watch}
+                </button>
+              ) : null}
               {model ? (
                 <a href="#piece-3d-viewer" data-see-3d className="inline-flex min-h-14 items-center justify-center gap-3 border border-rose-light/70 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
                   <Rotate3d className="size-5" aria-hidden="true" /> {t.viewer.see}
@@ -153,7 +177,7 @@ export default function PiecePage() {
       <div id="piece-details" className="scroll-mt-24">
         {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} bare /> : null}
         {atelier ? <AtelierPassage piece={piece} madeFor={madeFor(cat, piece)} atelier={atelier} /> : null}
-        {piece.details.length > 0 ? <DetailsSection piece={piece} /> : null}
+        {piece.details.length > 0 ? <DetailsSection piece={piece} model={model} /> : null}
       </div>
 
       {/* Made for, and the story */}
@@ -165,13 +189,26 @@ export default function PiecePage() {
               {people.slice(0, 3).map((person) => {
                 const portrait = portraitOf(cat, person);
                 const stories = storiesOf(cat, person.slug);
+                // A club with its official logo (src/lib/clubs.ts): the logo, in the light of the universe of the piece.
+                const logo = person.kind === "club" ? clubLogo(person.slug) : null;
                 return (
                   <li key={person.slug} className="flex items-center gap-5">
-                    <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
-                      <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
-                        {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span aria-hidden="true" className="font-display text-xl text-white">{initials(person.name)}</span>}
-                      </span>
-                    </Link>
+                    {logo ? (
+                      <Link to={"/players/" + person.slug} data-club-logo={person.slug} className="club-emblem relative block size-24 shrink-0 sm:size-28" aria-label={person.name}>
+                        <span aria-hidden="true" className="club-emblem-halo absolute -inset-5 rounded-full" />
+                        <span className="relative flex h-full w-full items-center justify-center rounded-full bg-rose-gold p-[2px]">
+                          <span className="flex h-full w-full items-center justify-center rounded-full border-2 border-ink bg-ink p-2.5">
+                            <img src={logo} alt="" width={840} height={840} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                          </span>
+                        </span>
+                      </Link>
+                    ) : (
+                      <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
+                        <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
+                          {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span aria-hidden="true" className="font-display text-xl text-white">{initials(person.name)}</span>}
+                        </span>
+                      </Link>
+                    )}
                     <div className="min-w-0">
                       <Link to={"/players/" + person.slug} data-made-for-person={person.slug} className="inline-flex min-h-12 items-baseline gap-2 font-display text-[clamp(1.5rem,3vw,2.25rem)] uppercase tracking-[0.06em] text-white hover:text-rose-light">
                         {person.number !== null ? <span className="text-rose-gold text-lg">{person.number}</span> : null}
@@ -344,6 +381,8 @@ export default function PiecePage() {
         </div>
       </section>
 
+      {filmOpen && reveal ? <PieceFilm title={piece.title} film={reveal.film} poster={reveal.poster} theme={theme} onClose={() => setFilmOpen(false)} /> : null}
+
       {/* Out of the page (its blocks are positioned over the universe): over everything, the menu included. */}
       {viewer ? createPortal(<StoryViewer stories={viewer.stories} start={0} startStep={viewer.step} onClose={() => setViewer(null)} />, document.body) : null}
     </article>
@@ -352,10 +391,14 @@ export default function PiecePage() {
 
 /**
  * "The Art of Detail": each symbol of the piece and what it stands for, numbered; a detail shown by a photo of the piece opens
- * it in full screen.
+ * it in full screen. A piece with a 3D model shows it above them, turning, its details pointed at on the jewel (the points
+ * placed in the admin: src/data/details3d.ts, src/viewer/DetailViewer.tsx).
  */
-function DetailsSection({ piece }: { piece: Piece }) {
+function DetailsSection({ piece, model }: { piece: Piece; model: PublicModel | null }) {
   const { t } = useI18n();
+  const marks: DetailMark[] = model
+    ? pointsFor(piece.detailPoints, model.id, piece.details.length).map((p) => ({ n: p.detail + 1, title: piece.details[p.detail]!.title, at: p.at }))
+    : [];
   const photos = [piece.cover, ...piece.gallery].filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i);
   const [open, setOpen] = useState<number | null>(null);
   return (
@@ -365,6 +408,15 @@ function DetailsSection({ piece }: { piece: Piece }) {
         <h2 id="details-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
           {t.piece.details}
         </h2>
+        {model ? (
+          <div className="mt-12" data-details-3d>
+            <Detail3D model={model} marks={marks} words={t.viewer} className="h-[62svh] max-h-[760px] min-h-[340px] border border-white/10 lg:h-[72svh]" />
+            <p className="mt-4 text-base text-mist">
+              <span className="[@media(pointer:coarse)]:hidden">{t.viewer.detailHint}</span>
+              <span className="hidden [@media(pointer:coarse)]:inline">{t.viewer.detailHintTouch}</span>
+            </p>
+          </div>
+        ) : null}
         <ol className="mt-14 grid gap-x-12 gap-y-12 border-t border-white/15 pt-12 md:grid-cols-2 xl:grid-cols-3">
           {piece.details.map((d, i) => {
             const index = d.photo ? photos.findIndex((m) => m.src === d.photo) : -1;

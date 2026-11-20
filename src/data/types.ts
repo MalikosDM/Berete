@@ -1,4 +1,5 @@
 import type { Film, FilmKind, PieceAtelier } from "./atelier.js";
+import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 
@@ -119,6 +120,8 @@ export type Piece = {
   showcase: PieceShowcase | null;
   /** Its atelier: the making-of and the finished piece played full screen (src/data/atelier.ts); null: its own films. */
   atelier: PieceAtelier | null;
+  /** "The Art of Detail" in 3D: the points of its model tied to its details (src/data/details3d.ts); null: none placed. */
+  detailPoints: PieceDetailPoints | null;
   making: Making;
   translations?: Translations;
 };

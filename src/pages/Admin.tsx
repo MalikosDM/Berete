@@ -3,6 +3,8 @@ import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, 
 import Logo from "@/components/Logo";
 import Universe, { universeProps } from "@/components/Universe";
 import { cleanAtelier, filmId, FILMS, filmTime, resolveAtelier, type Film, type FilmKind, type PieceAtelier } from "@/data/atelier";
+import { cleanDetailPoints, pointsFor, type PieceDetailPoints } from "@/data/details3d";
+import type { PublicModel } from "@/data/models";
 import { HOUSE_PHOTO_PLACES } from "@/data/house";
 import { cleanShowcase, CUTOUTS, cutoutSrc, resolveShowcase, SHOWCASE_BY_DEFAULT, type CutoutView, type PieceShowcase } from "@/data/showcase";
 import {
@@ -24,7 +26,8 @@ import {
   type ThemeFontSpec,
 } from "@/data/themes";
 import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
-import { bundleOf, loadLocale, LOCALE_INFO } from "@/i18n";
+import { bundleOf, loadLocale, LOCALE_INFO, useI18n } from "@/i18n";
+import { Detail3D } from "@/viewer";
 import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
 import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
@@ -53,6 +56,8 @@ type Field =
   | { key: string; label: string; type: "atelier" }
   /** The 3D model shown on the page of the piece (kept with the model, not with the piece). */
   | { key: string; label: string; type: "model3d" }
+  /** "The Art of Detail" in 3D: a point of the model for each detail, placed by a click on it (src/data/details3d.ts). */
+  | { key: string; label: string; type: "detailPoints" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
   | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
 
@@ -122,12 +127,13 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "handover", label: "Remise au client", type: "medialist" },
       { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Or : 18 carats ; « Precious Materials » : d'après les photos, à faire valider par Yoni)", type: "specs" },
       { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },
+      { key: "detailPoints", label: "Les détails sur le modèle 3D (« The Art of Detail » : un point de la pièce pour chaque détail, relié à son étiquette)", type: "detailPoints" },
       { key: "press", label: "Presse (une ligne : Média | Titre | Lien)", type: "press" },
       { key: "people", label: "Joueurs liés (adresses web, séparées par des virgules)", type: "slugs" },
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, atelier: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, atelier: null, detailPoints: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins Signature",
@@ -395,6 +401,7 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
     else if (field.type === "theme") body[field.key] = cleanTheme(v);
     else if (field.type === "showcase") body[field.key] = cleanShowcase(v);
     else if (field.type === "atelier") body[field.key] = cleanAtelier(v);
+    else if (field.type === "detailPoints") body[field.key] = cleanDetailPoints(v);
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
@@ -485,6 +492,20 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
     if (d.type === "atelier") return <AtelierField key={d.key} label={d.label} slug={asText(f.slug)} titles={titles} value={cleanAtelier(v)} onChange={(a) => set(d.key, a)} />;
     if (d.type === "showcase") return <ShowcaseField key={d.key} label={d.label} slug={asText(f.slug)} value={cleanShowcase(v)} onChange={(c) => set(d.key, c)} />;
     if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
+    if (d.type === "detailPoints")
+      return (
+        <DetailPointsField
+          key={d.key}
+          label={d.label}
+          model={(modelChosen && models?.find((m) => m.id === modelChosen)?.preview) || null}
+          titles={asText(f.details)
+            .split("\n")
+            .map((l) => l.split("|")[0]!.trim())
+            .filter(Boolean)}
+          value={cleanDetailPoints(v)}
+          onChange={(p) => set(d.key, p)}
+        />
+      );
     if (d.type === "image") return <MediaField key={d.key} token={token} single imagesOnly label={d.label} value={asText(v) ? [{ type: "image", src: asText(v) }] : []} onChange={(l) => set(d.key, l[0]?.src ?? "")} />;
     if (d.type === "media") return <MediaField key={d.key} token={token} single label={d.label} value={asList([v]).filter((m) => m.src)} onChange={(l) => set(d.key, l[0] ?? { type: "image", src: "" })} />;
     if (d.type === "medialist") return <MediaField key={d.key} token={token} label={d.label} value={asList(v)} onChange={(l) => set(d.key, l)} />;
@@ -822,6 +843,70 @@ function CutoutThumb({ slug, view, black = false, className = "" }: { slug: stri
 }
 
 const FILM_NAMES: Record<FilmKind, string> = { making: "Fabrication", reveal: "Pièce finie" };
+
+/**
+ * "The Art of Detail" in 3D: the model of the piece, and for each of its details a point of the jewel, placed by a click
+ * on it ("Placer", then a click on the model); its label on the page holds its number and its title. Points placed on
+ * another model (the piece has a new one) are not shown: they are placed again.
+ */
+function DetailPointsField({ label, model, titles, value, onChange }: { label: string; model: PublicModel | null; titles: string[]; value: PieceDetailPoints | null; onChange: (v: PieceDetailPoints | null) => void }) {
+  const { t } = useI18n();
+  const [active, setActive] = useState<number | null>(null);
+  const points = model ? pointsFor(value, model.id, titles.length) : [];
+  const stale = Boolean(model && value && value.model !== model.id);
+  const save = (next: typeof points) => onChange(model ? cleanDetailPoints({ model: model.id, points: next }) : null);
+  const place = (at: [number, number, number]) => {
+    if (active === null) return;
+    const next = [...points.filter((p) => p.detail !== active - 1), { detail: active - 1, at }];
+    save(next);
+    // On to the next detail without its point, if any.
+    const free = titles.findIndex((_, i) => i !== active - 1 && !next.some((p) => p.detail === i));
+    setActive(free >= 0 ? free + 1 : null);
+  };
+  return (
+    <fieldset className="border border-white/15 p-4" data-detail-points-field>
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      {!model ? (
+        <p className="text-base text-mist">Choisissez d'abord le modèle 3D de la pièce (« Modèle 3D sur la page », plus haut) et enregistrez : ses détails pourront alors être placés dessus.</p>
+      ) : titles.length === 0 ? (
+        <p className="text-base text-mist">Écrivez d'abord les détails de la pièce (champ « Les détails », juste au-dessus).</p>
+      ) : (
+        <>
+          <p className="text-base text-mist">
+            Cliquez sur « Placer » à côté d'un détail, puis sur l'endroit de la pièce qu'il désigne. Faites tourner la pièce en la faisant glisser, zoomez avec la molette.
+            {stale ? " Les points placés sur l'ancien modèle de la pièce sont à replacer." : ""}
+          </p>
+          <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <Detail3D model={model} marks={points.map((p) => ({ n: p.detail + 1, title: titles[p.detail] ?? "", at: p.at }))} words={t.viewer} mode="admin" onPick={place} active={active} className="h-[28rem] border border-white/10" />
+            <ol className="grid content-start gap-2">
+              {titles.map((title, i) => {
+                const placed = points.some((p) => p.detail === i);
+                const n = i + 1;
+                return (
+                  <li key={i} data-detail-point-row={n} data-placed={placed ? "true" : "false"} className={"flex flex-wrap items-center gap-2 border px-3 py-2 " + (active === n ? "border-rose-light" : "border-white/10")}>
+                    <span className="w-7 font-display text-lg text-rose-light">{String(n).padStart(2, "0")}</span>
+                    <span className="min-w-0 flex-1 break-words text-base text-white">
+                      {title}
+                      <span className="block text-sm text-mist">{active === n ? "Cliquez sur la pièce…" : placed ? "Placé" : "Pas encore placé"}</span>
+                    </span>
+                    <button type="button" className={btn + " min-h-10 px-3"} data-place={n} aria-pressed={active === n} onClick={() => setActive(active === n ? null : n)}>
+                      {active === n ? "Annuler" : placed ? "Déplacer" : "Placer"}
+                    </button>
+                    {placed ? (
+                      <button type="button" className={iconBtn} data-remove-point={n} aria-label={"Retirer le point du détail " + n} onClick={() => save(points.filter((p) => p.detail !== i))}>
+                        <X className="size-4" aria-hidden="true" />
+                      </button>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </>
+      )}
+    </fieldset>
+  );
+}
 
 /**
  * The atelier of a piece ("Entrer dans l'atelier" on its page, and its place on the page The Atelier): its film of

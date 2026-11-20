@@ -21,7 +21,7 @@ export const THEME_LIGHTS = ["halo", "spotlight", "beam", "aura", "ember"] as co
 /** The former slow motion of the backdrop: kept for the universes written before the effects (it maps to an effect). */
 export const THEME_MOTIONS = ["none", "drift", "pulse", "sparkle", "flutter", "rise", "rotate"] as const;
 export const THEME_ENTRANCES = ["ignite", "flash", "smoke", "stars", "flutter", "tunnel", "spotlight", "glint", "bloom", "rain", "tick"] as const;
-export const THEME_EFFECTS = ["dust", "embers", "glints", "lightning", "speedlines", "impact", "butterflies", "iridescence", "confetti", "twenty-stars", "petals", "rain", "stars", "smoke"] as const;
+export const THEME_EFFECTS = ["dust", "embers", "glints", "lightning", "speedlines", "impact", "butterflies", "iridescence", "confetti", "twenty-stars", "petals", "rain", "stars", "smoke", "genkidama"] as const;
 
 export type ThemeTexture = (typeof THEME_TEXTURES)[number];
 export type ThemeLight = (typeof THEME_LIGHTS)[number];
@@ -79,8 +79,11 @@ export type Backdrop = {
   /** The widths of the files, landscape ("<id>-<w>") and portrait for phones ("<id>-m-<w>"), each in AVIF and WebP. */
   widths: number[];
   mobileWidths: number[];
+  /** A sphere of light in the image (Genkidama): its centre and its radius, as shares of the width, landscape and portrait. */
+  core?: [number, number, number];
+  mobileCore?: [number, number, number];
 };
-export const BACKDROPS = universes.backdrops as Record<string, Backdrop>;
+export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
 
 /** What a piece (or the admin) writes: a preset, and the parts it changes. */
 export type PieceTheme = {
@@ -248,6 +251,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   rain: "Pluie",
   stars: "Étoiles et étoile filante",
   smoke: "Fumée",
+  genkidama: "Genkidama : la lumière monte vers la sphère",
 };
 
 /** Every former motion becomes one of the effects. */

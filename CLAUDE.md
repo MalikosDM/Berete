@@ -135,6 +135,31 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : valider les fonds IA et l'ambiance de chaque univers ; droits des photos des joueurs (photos d'agences et
       de clubs) ; photo HD d'Angelo Stiller ; fonds IA des 22 autres pièces à générer (idées dans le rapport du 19/11).
 
+## Passe « capsules » (pages des pièces) — état au 20/11/2026
+- [x] **Logo officiel de l'Inter** dans « Created exclusively for » (le fichier du club, logo 2021, FC Internazionale Milano
+      / Bureau Borsche, pris sur Wikimedia Commons, jamais retouché : `src/assets/clubs/inter-milan.svg`, servi tel quel).
+      Ajouter le logo d'un autre club = déposer `src/assets/clubs/<adresse du club>.svg` (`src/lib/clubs.ts`).
+- [ ] **Yoni doit valider l'utilisation des logos de club** (marques déposées), Inter compris.
+- [x] **« The Art of Detail » en 3D** (`src/viewer/DetailViewer.tsx`) : quand la pièce a un modèle 3D, il tourne lentement au-dessus
+      de la liste des détails, fils fins et étiquettes accrochés à la pièce (titre sur ordinateur, numéro sur téléphone),
+      une étiquette dont le point passe derrière s'efface puis revient. Admin : « Les détails sur le modèle 3D » (Placer,
+      puis un clic sur la pièce). Points gardés avec la pièce (`detailPoints`, liés au modèle). Seule l'Inter a des détails
+      écrits : la 3D annotée attend son fichier 3D. Testé seulement en local (ZN1242 posé sur l'Inter puis retiré).
+- [x] **Genkidama** pour la pièce Dragon Ball (page et story) : fond noir, sphère de lumière qui respire, particules qui
+      montent vers elle (`npm run universes -- --only=genkidama`, effet « genkidama »). Rien d'officiel Dragon Ball. La chaîne
+      de Kevin Schade n'était pas dans l'univers Énergie (univers de la Maison, soie) : inchangée.
+- [x] **La vidéo du produit fini en premier** en entrant dans une capsule (`src/components/PieceFilm.tsx`), une fois par visite,
+      avec le son (sinon muette avec un bouton son en vue), dans un cadre aux couleurs de l'univers ; « Voir la pièce »,
+      Échap ou la fin de la vidéo la ferment ; « Voir le film » la relance. 13 pièces : Inter, VfB, OKA, octogone et maillot
+      d'Okafor, croix Tillman, AS, Ruby T, T-Serpent, Tulips, Kenan, The Hand, Butterfly (vidéos regardées image par image ;
+      maillot : le petit edit 32/v03 plutôt que le film de livraison). Sans vidéo : Dragon Ball, Samuel Ballet, Safi Link et
+      les pièces tirées des stories. Mobile en 720p.
+- [x] **Vidéos HD** : `npm run films` les prend dès qu'elles sont entières dans « Videos HD » (pas écrites depuis 3 min, même
+      durée que la copie) ; au 20/11 à 3 h 40, aucun dossier « Videos HD » n'était encore arrivé.
+- [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
+      vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
+      l'écrin (droits, comme Dragon Ball).
+
 ## Passe « mise en ligne sur VPS » (tout en un) — état au 20/11/2026
 - [x] **Tout sur une machine** (`docker-compose.yml`) : base PostgreSQL 17, site construit (`Dockerfile` : pages, API,
       admin, visualiseur 3D, espace VIP), Caddy devant (`deploy/Caddyfile` : HTTPS tout seul, `www.` → sans `www.`).

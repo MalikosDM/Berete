@@ -4,6 +4,7 @@ import { z } from "zod";
 import { HOUSE_PHOTO_PLACES } from "../../src/data/house.js";
 import { publicCatalogue } from "../../src/data/relations.js";
 import { cleanAtelier } from "../../src/data/atelier.js";
+import { cleanDetailPoints } from "../../src/data/details3d.js";
 import { cleanShowcase } from "../../src/data/showcase.js";
 import { cleanTheme } from "../../src/data/themes.js";
 import { PIECE_TYPES } from "../../src/data/types.js";
@@ -297,6 +298,11 @@ const PieceIn = z.object({
     .unknown()
     .optional()
     .transform((v) => cleanAtelier(v) ?? Prisma.DbNull),
+  /** "The Art of Detail" in 3D: the points of its model tied to its details; none: none placed. */
+  detailPoints: z
+    .unknown()
+    .optional()
+    .transform((v) => cleanDetailPoints(v) ?? Prisma.DbNull),
   making: MakingSchema.optional(),
   translations: TranslationsSchema.default({}),
 });

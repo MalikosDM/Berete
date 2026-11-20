@@ -54,6 +54,18 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   `src/data/cutouts.generated.json`), seul ou en **vitrine multi-vues** (`src/components/Showcase.tsx`, règles dans
   `src/data/showcase.ts`) ; une pièce sans détourage garde sa photo. Admin : « Vitrine de l'ouverture » dans la fiche de la
   pièce, onglet « Détourages » pour tout vérifier et exclure une vue.
+- **La vidéo du produit fini** (`src/components/PieceFilm.tsx`) : la première chose vue en entrant dans une pièce, une fois par
+  visite (`src/lib/films.ts`), avec le son (un navigateur qui le refuse : muette, bouton son en vue), dans un cadre fait de
+  l'univers de la pièce ; « Voir la pièce », Échap ou la fin la ferment, « Voir le film » dans l'ouverture la relance. C'est
+  la vidéo « reveal » de la pièce (`scripts/film-media.mjs`, `resolveReveal` dans `src/data/atelier.ts`, réglable dans l'admin
+  avec l'atelier). `npm run films` encode les vidéos (ordinateur jusqu'à 1080p, téléphone 720p) et prend celles de
+  « Videos HD » dès qu'elles sont entières.
+- **Logos de club** (`src/lib/clubs.ts`) : le fichier officiel du club dans `src/assets/clubs/<adresse du club>.svg`, servi tel
+  quel, montré dans « Created exclusively for » (aujourd'hui l'Inter seule).
+- **« The Art of Detail » en 3D** (`src/viewer/DetailViewer.tsx`, `src/data/details3d.ts`) : une pièce qui a un modèle 3D le
+  montre au-dessus de ses détails, tournant lentement, ses détails accrochés à la pièce (fils et étiquettes qui la suivent,
+  s'effacent quand leur point passe derrière : `lookAt` dans `src/viewer/Stage.tsx`). Points placés dans l'admin (« Les
+  détails sur le modèle 3D »). La molette ne zoome qu'après un clic sur la pièce (sinon elle fait défiler la page).
 - **L'atelier d'une pièce** (« Enter the Atelier » / « Entrer dans l'atelier ») : après les photos de la pièce, un passage
   ouvre en plein écran son atelier (`src/components/AtelierRoom.tsx`) : sa vidéo de fabrication, puis la pièce finie
   (« The Final Reveal »), son coupé au départ, lecture seulement après le clic, sortie par le bouton, Échap ou le geste

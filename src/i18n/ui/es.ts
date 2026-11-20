@@ -519,6 +519,8 @@ export const es: Messages = {
     noWebgl: "Este navegador no puede mostrar 3D. Pruebe con otro o pídanos fotos por WhatsApp.",
     hint: "Arrastre para girar · Rueda para acercar donde apunta · Clic derecho para desplazar · Doble clic en un detalle para acercarse",
     hintTouch: "Un dedo para girar · Pellizque para acercar · Dos dedos para desplazar · Toque dos veces un detalle para acercarse",
+    detailHint: "Arrastre para girar la pieza · Haga clic en ella y desplácese para acercar",
+    detailHintTouch: "Un dedo para girar la pieza · Pellizque para acercar",
     metal: "Metal",
     metals: { "yellow-gold": "Oro amarillo de 18 quilates", "white-gold": "Oro blanco de 18 quilates", "rose-gold": "Oro rosa de 18 quilates", platinum: "Platino", "black-rhodium": "Rodio negro" },
     stoneColor: "Color de las piedras",
@@ -602,5 +604,8 @@ export const es: Messages = {
     sectionEyebrow: "Desde el banco del joyero",
     sectionTitle: "Cada pieza, su making-of",
     sectionLead: "Cada creación, filmada en el banco del joyero. Abra su taller y después entre en su universo.",
+    intro: (title: string) => "El vídeo de " + title,
+    skip: "Ver la pieza",
+    watch: "Ver el vídeo",
   },
 };

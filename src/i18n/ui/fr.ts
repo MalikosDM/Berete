@@ -530,6 +530,8 @@ export const fr: Messages = {
     noWebgl: "Ce navigateur ne peut pas afficher la 3D. Essayez-en un autre, ou demandez-nous des photos sur WhatsApp.",
     hint: "Glissez pour tourner · Molette pour zoomer là où vous pointez · Clic droit pour déplacer · Double-clic sur un détail pour s’en approcher",
     hintTouch: "Un doigt pour tourner · Pincez pour zoomer · Deux doigts pour déplacer · Touchez deux fois un détail pour vous en approcher",
+    detailHint: "Faites glisser pour tourner la pièce · Cliquez dessus, puis faites défiler pour zoomer",
+    detailHintTouch: "Un doigt pour tourner la pièce · Pincez pour zoomer",
     metal: "Métal",
     metals: { "yellow-gold": "Or jaune 18 carats", "white-gold": "Or blanc 18 carats", "rose-gold": "Or rose 18 carats", platinum: "Platine", "black-rhodium": "Rhodium noir" },
     stoneColor: "Couleur des pierres",
@@ -613,5 +615,8 @@ export const fr: Messages = {
     sectionEyebrow: "Depuis l’établi",
     sectionTitle: "Chaque pièce, son making-of",
     sectionLead: "Chaque création, filmée à l’établi. Ouvrez son atelier, puis entrez dans son univers.",
+    intro: (title: string) => "Le film de " + title,
+    skip: "Voir la pièce",
+    watch: "Voir le film",
   },
 };

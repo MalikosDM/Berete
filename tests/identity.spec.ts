@@ -249,7 +249,8 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
   const problems = watch(page);
   await skipIntro(page);
   const cases: [slug: string, backdrop: string, font: string][] = [
-    ["kevin-schade-dragon-ball-pendant", "dragon", "Shojumaru"],
+    // Since 20/11/2026: its own world, the Genkidama (tests/capsules.spec.ts).
+    ["kevin-schade-dragon-ball-pendant", "genkidama", "Shojumaru"],
     ["michy-batshuayi-butterfly-chain", "butterfly", "Italiana"],
     ["campione-d-italia-2023-2024", "inter", "Cinzel"],
     ["vfb-stuttgart-dfb-pokal-2025", "vfb", "Grenze Gotisch"],

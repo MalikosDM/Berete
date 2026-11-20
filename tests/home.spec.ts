@@ -4,7 +4,7 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { expect, test, type Page } from "@playwright/test";
-import { getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
+import { FILM_PIECES, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
 const INTER = "campione-d-italia-2023-2024";
 const VFB = "vfb-stuttgart-dfb-pokal-2025";
@@ -287,9 +287,11 @@ test("layout shifts under 0.05 on every main page, on the computer and the three
   ];
   for (const screen of screens) {
     const context = await browser.newContext({ ...screen, baseURL: process.env.BASE_URL ?? "http://localhost:3001" });
-    await context.addInitScript(() => {
+    // The film of a finished piece is a layer over its page (no shift of the page): counted as seen, the page is measured.
+    await context.addInitScript((films) => {
       try {
         sessionStorage.setItem("bj-intro-seen", "1");
+        sessionStorage.setItem("berete:films", JSON.stringify(films));
       } catch {
         /* ignore */
       }
@@ -298,7 +300,7 @@ test("layout shifts under 0.05 on every main page, on the computer and the three
       new PerformanceObserver((list) => {
         for (const e of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) if (!e.hadRecentInput) w.__cls += e.value;
       }).observe({ type: "layout-shift", buffered: true });
-    });
+    }, FILM_PIECES);
     const page = await context.newPage();
     for (const path of CLS_PAGES) expect(await layoutShift(page, path), "CLS of " + path + " at " + screen.viewport.width + " px").toBeLessThan(0.05);
     await context.close();

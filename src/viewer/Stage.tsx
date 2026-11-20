@@ -81,7 +81,12 @@ export type StageApi = {
   view(kind: "front" | "side" | "top" | "reset"): void;
   getView(): ModelView | null;
   capture(): string | null;
+  /** The point of the jewel under a point of the screen, in the space of the model (null: nothing there). */
+  pick(clientX: number, clientY: number): [number, number, number] | null;
 };
+
+/** A point of the model on the screen (CSS pixels of the canvas), and whether the jewel hides it. */
+export type AnchorFrame = { x: number; y: number; visible: boolean };
 
 export type Choices = { metals: Record<string, MetalId>; colors: Record<string, string> };
 
@@ -97,6 +102,11 @@ type Props = {
   lightAngle: number;
   background: Background;
   autoRotate: boolean;
+  /** Radians per second of the turning (default 0.35); it waits while the visitor turns the jewel, then goes on. */
+  rotateSpeed?: number;
+  /** Points of the model followed on the screen ("The Art of Detail"): onAnchors gets them at every image drawn. */
+  anchors?: [number, number, number][];
+  onAnchors?: (frames: AnchorFrame[]) => void;
   /** Admin: one layer shown, the rest dimmed. */
   highlight: string | null;
   onApi: (api: StageApi | null) => void;
@@ -143,6 +153,23 @@ export default function Stage(props: Props) {
   const { url, bytes, phone, simpleStones, settings, choices, ambiance, lightAngle, background, autoRotate, highlight, onApi, onProgress, onReady, onError } = props;
   // The scene, the renderer and the camera are read when needed (get), never kept from a render.
   const get = useThree((s) => s.get);
+  const rotateSpeed = props.rotateSpeed ?? 0.35;
+  // The points followed, read at every image (never a new render for them).
+  const anchors = useRef(props.anchors ?? []);
+  const onAnchors = useRef(props.onAnchors);
+  const visible = useRef<boolean[]>([]);
+  const lastLook = useRef(0);
+  useEffect(() => {
+    anchors.current = props.anchors ?? [];
+    onAnchors.current = props.onAnchors;
+    lastLook.current = 0;
+    get().invalidate();
+  });
+  const [looker] = useState(() => makePicker());
+  useEffect(() => () => looker.dispose(), [looker]);
+  // The turning waits while the jewel is in the hands of the visitor, and 2.5 seconds after.
+  const handledUntil = useRef(0);
+  const pickRef = useRef<((x: number, y: number) => Vector3 | null) | null>(null);
   const controls = useRef<CameraControls>(null);
   const composer = useRef<Composer>(null);
   const model = useRef<Loaded | null>(null);
@@ -290,7 +317,7 @@ export default function Stage(props: Props) {
   useFrame((state, delta) => {
     const c = controls.current;
     if (c && autoRotate) {
-      c.azimuthAngle += delta * 0.35;
+      if (performance.now() > handledUntil.current) c.azimuthAngle += delta * rotateSpeed;
       state.invalidate();
     }
     const cam = state.camera as PerspectiveCamera;
@@ -326,7 +353,44 @@ export default function Stage(props: Props) {
     if (refraction.current.length > 0) {
       for (const m of refraction.current) updateRefraction(m, cam, w, h, angle.current, bounces);
     }
+    // The points followed: where they are on the screen, and (a few times a second) whether the jewel hides them.
+    const points = anchors.current;
+    if (points.length > 0 && onAnchors.current && loaded) {
+      const now = performance.now();
+      if (now - lastLook.current > (phone ? 320 : 180) || visible.current.length !== points.length) {
+        lastLook.current = now;
+        const seen = lookAt(state.gl, state.scene, cam, points, loaded.sphere.radius, looker);
+        visible.current.length = 0;
+        visible.current.push(...seen);
+      }
+      const v = new Vector3();
+      onAnchors.current(
+        points.map((p, i) => {
+          v.set(p[0], p[1], p[2]).project(cam);
+          const onScreen = v.z < 1 && Math.abs(v.x) <= 1.05 && Math.abs(v.y) <= 1.05;
+          return { x: ((v.x + 1) / 2) * state.size.width, y: ((1 - v.y) / 2) * state.size.height, visible: onScreen && (visible.current[i] ?? true) };
+        }),
+      );
+    }
   });
+
+  /* The visitor turning or zooming: the turning waits */
+  useEffect(() => {
+    const c = controls.current;
+    if (!c) return undefined;
+    const hold = () => {
+      handledUntil.current = Number.POSITIVE_INFINITY;
+    };
+    const release = () => {
+      handledUntil.current = performance.now() + 2500;
+    };
+    c.addEventListener("controlstart", hold);
+    c.addEventListener("controlend", release);
+    return () => {
+      c.removeEventListener("controlstart", hold);
+      c.removeEventListener("controlend", release);
+    };
+  }, [frame]);
 
   useEffect(() => () => accumulate.dispose(), [accumulate]);
 
@@ -427,6 +491,7 @@ export default function Stage(props: Props) {
       invalidate();
       return pixel[3]! > 0.5 ? new Vector3(pixel[0], pixel[1], pixel[2]) : null;
     };
+    pickRef.current = pick;
     const glide = (clientX: number, clientY: number) => {
       const c = controls.current;
       const hit = pick(clientX, clientY);
@@ -456,6 +521,7 @@ export default function Stage(props: Props) {
       canvas.removeEventListener("dblclick", onDouble);
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointerup", onUp);
+      pickRef.current = null;
       picker.dispose();
     };
   }, [get]);
@@ -478,6 +544,10 @@ export default function Stage(props: Props) {
         const p = c.getPosition(new Vector3());
         const t = c.getTarget(new Vector3());
         return { position: [p.x, p.y, p.z], target: [t.x, t.y, t.z] };
+      },
+      pick(clientX, clientY) {
+        const hit = pickRef.current?.(clientX, clientY);
+        return hit ? [hit.x, hit.y, hit.z] : null;
       },
       capture() {
         const { gl, scene, camera } = get();
@@ -719,6 +789,80 @@ function SurfaceUnder({ surface, frame, onReady }: { surface: Surface; frame: Fr
       <circleGeometry args={[radius, 96]} />
     </mesh>
   );
+}
+
+/**
+ * Which points the jewel hides from the camera: the positions of the jewel are drawn in a small image (the size of a
+ * thumbnail), and a point is seen when nothing of the jewel stands between it and the camera around its place.
+ */
+function lookAt(
+  gl: import("three").WebGLRenderer,
+  scene: import("three").Scene,
+  cam: PerspectiveCamera,
+  points: [number, number, number][],
+  radius: number,
+  looker: ReturnType<typeof makePicker>,
+): boolean[] {
+  const half = !gl.extensions.has("EXT_color_buffer_float");
+  const W = 128;
+  const H = Math.max(16, Math.round(W / Math.max(cam.aspect, 0.1)));
+  const target = looker.target(half);
+  if (target.width !== W || target.height !== H) target.setSize(W, H);
+  const view = cam.view?.enabled ? { ...cam.view } : null;
+  if (view) cam.clearViewOffset();
+  const background = scene.background;
+  const override = scene.overrideMaterial;
+  scene.background = null;
+  scene.overrideMaterial = looker.material;
+  const hidden: Object3D[] = [];
+  scene.traverse((o) => {
+    if (o.userData.noPick && o.visible) {
+      o.visible = false;
+      hidden.push(o);
+    }
+  });
+  const before = gl.getRenderTarget();
+  gl.setRenderTarget(target);
+  gl.setClearColor(0x000000, 0);
+  gl.clear();
+  gl.render(scene, cam);
+  const data = new Float32Array(W * H * 4);
+  if (half) {
+    const raw = new Uint16Array(W * H * 4);
+    gl.readRenderTargetPixels(target, 0, 0, W, H, raw);
+    for (let i = 0; i < raw.length; i++) data[i] = halfToFloat(raw[i]!);
+  } else gl.readRenderTargetPixels(target, 0, 0, W, H, data);
+  gl.setRenderTarget(before);
+  scene.background = background;
+  scene.overrideMaterial = override;
+  for (const o of hidden) o.visible = true;
+  if (view) cam.setViewOffset(view.fullWidth, view.fullHeight, view.offsetX, view.offsetY, view.width, view.height);
+
+  const eye = cam.getWorldPosition(new Vector3());
+  const tolerance = radius * 0.04;
+  const v = new Vector3();
+  const hit = new Vector3();
+  return points.map((p) => {
+    v.set(p[0], p[1], p[2]);
+    const distance = v.distanceTo(eye);
+    v.project(cam);
+    if (v.z >= 1) return false;
+    const px = Math.round(((v.x + 1) / 2) * W);
+    const py = Math.round(((v.y + 1) / 2) * H);
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const x = px + dx;
+        const y = py + dy;
+        if (x < 0 || y < 0 || x >= W || y >= H) continue;
+        const i = (y * W + x) * 4;
+        // Nothing of the jewel there, or the jewel no nearer than the point itself: seen.
+        if (data[i + 3]! < 0.5) return true;
+        hit.set(data[i]!, data[i + 1]!, data[i + 2]!);
+        if (hit.distanceTo(eye) >= distance - tolerance) return true;
+      }
+    }
+    return false;
+  });
 }
 
 /** The first view: the one the jeweller saved, else the whole jewel seen from the front and above, its long side across the screen. */

@@ -1,6 +1,7 @@
 // Shared by the checks of the site (site.spec.ts) and of its languages (languages.spec.ts).
 import { mkdirSync } from "node:fs";
 import { expect, type Page, type TestInfo } from "@playwright/test";
+import media from "../src/data/media.generated.json" with { type: "json" };
 import type { Catalogue } from "../src/data/types";
 
 
@@ -30,16 +31,29 @@ export function watch(page: Page): Problems {
   return problems;
 }
 
-export async function skipIntro(page: Page) {
-  await page.addInitScript(() => {
-    // Keep every resource entry (the films have hundreds of frames).
-    performance.setResourceTimingBufferSize(10_000);
-    try {
-      sessionStorage.setItem("bj-intro-seen", "1");
-    } catch {
-      /* ignore */
-    }
-  });
+/** The pieces whose page opens with the film of the finished piece (src/components/PieceFilm.tsx). */
+export const FILM_PIECES = Object.entries((media as unknown as { films: Record<string, { reveal?: unknown }> }).films)
+  .filter(([, f]) => f.reveal)
+  .map(([slug]) => slug);
+
+/**
+ * The intro of the house already seen; `films: false` keeps the films of the finished pieces as a visitor gets them
+ * (else they count as seen, so that the checks of the pages reach the pieces at once).
+ */
+export async function skipIntro(page: Page, { films = true }: { films?: boolean } = {}) {
+  await page.addInitScript(
+    ([seen]) => {
+      // Keep every resource entry (the films have hundreds of frames).
+      performance.setResourceTimingBufferSize(10_000);
+      try {
+        sessionStorage.setItem("bj-intro-seen", "1");
+        if (seen && !sessionStorage.getItem("berete:films")) sessionStorage.setItem("berete:films", JSON.stringify(seen));
+      } catch {
+        /* ignore */
+      }
+    },
+    [films ? FILM_PIECES : null] as const,
+  );
 }
 
 let catalogue: Catalogue | null = null;

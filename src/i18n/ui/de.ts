@@ -531,6 +531,8 @@ export const de: Messages = {
     noWebgl: "Dieser Browser kann kein 3D anzeigen. Versuchen Sie einen anderen oder bitten Sie uns per WhatsApp um Fotos.",
     hint: "Ziehen zum Drehen · Mausrad zoomt dorthin, wo Sie zeigen · Rechtsklick zum Verschieben · Doppelklick auf ein Detail, um näher heranzugehen",
     hintTouch: "Ein Finger zum Drehen · Zwei Finger auseinander zum Zoomen · Zwei Finger zum Verschieben · Doppeltippen auf ein Detail, um näher heranzugehen",
+    detailHint: "Ziehen, um das Schmuckstück zu drehen · Anklicken, dann scrollen zum Zoomen",
+    detailHintTouch: "Mit einem Finger drehen · Mit zwei Fingern zoomen",
     metal: "Metall",
     metals: { "yellow-gold": "18 Karat Gelbgold", "white-gold": "18 Karat Weißgold", "rose-gold": "18 Karat Roségold", platinum: "Platin", "black-rhodium": "Schwarzes Rhodium" },
     stoneColor: "Farbe der Steine",
@@ -614,5 +616,8 @@ export const de: Messages = {
     sectionEyebrow: "Von der Werkbank",
     sectionTitle: "Jedes Stück, sein Making-of",
     sectionLead: "Jede Kreation, an der Werkbank gefilmt. Öffnen Sie ihr Atelier und tauchen Sie dann in ihre Welt ein.",
+    intro: (title: string) => "Der Film von " + title,
+    skip: "Zum Schmuckstück",
+    watch: "Film ansehen",
   },
 };

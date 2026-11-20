@@ -8,6 +8,7 @@
  */
 import { group, list, sketch, st, still, yoni } from "./sources.js";
 import type { PieceAtelier } from "./atelier.js";
+import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
@@ -66,6 +67,7 @@ type PieceInput = {
   theme?: PieceTheme;
   showcase?: PieceShowcase;
   atelier?: PieceAtelier;
+  detailPoints?: PieceDetailPoints;
   cover: Maybe;
   gallery: Maybe[];
   handover?: Maybe[];
@@ -112,6 +114,7 @@ function piece(p: PieceInput): Piece {
     theme: p.theme ?? null,
     showcase: p.showcase ?? null,
     atelier: p.atelier ?? null,
+    detailPoints: p.detailPoints ?? null,
     making,
   };
 }
@@ -283,7 +286,9 @@ const SITE_PIECES: Piece[] = [
     story:
       "A sculpture in miniature, made for Kevin Schade. A figure in rose gold holds up a sphere set with blue stones, while a dragon paved with white diamonds coils around him, among dragon balls in rose gold. It started as a hand drawing; several versions were drawn before this one was chosen. It hangs from a diamond-set Cuban chain.",
     people: ["kevin-schade"],
-    theme: { preset: "energie" },
+    // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
+    // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
+    theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "impact"] },
     cover: yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
     gallery: [
       yoni("kevin-schade-dragon-ball-pendant", "p19", at("The Dragon Ball pendant on black, with its Cuban chain")),

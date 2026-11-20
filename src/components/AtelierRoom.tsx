@@ -4,6 +4,7 @@ import { ArrowRight, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX, X }
 import { media } from "@/data/catalogue";
 import { filmTime, type Film, type FilmKind, type ResolvedAtelier } from "@/data/atelier";
 import { Link, useI18n } from "@/i18n";
+import { wantsLight } from "@/lib/films";
 import { getLenis, useReducedMotion } from "@/lib/gsap";
 
 /*
@@ -27,13 +28,6 @@ type Props = {
   world?: boolean;
   onClose: () => void;
 };
-
-/** The lighter copies: phones, a computer saving data or on a slow connection. */
-function wantsLight(): boolean {
-  if (window.matchMedia("(max-width: 1023px)").matches) return true;
-  const c = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
-  return Boolean(c?.saveData) || /(^|-)(2g|3g)$/.test(c?.effectiveType ?? "");
-}
 
 const posterOf = (film: Film) => film.posters[film.poster] ?? film.posters[0] ?? "";
 

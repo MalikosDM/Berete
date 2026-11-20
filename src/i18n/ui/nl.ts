@@ -516,6 +516,8 @@ export const nl: Messages = {
     noWebgl: "Deze browser kan geen 3D tonen. Probeer een andere, of vraag ons om foto's via WhatsApp.",
     hint: "Sleep om te draaien · Scrollwiel zoomt waar u wijst · Rechtermuisknop om te verplaatsen · Dubbelklik op een detail om dichterbij te komen",
     hintTouch: "Eén vinger om te draaien · Knijp om te zoomen · Twee vingers om te verplaatsen · Tik twee keer op een detail om dichterbij te komen",
+    detailHint: "Sleep om het juweel te draaien · Klik erop en scrol om in te zoomen",
+    detailHintTouch: "Draai het juweel met één vinger · Knijp om te zoomen",
     metal: "Metaal",
     metals: { "yellow-gold": "18 karaat geelgoud", "white-gold": "18 karaat witgoud", "rose-gold": "18 karaat roségoud", platinum: "Platina", "black-rhodium": "Zwart rodium" },
     stoneColor: "Kleur van de stenen",
@@ -599,5 +601,8 @@ export const nl: Messages = {
     sectionEyebrow: "Vanaf de werkbank",
     sectionTitle: "Elk stuk, zijn making-of",
     sectionLead: "Elke creatie, gefilmd aan de werkbank. Open het atelier en betreed daarna het universum ervan.",
+    intro: (title: string) => "De film van " + title,
+    skip: "Bekijk het juweel",
+    watch: "Bekijk de film",
   },
 };

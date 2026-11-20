@@ -916,6 +916,106 @@ html.lenis body {
   }
 }
 
+/* The sphere of light of a backdrop (Genkidama, src/components/Universe.tsx): a layer laid exactly over the image (the same
+   size and place as the image, whatever the screen), going back into the depth with it during the scroll. Its glow
+   breathes, barely; its heart (u-genki-core) is where the particles of light go (src/components/universe/fx.ts). */
+.universe-stage {
+  container-type: size;
+}
+.u-genki {
+  --gx: var(--g-x);
+  --gy: var(--g-y);
+  --gr: var(--g-r);
+  overflow: hidden;
+  opacity: calc(1 - var(--u-scroll) * 0.62);
+  transform: translate3d(0, calc(var(--u-scroll) * -2.5%), 0) scale(calc(1 + var(--u-scroll) * 0.05));
+  transform-origin: var(--u-at-x) 40%;
+}
+.u-genki-box {
+  position: absolute;
+  top: 50%;
+  left: var(--u-at-x);
+  aspect-ratio: var(--u-ratio, 1.75);
+  width: max(100cqw, calc(100cqh * var(--u-ratio, 1.75)), calc(100cqw * var(--u-at-n) / var(--u-fx, 0.5)), calc(100cqw * (1 - var(--u-at-n)) / (1 - var(--u-fx, 0.5))));
+  transform: translate(calc(var(--u-fx, 0.5) * -100%), -50%);
+}
+.universe[data-preview] .u-genki-box {
+  left: 50%;
+  width: max(100cqw, calc(100cqh * var(--u-ratio, 1.75)));
+  transform: translate(-50%, -50%);
+}
+@media (max-aspect-ratio: 4/5) {
+  .u-genki {
+    --gx: var(--g-mx);
+    --gy: var(--g-my);
+    --gr: var(--g-mr);
+  }
+  .u-genki-box,
+  .universe[data-preview] .u-genki-box {
+    left: 50%;
+    top: calc((100cqh - max(100cqh, calc(100cqw * 16 / 9))) * 0.32);
+    aspect-ratio: 9 / 16;
+    width: max(100cqw, calc(100cqh * 9 / 16));
+    transform: translateX(-50%);
+  }
+}
+.u-genki-glow,
+.u-genki-core {
+  position: absolute;
+  left: calc(var(--gx) * 100%);
+  top: calc(var(--gy) * 100%);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.u-genki-core {
+  width: calc(var(--gr) * 200%);
+}
+.u-genki-glow {
+  width: calc(var(--gr) * 300%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(235 250 255 / 0.5) 0%, rgb(170 225 255 / 0.22) 34%, rgb(120 190 255 / 0.08) 52%, transparent 70%);
+  mix-blend-mode: screen;
+  animation: u-genki-pulse 4.8s ease-in-out infinite;
+}
+@keyframes u-genki-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.035);
+  }
+}
+[data-entering] .u-genki {
+  animation: u-genki-in 2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+@keyframes u-genki-in {
+  from {
+    opacity: 0;
+  }
+}
+.universe[data-deep] .u-genki-glow {
+  animation-play-state: paused;
+}
+/* Behind a story: the world on the whole screen, a quiet veil (the story is in the middle). */
+.universe[data-fixed] {
+  position: absolute;
+  inset: 0;
+}
+.universe[data-fixed] .u-veil {
+  background: radial-gradient(120% 90% at 50% 40%, transparent 40%, color-mix(in oklab, var(--u-base) 70%, transparent) 100%);
+}
+/* On a wide screen the story stands in the middle, in front of the heart of the image: the image grows from its top, so
+   that the sphere shines around the story. */
+@media (min-aspect-ratio: 4/5) {
+  .universe[data-fixed] :is(.u-backdrop, .u-genki) {
+    transform: scale(1.6);
+    transform-origin: 50% 0;
+  }
+}
+
 /* The veil: the texts always on a dark ground, whatever the backdrop shows; darker once the opening has passed. */
 .u-veil {
   background:
@@ -1663,5 +1763,186 @@ html[lang="ar"] [data-piece] [data-u-title] {
   .atelier-room .ar-lamp,
   .atelier-room .ar-rise {
     animation: none;
+  }
+}
+
+/* The official logo of a club in "Created exclusively for" (src/pages/PiecePage.tsx, src/lib/clubs.ts): in a rose gold
+   ring like the portraits, lit from behind by the light of the universe of the piece (--u-glow). */
+.club-emblem-halo {
+  background: radial-gradient(circle, color-mix(in oklab, var(--u-glow, #e8b4a0) 34%, transparent) 0%, color-mix(in oklab, var(--u-glow, #e8b4a0) 10%, transparent) 45%, transparent 70%);
+  filter: blur(6px);
+  animation: club-halo 5s ease-in-out infinite;
+}
+.club-emblem img {
+  filter: drop-shadow(0 0 14px color-mix(in oklab, var(--u-glow, #e8b4a0) 35%, transparent));
+}
+@keyframes club-halo {
+  50% {
+    opacity: 0.65;
+    transform: scale(0.96);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .club-emblem-halo {
+    animation: none;
+  }
+}
+
+/* The film of the finished piece that opens its page (src/components/PieceFilm.tsx): the film in a frame made of the
+   universe of the piece: a dark mat, a fine fillet in the light of the universe (--u-glow), the glow of that light
+   around it. */
+.piece-film {
+  background: var(--u-base);
+  animation: pf-open 0.6s ease-out both;
+  transition: opacity 0.45s ease;
+}
+.piece-film[data-leaving] {
+  opacity: 0;
+}
+@keyframes pf-open {
+  from {
+    opacity: 0;
+  }
+}
+.piece-film .pf-veil {
+  background:
+    radial-gradient(70% 60% at 50% 45%, color-mix(in oklab, var(--u-base) 35%, transparent) 0%, color-mix(in oklab, var(--u-base) 78%, transparent) 100%),
+    linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 40%, transparent), color-mix(in oklab, var(--u-base) 70%, transparent));
+}
+.piece-film .pf-frame {
+  aspect-ratio: var(--pf-ratio, 0.5625);
+  height: min(78svh, calc(100svh - 200px), calc((100vw - 32px) / var(--pf-ratio, 0.5625)));
+  padding: 6px;
+  background: linear-gradient(160deg, color-mix(in oklab, var(--u-tint) 70%, #000) 0%, color-mix(in oklab, var(--u-base) 92%, #000) 60%);
+  border: 1px solid color-mix(in oklab, var(--u-glow) 55%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--u-base) 80%, transparent),
+    0 30px 90px -25px color-mix(in oklab, var(--u-glow) 45%, transparent),
+    0 0 140px -30px color-mix(in oklab, var(--u-glow) 35%, transparent);
+  animation: pf-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.piece-film .pf-frame::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  border: 1px solid color-mix(in oklab, var(--u-glow) 22%, transparent);
+  background: radial-gradient(90% 40% at 50% 0%, color-mix(in oklab, var(--u-glow) 14%, transparent), transparent 70%);
+}
+.piece-film .pf-frame > video {
+  display: block;
+}
+@media (min-width: 1024px) {
+  .piece-film .pf-frame {
+    height: min(80svh, calc(100svh - 96px));
+    padding: 8px;
+  }
+  .piece-film .pf-frame::after {
+    inset: 8px;
+  }
+}
+@keyframes pf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+}
+.piece-film .pf-progress {
+  background: linear-gradient(90deg, var(--color-rose-light) calc(var(--p) * 100%), rgb(255 255 255 / 0.18) calc(var(--p) * 100%));
+}
+/* The sound refused by the browser: the button asks for it, in view. */
+.piece-film .pf-sound-call {
+  animation: pf-call 2.2s ease-in-out infinite;
+}
+@keyframes pf-call {
+  50% {
+    box-shadow: 0 0 0 6px rgb(232 180 160 / 0.25);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .piece-film,
+  .piece-film .pf-frame,
+  .piece-film .pf-sound-call {
+    animation: none;
+  }
+}
+
+/* "The Art of Detail" in 3D (src/viewer/DetailViewer.tsx): the points of the jewel, their fine threads and their labels,
+   in rose gold; a point hidden behind the jewel fades (opacity set by the viewer), then comes back. */
+.detail-dot,
+.detail-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  will-change: transform, opacity;
+}
+.detail-thread {
+  stroke: color-mix(in oklab, var(--color-rose-light) 85%, transparent);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.detail-dot {
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 2px rgb(10 10 10 / 0.55),
+    0 0 12px 2px color-mix(in oklab, var(--color-rose-light) 70%, transparent);
+}
+.detail-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  max-width: 13rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--color-rose-light) 45%, transparent);
+  background: rgb(10 10 10 / 0.72);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  white-space: normal;
+}
+.detail-label-n {
+  font-family: var(--font-display);
+  color: var(--color-rose-light);
+}
+.detail-label-title {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+.detail-label[data-active],
+.detail-dot[data-active] {
+  outline: 2px solid var(--color-rose-light);
+  outline-offset: 2px;
+}
+/* A phone: the number only, in a small round label (the list under the jewel says the details). */
+@media (max-width: 639px) {
+  .detail-label {
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    padding: 0;
+    border-radius: 50%;
+    align-items: center;
+  }
+  .detail-label-title {
+    display: none;
+  }
+  .detail-label-n {
+    font-size: 0.9rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .detail-dot,
+  .detail-label,
+  .detail-thread {
+    transition: none;
   }
 }

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as
 import { ArrowRight, ArrowUpRight, Play, Volume2, VolumeX, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
+import Universe from "@/components/Universe";
+import { resolveTheme } from "@/data/themes";
 import { srcSetOf } from "@/lib/responsive";
 import { pieceByMedia } from "@/data/relations";
 import type { Story } from "@/data/types";
@@ -48,6 +50,11 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   // The piece shown in this photo or video, else the piece of the story.
   const pieceSlug = (item && byMedia.get(item.src)) ?? story?.pieceSlug ?? null;
   const piece = pieceSlug ? cat.pieces.find((p) => p.slug === pieceSlug) : undefined;
+  // A piece whose world surrounds its story (the Genkidama of Dragon Ball): its universe behind the story, else black.
+  const world = useMemo(() => {
+    const theme = piece ? resolveTheme(piece.theme) : null;
+    return theme?.effects.includes("genkidama") ? theme : null;
+  }, [piece]);
   const isVideo = item?.type === "video";
   const stepKey = s + ":" + m;
   const blocked = blockedStep === stepKey;
@@ -294,7 +301,8 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   const first = s === 0 && m === 0;
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={t.stories.dialog(story.title)} data-lenis-prevent data-story={story.slug} data-step={m} className="fixed inset-0 z-[95] flex justify-center bg-black">
+    <div role="dialog" aria-modal="true" aria-label={t.stories.dialog(story.title)} data-lenis-prevent data-story={story.slug} data-step={m} data-story-world={world ? piece?.slug : undefined} className="fixed inset-0 z-[95] flex justify-center bg-black">
+      {world ? <Universe key={piece?.slug} theme={world} fixed /> : null}
       <div className="relative h-full w-full overflow-hidden sm:max-w-[min(28rem,56svh)]">
         <div
           data-story-surface

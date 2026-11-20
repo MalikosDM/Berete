@@ -55,6 +55,18 @@ export function filmOf(id: string): Film | null {
 }
 
 /** The atelier of a piece: its films and its image; null when it has no making-of (no passage, no place on The Atelier). */
+/**
+ * The film of the finished piece that opens the page of a piece (src/components/PieceFilm.tsx): its "reveal" (the admin may
+ * choose another, or none), and its image (the one chosen for that film).
+ */
+export function resolveReveal(slug: string, atelier: PieceAtelier | null | undefined): { film: Film; poster: string } | null {
+  const chosen = atelier?.reveal;
+  if (chosen === null) return null;
+  const film = chosen ? filmOf(chosen) : (FILMS[slug]?.reveal ?? null);
+  if (!film) return null;
+  return { film, poster: film.posters[film.poster] || film.posters[0] || "" };
+}
+
 export function resolveAtelier(slug: string, atelier: PieceAtelier | null | undefined): ResolvedAtelier | null {
   const pick = (kind: FilmKind): Film | null => {
     const chosen = atelier?.[kind];

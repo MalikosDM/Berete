@@ -74,6 +74,31 @@
     720,
     1080
    ]
+  },
+  "genkidama": {
+   "name": "Genkidama, sphère de lumière (Dragon Ball)",
+   "ratio": 1.792,
+   "focusX": 0.5,
+   "focusY": 0.42,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "core": [
+    0.5,
+    0.148,
+    0.15
+   ],
+   "mobileCore": [
+    0.5,
+    0.223,
+    0.26
+   ]
   }
  }
 }
