@@ -11,10 +11,13 @@ import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
 import { vip } from "./routes/vip.js";
 import { loadSecret } from "./secret.js";
+import { protect } from "./security.js";
 import { site } from "./routes/site.js";
 
 const app = express();
 app.disable("x-powered-by");
+// Behind Caddy on the VPS: the real address of the visitor, the security headers, "noindex" until the launch.
+protect(app);
 // Pages, code and API answers travel compressed (about 5 times lighter); photos and videos already are.
 app.use(compression());
 app.use(express.json({ limit: "2mb" }));

@@ -19,6 +19,8 @@ export default defineConfig({
     trace: "off",
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
+    // The site run with Docker on this Mac (https://localhost:8443) has a local certificate.
+    ignoreHTTPSErrors: /^https:\/\/localhost[:/]/.test(process.env.BASE_URL ?? ""),
   },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },

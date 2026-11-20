@@ -13,6 +13,7 @@ import { createHmac, randomBytes, randomInt, timingSafeEqual } from "node:crypto
 import { z } from "zod";
 import { prisma } from "../db.js";
 import { serverSecret } from "../secret.js";
+import { limiter } from "../security.js";
 import { publicModel } from "./models.js";
 import { requireAdmin } from "./site.js";
 
@@ -63,15 +64,20 @@ function noStore(res: Response): void {
 
 /* ---------- Clients ---------- */
 
+/** 10 wrong codes in 15 minutes per visitor, then every code is wrong until the wait is over. */
+const codeTries = limiter(10, 15);
+
 vip.post("/vip/login", async (req, res) => {
   noStore(res);
   const body = z.object({ code: z.string().max(40) }).safeParse(req.body);
-  const client = body.success && body.data.code.replace(/[^0-9A-Za-z]/g, "").length >= 8 ? await prisma.client.findUnique({ where: { codeKey: codeKey(body.data.code) } }) : null;
+  const client = codeTries.allowed(req) && body.success && body.data.code.replace(/[^0-9A-Za-z]/g, "").length >= 8 ? await prisma.client.findUnique({ where: { codeKey: codeKey(body.data.code) } }) : null;
   if (!client) {
+    codeTries.hit(req);
     await new Promise((r) => setTimeout(r, 700));
     res.json({ state: "wrong" });
     return;
   }
+  codeTries.clear(req);
   openSession(req, res, client.id);
   res.json({ state: "ok", name: client.name });
 });

@@ -18,6 +18,7 @@ import { prisma } from "../db.js";
 import { enqueue, rememberLayers } from "../models/jobs.js";
 import { MODEL_FILES, storage, type ModelFile } from "../models/storage.js";
 import { serverSecret } from "../secret.js";
+import { limiter } from "../security.js";
 import { requireAdmin } from "./site.js";
 
 const scrypt = promisify(scryptCb) as (password: string, salt: string, keylen: number) => Promise<Buffer>;
@@ -144,6 +145,9 @@ models.get("/models/:id/files/:file", (req, res) => {
  * { state: "missing" | "expired" | "password" | "wrong" }, always with the status 200 (the page
  * shows each case in words, without an error in the console).
  */
+/** 10 wrong passwords of a private link in 15 minutes per visitor. */
+const linkTries = limiter(10, 15);
+
 async function openLink(req: Request, res: Response, password: string | null): Promise<void> {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("X-Robots-Tag", "noindex, nofollow");
@@ -165,7 +169,9 @@ async function openLink(req: Request, res: Response, password: string | null): P
     const [salt = "", hash = ""] = link.passwordHash.split("$").slice(1);
     const given = await scrypt(password, salt, 32);
     const expected = Buffer.from(hash, "base64url");
-    if (given.length !== expected.length || !timingSafeEqual(given, expected)) {
+    // Too many wrong passwords from this visitor: every password is wrong until the wait is over.
+    if (!linkTries.allowed(req) || given.length !== expected.length || !timingSafeEqual(given, expected)) {
+      linkTries.hit(req);
       await new Promise((r) => setTimeout(r, 600));
       res.json({ state: "wrong" });
       return;

@@ -10,6 +10,9 @@ import { PIECE_TYPES } from "../../src/data/types.js";
 import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, readHouse, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
 import { Prisma } from "../generated/prisma/client.js";
+import { alertHouse } from "../alerts.js";
+import { serverSecret } from "../secret.js";
+import { limiter } from "../security.js";
 
 /**
  * The API of the site, mounted on /api:
@@ -21,8 +24,15 @@ import { Prisma } from "../generated/prisma/client.js";
  */
 export const site = Router();
 
-site.get("/health", (_req, res) => {
-  res.json({ ok: true });
+/** The check of the server (deploy/update.sh, Docker): the base answers. */
+site.get("/health", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true });
+  } catch {
+    res.status(503).json({ ok: false });
+  }
 });
 
 site.get("/catalogue", async (_req, res) => {
@@ -32,6 +42,9 @@ site.get("/catalogue", async (_req, res) => {
 });
 
 /* ---------- Visitors ---------- */
+
+/** 5 forms in 10 minutes per visitor (beyond, the page offers WhatsApp, the request already written). */
+const formTries = limiter(5, 10);
 
 const Language = z.enum(["en", "fr", "es", "de", "nl", "ar"]).catch("en").default("en");
 
@@ -46,6 +59,10 @@ const ContactIn = z.object({
 });
 
 site.post("/contact", async (req, res) => {
+  if (!formTries.hit(req)) {
+    res.status(429).json({ error: "Too many requests, please try again later." });
+    return;
+  }
   const p = ContactIn.safeParse(req.body);
   if (!p.success) {
     res.status(400).json({ error: "Please check the form and try again." });
@@ -53,6 +70,7 @@ site.post("/contact", async (req, res) => {
   }
   const { name, email, message, language } = p.data;
   await prisma.contactMessage.create({ data: { name, email, message, language } });
+  alertHouse({ kind: "message", name, email, message, language });
   res.status(201).json({ ok: true });
 });
 
@@ -64,12 +82,17 @@ const CallbackIn = z.object({
 });
 
 site.post("/callback", async (req, res) => {
+  if (!formTries.hit(req)) {
+    res.status(429).json({ error: "Too many requests, please try again later." });
+    return;
+  }
   const p = CallbackIn.safeParse(req.body);
   if (!p.success) {
     res.status(400).json({ error: "Please check your name and number." });
     return;
   }
   await prisma.callbackRequest.create({ data: { name: p.data.name, phone: p.data.phone, interest: p.data.interest || null, language: p.data.language } });
+  alertHouse({ kind: "callback", name: p.data.name, phone: p.data.phone, interest: p.data.interest || null, language: p.data.language });
   res.status(201).json({ ok: true });
 });
 
@@ -101,17 +124,33 @@ site.get("/media/:id", async (req, res) => {
 
 /* ---------- Admin ---------- */
 
-function adminToken(): string | null {
+/** How long an admin session lasts: a working day, then the password again. */
+const ADMIN_HOURS = 12;
+/** 5 wrong passwords, then 15 minutes to wait (per visitor). */
+const adminTries = limiter(5, 15);
+
+/**
+ * The key of the admin sessions: the secret of the server and the password. A new password closes every session
+ * opened with the old one.
+ */
+function adminKey(): string | null {
   const password = process.env.ADMIN_PASSWORD;
   if (!password) return null;
-  return createHmac("sha256", password).update("berete-admin").digest("hex");
+  return createHmac("sha256", serverSecret()).update("berete-admin:" + password).digest("hex");
+}
+
+/** A session token: "<expiry in seconds>.<signature>". */
+function adminToken(exp: number): string | null {
+  const key = adminKey();
+  return key === null ? null : exp + "." + createHmac("sha256", key).update("admin-session:" + exp).digest("base64url");
 }
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
-  const token = adminToken();
   const header = req.headers.authorization ?? "";
   const given = header.startsWith("Bearer ") ? header.slice(7) : "";
-  if (!token || given.length !== token.length || !timingSafeEqual(Buffer.from(given), Buffer.from(token))) {
+  const exp = Number(given.split(".")[0]);
+  const expected = Number.isInteger(exp) && exp > Date.now() / 1000 ? adminToken(exp) : null;
+  if (!expected || given.length !== expected.length || !timingSafeEqual(Buffer.from(given), Buffer.from(expected))) {
     res.status(401).json({ error: "Session expirée, reconnectez-vous." });
     return;
   }
@@ -124,15 +163,22 @@ site.post("/admin/login", async (req, res) => {
     res.status(503).json({ error: "Le mot de passe admin n'est pas défini (ADMIN_PASSWORD dans le fichier .env)." });
     return;
   }
+  if (!adminTries.allowed(req)) {
+    const minutes = adminTries.wait(req);
+    res.status(429).json({ error: "Trop d'essais. Réessayez dans " + minutes + (minutes > 1 ? " minutes." : " minute.") });
+    return;
+  }
   const body = z.object({ password: z.string().max(200) }).safeParse(req.body);
   const given = Buffer.from(body.success ? body.data.password : "");
   const expected = Buffer.from(password);
   if (given.length !== expected.length || !timingSafeEqual(given, expected)) {
+    adminTries.hit(req);
     await new Promise((r) => setTimeout(r, 600));
     res.status(401).json({ error: "Mot de passe incorrect." });
     return;
   }
-  res.json({ token: adminToken() });
+  adminTries.clear(req);
+  res.json({ token: adminToken(Math.floor(Date.now() / 1000) + ADMIN_HOURS * 3600) });
 });
 
 function fileName(header: unknown): string {
