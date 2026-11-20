@@ -621,6 +621,23 @@ async function filmDir(folder) {
   return (await listDir(HD_DIR)).find((n) => n.startsWith(folder + " ")) ?? null;
 }
 
+/**
+ * A file of "Videos HD/" is taken only once it is whole: not written in the last 3 minutes (a download in progress),
+ * readable, and as long as its copy of "Videos/" when there is one. Else the copy of "Videos/" serves until next time.
+ */
+async function wholeHd(file, other) {
+  try {
+    if (Date.now() - (await stat(file)).mtimeMs < 3 * 60_000) throw new Error("still being written");
+    const info = await probe(file);
+    if (!(info.duration > 0.5) || !info.width) throw new Error("unreadable");
+    if (other && Math.abs((await probe(other)).duration - info.duration) > 1.5) throw new Error("shorter than its copy");
+    return true;
+  } catch (error) {
+    console.warn("  ! Videos HD not used yet (" + error.message + "): " + file.split("/").slice(-3).join("/"));
+    return false;
+  }
+}
+
 /** "25/v02" or "01/f" -> the best copy of that film on disk ("Videos HD/", else "Videos/", else its "(720p)"), or null. */
 async function filmSource(ref) {
   const [folder, item = ""] = ref.split("/");
@@ -631,13 +648,14 @@ async function filmSource(ref) {
     return files[0] ? join(HD_DIR, dir, "Fabrication", files[0]) : null;
   }
   const n = pad2(Number(item.slice(1)));
-  const hd = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && new RegExp(" - video " + n + "(?!\\d)", "i").test(f)).sort()[0];
-  if (hd) return join(HD_DIR, dir, "Videos HD", hd);
   const files = await listDir(join(HD_DIR, dir, "Videos"));
   const full = files.find((f) => new RegExp(" - video " + n + "\\.(mp4|mov|m4v)$", "i").test(f));
   const light = files.find((f) => new RegExp(" - video " + n + " \\(720p\\)\\.(mp4|mov|m4v)$", "i").test(f));
   const file = full ?? light;
-  return file ? join(HD_DIR, dir, "Videos", file) : null;
+  const copy = file ? join(HD_DIR, dir, "Videos", file) : null;
+  const hd = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && new RegExp(" - video " + n + "(?!\\d)", "i").test(f)).sort()[0];
+  if (hd && (await wholeHd(join(HD_DIR, dir, "Videos HD", hd), copy))) return join(HD_DIR, dir, "Videos HD", hd);
+  return copy;
 }
 
 /** The film of "Videos HD/" of a folder named after its kind (its original name kept), or null. */
@@ -645,7 +663,7 @@ async function namedFilm(folder, kind) {
   const dir = await filmDir(folder);
   if (!dir) return null;
   const file = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && KIND_WORDS[kind].test(f)).sort()[0];
-  return file ? join(HD_DIR, dir, "Videos HD", file) : null;
+  return file && (await wholeHd(join(HD_DIR, dir, "Videos HD", file), null)) ? join(HD_DIR, dir, "Videos HD", file) : null;
 }
 
 /** The scale filter: the short side at most `short`, the long side at most `long`, never larger than the film. */
@@ -668,12 +686,13 @@ async function filmCopy(src, out, info, { short, long, crf, maxrate, audio }) {
   return probe(out);
 }
 
-async function film(src, base, { light, label, pick }) {
+async function film(src, base, { light, label, pick, sharpPhone = false }) {
   const info = await probe(src);
   const shortSide = Math.min(info.width, info.height);
-  const mobileShort = shortSide > 720 ? 720 : 540;
+  // The finished piece opens the page of the piece: on a phone it keeps 720p when the film has it.
+  const mobileShort = shortSide > 720 || (sharpPhone && shortSide >= 720) ? 720 : Math.min(540, shortSide);
   const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9) });
-  // A film no page shows yet (a draft, a finished piece without its making-of): its light copy serves everywhere.
+  // A film no page shows yet (a draft): its light copy serves everywhere.
   const desktop = light ? null : await filmCopy(src, base + ".mp4", info, FILM.desktop);
   const main = desktop ?? mobile;
   // Its images: frames spread over the film, from the original (sharp), the sharpest well-lit one first by default.
@@ -724,9 +743,10 @@ async function importFilms() {
       found[kind] = { file, label: named ? entry.folder + "/" + named.split("/").pop() : entry[kind] };
     }
     for (const [kind, { file, label }] of Object.entries(found)) {
-      const light = entry.draft === true || (kind === "reveal" && !found.making);
+      const light = entry.draft === true;
       const pick = entry.poster?.[kind];
-      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick })));
+      const sharpPhone = kind === "reveal" && !light;
+      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick, sharpPhone })));
     }
   }
   await pool(jobs, Math.max(1, Math.floor(cpus().length / 4)), (go) => go());

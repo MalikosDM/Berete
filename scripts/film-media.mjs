@@ -16,9 +16,14 @@
  * Not used: the delivery videos (players, cars), the phone videos of the finished piece in a glove, 08/v15 and 31/v02 (a
  * flower chain with a BRT clasp that matches no piece), 20 (the Jesus piece of Marcus Thuram, removed).
  *
+ * The finished piece ("reveal") also opens the page of the piece: the first thing seen when entering it
+ * (src/components/PieceFilm.tsx). Checked again by eye on 20/11/2026, every video of the folders of the pieces (frames):
+ * the most beautiful and sharpest edit of the finished piece of each (studio, on black, with music), never a making-of,
+ * a delivery or a phone video. Folders 13 (Dragon Ball), 16 (The Safi Link) and 08 hold no edit of a finished piece of
+ * the site; the pieces taken from the stories have no folder.
+ *
  * folder: the folder of the piece itself (scripts/hd-media.mjs), where a "Videos HD/" film named after its kind is looked
- * for. A piece of the drafts (unpublished) and a finished piece without a making-of (its page shows no atelier) get the
- * light copy only. poster: the frame used as its image by default (1 to 6), when the one found by the numbers (the sharpest
+ * for. A piece of the drafts (unpublished) gets the light copy only. poster: the frame used as its image by default (1 to 6), when the one found by the numbers (the sharpest
  * well-lit) is not the best one to the eye (all were looked at on 19/11/2026); the admin can choose another.
  */
 export const FILMS = [
@@ -42,8 +47,8 @@ export const FILMS = [
   { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01" },
   { slug: "the-hand", folder: "12", reveal: "12/v01" },
   { slug: "michy-batshuayi-butterfly-chain", folder: "23", reveal: "23/v04" },
-  // The film of its delivery: the trunk, the pendant, Noah Okafor and his friends.
-  { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v02" },
+  // The short edit of the finished pendant (32/v02 is the film of its delivery: the trunk, Noah Okafor and his friends).
+  { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v03" },
 
   /* ---------- Drafts (unpublished, to be named by Yoni) ---------- */
   { slug: "chaine-cubaine-glacee-or-rose", folder: "01", draft: true, making: "01/f" },

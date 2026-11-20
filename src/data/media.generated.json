@@ -3421,10 +3421,10 @@
     },
     "kenan-yildiz-celebration-pendant": {
       "reveal": {
-        "src": "/media/films/kenan-yildiz-celebration-pendant/reveal.m.mp4",
+        "src": "/media/films/kenan-yildiz-celebration-pendant/reveal.mp4",
         "mobile": "/media/films/kenan-yildiz-celebration-pendant/reveal.m.mp4",
-        "width": 540,
-        "height": 960,
+        "width": 720,
+        "height": 1280,
         "duration": 21.4,
         "audio": true,
         "posters": [
@@ -3437,15 +3437,15 @@
         ],
         "poster": 2,
         "source": "11/v01 · 720p",
-        "light": true
+        "light": false
       }
     },
     "the-hand": {
       "reveal": {
-        "src": "/media/films/the-hand/reveal.m.mp4",
+        "src": "/media/films/the-hand/reveal.mp4",
         "mobile": "/media/films/the-hand/reveal.m.mp4",
-        "width": 540,
-        "height": 960,
+        "width": 720,
+        "height": 1280,
         "duration": 24.93,
         "audio": true,
         "posters": [
@@ -3458,15 +3458,15 @@
         ],
         "poster": 3,
         "source": "12/v01 · 720p",
-        "light": true
+        "light": false
       }
     },
     "michy-batshuayi-butterfly-chain": {
       "reveal": {
-        "src": "/media/films/michy-batshuayi-butterfly-chain/reveal.m.mp4",
+        "src": "/media/films/michy-batshuayi-butterfly-chain/reveal.mp4",
         "mobile": "/media/films/michy-batshuayi-butterfly-chain/reveal.m.mp4",
-        "width": 540,
-        "height": 960,
+        "width": 720,
+        "height": 1280,
         "duration": 34,
         "audio": true,
         "posters": [
@@ -3479,16 +3479,16 @@
         ],
         "poster": 4,
         "source": "23/v04 · 720p",
-        "light": true
+        "light": false
       }
     },
     "noah-okafor-jersey-pendant": {
       "reveal": {
-        "src": "/media/films/noah-okafor-jersey-pendant/reveal.m.mp4",
+        "src": "/media/films/noah-okafor-jersey-pendant/reveal.mp4",
         "mobile": "/media/films/noah-okafor-jersey-pendant/reveal.m.mp4",
-        "width": 540,
-        "height": 960,
-        "duration": 48.92,
+        "width": 720,
+        "height": 1280,
+        "duration": 10.1,
         "audio": true,
         "posters": [
           "/media/films/noah-okafor-jersey-pendant/reveal-1.webp",
@@ -3498,9 +3498,9 @@
           "/media/films/noah-okafor-jersey-pendant/reveal-5.webp",
           "/media/films/noah-okafor-jersey-pendant/reveal-6.webp"
         ],
-        "poster": 4,
-        "source": "32/v02 · 720p",
-        "light": true
+        "poster": 1,
+        "source": "32/v03 · 720p",
+        "light": false
       }
     },
     "chaine-cubaine-glacee-or-rose": {

@@ -13,6 +13,7 @@
     "start": "node dist-server/server/index.js",
     "db:migrate": "prisma migrate deploy",
     "import-media": "node scripts/import-media.mjs",
+    "films": "node scripts/import-media.mjs --only=films",
     "db:local": "node scripts/local-db.mjs",
     "lint": "eslint .",
     "verify": "playwright test",
