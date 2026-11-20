@@ -62,16 +62,19 @@ test("the ten removed pieces appear nowhere; their addresses lead to their playe
 test("the drafts made from Yoni's photos are published (20/11/2026): each with its page, made for a private collector", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
-  // Unpublished: the 10 removed pieces only.
+  // Unpublished: the 10 removed pieces and the tennis chain he crossed out, only.
+  expect(REMOVED_PIECES).toContain("two-row-tennis-chain");
   expect(defaultCatalogue.pieces.filter((p) => !p.published).map((p) => p.slug).sort()).toEqual([...REMOVED_PIECES].sort());
   for (const slug of NEW_PIECES) {
     const piece = cat.pieces.find((p) => p.slug === slug);
     expect(piece, slug).toBeTruthy();
     expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
-    expect(piece!.people, slug + " made for a private collector").toEqual([]);
-    expect(piece!.clientPublic, slug).toBe(false);
-    // Never the name of a person in its texts (even engraved on the piece).
-    expect(piece!.title + " " + piece!.line + " " + piece!.story, slug).not.toMatch(/Nathalie|José|Jose\b|LASANA|Loan|Elya|Annie/i);
+    expect(piece!.people, slug + " linked to no page of a person").toEqual([]);
+    // Made for a private collector, but the panther: made for Lasana Keita (the album of Yoni, 20/11/2026).
+    if (slug === "panther-champion-pendant") expect(piece!.client).toBe("Lasana Keita");
+    else expect(piece!.clientPublic, slug).toBe(false);
+    // Never the first names engraved on the back of N14.
+    expect(piece!.title + " " + piece!.line + " " + piece!.story, slug).not.toMatch(/Nathalie|José|Jose\b|Loan|Elya|Annie/i);
     const res = await page.request.get("/pieces/" + slug, { maxRedirects: 0 });
     expect(res.status(), slug).toBe(200);
   }

@@ -38,6 +38,8 @@ export const REMOVED_PIECES = [
   "tanguy-nianzou-nz-pendant",
   "tanguy-nianzou-nz-ring",
   "sidney-eweka-999-pendant",
+  // The tennis chain of two rows (folder 03), crossed out by Yoni on his albums (20/11/2026).
+  "two-row-tennis-chain",
 ];
 
 /** Pieces renamed since the first version of the site: old address -> new address. */
@@ -1103,9 +1105,10 @@ const SITE_PIECES: Piece[] = [
 
 /**
  * A piece made for a private collector, from a folder of Yoni sorted photo by photo (scripts/hd-media.mjs): its photos in
- * their order, each saying what it shows. Its title describes the piece (never the name of a person, even engraved on
- * it); its texts only say what the photos show, no figure, the coloured stones by their colour. Yoni can rename it, hide
- * it or write its story from the admin.
+ * their order, each saying what it shows. Its title is the name of its album in the phone of Yoni, cleaned up in English
+ * ("Bouzou — Pendant", "Rose 20 mm Cuban Chain"; never the name of a stone), else it describes the piece; its texts only
+ * say what the photos show, no figure but the sizes given by Yoni, the coloured stones by their colour. Yoni can rename
+ * it, hide it or write its story from the admin.
  */
 function collected(p: Omit<PieceInput, "cover" | "gallery">): Piece {
   return piece({ ...p, ...sorted(p.slug, []) });
@@ -1117,9 +1120,12 @@ export const NEW_PIECES = [
   "wide-rose-iced-cuban-chain",
   "two-tone-iced-cuban-chain",
   "white-iced-cuban-chain",
-  "two-row-tennis-chain",
+  "baguette-cuban-chain",
+  "cross-infinity-chain",
+  "brt-flower-chain",
   "pear-link-chain",
   "script-nameplate-pendant",
+  "jesus-piece-red-flowers",
   "ampersand-initials-pendant",
   "thorns-and-roses-crucifix",
   "baguette-cross-pendant",
@@ -1133,14 +1139,14 @@ const COLLECTED: Piece[] = [
   /* Pendants */
   collected({
     slug: "script-nameplate-pendant",
-    title: "Script Nameplate Pendant",
+    title: "Bouzou — Pendant",
     type: "pendant",
     line: "A name in script, on a chain of crosses.",
     story:
-      "A name written in script letters in rose gold tones, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on a chain of round links paved with diamonds, joined by crosses of baguettes, with an oval clasp signed BRT.",
+      "A name written in script letters in rose gold tones, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on the Cross Infinity chain: round links paved with diamonds, joined by crosses of baguettes.",
     theme: { preset: "velours" },
     specs: [
-      ["Type", "Chain and pendant"],
+      ["Type", "Pendant"],
       ["Motif", "A name in script letters"],
       ["Signature", "BRT mark on the back"],
     ],
@@ -1149,7 +1155,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "ampersand-initials-pendant",
-    title: "Ampersand Initials Pendant",
+    title: "D&E — Pendant",
     type: "pendant",
     line: "Two initials joined by an ampersand.",
     story:
@@ -1163,7 +1169,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "thorns-and-roses-crucifix",
-    title: "Thorns and Roses Crucifix",
+    title: "Jesus Cross",
     type: "pendant",
     line: "A Christ in rose gold, wound with thorns and roses.",
     story:
@@ -1178,7 +1184,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "baguette-cross-pendant",
-    title: "Baguette Cross Pendant",
+    title: "Baguette Cross",
     type: "pendant",
     line: "Rows of baguettes, inside a border of diamonds.",
     story:
@@ -1193,7 +1199,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "crown-of-thorns-jesus-piece",
-    title: "Crown of Thorns Jesus Piece",
+    title: "Jesus Piece — Red Crown",
     type: "pendant",
     line: "A crown of red stones and spikes.",
     story:
@@ -1208,8 +1214,9 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "panther-champion-pendant",
-    title: "Panther Champion Pendant",
+    title: "Lasana Keita — Panther Pendant",
     type: "pendant",
+    client: "Lasana Keita",
     line: "A panther holding a champion's belt.",
     story:
       "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones. The back is carved with a star pattern and the BRT mark.",
@@ -1224,7 +1231,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "celestial-initial-medallion",
-    title: "Celestial Initial Medallion",
+    title: "N14 — Medallion",
     type: "pendant",
     line: "An initial and a number, under a web of stars.",
     story:
@@ -1237,13 +1244,75 @@ const COLLECTED: Piece[] = [
     seen: "Rose gold tone · baguettes, round diamonds, marquise-cut diamonds",
   }),
 
+  collected({
+    slug: "jesus-piece-red-flowers",
+    title: "Jesus Piece — Red Flowers",
+    type: "pendant",
+    line: "A crown of red flowers in rose gold.",
+    story:
+      "A Jesus piece in white gold tones, entirely paved with diamonds, crowned with flowers of red pear-shaped stones in rose gold settings. The back is carved with a star pattern and the BRT mark in rose gold.",
+    theme: { preset: "velours", font: "sacre" },
+    specs: [
+      ["Type", "Pendant"],
+      ["Motif", "A crown of red flowers"],
+      ["Signature", "BRT mark on the back"],
+    ],
+    seen: "White gold tone, rose gold crown · round diamonds in pavé, baguettes, red pear-shaped stones",
+  }),
+
   /* Chains */
   collected({
-    slug: "rose-iced-cuban-chain",
-    title: "Rose Iced Cuban Chain",
+    slug: "cross-infinity-chain",
+    title: "Cross Infinity Chain",
     type: "chain",
-    line: "A Cuban chain paved link by link, its clasp signed BRT.",
-    story: "A Cuban chain in rose gold tones, every link paved with round diamonds and polished on the back. Its flat clasp is set with diamonds around the BRT mark.",
+    line: "Round links paved with diamonds, joined by crosses.",
+    story:
+      "A chain of round links in rose gold tones, each one paved with diamonds, joined by crosses of baguettes. Its oval clasp is paved too, with baguettes around the BRT mark. It carries the Bouzou pendant.",
+    theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
+    specs: [
+      ["Type", "Chain"],
+      ["Signature", "BRT mark on the clasp"],
+    ],
+    seen: "Rose gold tone · round diamonds in pavé, baguettes",
+  }),
+  collected({
+    slug: "brt-flower-chain",
+    title: "BRT Flower — Chain",
+    type: "chain",
+    line: "Twisted links, flowers of diamonds, a clasp signed BRT.",
+    story:
+      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds along its length. Its rectangular clasp is paved with diamonds around the BRT mark.",
+    theme: { preset: "roses" },
+    specs: [
+      ["Type", "Chain"],
+      ["Signature", "BRT mark on the clasp"],
+    ],
+    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
+    making: {
+      polishing: yoni("brt-flower-chain", "08-v02", { ...at("Film: the clasp finished at the bench", "At the bench"), onBlack: false }),
+      setting: yoni("brt-flower-chain", "08-v03", { ...SETTING_FILM(), onBlack: false }),
+    },
+  }),
+  collected({
+    slug: "baguette-cuban-chain",
+    title: "Baguette Cuban Chain",
+    type: "chain",
+    line: "Baguettes in every link, white and rose in turn.",
+    story:
+      "A heavy Cuban chain with angular links, each one a field of baguettes framed by round diamonds, the links alternating white and rose gold tones; the back is polished in both tones. Its domed clasp is paved, with the letters BRT and the diamond of the house in rose gold.",
+    theme: { preset: "facettes" },
+    specs: [
+      ["Type", "Chain"],
+      ["Signature", "BRT mark on the clasp"],
+    ],
+    seen: "White and rose gold tones · baguettes, round diamonds in pavé",
+  }),
+  collected({
+    slug: "rose-iced-cuban-chain",
+    title: "14 mm Cuban Chain",
+    type: "chain",
+    line: "A 14 mm Cuban chain, paved link by link, its clasp signed BRT.",
+    story: "A 14 mm Cuban chain in rose gold tones, every link paved with round diamonds and polished on the back. Its flat clasp is set with diamonds around the BRT mark.",
     theme: { preset: "velours" },
     specs: [
       ["Type", "Chain"],
@@ -1253,10 +1322,10 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "wide-rose-iced-cuban-chain",
-    title: "Wide Rose Iced Cuban Chain",
+    title: "Rose 20 mm Cuban Chain",
     type: "chain",
-    line: "Wide links, densely paved, under a domed clasp.",
-    story: "A wide Cuban chain in rose gold tones, each link densely paved with round diamonds, the back polished. The domed clasp is paved too, with the letters BRT raised in polished gold.",
+    line: "A 20 mm Cuban chain, densely paved, under a domed clasp.",
+    story: "A 20 mm Cuban chain in rose gold tones, each link densely paved with round diamonds, the back polished. The domed clasp is paved too, with the letters BRT raised in polished gold.",
     theme: { preset: "maison", tint: "#33171a", glow: "#f2b0a8", texture: "facets", font: "geometrie" },
     specs: [
       ["Type", "Chain"],
@@ -1303,7 +1372,7 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "pear-link-chain",
-    title: "Pear Link Chain",
+    title: "Infinity Pear Chain",
     type: "chain",
     line: "Links of diamonds, each holding a pear.",
     story: "A chain in white gold tones made of figure-of-eight links, each loop outlined with round diamonds and holding a pear-shaped diamond, joined by short paved bars.",
@@ -1315,7 +1384,7 @@ const COLLECTED: Piece[] = [
   /* Rings */
   collected({
     slug: "oval-eternity-band",
-    title: "Oval Eternity Band",
+    title: "Oval Eternity Ring",
     type: "ring",
     line: "Oval diamonds, all the way around.",
     story: "An eternity band in white gold tones, set all around with oval diamonds in claw settings. Inside, the polished band carries the BRT mark.",

@@ -22,15 +22,16 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
 - **Une seule source de données** : `src/data/` — `catalogue.ts` (joueurs, stories), `pieces.ts`
   (les pièces et les écrins), `collections.ts` (une collection par type de bijou), `relations.ts`
   (liens entre stories, joueurs et pièces).
-- **Les pièces** : 43 pièces publiées, trouvées dans les stories, les dossiers et les photos HD de Yoni (dont 14 pièces
-  de collectionneurs privés publiées le 20/11/2026, `NEW_PIECES`). Leurs textes
+- **Les pièces** : 46 pièces publiées, trouvées dans les stories, les dossiers et les photos HD de Yoni (dont 17 pièces
+  publiées le 20/11/2026, `NEW_PIECES`, titrées d'après les albums de son téléphone). Leurs textes
   sont des brouillons (`draft: true`, « Brouillon » dans l'admin) à faire valider par le client ; aucun chiffre n'est inventé.
 - **Pièces non publiées** (`published: false`, case « Publiée sur le site » dans l'admin) : gardées dans la base mais
   invisibles partout sur le site (listes, pièces similaires, stories, écrins, plan du site, aperçus ; `publicCatalogue`
   dans `src/data/relations.ts`, aussi appliqué par l'API `/api/catalogue`). Leur adresse redirige (301) vers la page de
   leur joueur s'il a encore des pièces, sinon vers `/creations` ; un joueur dont toutes les pièces sont non publiées sort
   du Cercle (sa page mène à `/players`). Le serveur le fait depuis la base ; pour Vercel, `npm run redirects` écrit les
-  mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni (`REMOVED_PIECES`).
+  mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni et la chaîne Tennis qu'il a barrée
+  (`REMOVED_PIECES`).
 - **L'univers de chaque pièce** (`theme` d'une pièce, `src/data/themes.ts`, dessiné par `src/components/Universe.tsx`,
   `src/components/universe/fx.ts` et `.universe` dans `src/index.css`) : la page garde sa structure, mais on entre dans le
   monde de la pièce.

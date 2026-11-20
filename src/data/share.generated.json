@@ -185,6 +185,26 @@
    "width": 1200,
    "height": 630
   },
+  "jesus-piece-red-flowers": {
+   "src": "/media/share/pieces/jesus-piece-red-flowers.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "cross-infinity-chain": {
+   "src": "/media/share/pieces/cross-infinity-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "brt-flower-chain": {
+   "src": "/media/share/pieces/brt-flower-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "baguette-cuban-chain": {
+   "src": "/media/share/pieces/baguette-cuban-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
   "rose-iced-cuban-chain": {
    "src": "/media/share/pieces/rose-iced-cuban-chain.jpg",
    "width": 1200,
@@ -202,11 +222,6 @@
   },
   "white-iced-cuban-chain": {
    "src": "/media/share/pieces/white-iced-cuban-chain.jpg",
-   "width": 1200,
-   "height": 630
-  },
-  "two-row-tennis-chain": {
-   "src": "/media/share/pieces/two-row-tennis-chain.jpg",
    "width": 1200,
    "height": 630
   },

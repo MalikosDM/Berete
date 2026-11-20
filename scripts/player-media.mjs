@@ -10,7 +10,8 @@
  *         4:5 on phones and computers alike, so one crop serves both). Found with the face detection of macOS (Vision),
  *         then checked by eye: the face in the upper third, the jersey below, never the head or the number cut.
  *
- * Not used: photos under 1000 px on their short side (Instagram copies), or blurry. A person left out keeps the photo
+ * Not used: photos under 1000 px on their short side (Instagram copies), or blurry; but the photos Yoni chose himself
+ * (19/11/2026: Kenan Yildiz, Marcus Thuram, Noah Okafor, Loïs Openda, Michy Batshuayi) come first, whatever their size. A person left out keeps the photo
  * from the stories (scripts/piece-media.mjs, PORTRAITS), else their initials:
  *   Angelo Stiller  only "- 01" (1080 x 720, a back view in the crowd around the cup): too small
  *   Sambi Lokonga   folder empty
@@ -44,6 +45,8 @@ export const PLAYERS = [
   {
     slug: "kenan-yildiz",
     photos: [
+      // Sent by Yoni on 19/11/2026 (Juventus jersey, hands crossed): small (554 px), never enlarged.
+      { n: 3, crop: [0.108, 0, 0.8, 1] },
       { n: 1, crop: [0, 0, 1, 1] },
       { n: 2, crop: [0, 0, 1, 1] },
     ],
@@ -55,7 +58,14 @@ export const PLAYERS = [
       { n: 2, crop: [0.2043, 0.1552, 0.6792, 0.6811] },
     ],
   },
-  { slug: "lois-openda", photos: [{ n: 1, crop: [0.2434, 0.0255, 0.5882, 0.6588] }] },
+  {
+    slug: "lois-openda",
+    photos: [
+      // Sent by Yoni on 19/11/2026 (Juventus jersey, 20): small (479 px), never enlarged.
+      { n: 2, crop: [0.031, 0, 0.95, 0.889] },
+      { n: 1, crop: [0.2434, 0.0255, 0.5882, 0.6588] },
+    ],
+  },
   {
     slug: "malik-tillman",
     photos: [
@@ -67,6 +77,8 @@ export const PLAYERS = [
   {
     slug: "marcus-thuram",
     photos: [
+      // Sent by Yoni on 19/11/2026: Inter jersey, hands to his ears.
+      { n: 4, crop: [0.321, 0.169, 0.4375, 0.82] },
       // Face and jersey seen (in "- 01" his hand hides his face, "- 02" is a back view).
       { n: 3, crop: [0.2974, 0.2324, 0.555, 0.56] },
       { n: 1, crop: [0, 0.03125, 1, 0.9375] },
@@ -80,8 +92,22 @@ export const PLAYERS = [
       { n: 2, crop: [0, 0.03, 1, 0.9374] },
     ],
   },
-  { slug: "michy-batshuayi", photos: [{ n: 1, crop: [0.1536, 0.1007, 0.7965, 0.7987] }] },
-  { slug: "noah-okafor", photos: [{ n: 3, crop: [0.3207, 0.0746, 0.4183, 0.4179] }] },
+  {
+    slug: "michy-batshuayi",
+    photos: [
+      // Sent by Yoni on 19/11/2026: Belgium jersey (23), pointing to the sky.
+      { n: 2, crop: [0, 0.1, 1, 0.847] },
+      { n: 1, crop: [0.1536, 0.1007, 0.7965, 0.7987] },
+    ],
+  },
+  {
+    slug: "noah-okafor",
+    photos: [
+      // Sent by Yoni on 19/11/2026: Leeds jersey (19), arms crossed.
+      { n: 4, crop: [0.0885, 0, 0.9, 0.546] },
+      { n: 3, crop: [0.3207, 0.0746, 0.4183, 0.4179] },
+    ],
+  },
   {
     slug: "radja-nainggolan",
     photos: [

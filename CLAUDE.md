@@ -171,24 +171,29 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Page d'une pièce** : les 8 premières photos défilent comme avant, toutes les autres dans la grille « Every Angle
       / Sous tous les angles » (`src/components/GalleryGrid.tsx` : 12 d'abord, puis « Voir les N autres », chargées au
       fil du défilement, copie légère de chaque photo, vidéos muettes qui ne jouent qu'à l'écran). Plus de limite de 10.
-- [x] **14 pièces cachées publiées** (« Created exclusively for a private collector », titres anglais d'après les
-      photos, univers existants, textes sans nom ni chiffre, `NEW_PIECES` dans `src/data/pieces.ts`) : Script Nameplate
-      Pendant (dossiers 14 + 07, même pièce), Ampersand Initials Pendant, Thorns and Roses Crucifix, Baguette Cross
-      Pendant, Crown of Thorns Jesus Piece, Panther Champion Pendant, Celestial Initial Medallion, Rose Iced Cuban Chain
-      (01), Wide Rose Iced Cuban Chain (02 + 28/p07 : pas la même chaîne que 01, fermoir et largeur différents),
-      Two-Tone Iced Cuban Chain (31, seule pièce propre du dossier), White Iced Cuban Chain (33), Two-Row Tennis Chain,
-      Pear Link Chain, Oval Eternity Band. Aucune ne correspond aux 10 pièces retirées. Yoni peut les renommer ou les
-      cacher dans l'admin. Films d'ouverture : D&E (commence à 7,4 s : avant, une fresque d'un basketteur connu),
-      crucifix, prénom, panthère ; atelier : chaîne rose (01/f), crucifix, panthère.
-- [x] **Fusions** : dossier 30 = la chaîne du pendentif OKA d'Okafor (mêmes maillons, même écrin) : ses photos sont sur la
-      page OKA ; 28 = copies d'autres dossiers (rien à publier) ; 31 mélangeait 6 chaînes (une seule gardée).
+- [x] **Aucune pièce cachée** (demande de Yoni, captures de ses albums iPhone du 20/11, cochées en vert) : toutes les
+      pièces des dossiers sont en ligne, sauf les 10 retirées et la chaîne **Tennis** (03, barrée par Yoni : non publiée,
+      `REMOVED_PIECES`). Titres = noms de ses albums mis au propre (`NEW_PIECES` dans `src/data/pieces.ts`, jamais le nom
+      d'une pierre : « red ruby » devient « Red ») : Bouzou — Pendant (14), Cross Infinity Chain (07, la chaîne du
+      Bouzou), BRT Flower — Chain (aucune photo : images de son film de studio 31/v02, fabrication 08/v15), Baguette Cross
+      (06), Jesus Cross (05), D&E — Pendant (04), Jesus Piece — Red Crown (15), Jesus Piece — Red Flowers (20 : la pièce
+      retirée « Marcus Thuram — Jesus Piece », remise en ligne sans nom à la demande de Yoni), Oval Eternity Ring (10),
+      Rose 20 mm Cuban Chain (02 + 28/p07), 14 mm Cuban Chain (01 : les vignettes de ses albums le montrent ; 01 et 02 sont
+      deux chaînes), N14 — Medallion (22), Lasana Keita — Panther Pendant (19, « Created exclusively for Lasana Keita »).
+      Non cochées, titre descriptif : Infinity Pear Chain (09, nom de son album), Baguette Cuban Chain (30, sans doute la
+      chaîne du pendentif OKA), Two-Tone Iced Cuban Chain (31), White Iced Cuban Chain (33). 46 pièces en ligne.
+- [x] **Photos des joueurs** envoyées par Yoni (19/11) en photo principale, rangées dans « Photos joueurs en maillot »
+      (`- 03`/`- 04`/`- 02`, `scripts/player-media.mjs`) : Kenan Yildiz (Juventus), Marcus Thuram (Inter), Noah Okafor
+      (Leeds), Loïs Openda (Juventus), Michy Batshuayi (Belgique). Kenan (554 px) et Openda (479 px) sont petites, jamais
+      agrandies : à redemander en grand.
 - [x] Détourages des nouvelles pièces (8 vues propres : D&E, crucifix, croix baguettes, prénom, Jesus piece, médaillon) ;
       l'alliance et la panthère gardaient le reflet du miroir : elles s'ouvrent sur leur photo.
-- 43 pièces en ligne : 156 photos et 77 vidéos avant, 392 photos et 89 vidéos après (détail dans le rapport du 20/11).
-- [ ] Yoni : **revers de la médaille céleste** (dossier 22) : prénoms d'une famille et « 1955 – 2022 » gravés : ni ce
-      revers ni le film (22/v08) ne sont montrés tant que la famille n'a pas dit oui. **Panthère** : la ceinture porte un
-      prénom, une date et une heure (les deux gros plans de la date et de l'heure sont retirés) ; est-ce la pièce de Keita
-      Losene (« MMA CHAMPION ») ? **Homme en casquette verte** (40 photos de la livraison du Butterfly) et **homme en
+- Galeries : 156 photos et 77 vidéos avant ce chantier (29 pièces), 402 photos et 95 vidéos après (46 pièces).
+- [ ] Yoni : **revers de N14** (dossier 22) : prénoms d'une famille et « 1955 – 2022 » gravés : ni ce
+      revers ni le film (22/v08) ne sont montrés tant que la famille n'a pas dit oui. **Panthère** : la ceinture porte une
+      date et une heure (les deux gros plans sont retirés). **« BRT-Flower »** ressemble à la chaîne torsadée de Kevin
+      Schade : même pièce ? Son album « Openda » montre **The Hand** (en ligne pour un collectionneur privé) : pièce de Loïs
+      Openda ? **Homme en casquette verte** (40 photos de la livraison du Butterfly) et **homme en
       lunettes** (remise des bagues VfB) : si c'est Yoni, ces photos peuvent revenir. Visages des joueurs de l'Inter
       (remise des bagues) gardés hors galerie. Tulips on Tour porte « Mason Garments ». Les montres de Thuram et Tajon
       ressemblent à des Cartier Santos glacées. Photos des 4 chaînes isolées du dossier 31 et vidéos 08/v18, v19 à identifier.
@@ -244,7 +249,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       de domaine de Yoni (chez one.com).
 
 ## Attendu de Yoni (bloque le lancement)
-Photos personnelles pour La Maison, vrais noms des 14 pièces publiées le 20/11 s'il en veut d'autres (et leurs
+Photos personnelles pour La Maison, autres noms des pièces publiées le 20/11 s'il en veut (et leurs
 destinataires), photos des étapes de
 fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
 

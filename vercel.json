@@ -107,6 +107,16 @@
       "statusCode": 301
     },
     {
+      "source": "/pieces/two-row-tennis-chain",
+      "destination": "/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/two-row-tennis-chain",
+      "destination": "/:lang/creations",
+      "statusCode": 301
+    },
+    {
       "source": "/players/jeff-chabot",
       "destination": "/players",
       "statusCode": 301

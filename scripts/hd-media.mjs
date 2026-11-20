@@ -11,7 +11,7 @@
  *            seconds at most; "07/p5:links" = photo 05 of folder 07 (copied as "07-p05").
  *   also     files used elsewhere by the piece (its making-of steps, its details, its handover), not in its gallery.
  *   items    (boxes, atelier) the files of a folder that is no piece: in this order.
- *   "f" is the video of the Fabrication/ folder.
+ *   "f" is the video of the Fabrication/ folder; "v2@9:links" is the frame of video 02 at 9 s, kept as a photo.
  * The pieces use them by folder (src/data/pieces.ts: sorted() builds the cover and the gallery, yoni() one file).
  *
  * Sorted again on 20/11/2026, photo by photo and video by video (frames of every video), from the whole folder of each
@@ -19,11 +19,12 @@
  * blurred or failed photos, screenshots and renders, workshop photos (they serve the making-of), faces of private people
  * (a footballer only when sure it is him), the anime artwork (rights of Dragon Ball not confirmed), the engraved first
  * names and dates of a private family (the back of the celestial medallion), the engraved date and time of the panther.
- * The folders 07 (the chain of the script nameplate, same photos), 28 (copies of other folders and one photo of the
- * chain of 02) and 30 (the baguette Cuban chain of the OKA pendant of Noah Okafor: same links, same case) have no piece
- * of their own. 01 and 02 are two different chains (clasp, size of the links). Folder 31 holds one piece of its own
- * (p08, p09), the rest being copies of 30 and single shots of chains found nowhere else. Folder 20 (the Jesus piece of
- * Marcus Thuram, removed from the catalogue) is not read.
+ * Later on 20/11/2026, the albums of Yoni (his captures): every piece of the folders is online but the 10 removed ones and the
+ * tennis chain (03, crossed out by him). 07 ("Cross infinity", the chain) and 14 ("Bouzou", the pendant on it) are two
+ * pieces; 01 is his "14 mm cuban", 02 (+ 28/p07) his "Rose 20 mm cuban" (the thumbnails of his albums); 20 is his
+ * "Jesus piece red ruby"; 30 is a piece of its own. Folder 28 holds only copies of other folders and one photo of the
+ * chain of 02. Folder 31 holds one piece of its own (p08, p09) and the studio film of "BRT-Flower" (v02); the rest are
+ * copies of 30 and single shots of chains found nowhere else.
  */
 
 /** Warm black and white, as the other photos of the atelier (no blue bench in the palette). */
@@ -115,7 +116,7 @@ export const HD = [
   {
     dir: "noah-okafor-oka-pendant",
     folder: "34",
-    gallery: ["p5:front", "p17:angle", "p8:bail", "p10:bail", "p14:detail", "p3:detail", "p4:detail", "p9:detail", "p6:detail", "p16:detail", "p7:detail", "p13:side", "30/p1:angle", "30/p5:bust", "30/p3:angle", "30/p2:side", "30/v1:film", "30/p8:links", "30/p7:links", "30/p6:setting", "30/p10:mark", "30/p11:back", "p1:worn", "p2:worn", "p18:case"],
+    gallery: ["p5:front", "p17:angle", "p8:bail", "p10:bail", "p14:detail", "p3:detail", "p4:detail", "p9:detail", "p6:detail", "p16:detail", "p7:detail", "p13:side", "p1:worn", "p2:worn", "p18:case"],
   },
 
   /* ---------- The pieces published on 20/11/2026 (the drafts of 19/11, named from their photos) ---------- */
@@ -149,11 +150,17 @@ export const HD = [
     folder: "06",
     gallery: ["p12:front", "p9:angle", "p4:setting", "p5:detail", "p11:detail", "p8:detail", "p10:bail", "p7:bail", "p3:back", "p2:back", "p1:mark"],
   },
+  // Two albums of Yoni: the pendant "Bouzou" (14) and its chain "Cross infinity" (07; the clasp shots are in both folders).
   {
     dir: "script-nameplate-pendant",
     folder: "14",
-    gallery: ["p21:front", "p3:bust", "07/p9:bust", "p15:angle", "p20:angle", "p16:side", "p17:side", "p1:detail", "p13:detail", "p19:detail", "p14:detail", "p18:bail", "p5:links", "07/p1:links", "07/p2:links", "p10:setting", "07/p4:setting", "p6:links", "07/p7:links", "07/p5:links", "p9:links", "p7:clasp", "p8:clasp", "07/p6:clasp", "p12:engraving"],
+    gallery: ["p21:front", "p3:bust", "p15:angle", "p20:angle", "p16:side", "p17:side", "p1:detail", "p13:detail", "p19:detail", "p14:detail", "p18:bail", "p12:engraving"],
     also: ["p22"],
+  },
+  {
+    dir: "cross-infinity-chain",
+    folder: "07",
+    gallery: ["p9:bust", "p1:links", "p2:links", "14/p5:links", "p4:setting", "14/p10:setting", "p7:links", "p5:links", "14/p6:links", "p12:links", "p10:clasp", "p11:clasp", "p6:clasp"],
   },
   {
     dir: "pear-link-chain",
@@ -191,6 +198,26 @@ export const HD = [
     folder: "33",
     gallery: ["p2:bust", "p3:links", "p1:mark"],
     also: ["p4", "v1"],
+  },
+  // Folder 30: the baguette Cuban chain (the chain the OKA pendant of Noah Okafor is shown on has the same links).
+  {
+    dir: "baguette-cuban-chain",
+    folder: "30",
+    gallery: ["p1:bust", "p5:bust", "p3:bust", "p2:side", "p8:links", "p7:links", "p6:setting", "p10:mark", "p11:back"],
+  },
+  // Folder 20: the album "Jesus piece red ruby" of Yoni (the Jesus piece once shown as Marcus Thuram's, removed then).
+  {
+    dir: "jesus-piece-red-flowers",
+    folder: "20",
+    gallery: ["p6:front", "p4:detail", "p1:detail", "p2:setting", "p7:setting", "p3:side", "p5:back"],
+  },
+  // The album "BRT-Flower" of Yoni: filmed, never photographed (its studio film 31/v02, its making-of 08/v15). Its photos
+  // are frames of the studio film; the steps of its making: the clasp finished (08/v02), the flowers set (08/v03).
+  {
+    dir: "brt-flower-chain",
+    folder: "31",
+    gallery: ["v2@2.5:bust", "v2@6:links", "v2@8:detail", "v2@14:whole", "v2@17:setting", "v2@23:detail", "v2@26:detail", "v2@10:clasp", "v2@20:mark"],
+    also: ["08/v2", "08/v3"],
   },
 
   /* ---------- Boxes ---------- */

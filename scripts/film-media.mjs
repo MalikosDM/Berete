@@ -13,8 +13,8 @@
  * with music), a phone video only when nothing else exists and it is clean. Folder 08 ("Fabrication atelier (divers)")
  * holds the making-of of several pieces, recognised on their last shots (the finished piece): 08/v05 is the VfB film in
  * high quality (29/v02 is its light copy), 08/v14 ends on the T-Serpent, 08/v21 on the Jesus piece of Samuel Ballet.
- * Not used: the delivery videos (players, cars), the phone videos of the finished piece in a glove, 08/v15 and 31/v02 (a
- * flower chain with a BRT clasp that matches no piece), 20 (the Jesus piece of Marcus Thuram, removed).
+ * Not used: the delivery videos (players, cars), the phone videos of the finished piece in a glove. Since 20/11/2026,
+ * 08/v15 and 31/v02 are the films of "BRT-Flower" (an album of Yoni), 20 the films of his "Jesus piece red ruby".
  *
  * The finished piece ("reveal") also opens the page of the piece: the first thing seen when entering it
  * (src/components/PieceFilm.tsx). Checked again by eye on 20/11/2026, every video of the folders of the pieces (frames):
@@ -59,6 +59,12 @@ export const FILMS = [
   { slug: "thorns-and-roses-crucifix", folder: "05", making: "05/v02", reveal: "05/v01" },
   { slug: "script-nameplate-pendant", folder: "14", reveal: "14/v01" },
   { slug: "panther-champion-pendant", folder: "19", making: "19/v01", reveal: "19/v02" },
+  // The album "Jesus piece red ruby" of Yoni (folder 20): its studio film in HD, its making-of.
+  { slug: "jesus-piece-red-flowers", folder: "20", making: "20/v01", reveal: "20/v02" },
+  // The album "BRT-Flower": its studio film (31/v02) and its making-of (08/v15, ends on the finished chain).
+  { slug: "brt-flower-chain", making: "08/v15", reveal: "31/v02" },
+  // The baguette Cuban chain (folder 30): its studio film.
+  { slug: "baguette-cuban-chain", folder: "30", reveal: "30/v01" },
   // The celestial medallion (22) has no film first: its film shows the engraved back, first names of a family and a
   // date (22/v08), kept out until Yoni says the family agrees.
 ];

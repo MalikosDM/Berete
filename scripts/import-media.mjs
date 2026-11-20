@@ -536,8 +536,20 @@ const hdName = (ref) => (ref === "f" ? "f" : ref[0] + pad2(Number(ref.slice(1)))
  */
 function hdItem(entry, item) {
   const [path, view = null] = item.split(":");
-  const [folder, ref] = path.includes("/") ? path.split("/") : [entry.folder, path];
-  return { folder, ref, name: (folder === entry.folder ? "" : folder + "-") + hdName(ref), view };
+  const [folder, full] = path.includes("/") ? path.split("/") : [entry.folder, path];
+  // "v2@9": the frame of video 02 at 9 seconds, kept as a photo (a piece filmed but never photographed).
+  const [ref, at = null] = full.split("@");
+  const name = (folder === entry.folder ? "" : folder + "-") + hdName(ref) + (at === null ? "" : "-" + at.replace(".", "_") + "s");
+  return { folder, ref, at: at === null ? null : Number(at), name, view };
+}
+
+/** A frame of a video as a photo: the frame at `at` seconds, at its own size (never enlarged). */
+async function hdStill(src, out, at) {
+  const size = HD_PHOTO;
+  const vf = "scale=w='min(" + size.maxW + ",iw)':h='min(" + size.maxH + ",ih)':force_original_aspect_ratio=decrease:flags=lanczos";
+  await produce(out, src, "hd-still:" + at + ":" + vf + ":" + size.quality, ["-ss", String(at), "-i", src, "-frames:v", "1", "-vf", vf, "-c:v", "libwebp", "-quality", String(size.quality), "-compression_level", "6"]);
+  const p = await probe(out);
+  return { type: "image", src: webPath(out), width: p.width, height: p.height, onBlack: await shotOnBlack(out) };
 }
 
 async function hdPhoto(src, out, filter = "") {
@@ -625,7 +637,7 @@ async function importHd() {
     const group = (out[entry.dir] ??= {});
     const wanted = [...(entry.gallery ?? []).map((item) => ({ item, shown: true })), ...[...(entry.items ?? []), ...(entry.also ?? [])].map((item) => ({ item, shown: false }))];
     for (const { item, shown } of wanted) {
-      const { folder, ref, name, view } = hdItem(entry, item);
+      const { folder, ref, at, name, view } = hdItem(entry, item);
       if (shown) (galleries[entry.dir] ??= []).push({ file: name, view });
       if (name in group) continue;
       const src = await hdSource(folder, ref);
@@ -633,10 +645,11 @@ async function importHd() {
         console.warn("  ! not found: folder " + folder + ", " + ref + " (" + entry.dir + ")");
         continue;
       }
-      const isVideo = ref[0] !== "p";
+      const isVideo = ref[0] !== "p" && at === null;
       const file = join(MEDIA, "hd", entry.dir, name + (isVideo ? ".mp4" : ".webp"));
       group[name] = null;
-      jobs.push({ heavy: isVideo, go: async () => (group[name] = isVideo ? await hdVideo(src, file, entry.filter) : await hdPhoto(src, file, entry.filter)) });
+      const make = at !== null ? () => hdStill(src, file, at) : isVideo ? () => hdVideo(src, file, entry.filter) : () => hdPhoto(src, file, entry.filter);
+      jobs.push({ heavy: isVideo, go: async () => (group[name] = await make()) });
     }
   }
   const cores = cpus().length;

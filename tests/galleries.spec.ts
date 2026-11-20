@@ -6,6 +6,7 @@
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { defaultCatalogue } from "../src/data/catalogue";
+import media from "../src/data/media.generated.json" with { type: "json" };
 import { NEW_PIECES } from "../src/data/pieces";
 import { skipIntro, watch } from "./helpers";
 
@@ -33,8 +34,8 @@ test("Créations: every published piece is there, each card with its photo", asy
   expect(problems.errors).toEqual([]);
 });
 
-/** Five new pieces (the most photos, films), and the four pieces of the site with the most photos. */
-const NEW_PAGES = ["script-nameplate-pendant", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain"];
+/** Eight new pieces (the most photos, films, the albums of Yoni), and the four pieces of the site with the most photos. */
+const NEW_PAGES = ["script-nameplate-pendant", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain", "cross-infinity-chain", "brt-flower-chain", "jesus-piece-red-flowers"];
 const PAGES = [
   ...NEW_PAGES,
   ...PUBLISHED.filter((p) => !NEW_PIECES.includes(p.slug))
@@ -43,13 +44,13 @@ const PAGES = [
     .map((p) => p.slug),
 ];
 
-test("the pages chosen: five new pieces and four of the site", () => {
-  expect(PAGES.length).toBe(9);
+test("the pages chosen: eight new pieces and four of the site", () => {
+  expect(PAGES.length).toBe(12);
   for (const slug of NEW_PAGES) expect(NEW_PIECES).toContain(slug);
 });
 
 /** The new pieces with a film of the finished piece: it opens their page (src/components/PieceFilm.tsx). */
-const NEW_FILMS = ["ampersand-initials-pendant", "thorns-and-roses-crucifix", "script-nameplate-pendant", "panther-champion-pendant"];
+const NEW_FILMS = ["ampersand-initials-pendant", "thorns-and-roses-crucifix", "script-nameplate-pendant", "panther-champion-pendant", "jesus-piece-red-flowers", "brt-flower-chain", "baguette-cuban-chain"];
 for (const slug of NEW_FILMS) {
   test(slug + ": its film first, then the piece", async ({ page }, info) => {
     const problems = watch(page);
@@ -144,3 +145,26 @@ for (const slug of PAGES) {
     expect(problems.errors).toEqual([]);
   });
 }
+
+/** The five jersey photos Yoni sent on 19/11/2026: the portrait of each player, on his page and on the wall. */
+const NEW_PORTRAITS = ["kenan-yildiz", "marcus-thuram", "noah-okafor", "lois-openda", "michy-batshuayi"];
+test("the new jersey photos of five players: their portrait on their page and on the wall of the players", async ({ page }, info) => {
+  const problems = watch(page);
+  await skipIntro(page);
+  const players = (media as unknown as { players: Record<string, { src: string; width: number }[]> }).players;
+  for (const slug of NEW_PORTRAITS) {
+    const portrait = players[slug]![0]!;
+    await page.goto("/players/" + slug, { waitUntil: "load" });
+    const img = page.locator("img[src='" + portrait.src + "'], img[srcset*='" + portrait.src.replace(/\.webp$/, "") + "']").first();
+    await expect(img, slug).toBeVisible({ timeout: 20_000 });
+    await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { timeout: 20_000 }).toBe(true);
+    await shot(page, info.project.name + "-player-" + slug);
+  }
+  await page.goto("/players", { waitUntil: "load" });
+  for (const slug of NEW_PORTRAITS) {
+    const card = page.locator("a[href$='/players/" + slug + "']").first();
+    await card.scrollIntoViewIfNeeded();
+    await expect(card.locator("img").first(), slug + " on the wall").toHaveAttribute("src", new RegExp(players[slug]![0]!.src.replace(/\.webp$/, "").replace(/[/.-]/g, "\\$&")));
+  }
+  expect(problems.errors).toEqual([]);
+});
