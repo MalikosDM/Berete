@@ -69,7 +69,8 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
 - **L'atelier d'une pièce** (« Enter the Atelier » / « Entrer dans l'atelier ») : après les photos de la pièce, un passage
   ouvre en plein écran son atelier (`src/components/AtelierRoom.tsx`) : sa vidéo de fabrication, puis la pièce finie
   (« The Final Reveal »), son coupé au départ, lecture seulement après le clic, sortie par le bouton, Échap ou le geste
-  retour. La page The Atelier rassemble les making-of de toutes les pièces publiées. Vidéos : `npm run import-media --
+  retour. Sur la page, le passage montre déjà la vidéo de fabrication : elle joue seule, muette et en boucle, tant qu'elle
+  est à l'écran (copie légère), et s'arrête hors écran ou quand l'atelier est ouvert (`AtelierPassage.tsx`). La page The Atelier rassemble les making-of de toutes les pièces publiées. Vidéos : `npm run import-media --
   --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à l'œil le 19/11/2026 ; un fichier de « Videos HD/ »
   passe toujours avant), H.264 1080p max pour ordinateur, copie légère pour mobile, 6 images d'aperçu, dans
   `public/media/films` (`media.films` de `src/data/media.generated.json`, règles dans `src/data/atelier.ts`). Admin :
@@ -129,7 +130,9 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   reste) ; `sorted()` dans `src/data/pieces.ts` en fait la photo principale et la galerie, un texte écrit à la main pour
   une photo restant prioritaire ; `yoni(<dossier>, "p07")` place un fichier ailleurs (étapes, détails). Une photo est
   « sur noir » (fondue dans la page) sauf si son fond est clair (`shotOnBlack`). Sur la page, les 8 premières photos
-  défilent de côté, toutes les autres sont dans la grille « Every Angle » (`src/components/GalleryGrid.tsx`).
+  défilent de côté (« The Art of Detail », à peu près de la taille des photos de la grille), toutes les autres sont dans la
+  grille « Every Angle » (`src/components/GalleryGrid.tsx`). La page Créations est une grille serrée (`PieceCard compact` :
+  6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
 - **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces (dont
@@ -249,6 +252,9 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
 npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
                         # tests/galleries.spec.ts : Créations complète, galeries entières (grille « Every Angle »),
                         # films des nouvelles pièces, peu de photos chargées avant le défilement
+                        # tests/feedback.spec.ts : retours de Yoni du 20/11 (6 pièces au premier écran des Créations,
+                        # ouverture discrète des capsules, atelier qui joue seul, Sirius, BRT Flower, pendentif L,
+                        # collier T, aucun repost de story dans les galeries)
                         # tests/identity.spec.ts : pièces retirées (301), pièces de collectionneurs publiées, nouveaux noms
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film

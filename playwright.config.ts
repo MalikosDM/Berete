@@ -5,7 +5,7 @@ import { defineConfig, devices } from "@playwright/test";
  * End-to-end checks of the site (npm run verify). By default they run against
  * the production build served by the API (npm run build && npm start, port 3001);
  * BASE_URL points them elsewhere (the dev server: http://localhost:5173).
- * Screenshots go to verification/.
+ * Screenshots go to verification/. Every check runs silent (tests/fixtures.ts).
  */
 export default defineConfig({
   testDir: "tests",
@@ -23,7 +23,8 @@ export default defineConfig({
     ignoreHTTPSErrors: /^https:\/\/localhost[:/]/.test(process.env.BASE_URL ?? ""),
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } } },
+    // Silent: no sound from the videos on the speakers of the computer (WebKit: tests/fixtures.ts).
+    { name: "desktop", use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, launchOptions: { args: ["--mute-audio"] } } },
     { name: "iphone", use: { ...devices["iPhone 13"], viewport: { width: 390, height: 844 } } },
     // The smallest and the largest iPhones, for the home page and the new sections (tests/home.spec.ts).
     { name: "iphone-se", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone SE"], viewport: { width: 320, height: 568 } } },

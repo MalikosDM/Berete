@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { catalogueTexts } from "../src/i18n/content";
 import arContent from "../src/i18n/content/ar";

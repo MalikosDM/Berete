@@ -4,7 +4,7 @@
 // test model is never put on a real piece online). Screenshots go to verification/capsules/.
 import { createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { chromium, devices, expect, test, type Page } from "@playwright/test";
+import { chromium, devices, expect, test, type Page } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { FILM_PIECES, skipIntro, watch } from "./helpers";
 
@@ -276,7 +276,7 @@ test("The Art of Detail in 3D: the points placed in the admin by a click on the 
     };
     // The page, in a browser that draws with the graphics card of the Mac (as scripts/verify-3d.mjs: without it, Chromium
     // draws the 3D on the processor, many times slower than any phone).
-    const gpu = await chromium.launch({ headless: true, channel: "chromium", args: ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist"] });
+    const gpu = await chromium.launch({ headless: true, channel: "chromium", args: ["--use-angle=metal", "--enable-gpu", "--ignore-gpu-blocklist", "--mute-audio"] });
     try {
       const computer = await (await gpu.newContext({ viewport: { width: 1440, height: 900 }, baseURL: base })).newPage();
       await skipIntro(computer);

@@ -4,7 +4,7 @@
 // the visitor comes near them), its films in their place, and loads little before the visitor scrolls.
 // Screenshots go to verification/galleries/.
 import { mkdirSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import { defaultCatalogue } from "../src/data/catalogue";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { NEW_PIECES } from "../src/data/pieces";

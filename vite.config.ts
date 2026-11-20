@@ -26,13 +26,15 @@ function preloadFonts(): Plugin {
   };
 }
 
-export default defineConfig({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react(), tailwindcss(), preloadFonts()],
   define: { __HAS_SERVER__: JSON.stringify(hasServer) },
   resolve: {
     alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
   build: {
+    // The build for the pages written in advance (dist-ssr) needs only its code: no copy of the photos and videos (1.5 GB).
+    copyPublicDir: !isSsrBuild,
     // The 3D viewer (three.js and its tools, about 1.2 MB) is its own chunk, loaded only on the pages that show a model.
     chunkSizeWarningLimit: 1300,
     rolldownOptions: {
@@ -51,4 +53,4 @@ export default defineConfig({
     // The API (server/index.ts) runs on 3001 in development: npm run dev:server
     proxy: { "/api": "http://localhost:3001" },
   },
-});
+}));

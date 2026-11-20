@@ -17,3 +17,6 @@ storage/*
 !storage/demo/
 # The data of the site run with Docker on this Mac (docker compose: base, 3D files)
 .data
+
+# Python
+__pycache__/

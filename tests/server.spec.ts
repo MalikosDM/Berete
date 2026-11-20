@@ -1,7 +1,7 @@
 // The server once on the internet (server/security.ts, the admin of server/routes/site.ts): its check answers with the
 // base, every answer carries the security headers and "noindex" until the launch, an admin session ends on its own and
 // cannot be forged. Through the API only (one run is enough: the computer).
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test.skip(({ browserName }) => browserName !== "chromium", "the API is checked once, from the computer");
 

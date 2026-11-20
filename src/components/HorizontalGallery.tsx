@@ -76,7 +76,7 @@ export default function HorizontalGallery({
         <div
           ref={trackRef}
           className={
-            "no-scrollbar flex snap-x snap-mandatory gap-6 overflow-x-auto px-5 sm:px-8 lg:gap-12 lg:px-12 " +
+            "no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 sm:gap-4 sm:px-8 lg:gap-6 lg:px-12 " +
             (pinned ? "lg:w-max lg:snap-none lg:overflow-visible" : "")
           }
         >
@@ -84,7 +84,8 @@ export default function HorizontalGallery({
             <figure
               key={item.src + i}
               data-gallery-item={item.type}
-              className="w-[78vw] shrink-0 snap-center sm:w-[55vw] lg:w-[38vw] xl:w-[32vw]"
+              // About the size of a photo of "Every Angle" (src/components/GalleryGrid.tsx), asked by Yoni on 20/11/2026.
+              className="w-[44vw] shrink-0 snap-start sm:w-[31vw] lg:w-[23vw] xl:w-[21vw] 2xl:w-[19vw]"
             >
               <button
                 type="button"
@@ -97,17 +98,17 @@ export default function HorizontalGallery({
                 aria-label={t.gallery.open(item.alt ?? title)}
               >
                 <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]">
-                  <MediaView item={item} sizes="(max-width: 639px) 78vw, (max-width: 1023px) 55vw, 38vw" />
+                  <MediaView item={item} sizes="(max-width: 639px) 44vw, (max-width: 1023px) 31vw, 23vw" />
                 </span>
-                <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-100 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
+                <span className="absolute end-2 bottom-2 hidden size-11 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-0 transition-opacity group-hover:opacity-100 lg:inline-flex">
                   <ZoomIn className="size-5" aria-hidden="true" />
                 </span>
               </button>
-              <figcaption className="mt-4 flex items-baseline gap-4">
-                <span className="text-rose-gold font-display text-xl">
+              <figcaption className="mt-3 flex items-baseline gap-3">
+                <span className="text-rose-gold font-display text-lg">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="text-base text-bone">
+                <span className="text-base leading-snug text-bone">
                   {item.caption ?? item.alt}
                 </span>
               </figcaption>

@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "./fixtures";
 import { catalogueRedirects } from "../scripts/vercel-redirects";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { HOUSE_PHOTO_PLACES } from "../src/data/house";

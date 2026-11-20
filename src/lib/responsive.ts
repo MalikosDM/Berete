@@ -18,6 +18,8 @@ export const SIZES_FOR = {
   half: "(max-width: 767px) 100vw, 50vw",
   /** The jewel of a card in a grid of 1, 2 then 3 columns (inside its margins). */
   grid3: "(max-width: 639px) 80vw, (max-width: 1023px) 40vw, 26vw",
+  /** The jewel of a card of the dense grid of the creations: 2, 3, 4 then 6 columns. */
+  grid6: "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, (max-width: 1279px) 23vw, 15vw",
   /** A thumbnail of about 6rem. */
   thumb: "96px",
 };

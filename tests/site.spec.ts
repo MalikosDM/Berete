@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
 import { MAKING_STEPS, type Catalogue, type MediaItem, type Piece } from "../src/data/types";

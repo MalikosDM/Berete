@@ -322,7 +322,6 @@ const SITE_PIECES: Piece[] = [
       yoni("kevin-schade-dragon-ball-pendant", "p14", at("The hero lifting the sphere")),
       yoni("kevin-schade-dragon-ball-pendant", "p06", BACK()),
       yoni("kevin-schade-dragon-ball-pendant", "p20", at("The pendant on its chain, on a black bust")),
-      st("kevin-schade", 15, at("Kevin Schade wearing the pendant", "Worn by Kevin Schade")),
       st("kevin-schade", 22, at("Film of the pendant turning in a gloved hand")),
     ]),
     specs: [
@@ -354,7 +353,6 @@ const SITE_PIECES: Piece[] = [
       yoni("kenan-yildiz-celebration-pendant", "p03", at("The celebration pendant and its medallion")),
       yoni("kenan-yildiz-celebration-pendant", "v01", at("Film of the celebration pendant")),
       yoni("kenan-yildiz-celebration-pendant", "p01", { ...at("Kenan Yildiz wearing the pendant", "Worn by Kenan Yildiz"), onBlack: false }),
-      st("kenan-yildiz", 2, at("Kenan Yildiz doing his celebration on the pitch", "The celebration")),
       st("kenan-yildiz", 4, at("The pendant and its medallion on black")),
     ]),
     specs: [
@@ -384,7 +382,6 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-jersey-pendant", "p16", at("The pendant, arms crossed, from another angle")),
       yoni("noah-okafor-jersey-pendant", "p01", { ...at("Noah Okafor wearing the pendant", "Worn by Noah Okafor"), onBlack: false }),
       st("noah-okafor", 11, at("Film: from the player to the jersey in diamonds")),
-      st("noah-okafor", 5, at("Noah Okafor arms crossed, above the pendant that reproduces his pose", "From the pitch to the pendant")),
     ]),
     specs: [
       ["Type", "Pendant"],
@@ -413,7 +410,6 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-oka-pendant", "p01", { ...at("Noah Okafor wearing the OKA pendant", "Worn by Noah Okafor"), onBlack: false }),
       yoni("noah-okafor-oka-pendant", "p02", { ...at("The OKA pendant worn on a white jersey"), onBlack: false }),
       yoni("noah-okafor-oka-pendant", "p18", { ...at("The OKA pendant presented in its box"), onBlack: false }),
-      st("noah-okafor-s24", 4, at("Film of the OKA pendant")),
     ]),
     specs: [
       ["Type", "Nameplate pendant"],
@@ -471,7 +467,6 @@ const SITE_PIECES: Piece[] = [
       yoni("marcus-thuram-t-serpent-pendant", "p04", at("The pendant with its bail")),
       yoni("marcus-thuram-t-serpent-pendant", "p18", at("The T-Serpent pendant on black")),
       yoni("marcus-thuram-t-serpent-pendant", "v01", at("Details of the T-Serpent pendant")),
-      st("thuram", 15, at("Film of the pendant on its chain")),
     ]),
     specs: [
       ["Type", "Pendant"],
@@ -575,7 +570,6 @@ const SITE_PIECES: Piece[] = [
       yoni("angelo-stiller-as-pendant", "p01", at("Back of the AS pendant with the BRT mark in rose gold", "The BRT mark, on the back")),
       yoni("angelo-stiller-as-pendant", "p10", at("AS pendant, side view", "In profile")),
       yoni("angelo-stiller-as-pendant", "p04", BAIL()),
-      st("angelo-stiller", 1, at("Film of the AS pendant on a bust")),
     ]),
     specs: [
       ["Type", "Pendant on a tennis chain"],
@@ -598,7 +592,6 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "stuttgart", mark: "JL" },
     cover: still("pieces/jamie-leweling-jl-pendant/cover", at("Jamie Leweling's JL pendant on its chain")),
     gallery: [
-      st("jamie-leweling", 1, at("Film of the JL pendant")),
       st("jamie-leweling", 2, at("Jamie Leweling wearing his JL pendant with his DFB-Pokal medal", "Worn by Jamie Leweling")),
       st("collectors", 7, at("Jamie Leweling wearing the JL pendant")),
     ],
@@ -612,16 +605,19 @@ const SITE_PIECES: Piece[] = [
     title: "Deniz Undav — L Pendant",
     type: "pendant",
     line: "A letter in diamonds, an angel in rose gold.",
-    story: "A tall letter L paved with white diamonds, with a cherub in rose gold resting in its corner.",
+    story:
+      "A tall letter L paved with white diamonds, with a cherub in rose gold resting in its corner. Its bail is set with diamonds too, and the back is engraved with a pattern of interlaced circles and the BRT mark in rose gold.",
     people: ["deniz-undav"],
     theme: { preset: "sacre", tint: "#331013", mark: "L" },
-    cover: still("pieces/deniz-undav-l-pendant/cover", { ...at("Deniz Undav's L pendant with a rose gold cherub"), onBlack: true }),
-    gallery: [],
+    // Its photos in HD (folder 38, 20/11/2026).
+    ...sorted("deniz-undav-l-pendant", []),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "The letter L and a cherub"],
+      ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone, rose gold cherub · round diamonds in pavé",
+    making: { polishing: yoni("deniz-undav-l-pendant", "v02", { ...at("Film: the pendant polished at the bench", "At the bench"), onBlack: false }) },
   }),
   piece({
     slug: "samuel-ballet-jesus-piece",
@@ -665,8 +661,6 @@ const SITE_PIECES: Piece[] = [
       yoni("malik-tillman-cross-pendant", "p18", at("A link of the chain, with a cross of baguettes")),
       yoni("malik-tillman-cross-pendant", "p20", { ...at("The 3D design of the cross", "The 3D design"), onBlack: false }),
       yoni("malik-tillman-cross-pendant", "p01", { ...at("The cross pendant, worn"), onBlack: false }),
-      st("collectors", 13, at("Malik Tillman wearing his cross at the house", "Worn by Malik Tillman")),
-      st("malik-tillman", 2, at("Film of the cross and its link chain")),
     ]),
     specs: [
       ["Type", "Pendant on a link chain"],
@@ -690,8 +684,6 @@ const SITE_PIECES: Piece[] = [
     cover: still("pieces/malik-tillman-tm-pendant/cover", at("Malik Tillman's TM pendant")),
     gallery: [
       st("malik-tillman-ii", 4, at("The TM pendant held up in the light")),
-      st("malik-tillman-ii", 2, at("Film of the TM pendant in a gloved hand")),
-      st("malik-tillman-ii", 3, at("Film of the TM pendant on its Cuban chain", "With its Cuban chain")),
       st("malik-tillman-ii", 1, at("Post about Malik Tillman's TM pendant")),
     ],
     specs: [
@@ -713,7 +705,6 @@ const SITE_PIECES: Piece[] = [
     gallery: [
       st("nz", 6, at("Close-up of the rose gold roses and a marquise diamond", "The roses")),
       st("nz", 2, at("The FAM medallion and its story: one marquise diamond for each family member")),
-      st("nz", 1, at("Film of the medallion")),
       st("nz", 5, at("Film of the medallion on a bust")),
     ],
     specs: [
@@ -813,7 +804,7 @@ const SITE_PIECES: Piece[] = [
     people: ["lois-openda"],
     theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
     cover: still("pieces/lois-openda-nameplate-pendant/cover", at("Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes")),
-    gallery: [st("lois-openda", 2, at("Film of the pendant and its chain"))],
+    gallery: [],
     specs: [
       ["Type", "Pendant"],
       ["Motif", "Script letters and a cross"],
@@ -852,7 +843,7 @@ const SITE_PIECES: Piece[] = [
     story: "A round medallion paved with diamonds, with the word FLÂNEUR and a rose gold walker holding an umbrella, worn on a tennis chain.",
     theme: { preset: "pluie" },
     cover: still("pieces/flaneur-medallion/cover", at("The Flâneur medallion held in a gloved hand")),
-    gallery: [st("collectors", 3, at("Film of the Flâneur medallion on its tennis chain"))],
+    gallery: [],
     specs: [
       ["Type", "Medallion pendant"],
       ["Motif", "A walker under an umbrella"],
@@ -889,7 +880,6 @@ const SITE_PIECES: Piece[] = [
       yoni("tulips-on-tour-medallion", "p20", BAIL()),
       yoni("tulips-on-tour-medallion", "p05", at("The edge of the medallion, set with red stones", "The edge")),
       st("collectors", 54, at("Film of the medallion being worn for the first time")),
-      st("collectors", 53, at("Film of the medallion taken out of its case", "Out of the case")),
     ]),
     specs: [
       ["Type", "Medallion pendant"],
@@ -923,7 +913,6 @@ const SITE_PIECES: Piece[] = [
       yoni("michy-batshuayi-butterfly-chain", "p69", BACK()),
       yoni("michy-batshuayi-butterfly-chain", "p66", at("The links of the Butterfly chain", "The links")),
       yoni("michy-batshuayi-butterfly-chain", "p60", at("The Butterfly chain and its pendant on a black bust")),
-      st("michy-batshuayi", 3, at("Michy Batshuayi wearing the chain", "Worn by Michy Batshuayi")),
       st("michy-batshuayi", 10, at("Film: the piece in the making, its back and the finished chain", "In the making")),
     ]),
     handover: [yoni("michy-batshuayi-butterfly-chain", "p17", { ...at("Michy Batshuayi wearing his chain"), onBlack: false })],
@@ -957,7 +946,6 @@ const SITE_PIECES: Piece[] = [
       yoni("marcus-thuram-ruby-t-necklace", "p06", at("Marquise diamonds along the T")),
       yoni("marcus-thuram-ruby-t-necklace", "p07", at("The infinity links of the necklace", "The links")),
       yoni("marcus-thuram-ruby-t-necklace", "p01", at("The whole necklace on black velvet")),
-      st("thuram-ii", 1, at("Film of the necklace and the engraved back of the T", "The back")),
       st("thuram", 13, at("Film of the drop held in a gloved hand")),
     ]),
     specs: [
@@ -999,7 +987,6 @@ const SITE_PIECES: Piece[] = [
     gallery: [
       st("kevin-schade", 14, at("Film of the twisted chain and its diamond flowers")),
       st("kevin-schade", 1, at("Kevin Schade wearing his chain", "Worn by Kevin Schade")),
-      st("kevin-schade", 23, at("Film of Kevin Schade with his chain")),
     ],
     specs: [
       ["Type", "Chain"],
@@ -1022,7 +1009,6 @@ const SITE_PIECES: Piece[] = [
       yoni("the-safi-link", "p04", at("The twisted rose gold links between the flowers")),
       yoni("the-safi-link", "p05", at("The Safi Link on a black bust, from the side")),
       yoni("the-safi-link", "p01", { ...at("A chain of diamond flowers seen from behind, worn"), onBlack: false }),
-      st("noah-okafor", 10, at("The Safi Link, presented by the house")),
     ]),
     specs: [
       ["Type", "Chain"],
@@ -1035,17 +1021,22 @@ const SITE_PIECES: Piece[] = [
     title: "Sirius — Chain",
     type: "chain",
     line: "A chain and its nameplate, delivered in their own trunk.",
-    story: "A chain of diamond flowers with a diamond-set nameplate, delivered in the Sirius trunk made for it, on a red lining.",
+    story:
+      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
     theme: { preset: "etoiles" },
-    cover: group("pieces/sirius", [at("Sirius chain with its diamond nameplate pendant")])[0],
-    // The chain resting in its trunk (the page Signature Trunks shows the trunk itself).
-    gallery: [group("boxes/sirius", [undefined, undefined, at("The Sirius chain resting in its trunk", "In its trunk")], false)[2]],
+    // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
+    ...sorted("sirius", []),
     specs: [
       ["Type", "Chain and nameplate"],
       ["Box", "Sirius trunk"],
+      ["Signature", "BRT mark on the clasp"],
     ],
     seen: "Rose gold tone, white gold lettering · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
     boxSlug: "sirius",
+    making: {
+      raw: yoni("sirius", "p30", { ...at("The parts of the nameplate laid out before they are put together", "Before the assembly"), onBlack: false }),
+      setting: yoni("sirius", "v05", { ...SETTING_FILM(), onBlack: false }),
+    },
   }),
 
   /* Watches */
@@ -1075,8 +1066,6 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "mecanique" },
     cover: still("pieces/tajon-buchanan-iced-watch/cover", at("Tajon Buchanan's square watch set with diamonds, on the wrist")),
     gallery: [
-      st("tajon-buchanan", 2, at("Film of the iced watch on the wrist")),
-      st("tajon-buchanan", 1, at("Film: Tajon Buchanan discovers his watch", "The handover")),
       st("tajon-buchanan", 3, at("Tajon Buchanan at the house")),
     ],
     specs: [
@@ -1093,7 +1082,7 @@ const SITE_PIECES: Piece[] = [
     people: ["radja-nainggolan"],
     theme: { preset: "mecanique" },
     cover: still("pieces/radja-nainggolan-iced-watch/cover", at("Radja Nainggolan's iced watch on his wrist")),
-    gallery: [st("radja-nainggolan", 1, at("Film of the iced watch on the wrist"))],
+    gallery: [],
     specs: [
       ["Type", "Watch"],
     ],
@@ -1277,11 +1266,11 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "brt-flower-chain",
-    title: "BRT Flower — Chain",
+    title: "BRT Flower Chain",
     type: "chain",
     line: "Twisted links, flowers of diamonds, a clasp signed BRT.",
     story:
-      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds along its length. Its rectangular clasp is paved with diamonds around the BRT mark.",
+      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds along its length. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.",
     theme: { preset: "roses" },
     specs: [
       ["Type", "Chain"],
@@ -1289,8 +1278,8 @@ const COLLECTED: Piece[] = [
     ],
     seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
     making: {
-      polishing: yoni("brt-flower-chain", "08-v02", { ...at("Film: the clasp finished at the bench", "At the bench"), onBlack: false }),
-      setting: yoni("brt-flower-chain", "08-v03", { ...SETTING_FILM(), onBlack: false }),
+      setting: yoni("brt-flower-chain", "v04", { ...SETTING_FILM(), onBlack: false }),
+      polishing: yoni("brt-flower-chain", "v05", { ...at("Film: the clasp finished at the bench", "At the bench"), onBlack: false }),
     },
   }),
   collected({
@@ -1432,10 +1421,11 @@ export const BOXES: Box[] = [
     slug: "sirius",
     name: "Sirius",
     description: "A trunk made to measure for the Sirius chain, lined in red to hold the piece like a trophy.",
-    images: group(
-      "boxes/sirius",
-      [at("The Sirius trunk, closed"), at("The Sirius trunk, opened on its red lining", "Opened"), at("The Sirius chain resting in its trunk", "The piece in its setting")],
-      false,
+    // Its photos in HD (folder 37 of the chain, 20/11/2026).
+    images: list(
+      yoni("sirius", "p01", { ...at("The Sirius trunk, closed"), onBlack: false }),
+      yoni("sirius", "p03", { ...at("The Sirius trunk, opened on its red lining", "Opened"), onBlack: false }),
+      yoni("sirius", "p04", { ...at("The Sirius chain resting in its trunk", "The piece in its setting"), onBlack: false }),
     ),
     pieceSlug: "sirius",
   },

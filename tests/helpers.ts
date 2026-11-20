@@ -1,6 +1,6 @@
 // Shared by the checks of the site (site.spec.ts) and of its languages (languages.spec.ts).
 import { mkdirSync } from "node:fs";
-import { expect, type Page, type TestInfo } from "@playwright/test";
+import { expect, type Page, type TestInfo } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import type { Catalogue } from "../src/data/types";
 

@@ -2,7 +2,7 @@
 // silent at first, with the sound, pause and the ways out (Escape, the back gesture); the page The Atelier gathers the
 // making-of of every published piece. Screenshots go to verification/atelier/.
 import { mkdirSync } from "node:fs";
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { skipIntro, watch } from "./helpers";
 
@@ -32,14 +32,21 @@ for (const slug of PIECES) {
     const passage = page.locator("[data-atelier-passage]");
     await passage.scrollIntoViewIfNeeded();
     await expect(passage.getByRole("heading", { name: "Entrer dans l’atelier" })).toBeVisible();
-    // Nothing plays on the page: the films exist only in the room.
+    // On screen, its making-of plays by itself on the page: silent, in a loop, its light copy (20/11/2026). The films
+    // with their sound exist only in the room.
     await expect(page.locator("[data-atelier-video]")).toHaveCount(0);
+    const preview = passage.locator("[data-atelier-preview]");
+    await expect(preview).toHaveAttribute("src", FILMS[slug]!.making!.mobile);
+    await expect.poll(() => time(preview), { timeout: 30_000 }).toBeGreaterThan(0.3);
+    expect(await state(preview)).toEqual({ paused: false, muted: true });
     await page.waitForTimeout(800);
     await shot(page, slug + "-passage", info.project.name);
 
     await passage.locator("[data-enter-atelier]").click();
     const room = page.locator("[data-atelier-room]");
     await expect(room).toBeVisible();
+    // In the room, the film of the page rests.
+    await expect.poll(async () => (await state(preview)).paused).toBe(true);
     const video = room.locator("[data-atelier-video]");
     const film = FILMS[slug]!.making!;
     await expect(video).toHaveAttribute("src", phone ? film.mobile : film.src);
@@ -178,7 +185,7 @@ test("admin: the films of a piece and their image, chosen per piece", async ({ p
   const passage = page.locator("[data-atelier-passage]");
   await passage.scrollIntoViewIfNeeded();
   await expect(passage.locator("ol li")).toHaveCount(1);
-  await expect(passage.locator("img").first()).toHaveAttribute("src", making[2]!);
+  await expect(passage.locator("[data-atelier-preview]")).toHaveAttribute("poster", making[2]!);
 
   // Back to the automatic choice: its two films again.
   await login();

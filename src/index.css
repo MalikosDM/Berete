@@ -1588,15 +1588,16 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   font-style: var(--u-font-style, normal);
   text-transform: var(--u-font-case, uppercase);
   letter-spacing: var(--u-font-tracking, 0.06em);
-  font-size: calc(clamp(2.25rem, 4.2vw, 4.5rem) * var(--u-font-scale, 1));
-  line-height: 1.08;
+  /* Discreet beside the jewel (20/11/2026), still the first thing read. */
+  font-size: calc(clamp(1.75rem, 2.7vw, 2.75rem) * var(--u-font-scale, 1));
+  line-height: 1.1;
 }
 html[lang="ar"] [data-piece] [data-u-title] {
   font-family: var(--font-display);
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0;
-  font-size: clamp(2.25rem, 4.2vw, 4.5rem);
+  font-size: clamp(1.75rem, 2.7vw, 2.75rem);
 }
 /* Engraved in gold, like a trophy. */
 [data-font="trophee"] [data-u-title] {

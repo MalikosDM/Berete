@@ -127,49 +127,51 @@ export default function PiecePage() {
       {/* Opening: the jewel, full screen */}
       <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
-        <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14">
+        <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14 xl:col-span-8">
           {opening.mode === "photo" ? (
-            <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 58vw" />
+            <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
           ) : (
             <Showcase slug={piece.slug} title={piece.title} views={opening.views} />
           )}
         </div>
-        <div className="w-full px-5 pt-6 pb-10 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-16 lg:pl-12">
-          <div className="flex flex-col gap-8">
+        {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the
+            buttons stay plain to see (48 px high at least on a phone). */}
+        <div data-piece-intro className="w-full px-5 pt-5 pb-8 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-14 lg:pl-12 xl:col-span-4">
+          <div className="flex max-w-md flex-col gap-6">
             <div data-piece-text className={shadow}>
-              {historic ? <p className="mb-3 text-base font-semibold uppercase tracking-[0.24em] text-rose-light">{t.piece.historic}</p> : null}
-              <p className="eyebrow">
-                <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center hover:text-white">
+              {historic ? <p className="mb-2 text-base font-semibold uppercase tracking-[0.22em] text-rose-light">{t.piece.historic}</p> : null}
+              <p className="text-base leading-snug tracking-[0.04em] text-mist">
+                <Link to={"/creations/" + collection.slug} className="inline-flex min-h-12 items-center font-semibold uppercase tracking-[0.2em] text-rose-light hover:text-white lg:min-h-10">
                   {collectionName}
                 </Link>
-                <span className="text-mist"> · {t.common.madeFor(madeFor(cat, piece))}</span>
+                <span className="block">{t.common.madeFor(madeFor(cat, piece))}</span>
               </p>
-              <h1 id="piece-title" data-u-title className="title-caps mt-3 text-[clamp(2.25rem,4.2vw,4.5rem)] tracking-[0.06em] break-words text-white [text-wrap:balance]">
+              <h1 id="piece-title" data-u-title className="title-caps mt-3 text-[clamp(1.75rem,2.7vw,2.75rem)] leading-[1.1] tracking-[0.06em] break-words text-white [text-wrap:balance]">
                 {piece.title}
               </h1>
-              {piece.line ? <p className="mt-5 max-w-2xl text-lg text-bone md:text-xl">{piece.line}</p> : null}
+              {piece.line ? <p className="mt-3 text-base leading-relaxed text-bone lg:text-[1.0625rem]">{piece.line}</p> : null}
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col 2xl:flex-row">
-              <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
-                <BrandIcon name="whatsapp" className="size-5" /> {t.piece.want}
+            <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+              <a href={wa} target="_blank" rel="noreferrer" data-want-piece className="inline-flex min-h-12 items-center justify-center gap-2.5 bg-white px-5 text-base font-semibold tracking-[0.04em] text-ink transition-colors hover:bg-rose-light">
+                <BrandIcon name="whatsapp" className="size-4.5" /> {t.piece.want}
               </a>
               {reveal ? (
-                <button type="button" onClick={() => setFilmOpen(true)} data-watch-film className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
-                  <Play className="size-4 fill-current" aria-hidden="true" /> {t.films.watch}
+                <button type="button" onClick={() => setFilmOpen(true)} data-watch-film className="inline-flex min-h-12 items-center justify-center gap-2.5 border border-white/35 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                  <Play className="size-3.5 fill-current" aria-hidden="true" /> {t.films.watch}
                 </button>
               ) : null}
               {model ? (
-                <a href="#piece-3d-viewer" data-see-3d className="inline-flex min-h-14 items-center justify-center gap-3 border border-rose-light/70 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
-                  <Rotate3d className="size-5" aria-hidden="true" /> {t.viewer.see}
+                <a href="#piece-3d-viewer" data-see-3d className="inline-flex min-h-12 items-center justify-center gap-2.5 border border-rose-light/70 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                  <Rotate3d className="size-4.5" aria-hidden="true" /> {t.viewer.see}
                 </a>
               ) : (
-                <a href="#piece-details" className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                <a href="#piece-details" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/35 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
                   {t.piece.details} <ArrowDown className="size-4" aria-hidden="true" />
                 </a>
               )}
             </div>
           </div>
-          <Link to="/creations" className="mt-8 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-mist hover:text-rose-light">
+          <Link to="/creations" className="mt-4 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
             <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" /> {t.common.allCreations}
           </Link>
         </div>

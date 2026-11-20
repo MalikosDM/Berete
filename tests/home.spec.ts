@@ -3,7 +3,7 @@
 // the iPhone 13 (390 px) and the iPhone 15 Pro Max (430 px): npm run verify -- tests/home.spec.ts
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import { FILM_PIECES, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
 const INTER = "campione-d-italia-2023-2024";

@@ -3,7 +3,7 @@
 // stretched, light, loaded only when the visitor comes near it; Dragon Ball keeps its first hand drawing.
 // Screenshots go to verification/sketches/.
 import { mkdirSync } from "node:fs";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { skipIntro } from "./helpers";
 
