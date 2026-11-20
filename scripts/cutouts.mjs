@@ -40,7 +40,7 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 /*
  * The views of each piece, the main one first: "hd:<folder>/<photo>" (an HD photo of Yoni), or a photo of the site.
  * kind: face, profile, back, detail, worn. mode "luma": a jewel on a dark bust (only its light is kept). solo: one object
- * only (a reflection on a mirror under it goes).
+ * only (a reflection on a mirror under it goes). stones: a coloured stone as dark as the background is kept.
  * note: what to look at by eye (French, shown in the admin).
  */
 const VIEWS = {
@@ -113,10 +113,12 @@ const VIEWS = {
     { id: "p21", kind: "face", from: "hd:24/p21" },
     { id: "p06", kind: "back", from: "hd:24/p6" },
   ],
+  // The whole necklace first (asked by Yoni, 20/11/2026), the T and its drop beside it. Its red pear-shaped stone is as
+  // dark as the velvet: kept (stones).
   "marcus-thuram-ruby-t-necklace": [
-    { id: "p02", kind: "face", from: "hd:26/p2" },
-    { id: "p01", kind: "profile", from: "hd:26/p1", mode: "luma" },
-    { id: "p12", kind: "detail", from: "hd:26/p12" },
+    { id: "p01", kind: "face", from: "hd:26/p1", mode: "luma", stones: true },
+    { id: "p02", kind: "detail", from: "hd:26/p2", stones: true },
+    { id: "p12", kind: "detail", from: "hd:26/p12", stones: true },
   ],
   "the-safi-link": [
     { id: "p07", kind: "face", from: "hd:16/p7", mode: "luma" },
@@ -147,8 +149,12 @@ const VIEWS = {
   ],
   // The pieces without HD photos: the best photo of the site (stories at 1080 px).
   "marcus-thuram-thorned-t-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp" }],
-  // macOS sees the angel only: the whole letter by its light.
-  "deniz-undav-l-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/deniz-undav-l-pendant/cover.webp", mode: "luma" }],
+  // Its HD photos (folder 38, 20/11/2026): macOS may see the angel only, the whole letter is kept by its light.
+  "deniz-undav-l-pendant": [
+    { id: "p10", kind: "face", from: "hd:38/p10", mode: "luma" },
+    { id: "p08", kind: "profile", from: "hd:38/p8", mode: "luma" },
+    { id: "p02", kind: "back", from: "hd:38/p2", mode: "luma" },
+  ],
   "samuel-ballet-jesus-piece": [
     { id: "s02", kind: "face", from: "/media/stories/samuel-ballet/02.webp" },
     { id: "s06", kind: "back", from: "/media/stories/samuel-ballet/06.webp" },
@@ -159,7 +165,13 @@ const VIEWS = {
     { id: "s04", kind: "face", from: "/media/stories/eljero-elia/04.webp" },
     { id: "s05", kind: "profile", from: "/media/stories/eljero-elia/05.webp" },
   ],
-  sirius: [{ id: "s01", kind: "face", from: "/media/pieces/sirius/01.webp", mode: "luma" }],
+  // Its HD photos (folder 37, 20/11/2026): the chain and its plate on the bust (by its light), the plate, its back.
+  sirius: [
+    { id: "p27", kind: "face", from: "hd:37/p27", mode: "luma", solo: true },
+    { id: "p28", kind: "detail", from: "hd:37/p28" },
+    { id: "p26", kind: "back", from: "hd:37/p26" },
+  ],
+  // BRT Flower (folder 36): its chain leaves the photo on three sides and its ends come out torn: it opens on its photo.
 };
 
 /** Views refused after a look (they stay out of the site), with the reason. */
@@ -230,7 +242,7 @@ for (const [slug, views] of Object.entries(VIEWS)) {
     else console.warn("  ! " + view.id + ": no subject found by macOS, view left out");
   }
   const jobFile = join(WORK, slug, "jobs.json");
-  await writeFile(jobFile, JSON.stringify(jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo }))));
+  await writeFile(jobFile, JSON.stringify(jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones }))));
   const py = spawnSync("python3", [join(ROOT, "scripts", "cutouts.py"), jobFile], { encoding: "utf8", maxBuffer: 1 << 24 });
   if (py.status !== 0) throw new Error(py.stderr);
   const reports = py.stdout.trim().split("\n").map((l) => JSON.parse(l));

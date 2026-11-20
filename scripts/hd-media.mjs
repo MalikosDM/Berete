@@ -25,6 +25,8 @@
  * "Jesus piece red ruby"; 30 is a piece of its own. Folder 28 holds only copies of other folders and one photo of the
  * chain of 02. Folder 31 holds one piece of its own (p08, p09) and the studio film of "BRT-Flower" (v02); the rest are
  * copies of 30 and single shots of chains found nowhere else.
+ * Then on 20/11/2026, three new albums: 36 (BRT-Flower, photographed), 37 (the chain Sirius), 38 (the L pendant of Deniz
+ * Undav); sorted the same way.
  */
 
 /** Warm black and white, as the other photos of the atelier (no blue bench in the palette). */
@@ -211,13 +213,34 @@ export const HD = [
     folder: "20",
     gallery: ["p6:front", "p4:detail", "p1:detail", "p2:setting", "p7:setting", "p3:side", "p5:back"],
   },
-  // The album "BRT-Flower" of Yoni: filmed, never photographed (its studio film 31/v02, its making-of 08/v15). Its photos
-  // are frames of the studio film; the steps of its making: the clasp finished (08/v02), the flowers set (08/v03).
+  // The album "BRT-Flower" of Yoni, photographed at last (folder 36, 20/11/2026): the chain on the bust, its flowers and
+  // leaves, its links, its clasp signed BRT and the back of the clasp. Left out: p01 (a montage of the other photos), p08
+  // (copy of p02), p09 and p10 (the same flower as p15, less sharp). The steps of its making: the flowers set in the red
+  // cement (v04), the clasp finished at the bench (v05). The design of its chain is the one of the chain of Sirius (37).
   {
     dir: "brt-flower-chain",
-    folder: "31",
-    gallery: ["v2@2.5:bust", "v2@6:links", "v2@8:detail", "v2@14:whole", "v2@17:setting", "v2@23:detail", "v2@26:detail", "v2@10:clasp", "v2@20:mark"],
-    also: ["08/v2", "08/v3"],
+    folder: "36",
+    gallery: ["p4:bust", "p5:angle", "p12:links", "p15:setting", "p7:detail", "p6:detail", "p11:clasp", "p14:mark", "p13:links", "p2:detail", "p3:back"],
+    also: ["v4", "v5"],
+  },
+  // The chain Sirius and its nameplate (folder 37, 20/11/2026): first the chain with its plate, the plate, its horned mask,
+  // the flowers and links of the chain, its clasp, the trunk; then every angle of the plate (its letters of baguettes, its
+  // masks, its edges), the back, the trunk and its case. Left out: p06 (p14 closer, less sharp), p07 (p21 wider, sharper);
+  // p30 (the parts before assembly) is the raw step of its making, v05 its setting. Its film v03 (a short edit) in the
+  // gallery; v01 is the same edit as its studio film v02; v04 (its delivery) shows the face of a private person.
+  {
+    dir: "sirius",
+    folder: "37",
+    gallery: ["p27:bust", "p28:front", "p18:detail", "p17:links", "p16:setting", "p22:clasp", "p2:case", "p23:setting", "p29:bust", "p24:bust", "p25:angle", "v3:film", "p20:detail", "p21:setting", "p14:setting", "p15:setting", "p8:setting", "p12:detail", "p19:detail", "p11:side", "p13:side", "p10:detail", "p9:links", "p26:back", "p5:back", "p1:case", "p3:case", "p4:case"],
+    also: ["p30", "v5"],
+  },
+  // The L pendant of Deniz Undav (folder 38, 20/11/2026): every photo (front, angles, the cherub, the setting, the bail,
+  // the back with its pattern and the BRT mark). Its making-of: v01 (atelier), v02 the polishing (a step).
+  {
+    dir: "deniz-undav-l-pendant",
+    folder: "38",
+    gallery: ["p10:front", "p8:angle", "p4:detail", "p9:side", "p7:angle", "p3:setting", "p6:bail", "p1:back", "p5:setting", "p2:engraving"],
+    also: ["v2"],
   },
 
   /* ---------- Boxes ---------- */

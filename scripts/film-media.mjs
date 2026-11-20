@@ -61,8 +61,14 @@ export const FILMS = [
   { slug: "panther-champion-pendant", folder: "19", making: "19/v01", reveal: "19/v02" },
   // The album "Jesus piece red ruby" of Yoni (folder 20): its studio film in HD, its making-of.
   { slug: "jesus-piece-red-flowers", folder: "20", making: "20/v01", reveal: "20/v02" },
-  // The album "BRT-Flower": its studio film (31/v02) and its making-of (08/v15, ends on the finished chain).
-  { slug: "brt-flower-chain", making: "08/v15", reveal: "31/v02" },
+  // The album "BRT-Flower" (folder 36, 20/11/2026): its studio film and its making-of, both in ProRes (31/v02 and 08/v15
+  // were their light copies).
+  { slug: "brt-flower-chain", folder: "36", making: "36/v02", reveal: "36/v01" },
+  // The chain Sirius (folder 37): its studio film v02 (ProRes; v01 is the same edit, compressed); its making-of, the only
+  // film of its fabrication: the stones set in the plate (v05, a short phone video).
+  { slug: "sirius", folder: "37", making: "37/v05", reveal: "37/v02" },
+  // The L pendant of Deniz Undav (folder 38): its making-of edit (no film of the finished piece was sent).
+  { slug: "deniz-undav-l-pendant", folder: "38", making: "38/v01" },
   // The baguette Cuban chain (folder 30): its studio film.
   { slug: "baguette-cuban-chain", folder: "30", reveal: "30/v01" },
   // The celestial medallion (22) has no film first: its film shows the engraved back, first names of a family and a

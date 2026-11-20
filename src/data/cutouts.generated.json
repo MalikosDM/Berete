@@ -697,8 +697,23 @@
   ],
   "marcus-thuram-ruby-t-necklace": [
    {
-    "id": "p02",
+    "id": "p01",
     "kind": "face",
+    "width": 1600,
+    "height": 2400,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 01.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "detail",
     "width": 1600,
     "height": 2402,
     "widths": [
@@ -712,21 +727,6 @@
     ],
     "clean": true,
     "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 02.jpg",
-    "note": ""
-   },
-   {
-    "id": "p01",
-    "kind": "profile",
-    "width": 1600,
-    "height": 2400,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 01.jpg",
     "note": ""
    },
    {
@@ -814,18 +814,48 @@
   ],
   "deniz-undav-l-pendant": [
    {
-    "id": "cover",
+    "id": "p10",
     "kind": "face",
-    "width": 1008,
-    "height": 1784,
+    "width": 1600,
+    "height": 2783,
     "widths": [
      480,
      960,
-     1008
+     1600
     ],
     "fade": null,
     "clean": true,
-    "source": "site /media/pieces/deniz-undav-l-pendant/cover.webp",
+    "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 10.jpg",
+    "note": ""
+   },
+   {
+    "id": "p08",
+    "kind": "profile",
+    "width": 1600,
+    "height": 2574,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 08.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "back",
+    "width": 1600,
+    "height": 2819,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 02.jpg",
     "note": ""
    }
   ],
@@ -926,18 +956,48 @@
   ],
   "sirius": [
    {
-    "id": "s01",
+    "id": "p27",
     "kind": "face",
-    "width": 1123,
-    "height": 1262,
+    "width": 1600,
+    "height": 1802,
     "widths": [
      480,
      960,
-     1123
+     1600
     ],
     "fade": null,
     "clean": true,
-    "source": "site /media/pieces/sirius/01.webp",
+    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 27.jpg",
+    "note": ""
+   },
+   {
+    "id": "p28",
+    "kind": "detail",
+    "width": 1600,
+    "height": 1205,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 28.jpg",
+    "note": ""
+   },
+   {
+    "id": "p26",
+    "kind": "back",
+    "width": 1600,
+    "height": 1321,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 26.jpg",
     "note": ""
    }
   ],

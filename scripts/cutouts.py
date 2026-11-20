@@ -10,6 +10,8 @@ subject lifting (scripts/cutout-mask.swift), a transparent image whose edges fol
   sharp), on any other background by a guided filter on the photo.
 - mode "luma" (a jewel on a dark bust or velvet): only the light of the jewel near the subject, so that the bust goes.
 - Edge colours decontaminated (no dark or coloured fringe), dust and small specks removed.
+- stones: a coloured stone set inside the jewel (the red pear of the Ruby T necklace), as dark as the background, is
+  kept: a hole of the jewel that is red, not the neutral black of the background, is filled.
 - A jewel that leaves the photo (a chain going up) fades out on that side instead of a sharp cut.
 - Cropped on the jewel with a transparent margin of 5 % (none on a faded side).
 Prints one JSON line per job: size, faded sides, checks (touches the edge, haze).
@@ -39,7 +41,26 @@ def border_pixels(img, n=10):
     return np.concatenate([img[:n].reshape(-1, 3), img[-n:].reshape(-1, 3), img[:, :n].reshape(-1, 3), img[:, -n:].reshape(-1, 3)])
 
 
-def cutout(work, mask_path, mode, solo=False):
+def fill_stones(alpha, img, s):
+    """The holes of the jewel (not reached from the edges of the photo) whose colour is a stone, not the background."""
+    solid = cv2.morphologyEx((alpha > 0.3).astype(np.uint8), cv2.MORPH_CLOSE, disk(2 * s))
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(1 - solid, connectivity=4)
+    h, w = alpha.shape
+    # How red a pixel is: a dark red stone stays redder than the neutral black of the velvet behind a link (measured on
+    # the Ruby T necklace: 0.015 to 0.02 on average and a red pixel in 6 to 18 against 0.005 and none at most).
+    red = img[..., 0] - (img[..., 1] + img[..., 2]) / 2
+    for i in range(1, n):
+        x, y, bw, bh, area = stats[i]
+        if x == 0 or y == 0 or x + bw >= w or y + bh >= h or area < 200 * s * s:
+            continue
+        hole = labels == i
+        if float(red[hole].mean()) > 0.01 and float((red[hole] > 0.04).mean()) > 0.04:
+            grown = cv2.dilate(hole.astype(np.uint8), disk(2 * s)).astype(np.float32)
+            alpha = np.maximum(alpha, cv2.GaussianBlur(grown, (0, 0), 0.8 * s + 0.3))
+    return alpha
+
+
+def cutout(work, mask_path, mode, solo=False, stones=False):
     img = cv2.cvtColor(cv2.imread(work, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
     h, w = img.shape[:2]
     m = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
@@ -80,6 +101,9 @@ def cutout(work, mask_path, mode, solo=False):
         num = cv2.GaussianBlur(img * bgmask[..., None], (0, 0), k)
         den = cv2.GaussianBlur(bgmask, (0, 0), k)[..., None]
         bg_color = num / np.maximum(den, 1e-4)
+
+    if stones:
+        alpha = fill_stones(alpha, img, s)
 
     # Specks: only the parts of a reasonable size stay (a chain, a pendant, a separate stone of the piece).
     solid = (alpha > 0.15).astype(np.uint8)
@@ -160,7 +184,7 @@ def cutout(work, mask_path, mode, solo=False):
 def main():
     jobs = json.load(open(sys.argv[1]))
     for job in jobs:
-        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False))
+        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False))
         if out is not None:
             Image.fromarray((out * 255 + 0.5).astype(np.uint8), "RGBA").save(job["out"], compress_level=3)
         print(json.dumps({"out": job["out"], **report}), flush=True)
