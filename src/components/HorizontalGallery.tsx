@@ -10,12 +10,15 @@ type HorizontalGalleryProps = {
   title?: string;
   /** Without its own black background: the photos melt into the background of the page (the universe of a piece). */
   bare?: boolean;
+  /** Every photo the full screen goes through (the first ones of which are `items`): by default `items`. */
+  all?: MediaItem[];
 };
 
 export default function HorizontalGallery({
   items,
   title: ownTitle,
   bare = false,
+  all,
 }: HorizontalGalleryProps) {
   const { t, dir } = useI18n();
   const title = ownTitle ?? t.gallery.title;
@@ -115,7 +118,7 @@ export default function HorizontalGallery({
 
         {openIndex !== null ? (
           <Lightbox
-            items={items}
+            items={all ?? items}
             index={openIndex}
             onIndex={setOpenIndex}
             onClose={() => setOpenIndex(null)}

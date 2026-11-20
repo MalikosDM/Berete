@@ -222,6 +222,10 @@ export const es: Messages = {
     photo: "Foto",
     zoomIn: "Ampliar",
     zoomOut: "Reducir",
+    /** The grid of every other photo of a piece, under its gallery. */
+    everyAngle: "Desde todos los ángulos",
+    more: (n: number) => "Ver " + n + " más",
+    film: "Vídeo",
   },
 
   players: {

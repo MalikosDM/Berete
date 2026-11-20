@@ -149,6 +149,76 @@
    "src": "/media/share/pieces/radja-nainggolan-iced-watch.jpg",
    "width": 1200,
    "height": 630
+  },
+  "script-nameplate-pendant": {
+   "src": "/media/share/pieces/script-nameplate-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "ampersand-initials-pendant": {
+   "src": "/media/share/pieces/ampersand-initials-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "thorns-and-roses-crucifix": {
+   "src": "/media/share/pieces/thorns-and-roses-crucifix.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "baguette-cross-pendant": {
+   "src": "/media/share/pieces/baguette-cross-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "crown-of-thorns-jesus-piece": {
+   "src": "/media/share/pieces/crown-of-thorns-jesus-piece.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "panther-champion-pendant": {
+   "src": "/media/share/pieces/panther-champion-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "celestial-initial-medallion": {
+   "src": "/media/share/pieces/celestial-initial-medallion.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "rose-iced-cuban-chain": {
+   "src": "/media/share/pieces/rose-iced-cuban-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "wide-rose-iced-cuban-chain": {
+   "src": "/media/share/pieces/wide-rose-iced-cuban-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "two-tone-iced-cuban-chain": {
+   "src": "/media/share/pieces/two-tone-iced-cuban-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "white-iced-cuban-chain": {
+   "src": "/media/share/pieces/white-iced-cuban-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "two-row-tennis-chain": {
+   "src": "/media/share/pieces/two-row-tennis-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "pear-link-chain": {
+   "src": "/media/share/pieces/pear-link-chain.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "oval-eternity-band": {
+   "src": "/media/share/pieces/oval-eternity-band.jpg",
+   "width": 1200,
+   "height": 630
   }
  }
 }

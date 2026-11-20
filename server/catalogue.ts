@@ -41,6 +41,7 @@ export const MediaItemSchema = z.object({
   alt: z.string().max(300).optional(),
   caption: z.string().max(300).optional(),
   onBlack: z.boolean().optional(),
+  view: z.string().max(20).optional(),
 });
 export const MediaListSchema = z.array(MediaItemSchema).max(200);
 export const MakingSchema = z.object(Object.fromEntries(MAKING_STEPS.map((k) => [k, MediaItemSchema.optional()])) as Record<(typeof MAKING_STEPS)[number], z.ZodOptional<typeof MediaItemSchema>>);

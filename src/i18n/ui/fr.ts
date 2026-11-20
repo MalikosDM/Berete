@@ -233,6 +233,10 @@ export const fr: Messages = {
     photo: "Photo",
     zoomIn: "Zoom avant",
     zoomOut: "Zoom arrière",
+    /** The grid of every other photo of a piece, under its gallery. */
+    everyAngle: "Sous tous les angles",
+    more: (n: number) => "Voir les " + n + " autres",
+    film: "Film",
   },
 
   players: {

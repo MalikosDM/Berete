@@ -83,8 +83,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       pour les dossiers sans pièce (titre = nom du dossier, « Made for » à valider), écrin Signature Trunk (dossier 35)
       en tête de Signature Trunks, vidéo d'ouverture de l'Atelier remplacée par un vrai plan horizontal (dossier 24).
 - [x] **Un univers par pièce** (29 pièces publiées) : thème modifiable dans l'admin (« Univers de la page »).
-- [ ] Yoni : nommer les 15 brouillons (liste dans le rapport du 19/11), envoyer ses photos personnelles pour La Maison,
-      relire les textes (dont les traductions), confirmer les droits Dragon Ball.
+- [ ] Yoni : envoyer ses photos personnelles pour La Maison, relire les textes (dont les traductions), confirmer les
+      droits Dragon Ball. (Les 15 brouillons sont publiés depuis le 20/11 : voir « Passe toutes les photos ».)
 
 ## Passe « détourages et vitrine » — état au 20/11/2026
 - [x] **Détourages** refaits depuis les photos HD d'origine (disque) : détourage de macOS (Vision, sur le Mac, sans rien
@@ -160,6 +160,39 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « toutes les photos » (galeries complètes, pièces cachées publiées) — état au 20/11/2026
+- [x] **Tri refait** de tous les dossiers iCloud (photo par photo, images de chaque vidéo regardées) : tout ce qui est
+      utile est gardé (chaque angle, détail, mise en scène) ; retirés : doublons et quasi-doublons (la plus nette gardée),
+      flous, captures d'écran et rendus 3D, photos d'atelier (gardées pour la fabrication), visages de personnes privées
+      (un joueur seulement s'il est reconnu à coup sûr), dessins animés (Dragon Ball). Liste et ordre dans
+      `scripts/hd-media.mjs` (`gallery` : `"p7:front"`, ce que montre chaque photo, `src/data/views.ts`, légendes
+      traduites dans les 6 langues ; `also` : fichiers des étapes de fabrication). `npm run import-media -- --only=hd`.
+      Ordre : la plus belle d'abord, vues d'ensemble, détails, dos et gravures, portées, écrin.
+- [x] **Page d'une pièce** : les 8 premières photos défilent comme avant, toutes les autres dans la grille « Every Angle
+      / Sous tous les angles » (`src/components/GalleryGrid.tsx` : 12 d'abord, puis « Voir les N autres », chargées au
+      fil du défilement, copie légère de chaque photo, vidéos muettes qui ne jouent qu'à l'écran). Plus de limite de 10.
+- [x] **14 pièces cachées publiées** (« Created exclusively for a private collector », titres anglais d'après les
+      photos, univers existants, textes sans nom ni chiffre, `NEW_PIECES` dans `src/data/pieces.ts`) : Script Nameplate
+      Pendant (dossiers 14 + 07, même pièce), Ampersand Initials Pendant, Thorns and Roses Crucifix, Baguette Cross
+      Pendant, Crown of Thorns Jesus Piece, Panther Champion Pendant, Celestial Initial Medallion, Rose Iced Cuban Chain
+      (01), Wide Rose Iced Cuban Chain (02 + 28/p07 : pas la même chaîne que 01, fermoir et largeur différents),
+      Two-Tone Iced Cuban Chain (31, seule pièce propre du dossier), White Iced Cuban Chain (33), Two-Row Tennis Chain,
+      Pear Link Chain, Oval Eternity Band. Aucune ne correspond aux 10 pièces retirées. Yoni peut les renommer ou les
+      cacher dans l'admin. Films d'ouverture : D&E (commence à 7,4 s : avant, une fresque d'un basketteur connu),
+      crucifix, prénom, panthère ; atelier : chaîne rose (01/f), crucifix, panthère.
+- [x] **Fusions** : dossier 30 = la chaîne du pendentif OKA d'Okafor (mêmes maillons, même écrin) : ses photos sont sur la
+      page OKA ; 28 = copies d'autres dossiers (rien à publier) ; 31 mélangeait 6 chaînes (une seule gardée).
+- [x] Détourages des nouvelles pièces (8 vues propres : D&E, crucifix, croix baguettes, prénom, Jesus piece, médaillon) ;
+      l'alliance et la panthère gardaient le reflet du miroir : elles s'ouvrent sur leur photo.
+- 43 pièces en ligne : 156 photos et 77 vidéos avant, 392 photos et 89 vidéos après (détail dans le rapport du 20/11).
+- [ ] Yoni : **revers de la médaille céleste** (dossier 22) : prénoms d'une famille et « 1955 – 2022 » gravés : ni ce
+      revers ni le film (22/v08) ne sont montrés tant que la famille n'a pas dit oui. **Panthère** : la ceinture porte un
+      prénom, une date et une heure (les deux gros plans de la date et de l'heure sont retirés) ; est-ce la pièce de Keita
+      Losene (« MMA CHAMPION ») ? **Homme en casquette verte** (40 photos de la livraison du Butterfly) et **homme en
+      lunettes** (remise des bagues VfB) : si c'est Yoni, ces photos peuvent revenir. Visages des joueurs de l'Inter
+      (remise des bagues) gardés hors galerie. Tulips on Tour porte « Mason Garments ». Les montres de Thuram et Tajon
+      ressemblent à des Cartier Santos glacées. Photos des 4 chaînes isolées du dossier 31 et vidéos 08/v18, v19 à identifier.
+
 ## Passe « mise en ligne sur VPS » (tout en un) — état au 20/11/2026
 - [x] **Tout sur une machine** (`docker-compose.yml`) : base PostgreSQL 17, site construit (`Dockerfile` : pages, API,
       admin, visualiseur 3D, espace VIP), Caddy devant (`deploy/Caddyfile` : HTTPS tout seul, `www.` → sans `www.`).
@@ -211,7 +244,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       de domaine de Yoni (chez one.com).
 
 ## Attendu de Yoni (bloque le lancement)
-Photos personnelles pour La Maison, vrais noms des 15 pièces brouillons (et leurs destinataires), photos des étapes de
+Photos personnelles pour La Maison, vrais noms des 14 pièces publiées le 20/11 s'il en veut d'autres (et leurs
+destinataires), photos des étapes de
 fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
 
 ## Points relevés à l'analyse du 12/11/2026 (à corriger)

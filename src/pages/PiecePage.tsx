@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
 import AtelierPassage from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
+import GalleryGrid from "@/components/GalleryGrid";
 import HorizontalGallery, { Lightbox } from "@/components/HorizontalGallery";
 import { Img, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
@@ -36,6 +37,8 @@ import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
+/** The first photos of the gallery, scrolled sideways; the others follow in the grid "Every Angle". */
+const HIGHLIGHTS = 8;
 
 /** The atelier photos that illustrate a step when the piece has none of its own. */
 function atelierFor(step: MakingStep): MediaItem | null {
@@ -175,7 +178,8 @@ export default function PiecePage() {
       {model ? <Piece3D piece={piece} model={model} /> : null}
 
       <div id="piece-details" className="scroll-mt-24">
-        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} bare /> : null}
+        {piece.gallery.length > 0 ? <HorizontalGallery items={piece.gallery.slice(0, HIGHLIGHTS)} all={piece.gallery} title={piece.details.length > 0 ? t.piece.upClose : t.piece.details} bare /> : null}
+        <GalleryGrid all={piece.gallery} start={HIGHLIGHTS} />
         {atelier ? <AtelierPassage piece={piece} madeFor={madeFor(cat, piece)} atelier={atelier} /> : null}
         {piece.details.length > 0 ? <DetailsSection piece={piece} model={model} /> : null}
       </div>

@@ -940,6 +940,178 @@
     "source": "site /media/pieces/sirius/01.webp",
     "note": ""
    }
+  ],
+  "ampersand-initials-pendant": [
+   {
+    "id": "p07",
+    "kind": "face",
+    "width": 1600,
+    "height": 1892,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "top",
+     "left",
+     "right"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/04 Pendentif initiales DE/04 Pendentif initiales DE - 07.jpg",
+    "note": ""
+   }
+  ],
+  "thorns-and-roses-crucifix": [
+   {
+    "id": "p05",
+    "kind": "face",
+    "width": 1600,
+    "height": 2936,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "bottom"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/05 Pendentif croix Christ or rose/05 Pendentif croix Christ or rose - 05.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "back",
+    "width": 1600,
+    "height": 3005,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "bottom"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/05 Pendentif croix Christ or rose/05 Pendentif croix Christ or rose - 06.jpg",
+    "note": ""
+   }
+  ],
+  "baguette-cross-pendant": [
+   {
+    "id": "p12",
+    "kind": "face",
+    "width": 1600,
+    "height": 2713,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/06 Croix baguettes/06 Croix baguettes - 12.jpg",
+    "note": ""
+   }
+  ],
+  "script-nameplate-pendant": [
+   {
+    "id": "p21",
+    "kind": "face",
+    "width": 1600,
+    "height": 1124,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/14 Pendentif nom en lettres/14 Pendentif nom en lettres - 21.jpg",
+    "note": ""
+   }
+  ],
+  "crown-of-thorns-jesus-piece": [
+   {
+    "id": "p12",
+    "kind": "face",
+    "width": 1600,
+    "height": 2952,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": [
+     "bottom"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 12.jpg",
+    "note": ""
+   },
+   {
+    "id": "p11",
+    "kind": "profile",
+    "width": 1600,
+    "height": 2980,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 11.jpg",
+    "note": ""
+   },
+   {
+    "id": "p18",
+    "kind": "back",
+    "width": 1600,
+    "height": 2984,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 18.jpg",
+    "note": ""
+   }
+  ],
+  "celestial-initial-medallion": [
+   {
+    "id": "p07",
+    "kind": "face",
+    "width": 1600,
+    "height": 2162,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/22 Medaille gravee Nathalie Jose/22 Medaille gravee Nathalie Jose - 07.jpg",
+    "note": ""
+   },
+   {
+    "id": "p16",
+    "kind": "profile",
+    "width": 1600,
+    "height": 2100,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/22 Medaille gravee Nathalie Jose/22 Medaille gravee Nathalie Jose - 16.jpg",
+    "note": ""
+   }
   ]
  }
 }

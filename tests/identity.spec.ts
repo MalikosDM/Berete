@@ -4,7 +4,7 @@ import { expect, test, type Locator, type Page } from "@playwright/test";
 import { catalogueRedirects } from "../scripts/vercel-redirects";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { HOUSE_PHOTO_PLACES } from "../src/data/house";
-import { REMOVED_PIECES } from "../src/data/pieces";
+import { NEW_PIECES, REMOVED_PIECES } from "../src/data/pieces";
 import { removedPieceTarget } from "../src/data/relations";
 import { CUTOUTS, resolveShowcase } from "../src/data/showcase";
 import { resolveTheme } from "../src/data/themes";
@@ -59,16 +59,21 @@ test("the ten removed pieces appear nowhere; their addresses lead to their playe
   expect(JSON.stringify(vercel.headers)).toContain("noindex");
 });
 
-test("the drafts made from Yoni's photos stay unpublished: not on the site, in the admin only", async ({ page }) => {
+test("the drafts made from Yoni's photos are published (20/11/2026): each with its page, made for a private collector", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
-  const drafts = defaultCatalogue.pieces.filter((p) => !p.published && !REMOVED_PIECES.includes(p.slug));
-  expect(drafts.length).toBe(15);
-  for (const d of drafts) {
-    expect(cat.pieces.some((p) => p.slug === d.slug), d.slug).toBe(false);
-    expect(d.gallery.length + 1, d.slug + " has its photos").toBeGreaterThanOrEqual(3);
-    const res = await page.request.get("/pieces/" + d.slug, { maxRedirects: 0 });
-    expect(res.status(), d.slug).toBe(301);
+  // Unpublished: the 10 removed pieces only.
+  expect(defaultCatalogue.pieces.filter((p) => !p.published).map((p) => p.slug).sort()).toEqual([...REMOVED_PIECES].sort());
+  for (const slug of NEW_PIECES) {
+    const piece = cat.pieces.find((p) => p.slug === slug);
+    expect(piece, slug).toBeTruthy();
+    expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
+    expect(piece!.people, slug + " made for a private collector").toEqual([]);
+    expect(piece!.clientPublic, slug).toBe(false);
+    // Never the name of a person in its texts (even engraved on the piece).
+    expect(piece!.title + " " + piece!.line + " " + piece!.story, slug).not.toMatch(/Nathalie|José|Jose\b|LASANA|Loan|Elya|Annie/i);
+    const res = await page.request.get("/pieces/" + slug, { maxRedirects: 0 });
+    expect(res.status(), slug).toBe(200);
   }
 });
 
@@ -375,10 +380,11 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await page.getByLabel("Mot de passe").fill(password!);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page.getByRole("tab", { name: "Pièces" })).toBeVisible();
-  // 10 removed pieces and 15 drafts, unpublished.
-  await expect(page.locator("[data-row-unpublished]")).toHaveCount(25);
-  for (const slug of [...REMOVED_PIECES, "chaine-diamants", "pendentif-tete-animal"]) await expect(page.locator("[data-admin-row='" + slug + "'] [data-row-unpublished]"), slug).toHaveCount(1);
-  await page.locator("[data-admin-row='chaine-diamants']").scrollIntoViewIfNeeded();
+  // The 10 removed pieces, unpublished; the pieces published on 20/11/2026 in the list, published.
+  await expect(page.locator("[data-row-unpublished]")).toHaveCount(REMOVED_PIECES.length);
+  for (const slug of REMOVED_PIECES) await expect(page.locator("[data-admin-row='" + slug + "'] [data-row-unpublished]"), slug).toHaveCount(1);
+  for (const slug of NEW_PIECES) await expect(page.locator("[data-admin-row='" + slug + "']"), slug).toHaveCount(1);
+  await page.locator("[data-admin-row='pear-link-chain']").scrollIntoViewIfNeeded();
   await page.screenshot({ path: shotPath(info, "admin-1-pieces-non-publiees"), type: "jpeg", quality: 70, fullPage: true });
   // The universe of the Dragon Ball pendant, editable.
   await page.locator("[data-admin-row='kevin-schade-dragon-ball-pendant'] button[aria-label='Modifier']").click();

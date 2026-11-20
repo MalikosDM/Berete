@@ -123,6 +123,28 @@ const VIEWS = {
     { id: "p05", kind: "profile", from: "hd:16/p5", mode: "luma" },
     { id: "p02", kind: "detail", from: "hd:16/p2" },
   ],
+  // The pieces published on 20/11/2026: their photos of the whole jewel on plain black (the chains are all on a bust).
+  // On black glass, the reflection under the jewel goes (solo).
+  "ampersand-initials-pendant": [{ id: "p07", kind: "face", from: "hd:04/p7" }],
+  "thorns-and-roses-crucifix": [
+    { id: "p05", kind: "face", from: "hd:05/p5", solo: true },
+    { id: "p06", kind: "back", from: "hd:05/p6", solo: true },
+  ],
+  // Its polished sides mirror the black background: the front view only (the angled views look cut by a black block).
+  "baguette-cross-pendant": [{ id: "p12", kind: "face", from: "hd:06/p12" }],
+  "script-nameplate-pendant": [{ id: "p21", kind: "face", from: "hd:14/p21", solo: true }],
+  // The oval eternity band and the panther stand on a mirror that the cutout keeps (a reflection stuck to the jewel):
+  // they open on their photo.
+  "crown-of-thorns-jesus-piece": [
+    { id: "p12", kind: "face", from: "hd:15/p12", solo: true },
+    { id: "p11", kind: "profile", from: "hd:15/p11", solo: true },
+    { id: "p18", kind: "back", from: "hd:15/p18", solo: true },
+  ],
+  // Its back carries the first names of a family: never cut out (the front only).
+  "celestial-initial-medallion": [
+    { id: "p07", kind: "face", from: "hd:22/p7", solo: true },
+    { id: "p16", kind: "profile", from: "hd:22/p16" },
+  ],
   // The pieces without HD photos: the best photo of the site (stories at 1080 px).
   "marcus-thuram-thorned-t-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp" }],
   // macOS sees the angel only: the whole letter by its light.

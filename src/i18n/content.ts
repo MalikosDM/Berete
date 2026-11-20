@@ -6,6 +6,7 @@
  * dictionary, else stays in English until it is translated.
  */
 import type { Box, Catalogue, MediaItem, Person, Piece, Story, Translations } from "@/data/types";
+import { isView, VIEWS, viewAlt } from "@/data/views";
 import type { Locale } from "./locales";
 
 /** "text": a sentence, translated in every language. "name": a proper name, written in another script only where needed (Arabic). */
@@ -33,7 +34,12 @@ function ownOf(translations: Translations | undefined, field: string, locale?: L
   return typeof value === "string" && value.trim() !== "" ? value : undefined;
 }
 
-function mediaTexts(m: MediaItem, v: Visitor, names: Set<string>): MediaItem {
+function mediaTexts(m: MediaItem, v: Visitor, names: Set<string>, title?: string): MediaItem {
+  // A photo of a gallery that says what it shows (src/data/views.ts): its caption, and the title of the piece with it.
+  if (title !== undefined && !m.alt && !m.caption && isView(m.view)) {
+    const words = v.text(VIEWS[m.view], "text");
+    return { ...m, caption: words, alt: viewAlt(title, words) };
+  }
   if (!m.alt && !m.caption) return m;
   const out: MediaItem = { ...m };
   if (m.alt) out.alt = v.text(m.alt, "text");
@@ -73,6 +79,7 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
 
   const pieces = cat.pieces.map((p): Piece => {
     const title = v.text(p.title, "text", ownOf(p.translations, "title", locale));
+    const shown = (item: MediaItem) => mediaTexts(item, v, names, title);
     const making: Piece["making"] = {};
     for (const [step, item] of Object.entries(p.making) as [keyof Piece["making"], MediaItem | undefined][]) {
       if (!item) continue;
@@ -86,8 +93,8 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
       line: p.line ? v.text(p.line, "text", ownOf(p.translations, "line", locale)) : p.line,
       story: p.story ? v.text(p.story, "text", ownOf(p.translations, "story", locale)) : p.story,
       client: p.client ? v.text(p.client, "name") : p.client,
-      cover: m(p.cover),
-      gallery: p.gallery.map(m),
+      cover: shown(p.cover),
+      gallery: p.gallery.map(shown),
       handover: p.handover.map(m),
       making,
       specs: p.specs.map((s) => ({ label: v.text(s.label, "text"), value: v.text(s.value, "text") })),
@@ -110,7 +117,7 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
 
 /** The catalogue in this language, with this dictionary (English text -> translation). */
 export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Record<string, string>, storyAlt: Visitor["storyAlt"], sketchAlt: Visitor["sketchAlt"]): Catalogue {
-  if (locale === "en") return cat;
+  if (locale === "en") return withViews(cat);
   return mapTexts(
     cat,
     {
@@ -120,6 +127,13 @@ export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Re
     },
     locale,
   );
+}
+
+/** In English: the photos that say what they show get their caption and their text (the title of the piece with it). */
+export function withViews(cat: Catalogue): Catalogue {
+  if (!cat.pieces.some((p) => [p.cover, ...p.gallery].some((m) => !m.alt && !m.caption && isView(m.view)))) return cat;
+  const named = (title: string) => (m: MediaItem) => (!m.alt && !m.caption && isView(m.view) ? { ...m, caption: VIEWS[m.view], alt: viewAlt(title, VIEWS[m.view]) } : m);
+  return { ...cat, pieces: cat.pieces.map((p) => ({ ...p, cover: named(p.title)(p.cover), gallery: p.gallery.map(named(p.title)) })) };
 }
 
 /** Every text of the catalogue to translate, by kind (scripts/i18n-check.ts). */

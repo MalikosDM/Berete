@@ -503,8 +503,6 @@ async function importSketches() {
 
 /** Photos: sharp on a large screen (the browser takes a smaller copy when it is enough, scripts/media-sizes.mjs). */
 const HD_PHOTO = { maxW: 1440, maxH: 2160, quality: 78 };
-/** The photos of a draft (unpublished, seen in the admin): smaller. */
-const HD_DRAFT_PHOTO = { maxW: 1080, maxH: 1620, quality: 78 };
 /** Videos: H.264, 720p (enough for a gallery, light on a phone), silent, 12 seconds at most, about 1.2 Mbit/s at most. */
 const HD_VIDEO = { long: 1280, short: 720, crf: 28, maxrate: "1200k", maxFps: 30, maxSeconds: 12 };
 
@@ -517,14 +515,33 @@ async function hdSource(folder, ref) {
   const sub = kind === "p" ? "Photos" : kind === "v" ? "Videos" : "Fabrication";
   const files = await listDir(join(HD_DIR, dir, sub));
   const pattern = kind === "p" ? new RegExp(" - " + n + "\\.(jpe?g|png|heic)$", "i") : kind === "v" ? new RegExp(" - video " + n + "( \\(720p\\))?\\.(mp4|mov|m4v)$", "i") : VIDEO_EXT;
-  const file = files.find((f) => pattern.test(f));
-  return file ? join(HD_DIR, dir, sub, file) : null;
+  const found = files.filter((f) => pattern.test(f));
+  // A video: its full copy rather than its light "(720p)" one, and its "Videos HD/" original once it is whole.
+  const file = found.find((f) => !/\(720p\)/.test(f)) ?? found[0];
+  if (!file) return null;
+  if (kind === "v") {
+    const copy = join(HD_DIR, dir, sub, file);
+    const hd = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && new RegExp(" - video " + n + "(?!\\d)", "i").test(f)).sort()[0];
+    if (hd && (await wholeHd(join(HD_DIR, dir, "Videos HD", hd), copy))) return join(HD_DIR, dir, "Videos HD", hd);
+    return copy;
+  }
+  return join(HD_DIR, dir, sub, file);
 }
 
 const hdName = (ref) => (ref === "f" ? "f" : ref[0] + pad2(Number(ref.slice(1))));
 
-async function hdPhoto(src, out, filter = "", draft = false) {
-  const size = draft ? HD_DRAFT_PHOTO : HD_PHOTO;
+/**
+ * One item of an entry of scripts/hd-media.mjs: "p7", "p7:front", "07/p5:links" (a photo of another folder) -> its folder,
+ * its file, the name of its copy ("p07", or "07-p05" for another folder than the entry's) and its view.
+ */
+function hdItem(entry, item) {
+  const [path, view = null] = item.split(":");
+  const [folder, ref] = path.includes("/") ? path.split("/") : [entry.folder, path];
+  return { folder, ref, name: (folder === entry.folder ? "" : folder + "-") + hdName(ref), view };
+}
+
+async function hdPhoto(src, out, filter = "") {
+  const size = HD_PHOTO;
   const scale = "scale=w='min(" + size.maxW + ",iw)':h='min(" + size.maxH + ",ih)':force_original_aspect_ratio=decrease:flags=lanczos";
   const vf = filter ? filter + "," + scale : scale;
   const recipe = "hd-photo:" + vf + ":" + size.quality;
@@ -540,7 +557,30 @@ async function hdPhoto(src, out, filter = "", draft = false) {
     if (input !== src) await rm(input, { force: true });
   }
   const p = await probe(out);
-  return { type: "image", src: webPath(out), width: p.width, height: p.height };
+  return { type: "image", src: webPath(out), width: p.width, height: p.height, onBlack: await shotOnBlack(out) };
+}
+
+/**
+ * Whether a photo is shot on black (it then blends into the page; any other photo fills its frame): its edges dark on
+ * average. A close-up whose jewel touches an edge stays "on black"; a photo on a white bench or in a room does not.
+ */
+async function shotOnBlack(file) {
+  const n = 48;
+  const { data } = await sharp(file).resize(n, n, { fit: "fill" }).greyscale().raw().toBuffer({ resolveWithObject: true });
+  const mean = (pick) => {
+    let sum = 0;
+    let count = 0;
+    for (let y = 0; y < n; y += 1) {
+      for (let x = 0; x < n; x += 1) {
+        if (!pick(x, y)) continue;
+        sum += data[y * n + x];
+        count += 1;
+      }
+    }
+    return sum / count;
+  };
+  const edges = [mean((_x, y) => y < 3), mean((_x, y) => y >= n - 3), mean((x) => x < 3), mean((x) => x >= n - 3)];
+  return edges.reduce((a, b) => a + b, 0) / edges.length < 80;
 }
 
 async function hdVideo(src, out, filter = "") {
@@ -568,6 +608,10 @@ async function hdVideo(src, out, filter = "") {
   };
 }
 
+/**
+ * The photos and videos of every entry of scripts/hd-media.mjs, by folder of the site then name ("p07", "07-p05"), and
+ * the gallery of each piece: its items in their order, each with what it shows ({ file, view }).
+ */
 async function importHd() {
   if (!existsSync(HD_DIR)) {
     console.warn("HD folder not found, skipped: " + HD_DIR);
@@ -575,30 +619,32 @@ async function importHd() {
   }
   console.log("High-resolution photos and videos: " + HD_DIR);
   const out = {};
+  const galleries = {};
   const jobs = [];
-  // A folder of the site fed by two folders of Yoni: the files of the second one are named "<its number>-p02".
-  const firstFolder = {};
-  for (const entry of HD) firstFolder[entry.dir] ??= entry.folder;
   for (const entry of HD) {
     const group = (out[entry.dir] ??= {});
-    for (const ref of entry.items) {
-      const src = await hdSource(entry.folder, ref);
+    const wanted = [...(entry.gallery ?? []).map((item) => ({ item, shown: true })), ...[...(entry.items ?? []), ...(entry.also ?? [])].map((item) => ({ item, shown: false }))];
+    for (const { item, shown } of wanted) {
+      const { folder, ref, name, view } = hdItem(entry, item);
+      if (shown) (galleries[entry.dir] ??= []).push({ file: name, view });
+      if (name in group) continue;
+      const src = await hdSource(folder, ref);
       if (!src) {
-        console.warn("  ! not found: folder " + entry.folder + ", " + ref);
+        console.warn("  ! not found: folder " + folder + ", " + ref + " (" + entry.dir + ")");
         continue;
       }
       const isVideo = ref[0] !== "p";
-      const name = (entry.folder === firstFolder[entry.dir] ? "" : entry.folder + "-") + hdName(ref);
       const file = join(MEDIA, "hd", entry.dir, name + (isVideo ? ".mp4" : ".webp"));
       group[name] = null;
-      jobs.push({ heavy: isVideo, go: async () => (group[name] = isVideo ? await hdVideo(src, file, entry.filter) : await hdPhoto(src, file, entry.filter, entry.draft === true)) });
+      jobs.push({ heavy: isVideo, go: async () => (group[name] = isVideo ? await hdVideo(src, file, entry.filter) : await hdPhoto(src, file, entry.filter)) });
     }
   }
   const cores = cpus().length;
   await pool(jobs.filter((j) => !j.heavy), cores, (j) => j.go());
   await pool(jobs.filter((j) => j.heavy), Math.max(1, Math.floor(cores / 4)), (j) => j.go());
   for (const group of Object.values(out)) for (const [k, v] of Object.entries(group)) if (!v) delete group[k];
-  return out;
+  for (const [dir, items] of Object.entries(galleries)) galleries[dir] = items.filter((i) => out[dir]?.[i.file]).map((i) => (i.view ? i : { file: i.file }));
+  return { hd: out, galleries };
 }
 
 /* ---------- The films of "Enter the Atelier": making-of and finished piece (scripts/film-media.mjs) ---------- */
@@ -669,37 +715,38 @@ async function namedFilm(folder, kind) {
 /** The scale filter: the short side at most `short`, the long side at most `long`, never larger than the film. */
 const fit = (short, long) => "scale=w='trunc(iw*min(1,min(" + short + "/min(iw,ih)," + long + "/max(iw,ih)))/2)*2':h=-2:flags=lanczos";
 
-async function filmCopy(src, out, info, { short, long, crf, maxrate, audio }) {
+async function filmCopy(src, out, info, { short, long, crf, maxrate, audio, start = 0 }) {
   const filters = [fit(short, long)];
   const fps = info.fps > FILM.maxFps + 0.5 ? FILM.maxFps : Math.round(info.fps) || 30;
   if (info.fps > FILM.maxFps + 0.5) filters.push("fps=" + FILM.maxFps);
   filters.push("format=yuv420p");
   const vf = filters.join(",");
   const rate = maxrate(Math.min(info.width, info.height, short));
-  const argv = ["-i", src, "-map", "0:v:0"];
+  // `start`: the film begins later than its file (its first seconds show what the page must not, scripts/film-media.mjs).
+  const argv = [...(start > 0 ? ["-ss", String(start)] : []), "-i", src, "-map", "0:v:0"];
   if (info.hasAudio) argv.push("-map", "0:a:0");
   argv.push("-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(crf), "-maxrate", rate, "-bufsize", parseInt(rate, 10) * 2 + "k", "-g", String(fps * 2), "-keyint_min", String(fps), "-profile:v", "high");
   if (info.hasAudio) argv.push("-c:a", "aac", "-b:a", audio, "-ac", "2");
   else argv.push("-an");
   argv.push("-movflags", "+faststart");
-  await produce(out, src, "film:" + [vf, crf, rate, audio, info.hasAudio].join(":"), argv);
+  await produce(out, src, "film:" + [vf, crf, rate, audio, info.hasAudio, ...(start > 0 ? [start] : [])].join(":"), argv);
   return probe(out);
 }
 
-async function film(src, base, { light, label, pick, sharpPhone = false }) {
+async function film(src, base, { light, label, pick, sharpPhone = false, start = 0 }) {
   const info = await probe(src);
   const shortSide = Math.min(info.width, info.height);
   // The finished piece opens the page of the piece: on a phone it keeps 720p when the film has it.
   const mobileShort = shortSide > 720 || (sharpPhone && shortSide >= 720) ? 720 : Math.min(540, shortSide);
-  const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9) });
+  const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9), start });
   // A film no page shows yet (a draft): its light copy serves everywhere.
-  const desktop = light ? null : await filmCopy(src, base + ".mp4", info, FILM.desktop);
+  const desktop = light ? null : await filmCopy(src, base + ".mp4", info, { ...FILM.desktop, start });
   const main = desktop ?? mobile;
   // Its images: frames spread over the film, from the original (sharp), the sharpest well-lit one first by default.
   const posters = [];
   const scores = [];
   for (let i = 0; i < FILM.posters; i += 1) {
-    const at = info.duration * (0.1 + (0.8 * i) / (FILM.posters - 1));
+    const at = start + (info.duration - start) * (0.1 + (0.8 * i) / (FILM.posters - 1));
     const out = base + "-" + (i + 1) + ".webp";
     const vf = "scale=w='trunc(iw*min(1," + FILM.posterLong + "/max(iw,ih))/2)*2':h=-2:flags=lanczos";
     await produce(out, src, "film-poster:" + at.toFixed(2) + ":" + vf, ["-ss", at.toFixed(2), "-i", src, "-frames:v", "1", "-vf", vf, "-c:v", "libwebp", "-quality", "80"]);
@@ -746,7 +793,8 @@ async function importFilms() {
       const light = entry.draft === true;
       const pick = entry.poster?.[kind];
       const sharpPhone = kind === "reveal" && !light;
-      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick, sharpPhone })));
+      const start = entry.start?.[kind] ?? 0;
+      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick, sharpPhone, start })));
     }
   }
   await pool(jobs, Math.max(1, Math.floor(cpus().length / 4)), (go) => go());
@@ -1052,7 +1100,8 @@ if (runs("players")) {
 if (runs("hd")) {
   const hd = await importHd();
   if (hd !== null) {
-    media.hd = hd;
+    media.hd = hd.hd;
+    media.galleries = hd.galleries;
     pruneDirs.push(join(MEDIA, "hd"));
   }
 }

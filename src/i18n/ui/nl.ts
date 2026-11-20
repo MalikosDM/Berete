@@ -220,6 +220,10 @@ export const nl: Messages = {
     photo: "Foto",
     zoomIn: "Inzoomen",
     zoomOut: "Uitzoomen",
+    /** The grid of every other photo of a piece, under its gallery. */
+    everyAngle: "Vanuit elke hoek",
+    more: (n: number) => "Nog " + n + " bekijken",
+    film: "Film",
   },
 
   players: {

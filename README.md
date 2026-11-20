@@ -22,16 +22,15 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
 - **Une seule source de données** : `src/data/` — `catalogue.ts` (joueurs, stories), `pieces.ts`
   (les pièces et les écrins), `collections.ts` (une collection par type de bijou), `relations.ts`
   (liens entre stories, joueurs et pièces).
-- **Les pièces** : 29 pièces publiées, trouvées dans les stories, les dossiers et les photos HD de Yoni. Leurs textes
+- **Les pièces** : 43 pièces publiées, trouvées dans les stories, les dossiers et les photos HD de Yoni (dont 14 pièces
+  de collectionneurs privés publiées le 20/11/2026, `NEW_PIECES`). Leurs textes
   sont des brouillons (`draft: true`, « Brouillon » dans l'admin) à faire valider par le client ; aucun chiffre n'est inventé.
 - **Pièces non publiées** (`published: false`, case « Publiée sur le site » dans l'admin) : gardées dans la base mais
   invisibles partout sur le site (listes, pièces similaires, stories, écrins, plan du site, aperçus ; `publicCatalogue`
   dans `src/data/relations.ts`, aussi appliqué par l'API `/api/catalogue`). Leur adresse redirige (301) vers la page de
   leur joueur s'il a encore des pièces, sinon vers `/creations` ; un joueur dont toutes les pièces sont non publiées sort
   du Cercle (sa page mène à `/players`). Le serveur le fait depuis la base ; pour Vercel, `npm run redirects` écrit les
-  mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni (`REMOVED_PIECES`) et les 15
-  **brouillons** créés depuis ses dossiers de photos qui ne correspondent à aucune pièce (`DRAFTS` dans
-  `src/data/pieces.ts` : titre provisoire = nom du dossier, « Made for » à valider, galerie déjà remplie).
+  mêmes redirections dans `vercel.json`. Ce sont les 10 pièces retirées par Yoni (`REMOVED_PIECES`).
 - **L'univers de chaque pièce** (`theme` d'une pièce, `src/data/themes.ts`, dessiné par `src/components/Universe.tsx`,
   `src/components/universe/fx.ts` et `.universe` dans `src/index.css`) : la page garde sa structure, mais on entre dans le
   monde de la pièce.
@@ -123,8 +122,13 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   Le dossier « 99 - NE PAS ENVOYER » n'est jamais lu.
   Les **photos et vidéos HD de Yoni** (disque externe « Berete - Dossiers icloud », `BERETE_HD_DIR`) sont choisies
   dossier par dossier dans `scripts/hd-media.mjs` (section `hd` : `npm run import-media -- --only=hd`) : photos 1440 px
-  de large (1080 px pour les brouillons), vidéos MP4 H.264 720p, muettes, 12 secondes au plus, avec leur image d'attente ;
-  les originaux ne vont jamais dans Git. `yoni(<dossier>, "p07")` dans `src/data/pieces.ts` les place dans une pièce.
+  de large, vidéos MP4 H.264 720p, muettes, 12 secondes au plus, avec leur image d'attente ; les originaux ne vont jamais
+  dans Git. Chaque pièce y a sa **galerie** dans l'ordre (`gallery`, la première est la photo principale) et ce que montre
+  chaque photo (`"p7:front"`, mots dans `src/data/views.ts` : légende et texte pour lecteur d'écran, traduits comme le
+  reste) ; `sorted()` dans `src/data/pieces.ts` en fait la photo principale et la galerie, un texte écrit à la main pour
+  une photo restant prioritaire ; `yoni(<dossier>, "p07")` place un fichier ailleurs (étapes, détails). Une photo est
+  « sur noir » (fondue dans la page) sauf si son fond est clair (`shotOnBlack`). Sur la page, les 8 premières photos
+  défilent de côté, toutes les autres sont dans la grille « Every Angle » (`src/components/GalleryGrid.tsx`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
 - **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces (dont
@@ -242,7 +246,9 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
-                        # tests/identity.spec.ts : pièces retirées (301) et brouillons absents du site, nouveaux noms
+                        # tests/galleries.spec.ts : Créations complète, galeries entières (grille « Every Angle »),
+                        # films des nouvelles pièces, peu de photos chargées avant le défilement
+                        # tests/identity.spec.ts : pièces retirées (301), pièces de collectionneurs publiées, nouveaux noms
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
                         # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)

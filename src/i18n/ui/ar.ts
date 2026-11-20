@@ -216,6 +216,10 @@ export const ar: Messages = {
     photo: "صورة",
     zoomIn: "تكبير",
     zoomOut: "تصغير",
+    /** The grid of every other photo of a piece, under its gallery. */
+    everyAngle: "من كل الزوايا",
+    more: (n: number) => "عرض " + n + " أخرى",
+    film: "فيلم",
   },
 
   players: {

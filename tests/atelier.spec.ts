@@ -9,8 +9,8 @@ import { skipIntro, watch } from "./helpers";
 type Film = { src: string; mobile: string; duration: number; audio: boolean };
 const FILMS = (media as unknown as { films: Record<string, { making?: Film; reveal?: Film }> }).films;
 const PIECES = ["campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "kevin-schade-dragon-ball-pendant"];
-/** The drafts (unpublished): never on the site. */
-const DRAFTS = ["chaine-cubaine-glacee-or-rose", "pendentif-croix-christ-or-rose", "pendentif-tete-animal"];
+/** The removed pieces (unpublished): never on the site. */
+const DRAFTS: string[] = [];
 const DIR = "verification/atelier";
 mkdirSync(DIR, { recursive: true });
 

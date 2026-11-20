@@ -101,8 +101,12 @@ test("every published piece with a file of the hand of Yoni shows it", async ({ 
   const res = await page.request.get("/api/catalogue").catch(() => null);
   const pieces = res?.ok() ? ((await res.json()) as { pieces: { slug: string; making: { sketch?: { src: string } } }[] }).pieces : null;
   test.skip(pieces === null, "the catalogue of the server is needed");
+  // The pieces published on 20/11/2026 have no drawing of his hand yet: their step shows the atelier.
+  const drawn = Object.keys((media as unknown as { sketches: Record<string, unknown> }).sketches);
   for (const p of pieces!) {
     if (p.slug === "kevin-schade-dragon-ball-pendant") continue;
+    if (!drawn.includes(p.slug)) continue;
     expect(p.making.sketch?.src, p.slug).toBe("/media/sketches/" + p.slug + ".webp");
   }
+  expect(pieces!.filter((p) => drawn.includes(p.slug)).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(28);
 });

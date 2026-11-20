@@ -38,6 +38,11 @@ export function yoni(dir: string, file: string, texts: Partial<MediaItem> = {}):
   return m ? { onBlack: true, ...m, ...texts } : null;
 }
 
+/** The gallery of a folder of hd (scripts/hd-media.mjs): its files in their order, with what each shows; [] when none. */
+export function hdGallery(dir: string): { file: string; view?: string }[] {
+  return media.galleries?.[dir] ?? [];
+}
+
 /** File number `n` of a story ("kevin-schade", 21), or null when it is missing. */
 export function st(slug: string, n: number, texts: Partial<MediaItem> = {}): MediaItem | null {
   const found = storyFiles.find((s) => s.slug === slug)?.media.find((m) => m.n === n);

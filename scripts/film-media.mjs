@@ -23,7 +23,8 @@
  * the site; the pieces taken from the stories have no folder.
  *
  * folder: the folder of the piece itself (scripts/hd-media.mjs), where a "Videos HD/" film named after its kind is looked
- * for. A piece of the drafts (unpublished) gets the light copy only. poster: the frame used as its image by default (1 to 6), when the one found by the numbers (the sharpest
+ * for. A piece of the drafts (unpublished) gets the light copy only. start: the second where a film begins, by kind, when
+ * its first seconds must not be shown. poster: the frame used as its image by default (1 to 6), when the one found by the numbers (the sharpest
  * well-lit) is not the best one to the eye (all were looked at on 19/11/2026); the admin can choose another.
  */
 export const FILMS = [
@@ -50,14 +51,16 @@ export const FILMS = [
   // The short edit of the finished pendant (32/v02 is the film of its delivery: the trunk, Noah Okafor and his friends).
   { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v03" },
 
-  /* ---------- Drafts (unpublished, to be named by Yoni) ---------- */
-  { slug: "chaine-cubaine-glacee-or-rose", folder: "01", draft: true, making: "01/f" },
-  { slug: "pendentif-initiales-de", folder: "04", draft: true, reveal: "04/v01" },
-  { slug: "pendentif-croix-christ-or-rose", folder: "05", draft: true, making: "05/v02", reveal: "05/v01" },
-  { slug: "pendentif-nom-en-lettres", folder: "14", draft: true, reveal: "14/v01" },
-  { slug: "pendentif-tete-animal", folder: "19", draft: true, making: "19/v01", reveal: "19/v02" },
-  { slug: "medaille-gravee-nathalie-jose", folder: "22", draft: true, reveal: "22/v08" },
-  { slug: "chaine-cubaine-baguettes", folder: "30", draft: true, reveal: "30/v01" },
+  /* ---------- The pieces published on 20/11/2026 (the drafts of 19/11) ---------- */
+  // The fabrication of the chain (the video of its Fabrication/ folder): no film of the finished chain.
+  { slug: "rose-iced-cuban-chain", folder: "01", making: "01/f" },
+  // Its film opens on a trunk painted with a mural (a famous player): it begins at 7.4 s, on the pendant.
+  { slug: "ampersand-initials-pendant", folder: "04", reveal: "04/v01", start: { reveal: 7.4 } },
+  { slug: "thorns-and-roses-crucifix", folder: "05", making: "05/v02", reveal: "05/v01" },
+  { slug: "script-nameplate-pendant", folder: "14", reveal: "14/v01" },
+  { slug: "panther-champion-pendant", folder: "19", making: "19/v01", reveal: "19/v02" },
+  // The celestial medallion (22) has no film first: its film shows the engraved back, first names of a family and a
+  // date (22/v08), kept out until Yoni says the family agrees.
 ];
 
 /** The words of the original names in "Videos HD/" that tell the kind of a film. */

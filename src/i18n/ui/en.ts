@@ -233,6 +233,10 @@ export const en = {
     photo: "Photo",
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
+    /** The grid of every other photo of a piece, under its gallery. */
+    everyAngle: "Every Angle",
+    more: (n: number) => "See " + n + " more",
+    film: "Film",
   },
 
   players: {

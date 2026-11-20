@@ -25,6 +25,8 @@ export type MediaItem = {
   caption?: string;
   /** A jewel shot on black: blended into the page without a frame. */
   onBlack?: boolean;
+  /** What the photo shows (src/data/views.ts): its caption, and its text with the title of the piece. */
+  view?: string;
 };
 
 /**
@@ -173,6 +175,8 @@ export type GeneratedMedia = {
   portraits?: Record<string, MediaItem>;
   /** The high-resolution photos and videos of Yoni (scripts/hd-media.mjs), by folder then file ("p07", "v01"). */
   hd?: Record<string, Record<string, MediaItem>>;
+  /** The gallery of each folder of hd: its files in their order, with what each shows (src/data/views.ts). */
+  galleries?: Record<string, { file: string; view?: string }[]>;
   /** The personal photos of Yoni for The House, by chapter (folder "Berete - La Maison"). */
   house?: HousePhotos;
   /**

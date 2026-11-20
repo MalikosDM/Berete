@@ -85,6 +85,10 @@ async function sharpness(page: Page, selector: string): Promise<{ score: number;
   });
 }
 
+/** The photos of the sideways gallery, and of the grid before "See N more" (src/pages/PiecePage.tsx, GalleryGrid.tsx). */
+const GALLERY_HIGHLIGHTS = 8;
+const GALLERY_FIRST = 12;
+
 /** What a piece page must show: its cover (sharp), gallery, people, the five steps, similar pieces, the WhatsApp button. */
 async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   const id = piece.slug;
@@ -95,7 +99,11 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   expect(Math.min(quality.width, quality.height), id + " cover size").toBeGreaterThanOrEqual(360);
   expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
   await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  await expect(page.locator("[data-gallery-item]"), id + " gallery").toHaveCount(piece.gallery.length);
+  // The first photos scroll sideways, every other one is in the grid "Every Angle" (12 at first, then "See N more").
+  await expect(page.locator("[data-gallery-item]"), id + " gallery").toHaveCount(Math.min(GALLERY_HIGHLIGHTS, piece.gallery.length));
+  const rest = Math.max(0, piece.gallery.length - GALLERY_HIGHLIGHTS);
+  await expect(page.locator("[data-gallery-tile]"), id + " every angle").toHaveCount(Math.min(GALLERY_FIRST, rest));
+  await expect(page.locator("[data-gallery-more]"), id + " see more").toHaveCount(rest > GALLERY_FIRST ? 1 : 0);
   for (const v of await page.locator("[data-gallery-item] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }
