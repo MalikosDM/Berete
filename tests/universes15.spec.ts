@@ -22,7 +22,8 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   { backdrop: "keita", preset: "keita", pieces: ["panther-champion-pendant"] },
   { backdrop: "bianconero", preset: "bianconero", pieces: ["kenan-yildiz-celebration-pendant"] },
   { backdrop: "serpent", preset: "serpent", pieces: ["marcus-thuram-t-serpent-pendant"] },
-  { backdrop: "sirius", preset: "sirius", pieces: ["sirius"] },
+  // Since 21/11/2026 (feedback of Yoni): the Japanese night (the starry sky before; tests/yoni2111.spec.ts).
+  { backdrop: "sirius-japon", preset: "japon", pieces: ["sirius"] },
   { backdrop: "tulipes", preset: "tulipes", pieces: ["tulips-on-tour-medallion"] },
   { backdrop: "trefle", preset: "emeraude", pieces: ["eljero-elia-clover-medallion"] },
   // The Hand: since 21/11/2026 the endless space (tests/infini.spec.ts).

@@ -235,6 +235,16 @@
       "source": "/:lang(fr|es|de|nl|ar)/pieces/script-nameplate-pendant",
       "destination": "/:lang/pieces/lois-openda-script-pendant",
       "statusCode": 301
+    },
+    {
+      "source": "/boxes/:slug",
+      "destination": "/boxes",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/boxes/:slug",
+      "destination": "/:lang/boxes",
+      "statusCode": 301
     }
   ],
   "rewrites": [

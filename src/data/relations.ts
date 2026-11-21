@@ -14,19 +14,21 @@ export const TYPE_LABELS: Record<PieceType, string> = {
  * The catalogue the visitors see: the published pieces only. An unpublished piece (removed from the catalogue, or a
  * draft waiting for its name) is kept in the admin but appears nowhere: not in the lists, the similar pieces, the
  * stories ("Enter the World"), the boxes, the search engines. A person whose pieces are all unpublished leaves the circle
- * of the house (their page leads to /players); people who never had a piece (stories only) stay.
+ * of the house (their page leads to /players); people who never had a piece (stories only) stay. An unpublished box
+ * (removed by Yoni) appears nowhere either: not on the page of the trunks, nor on the page of its piece.
  */
 export function publicCatalogue(cat: Catalogue): Catalogue {
   const hidden = new Set(cat.pieces.filter((p) => p.published === false).map((p) => p.slug));
-  if (hidden.size === 0) return cat;
-  const pieces = cat.pieces.filter((p) => !hidden.has(p.slug));
+  const hiddenBoxes = new Set(cat.boxes.filter((b) => b.published === false).map((b) => b.slug));
+  if (hidden.size === 0 && hiddenBoxes.size === 0) return cat;
+  const pieces = cat.pieces.filter((p) => !hidden.has(p.slug)).map((p) => (p.boxSlug && hiddenBoxes.has(p.boxSlug) ? { ...p, boxSlug: null } : p));
   const gone = new Set(cat.people.filter((person) => cat.pieces.some((p) => p.people.includes(person.slug)) && !pieces.some((p) => p.people.includes(person.slug))).map((p) => p.slug));
   return {
     ...cat,
     pieces: pieces.map((p) => (p.people.some((x) => gone.has(x)) ? { ...p, people: p.people.filter((x) => !gone.has(x)) } : p)),
     people: cat.people.filter((p) => !gone.has(p.slug)),
     stories: cat.stories.map((s) => (s.pieceSlug && hidden.has(s.pieceSlug)) || s.people.some((x) => gone.has(x)) ? { ...s, pieceSlug: s.pieceSlug && hidden.has(s.pieceSlug) ? null : s.pieceSlug, people: s.people.filter((x) => !gone.has(x)) } : s),
-    boxes: cat.boxes.map((b) => (b.pieceSlug && hidden.has(b.pieceSlug) ? { ...b, pieceSlug: null } : b)),
+    boxes: cat.boxes.filter((b) => !hiddenBoxes.has(b.slug)).map((b) => (b.pieceSlug && hidden.has(b.pieceSlug) ? { ...b, pieceSlug: null } : b)),
   };
 }
 
@@ -53,6 +55,16 @@ export function storiesOf(cat: Catalogue, personSlug: string): Story[] {
 
 export function piecesOf(cat: Catalogue, personSlug: string): Piece[] {
   return cat.pieces.filter((p) => p.people.includes(personSlug));
+}
+
+/**
+ * Where a click on a person leads (feedback of Yoni, 21/11/2026): straight to the capsule of the piece made for them, in
+ * its universe, when they have one; else to their page (their pieces first, their stories discreet at the bottom). The
+ * catalogue the visitors see (published pieces only).
+ */
+export function personHref(cat: Catalogue, person: Person): string {
+  const pieces = piecesOf(cat, person.slug);
+  return pieces.length === 1 ? "/pieces/" + pieces[0]!.slug : "/players/" + person.slug;
 }
 
 export function peopleOf(cat: Catalogue, piece: Piece): Person[] {

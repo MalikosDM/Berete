@@ -186,6 +186,7 @@ export const toBox = (r: BoxRow): Box => ({
   description: r.description,
   images: mediaList(r.images),
   pieceSlug: r.pieceSlug,
+  published: r.published,
   translations: translationsOf(r.translations),
 });
 
@@ -253,7 +254,7 @@ const pieceTexts = (p: Piece) => ({
   angles: Object.keys(p.angles).length > 0 ? p.angles : undefined,
   making: p.making,
 });
-const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceSlug: b.pieceSlug });
+const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceSlug: b.pieceSlug, published: b.published === false ? false : undefined });
 
 /**
  * The new texts of the catalogue, when the base still holds the texts last

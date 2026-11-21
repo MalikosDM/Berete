@@ -21,7 +21,7 @@ import Universe, { universeProps } from "@/components/Universe";
 import { defaultCatalogue } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
-import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
+import { findPiece, initials, mediaOfPiece, peopleOf, personHref, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
 import { anglePhotos } from "@/data/angles";
 import { filmTime, resolveAtelier, resolveReveal } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
@@ -122,7 +122,8 @@ export default function PiecePage() {
       {/* Opening: the jewel, full screen */}
       <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
-        <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14 xl:col-span-8">
+        {/* A piece shown large (Dragon Ball, 21/11/2026): a taller frame on a phone, the whole height on a computer. */}
+        <div data-piece-cover className={"relative shrink-0 px-4 pt-20 sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[70svh] sm:h-[72svh]" : "h-[58svh] sm:h-[62svh]")}>
           {opening.mode === "photo" ? (
             <>
               <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
@@ -136,7 +137,7 @@ export default function PiecePage() {
               ) : null}
             </>
           ) : (
-            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} />
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} />
           )}
         </div>
         {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the
@@ -200,12 +201,14 @@ export default function PiecePage() {
               {people.slice(0, 3).map((person) => {
                 const portrait = portraitOf(cat, person);
                 const stories = storiesOf(cat, person.slug);
+                // Their other piece, when they have one other than this one; else their page (21/11/2026).
+                const href = personHref(cat, person) === "/pieces/" + piece.slug ? "/players/" + person.slug : personHref(cat, person);
                 // A club with its official logo (src/lib/clubs.ts): the logo, in the light of the universe of the piece.
                 const logo = person.kind === "club" ? clubLogo(person.slug) : null;
                 return (
                   <li key={person.slug} className="flex items-center gap-5">
                     {logo ? (
-                      <Link to={"/players/" + person.slug} data-club-logo={person.slug} className="club-emblem relative block size-24 shrink-0 sm:size-28" aria-label={person.name}>
+                      <Link to={href} data-club-logo={person.slug} className="club-emblem relative block size-24 shrink-0 sm:size-28" aria-label={person.name}>
                         <span aria-hidden="true" className="club-emblem-halo absolute -inset-5 rounded-full" />
                         <span className="relative flex h-full w-full items-center justify-center rounded-full bg-rose-gold p-[2px]">
                           <span className="flex h-full w-full items-center justify-center rounded-full border-2 border-ink bg-ink p-2.5">
@@ -214,14 +217,14 @@ export default function PiecePage() {
                         </span>
                       </Link>
                     ) : (
-                      <Link to={"/players/" + person.slug} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
+                      <Link to={href} className="block size-20 shrink-0 overflow-hidden rounded-full bg-rose-gold p-[2px]" aria-label={person.name}>
                         <span className="flex h-full w-full items-center justify-center overflow-hidden rounded-full border-2 border-ink bg-ink-soft">
                           {portrait ? <Img src={portrait} srcSet={coverSrcSet(portrait)} sizes="64px" alt="" loading="lazy" className="h-full w-full object-cover" /> : <span aria-hidden="true" className="font-display text-xl text-white">{initials(person.name)}</span>}
                         </span>
                       </Link>
                     )}
                     <div className="min-w-0">
-                      <Link to={"/players/" + person.slug} data-made-for-person={person.slug} className="inline-flex min-h-12 items-baseline gap-2 font-display text-[clamp(1.5rem,3vw,2.25rem)] uppercase tracking-[0.06em] text-white hover:text-rose-light">
+                      <Link to={href} data-made-for-person={person.slug} className="inline-flex min-h-12 items-baseline gap-2 font-display text-[clamp(1.5rem,3vw,2.25rem)] uppercase tracking-[0.06em] text-white hover:text-rose-light">
                         {person.number !== null ? <span className="text-rose-gold text-lg">{person.number}</span> : null}
                         {person.name}
                       </Link>

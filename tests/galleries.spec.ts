@@ -161,7 +161,7 @@ test("the new jersey photos of five players: their portrait on their page and on
   }
   await page.goto("/players", { waitUntil: "load" });
   for (const slug of NEW_PORTRAITS) {
-    const card = page.locator("a[href$='/players/" + slug + "']").first();
+    const card = page.locator("[data-player-card='" + slug + "'] a[data-player-link]");
     await card.scrollIntoViewIfNeeded();
     await expect(card.locator("img").first(), slug + " on the wall").toHaveAttribute("src", new RegExp(players[slug]![0]!.src.replace(/\.webp$/, "").replace(/[/.-]/g, "\\$&")));
   }

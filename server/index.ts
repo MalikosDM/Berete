@@ -74,7 +74,8 @@ app.use(express.static(dist, { redirect: false, setHeaders: (res, file) => res.s
 // The old addresses of the site lead to the new ones (permanent redirects, in every language):
 // /pieces and /capsules/... to /creations, a piece under /creations/<slug> to /pieces/<slug>,
 // a renamed piece to its new address, an unpublished piece to the page of its player (else /creations),
-// the page of a person who left the circle (all their pieces unpublished) to /players.
+// the page of a person who left the circle (all their pieces unpublished) to /players, the address of a box (a box removed
+// by Yoni, 21/11/2026, or any other) to the page of the trunks.
 app.get(/^(?!\/api\/).*/, async (req, res, next) => {
   const parts = req.path.replace(/\/+$/, "").split("/").slice(1);
   const prefix = LANGUAGES.includes(parts[0] ?? "") ? "/" + parts.shift() : "";
@@ -83,6 +84,7 @@ app.get(/^(?!\/api\/).*/, async (req, res, next) => {
   if ((section === "pieces" && slug === "") || section === "capsules") target = "/creations";
   else if (section === "creations" && slug !== "" && rest.length === 0) target = "/pieces/" + (RENAMED_PIECES[slug] ?? slug);
   else if (section === "pieces" && rest.length === 0 && RENAMED_PIECES[slug]) target = "/pieces/" + RENAMED_PIECES[slug];
+  else if (section === "boxes" && slug !== "") target = "/boxes";
   else if ((section === "pieces" || section === "players") && slug !== "" && rest.length === 0) {
     // Only an address without its page comes here: the catalogue of the base says where it leads.
     try {

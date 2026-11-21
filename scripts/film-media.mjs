@@ -20,8 +20,9 @@
  * The finished piece ("reveal") also opens the page of the piece: the first thing seen when entering it
  * (src/components/PieceFilm.tsx). Checked again by eye on 20/11/2026, every video of the folders of the pieces (frames):
  * the most beautiful and sharpest edit of the finished piece of each (studio, on black, with music), never a making-of,
- * a delivery or a phone video. Folders 13 (Dragon Ball), 16 (The Safi Link) and 08 hold no edit of a finished piece of
- * the site; the pieces taken from the stories have no folder.
+ * a delivery or a phone video. Folders 16 (The Safi Link) and 08 hold no edit of a finished piece of the site; the pieces
+ * taken from the stories have no folder. Folder 13 (Dragon Ball): its making-of edit ends on the finished piece, Yoni
+ * wants it at the opening too (21/11/2026).
  *
  * folder: the folder of the piece itself (scripts/hd-media.mjs). A piece of the drafts (unpublished) gets the light copy
  * only. start: the second where a film begins, by kind, when its first seconds must not be shown. poster: the frame used
@@ -30,7 +31,9 @@
  */
 export const FILMS = [
   /* ---------- Pieces of the site ---------- */
-  { slug: "kevin-schade-dragon-ball-pendant", folder: "13", making: "13/v01" },
+  // Its professional edit (13/v01, HD 1080 x 1920, 25 s: from the 3D drawing to the finished piece) also opens its page
+  // (feedback of Yoni, 21/11/2026; the same edit in the stories, kevin-schade/20, is only 720p): played once in its atelier.
+  { slug: "kevin-schade-dragon-ball-pendant", folder: "13", making: "13/v01", reveal: "13/v01" },
   { slug: "noah-okafor-octagon-pendant", folder: "17", making: "17/v02", reveal: "17/v01" },
   // No studio film of its fabrication: the polishing at the bench, filmed by phone (clean, close).
   { slug: "angelo-stiller-as-pendant", folder: "18", making: "18/v04", reveal: "18/v01" },

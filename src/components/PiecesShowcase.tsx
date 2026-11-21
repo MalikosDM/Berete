@@ -62,12 +62,12 @@ export default function PiecesShowcase({
         aria-labelledby="capsules-title"
         className="relative overflow-hidden bg-ink py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0"
       >
-        <div className="mx-auto mb-10 flex w-full max-w-[1600px] flex-col justify-between gap-4 px-5 sm:flex-row sm:items-end sm:px-8 lg:mb-12 lg:px-12">
+        <div className="mx-auto mb-8 flex w-full max-w-[1600px] flex-col justify-between gap-4 px-5 sm:flex-row sm:items-end sm:px-8 lg:mb-10 lg:px-12">
           <div>
             <p className="eyebrow">{t.showcase.eyebrow}</p>
             <h2
               id="capsules-title"
-              className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]"
+              className="title-caps mt-4 text-[clamp(1.75rem,4vw,3.25rem)] tracking-[0.14em]"
             >
               {t.showcase.title}
             </h2>
@@ -81,21 +81,21 @@ export default function PiecesShowcase({
         </div>
         <div
           ref={trackRef}
-          className="no-scrollbar flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:w-max lg:snap-none lg:gap-8 lg:overflow-visible lg:px-12"
+          className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 sm:gap-5 sm:px-8 lg:w-max lg:snap-none lg:gap-7 lg:overflow-visible lg:px-12"
         >
           {pieces.map((p, i) => (
             <Link
               key={p.slug}
               to={"/pieces/" + p.slug}
-              className="group relative flex w-[82vw] shrink-0 snap-center flex-col border border-white/10 bg-ink sm:w-[46vw] lg:w-[30vw] xl:w-[26vw]"
+              className="group relative flex w-[70vw] shrink-0 snap-center flex-col border border-white/10 bg-ink sm:w-[40vw] lg:w-[25vw] xl:w-[21vw]"
             >
               <span className="relative block aspect-[4/5] overflow-hidden">
-                <span className="absolute inset-0 p-6 transition-transform duration-[1.8s] ease-out group-hover:scale-105">
+                <span className="absolute inset-0 p-5 transition-transform duration-[1.8s] ease-out group-hover:scale-105">
                   <MediaView
                     item={p.cover}
                     alt={p.title}
                     fit="contain"
-                    sizes="(max-width: 639px) 82vw, (max-width: 1023px) 46vw, 30vw"
+                    sizes="(max-width: 639px) 70vw, (max-width: 1023px) 40vw, 25vw"
                   />
                 </span>
                 <span
@@ -103,14 +103,14 @@ export default function PiecesShowcase({
                   className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-rose-light/20 to-transparent transition-transform duration-[1.6s] ease-out group-hover:translate-x-full"
                 />
               </span>
-              <span className="flex flex-1 flex-col p-6">
-                <span className="text-rose-gold font-display text-2xl">
+              <span className="flex flex-1 flex-col p-5">
+                <span className="text-rose-gold font-display text-xl">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="title-caps mt-3 block text-[clamp(1.5rem,2.2vw,2.25rem)] tracking-[0.06em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">
+                <span className="title-caps mt-2 block text-[clamp(1.25rem,1.7vw,1.75rem)] tracking-[0.06em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">
                   {p.title}
                 </span>
-                <span className="mt-3 block text-base text-mist">
+                <span className="mt-2 block text-base text-mist">
                   {t.types[p.type]}
                 </span>
                 <span data-enter-world className="mt-auto inline-flex min-h-12 items-center gap-2 pt-4 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">

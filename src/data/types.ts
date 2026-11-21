@@ -144,6 +144,8 @@ export type Box = {
   images: MediaItem[];
   /** The piece this box was made for, if it has a page. */
   pieceSlug: string | null;
+  /** Shown on the site. An unpublished box is kept (the admin can publish it again) but appears nowhere. */
+  published: boolean;
   translations?: Translations;
 };
 

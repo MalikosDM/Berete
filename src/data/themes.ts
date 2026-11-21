@@ -53,6 +53,8 @@ export const THEME_EFFECTS = [
   "drops",
   // The endless space of The Hand: lines of light rushing to the sphere, rings rippling from it, its light breathing.
   "void",
+  // The Japanese night of Sirius: red maple leaves falling.
+  "maple",
   // An effect on the piece itself, that ties it to its world (src/components/universe/JewelFx.tsx).
   "jewel-sheen",
   "jewel-sparkle",
@@ -61,10 +63,11 @@ export const THEME_EFFECTS = [
   "jewel-beam",
   "jewel-prism",
   "jewel-void",
+  "jewel-blood",
 ] as const;
 
 /** The effects drawn on the piece itself: a piece takes the first one of its universe. */
-export const JEWEL_EFFECTS = ["jewel-sheen", "jewel-sparkle", "jewel-halo", "jewel-warm", "jewel-beam", "jewel-prism", "jewel-void"] as const;
+export const JEWEL_EFFECTS = ["jewel-sheen", "jewel-sparkle", "jewel-halo", "jewel-warm", "jewel-beam", "jewel-prism", "jewel-void", "jewel-blood"] as const;
 export type JewelEffect = (typeof JEWEL_EFFECTS)[number];
 export const jewelOf = (effects: readonly string[]): JewelEffect | null => (JEWEL_EFFECTS.find((e) => effects.includes(e)) ?? null);
 
@@ -275,6 +278,13 @@ THEME_PRESETS.keita = {
   name: "La nuit de la célébration : KO, cage ouverte, célébration (Lasana Keita)",
   theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "keita", entrance: "spotlight", effects: ["embers", "gold-confetti", "smoke", "scene", "flashes", "jewel-sheen"], mark: "" },
 };
+// Sirius, since 21/11/2026 (feedback of Yoni): the Japanese night, the blood moon, the pagoda and the oni masks (backdrop
+// "sirius-japon"): red embers rising, red maple leaves falling, a red mist, the eyes of the masks glowing now and then and
+// discreet flashes in the clouds (its lights, "scene"); on the piece a red reflection and a red halo behind it.
+THEME_PRESETS.japon = {
+  name: "Nuit japonaise, lune de sang, masques oni (Sirius)",
+  theme: { base: "#070304", tint: "#3a0a0f", glow: "#ff4a3a", texture: "grain", light: "ember", font: "pinceau", backdrop: "sirius-japon", entrance: "smoke", effects: ["embers", "maple", "smoke", "scene", "jewel-blood"], mark: "" },
+};
 THEME_PRESETS.sirius = {
   name: "Ciel étoilé, l'étoile Sirius (Sirius)",
   theme: { base: "#03050b", tint: "#0d1a33", glow: "#cfe3ff", texture: "grain", light: "halo", font: "etoile", backdrop: "sirius", entrance: "stars", effects: ["stars", "dust", "scene", "jewel-sparkle"], mark: "" },
@@ -366,6 +376,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   "beam-dust": "Poussière dorée dans le faisceau",
   drops: "Gouttes qui brillent sous le réverbère",
   void: "Espace infini : traits de lumière vers la sphère, anneaux, respiration de la sphère",
+  maple: "Feuilles d'érable rouges qui tombent",
   "jewel-sheen": "Sur la pièce : un reflet passe (couleur de la lumière)",
   "jewel-sparkle": "Sur la pièce : des éclats scintillent",
   "jewel-halo": "Sur la pièce : un halo pulse autour",
@@ -373,6 +384,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   "jewel-warm": "Sur la pièce : une lumière chaude",
   "jewel-beam": "Sur la pièce : un rayon de lumière la touche",
   "jewel-prism": "Sur la pièce : reflets blancs et arcs-en-ciel",
+  "jewel-blood": "Sur la pièce : un reflet rouge passe, un halo rouge derrière elle",
 };
 
 /** Every former motion becomes one of the effects. */

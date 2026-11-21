@@ -44,6 +44,8 @@ function pages(prefix: string) {
       <Route path="players/:slug" element={<OnePerAddress><PlayerPage /></OnePerAddress>} />
       <Route path="atelier" element={<Atelier />} />
       <Route path="boxes" element={<Boxes />} />
+      {/* The boxes have no page of their own: an old address (a box removed by Yoni) leads to the page of the trunks. */}
+      <Route path="boxes/:slug" element={<Navigate to="/boxes" replace />} />
       <Route path="process" element={<Process />} />
       <Route path="about" element={<About />} />
       <Route path="contact" element={<Contact />} />

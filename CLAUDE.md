@@ -155,12 +155,45 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       avec le son (sinon muette avec un bouton son en vue), dans un cadre aux couleurs de l'univers ; « Voir la pièce »,
       Échap ou la fin de la vidéo la ferment ; « Voir le film » la relance. 13 pièces : Inter, VfB, OKA, octogone et maillot
       d'Okafor, croix Tillman, AS, Ruby T, T-Serpent, Tulips, Kenan, The Hand, Butterfly (vidéos regardées image par image ;
-      maillot : le petit edit 32/v03 plutôt que le film de livraison). Sans vidéo : Dragon Ball, Samuel Ballet, Safi Link et
-      les pièces tirées des stories. Mobile en 720p.
+      maillot : le petit edit 32/v03 plutôt que le film de livraison). Dragon Ball depuis le 21/11 (son montage 13/v01).
+      Sans vidéo : Samuel Ballet, Safi Link et les pièces tirées des stories. Mobile en 720p.
 - [x] **Vidéos HD** : arrivées le 21/11 (94 originaux), voir « Passe films en HD ».
 - [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
+
+## Passe « retours de Yoni du 21/11 (3) » (Dragon Ball, Cercle, Sirius, écrin NZ, accueil, menu) — état au 21/11/2026
+- [x] **Dragon Ball** : la vue principale détourée en grand à l'ouverture (`showcase: { size: "large" }` de la pièce ; admin
+      « Vitrine de l'ouverture » : « Pièce en grand ») : toute la hauteur sur ordinateur (+35 %), un cadre plus haut sur
+      téléphone (70 svh, +28 %), jamais coupée. Son montage pro **13/v01** (HD 1080 × 1920, 25 s, du dessin 3D à la pièce
+      finie) devient son film d'ouverture (`reveal` dans `scripts/film-media.mjs`) ; il reste dans l'atelier, joué une fois.
+      La version des stories (kevin-schade/20) n'est qu'en 720p, aucun « Videos HD » dans le dossier 13.
+- [x] **Le Cercle** : un clic sur un joueur mène droit à la capsule de sa pièce, dans son univers (`personHref` de
+      `src/data/relations.ts`) ; s'il en a plusieurs (Thuram, Okafor, Kevin Schade, Tillman, Leweling, Undav, Stiller), à sa
+      page : ses pièces en premier (cartes « Entrer dans l'univers »), photos, joueurs du club, puis ses stories en petit en
+      bas. Partout : mur du Cercle (/players et accueil), joueurs d'un club, « Créée pour » d'une pièce (vers sa page s'il
+      n'a que cette pièce). La barre des stories en haut de l'accueil ouvre toujours les stories (la fonction Instagram).
+- [x] **Écrin Sirius** : nouveaux fichiers de Yoni (le vrai écrin noir au masque, suède rouge, braises), `npm run trunks --
+      --only=sirius` ; ses deux images remplacent ses photos sur la page des écrins (`public/media/boxes/sirius/closed|open`,
+      `photos` dans `trunks.generated.json`). Les vraies photos de l'écrin (37/p01, p03, p04) restent sur la page de la chaîne.
+- [x] **Univers japonais de Sirius** (remplace le ciel étoilé) : fond `sirius-japon` (`sirius-japon-desktop/-mobile.jpg`),
+      preset `japon` : braises rouges, feuilles d'érable rouges qui tombent (effet `maple`, `fx.ts`), brume rouge (`smoke`),
+      lune de sang qui respire, yeux des masques qui s'allument par moments (spots `eye`, les 2 yeux d'un masque ensemble ;
+      2 masques sur ordinateur, 7 sur téléphone), éclairs discrets dans les nuages (spots `flash`) ; sur la pièce un reflet
+      rouge et un halo rouge (`jewel-blood`). Police pinceau. Aucune story ne montre Sirius : le fond (`portrait`) entourera
+      sa story dès qu'elle existera.
+- [x] **NZ Travel Case retirée** : les écrins ont maintenant une case « Publié » (colonne `published` de `Box`, migration
+      `20261121200000_box_published`, `REMOVED_BOXES` dans `src/data/pieces.ts`) ; gardée dans l'admin, invisible partout
+      (page des écrins, page du FAM). Toute adresse `/boxes/<écrin>` mène (301) à /boxes (serveur et `vercel.json`).
+- [x] **Accueil plus petit** (−15 à −20 %) : titres de section 52 px au plus (64 avant), textes, boutons et marges réduits
+      (textes ≥ 16 px et boutons ≥ 48 px gardés sur téléphone). « Explore the Creations » (`CollectionTiles.tsx`) : petites
+      cartes (4 de front sur ordinateur, 2 sur téléphone), le bijou entier avec de l'air autour (plus de recadrage). Cartes
+      « The Universes » et mur des joueurs plus petits, section « From Vision to Reality » en carrés.
+- [x] **Menu** : la page « Worn by Icons » (/players) avait le même menu que les autres ; sous 1 440 px (portable avec sa
+      barre de défilement), toutes les pages passaient au bouton menu en haut à droite. Le menu complet tient maintenant dès
+      **1 260 px** (`--breakpoint-nav`, lettres un peu plus serrées jusqu'à 1 440 px, `roomy`), vérifié dans les 6 langues.
+- `tests/yoni2111.spec.ts` (ordinateur et iPhone), captures dans `verification/yoni2111/`.
+- [ ] Yoni : relire l'univers japonais (masques oni : rien d'une œuvre précise) ; une story de Sirius et de The Hand ?
 
 ## Passe « The Hand : l'espace infini » — état au 21/11/2026
 - [x] **Nouvel univers de The Hand** (remplace le rideau de velours) : fond `infini` (images de Yoni `vide-infini-desktop/
@@ -192,6 +225,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       préparés par `npm run trunks` (`scripts/trunk-media.mjs`) : images carrées 720/1080/1440 en AVIF et WebP (15 à 50 Ko),
       vidéo 1080 × 1080 H.264 sans son (~0,8 Mo, la même sur ordinateur et téléphone), chargée seulement quand l'écrin
       approche de l'écran ou au survol. Originaux jamais dans Git. L'écrin Dragon Ball garde ses photos (droits).
+- Depuis le 21/11 (3) : nouvel écrin Sirius, NZ Travel Case retirée (voir plus haut).
 - `tests/trunks.spec.ts` (Signature, Inter, Sirius ; ordinateur et iPhone ; messages en anglais et en français ;
   « réduire les animations » ; vidéos chargées à l'approche), captures dans `verification/trunks/`.
 

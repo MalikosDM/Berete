@@ -319,6 +319,7 @@ const BoxIn = z.object({
   description: z.string().max(3000).default(""),
   images: MediaListSchema.default([]),
   pieceSlug: optText(200),
+  published: z.boolean().default(true),
   translations: TranslationsSchema.default({}),
 });
 

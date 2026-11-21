@@ -20,7 +20,19 @@
    ],
    "video": "/media/trunks/sirius/opening.mp4",
    "size": 1080,
-   "duration": 6.04
+   "duration": 6.04,
+   "photos": [
+    {
+     "src": "/media/boxes/sirius/closed.webp",
+     "width": 1600,
+     "height": 1600
+    },
+    {
+     "src": "/media/boxes/sirius/open.webp",
+     "width": 1600,
+     "height": 1600
+    }
+   ]
   },
   "tulips-on-tour": {
    "base": "/media/trunks/tulips-on-tour",

@@ -18,6 +18,9 @@ import { useI18n } from "@/i18n";
 /** The places around the main view: [x, y] as a share of the box, the size, the depth of the relief. */
 const MAIN = { x: 0, y: 0, s: 0.74, d: 16 };
 const SINGLE = { x: 0, y: 0, s: 0.94, d: 12 };
+// A piece shown large (PieceShowcase.size): its main view takes the whole box (the views around stay at their places, behind).
+const MAIN_LARGE = { ...MAIN, s: 1 };
+const SINGLE_LARGE = { ...SINGLE, s: 1 };
 // Each one stays inside the box: |x| and |y| at most (1 - s) / 2.
 const AROUND = [
   { x: -0.37, y: 0.33, s: 0.26, d: 7 },
@@ -26,8 +29,11 @@ const AROUND = [
   { x: -0.37, y: -0.32, s: 0.22, d: 5 },
 ];
 
-/** jewel: the effect of its universe on the piece itself (src/components/universe/JewelFx.tsx), on its main view. */
-export default function Showcase({ slug, title, views, jewel = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null }) {
+/**
+ * jewel: the effect of its universe on the piece itself (src/components/universe/JewelFx.tsx), on its main view. large: its
+ * main view much larger (the whole box).
+ */
+export default function Showcase({ slug, title, views, jewel = null, large = false }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -128,12 +134,12 @@ export default function Showcase({ slug, title, views, jewel = null }: { slug: s
   );
 
   return (
-    <div ref={rootRef} data-showcase={multi ? "multi" : "single"} className="relative h-full w-full">
+    <div ref={rootRef} data-showcase={multi ? "multi" : "single"} data-showcase-large={large ? "" : undefined} className="relative h-full w-full">
       {/* Computer: the views in depth */}
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
         {order.map((viewIndex, place) => {
           const v = views[viewIndex]!;
-          const spot = !multi ? SINGLE : place === 0 ? MAIN : AROUND[(place - 1) % AROUND.length]!;
+          const spot = !multi ? (large ? SINGLE_LARGE : SINGLE) : place === 0 ? (large ? MAIN_LARGE : MAIN) : AROUND[(place - 1) % AROUND.length]!;
           const main = place === 0;
           const style = {
             transform: "translate(" + spot.x * 100 + "%, " + spot.y * 100 + "%) scale(" + spot.s + ")",

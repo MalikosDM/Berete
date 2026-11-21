@@ -222,6 +222,46 @@ BACKDROPS.push({
   mobileCore: [0.5, 0.383, 0.233],
 });
 
+/*
+ * Sirius, since 21/11/2026 (it replaces the starry sky): a Japanese night, a blood moon, a pagoda, oni masks with red eyes,
+ * lightning in the clouds. Its lights: the moon breathing; the eyes of each mask that glow now and then (eye: both eyes of
+ * one mask share their number i, so they light up together); a flash in the clouds around each painted bolt (flash).
+ * Measured on the images of Yoni (crops with a grid, 21/11/2026).
+ */
+const EYES_D = [
+  [0.4681, 0.5453, 0.012, 0],
+  [0.5099, 0.5299, 0.012, 0],
+  [0.8392, 0.6806, 0.012, 1],
+  [0.8857, 0.7102, 0.012, 1],
+];
+const EYES_M = [
+  [0.8999, 0.2791, 0.017, 0],
+  [0.955, 0.2643, 0.017, 0],
+  [0.0618, 0.3638, 0.016, 1],
+  [0.1153, 0.3792, 0.016, 1],
+  [0.1867, 0.6078, 0.01, 2],
+  [0.2114, 0.605, 0.01, 2],
+  [0.7694, 0.5738, 0.014, 3],
+  [0.8132, 0.5778, 0.014, 3],
+  [0.5553, 0.7316, 0.01, 4],
+  [0.5772, 0.7367, 0.01, 4],
+  [0.0784, 0.7682, 0.014, 5],
+  [0.1234, 0.7587, 0.014, 5],
+  [0.7973, 0.8159, 0.019, 6],
+  [0.8875, 0.8296, 0.019, 6],
+];
+BACKDROPS.push(
+  scene("sirius-japon", "Nuit japonaise, lune de sang, pagode, masques oni (Sirius)", [0.668, 0.42], {
+    spots: [
+      { k: "glow", tone: "red", d: [0.668, 0.2945, 0.13], m: [0.5, 0.152, 0.3] },
+      ...EYES_D.map(([x, y, r, i]) => ({ k: "eye", tone: "red", d: [x, y, r], i })),
+      ...EYES_M.map(([x, y, r, i]) => ({ k: "eye", tone: "red", m: [x, y, r], i })),
+      { k: "flash", tone: "storm", d: [0.48, 0.31, 0.075], m: [0.21, 0.205, 0.17], i: 0 },
+      { k: "flash", tone: "storm", d: [0.886, 0.29, 0.075], m: [0.78, 0.17, 0.17], i: 1 },
+    ],
+  }),
+);
+
 /** Backdrops made of several images that follow one another in a slow fade (src/components/Universe.tsx): hold = seconds each. */
 const SEQUENCES = [{ id: "keita", name: "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)", frames: ["keita-ko", "keita-cage", "keita-tribune"], hold: 8 }];
 

@@ -149,7 +149,9 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   être une séquence d'images en fondu (`sequence`, `SEQUENCES` de `scripts/universe-media.mjs` : la nuit de Lasana Keita).
   Les Signature Trunks s'ouvrent au clic (`src/components/TrunkReveal.tsx`) : image fermée, vidéo d'ouverture, image
   ouverte et bouton WhatsApp pour créer le sien ; fichiers préparés par `npm run trunks` (`scripts/trunk-media.mjs`,
-  `src/data/trunks.generated.json`, position de la lumière de chaque écrin dans `src/data/trunks.ts`).
+  `src/data/trunks.generated.json`, position de la lumière de chaque écrin dans `src/data/trunks.ts`) ; un seul écrin :
+  `npm run trunks -- --only=sirius` (ses images remplacent aussi ses photos, `PHOTOS` du script). Un écrin retiré passe en
+  « non publié » (case de l'admin, `REMOVED_BOXES`) ; toute adresse `/boxes/<écrin>` mène à /boxes.
   La page Créations est une grille serrée (`PieceCard compact` :
   6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
@@ -284,6 +286,8 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # message WhatsApp en 2 langues, « réduire les animations »)
                         # tests/angles.spec.ts : retours de Yoni du 21/11 (« Sous tous les angles » : un texte par photo
                         # en 6 langues, damier, iPhone, lisibilité ; 4 pièces retirées, filtres des Créations, admin)
+                        # tests/yoni2111.spec.ts : Dragon Ball en grand et son film, le Cercle (clic = la pièce),
+                        # Sirius (écrin, nuit japonaise), écrin NZ retiré, accueil plus petit, menu dès 1 260 px
 ```
 
 ## Vitesse (Lighthouse)

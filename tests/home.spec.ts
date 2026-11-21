@@ -172,11 +172,11 @@ test("players: a wall of portraits on /players and on the home page", async ({ p
   await page.waitForTimeout(1500);
   const cards = page.locator("[data-player-card]");
   await expect(cards).toHaveCount(cat.people.length);
-  // Each card: a photo or the initials, the name, a link to the profile.
+  // Each card: a photo or the initials, the name, a link: the capsule of their piece, else their page (21/11/2026).
   for (let i = 0; i < (await cards.count()); i++) {
     const card = cards.nth(i);
     expect(await card.locator("img, [data-initials]").count()).toBe(1);
-    await expect(card.locator("a[href*='/players/']")).toHaveCount(1);
+    await expect(card.locator("a[data-player-link]")).toHaveAttribute("href", /\/(pieces|players)\/[a-z0-9-]+$/);
   }
   await page.evaluate(async () => {
     for (let y = 0; y < document.body.scrollHeight; y += 600) {

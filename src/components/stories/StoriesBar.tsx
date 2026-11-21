@@ -120,7 +120,7 @@ export default function StoriesBar() {
 
   if (stories.length === 0) return null;
 
-  const bubble = compact ? "size-11 lg:size-12" : "size-14 sm:size-16 lg:size-[4.75rem]";
+  const bubble = compact ? "size-11 lg:size-12" : "size-14 sm:size-16 lg:size-[4.25rem]";
   const arrow = "absolute top-1/2 hidden size-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-ink/70 text-white transition-colors hover:border-rose-light hover:text-rose-light md:inline-flex";
 
   return (

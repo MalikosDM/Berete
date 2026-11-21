@@ -1,6 +1,6 @@
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
-import { initials, instagramOf, portraitOf } from "@/data/relations";
+import { initials, instagramOf, personHref, portraitOf } from "@/data/relations";
 import type { Catalogue, Person } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -44,12 +44,14 @@ export function facesFirst(people: Person[], cat: Catalogue): Person[] {
 
 /**
  * The wall of the players: one portrait per person (photo, name, club, Instagram). `compact`: the smaller wall of the
- * home page (three columns on phones).
+ * home page (three columns on phones). A click leads straight to the capsule of their piece (their page when they have
+ * several: src/data/relations.ts, personHref).
  */
 export default function PlayerWall({ people, compact = false }: { people: Person[]; compact?: boolean }) {
   const { t } = useI18n();
-  const columns = compact ? "grid-cols-3 gap-x-3 gap-y-8 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-6" : "grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:grid-cols-5";
-  const sizes = compact ? "(max-width: 639px) 31vw, (max-width: 1023px) 23vw, 15vw" : "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, (max-width: 1279px) 23vw, 18vw";
+  const cat = useCatalogue();
+  const columns = compact ? "grid-cols-3 gap-x-3 gap-y-8 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-7 lg:gap-x-6" : "grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:grid-cols-5";
+  const sizes = compact ? "(max-width: 639px) 31vw, (max-width: 1023px) 23vw, 13vw" : "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, (max-width: 1279px) 23vw, 18vw";
   return (
     <ul data-player-wall className={"grid " + columns}>
       {people.map((p) => {
@@ -57,7 +59,7 @@ export default function PlayerWall({ people, compact = false }: { people: Person
         const role = p.kind === "club" ? t.players.club : p.kind === "personality" ? t.players.personality : p.club;
         return (
           <li key={p.slug} data-player-card={p.slug} className="group relative">
-            <Link to={"/players/" + p.slug} className="block">
+            <Link to={personHref(cat, p)} data-player-link className="block">
               <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
                 <PlayerPortrait person={p} sizes={sizes} className="h-full w-full transition-[opacity,transform] duration-700 group-hover:scale-105" />
                 <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-linear-to-t from-ink/60 to-transparent" />
@@ -66,7 +68,7 @@ export default function PlayerWall({ people, compact = false }: { people: Person
               <span
                 className={
                   "mt-4 flex items-baseline gap-2 leading-[1.15] text-white transition-colors group-hover:text-rose-light " +
-                  (compact ? "text-base font-medium max-sm:mt-3 sm:font-display sm:text-xl sm:font-normal sm:uppercase sm:tracking-[0.05em]" : "font-display text-xl uppercase tracking-[0.05em] sm:text-2xl")
+                  (compact ? "text-base font-medium max-sm:mt-3 sm:font-display sm:text-lg sm:font-normal sm:uppercase sm:tracking-[0.05em]" : "font-display text-xl uppercase tracking-[0.05em] sm:text-2xl")
                 }
               >
                 {p.number !== null ? <span className="text-rose-gold shrink-0">{p.number}</span> : null}

@@ -137,7 +137,8 @@ for (const slug of CAPSULES) {
     // (The typography of some universes is drawn larger or smaller: its scale.)
     const [titleSize, scale] = await title.evaluate((e) => [parseFloat(getComputedStyle(e).fontSize), parseFloat(getComputedStyle(e).getPropertyValue("--u-font-scale")) || 1]);
     expect(titleSize).toBeLessThanOrEqual((phone ? 36 : 46) * scale);
-    expect(titleSize).toBeGreaterThanOrEqual(24);
+    // (A wide font of a universe, the Japanese brush of Sirius, is drawn smaller: its scale.)
+    expect(titleSize).toBeGreaterThanOrEqual(24 * Math.min(1, scale));
     const intro = page.locator("[data-piece-intro]");
     for (const b of await intro.locator("a, button").all()) {
       const box = (await b.boundingBox())!;

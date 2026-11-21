@@ -41,7 +41,8 @@ const TWENTY = Array.from({ length: 20 }, (_, i) => {
  *   reflection that turns on a wheel, or swings on the balance of a watch; cone: the light of a projector (a: its tilt);
  *   beam: a stadium light bar that sways; rays: shafts of light through a window (w: their length, a: their tilt);
  *   ripples: the reflections of wet pavements; heat: the air over a fire; folds: a curtain that barely moves; sails: the
- *   sails of a windmill turning slowly (r: their length; the painted ones are removed from the image).
+ *   sails of a windmill turning slowly (r: their length; the painted ones are removed from the image); eye: an eye of a
+ *   mask that glows now and then (the two eyes of one mask share their number i); flash: lightning lighting up a cloud.
  */
 const SPOT_PARAMS: Record<string, string[]> = {
   glow: ["x", "y", "r"],
@@ -51,6 +52,8 @@ const SPOT_PARAMS: Record<string, string[]> = {
   spin: ["x", "y", "r"],
   swing: ["x", "y", "r"],
   sails: ["x", "y", "r"],
+  eye: ["x", "y", "r"],
+  flash: ["x", "y", "r"],
   cone: ["x", "y", "w", "h", "a"],
   beam: ["x", "y", "w", "h"],
   rays: ["x", "y", "w", "a"],
@@ -176,7 +179,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   // The other images of a sequence load once the page is there (the first one alone before).
   const [allFrames, setAllFrames] = useState(false);
   const canvasEffects = effects.filter((e) =>
-    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops", "void"].includes(e),
+    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "maple", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops", "void"].includes(e),
   );
   // The lights of the image that come alive, and the places where some effects of the canvas happen.
   const frameSpots = frames.map((f) => (effects.includes("scene") ? (f.b.spots ?? []) : []));

@@ -13,6 +13,8 @@ export type TrunkFilm = {
   video: string;
   size: number;
   duration: number;
+  /** Its two images as photos of the page of the trunks (closed, open), when they replace its old photos. */
+  photos?: { src: string; width: number; height: number }[];
 };
 
 const FILMS = generated.trunks as Record<string, TrunkFilm>;
@@ -23,7 +25,8 @@ const FILMS = generated.trunks as Record<string, TrunkFilm>;
  */
 const LIGHT: Record<string, [number, number]> = {
   "signature-trunk": [0.5, 0.48],
-  sirius: [0.5, 0.55],
+  // The trunk with the horned mask (images of 21/11/2026): its red suede, beside the open door.
+  sirius: [0.51, 0.53],
   "tulips-on-tour": [0.53, 0.57],
   "butterfly-trunk": [0.5, 0.6],
   "okafor-trunk": [0.55, 0.6],
@@ -37,4 +40,9 @@ export type Trunk = TrunkFilm & { light: [number, number] };
 export function trunkOf(slug: string): Trunk | null {
   const film = FILMS[slug];
   return film ? { ...film, light: LIGHT[slug] ?? [0.5, 0.55] } : null;
+}
+
+/** The images of a trunk as its photos (closed, open), or none. */
+export function trunkPhotos(slug: string): { src: string; width: number; height: number }[] {
+  return FILMS[slug]?.photos ?? [];
 }

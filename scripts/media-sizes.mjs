@@ -44,9 +44,10 @@ async function photos(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const p = join(dir, entry.name);
     // The frames of the scroll films are drawn in a canvas at their own size; the backdrops of the universes come in
-    // their own widths (scripts/universe-media.mjs), and so do the cutouts of the pieces (scripts/cutouts.mjs).
+    // their own widths (scripts/universe-media.mjs), and so do the cutouts of the pieces (scripts/cutouts.mjs) and the images
+    // of the trunks that open (scripts/trunk-media.mjs).
     if (entry.isDirectory()) {
-      if (!entry.name.startsWith("frames-") && entry.name !== "universes" && entry.name !== "cutouts") out.push(...(await photos(p)));
+      if (!entry.name.startsWith("frames-") && entry.name !== "universes" && entry.name !== "cutouts" && entry.name !== "trunks") out.push(...(await photos(p)));
     } else if (entry.name.endsWith(".webp") && !COPY.test(entry.name)) out.push(p);
   }
   return out;

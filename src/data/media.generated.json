@@ -4866,6 +4866,25 @@
         "poster": 5,
         "source": "13/v01 · HD 1080p",
         "light": false
+      },
+      "reveal": {
+        "src": "/media/films/kevin-schade-dragon-ball-pendant/reveal.mp4",
+        "mobile": "/media/films/kevin-schade-dragon-ball-pendant/reveal.m.mp4",
+        "width": 1080,
+        "height": 1920,
+        "duration": 25.03,
+        "audio": true,
+        "posters": [
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-1.webp",
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-2.webp",
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-3.webp",
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-4.webp",
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-5.webp",
+          "/media/films/kevin-schade-dragon-ball-pendant/reveal-6.webp"
+        ],
+        "poster": 5,
+        "source": "13/v01 · HD 1080p",
+        "light": false
       }
     },
     "noah-okafor-octagon-pendant": {

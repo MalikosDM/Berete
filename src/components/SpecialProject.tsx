@@ -18,7 +18,7 @@ function Ring({ piece, trophy, closed, open }: { piece: Piece; trophy: string; c
   const lift = lifted ? t.home.closeTop : t.home.liftTop;
   return (
     <li data-special-ring={piece.slug} className="flex flex-col bg-ink">
-      <div className="group relative h-[58svh] min-h-80 w-full overflow-hidden sm:h-[64svh] lg:h-[72svh]">
+      <div className="group relative h-[48svh] min-h-72 w-full overflow-hidden sm:h-[54svh] lg:h-[60svh]">
         <span className={"absolute inset-0 p-4 transition-opacity duration-700 sm:p-8 " + (lifted && open ? "opacity-0" : open ? "md:group-hover:opacity-0" : "")}>
           <MediaView item={closed} fit="contain" sizes="(max-width: 767px) 100vw, 50vw" />
         </span>
@@ -28,15 +28,15 @@ function Ring({ piece, trophy, closed, open }: { piece: Piece; trophy: string; c
           </span>
         ) : null}
       </div>
-      <div className="flex flex-1 flex-col px-5 pt-6 pb-12 sm:px-10 lg:pb-16">
+      <div className="flex flex-1 flex-col px-5 pt-5 pb-10 sm:px-10 lg:pb-12">
         <p className="eyebrow">{piece.client ?? piece.title}</p>
-        <h3 className="title-caps mt-4 text-[clamp(1.875rem,3.4vw,3.25rem)] leading-[1.05] tracking-[0.08em] text-white [text-wrap:balance]">{trophy}</h3>
-        {piece.line ? <p className="mt-4 max-w-md text-lg text-bone">{piece.line}</p> : null}
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <h3 className="title-caps mt-3 text-[clamp(1.625rem,2.8vw,2.625rem)] leading-[1.05] tracking-[0.08em] text-white [text-wrap:balance]">{trophy}</h3>
+        {piece.line ? <p className="mt-3 max-w-md text-base text-bone md:text-lg">{piece.line}</p> : null}
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <Link
             to={"/pieces/" + piece.slug}
             aria-label={t.home.special.discover + " · " + piece.title}
-            className="inline-flex min-h-14 items-center justify-center gap-3 border border-rose-light/80 px-8 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink"
+            className="inline-flex min-h-12 items-center justify-center gap-3 border border-rose-light/80 px-7 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink"
           >
             {t.home.special.discover}
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
@@ -74,12 +74,12 @@ export default function SpecialProject() {
 
   return (
     <section aria-labelledby="special-title" data-special-project className="border-b border-white/10 bg-ink">
-      <div className="mx-auto max-w-[1600px] px-5 pt-24 pb-10 sm:px-8 lg:px-12 lg:pt-32 lg:pb-14">
+      <div className="mx-auto max-w-[1600px] px-5 pt-20 pb-8 sm:px-8 lg:px-12 lg:pt-24 lg:pb-12">
         <p className="eyebrow">{t.home.special.eyebrow}</p>
-        <h2 id="special-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.14em] [text-wrap:balance]">
+        <h2 id="special-title" className="title-caps mt-4 text-[clamp(1.75rem,4vw,3.25rem)] tracking-[0.14em] [text-wrap:balance]">
           {t.home.special.title}
         </h2>
-        <p className="mt-6 max-w-2xl text-lg text-bone md:text-xl">{t.home.special.lead}</p>
+        <p className="mt-5 max-w-2xl text-base text-bone md:text-lg">{t.home.special.lead}</p>
       </div>
       <ul className="mx-auto grid max-w-[1600px] gap-px bg-white/10 md:grid-cols-2">
         {rings.map((r) => (

@@ -12,6 +12,7 @@ import type { PieceAtelier } from "./atelier.js";
 import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
+import { trunkPhotos } from "./trunks.js";
 import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
 
 export const VFB = "vfb-stuttgart-dfb-pokal-2025";
@@ -339,6 +340,8 @@ const SITE_PIECES: Piece[] = [
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
     theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "impact"] },
+    // Its main view much larger at the opening (feedback of Yoni, 21/11/2026), whole, on a computer and on a phone.
+    showcase: { size: "large" },
     ...sorted("kevin-schade-dragon-ball-pendant", [
       yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
       yoni("kevin-schade-dragon-ball-pendant", "p19", at("The Dragon Ball pendant on black, with its Cuban chain")),
@@ -1076,7 +1079,8 @@ const SITE_PIECES: Piece[] = [
     line: "A chain and its nameplate, delivered in their own trunk.",
     story:
       "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
-    theme: { preset: "sirius" },
+    // Its Japanese night since 21/11/2026 (the starry sky before).
+    theme: { preset: "japon" },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
     ...sorted("sirius", []),
     specs: [
@@ -1456,7 +1460,17 @@ export const FEATURED_BOX = "signature-trunk";
 
 const T = (file: string, texts: Partial<MediaItem>) => yoni("boxes/signature-trunk", file, { ...texts, onBlack: false });
 
-export const BOXES: Box[] = [
+/** The images of a trunk that opens (closed, open) as its photos, with their texts (src/data/trunks.ts). */
+const trunkImages = (slug: string, texts: Partial<MediaItem>[]): MediaItem[] =>
+  trunkPhotos(slug).map((p, i) => ({ type: "image", src: p.src, width: p.width, height: p.height, onBlack: false, ...texts[i] }));
+
+/**
+ * The boxes Yoni asked to remove (21/11/2026): kept unpublished in the admin (he can publish them again), shown nowhere;
+ * their old address leads to the page of the trunks.
+ */
+export const REMOVED_BOXES = ["nz-travel-case"];
+
+export const BOXES: Box[] = ([
   {
     // The player whose portrait it carries is not named (not confirmed).
     slug: FEATURED_BOX,
@@ -1481,12 +1495,9 @@ export const BOXES: Box[] = [
     slug: "sirius",
     name: "Sirius",
     description: "A trunk made to measure for the Sirius chain, lined in red to hold the piece like a trophy.",
-    // Its photos in HD (folder 37 of the chain, 20/11/2026).
-    images: list(
-      yoni("sirius", "p01", { ...at("The Sirius trunk, closed"), onBlack: false }),
-      yoni("sirius", "p03", { ...at("The Sirius trunk, opened on its red lining", "Opened"), onBlack: false }),
-      yoni("sirius", "p04", { ...at("The Sirius chain resting in its trunk", "The piece in its setting"), onBlack: false }),
-    ),
+    // Its images by Yoni (21/11/2026), the black trunk with the horned mask, closed then open on its red suede: they
+    // replace its photos here (scripts/trunk-media.mjs). Its real photos stay on the page of the chain.
+    images: trunkImages("sirius", [at("The Sirius trunk, closed"), at("The Sirius trunk, opened on its red lining", "Opened")]),
     pieceSlug: "sirius",
   },
   {
@@ -1546,4 +1557,4 @@ export const BOXES: Box[] = [
     images: list(still("boxes/nz-travel-case/01", at("The NZ travel case, open"))),
     pieceSlug: "tanguy-nianzou-fam-medallion",
   },
-];
+] satisfies Omit<Box, "published">[]).map((b) => ({ ...b, published: !REMOVED_BOXES.includes(b.slug) }));

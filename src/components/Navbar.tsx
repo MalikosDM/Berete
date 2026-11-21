@@ -15,8 +15,8 @@ type NavLinkItem = { label: string; to: string };
 
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
-    // Never on two lines: on a small laptop (1280 px) the letters and the gaps are a little tighter, as wide as they were from 1536 px.
-    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.8125rem] font-medium uppercase tracking-[0.12em] transition-colors ultra:tracking-[0.18em]",
+    // Never on two lines: from 1260 to 1440 px (a laptop) the letters and the gaps are a little tighter.
+    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.06em] transition-colors roomy:text-[0.8125rem] roomy:tracking-[0.12em] ultra:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -89,14 +89,15 @@ export default function Navbar() {
       {/* The frosted background sits in its own layer: a blur on the header itself would make it the frame of the
           mobile menu (position: fixed), which would then open with no height. */}
       <div aria-hidden="true" className={"absolute inset-0 -z-10 transition-[background-color,backdrop-filter] duration-500 " + (scrolled || open ? "bg-ink/80 backdrop-blur-xl" : "bg-transparent")} />
-      <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-6 px-5 sm:px-8 lg:h-22 lg:px-12">
+      <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-6 px-5 sm:px-8 lg:h-22 lg:px-12 nav:gap-4 nav:px-8 roomy:gap-6 roomy:px-12">
         <Link to="/" className="group flex min-h-12 flex-col justify-center" aria-label={t.site.homeLabel}>
           <Logo variant="mark" className="h-10 w-[3.375rem] lg:hidden" />
           <Logo className="hidden h-14 w-[4.875rem] lg:block" />
         </Link>
 
-        {/* The names of the menu are long (The Berete Circle, The Bespoke Journey…): the whole menu from 1440 px, else the menu button. */}
-        <nav aria-label={t.nav.main} data-desktop-nav className="hidden items-center gap-5 nav:flex wide:gap-7">
+        {/* The names of the menu are long (The Berete Circle, The Bespoke Journey…): the whole menu from 1260 px, the same on
+            every page; below, on tablets and phones, the menu button. */}
+        <nav aria-label={t.nav.main} data-desktop-nav className="hidden items-center gap-3.5 nav:flex roomy:gap-5 wide:gap-7">
           <div className="group relative">
             <NavLink
               to="/creations"

@@ -38,6 +38,8 @@ export type PieceShowcase = {
   views?: string[];
   /** Views refused (the page "Détourages"): never shown. */
   excluded?: string[];
+  /** "large": the main view much larger (the whole height of the opening on a computer, a taller frame on a phone). */
+  size?: "large";
 };
 
 /** The five priority universes (Dragon Ball, Butterfly, Inter, VfB, Noah Okafor): the showcase by default. */
@@ -57,20 +59,21 @@ export const cutoutSrc = (slug: string, v: CutoutView, w: number) => "/media/cut
 export const cutoutSrcSet = (slug: string, v: CutoutView) => v.widths.map((w) => cutoutSrc(slug, v, w) + " " + w + "w").join(", ");
 export const cutoutLargest = (slug: string, v: CutoutView) => cutoutSrc(slug, v, v.widths[v.widths.length - 1]!);
 
-export type ResolvedShowcase = { mode: "photo" | "single" | "multi"; views: CutoutView[] };
+export type ResolvedShowcase = { mode: "photo" | "single" | "multi"; views: CutoutView[]; large: boolean };
 
 /** How the opening of a piece shows its jewel. */
 export function resolveShowcase(slug: string, showcase: PieceShowcase | null | undefined): ResolvedShowcase {
   const all = CUTOUTS[slug] ?? [];
+  const large = showcase?.size === "large";
   const excluded = new Set(showcase?.excluded ?? []);
   const usable = all.filter((v) => v.clean && !excluded.has(v.id));
   const chosen = showcase?.views?.length
     ? showcase.views.map((id) => all.find((v) => v.id === id)).filter((v): v is CutoutView => !!v && !excluded.has(v.id))
     : usable;
-  if (chosen.length === 0) return { mode: "photo", views: [] };
+  if (chosen.length === 0) return { mode: "photo", views: [], large };
   const mode = showcase?.mode ?? (SHOWCASE_BY_DEFAULT.has(slug) || usable.length >= 3 ? "multi" : "single");
-  if (mode === "single" || chosen.length < 2) return { mode: "single", views: [chosen[0]!] };
-  return { mode: "multi", views: chosen.slice(0, MAX_VIEWS) };
+  if (mode === "single" || chosen.length < 2) return { mode: "single", views: [chosen[0]!], large };
+  return { mode: "multi", views: chosen.slice(0, MAX_VIEWS), large };
 }
 
 const ID = /^[a-z0-9-]{1,40}$/;
@@ -86,5 +89,6 @@ export function cleanShowcase(value: unknown): PieceShowcase | null {
   if (views?.length) out.views = views;
   const excluded = ids(v.excluded);
   if (excluded?.length) out.excluded = excluded;
+  if (v.size === "large") out.size = "large";
   return Object.keys(out).length > 0 ? out : null;
 }

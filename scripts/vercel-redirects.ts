@@ -5,6 +5,7 @@
  *   /creations;
  * - a person who left the circle (all their pieces unpublished) -> /players;
  * - a renamed piece (RENAMED_PIECES: two pieces become one, a new address) -> its page;
+ * - the address of a box (a box removed by Yoni, 21/11/2026, or any other: the boxes have no page of their own) -> /boxes;
  * in every language. With the server, server/index.ts does the same from the base. Run it again after publishing or
  * unpublishing a piece in src/data/pieces.ts (tests/site.spec.ts checks that vercel.json is up to date).
  */
@@ -30,6 +31,7 @@ export function catalogueRedirects(): Redirect[] {
   }
   for (const person of defaultCatalogue.people) if (leftTheCircle(defaultCatalogue, person.slug)) both("/players/" + person.slug, "/players");
   for (const [from, to] of Object.entries(RENAMED_PIECES)) both("/pieces/" + from, "/pieces/" + to);
+  both("/boxes/:slug", "/boxes");
   return out;
 }
 

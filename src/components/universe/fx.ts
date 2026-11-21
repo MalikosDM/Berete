@@ -3,7 +3,8 @@
  * lightning, speed lines, butterflies of light (in the colour of the universe), confetti, golden confetti, petals, stars,
  * the light rising to the sphere of the Genkidama; and since 21/11/2026 the camera flashes of a crowd, a serpent of golden
  * light, fireflies, the sparks of a forge, lines of light running from facet to facet, prismatic glints, sparkling dew, the
- * dust of a light beam, drops shining under a street lamp (their places: the regions of the backdrop, read on the page).
+ * dust of a light beam, drops shining under a street lamp (their places: the regions of the backdrop, read on the page);
+ * the red maple leaves of the Japanese night of Sirius, falling and turning.
  * Loaded after the content of the page
  * (src/components/Universe.tsx); every effect answers the speed of the scroll, lightly.
  *
@@ -85,6 +86,48 @@ const ROSES: [number, number, number][] = [
   [148, 16, 38],
   [228, 92, 116],
 ];
+/** The red maple leaves of the Japanese night (Sirius): from blood red to deep crimson, a few lit orange-red. */
+const MAPLE: [number, number, number][] = [
+  [196, 26, 30],
+  [168, 16, 24],
+  [222, 52, 40],
+  [140, 12, 20],
+  [236, 84, 52],
+];
+
+/** A maple leaf of five points, in a square of 2 (centre 0, tip of the stem below): drawn once. */
+function mapleLeaf(): Path2D {
+  const path = new Path2D();
+  // The five lobes, each a point with two shoulders, from the top clockwise; the stem at the bottom.
+  const lobes = [
+    [-90, 1, 0.42],
+    [-30, 0.86, 0.38],
+    [35, 0.66, 0.3],
+    [145, 0.66, 0.3],
+    [210, 0.86, 0.38],
+  ];
+  const at = (deg: number, r: number): [number, number] => [Math.cos((deg * Math.PI) / 180) * r, Math.sin((deg * Math.PI) / 180) * r];
+  // From the notch where the stem joins it, under the heart of the leaf.
+  path.moveTo(0, 0.2);
+  for (const [deg, tip, shoulder] of lobes) {
+    const [ax, ay] = at(deg! - 24, shoulder!);
+    const [tx, ty] = at(deg!, tip!);
+    const [bx, by] = at(deg! + 24, shoulder!);
+    path.lineTo(ax, ay);
+    path.lineTo(tx, ty);
+    path.lineTo(bx, by);
+    path.lineTo(...at(deg! + 36, shoulder! * 0.62));
+  }
+  path.closePath();
+  // The stem, from inside the leaf.
+  path.moveTo(-0.035, 0.05);
+  path.lineTo(0.035, 0.05);
+  path.lineTo(0.018, 0.85);
+  path.lineTo(-0.018, 0.85);
+  path.closePath();
+  return path;
+}
+
 /** The white confetti of the black and white stadium (Kenan Yildiz). */
 const WHITE = ["rgba(255,255,255,1)", "rgba(236,236,238,1)", "rgba(212,212,216,1)", "rgba(250,250,250,0.9)"];
 
@@ -235,10 +278,12 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const confettiColors = opts.preset === "bianconero" ? WHITE : [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
   const petalColors =
     opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : opts.preset === "roses" ? ROSES.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
-  /** kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light). */
+  const mapleColors = MAPLE.map((c) => rgba(c, 0.92));
+  const leaf = mapleLeaf();
+  /** kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light), 3: a red maple leaf. */
   const newFalling = (anywhere: boolean, kind: number): P => {
-    const petal = kind === 1;
-    const colors = petal ? petalColors : kind === 2 ? GOLD : confettiColors;
+    const petal = kind === 1 || kind === 3;
+    const colors = kind === 3 ? mapleColors : petal ? petalColors : kind === 2 ? GOLD : confettiColors;
     return {
       x: rand(-0.05, 1.05) * w,
       y: anywhere ? rand(-0.1, 1) * h : rand(-60, -10),
@@ -246,7 +291,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       vy: petal ? rand(0.35, 0.9) : kind === 2 ? rand(0.35, 0.85) : rand(0.5, 1.3),
       life: 0,
       max: 99999,
-      size: petal ? rand(6, 12) : rand(4, 8),
+      size: kind === 3 ? rand(7, 14) * (phone ? 0.85 : 1) : petal ? rand(6, 12) : rand(4, 8),
       spin: rand(0, Math.PI * 2),
       angle: rand(-0.04, 0.04),
       hue: rand(0, Math.PI * 2),
@@ -290,6 +335,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, 0));
     if (has("petals")) while (falling.filter((p) => p.kind === 1).length < count(22)) falling.push(newFalling(true, 1));
     if (has("gold-confetti")) while (falling.filter((p) => p.kind === 2).length < count(24)) falling.push(newFalling(true, 2));
+    if (has("maple")) while (falling.filter((p) => p.kind === 3).length < count(16)) falling.push(newFalling(true, 3));
     if (has("stars")) while (stars.length < count(110)) stars.push({ ...newDust(true), size: rand(0.5, 1.6), spin: rand(0, Math.PI * 2), angle: rand(0.01, 0.04) });
   };
   const newFly = (): P => ({ x: rand(0.35, 1) * w, y: rand(0.15, 0.9) * h, vx: rand(-0.3, 0.3), vy: rand(-0.3, 0.3), life: 0, max: 0, size: rand(1.6, 3.2) * (phone ? 0.85 : 1), spin: rand(0, Math.PI * 2), angle: rand(0.012, 0.03), hue: 0, color: "", kind: 0 });
@@ -822,7 +868,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
 
     // Confetti and petals fall in their own colours, not in light.
     ctx.globalCompositeOperation = "source-over";
-    if (has("confetti") || has("petals") || has("gold-confetti")) {
+    if (has("confetti") || has("petals") || has("gold-confetti") || has("maple")) {
       for (let i = falling.length - 1; i >= 0; i--) {
         const p = falling[i]!;
         p.hue += 0.05;
@@ -835,7 +881,13 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         ctx.rotate(p.spin);
         ctx.globalAlpha = 0.75;
         ctx.fillStyle = p.color;
-        if (p.kind === 1) {
+        if (p.kind === 3) {
+          // A maple leaf turning over as it falls (it narrows, then shows its other side, a little darker).
+          ctx.scale(Math.abs(turn) * 0.75 + 0.25, 1);
+          ctx.scale(p.size, p.size);
+          ctx.globalAlpha = turn < 0 ? 0.62 : 0.82;
+          ctx.fill(leaf);
+        } else if (p.kind === 1) {
           ctx.scale(1, Math.abs(turn) * 0.7 + 0.3);
           ctx.beginPath();
           ctx.moveTo(0, -p.size);

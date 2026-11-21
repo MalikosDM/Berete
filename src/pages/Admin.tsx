@@ -150,9 +150,10 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "description", label: "Texte", type: "textarea" },
       { key: "images", label: "Photos", type: "medialist" },
       { key: "pieceSlug", label: "Pièce liée (adresse web)", type: "text" },
+      { key: "published", label: "Publié sur le site (décoché : l'écrin n'apparaît nulle part sur le site)", type: "checkbox" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["description", "Texte", true]] },
     ],
-    empty: { name: "", slug: "", description: "", images: [], pieceSlug: "" },
+    empty: { name: "", slug: "", description: "", images: [], pieceSlug: "", published: true },
   },
 };
 
@@ -742,7 +743,7 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
                 <span className="block break-words text-lg text-white">{asText(item[name])}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-2 text-base text-mist">
                   {has3d.has(asText(item.slug)) ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-3d>3D</span> : null}
-                  {item.published === false ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-unpublished>Non publiée</span> : null}
+                  {item.published === false ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-unpublished>{kind === "boxes" ? "Non publié" : "Non publiée"}</span> : null}
                   {item.draft === true ? <span className="border border-white/25 px-2 text-bone">Brouillon</span> : null}
                   <span className="break-all">/{asText(item.slug)}{Array.isArray(item.media) ? " · " + item.media.length + " fichiers" : ""}</span>
                 </span>
@@ -1109,6 +1110,24 @@ function ShowcaseField({ label, slug, value, onChange }: { label: string; slug: 
                   name={"showcase-" + slug}
                   checked={(value?.mode ?? "auto") === key}
                   onChange={() => set({ mode: key === "auto" ? undefined : (key as "single" | "multi") })}
+                  className="size-5 accent-[#b76e79]"
+                />
+                {name}
+              </label>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-x-6 gap-y-2" role="radiogroup" aria-label="Taille de la pièce">
+            {[
+              ["normal", "Taille normale"],
+              ["large", "Pièce en grand (vue principale nettement plus grande)"],
+            ].map(([key, name]) => (
+              <label key={key} className="flex min-h-12 items-center gap-3 text-base text-bone">
+                <input
+                  type="radio"
+                  name={"showcase-size-" + slug}
+                  data-showcase-size={key}
+                  checked={(value?.size ?? "normal") === key}
+                  onChange={() => set({ size: key === "large" ? "large" : undefined })}
                   className="size-5 accent-[#b76e79]"
                 />
                 {name}
