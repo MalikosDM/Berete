@@ -4559,8 +4559,8 @@
       "making": {
         "src": "/media/films/noah-okafor-octagon-pendant/making.mp4",
         "mobile": "/media/films/noah-okafor-octagon-pendant/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 36.74,
         "audio": true,
         "posters": [
@@ -4572,14 +4572,14 @@
           "/media/films/noah-okafor-octagon-pendant/making-6.webp"
         ],
         "poster": 4,
-        "source": "17/v02 · 720p",
+        "source": "17/v02 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/noah-okafor-octagon-pendant/reveal.mp4",
         "mobile": "/media/films/noah-okafor-octagon-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 37.7,
         "audio": true,
         "posters": [
@@ -4590,8 +4590,8 @@
           "/media/films/noah-okafor-octagon-pendant/reveal-5.webp",
           "/media/films/noah-okafor-octagon-pendant/reveal-6.webp"
         ],
-        "poster": 3,
-        "source": "17/v01 · 720p",
+        "poster": 1,
+        "source": "17/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4618,8 +4618,8 @@
       "reveal": {
         "src": "/media/films/angelo-stiller-as-pendant/reveal.mp4",
         "mobile": "/media/films/angelo-stiller-as-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 30,
         "audio": true,
         "posters": [
@@ -4631,7 +4631,7 @@
           "/media/films/angelo-stiller-as-pendant/reveal-6.webp"
         ],
         "poster": 5,
-        "source": "18/v01 · 720p",
+        "source": "18/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4658,8 +4658,8 @@
       "reveal": {
         "src": "/media/films/malik-tillman-cross-pendant/reveal.mp4",
         "mobile": "/media/films/malik-tillman-cross-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 26.48,
         "audio": true,
         "posters": [
@@ -4670,8 +4670,8 @@
           "/media/films/malik-tillman-cross-pendant/reveal-5.webp",
           "/media/films/malik-tillman-cross-pendant/reveal-6.webp"
         ],
-        "poster": 5,
-        "source": "21/v01 · 720p",
+        "poster": 3,
+        "source": "21/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4698,8 +4698,8 @@
       "reveal": {
         "src": "/media/films/tulips-on-tour-medallion/reveal.mp4",
         "mobile": "/media/films/tulips-on-tour-medallion/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 25.3,
         "audio": true,
         "posters": [
@@ -4711,7 +4711,7 @@
           "/media/films/tulips-on-tour-medallion/reveal-6.webp"
         ],
         "poster": 3,
-        "source": "24/v01 · 720p",
+        "source": "24/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4719,8 +4719,8 @@
       "making": {
         "src": "/media/films/campione-d-italia-2023-2024/making.mp4",
         "mobile": "/media/films/campione-d-italia-2023-2024/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 47.76,
         "audio": true,
         "posters": [
@@ -4732,14 +4732,14 @@
           "/media/films/campione-d-italia-2023-2024/making-6.webp"
         ],
         "poster": 5,
-        "source": "25/v02 · 720p",
+        "source": "25/v02 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/campione-d-italia-2023-2024/reveal.mp4",
         "mobile": "/media/films/campione-d-italia-2023-2024/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 31.97,
         "audio": true,
         "posters": [
@@ -4751,7 +4751,7 @@
           "/media/films/campione-d-italia-2023-2024/reveal-6.webp"
         ],
         "poster": 2,
-        "source": "25/v01 · 720p",
+        "source": "25/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4759,8 +4759,8 @@
       "making": {
         "src": "/media/films/marcus-thuram-ruby-t-necklace/making.mp4",
         "mobile": "/media/films/marcus-thuram-ruby-t-necklace/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 32.44,
         "audio": true,
         "posters": [
@@ -4772,14 +4772,14 @@
           "/media/films/marcus-thuram-ruby-t-necklace/making-6.webp"
         ],
         "poster": 4,
-        "source": "26/v02 · 720p",
+        "source": "26/v02 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/marcus-thuram-ruby-t-necklace/reveal.mp4",
         "mobile": "/media/films/marcus-thuram-ruby-t-necklace/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 33.36,
         "audio": true,
         "posters": [
@@ -4791,7 +4791,7 @@
           "/media/films/marcus-thuram-ruby-t-necklace/reveal-6.webp"
         ],
         "poster": 3,
-        "source": "26/v01 · 720p",
+        "source": "26/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4799,8 +4799,8 @@
       "making": {
         "src": "/media/films/marcus-thuram-t-serpent-pendant/making.mp4",
         "mobile": "/media/films/marcus-thuram-t-serpent-pendant/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 35.92,
         "audio": true,
         "posters": [
@@ -4811,15 +4811,15 @@
           "/media/films/marcus-thuram-t-serpent-pendant/making-5.webp",
           "/media/films/marcus-thuram-t-serpent-pendant/making-6.webp"
         ],
-        "poster": 3,
-        "source": "08/v14 · 720p",
+        "poster": 2,
+        "source": "08/v14 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/marcus-thuram-t-serpent-pendant/reveal.mp4",
         "mobile": "/media/films/marcus-thuram-t-serpent-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 22.36,
         "audio": true,
         "posters": [
@@ -4831,7 +4831,7 @@
           "/media/films/marcus-thuram-t-serpent-pendant/reveal-6.webp"
         ],
         "poster": 2,
-        "source": "27/v02 · 720p",
+        "source": "27/v02 · HD 1080p",
         "light": false
       }
     },
@@ -4858,8 +4858,8 @@
       "reveal": {
         "src": "/media/films/vfb-stuttgart-dfb-pokal-2025/reveal.mp4",
         "mobile": "/media/films/vfb-stuttgart-dfb-pokal-2025/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 31.8,
         "audio": true,
         "posters": [
@@ -4871,7 +4871,7 @@
           "/media/films/vfb-stuttgart-dfb-pokal-2025/reveal-6.webp"
         ],
         "poster": 4,
-        "source": "29/v01 · 720p",
+        "source": "29/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4879,8 +4879,8 @@
       "making": {
         "src": "/media/films/noah-okafor-oka-pendant/making.mp4",
         "mobile": "/media/films/noah-okafor-oka-pendant/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 52.32,
         "audio": true,
         "posters": [
@@ -4892,7 +4892,7 @@
           "/media/films/noah-okafor-oka-pendant/making-6.webp"
         ],
         "poster": 3,
-        "source": "34/v02 · 720p",
+        "source": "34/v02 · HD 1080p",
         "light": false
       },
       "reveal": {
@@ -4919,8 +4919,8 @@
       "making": {
         "src": "/media/films/samuel-ballet-jesus-piece/making.mp4",
         "mobile": "/media/films/samuel-ballet-jesus-piece/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 51.52,
         "audio": true,
         "posters": [
@@ -4932,7 +4932,7 @@
           "/media/films/samuel-ballet-jesus-piece/making-6.webp"
         ],
         "poster": 1,
-        "source": "08/v21 · 720p",
+        "source": "08/v21 · HD 1080p",
         "light": false
       }
     },
@@ -4940,8 +4940,8 @@
       "reveal": {
         "src": "/media/films/kenan-yildiz-celebration-pendant/reveal.mp4",
         "mobile": "/media/films/kenan-yildiz-celebration-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 21.4,
         "audio": true,
         "posters": [
@@ -4953,7 +4953,7 @@
           "/media/films/kenan-yildiz-celebration-pendant/reveal-6.webp"
         ],
         "poster": 2,
-        "source": "11/v01 · 720p",
+        "source": "11/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4961,8 +4961,8 @@
       "reveal": {
         "src": "/media/films/the-hand/reveal.mp4",
         "mobile": "/media/films/the-hand/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 24.93,
         "audio": true,
         "posters": [
@@ -4974,7 +4974,7 @@
           "/media/films/the-hand/reveal-6.webp"
         ],
         "poster": 3,
-        "source": "12/v01 · 720p",
+        "source": "12/v01 · HD 1080p",
         "light": false
       }
     },
@@ -4982,8 +4982,8 @@
       "reveal": {
         "src": "/media/films/michy-batshuayi-butterfly-chain/reveal.mp4",
         "mobile": "/media/films/michy-batshuayi-butterfly-chain/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 34,
         "audio": true,
         "posters": [
@@ -4995,7 +4995,7 @@
           "/media/films/michy-batshuayi-butterfly-chain/reveal-6.webp"
         ],
         "poster": 4,
-        "source": "23/v04 · 720p",
+        "source": "23/v04 · HD 1080p",
         "light": false
       }
     },
@@ -5003,8 +5003,8 @@
       "reveal": {
         "src": "/media/films/noah-okafor-jersey-pendant/reveal.mp4",
         "mobile": "/media/films/noah-okafor-jersey-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 10.1,
         "audio": true,
         "posters": [
@@ -5015,8 +5015,8 @@
           "/media/films/noah-okafor-jersey-pendant/reveal-5.webp",
           "/media/films/noah-okafor-jersey-pendant/reveal-6.webp"
         ],
-        "poster": 1,
-        "source": "32/v03 · 720p",
+        "poster": 0,
+        "source": "32/v03 · HD 1080p",
         "light": false
       }
     },
@@ -5066,8 +5066,8 @@
       "making": {
         "src": "/media/films/thorns-and-roses-crucifix/making.mp4",
         "mobile": "/media/films/thorns-and-roses-crucifix/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 35.88,
         "audio": true,
         "posters": [
@@ -5079,14 +5079,14 @@
           "/media/films/thorns-and-roses-crucifix/making-6.webp"
         ],
         "poster": 5,
-        "source": "05/v02 · 720p",
+        "source": "05/v02 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/thorns-and-roses-crucifix/reveal.mp4",
         "mobile": "/media/films/thorns-and-roses-crucifix/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 29.4,
         "audio": true,
         "posters": [
@@ -5097,8 +5097,8 @@
           "/media/films/thorns-and-roses-crucifix/reveal-5.webp",
           "/media/films/thorns-and-roses-crucifix/reveal-6.webp"
         ],
-        "poster": 3,
-        "source": "05/v01 · 720p",
+        "poster": 2,
+        "source": "05/v01 · HD 1080p",
         "light": false
       }
     },
@@ -5106,8 +5106,8 @@
       "reveal": {
         "src": "/media/films/script-nameplate-pendant/reveal.mp4",
         "mobile": "/media/films/script-nameplate-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 32.83,
         "audio": true,
         "posters": [
@@ -5119,7 +5119,7 @@
           "/media/films/script-nameplate-pendant/reveal-6.webp"
         ],
         "poster": 4,
-        "source": "14/v01 · 720p",
+        "source": "14/v01 · HD 1080p",
         "light": false
       }
     },
@@ -5127,8 +5127,8 @@
       "making": {
         "src": "/media/films/panther-champion-pendant/making.mp4",
         "mobile": "/media/films/panther-champion-pendant/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 26,
         "audio": true,
         "posters": [
@@ -5140,14 +5140,14 @@
           "/media/films/panther-champion-pendant/making-6.webp"
         ],
         "poster": 4,
-        "source": "19/v01 · 720p",
+        "source": "19/v01 · HD 1080p",
         "light": false
       },
       "reveal": {
         "src": "/media/films/panther-champion-pendant/reveal.mp4",
         "mobile": "/media/films/panther-champion-pendant/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 26.6,
         "audio": true,
         "posters": [
@@ -5159,7 +5159,7 @@
           "/media/films/panther-champion-pendant/reveal-6.webp"
         ],
         "poster": 4,
-        "source": "19/v02 · 720p",
+        "source": "19/v02 · HD 1080p",
         "light": false
       }
     },
@@ -5167,8 +5167,8 @@
       "making": {
         "src": "/media/films/jesus-piece-red-flowers/making.mp4",
         "mobile": "/media/films/jesus-piece-red-flowers/making.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 60,
         "audio": true,
         "posters": [
@@ -5179,8 +5179,8 @@
           "/media/films/jesus-piece-red-flowers/making-5.webp",
           "/media/films/jesus-piece-red-flowers/making-6.webp"
         ],
-        "poster": 5,
-        "source": "20/v01 · 720p",
+        "poster": 3,
+        "source": "20/v01 · HD 1080p",
         "light": false
       },
       "reveal": {
@@ -5308,8 +5308,8 @@
       "reveal": {
         "src": "/media/films/baguette-cuban-chain/reveal.mp4",
         "mobile": "/media/films/baguette-cuban-chain/reveal.m.mp4",
-        "width": 720,
-        "height": 1280,
+        "width": 1080,
+        "height": 1920,
         "duration": 31.64,
         "audio": true,
         "posters": [
@@ -5321,7 +5321,7 @@
           "/media/films/baguette-cuban-chain/reveal-6.webp"
         ],
         "poster": 4,
-        "source": "30/v01 · 720p",
+        "source": "30/v01 · HD 1080p",
         "light": false
       }
     }

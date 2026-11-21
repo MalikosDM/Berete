@@ -47,7 +47,7 @@ import { copyOf, makeSizes } from "./media-sizes.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
 import { HD } from "./hd-media.mjs";
-import { FILMS, KIND_WORDS } from "./film-media.mjs";
+import { FILMS } from "./film-media.mjs";
 import sharp from "sharp";
 import { PLAYERS } from "./player-media.mjs";
 
@@ -663,13 +663,16 @@ async function importHd() {
 /* ---------- The films of "Enter the Atelier": making-of and finished piece (scripts/film-media.mjs) ---------- */
 
 /**
- * Computers: the film at its own size, up to 1080 x 1920 (a light 720p copy stays 720p: nothing is invented); phones: a
- * lighter copy, 720p from a high-quality film, else 540p. H.264 with its sound (AAC), the index at the start of the file
+ * Computers: the film at its own size, up to 1080 x 1920 (the HD originals: true 1080p; a light 720p copy stays 720p:
+ * nothing is invented). Phones: a lighter copy, 720p from a high-quality film, else 540p, never heavier than before the
+ * originals (21/11/2026): at most 1.2 Mbit/s for a making-of (also the small preview of "Enter the Atelier"), 1.5 Mbit/s
+ * for the finished piece (the film that opens the page). H.264 with its sound (AAC), the index at the start of the file
  * (+faststart: the film starts as soon as its first seconds arrive, the rest follows) and a key frame every 2 seconds.
+ * The pages load none of them before it is seen (src/components/AtelierPassage.tsx, PieceFilm.tsx, AtelierRoom.tsx).
  */
 const FILM = {
   desktop: { short: 1080, long: 1920, crf: 23, maxrate: (short) => (short > 720 ? "4500k" : "2500k"), audio: "128k" },
-  mobile: { crf: 24, maxrate: (short) => (short > 540 ? "1500k" : "1200k"), audio: "96k" },
+  mobile: { crf: 24, maxrate: (_short, kind) => (kind === "reveal" ? "1500k" : "1200k"), audio: "96k" },
   maxFps: 30,
   /** Frames offered as the image of the film (the admin chooses one; by default the sharpest well-lit one). */
   posters: 6,
@@ -713,47 +716,43 @@ async function filmSource(ref) {
   const file = full ?? light;
   const copy = file ? join(HD_DIR, dir, "Videos", file) : null;
   const hd = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && new RegExp(" - video " + n + "(?!\\d)", "i").test(f)).sort()[0];
-  if (hd && (await wholeHd(join(HD_DIR, dir, "Videos HD", hd), copy))) return join(HD_DIR, dir, "Videos HD", hd);
+  const original = hd ? join(HD_DIR, dir, "Videos HD", hd) : null;
+  // The full copy of "Videos/" that already is the original (the same size: the same file): kept, nothing to redo.
+  if (original && full && (await stat(original)).size === (await stat(copy)).size) return copy;
+  if (original && (await wholeHd(original, copy))) return original;
   return copy;
-}
-
-/** The film of "Videos HD/" of a folder named after its kind (its original name kept), or null. */
-async function namedFilm(folder, kind) {
-  const dir = await filmDir(folder);
-  if (!dir) return null;
-  const file = (await listDir(join(HD_DIR, dir, "Videos HD"))).filter((f) => VIDEO_EXT.test(f) && KIND_WORDS[kind].test(f)).sort()[0];
-  return file && (await wholeHd(join(HD_DIR, dir, "Videos HD", file), null)) ? join(HD_DIR, dir, "Videos HD", file) : null;
 }
 
 /** The scale filter: the short side at most `short`, the long side at most `long`, never larger than the film. */
 const fit = (short, long) => "scale=w='trunc(iw*min(1,min(" + short + "/min(iw,ih)," + long + "/max(iw,ih)))/2)*2':h=-2:flags=lanczos";
 
-async function filmCopy(src, out, info, { short, long, crf, maxrate, audio, start = 0 }) {
+async function filmCopy(src, out, info, { short, long, crf, maxrate, audio, start = 0, kind }) {
   const filters = [fit(short, long)];
   const fps = info.fps > FILM.maxFps + 0.5 ? FILM.maxFps : Math.round(info.fps) || 30;
   if (info.fps > FILM.maxFps + 0.5) filters.push("fps=" + FILM.maxFps);
   filters.push("format=yuv420p");
   const vf = filters.join(",");
-  const rate = maxrate(Math.min(info.width, info.height, short));
+  const rate = maxrate(Math.min(info.width, info.height, short), kind);
   // `start`: the film begins later than its file (its first seconds show what the page must not, scripts/film-media.mjs).
   const argv = [...(start > 0 ? ["-ss", String(start)] : []), "-i", src, "-map", "0:v:0"];
   if (info.hasAudio) argv.push("-map", "0:a:0");
   argv.push("-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(crf), "-maxrate", rate, "-bufsize", parseInt(rate, 10) * 2 + "k", "-g", String(fps * 2), "-keyint_min", String(fps), "-profile:v", "high");
   if (info.hasAudio) argv.push("-c:a", "aac", "-b:a", audio, "-ac", "2");
   else argv.push("-an");
-  argv.push("-movflags", "+faststart");
+  // No time code track (the ProRes originals carry one): of no use to a browser.
+  argv.push("-write_tmcd", "0", "-movflags", "+faststart");
   await produce(out, src, "film:" + [vf, crf, rate, audio, info.hasAudio, ...(start > 0 ? [start] : [])].join(":"), argv);
   return probe(out);
 }
 
-async function film(src, base, { light, label, pick, sharpPhone = false, start = 0 }) {
+async function film(src, base, { kind, light, label, pick, sharpPhone = false, start = 0 }) {
   const info = await probe(src);
   const shortSide = Math.min(info.width, info.height);
   // The finished piece opens the page of the piece: on a phone it keeps 720p when the film has it.
   const mobileShort = shortSide > 720 || (sharpPhone && shortSide >= 720) ? 720 : Math.min(540, shortSide);
-  const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9), start });
+  const mobile = await filmCopy(src, base + ".m.mp4", info, { ...FILM.mobile, short: mobileShort, long: Math.round((mobileShort * 16) / 9), start, kind });
   // A film no page shows yet (a draft): its light copy serves everywhere.
-  const desktop = light ? null : await filmCopy(src, base + ".mp4", info, { ...FILM.desktop, start });
+  const desktop = light ? null : await filmCopy(src, base + ".mp4", info, { ...FILM.desktop, start, kind });
   const main = desktop ?? mobile;
   // Its images: frames spread over the film, from the original (sharp), the sharpest well-lit one first by default.
   const posters = [];
@@ -794,20 +793,20 @@ async function importFilms() {
   for (const entry of FILMS) {
     const found = {};
     for (const kind of ["making", "reveal"]) {
-      const named = entry.folder ? await namedFilm(entry.folder, kind) : null;
-      const file = named ?? (entry[kind] ? await filmSource(entry[kind]) : null);
+      if (!entry[kind]) continue;
+      const file = await filmSource(entry[kind]);
       if (!file) {
-        if (entry[kind]) console.warn("  ! not found: " + entry[kind] + " (" + entry.slug + ", " + kind + ")");
+        console.warn("  ! not found: " + entry[kind] + " (" + entry.slug + ", " + kind + ")");
         continue;
       }
-      found[kind] = { file, label: named ? entry.folder + "/" + named.split("/").pop() : entry[kind] };
+      found[kind] = { file, label: entry[kind] };
     }
     for (const [kind, { file, label }] of Object.entries(found)) {
       const light = entry.draft === true;
       const pick = entry.poster?.[kind];
       const sharpPhone = kind === "reveal" && !light;
       const start = entry.start?.[kind] ?? 0;
-      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { light, label, pick, sharpPhone, start })));
+      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { kind, light, label, pick, sharpPhone, start })));
     }
   }
   await pool(jobs, Math.max(1, Math.floor(cpus().length / 4)), (go) => go());

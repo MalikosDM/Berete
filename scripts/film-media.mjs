@@ -4,10 +4,11 @@
  * Yoni (BERETE_HD_DIR, "Berete - Dossiers icloud"); the source files are only read, never changed.
  *
  * Each film is "NN/vMM" (folder NN, video MM) or "NN/f" (the video of its Fabrication/ folder). The best copy of it is
- * taken: the file of "Videos HD/" with the same number when there is one (the original in high quality), else the file
- * of "Videos/" without "(720p)", else its light "(720p)" copy. A folder of the piece whose "Videos HD/" holds a file named
- * after its kind ("…Craftsmanship…", "…Process…": the making-of; "Final Product Video", "Final cut": the finished piece)
- * uses that one instead.
+ * taken: the file of "Videos HD/" with the same number when there is one (the original in high quality, once whole:
+ * readable, as long as its copy), else the file of "Videos/" without "(720p)", else its light "(720p)" copy. Since
+ * 21/11/2026 every film of the site has its original in "Videos HD/" (folders 36, 37 and 38: already originals in
+ * "Videos/"). Only the films chosen here count: the choice by the name of a file is dropped (the atelier names nearly all
+ * its videos "…Craftsmanship…" or "…Final cut", finished piece and making-of alike: it took other films than these).
  *
  * Chosen by eye on 19/11/2026 (frames of every video): the professional edits first (studio light, 25 frames a second,
  * with music), a phone video only when nothing else exists and it is clean. Folder 08 ("Fabrication atelier (divers)")
@@ -22,10 +23,10 @@
  * a delivery or a phone video. Folders 13 (Dragon Ball), 16 (The Safi Link) and 08 hold no edit of a finished piece of
  * the site; the pieces taken from the stories have no folder.
  *
- * folder: the folder of the piece itself (scripts/hd-media.mjs), where a "Videos HD/" film named after its kind is looked
- * for. A piece of the drafts (unpublished) gets the light copy only. start: the second where a film begins, by kind, when
- * its first seconds must not be shown. poster: the frame used as its image by default (1 to 6), when the one found by the numbers (the sharpest
- * well-lit) is not the best one to the eye (all were looked at on 19/11/2026); the admin can choose another.
+ * folder: the folder of the piece itself (scripts/hd-media.mjs). A piece of the drafts (unpublished) gets the light copy
+ * only. start: the second where a film begins, by kind, when its first seconds must not be shown. poster: the frame used
+ * as its image by default (1 to 6), when the one found by the numbers (the sharpest well-lit) is not the best one to the
+ * eye (all were looked at on 19/11/2026); the admin can choose another.
  */
 export const FILMS = [
   /* ---------- Pieces of the site ---------- */
@@ -74,9 +75,3 @@ export const FILMS = [
   // The celestial medallion (22) has no film first: its film shows the engraved back, first names of a family and a
   // date (22/v08), kept out until Yoni says the family agrees.
 ];
-
-/** The words of the original names in "Videos HD/" that tell the kind of a film. */
-export const KIND_WORDS = {
-  making: /craftsmanship|process/i,
-  reveal: /final product video|final cut/i,
-};
