@@ -836,7 +836,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "A rose gold hand, paved with diamonds and lit with rubies.",
     story: "A hand sculpted in volume, then set stone by stone. Rubies catch the light at every movement, and the BRT mark is engraved on the piece.",
-    theme: { preset: "velours" },
+    theme: { preset: "rideau" },
     ...sorted("the-hand", [
       yoni("the-hand", "p07", at("The Hand pendant, a diamond-paved rose gold hand holding a ruby")),
       yoni("the-hand", "p04", at("The Hand held by its bail, the red stone hanging below")),
@@ -860,7 +860,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "A walker under his umbrella.",
     story: "A round medallion paved with diamonds, with the word FLÂNEUR and a rose gold walker holding an umbrella, worn on a tennis chain.",
-    theme: { preset: "pluie" },
+    theme: { preset: "flaneur" },
     cover: still("pieces/flaneur-medallion/cover", at("The Flâneur medallion held in a gloved hand")),
     gallery: [],
     specs: [
@@ -1001,7 +1001,7 @@ const SITE_PIECES: Piece[] = [
     line: "Twisted links, set with diamond flowers.",
     story: "A chain of twisted links in rose and yellow gold tones, set with diamond flowers along its length.",
     people: ["kevin-schade"],
-    theme: { preset: "maison", texture: "silk", font: "bodoni", entrance: "glint" },
+    theme: { preset: "forge" },
     cover: st("kevin-schade", 3, at("Kevin Schade's twisted link chain laid in its box")),
     gallery: [
       st("kevin-schade", 14, at("Film of the twisted chain and its diamond flowers")),
@@ -1042,7 +1042,7 @@ const SITE_PIECES: Piece[] = [
     line: "A chain and its nameplate, delivered in their own trunk.",
     story:
       "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
-    theme: { preset: "etoiles" },
+    theme: { preset: "sirius" },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
     ...sorted("sirius", []),
     specs: [
@@ -1211,7 +1211,7 @@ const COLLECTED: Piece[] = [
     line: "A panther holding a champion's belt.",
     story:
       "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones. The back is carved with a star pattern and the BRT mark.",
-    theme: { preset: "facettes", tint: "#2a2214", glow: "#f0d49a", font: "trophee" },
+    theme: { preset: "arene" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A panther and a champion's belt"],
@@ -1227,7 +1227,7 @@ const COLLECTED: Piece[] = [
     line: "An initial and a number, under a web of stars.",
     story:
       "A large round medallion in rose gold tones: an initial and a number woven in baguettes, an openwork web of stars set with round diamonds, and a sculpted figure pouring waves of diamonds. A border of marquise-cut diamonds frames it, under a bail crowned with a marquise flower.",
-    theme: { preset: "etoiles" },
+    theme: { preset: "n14" },
     specs: [
       ["Type", "Medallion pendant"],
       ["Motif", "An initial, a number and a web of stars"],

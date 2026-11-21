@@ -21,7 +21,49 @@ export const THEME_LIGHTS = ["halo", "spotlight", "beam", "aura", "ember"] as co
 /** The former slow motion of the backdrop: kept for the universes written before the effects (it maps to an effect). */
 export const THEME_MOTIONS = ["none", "drift", "pulse", "sparkle", "flutter", "rise", "rotate"] as const;
 export const THEME_ENTRANCES = ["ignite", "flash", "smoke", "stars", "flutter", "tunnel", "spotlight", "glint", "bloom", "rain", "tick"] as const;
-export const THEME_EFFECTS = ["dust", "embers", "glints", "lightning", "speedlines", "impact", "butterflies", "iridescence", "confetti", "gold-confetti", "twenty-stars", "petals", "rain", "stars", "smoke", "smoke-rise", "genkidama", "moon"] as const;
+export const THEME_EFFECTS = [
+  "dust",
+  "embers",
+  "glints",
+  "lightning",
+  "speedlines",
+  "impact",
+  "butterflies",
+  "iridescence",
+  "confetti",
+  "gold-confetti",
+  "twenty-stars",
+  "petals",
+  "rain",
+  "stars",
+  "smoke",
+  "smoke-rise",
+  "genkidama",
+  "moon",
+  // 21/11/2026: the lights of an AI background that come alive (its spots), and the effects that carry its image on.
+  "scene",
+  "flashes",
+  "serpent",
+  "fireflies",
+  "sparks",
+  "light-lines",
+  "prism",
+  "dew",
+  "beam-dust",
+  "drops",
+  // An effect on the piece itself, that ties it to its world (src/components/universe/JewelFx.tsx).
+  "jewel-sheen",
+  "jewel-sparkle",
+  "jewel-halo",
+  "jewel-warm",
+  "jewel-beam",
+  "jewel-prism",
+] as const;
+
+/** The effects drawn on the piece itself: a piece takes the first one of its universe. */
+export const JEWEL_EFFECTS = ["jewel-sheen", "jewel-sparkle", "jewel-halo", "jewel-warm", "jewel-beam", "jewel-prism"] as const;
+export type JewelEffect = (typeof JEWEL_EFFECTS)[number];
+export const jewelOf = (effects: readonly string[]): JewelEffect | null => (JEWEL_EFFECTS.find((e) => effects.includes(e)) ?? null);
 
 export type ThemeTexture = (typeof THEME_TEXTURES)[number];
 export type ThemeLight = (typeof THEME_LIGHTS)[number];
@@ -87,7 +129,14 @@ export type Backdrop = {
   /** The moon of the image (effect "moon"): its centre and its radius, the same way. */
   moon?: [number, number, number];
   mobileMoon?: [number, number, number];
+  /** The lights of the image that come alive (effect "scene"), on the computer image (d) and the phone image (m). */
+  spots?: BackdropSpot[];
+  /** Where some effects of the canvas happen: [left, top, right, bottom], shares of the image. */
+  regions?: Record<string, { d?: [number, number, number, number]; m?: [number, number, number, number] }>;
 };
+
+/** One light of an AI background (scripts/universe-media.mjs; the meaning of its numbers by kind: src/components/Universe.tsx). */
+export type BackdropSpot = { k: string; tone?: string; seq?: boolean; i?: number; d?: number[]; m?: number[] };
 export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
 
 /** What a piece (or the admin) writes: a preset, and the parts it changes. */
@@ -159,53 +208,79 @@ export const THEME_PRESETS: Record<string, Preset> = {
     theme: { base: "#050906", tint: "#0f2618", glow: "#e8d2b8", texture: "pitch", light: "spotlight", font: "stade", backdrop: "", entrance: "spotlight", effects: ["dust", "glints"], mark: "" },
   },
   bianconero: {
-    name: "Bianconero (rayures noir et blanc, célébration)",
-    theme: { base: "#060606", tint: "#232325", glow: "#f4f2ef", texture: "stripes", light: "spotlight", font: "geometrie", backdrop: "", entrance: "glint", effects: ["confetti", "glints", "dust", "smoke"], mark: "" },
+    name: "Stade en noir et blanc, flashs et confettis (Kenan Yildiz)",
+    theme: { base: "#060606", tint: "#232325", glow: "#f4f2ef", texture: "grain", light: "spotlight", font: "geometrie", backdrop: "bianconero", entrance: "glint", effects: ["flashes", "confetti", "scene", "jewel-sparkle"], mark: "" },
   },
   stuttgart: {
     name: "Rouge et blanc du VfB (joueurs du club)",
     theme: { base: "#080404", tint: "#3a0d10", glow: "#ffd9cf", texture: "facets", light: "spotlight", font: "geometrie", backdrop: "", entrance: "glint", effects: ["embers", "glints", "smoke"], mark: "" },
   },
   serpent: {
-    name: "Serpent (écailles, pierre rouge)",
-    theme: { base: "#090404", tint: "#3a0d13", glow: "#ff7a6a", texture: "scales", light: "ember", font: "gothique", backdrop: "", entrance: "glint", effects: ["embers", "glints", "smoke"], mark: "" },
+    name: "Temple du serpent, écailles dorées, lueur rouge (Marcus Thuram)",
+    theme: { base: "#090404", tint: "#3a0d13", glow: "#ff6a5a", texture: "grain", light: "ember", font: "gothique", backdrop: "serpent", entrance: "glint", effects: ["serpent", "embers", "smoke", "scene", "jewel-halo"], mark: "" },
   },
   velours: {
-    name: "Velours rubis",
-    theme: { base: "#090505", tint: "#2e1015", glow: "#ff9a8a", texture: "silk", light: "ember", font: "bodoni", backdrop: "", entrance: "spotlight", effects: ["dust", "glints", "smoke"], mark: "" },
+    name: "Velours rubis : salon de velours, bougies",
+    theme: { base: "#090505", tint: "#2e1015", glow: "#ffb98a", texture: "grain", light: "ember", font: "bodoni", backdrop: "velours", entrance: "spotlight", effects: ["glints", "scene", "jewel-warm"], mark: "" },
   },
   sacre: {
-    name: "Lumière sacrée",
-    theme: { base: "#090706", tint: "#2a1f14", glow: "#f6dcae", texture: "grain", light: "beam", font: "sacre", backdrop: "", entrance: "spotlight", effects: ["dust", "glints"], mark: "" },
+    name: "Lumière sacrée : cathédrale, rayons des vitraux",
+    theme: { base: "#090706", tint: "#2a1f14", glow: "#f6dcae", texture: "grain", light: "beam", font: "sacre", backdrop: "sacre", entrance: "spotlight", effects: ["dust", "smoke-rise", "scene", "jewel-beam"], mark: "" },
   },
   roses: {
-    name: "Roseraie",
-    theme: { base: "#0a0607", tint: "#33141c", glow: "#f2b0a8", texture: "petals", light: "halo", font: "bodoni", backdrop: "", entrance: "bloom", effects: ["petals", "glints", "smoke"], mark: "" },
+    name: "Roseraie de nuit : pétales, brume, rosée",
+    theme: { base: "#0a0607", tint: "#33141c", glow: "#f2b0a8", texture: "grain", light: "halo", font: "bodoni", backdrop: "roses", entrance: "bloom", effects: ["petals", "smoke", "dew", "scene", "jewel-sparkle"], mark: "" },
   },
   emeraude: {
-    name: "Émeraude (trèfle, chance)",
-    theme: { base: "#040905", tint: "#10291a", glow: "#e2cd84", texture: "grain", light: "halo", font: "douce", backdrop: "", entrance: "glint", effects: ["dust", "glints", "smoke"], mark: "" },
+    name: "Jardin émeraude, trèfles et rosée (Eljero Elia)",
+    theme: { base: "#040905", tint: "#10291a", glow: "#5fe0a0", texture: "grain", light: "halo", font: "douce", backdrop: "trefle", entrance: "glint", effects: ["fireflies", "smoke", "dew", "scene", "jewel-halo"], mark: "" },
   },
   facettes: {
-    name: "Facettes (géométrie, baguettes)",
-    theme: { base: "#08080a", tint: "#1f1e22", glow: "#f4f2ef", texture: "facets", light: "spotlight", font: "geometrie", backdrop: "", entrance: "glint", effects: ["glints", "dust", "smoke"], mark: "" },
+    name: "Facettes : salle de miroirs, lignes de lumière",
+    theme: { base: "#08080a", tint: "#1f1e22", glow: "#f4f2ef", texture: "grain", light: "spotlight", font: "geometrie", backdrop: "facettes", entrance: "glint", effects: ["light-lines", "prism", "jewel-prism"], mark: "" },
   },
   etoiles: {
     name: "Nuit étoilée",
     theme: { base: "#060608", tint: "#1b1820", glow: "#f4f2ef", texture: "stars", light: "halo", font: "etoile", backdrop: "", entrance: "stars", effects: ["stars", "glints"], mark: "" },
   },
   mecanique: {
-    name: "Mécanique (montres)",
-    theme: { base: "#07080a", tint: "#1c1d20", glow: "#e6e8eb", texture: "clockwork", light: "spotlight", font: "cadran", backdrop: "", entrance: "tick", effects: ["glints", "dust", "smoke"], mark: "" },
+    name: "Mécanique : mouvement de montre géant (les montres)",
+    theme: { base: "#07080a", tint: "#1c1d20", glow: "#e6e8eb", texture: "grain", light: "spotlight", font: "cadran", backdrop: "mecanique", entrance: "tick", effects: ["scene", "glints", "jewel-sheen"], mark: "" },
   },
   pluie: {
     name: "Promenade sous la pluie",
     theme: { base: "#08080a", tint: "#1e1d20", glow: "#f0c9a8", texture: "none", light: "halo", font: "deco", backdrop: "", entrance: "rain", effects: ["rain", "dust", "smoke"], mark: "" },
   },
   tulipes: {
-    name: "Tulipes (Amsterdam)",
-    theme: { base: "#0a0506", tint: "#3a1221", glow: "#ffb0a0", texture: "petals", light: "halo", font: "douce", backdrop: "", entrance: "bloom", effects: ["petals", "glints"], mark: "" },
+    name: "Champ de tulipes au crépuscule, moulins (Tulips on Tour)",
+    theme: { base: "#07060a", tint: "#2b1530", glow: "#ffc27a", texture: "grain", light: "halo", font: "douce", backdrop: "tulipes", entrance: "bloom", effects: ["petals", "smoke", "scene", "jewel-warm"], mark: "" },
   },
+};
+
+// 21/11/2026: the universes of their own piece, on an AI background of Yoni.
+THEME_PRESETS.arene = {
+  name: "Arène de combat, projecteur doré (Lasana Keita)",
+  theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "arene", entrance: "spotlight", effects: ["embers", "smoke", "scene", "jewel-sheen"], mark: "" },
+};
+THEME_PRESETS.sirius = {
+  name: "Ciel étoilé, l'étoile Sirius (Sirius)",
+  theme: { base: "#03050b", tint: "#0d1a33", glow: "#cfe3ff", texture: "grain", light: "halo", font: "etoile", backdrop: "sirius", entrance: "stars", effects: ["stars", "dust", "scene", "jewel-sparkle"], mark: "" },
+};
+THEME_PRESETS.flaneur = {
+  name: "Rue de Paris la nuit sous la pluie (Flâneur)",
+  theme: { base: "#070605", tint: "#2a1c10", glow: "#ffd59a", texture: "grain", light: "halo", font: "deco", backdrop: "flaneur", entrance: "rain", effects: ["rain", "drops", "scene", "jewel-sparkle"], mark: "" },
+};
+THEME_PRESETS.rideau = {
+  name: "Rideau de velours rouge, faisceau de lumière (The Hand)",
+  theme: { base: "#0a0505", tint: "#3a0d10", glow: "#ffd7a8", texture: "grain", light: "beam", font: "bodoni", backdrop: "the-hand", entrance: "spotlight", effects: ["beam-dust", "scene", "jewel-beam"], mark: "" },
+};
+THEME_PRESETS.forge = {
+  name: "Forge, or en fusion, étincelles (Kevin Schade)",
+  theme: { base: "#070403", tint: "#3a1a08", glow: "#ffa04a", texture: "grain", light: "ember", font: "gothique", backdrop: "forge", entrance: "flash", effects: ["sparks", "embers", "smoke", "scene", "jewel-sheen"], mark: "" },
+};
+THEME_PRESETS.n14 = {
+  name: "Constellation N14 (N14)",
+  theme: { base: "#05040a", tint: "#2a1820", glow: "#f2c2b0", texture: "grain", light: "halo", font: "etoile", backdrop: "n14", entrance: "stars", effects: ["dust", "scene", "jewel-sparkle"], mark: "" },
 };
 
 export const DEFAULT_PRESET = "maison";
@@ -260,6 +335,22 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   "smoke-rise": "Fumée qui monte (fumigènes)",
   genkidama: "Genkidama : la lumière monte vers la sphère",
   moon: "La lune brille à peine (fond avec une lune)",
+  scene: "Le décor s'anime (projecteur, étoile, bougies, faisceaux… propres au fond)",
+  flashes: "Flashs d'appareils photo dans la foule",
+  serpent: "Un serpent de lumière dorée glisse",
+  fireflies: "Lucioles dorées",
+  sparks: "Gerbes d'étincelles (forge)",
+  "light-lines": "Lignes de lumière qui courent",
+  prism: "Éclats prismatiques",
+  dew: "Rosée qui scintille",
+  "beam-dust": "Poussière dorée dans le faisceau",
+  drops: "Gouttes qui brillent sous le réverbère",
+  "jewel-sheen": "Sur la pièce : un reflet passe (couleur de la lumière)",
+  "jewel-sparkle": "Sur la pièce : des éclats scintillent",
+  "jewel-halo": "Sur la pièce : un halo pulse autour",
+  "jewel-warm": "Sur la pièce : une lumière chaude",
+  "jewel-beam": "Sur la pièce : un rayon de lumière la touche",
+  "jewel-prism": "Sur la pièce : reflets blancs et arcs-en-ciel",
 };
 
 /** Every former motion becomes one of the effects. */

@@ -162,6 +162,37 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « 15 univers » (fonds IA de Yoni, effets, effet sur la pièce) — état au 21/11/2026
+- [x] **15 fonds** de `00 Contexte Yoni/Univers IA (propositions)/` (`<nom>-desktop.jpg` / `<nom>-mobile.jpg`), préparés par
+      `npm run universes` (AVIF + WebP, 3 tailles ordinateur, 2 mobile ; 8,7 Mo en tout, 235 Ko au plus ; originaux hors Git).
+      Version mobile sur téléphone, ordinateur sinon. Chaque fond entoure aussi la story de sa pièce (`portrait`).
+- [x] **Univers propres** : arène → Lasana Keita (`arene`) ; bianconero → Kenan Yildiz ; serpent → T-Serpent ; Sirius
+      (`sirius`) ; tulipes → Tulips on Tour ; Flâneur (`flaneur`) ; trèfle → Eljero Elia (`emeraude`) ; The Hand (`rideau`) ;
+      forge → chaîne torsadée de Kevin Schade (`forge`) ; N14 (`n14`). **Partagés** (même nom de preset) : `sacre` (Deniz
+      Undav L, Samuel Ballet, croix Tillman, Loïs Openda, Baguette Cross, Jesus Piece Red Crown, Cross Infinity), `roses`
+      (Thorned T, FAM, Safi Link, Jesus Cross, BRT Flower), `velours` (collier T au rubis, Jesus Piece Red Flowers, 14 mm
+      Cuban), `facettes` (TM, D&E, Baguette Cuban, Two-Tone, White Iced, Oval Eternity), `mecanique` (les 3 montres).
+- [x] **Effets** (`src/data/themes.ts`, admin « Univers de la page ») : « scene » anime les lumières propres au fond
+      (projecteur qui respire, étoile qui scintille, constellation du N qui s'allume étoile par étoile, réverbères, bougies
+      qui vacillent et leur fumée, faisceaux du stade, rayons des vitraux, reflets des pavés, air chaud de la forge, rideau,
+      reflets qui tournent sur les rouages, ailes des moulins ; positions dans `scripts/universe-media.mjs`, dessin dans
+      `src/index.css` « .u-spot ») ; effets dessinés (`src/components/universe/fx.ts`) : flashs d'appareils, serpent de
+      lumière dorée, lucioles, gerbes d'étincelles, lignes de lumière, éclats prismatiques, rosée, poussière du faisceau,
+      gouttes sous le réverbère, pétales rouges, confettis blancs. **Effet sur la pièce** (`JewelFx.tsx`) : reflet doré,
+      éclats blancs ou bleu-blanc, halo rouge ou émeraude qui pulse, lumière chaude, rayon de lumière, reflets
+      arcs-en-ciel ; sur un détourage il prend la forme du bijou, sur une photo un cercle doux.
+- [x] Lisibilité : voile sombre derrière les textes, bande sombre sous le menu de l'ordinateur sur les fonds IA (sauf
+      Genkidama) ; contraste AA vérifié (titre et menu). Pause hors écran et en bas de page ; rien ne bouge avec « réduire
+      les animations ». `tests/universes15.spec.ts` (une pièce par univers, ordinateur et iPhone, captures dans
+      `verification/universes15/`).
+- Moulins : les ailes peintes sont effacées d'une copie de l'image ordinateur (`scripts/universe-inpaint.py`, ciel
+  reconstitué) et redessinées en train de tourner ; sur téléphone le moulin est sous le texte, il reste tel quel.
+- Approchés, faute de pouvoir bouger une image fixe : les rouages ne tournent pas vraiment (un reflet tourne sur les roues,
+  le balancier oscille en reflet), l'air de la forge scintille au lieu d'onduler, le rideau bouge par ses plis d'ombre.
+- [ ] Hors des 15 univers (gardent l'ancien) : AS de Stiller et JL de Leweling (`stuttgart`), Rose 20 mm (`maison`),
+      Infinity Pear Chain (`pluie`). Flâneur, chaîne torsadée de Kevin Schade, panthère et les 3 montres s'ouvrent encore sur
+      leur photo (pas de photo du bijou seul) : le fond se voit autour.
+
 ## Passe « retours de Yoni du 21/11 » (WhatsApp, univers VfB et Butterfly, Openda) — état au 21/11/2026
 - [x] **WhatsApp** : chaque bouton ouvre WhatsApp avec un message déjà écrit, adapté à la page (`src/lib/whatsapp.ts`,
       textes « whatsapp » de `src/i18n/ui/*.ts`, 6 langues). Pièce : « Hello Berete, I discovered the <nom affiché> on your

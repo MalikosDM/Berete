@@ -121,7 +121,7 @@ test("Inter Milan: its official logo in Created exclusively for, as the club mad
 
 /* ---------- The Genkidama of Dragon Ball ---------- */
 
-test("Dragon Ball: black, the sphere of the Genkidama breathing, the light rising to it; its story too; the chain of Kevin Schade unchanged", async ({ page }, info) => {
+test("Dragon Ball: black, the sphere of the Genkidama breathing, the light rising to it; its story too; the chain of Kevin Schade in its own world", async ({ page }, info) => {
   const problems = watch(page);
   const phone = info.project.name !== "desktop";
   await skipIntro(page);
@@ -164,9 +164,9 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   await page.waitForTimeout(1500);
   await shot(page, info.project.name + "-genkidama-story");
   await page.keyboard.press("Escape");
-  // The chain of Kevin Schade keeps its universe.
+  // The chain of Kevin Schade is not in the Genkidama: its own world, the forge (21/11/2026, tests/universes15.spec.ts).
   await page.goto("/pieces/kevin-schade-twisted-chain", { waitUntil: "load" });
-  await expect(page.locator("article[data-piece] .universe")).toHaveAttribute("data-universe", "maison");
+  await expect(page.locator("article[data-piece] .universe")).toHaveAttribute("data-universe", "forge");
   await expect(page.locator(".u-genki")).toHaveCount(0);
   expect(problems.errors).toEqual([]);
 });

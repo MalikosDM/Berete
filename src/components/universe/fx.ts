@@ -1,7 +1,9 @@
 /*
  * The effects of a universe (src/data/themes.ts), drawn in one canvas behind the content: dust, embers, diamond glints,
  * lightning, speed lines, butterflies of light (in the colour of the universe), confetti, golden confetti, petals, stars,
- * the light rising to the sphere of the Genkidama.
+ * the light rising to the sphere of the Genkidama; and since 21/11/2026 the camera flashes of a crowd, a serpent of golden
+ * light, fireflies, the sparks of a forge, lines of light running from facet to facet, prismatic glints, sparkling dew, the
+ * dust of a light beam, drops shining under a street lamp (their places: the regions of the backdrop, read on the page).
  * Loaded after the content of the page
  * (src/components/Universe.tsx); every effect answers the speed of the scroll, lightly.
  *
@@ -14,7 +16,7 @@
  * core: the sphere of light of the backdrop (Genkidama), where its particles go (its centre and its size, read on the
  * page). fixed: the world behind a layer that covers the screen (a story): drawn whatever the scroll of the page.
  */
-export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean; core?: HTMLElement | null; fixed?: boolean };
+export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean; core?: HTMLElement | null; regions?: Record<string, HTMLElement>; fixed?: boolean };
 
 type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; spin: number; angle: number; hue: number; color: string; kind: number };
 
@@ -59,13 +61,21 @@ function hueOf([r, g, b]: [number, number, number]): number {
   return h * 60;
 }
 
+/** The red petals of the tulips (Tulips on Tour) and of the roses (the rose garden). */
 const TULIPS: [number, number, number][] = [
   [226, 72, 92],
   [242, 140, 160],
-  [246, 168, 92],
-  [244, 214, 120],
-  [176, 112, 196],
+  [204, 40, 72],
+  [236, 104, 132],
 ];
+const ROSES: [number, number, number][] = [
+  [176, 22, 46],
+  [208, 40, 68],
+  [148, 16, 38],
+  [228, 92, 116],
+];
+/** The white confetti of the black and white stadium (Kenan Yildiz). */
+const WHITE = ["rgba(255,255,255,1)", "rgba(236,236,238,1)", "rgba(212,212,216,1)", "rgba(250,250,250,0.9)"];
 
 export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () => void; impact: (x: number, y: number) => void } {
   const ctx = canvas.getContext("2d");
@@ -115,6 +125,23 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   };
   readSphere();
 
+  // The places of some effects (the crowd of the flashes, the fire of the sparks, the beam of the dust...), in the
+  // coordinates of the canvas (read again now and then: they move with the scroll); else a share of the screen.
+  type Box = { x0: number; y0: number; x1: number; y1: number };
+  const boxes: Record<string, Box> = {};
+  const readRegions = () => {
+    const c = canvas.getBoundingClientRect();
+    for (const [name, el] of Object.entries(opts.regions ?? {})) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) boxes[name] = { x0: r.left - c.left, y0: r.top - c.top, x1: r.right - c.left, y1: r.bottom - c.top };
+      else delete boxes[name];
+    }
+  };
+  readRegions();
+  const box = (name: string, f: [number, number, number, number]): Box => boxes[name] ?? { x0: f[0] * w, y0: f[1] * h, x1: f[2] * w, y1: f[3] * h };
+  const goldSprite = sprite([255, 212, 120]);
+  const whiteSprite = sprite([255, 255, 255]);
+
   const area = () => (w * h) / (1440 * 900);
   const count = (n: number) => Math.max(3, Math.round(n * density * clamp(area(), 0.35, 1.6)));
 
@@ -127,6 +154,16 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const rings: P[] = [];
   const sparks: P[] = [];
   const genki: P[] = [];
+  const flashes: P[] = [];
+  const trail: { x: number; y: number }[] = []; // the serpent of light
+  let serpentT = rand(0, Math.PI * 2);
+  const flies: P[] = [];
+  const forge: P[] = [];
+  const lightLines: P[] = [];
+  const prisms: P[] = [];
+  const dews: P[] = [];
+  const motes: P[] = []; // the dust of the beam
+  const drops: P[] = [];
   let bolt: { pts: [number, number][][]; life: number } | null = null;
   let nextBolt = performance.now() + rand(1500, 3500);
   let shooting: P | null = null;
@@ -172,8 +209,9 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       kind: 0,
     };
   };
-  const confettiColors = [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
-  const petalColors = opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
+  const confettiColors = opts.preset === "bianconero" ? WHITE : [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
+  const petalColors =
+    opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : opts.preset === "roses" ? ROSES.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
   /** kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light). */
   const newFalling = (anywhere: boolean, kind: number): P => {
     const petal = kind === 1;
@@ -223,7 +261,19 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     if (has("gold-confetti")) while (falling.filter((p) => p.kind === 2).length < count(24)) falling.push(newFalling(true, 2));
     if (has("stars")) while (stars.length < count(110)) stars.push({ ...newDust(true), size: rand(0.5, 1.6), spin: rand(0, Math.PI * 2), angle: rand(0.01, 0.04) });
   };
+  const newFly = (): P => ({ x: rand(0.35, 1) * w, y: rand(0.15, 0.9) * h, vx: rand(-0.3, 0.3), vy: rand(-0.3, 0.3), life: 0, max: 0, size: rand(1.6, 3.2) * (phone ? 0.85 : 1), spin: rand(0, Math.PI * 2), angle: rand(0.012, 0.03), hue: 0, color: "", kind: 0 });
+  const newMote = (anywhere: boolean): P => {
+    const b = box("beam", [0.55, 0.1, 0.85, 0.7]);
+    return { x: rand(b.x0, b.x1), y: anywhere ? rand(b.y0, b.y1) : b.y0 + rand(0, 20), vx: rand(-0.12, 0.12), vy: rand(0.03, 0.2), life: 0, max: rand(300, 700), size: rand(0.6, 1.7), spin: rand(0, Math.PI * 2), angle: rand(0.02, 0.05), hue: 0, color: "", kind: 0 };
+  };
+  const newDrop = (anywhere: boolean): P => {
+    const b = box("lamp", [0.3, 0.05, 0.5, 0.35]);
+    return { x: rand(b.x0, b.x1), y: anywhere ? rand(b.y0, b.y1) : b.y0 - rand(0, 40), vx: rand(-0.5, -0.1), vy: rand(5, 8), life: 0, max: 0, size: rand(5, 11), spin: 0, angle: 0, hue: 0, color: "", kind: 0 };
+  };
   fill();
+  if (has("fireflies")) for (let i = 0; i < count(14); i++) flies.push(newFly());
+  if (has("beam-dust")) for (let i = 0; i < count(40); i++) motes.push(newMote(true));
+  if (has("drops")) for (let i = 0; i < count(26); i++) drops.push(newDrop(true));
   if (has("butterflies")) for (let i = 0; i < count(6); i++) flyers.push({ ...newFlyer(false), y: rand(0.3, 1) * h });
 
   /* ---------- Lightning: a branching bolt from the heart of the scene ---------- */
@@ -365,6 +415,230 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         if (d < sphere.r * 0.7 || p.life > p.max) genki[i] = newGenki(false);
       }
       ctx.globalAlpha = 1;
+    }
+
+
+    if (frame % 30 === 2) readRegions();
+
+    if (has("flashes")) {
+      // The camera flashes of the crowd: a crackle of white stars, one here, three there.
+      const b = box("crowd", [0.4, 0.45, 1, 0.75]);
+      if (Math.random() < (phone ? 0.05 : 0.09) + boost * 0.1) {
+        const n = Math.random() < 0.3 ? 3 : 1;
+        for (let k = 0; k < n; k++) flashes.push({ x: rand(b.x0, b.x1), y: rand(b.y0, b.y1), vx: 0, vy: 0, life: 0, max: rand(5, 10), size: rand(4, 9) * (phone ? 0.8 : 1), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+      }
+      for (let i = flashes.length - 1; i >= 0; i--) {
+        const p = flashes[i]!;
+        p.life++;
+        const t = p.life / p.max;
+        const a = t < 0.25 ? t / 0.25 : 1 - (t - 0.25) / 0.75;
+        const sz = p.size * (0.7 + 0.6 * a);
+        ctx.globalAlpha = Math.max(0, a);
+        ctx.drawImage(whiteSprite, p.x - sz * 2.2, p.y - sz * 2.2, sz * 4.4, sz * 4.4);
+        ctx.fillStyle = "rgba(255,255,255," + Math.max(0, 0.9 * a).toFixed(3) + ")";
+        ctx.fillRect(p.x - sz * 2.4, p.y - 0.5, sz * 4.8, 1);
+        ctx.fillRect(p.x - 0.5, p.y - sz * 2.4, 1, sz * 4.8);
+        if (p.life >= p.max) flashes.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("serpent")) {
+      // A serpent of golden light glides slowly in the depth: its head follows a long loop and waves, its body is its trail.
+      const b = box("path", [0.45, 0.12, 0.98, 0.86]);
+      serpentT += 0.0042 * (1 + boost * 2);
+      const hx = (b.x0 + b.x1) / 2 + ((b.x1 - b.x0) / 2) * 0.9 * Math.sin(serpentT) + 10 * Math.sin(serpentT * 11);
+      const hy = (b.y0 + b.y1) / 2 + ((b.y1 - b.y0) / 2) * 0.8 * Math.sin(serpentT * 2 + 0.6) + 10 * Math.cos(serpentT * 11);
+      trail.push({ x: hx, y: hy });
+      while (trail.length > (phone ? 70 : 120)) trail.shift();
+      ctx.lineCap = "round";
+      for (let i = 1; i < trail.length; i++) {
+        const t = i / trail.length;
+        ctx.strokeStyle = "rgba(240,200,120," + (0.34 * t * t).toFixed(3) + ")";
+        ctx.lineWidth = (phone ? 1.4 : 2) + t * (phone ? 4 : 7);
+        ctx.beginPath();
+        ctx.moveTo(trail[i - 1]!.x, trail[i - 1]!.y);
+        ctx.lineTo(trail[i]!.x, trail[i]!.y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 0.55;
+      ctx.drawImage(goldSprite, hx - 20, hy - 20, 40, 40);
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("fireflies")) {
+      // Golden fireflies wander and blink.
+      for (const p of flies) {
+        p.vx = clamp(p.vx + rand(-0.03, 0.03) + (p.x < 0.32 * w ? 0.02 : p.x > w ? -0.03 : 0), -0.45, 0.45);
+        p.vy = clamp(p.vy + rand(-0.03, 0.03) + (p.y < 0.1 * h ? 0.02 : p.y > 0.95 * h ? -0.03 : 0), -0.4, 0.4);
+        p.x += p.vx;
+        p.y += p.vy - boost * 0.6;
+        p.spin += p.angle;
+        const a = Math.max(0, Math.sin(p.spin)) ** 2;
+        if (a < 0.02) continue;
+        const sz = p.size * 4;
+        ctx.globalAlpha = a * 0.9;
+        ctx.drawImage(goldSprite, p.x - sz, p.y - sz, sz * 2, sz * 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("sparks")) {
+      // The sparks of the forge: a trickle, and now and then a burst from the molten gold.
+      const b = box("fire", [0.6, 0.5, 0.7, 0.57]);
+      const burst = Math.random() < (phone ? 0.012 : 0.02) + boost * 0.05;
+      const n = burst ? Math.round(rand(10, 22) * (phone ? 0.6 : 1)) : Math.random() < 0.35 ? 1 : 0;
+      for (let k = 0; k < n && forge.length < 160; k++) forge.push({ x: rand(b.x0, b.x1), y: rand(b.y0, (b.y0 + b.y1) / 2), vx: rand(-2.4, 2.4), vy: rand(-6.5, -2.2), life: 0, max: rand(35, 75), size: rand(0.8, 1.8), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+      ctx.lineCap = "round";
+      for (let i = forge.length - 1; i >= 0; i--) {
+        const p = forge[i]!;
+        p.life++;
+        const px = p.x;
+        const py = p.y;
+        p.vy += 0.11;
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        const t = p.life / p.max;
+        ctx.strokeStyle = "rgba(255," + Math.round(205 - 90 * t) + "," + Math.round(115 - 80 * t) + "," + Math.max(0, 1 - t).toFixed(3) + ")";
+        ctx.lineWidth = p.size;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        if (p.life >= p.max || p.y > h + 10) forge.splice(i, 1);
+      }
+    }
+
+    if (has("light-lines")) {
+      // Lines of light run from facet to facet: straight, turning a corner now and then.
+      if (lightLines.length < (phone ? 2 : 4) && Math.random() < 0.025 + boost * 0.05) {
+        const dirs = [0, Math.PI / 2, Math.PI / 4, -Math.PI / 4, Math.PI, -Math.PI / 2, (3 * Math.PI) / 4];
+        const a = dirs[Math.floor(Math.random() * dirs.length)]!;
+        const v = rand(7, 12);
+        lightLines.push({ x: rand(0.3, 1) * w, y: rand(0, 1) * h, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: Math.round(rand(40, 80)), size: rand(60, 180), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+      }
+      for (let i = lightLines.length - 1; i >= 0; i--) {
+        const p = lightLines[i]!;
+        p.life++;
+        const v = Math.hypot(p.vx, p.vy);
+        if (p.life === Math.round(p.max / 2) && Math.random() < 0.6) {
+          const a = Math.atan2(p.vy, p.vx) + (Math.random() < 0.5 ? 1 : -1) * (Math.PI / 2);
+          p.vx = Math.cos(a) * v;
+          p.vy = Math.sin(a) * v;
+        }
+        p.x += p.vx;
+        p.y += p.vy;
+        const a = Math.sin(Math.PI * Math.min(1, p.life / p.max)) * 0.8;
+        const tx = p.x - (p.vx / v) * p.size;
+        const ty = p.y - (p.vy / v) * p.size;
+        const g = ctx.createLinearGradient(tx, ty, p.x, p.y);
+        g.addColorStop(0, rgba(light, 0));
+        g.addColorStop(1, rgba(white, a));
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        ctx.globalAlpha = a;
+        ctx.drawImage(lightSprite, p.x - 7, p.y - 7, 14, 14);
+        ctx.globalAlpha = 1;
+        if (p.life >= p.max) lightLines.splice(i, 1);
+      }
+    }
+
+    if (has("prism")) {
+      // Prismatic glints: the stars of a diamond, in the colours of a rainbow.
+      if (prisms.length < (phone ? 3 : 6) && Math.random() < 0.05 + boost * 0.1) prisms.push({ ...newGlint(), hue: rand(0, 360) });
+      for (let i = prisms.length - 1; i >= 0; i--) {
+        const p = prisms[i]!;
+        p.life++;
+        const t = p.life / p.max;
+        const sz = p.size * Math.sin(Math.PI * t);
+        const a = Math.sin(Math.PI * t) * 0.85;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.spin + t * 0.6);
+        ctx.globalAlpha = a;
+        ctx.fillStyle = "hsla(" + p.hue.toFixed(0) + ",95%,78%,0.9)";
+        ctx.beginPath();
+        ctx.moveTo(0, -sz * 2);
+        ctx.quadraticCurveTo(0, 0, sz * 2, 0);
+        ctx.quadraticCurveTo(0, 0, 0, sz * 2);
+        ctx.quadraticCurveTo(0, 0, -sz * 2, 0);
+        ctx.quadraticCurveTo(0, 0, 0, -sz * 2);
+        ctx.fill();
+        ctx.drawImage(lightSprite, -sz * 0.8, -sz * 0.8, sz * 1.6, sz * 1.6);
+        ctx.restore();
+        if (p.life >= p.max) prisms.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("dew")) {
+      // Dew on the leaves: tiny points that catch the light and go out.
+      const b = box("dew", [0.45, 0.55, 1, 0.95]);
+      if (dews.length < (phone ? 6 : 12) && Math.random() < 0.12) dews.push({ x: rand(b.x0, b.x1), y: rand(b.y0, b.y1), vx: 0, vy: 0, life: 0, max: rand(40, 80), size: rand(1.5, 3.5), spin: rand(0, Math.PI), angle: 0, hue: 0, color: "", kind: 0 });
+      for (let i = dews.length - 1; i >= 0; i--) {
+        const p = dews[i]!;
+        p.life++;
+        const a = Math.sin(Math.PI * (p.life / p.max));
+        const sz = p.size * (0.6 + 0.4 * a);
+        ctx.globalAlpha = a * 0.9;
+        ctx.drawImage(whiteSprite, p.x - sz * 2, p.y - sz * 2, sz * 4, sz * 4);
+        ctx.fillStyle = "rgba(255,255,255," + (0.8 * a).toFixed(3) + ")";
+        ctx.fillRect(p.x - sz * 1.8, p.y - 0.4, sz * 3.6, 0.8);
+        ctx.fillRect(p.x - 0.4, p.y - sz * 1.8, 0.8, sz * 3.6);
+        if (p.life >= p.max) dews.splice(i, 1);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("beam-dust")) {
+      // Golden dust floating in the beam of light, slowly, turning to the light and away.
+      const b = box("beam", [0.55, 0.1, 0.85, 0.7]);
+      for (let i = 0; i < motes.length; i++) {
+        const p = motes[i]!;
+        p.life++;
+        p.spin += p.angle;
+        p.x += p.vx + Math.sin(p.life * 0.01 + p.spin) * 0.12;
+        p.y += p.vy * (1 + boost * 2);
+        const a = Math.min(1, p.life / 60, (p.max - p.life) / 60) * (0.45 + 0.4 * Math.sin(p.spin * 3));
+        if (a > 0.02) {
+          const sz = p.size * 4;
+          ctx.globalAlpha = a;
+          ctx.drawImage(goldSprite, p.x - sz, p.y - sz, sz * 2, sz * 2);
+        }
+        if (p.life > p.max || p.y > b.y1 + 10 || p.x < b.x0 - 20 || p.x > b.x1 + 20) motes[i] = newMote(false);
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if (has("drops")) {
+      // The rain shines in the light of the street lamp: short bright streaks, brighter near it.
+      const b = box("lamp", [0.3, 0.05, 0.5, 0.35]);
+      const lx = (b.x0 + b.x1) / 2;
+      const ly = (b.y0 + b.y1) / 2;
+      const rr = Math.max(b.x1 - b.x0, b.y1 - b.y0) / 2;
+      ctx.lineCap = "round";
+      ctx.lineWidth = 1;
+      for (let i = 0; i < drops.length; i++) {
+        const p = drops[i]!;
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.y > b.y1 + 20) {
+          drops[i] = newDrop(false);
+          continue;
+        }
+        const a = clamp(1 - Math.hypot(p.x - lx, p.y - ly) / rr, 0, 1) * 0.85;
+        if (a < 0.03) continue;
+        ctx.strokeStyle = rgba(light, a);
+        ctx.beginPath();
+        ctx.moveTo(p.x - p.vx * 1.5, p.y - p.size);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+      }
     }
 
     if (has("dust")) {
@@ -587,6 +861,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const ro = new ResizeObserver(() => {
     resize();
     readSphere();
+    readRegions();
     makeLines();
   });
   ro.observe(canvas);

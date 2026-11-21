@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { BACKDROPS, THEME_FONTS, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
+import { BACKDROPS, THEME_FONTS, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
 import { afterLoad } from "@/lib/idle";
 
 /*
@@ -31,6 +31,72 @@ const TWENTY = Array.from({ length: 20 }, (_, i) => {
   const a = Math.PI * (1.08 - (i / 19) * 1.16);
   return { x: 50 + Math.cos(a) * 48, y: 62 - Math.sin(a) * 54 };
 });
+
+/**
+ * The numbers of a spot of an AI background (scripts/universe-media.mjs), by kind, as CSS variables (src/index.css,
+ * ".u-spot"): x, y its place (shares of the width and of the height of the image), r a radius (share of the width), w and
+ * h a width (share of the width) and a height (share of the height), a an angle (degrees).
+ *   glow: a light that breathes (a projector, a lamp, the sun, a fire); star: a star that twinkles (seq: they light up one
+ *   after the other, the constellation of N14); flame: a candle flame; wisp: the smoke of a candle; spin and swing: a
+ *   reflection that turns on a wheel, or swings on the balance of a watch; cone: the light of a projector (a: its tilt);
+ *   beam: a stadium light bar that sways; rays: shafts of light through a window (w: their length, a: their tilt);
+ *   ripples: the reflections of wet pavements; heat: the air over a fire; folds: a curtain that barely moves; sails: the
+ *   sails of a windmill turning slowly (r: their length; the painted ones are removed from the image).
+ */
+const SPOT_PARAMS: Record<string, string[]> = {
+  glow: ["x", "y", "r"],
+  star: ["x", "y", "r"],
+  flame: ["x", "y", "r"],
+  wisp: ["x", "y", "r"],
+  spin: ["x", "y", "r"],
+  swing: ["x", "y", "r"],
+  sails: ["x", "y", "r"],
+  cone: ["x", "y", "w", "h", "a"],
+  beam: ["x", "y", "w", "h"],
+  rays: ["x", "y", "w", "a"],
+  ripples: ["x", "y", "w", "h"],
+  heat: ["x", "y", "w", "h"],
+  folds: ["x", "y", "w", "h"],
+};
+/** The four sails of a windmill: a spar and its lattice each, around the hub (drawn in a square of 200, centre 0). */
+function Sails() {
+  return (
+    <svg viewBox="-100 -100 200 200" aria-hidden="true">
+      {[0, 90, 180, 270].map((a) => (
+        <g key={a} transform={"rotate(" + a + ")"}>
+          <rect x={-2.6} y={-100} width={5.2} height={92} />
+          <rect x={2.6} y={-96} width={17} height={70} fillOpacity={0.32} />
+          {[-90, -78, -66, -54, -42, -30].map((y) => (
+            <rect key={y} x={2.6} y={y} width={17} height={1.6} />
+          ))}
+          <rect x={18.4} y={-96} width={1.6} height={70} />
+        </g>
+      ))}
+      <circle r={6.5} />
+    </svg>
+  );
+}
+
+/** The inner pieces of a spot (its flame, its puffs of smoke, its shafts, its folds). */
+const SPOT_PARTS: Record<string, number> = { flame: 1, wisp: 2, rays: 3, heat: 2, folds: 3 };
+
+function spotStyle(spot: BackdropSpot, index: number): CSSProperties {
+  const style: Record<string, string | number> = { "--i": spot.i ?? index };
+  for (const [side, values] of [["d", spot.d], ["m", spot.m]] as const) {
+    (SPOT_PARAMS[spot.k] ?? []).forEach((name, n) => {
+      if (values && values[n] !== undefined) style["--" + side + name] = values[n]!;
+    });
+  }
+  return style as CSSProperties;
+}
+
+function regionStyle(r: { d?: number[]; m?: number[] }): CSSProperties {
+  const style: Record<string, number> = {};
+  for (const [side, values] of [["d", r.d], ["m", r.m]] as const) {
+    if (values) ["x0", "y0", "x1", "y1"].forEach((name, n) => (style["--" + side + name] = values[n]!));
+  }
+  return style as CSSProperties;
+}
 
 /** A Japanese or Chinese glyph: the watermark takes the brush font. */
 const isBrush = (mark: string) => [...mark].some((c) => (c.codePointAt(0) ?? 0) >= 0x3040 && (c.codePointAt(0) ?? 0) <= 0x9fff);
@@ -103,7 +169,13 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
   const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
-  const canvasEffects = effects.filter((e) => ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama"].includes(e));
+  const canvasEffects = effects.filter((e) =>
+    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops"].includes(e),
+  );
+  // The lights of the image that come alive, and the places where some effects of the canvas happen.
+  const spots = effects.includes("scene") ? (backdrop?.spots ?? []) : [];
+  const regions = backdrop?.regions ?? {};
+  const hasSpots = spots.length > 0 || Object.keys(regions).length > 0;
   // A light laid on the image: the sphere of the Genkidama (its glow, and where the particles of light go), else the moon
   // of the backdrop, shining barely.
   const genkidama = Boolean(backdrop?.core && effects.includes("genkidama"));
@@ -125,6 +197,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
       el.style.setProperty("--u-scroll", String(Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 0.9))).toFixed(3)));
       // Deep in the page (the texts, the photos), the world rests: its slow motions pause (src/index.css), its effects stop.
       el.toggleAttribute("data-deep", window.scrollY > window.innerHeight * 1.1);
+      // The piece of the opening rests too (its effect: src/components/universe/JewelFx.tsx).
+      el.parentElement?.toggleAttribute("data-deep", window.scrollY > window.innerHeight * 1.1);
     };
     const onScroll = () => {
       if (!frame) frame = window.requestAnimationFrame(update);
@@ -149,7 +223,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         void import("./universe/fx").then((m) => {
           if (cancelled) return;
           const coreEl = canvas.parentElement?.querySelector<HTMLElement>(".u-genki-core") ?? null;
-          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, fixed });
+          const regionEls = Object.fromEntries([...(canvas.parentElement?.querySelectorAll<HTMLElement>(".u-region") ?? [])].map((r) => [r.dataset.region ?? "", r]));
+          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, regions: regionEls, fixed });
         });
       },
       { delay: 200, onGesture: true },
@@ -227,6 +302,30 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
             <div className="u-genki-box">
               <span className="u-genki-glow" />
               {genkidama ? <span className="u-genki-core" /> : null}
+            </div>
+          </div>
+        ) : null}
+        {hasSpots ? (
+          // Laid over the image exactly, like the sphere above (src/index.css, ".u-spots").
+          <div className="u-spots">
+            <div className="u-spots-box">
+              {spots.map((spot, i) => (
+                <span
+                  key={i}
+                  className="u-spot"
+                  data-kind={spot.k}
+                  data-tone={spot.tone}
+                  data-seq={spot.seq ? "" : undefined}
+                  data-desktop={spot.d ? undefined : "none"}
+                  data-mobile={spot.m ? undefined : "none"}
+                  style={spotStyle(spot, i)}
+                >
+                  {spot.k === "sails" ? <Sails /> : Array.from({ length: SPOT_PARTS[spot.k] ?? 0 }, (_, n) => <i key={n} />)}
+                </span>
+              ))}
+              {Object.entries(regions).map(([name, r]) => (
+                <i key={name} className="u-region" data-region={name} data-desktop={r.d ? undefined : "none"} data-mobile={r.m ? undefined : "none"} style={regionStyle(r)} />
+              ))}
             </div>
           </div>
         ) : null}

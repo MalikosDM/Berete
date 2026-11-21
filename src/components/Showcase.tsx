@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import JewelFx, { jewelSource } from "@/components/universe/JewelFx";
 import { cutoutLargest, cutoutSrcSet, type CutoutView } from "@/data/showcase";
+import type { JewelEffect } from "@/data/themes";
 import { useI18n } from "@/i18n";
 
 /*
@@ -24,7 +26,8 @@ const AROUND = [
   { x: -0.37, y: -0.32, s: 0.22, d: 5 },
 ];
 
-export default function Showcase({ slug, title, views }: { slug: string; title: string; views: CutoutView[] }) {
+/** jewel: the effect of its universe on the piece itself (src/components/universe/JewelFx.tsx), on its main view. */
+export default function Showcase({ slug, title, views, jewel = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -112,8 +115,16 @@ export default function Showcase({ slug, title, views }: { slug: string; title: 
       fetchPriority={main ? "high" : undefined}
       decoding="async"
       draggable={false}
+      ref={jewel ? jewelSource : undefined}
       className="h-full w-full select-none object-contain"
     />
+  );
+  // The jewel and the effect of its world on it, in one frame (isolated: the halo stays behind it).
+  const framed = (v: CutoutView, main: boolean, sizes: string) => (
+    <span className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
+      {img(v, main, sizes)}
+      {jewel ? <JewelFx kind={jewel} /> : null}
+    </span>
   );
 
   return (
@@ -143,7 +154,7 @@ export default function Showcase({ slug, title, views }: { slug: string; title: 
               className={"sv-view absolute inset-0 " + (main ? "pointer-events-none" : "cursor-pointer")}
             >
               <span className="sv-par block h-full w-full">
-                <span className="sv-float block h-full w-full">{img(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw")}</span>
+                {framed(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw")}
               </span>
             </button>
           );
@@ -161,7 +172,7 @@ export default function Showcase({ slug, title, views }: { slug: string; title: 
         >
           {views.map((v, i) => (
             <div key={v.id} data-showcase-slide={i} className={"h-full w-full shrink-0 snap-center " + (multi ? "pb-12" : "")} style={{ "--i": i } as CSSProperties}>
-              <span className="sv-float block h-full w-full">{img(v, i === 0, "92vw")}</span>
+              {framed(v, i === 0, "92vw")}
             </div>
           ))}
         </div>

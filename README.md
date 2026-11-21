@@ -46,6 +46,10 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   - **Effets** : un canvas chargé après le contenu (braises, éclairs, lignes de vitesse, papillons, confettis, pétales,
     étoiles, poussière, éclats), qui répond à la vitesse du scroll, moins de la moitié des particules sur téléphone ; plus
     des couches CSS (brume, reflets irisés, pluie, vingt étoiles de l'Inter) et l'impact à l'ouverture d'une photo.
+  - **Le décor qui s'anime** (effet « scene », 21/11/2026) : les lumières d'un fond IA (projecteur, étoile, bougies,
+    faisceaux, rayons, reflets, ailes de moulin…) placées sur l'image (`spots` de `scripts/universe-media.mjs`, `.u-spot`
+    de `src/index.css`), et **un effet sur la pièce elle-même** (reflet, éclats, halo, lumière chaude, rayon, arcs-en-ciel :
+    `src/components/universe/JewelFx.tsx`). Les fonds avec leur propre version téléphone entourent aussi la story de la pièce.
   - Tout se règle dans l'admin (« Univers de la page » : univers, fond IA ou image envoyée, police, entrée, effets,
     filigrane, couleurs, texture, lumière, avec un aperçu et « Rejouer l'entrée »). Sans thème : l'univers de la Maison.
     L'accent reste l'or rose ; rien ne bouge avec « réduire les animations ».

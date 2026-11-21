@@ -13,6 +13,7 @@ import PieceFilm from "@/components/PieceFilm";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import Showcase from "@/components/Showcase";
+import JewelFx from "@/components/universe/JewelFx";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import Universe, { universeProps } from "@/components/Universe";
@@ -24,7 +25,7 @@ import { resolveAtelier, resolveReveal } from "@/data/atelier";
 import { pointsFor } from "@/data/details3d";
 import type { PublicModel } from "@/data/models";
 import { resolveShowcase } from "@/data/showcase";
-import { resolveTheme } from "@/data/themes";
+import { jewelOf, resolveTheme } from "@/data/themes";
 import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
@@ -103,6 +104,8 @@ export default function PiecePage() {
   };
 
   const theme = resolveTheme(piece.theme);
+  // The effect of its universe on the piece itself (a reflection, sparkles, a halo...).
+  const jewel = jewelOf(theme.effects);
   // The jewel of the opening: cut out, in one view or a showcase of several; else its photo.
   const opening = resolveShowcase(piece.slug, piece.showcase);
   // Its atelier (its making-of, then the finished piece): a passage after its photos, when it has a making-of.
@@ -129,9 +132,19 @@ export default function PiecePage() {
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
         <div data-piece-cover className="relative h-[58svh] shrink-0 px-4 pt-20 sm:h-[62svh] sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14 xl:col-span-8">
           {opening.mode === "photo" ? (
-            <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
+            <>
+              <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
+              {/* The effect of its world on the piece, over its photo (the same frame as the photo). */}
+              {jewel ? (
+                <span aria-hidden="true" className="pointer-events-none absolute inset-0 px-4 pt-20 sm:px-10 lg:px-12 lg:pt-28 lg:pb-14">
+                  <span className="relative block h-full w-full">
+                    <JewelFx kind={jewel} photo />
+                  </span>
+                </span>
+              ) : null}
+            </>
           ) : (
-            <Showcase slug={piece.slug} title={piece.title} views={opening.views} />
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} />
           )}
         </div>
         {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the

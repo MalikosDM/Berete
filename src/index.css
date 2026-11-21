@@ -949,7 +949,7 @@ html.lenis body {
 }
 
 /* Deep in the page the world rests: its slow motions pause (the backdrop is dim behind the texts there). */
-.universe[data-deep] :is(.u-light, .u-texture, .u-iris, .u-rain, .u-smoke > span, .u-twenty > span) {
+.universe[data-deep] :is(.u-light, .u-texture, .u-iris, .u-rain, .u-smoke > span, .u-twenty > span, .u-spot, .u-spot > i) {
   animation-play-state: paused;
 }
 
@@ -979,7 +979,8 @@ html.lenis body {
 .universe-stage {
   container-type: size;
 }
-.u-genki {
+.u-genki,
+.u-spots {
   --gx: var(--g-x);
   --gy: var(--g-y);
   --gr: var(--g-r);
@@ -988,7 +989,8 @@ html.lenis body {
   transform: translate3d(0, calc(var(--u-scroll) * -2.5%), 0) scale(calc(1 + var(--u-scroll) * 0.05));
   transform-origin: var(--u-at-x) 40%;
 }
-.u-genki-box {
+.u-genki-box,
+.u-spots-box {
   position: absolute;
   top: 50%;
   left: var(--u-at-x);
@@ -996,7 +998,8 @@ html.lenis body {
   width: max(100cqw, calc(100cqh * var(--u-ratio, 1.75)), calc(100cqw * var(--u-at-n) / var(--u-fx, 0.5)), calc(100cqw * (1 - var(--u-at-n)) / (1 - var(--u-fx, 0.5))));
   transform: translate(calc(var(--u-fx, 0.5) * -100%), -50%);
 }
-.universe[data-preview] .u-genki-box {
+.universe[data-preview] .u-genki-box,
+.universe[data-preview] .u-spots-box {
   left: 50%;
   width: max(100cqw, calc(100cqh * var(--u-ratio, 1.75)));
   transform: translate(-50%, -50%);
@@ -1008,7 +1011,9 @@ html.lenis body {
     --gr: var(--g-mr);
   }
   .u-genki-box,
-  .universe[data-preview] .u-genki-box {
+  .universe[data-preview] .u-genki-box,
+  .u-spots-box,
+  .universe[data-preview] .u-spots-box {
     left: 50%;
     top: calc((100cqh - max(100cqh, calc(100cqw * 16 / 9))) * 0.32);
     aspect-ratio: 9 / 16;
@@ -1045,7 +1050,7 @@ html.lenis body {
     transform: translate(-50%, -50%) scale(1.035);
   }
 }
-[data-entering] .u-genki {
+[data-entering] :is(.u-genki, .u-spots) {
   animation: u-genki-in 2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
 @keyframes u-genki-in {
@@ -1084,7 +1089,7 @@ html.lenis body {
 /* On a wide screen the story stands in the middle, in front of the heart of the image: the image grows from its top, so
    that the sphere shines around the story. */
 @media (min-aspect-ratio: 4/5) {
-  .universe[data-fixed] :is(.u-backdrop, .u-genki) {
+  .universe[data-fixed] :is(.u-backdrop, .u-genki, .u-spots) {
     transform: scale(1.6);
     transform-origin: 50% 0;
   }
@@ -1139,16 +1144,672 @@ html.lenis body {
   background: var(--u-base);
   opacity: calc(var(--u-scroll) * 0.4);
 }
-/* The moon of the violet forest (Butterfly) rises behind the menu of a computer: a darker band under the menu, so that its
-   words stay readable on the pale moon. */
+/* The light of an AI background may rise behind the menu of a computer (the moon of the forest, the lights of a stadium,
+   the sun of the clover garden): a darker band under the menu, so that its words stay readable. Not under the sphere of
+   the Genkidama (its light is the heart of the image). */
 @media (min-width: 1024px) {
-  .universe[data-backdrop="butterfly"]:not([data-fixed]) .u-veil::before {
+  .universe[data-backdrop]:not([data-fixed], [data-backdrop="genkidama"]) .u-veil::before {
     content: "";
     position: absolute;
     inset: 0 0 auto;
     height: 9rem;
     background: linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 80%, transparent) 0%, color-mix(in oklab, var(--u-base) 55%, transparent) 50%, transparent 100%);
   }
+}
+
+/* ---------- The lights of an AI background that come alive (effect "scene", src/components/Universe.tsx) ---------- */
+
+/* Each spot is laid on the image at its place (shares of the image), the computer or the phone one; a spot of one image
+   only is not drawn on the other. Animations: opacity, scale, rotation and translation only (light on a phone). */
+.u-spot {
+  --x: var(--dx);
+  --y: var(--dy);
+  --r: var(--dr, 0);
+  --w: var(--dw, 0);
+  --h: var(--dh, 0);
+  --a: var(--da, 0);
+  --tone: 255 214 160;
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  pointer-events: none;
+}
+@media (min-aspect-ratio: 4/5) {
+  .u-spot[data-desktop="none"],
+  .u-region[data-desktop="none"] {
+    display: none;
+  }
+}
+@media (max-aspect-ratio: 4/5) {
+  .u-spot {
+    --x: var(--mx);
+    --y: var(--my);
+    --r: var(--mr, 0);
+    --w: var(--mw, 0);
+    --h: var(--mh, 0);
+    --a: var(--ma, 0);
+  }
+  .u-spot[data-mobile="none"],
+  .u-region[data-mobile="none"] {
+    display: none;
+  }
+}
+.u-spot[data-tone="gold"] {
+  --tone: 255 208 128;
+}
+.u-spot[data-tone="white"] {
+  --tone: 244 246 255;
+}
+.u-spot[data-tone="blue"] {
+  --tone: 205 228 255;
+}
+.u-spot[data-tone="warm"] {
+  --tone: 255 196 120;
+}
+.u-spot[data-tone="fire"] {
+  --tone: 255 138 48;
+}
+.u-spot[data-tone="red"] {
+  --tone: 255 64 44;
+}
+.u-spot[data-tone="green"] {
+  --tone: 205 255 214;
+}
+.u-spot[data-tone="rose"] {
+  --tone: 255 210 196;
+}
+/* The round ones, centred on their place. */
+.u-spot:is([data-kind="glow"], [data-kind="star"], [data-kind="flame"], [data-kind="spin"], [data-kind="swing"]) {
+  width: calc(var(--r) * 200%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+}
+/* A light that breathes: a projector, a lamp, the sun in the trees, the molten gold. */
+.u-spot[data-kind="glow"] {
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--tone) / 0.55) 0%, rgb(var(--tone) / 0.22) 34%, rgb(var(--tone) / 0.07) 54%, transparent 70%);
+  mix-blend-mode: screen;
+  animation: u-breathe 6.5s ease-in-out calc(var(--i) * -1.3s) infinite;
+}
+.u-spot[data-kind="glow"][data-tone="fire"] {
+  animation: u-fire 2.6s ease-in-out infinite;
+}
+@keyframes u-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    scale: 1;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.06;
+  }
+}
+@keyframes u-fire {
+  0%,
+  100% {
+    opacity: 0.75;
+    scale: 1;
+  }
+  20% {
+    opacity: 1;
+    scale: 1.05;
+  }
+  45% {
+    opacity: 0.6;
+    scale: 0.97;
+  }
+  70% {
+    opacity: 0.95;
+    scale: 1.04;
+  }
+}
+/* A star that twinkles: its heart and its four rays. The stars of a constellation light up one after the other first. */
+.u-spot[data-kind="star"] {
+  background: radial-gradient(circle, rgb(255 255 255 / 0.95) 0%, rgb(var(--tone) / 0.6) 9%, rgb(var(--tone) / 0.16) 24%, transparent 46%);
+  mix-blend-mode: screen;
+  animation: u-twinkle 3.1s ease-in-out calc(var(--i) * -0.7s) infinite;
+}
+.u-spot[data-kind="star"]::before,
+.u-spot[data-kind="star"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170%;
+  height: 2%;
+  min-height: 1px;
+  translate: -50% -50%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.9), transparent);
+}
+.u-spot[data-kind="star"]::after {
+  rotate: 90deg;
+}
+.u-spot[data-kind="star"][data-seq] {
+  opacity: 0;
+  animation:
+    u-star-on 1.1s ease-out calc(0.8s + var(--i) * 0.38s) both,
+    u-twinkle 3.4s ease-in-out calc(2.2s + var(--i) * 0.38s) infinite;
+}
+@keyframes u-twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+    scale: 0.92;
+    rotate: 0deg;
+  }
+  30% {
+    opacity: 1;
+    scale: 1.12;
+    rotate: 8deg;
+  }
+  55% {
+    opacity: 0.6;
+    scale: 0.88;
+  }
+  80% {
+    opacity: 0.95;
+    scale: 1.04;
+    rotate: -4deg;
+  }
+}
+@keyframes u-star-on {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.35;
+  }
+  to {
+    opacity: 0.8;
+    scale: 1;
+  }
+}
+/* A candle flame that flickers. */
+.u-spot[data-kind="flame"] > i {
+  position: absolute;
+  left: 22%;
+  top: -40%;
+  width: 56%;
+  height: 150%;
+  border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: radial-gradient(ellipse at 50% 64%, rgb(255 250 220 / 0.95) 0%, rgb(var(--tone) / 0.7) 32%, rgb(var(--tone) / 0.12) 62%, transparent 74%);
+  mix-blend-mode: screen;
+  transform-origin: 50% 90%;
+  animation: u-flicker 1.7s steps(1, end) calc(var(--i) * -0.37s) infinite;
+}
+.u-spot[data-kind="flame"]::before {
+  content: "";
+  position: absolute;
+  inset: -160%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--tone) / 0.26) 0%, rgb(var(--tone) / 0.08) 36%, transparent 64%);
+  mix-blend-mode: screen;
+  animation: u-breathe 2.3s ease-in-out calc(var(--i) * -0.6s) infinite;
+}
+@keyframes u-flicker {
+  0% {
+    scale: 1 1;
+    opacity: 0.95;
+  }
+  12% {
+    scale: 0.94 1.08;
+    opacity: 1;
+  }
+  25% {
+    scale: 1.04 0.93;
+    opacity: 0.85;
+  }
+  40% {
+    scale: 0.97 1.05;
+    opacity: 1;
+  }
+  55% {
+    scale: 1.02 0.96;
+    opacity: 0.9;
+  }
+  70% {
+    scale: 0.95 1.1;
+    opacity: 1;
+  }
+  85% {
+    scale: 1.03 0.95;
+    opacity: 0.88;
+  }
+}
+/* The smoke of a candle: two puffs rising one after the other, fading as they climb. */
+.u-spot[data-kind="wisp"] {
+  width: calc(var(--r) * 200%);
+  aspect-ratio: 1 / 6;
+  translate: -50% -100%;
+}
+.u-spot[data-kind="wisp"] > i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 42%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(226 226 236 / 0.3), transparent 70%);
+  opacity: 0;
+  animation: u-wisp 7s ease-in infinite;
+}
+.u-spot[data-kind="wisp"] > i:nth-child(2) {
+  animation-delay: -3.5s;
+}
+@keyframes u-wisp {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    scale: 0.5 0.8;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    translate: 18% -140%;
+    scale: 1.8 1.4;
+  }
+}
+/* A reflection that turns on a wheel of the watch, or swings on its balance. */
+.u-spot:is([data-kind="spin"], [data-kind="swing"]) {
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 62%, rgb(255 255 255 / 0.34) 72%, rgb(255 255 255 / 0.08) 80%, transparent 88%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 82%, transparent);
+  mask-image: radial-gradient(closest-side, #000 82%, transparent);
+  mix-blend-mode: overlay;
+  animation: u-spin 26s linear calc(var(--i) * -7s) infinite;
+}
+.u-spot[data-kind="swing"] {
+  animation: u-swing 1.9s ease-in-out infinite alternate;
+}
+@keyframes u-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes u-swing {
+  from {
+    rotate: -48deg;
+  }
+  to {
+    rotate: 48deg;
+  }
+}
+/* The sails of a windmill, turning slowly, as soft as the image around them. */
+.u-spot[data-kind="sails"] {
+  width: calc(var(--r) * 200%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  filter: blur(3.2px);
+  opacity: 0.85;
+  animation: u-spin 46s linear calc(var(--i) * -13s) infinite reverse;
+}
+.u-spot[data-kind="sails"] > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: rgb(46 34 58 / 0.9);
+}
+/* The light of a projector, falling: a soft cone that breathes. */
+.u-spot[data-kind="cone"] {
+  width: calc(var(--w) * 100%);
+  height: calc(var(--h) * 100%);
+  translate: -50% 0;
+  rotate: calc(var(--a) * 1deg);
+  transform-origin: 50% 0;
+  filter: blur(14px);
+  mix-blend-mode: screen;
+  animation: u-breathe 7s ease-in-out infinite;
+}
+.u-spot[data-kind="cone"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgb(var(--tone) / 0.34), rgb(var(--tone) / 0.1) 62%, transparent);
+  clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+}
+/* The light bars of the stadium, swaying gently from the top. */
+.u-spot[data-kind="beam"] {
+  width: calc(var(--w) * 100%);
+  height: calc(var(--h) * 100%);
+  translate: -50% 0;
+  transform-origin: 50% 0;
+  background: linear-gradient(to bottom, rgb(var(--tone) / 0.24), rgb(var(--tone) / 0.08) 70%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 30%, #000 70%, transparent);
+  mix-blend-mode: screen;
+  animation: u-sway 9s ease-in-out calc(var(--i) * -1.7s) infinite alternate;
+}
+@keyframes u-sway {
+  from {
+    rotate: -1.6deg;
+    opacity: 0.6;
+  }
+  to {
+    rotate: 1.6deg;
+    opacity: 1;
+  }
+}
+/* Shafts of light through the stained glass, moving slowly. */
+.u-spot[data-kind="rays"] {
+  width: calc(var(--w) * 100%);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  rotate: calc(var(--a) * 1deg);
+  transform-origin: 50% 0;
+  filter: blur(6px);
+  mix-blend-mode: screen;
+  animation: u-rays 16s ease-in-out infinite alternate;
+}
+.u-spot[data-kind="rays"] > i {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgb(var(--tone) / 0.3), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, #000 10%, transparent 92%);
+  mask-image: linear-gradient(to bottom, #000 10%, transparent 92%);
+  animation: u-breathe 8s ease-in-out infinite;
+}
+.u-spot[data-kind="rays"] > i:nth-child(1) {
+  left: 30%;
+  width: 14%;
+  animation-delay: -2s;
+}
+.u-spot[data-kind="rays"] > i:nth-child(2) {
+  left: 44%;
+  width: 20%;
+}
+.u-spot[data-kind="rays"] > i:nth-child(3) {
+  left: 62%;
+  width: 11%;
+  animation-delay: -5s;
+}
+@keyframes u-rays {
+  from {
+    rotate: calc(var(--a) * 1deg - 2.5deg);
+  }
+  to {
+    rotate: calc(var(--a) * 1deg + 2.5deg);
+  }
+}
+/* Regions (left, top, width, height): the wet pavements, the air over the fire, the curtains. */
+.u-spot:is([data-kind="ripples"], [data-kind="heat"], [data-kind="folds"]) {
+  width: calc(var(--w) * 100%);
+  height: calc(var(--h) * 100%);
+}
+/* The reflections of the street lamps on the wet pavements, rippling. */
+.u-spot[data-kind="ripples"] {
+  background: repeating-linear-gradient(to bottom, transparent 0 9px, rgb(var(--tone) / 0.16) 10px, transparent 13px);
+  -webkit-mask-image: radial-gradient(ellipse 60% 70% at 40% 70%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 70% at 40% 70%, #000 20%, transparent 75%);
+  mix-blend-mode: screen;
+  animation: u-ripple 3.4s ease-in-out infinite alternate;
+}
+@keyframes u-ripple {
+  from {
+    translate: 0 0;
+    scale: 1 1;
+    opacity: 0.45;
+  }
+  to {
+    translate: 0 4px;
+    scale: 1.03 1.06;
+    opacity: 0.9;
+  }
+}
+/* The hot air over the molten gold: soft shimmering blobs rising. */
+.u-spot[data-kind="heat"] > i {
+  position: absolute;
+  left: 15%;
+  bottom: 0;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(255 190 120 / 0.16), transparent 70%);
+  filter: blur(8px);
+  mix-blend-mode: overlay;
+  animation: u-heat 3.8s ease-in infinite;
+}
+.u-spot[data-kind="heat"] > i:nth-child(2) {
+  left: 30%;
+  animation-delay: -1.9s;
+}
+@keyframes u-heat {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+    skew: 0deg;
+  }
+  25% {
+    opacity: 1;
+    skew: 4deg;
+  }
+  60% {
+    skew: -4deg;
+  }
+  100% {
+    opacity: 0;
+    translate: 6% -60%;
+    skew: 2deg;
+  }
+}
+/* A curtain that barely moves: its folds of shadow shifting slowly. */
+.u-spot[data-kind="folds"] > i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 26%;
+  background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.32), transparent);
+  mix-blend-mode: multiply;
+  animation: u-folds 11s ease-in-out infinite alternate;
+}
+.u-spot[data-kind="folds"] > i:nth-child(1) {
+  left: 6%;
+}
+.u-spot[data-kind="folds"] > i:nth-child(2) {
+  left: 40%;
+  animation-delay: -4s;
+}
+.u-spot[data-kind="folds"] > i:nth-child(3) {
+  left: 70%;
+  animation-delay: -7s;
+}
+@keyframes u-folds {
+  from {
+    translate: -14% 0;
+    opacity: 0.6;
+  }
+  to {
+    translate: 14% 0;
+    opacity: 1;
+  }
+}
+/* The places of some effects of the canvas: never seen. */
+.u-region {
+  --x0: var(--dx0);
+  --y0: var(--dy0);
+  --x1: var(--dx1);
+  --y1: var(--dy1);
+  position: absolute;
+  left: calc(var(--x0) * 100%);
+  top: calc(var(--y0) * 100%);
+  width: calc((var(--x1) - var(--x0)) * 100%);
+  height: calc((var(--y1) - var(--y0)) * 100%);
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (max-aspect-ratio: 4/5) {
+  .u-region {
+    --x0: var(--mx0);
+    --y0: var(--my0);
+    --x1: var(--mx1);
+    --y1: var(--my1);
+  }
+}
+
+/* ---------- The effect on the piece itself (src/components/universe/JewelFx.tsx) ---------- */
+
+/* Laid on the jewel: its own shape when it is cut out (the image as a mask), else a soft circle over its photo. Its light
+   blends with the jewel (the dark parts stay dark), in the colour of the universe. */
+.u-jewel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask: var(--jewel-src, radial-gradient(closest-side, #000 40%, transparent)) center / contain no-repeat;
+  mask: var(--jewel-src, radial-gradient(closest-side, #000 40%, transparent)) center / contain no-repeat;
+}
+.u-jewel[data-photo] {
+  -webkit-mask: radial-gradient(closest-side, #000 52%, transparent) center / contain no-repeat;
+  mask: radial-gradient(closest-side, #000 52%, transparent) center / contain no-repeat;
+}
+.sv-view:not([data-place="0"]) :is(.u-jewel, .u-jewel-halo) {
+  display: none;
+}
+/* A reflection crossing the jewel now and then (a trophy of gold, hot metal, a watch). */
+.u-jewel:is([data-jewel="jewel-sheen"], [data-jewel="jewel-prism"]) {
+  mix-blend-mode: overlay;
+}
+.u-jewel:is([data-jewel="jewel-sheen"], [data-jewel="jewel-prism"])::before {
+  content: "";
+  position: absolute;
+  inset: -20% -50%;
+  background: linear-gradient(105deg, transparent 38%, color-mix(in oklab, var(--u-glow) 75%, #fff) 50%, transparent 62%);
+  translate: -70% 0;
+  animation: u-jewel-sheen 7.5s ease-in-out 1.2s infinite;
+}
+.u-jewel[data-jewel="jewel-prism"]::before {
+  background: linear-gradient(105deg, transparent 34%, rgb(255 140 150 / 0.7) 43%, rgb(255 240 150 / 0.8) 47%, rgb(150 255 200 / 0.8) 51%, rgb(150 190 255 / 0.8) 55%, rgb(255 255 255 / 0.9) 58%, transparent 66%);
+  animation-duration: 9s;
+}
+@keyframes u-jewel-sheen {
+  0% {
+    translate: -70% 0;
+  }
+  45%,
+  100% {
+    translate: 70% 0;
+  }
+}
+/* Points of light that twinkle on it (white, blue-white, rose-gold, drops of rain, dew). */
+.u-jewel[data-jewel="jewel-sparkle"] {
+  mix-blend-mode: screen;
+}
+.u-jewel[data-jewel="jewel-sparkle"] > i {
+  position: absolute;
+  width: 9%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(circle, #fff 0 6%, color-mix(in oklab, var(--u-glow) 70%, #fff) 12%, transparent 42%);
+  scale: 0;
+  animation: u-jewel-twinkle 3.6s ease-in-out infinite;
+}
+.u-jewel[data-jewel="jewel-sparkle"] > i::before,
+.u-jewel[data-jewel="jewel-sparkle"] > i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 3%;
+  translate: -50% -50%;
+  background: linear-gradient(90deg, transparent, #fff, transparent);
+}
+.u-jewel[data-jewel="jewel-sparkle"] > i::after {
+  rotate: 90deg;
+}
+@keyframes u-jewel-twinkle {
+  0%,
+  40%,
+  100% {
+    scale: 0;
+    rotate: 0deg;
+  }
+  55% {
+    scale: 1;
+    rotate: 25deg;
+  }
+  70% {
+    scale: 0;
+    rotate: 45deg;
+  }
+}
+/* A warm light on it (the evening, the candles), breathing. */
+.u-jewel[data-jewel="jewel-warm"] {
+  mix-blend-mode: soft-light;
+}
+.u-jewel[data-jewel="jewel-warm"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg, color-mix(in oklab, var(--u-glow) 90%, transparent) 0%, color-mix(in oklab, var(--u-glow) 40%, transparent) 45%, transparent 75%);
+  animation: u-breathe 6s ease-in-out infinite;
+}
+/* A beam of light touching it, from above. */
+.u-jewel[data-jewel="jewel-beam"] {
+  mix-blend-mode: soft-light;
+}
+.u-jewel[data-jewel="jewel-beam"]::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(118deg, transparent 28%, rgb(255 246 226 / 0.85) 42%, rgb(255 246 226 / 0.85) 54%, transparent 68%);
+  animation: u-jewel-beam 10s ease-in-out infinite alternate;
+}
+@keyframes u-jewel-beam {
+  from {
+    translate: -6% 0;
+    opacity: 0.7;
+  }
+  to {
+    translate: 6% 0;
+    opacity: 1;
+  }
+}
+/* A halo pulsing around it: its own shape, blurred, behind it (a photo: a soft glow over it). */
+.u-jewel-halo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(16px);
+  animation: u-jewel-halo 3.8s ease-in-out infinite;
+}
+.u-jewel-halo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--u-glow);
+  -webkit-mask: var(--jewel-src, radial-gradient(closest-side, #000 30%, transparent)) center / contain no-repeat;
+  mask: var(--jewel-src, radial-gradient(closest-side, #000 30%, transparent)) center / contain no-repeat;
+}
+.u-jewel[data-jewel="jewel-halo"] {
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--u-glow) 36%, transparent), transparent);
+  mix-blend-mode: screen;
+  animation: u-jewel-halo 3.8s ease-in-out infinite;
+}
+@keyframes u-jewel-halo {
+  0%,
+  100% {
+    opacity: 0.35;
+    scale: 1;
+  }
+  50% {
+    opacity: 0.85;
+    scale: 1.03;
+  }
+}
+/* Deep in the page the piece of the opening rests. */
+[data-deep] .u-jewel,
+[data-deep] .u-jewel::before,
+[data-deep] .u-jewel > i,
+[data-deep] .u-jewel-halo {
+  animation-play-state: paused;
 }
 
 /* ---------- The entrance (the first visit of the piece) ---------- */
@@ -1722,6 +2383,12 @@ html[lang="ar"] [data-piece] [data-u-title] {
   .u-entrance,
   .u-fx {
     display: none !important;
+  }
+  .u-jewel,
+  .u-jewel *,
+  .u-jewel::before,
+  .u-jewel-halo {
+    animation: none !important;
   }
   .sv-float,
   .sv-float > img {
