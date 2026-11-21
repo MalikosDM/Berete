@@ -376,6 +376,7 @@ test("admin: the NZ Travel Case kept, unpublished; the size of the piece in the 
   test.skip(info.project.name !== "desktop", "the admin, on a computer");
   const password = process.env.ADMIN_PASSWORD;
   test.skip(!password, "ADMIN_PASSWORD (.env) is needed to open the admin");
+  test.skip(/vercel\.app/.test(process.env.BASE_URL ?? ""), "the admin needs the server (not on the Vercel version)");
   await page.goto("/admin");
   await expect(page.getByLabel("Mot de passe").or(page.getByRole("tab", { name: "Pièces" }))).toBeVisible({ timeout: 15_000 });
   if (await page.getByLabel("Mot de passe").isVisible()) {
