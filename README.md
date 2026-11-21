@@ -58,8 +58,8 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   visite (`src/lib/films.ts`), avec le son (un navigateur qui le refuse : muette, bouton son en vue), dans un cadre fait de
   l'univers de la pièce ; « Voir la pièce », Échap ou la fin la ferment, « Voir le film » dans l'ouverture la relance. C'est
   la vidéo « reveal » de la pièce (`scripts/film-media.mjs`, `resolveReveal` dans `src/data/atelier.ts`, réglable dans l'admin
-  avec l'atelier). `npm run films` encode les vidéos (ordinateur jusqu'à 1080p, téléphone 720p) et prend celles de
-  « Videos HD » dès qu'elles sont entières.
+  avec l'atelier). `npm run films` encode les vidéos depuis les originaux de « Videos HD » (ordinateur en 1080p, téléphone
+  en 720p léger : 1,5 Mbit/s au plus pour ce film, 1,2 pour un making-of) ; aucune vidéo ne se charge avant d'être vue.
 - **Logos de club** (`src/lib/clubs.ts`) : le fichier officiel du club dans `src/assets/clubs/<adresse du club>.svg`, servi tel
   quel, montré dans « Created exclusively for » (aujourd'hui l'Inter seule).
 - **« The Art of Detail » en 3D** (`src/viewer/DetailViewer.tsx`, `src/data/details3d.ts`) : une pièce qui a un modèle 3D le
@@ -71,8 +71,9 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   (« The Final Reveal »), son coupé au départ, lecture seulement après le clic, sortie par le bouton, Échap ou le geste
   retour. Sur la page, le passage montre déjà la vidéo de fabrication : elle joue seule, muette et en boucle, tant qu'elle
   est à l'écran (copie légère), et s'arrête hors écran ou quand l'atelier est ouvert (`AtelierPassage.tsx`). La page The Atelier rassemble les making-of de toutes les pièces publiées. Vidéos : `npm run import-media --
-  --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à l'œil le 19/11/2026 ; un fichier de « Videos HD/ »
-  passe toujours avant), H.264 1080p max pour ordinateur, copie légère pour mobile, 6 images d'aperçu, dans
+  --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à l'œil le 19/11/2026 ; l'original de « Videos HD/ » au même
+  numéro passe avant, une fois entier et lisible ; plus de choix d'après le nom du fichier), H.264 1080p pour ordinateur,
+  copie légère pour mobile, 6 images d'aperçu tirées de l'original, dans
   `public/media/films` (`media.films` de `src/data/media.generated.json`, règles dans `src/data/atelier.ts`). Admin :
   « L'atelier de la pièce » (vidéo de fabrication, vidéo de la pièce finie, ou aucune, et l'image d'aperçu). Sans vidéo
   de fabrication, pas de passage.

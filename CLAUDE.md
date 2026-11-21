@@ -106,11 +106,10 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 
 ## Passe « making-of : Entrer dans l'atelier » — état au 19/11/2026
 - [x] **Vidéos web** : `npm run import-media -- --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à
-      l'œil). Les dossiers « Videos HD/ » annoncés **n'existent pas encore** sur le disque : on prend la meilleure copie de
-      « Videos/ » (sans « (720p) » quand elle existe) ; dès qu'un « Videos HD/ » arrive, relancer la commande (il passe
-      avant, et un fichier nommé « …Craftsmanship… / …Process… / Final Product Video / Final cut » est pris d'office).
+      l'œil). Depuis le 21/11, chaque film part de son original de « Videos HD/ » (même numéro que la copie de « Videos/ ») :
+      voir « Passe films en HD ». Le choix d'après le nom du fichier est supprimé (il prenait d'autres films que ceux choisis).
       Le dossier 08 « Fabrication atelier (divers) » contient les making-of de VfB (HD), T-Serpent et Samuel Ballet.
-      Ordinateur : H.264 jusqu'à 1080p ; mobile : copie légère (720p/540p) ; 6 images d'aperçu ; `public/media/films`.
+      Ordinateur : H.264 1080p ; mobile : copie légère (720p, 540p depuis une petite vidéo) ; 6 images d'aperçu ; `public/media/films`.
 - [x] **Page pièce** : passage « Enter the Atelier » / « Entrer dans l'atelier » après les photos, atelier plein écran
       (`src/components/AtelierRoom.tsx`) : fabrication puis « The Final Reveal », son coupé au départ, lecture après le
       clic seulement, sortie bouton / Échap / geste retour. Sans vidéo de fabrication : pas de passage.
@@ -119,7 +118,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - Making-of en ligne (11) : Dragon Ball (HD), VfB (HD), croix Tillman (HD), Inter, OKA, octogone Okafor, Ruby T,
   T-Serpent, Samuel Ballet, Tulips (vidéo téléphone à l'établi), AS (vidéo téléphone, polissage). Sans fabrication : Kenan
   Yildiz, The Hand, Butterfly, maillot d'Okafor (pièce finie seule, prête), Safi Link et les autres (aucune vidéo).
-- [ ] Yoni : envoyer les vidéos HD d'origine (la plupart des making-of sont en 720p) et les making-of manquants
+- [ ] Yoni : envoyer les originaux des 4 films restés en 720p (voir « Passe films en HD ») et les making-of manquants
       (Butterfly, maillot d'Okafor, Kenan, The Hand, Safi Link…) ; confirmer que 08/v21 est bien le Jesus piece de Samuel Ballet.
 
 ## Passe « portraits et univers immersifs » — état au 19/11/2026
@@ -158,11 +157,27 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       d'Okafor, croix Tillman, AS, Ruby T, T-Serpent, Tulips, Kenan, The Hand, Butterfly (vidéos regardées image par image ;
       maillot : le petit edit 32/v03 plutôt que le film de livraison). Sans vidéo : Dragon Ball, Samuel Ballet, Safi Link et
       les pièces tirées des stories. Mobile en 720p.
-- [x] **Vidéos HD** : `npm run films` les prend dès qu'elles sont entières dans « Videos HD » (pas écrites depuis 3 min, même
-      durée que la copie) ; au 20/11 à 3 h 40, aucun dossier « Videos HD » n'était encore arrivé.
+- [x] **Vidéos HD** : arrivées le 21/11 (94 originaux), voir « Passe films en HD ».
 - [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
+
+## Passe « films en HD » — état au 21/11/2026
+- [x] **94 originaux** dans `<NN dossier>/Videos HD/` (« NN dossier - video NN - nom d'origine », même numéro que la copie
+      de « Videos/ ») : ProRes 422 ou H.264, tous en 1080 × 1920, aucun en HDR, durées identiques aux copies ; les 25 utilisés
+      lus en entier sans erreur (14/01 : un repère de chapitre absent, sans effet). Jamais copiés dans Git.
+- [x] `npm run films` : **36 films sur 40 en vraie HD 1080p** sur ordinateur (au lieu de 10), H.264, 4,5 Mbit/s au plus.
+      Mobile : 720p tiré de la HD, jamais plus lourd qu'avant (1,2 Mbit/s au plus pour un making-of, 1,5 pour le film
+      d'ouverture) : 202 Mo pour tous les films au lieu de 207. Images d'attente refaites depuis les originaux. Plus de piste
+      de timecode (héritée du ProRes). Une copie de « Videos/ » déjà identique à l'original (21/v02, 08/v05, 04/v01) est gardée.
+- [x] Chargement : le film d'ouverture à l'entrée dans la page, l'aperçu de l'atelier seulement quand il arrive à l'écran,
+      l'atelier plein écran après le clic ; aucun autre film avant. `tests/films.spec.ts` (Inter, VfB, collier T, panthère de
+      Lasana Keita, Jesus Cross, Sirius ; ordinateur et iPhone ; captures dans `verification/films/`).
+- [ ] Restés en 720p, faute d'original : making-of du AS (18/v04, vidéo téléphone), de Tulips (24/v12, vidéo téléphone), de
+      la Rose 20 mm Cuban Chain (01, dossier Fabrication) et de Sirius (37/v05, 848 × 480). Dragon Ball (13/v01), OKA (34/v03),
+      Jesus Piece Red Flowers (20/v02) et les dossiers 36, 37, 38 étaient déjà en 1080p dans « Videos/ ».
+- Les vidéos courtes des galeries (« Sous tous les angles », 720p, 12 s) viennent encore des copies : elles passeront aux
+  originaux au prochain `npm run import-media -- --only=hd` (même poids, plus nettes).
 
 ## Passe « toutes les photos » (galeries complètes, pièces cachées publiées) — état au 20/11/2026
 - [x] **Tri refait** de tous les dossiers iCloud (photo par photo, images de chaque vidéo regardées) : tout ce qui est
