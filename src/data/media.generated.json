@@ -4893,7 +4893,15 @@
       }
     ]
   },
-  "house": {},
+  "house": {
+    "portrait": {
+      "type": "image",
+      "src": "/media/house/portrait.webp",
+      "width": 1440,
+      "height": 1929,
+      "onBlack": true
+    }
+  },
   "films": {
     "kevin-schade-dragon-ball-pendant": {
       "making": {

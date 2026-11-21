@@ -46,11 +46,14 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
   // A new piece (or other views from the admin): the main view in the middle again.
   const key = slug + views.map((v) => v.id).join(",");
   const [shown, setShown] = useState(key);
-  if (shown !== key) {
+  const renewed = shown !== key;
+  if (renewed) {
     setShown(key);
     setOrder(views.map((_, i) => i));
     setSlide(0);
   }
+  // This render already uses the new order: the old one may point at a view that is gone (a view excluded in the admin).
+  const places = renewed ? views.map((_, i) => i) : order;
 
   // The relief: the views follow the mouse a little (computers only, never with reduced motion).
   useEffect(() => {
@@ -137,7 +140,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
     <div ref={rootRef} data-showcase={multi ? "multi" : "single"} data-showcase-large={large ? "" : undefined} className="relative h-full w-full">
       {/* Computer: the views in depth */}
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
-        {order.map((viewIndex, place) => {
+        {places.map((viewIndex, place) => {
           const v = views[viewIndex]!;
           const spot = !multi ? (large ? SINGLE_LARGE : SINGLE) : place === 0 ? (large ? MAIN_LARGE : MAIN) : AROUND[(place - 1) % AROUND.length]!;
           const main = place === 0;

@@ -162,6 +162,18 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « portrait de Yoni sur La Maison » — état au 22/11/2026
+- [x] **Le portrait noir et blanc** de Yoni (`Berete - La Maison/Portraits IA (propositions)/yoni-noir-blanc.jpg`, copié en
+      `Berete - La Maison/portrait.jpg`, `npm run import-media -- --only=house`) est la photo principale de La Maison
+      (`public/media/house/portrait.webp`) : cadré depuis le haut (le cadre 4:5 ne retire que le bas du pull, jamais la
+      tête), chargé tout de suite. Aucune autre photo de ce dossier sur le site (ni yoni-showroom, ni yoni-etabli, ni
+      yoni-portrait-atelier, jamais mises en ligne). Citations et chapitres : toujours sans photo (aucun cadre vide).
+- [x] Corrigé au passage : la vitrine d'une pièce plantait quand une de ses vues est exclue dans l'admin (seulement avec le
+      serveur, jamais sur Vercel) : `places` de `src/components/Showcase.tsx`.
+- `tests/maison.spec.ts` (ordinateur et iPhone, anglais et français : visage entier, rien coupé), captures dans
+  `verification/maison/`.
+- [ ] Yoni : valider ce portrait (image IA) ; ses vraies photos personnelles pour les citations et les chapitres.
+
 ## Passe « réponses aux doutes du Making of » (Yoni, 21/11/2026) — état au 21/11/2026
 - [x] **Nouvelles étapes** (`MAKING_STEPS` de `src/data/types.ts`, titres et textes en 6 langues dans `src/i18n/ui/*.ts`) :
       « Préparation du sertissage » (`preparation`), « Les pièces avant assemblage » (`parts`), « Assemblage » (`assembly`),
@@ -499,7 +511,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] Photos des pièces : **haute résolution et fond noir en premier** pour les 15 pièces dont Yoni a envoyé les photos.
 - [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon la page et la pièce (21/11, voir plus haut) ; Bracelet et
       Montre ajoutés au configurateur de contact (fait).
-- [x] La Maison : biographie (fait). [ ] Photos personnelles de Yoni (il les envoie).
+- [x] La Maison : biographie (fait), portrait noir et blanc en haut de la page (22/11). [ ] Photos personnelles de Yoni pour
+      les citations et les chapitres (il les envoie).
 - [ ] Étapes « croquis → 3D » de chaque pièce (Yoni envoie ses étapes).
 - [ ] Vidéos IA à refaire par Malik : mécanisme bague → pendentif (plus clair), explication de la bague Inter en voix
       off grave, en anglais, sans longue intro.
@@ -507,7 +520,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       de domaine de Yoni (chez one.com).
 
 ## Attendu de Yoni (bloque le lancement)
-Photos personnelles pour La Maison, autres noms des pièces publiées le 20/11 s'il en veut (et leurs
+Photos personnelles pour La Maison (citations, chapitres ; le portrait est en ligne depuis le 22/11), autres noms des pièces publiées le 20/11 s'il en veut (et leurs
 destinataires), photos des étapes de
 fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
 

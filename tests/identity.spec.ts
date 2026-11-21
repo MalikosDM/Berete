@@ -163,8 +163,9 @@ test("The House: Yoni Berete's story in chapters, his three quotes, the signatur
     await expect(quotes.nth(i)).toContainText(label);
     await expect(quotes.nth(i)).toContainText("Yoni Berete");
   }
-  // No photo of Yoni yet: no frame at all.
-  await expect(page.locator("[data-house-photo]")).toHaveCount(0);
+  // His portrait only (22/11/2026): no photo, so no frame, in the chapters and the quotes.
+  await expect(page.locator("[data-house-photo]")).toHaveCount(1);
+  await expect(page.locator("[data-house-chapter] [data-house-photo], [data-house-quote] [data-house-photo]")).toHaveCount(0);
   await quotes.nth(0).scrollIntoViewIfNeeded();
   await page.waitForTimeout(1000);
   await page.screenshot({ path: shotPath(info, "house-2-citation"), type: "jpeg", quality: 70 });

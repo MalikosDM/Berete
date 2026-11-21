@@ -11,13 +11,16 @@ import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
-/** A personal photo of Yoni, only when there is one (never an empty frame). */
-function HousePhoto({ photo, alt, className = "" }: { photo: MediaItem | null; alt: string; className?: string }) {
+/**
+ * A personal photo of Yoni, only when there is one (never an empty frame). `top`: framed from its top, so that a portrait
+ * keeps the whole head (the 4:5 frame only trims the bottom). `eager`: the photo of the top of the page, loaded at once.
+ */
+function HousePhoto({ photo, alt, className = "", top = false, eager = false }: { photo: MediaItem | null; alt: string; className?: string; top?: boolean; eager?: boolean }) {
   if (!photo) return null;
   return (
     <Reveal mask className={className}>
       <figure data-house-photo className="overflow-hidden bg-ink-soft">
-        <MediaView item={photo} alt={photo.alt ?? alt} fit="cover" sizes="(max-width: 1023px) 100vw, 40vw" className="aspect-[4/5]" />
+        <MediaView item={photo} alt={photo.alt ?? alt} fit="cover" eager={eager} sizes="(max-width: 1023px) 100vw, 40vw" className={"aspect-[4/5]" + (top ? " object-top" : "")} />
       </figure>
     </Reveal>
   );
@@ -53,7 +56,7 @@ export default function About() {
               <p className="mt-8 max-w-2xl text-lg leading-relaxed text-mist lg:text-xl">{t.about.lead}</p>
             </Reveal>
           </div>
-          <HousePhoto photo={portrait} alt={t.about.founderPortrait} className="lg:col-span-4 lg:col-start-9" />
+          <HousePhoto photo={portrait} alt={t.about.founderPortrait} top eager className="lg:col-span-4 lg:col-start-9" />
         </div>
         <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
           <div className="rule-rose mt-14 origin-left animate-draw rtl:origin-right lg:mt-20" aria-hidden="true" />
