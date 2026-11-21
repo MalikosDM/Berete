@@ -146,8 +146,12 @@ for (const [story, backdrop] of STORIES) {
     const problems = watch(page);
     await skipIntro(page);
     await page.goto("/fr", { waitUntil: "load" });
-    await page.locator('[data-story-bubble="' + story + '"]').click();
-    await expect(page.locator('[role="dialog"][data-story="' + story + '"]')).toBeVisible();
+    // Clicked again until the page is ready (online, the bar may be drawn before it answers).
+    const dialog = page.locator('[role="dialog"][data-story="' + story + '"]');
+    await expect(async () => {
+      if (!(await dialog.isVisible())) await page.locator('[data-story-bubble="' + story + '"]').click();
+      await expect(dialog).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
     await expect(page.locator(".universe[data-fixed][data-backdrop='" + backdrop + "']")).toHaveCount(1, { timeout: 15_000 });
     await page.waitForTimeout(1200);
     await page.screenshot({ path: DIR + "/" + info.project.name + "-story-" + story + ".jpg", type: "jpeg", quality: 62 });
