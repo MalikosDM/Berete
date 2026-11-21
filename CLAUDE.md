@@ -162,6 +162,25 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « écrins qui s'ouvrent » (Signature Trunks) — état au 21/11/2026
+- [x] **Page des écrins** (`/boxes`, `src/pages/Atelier.tsx` « Boxes ») : une grille de carrés de même taille (3 colonnes sur
+      ordinateur, 2 sur tablette, 1 sur téléphone), l'écrin Signature en premier, chacun **fermé** avec son nom ; dessous,
+      son texte, ses photos (plein écran) et sa pièce. La section qui montrait les 10 photos de l'écrin Signature est
+      remplacée (photos toujours accessibles par « 10 photos »).
+- [x] **Ouverture** (`src/components/TrunkReveal.tsx`) : au clic, la vidéo d'ouverture joue à la place de l'image fermée,
+      muette ; une lueur dorée en CSS (halo qui respire, quelques étincelles, `src/index.css` « .trunk-glow ») ; à la fin,
+      l'image ouverte arrive en fondu sur la dernière image de la vidéo (aucun saut, vérifié par test : écart moyen < 9/255),
+      puis le bouton « Create my own trunk » / « Créer mon écrin » apparaît dans la lumière (position par écrin, `LIGHT`
+      dans `src/data/trunks.ts`), avec un message WhatsApp qui nomme l'écrin dans la langue du site (« Hello Berete, I
+      discovered the Sirius trunk on your website and would like to create my own. »). En bas du carré : « Revoir
+      l'ouverture » et « Refermer l'écrin ». Avec « réduire les animations », le clic montre directement l'écrin ouvert.
+- [x] **Fichiers** de Yoni : `00 Contexte Yoni/Ecrins IA (ouverture)/` (`<nom>-closed.jpg`, `-open.jpg`, `-ouverture.mp4`),
+      préparés par `npm run trunks` (`scripts/trunk-media.mjs`) : images carrées 720/1080/1440 en AVIF et WebP (15 à 50 Ko),
+      vidéo 1080 × 1080 H.264 sans son (~0,8 Mo, la même sur ordinateur et téléphone), chargée seulement quand l'écrin
+      approche de l'écran ou au survol. Originaux jamais dans Git. L'écrin Dragon Ball garde ses photos (droits).
+- `tests/trunks.spec.ts` (Signature, Inter, Sirius ; ordinateur et iPhone ; messages en anglais et en français ;
+  « réduire les animations » ; vidéos chargées à l'approche), captures dans `verification/trunks/`.
+
 ## Passe « Making of réel, panthère, N14, Jesus Pieces » (retours de Yoni du 21/11, 2) — état au 21/11/2026
 - [x] **The Making of a Masterpiece : seulement les vraies étapes** (`src/data/making.ts`, `making` de chaque pièce dans
       `src/data/pieces.ts`). Toutes les vidéos des dossiers (Videos HD, Fabrication/, 08, stories) regardées image par image

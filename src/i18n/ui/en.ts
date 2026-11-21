@@ -62,6 +62,8 @@ export const en = {
   whatsapp: {
     hello: "Hello Berete, I would like to discuss a bespoke creation of my own.",
     createBox: "Hello Berete, I discovered the Signature Trunks on your website and would like to commission a trunk of my own.",
+    /** From a trunk that opened: its name, as shown. */
+    trunk: (name: string) => "Hello Berete, I discovered the " + (/\b(trunk|case)$/i.test(name) ? name : name + " trunk") + " on your website and would like to create my own.",
     piece: (name: string) => discovered((/^the\s/i.test(name) ? "" : "the ") + name),
     person: (name: string) => discovered("the creations made for " + name),
     collection: (name: string) => discovered("your " + name),
@@ -327,6 +329,12 @@ export const en = {
     photos: (count: number) => n(count, "# photo", "# photos"),
     create: "Commission Your Signature Trunk",
     closing: "An Extension of Your Creation",
+    /* The trunks that open (src/components/TrunkReveal.tsx). */
+    openTrunk: (name: string) => "Open " + name,
+    openHint: "Open",
+    createOwn: "Create my own trunk",
+    replay: "Watch the opening again",
+    closeTrunk: "Close the trunk",
   },
 
   process: {

@@ -49,6 +49,7 @@ export const ar: Messages = {
   whatsapp: {
     hello: "مرحباً Berete، أودّ مناقشة إبداع خاص بي حسب الطلب.",
     createBox: "مرحباً Berete، اكتشفتُ صناديق Signature على موقعكم وأودّ طلب صندوق خاص بي.",
+    trunk: (name: string) => "مرحباً Berete، اكتشفتُ " + (/^(صندوق|علبة|حقيبة)/.test(name) ? name : "صندوق «" + name + "»") + " على موقعكم وأودّ تصميم صندوقي الخاص.",
     piece: (name: string) => discovered("قطعة «" + name + "»"),
     person: (name: string) => discovered("الإبداعات المصمَّمة لـ " + name),
     collection: (name: string) => discovered("مجموعة " + name),
@@ -302,6 +303,11 @@ export const ar: Messages = {
     photos: (count: number) => n(count, { zero: "# صورة", one: "صورة واحدة", two: "صورتان", few: "# صور", many: "# صورة", other: "# صورة" }),
     create: "اطلبوا صندوق Signature الخاص بكم",
     closing: "امتدادٌ لإبداعكم",
+    openTrunk: (name: string) => "فتح: " + name,
+    openHint: "افتح",
+    createOwn: "صمّم صندوقي الخاص",
+    replay: "إعادة مشاهدة الفتح",
+    closeTrunk: "إغلاق الصندوق",
   },
 
   process: {

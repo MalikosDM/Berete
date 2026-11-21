@@ -2716,3 +2716,100 @@ html[lang="ar"] [data-piece] [data-u-title] {
     transition: none;
   }
 }
+
+/* The Signature Trunks that open (src/components/TrunkReveal.tsx): the golden light of the open trunk, a little brighter
+   (a halo that breathes, a few sparks rising), never over the film; the button to create one's own, in that light. */
+.trunk-glow {
+  position: absolute;
+  left: calc(var(--lx) * 100%);
+  top: calc(var(--ly) * 100%);
+  width: 58%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  transition: opacity 1.2s ease;
+}
+.trunk-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 216 150 / 0.4) 0%, rgb(232 180 160 / 0.15) 38%, transparent 68%);
+  animation: trunk-pulse 3.4s ease-in-out infinite;
+}
+.trunk-glow i {
+  position: absolute;
+  bottom: 40%;
+  border-radius: 50%;
+  background: #ffe2ad;
+  box-shadow: 0 0 6px 2px rgb(255 214 150 / 0.7);
+  opacity: 0;
+  animation: trunk-spark 4s ease-out infinite;
+}
+[data-trunk-state="opening"] .trunk-glow {
+  opacity: 1;
+  transition-delay: 2.4s;
+}
+[data-trunk-state="open"] .trunk-glow {
+  opacity: 1;
+}
+.trunk-create {
+  left: calc(var(--lx) * 100%);
+  top: calc(var(--ly) * 100%);
+  translate: -50% -50%;
+  animation: trunk-create-in 0.9s ease-out 0.35s both;
+}
+.trunk-links {
+  animation: trunk-links-in 0.8s ease-out 0.6s both;
+}
+@keyframes trunk-links-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes trunk-pulse {
+  0%,
+  100% {
+    transform: scale(0.88);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+@keyframes trunk-spark {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-130px);
+    opacity: 0;
+  }
+}
+@keyframes trunk-create-in {
+  from {
+    opacity: 0;
+    translate: -50% -38%;
+  }
+  to {
+    opacity: 1;
+    translate: -50% -50%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trunk-glow::before,
+  .trunk-links,
+  .trunk-create {
+    animation: none;
+  }
+  .trunk-glow i {
+    display: none;
+  }
+}

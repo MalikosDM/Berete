@@ -1,0 +1,81 @@
+{
+ "trunks": {
+  "signature-trunk": {
+   "base": "/media/trunks/signature-trunk",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/signature-trunk/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "sirius": {
+   "base": "/media/trunks/sirius",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/sirius/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "tulips-on-tour": {
+   "base": "/media/trunks/tulips-on-tour",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/tulips-on-tour/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "butterfly-trunk": {
+   "base": "/media/trunks/butterfly-trunk",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/butterfly-trunk/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "okafor-trunk": {
+   "base": "/media/trunks/okafor-trunk",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/okafor-trunk/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "campione-d-italia-case": {
+   "base": "/media/trunks/campione-d-italia-case",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/campione-d-italia-case/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  },
+  "nz-travel-case": {
+   "base": "/media/trunks/nz-travel-case",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "video": "/media/trunks/nz-travel-case/opening.mp4",
+   "size": 1080,
+   "duration": 6.04
+  }
+ }
+}

@@ -56,6 +56,7 @@ export const es: Messages = {
   whatsapp: {
     hello: "Hola, Berete: me gustaría hablar de una creación a medida, solo para mí.",
     createBox: "Hola, Berete: he descubierto los Estuches Signature en su web y me gustaría encargar un estuche solo para mí.",
+    trunk: (name: string) => "Hola, Berete: he descubierto " + (/^(Baúl|Estuche)\b/.test(name) ? "el " + name.charAt(0).toLocaleLowerCase("es") + name.slice(1) : "el estuche " + name) + " en su web y me gustaría crear mi propio estuche.",
     piece: (name: string) => discovered("la creación “" + name + "”"),
     person: (name: string) => discovered("las creaciones realizadas para " + name),
     collection: (name: string) => discovered("sus " + lowerFirst(name)),
@@ -309,6 +310,11 @@ export const es: Messages = {
     photos: (count: number) => n(count, "# foto", "# fotos"),
     create: "Encargue su Estuche Signature",
     closing: "La prolongación de su creación",
+    openTrunk: (name: string) => "Abrir: " + name,
+    openHint: "Abrir",
+    createOwn: "Crear mi estuche",
+    replay: "Ver de nuevo la apertura",
+    closeTrunk: "Cerrar el estuche",
   },
 
   process: {

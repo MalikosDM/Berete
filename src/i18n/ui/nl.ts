@@ -54,6 +54,7 @@ export const nl: Messages = {
   whatsapp: {
     hello: "Hallo Berete, ik zou graag een eigen creatie op maat bespreken.",
     createBox: "Hallo Berete, ik heb de Signature-koffers op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
+    trunk: (name: string) => "Hallo Berete, ik heb " + (/koffer$/.test(name) ? "de " + name : /etui$/.test(name) ? "het " + name : "de koffer ‘" + name + "’") + " op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
     piece: (name: string) => discovered("de creatie “" + name + "”"),
     person: (name: string) => discovered("de creaties voor " + name),
     collection: (name: string) => discovered("uw " + lowerFirst(name)),
@@ -307,6 +308,11 @@ export const nl: Messages = {
     photos: (count: number) => n(count, "# foto", "# foto’s"),
     create: "Ontwerp uw Signature-koffer",
     closing: "Een verlengstuk van uw creatie",
+    openTrunk: (name: string) => "Openen: " + name,
+    openHint: "Openen",
+    createOwn: "Mijn eigen koffer ontwerpen",
+    replay: "Opening opnieuw bekijken",
+    closeTrunk: "Koffer sluiten",
   },
 
   process: {

@@ -64,6 +64,7 @@ export const de: Messages = {
   whatsapp: {
     hello: "Hallo Berete, ich würde gern über eine eigene Kreation nach Maß sprechen.",
     createBox: "Hallo Berete, ich habe die Signature-Etuis auf Ihrer Website entdeckt und möchte mein eigenes Etui in Auftrag geben.",
+    trunk: (name: string) => "Hallo Berete, ich habe " + (/Koffer$/.test(name) ? "den " + name : /^(Etui|Reiseetui)\b/.test(name) ? "das " + name : "das Etui „" + name + "“") + " auf Ihrer Website entdeckt und möchte mein eigenes Etui gestalten lassen.",
     piece: (name: string) => discovered("die Kreation „" + name + "“"),
     person: (name: string) => discovered("die Kreationen für " + named(name, "acc")),
     collection: (name: string) => discovered("Ihre " + name),
@@ -320,6 +321,11 @@ export const de: Messages = {
     photos: (count: number) => n(count, "# Foto", "# Fotos"),
     create: "Ihr Signature-Etui in Auftrag geben",
     closing: "Die Vollendung Ihrer Kreation",
+    openTrunk: (name: string) => "Öffnen: " + name,
+    openHint: "Öffnen",
+    createOwn: "Mein eigenes Etui gestalten",
+    replay: "Öffnung noch einmal ansehen",
+    closeTrunk: "Etui schließen",
   },
 
   process: {

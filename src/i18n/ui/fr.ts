@@ -67,6 +67,7 @@ export const fr: Messages = {
   whatsapp: {
     hello: "Bonjour Berete, j’aimerais vous parler d’une création sur mesure, rien qu’à moi.",
     createBox: "Bonjour Berete, j’ai découvert les Écrins Signature sur votre site et j’aimerais imaginer un écrin rien qu’à moi.",
+    trunk: (name: string) => "Bonjour Berete, j’ai découvert " + (/^Malle\b/.test(name) ? "la " + lowerFirst(name) : /^(Écrin|Étui)\b/.test(name) ? "l’" + lowerFirst(name) : "l’écrin " + name) + " sur votre site et j’aimerais créer mon propre écrin.",
     piece: (name: string) => discovered("la création « " + name + " »"),
     person: (name: string) => discovered("les créations réalisées pour " + named(name)),
     collection: (name: string) => discovered("vos " + lowerFirst(name)),
@@ -320,6 +321,11 @@ export const fr: Messages = {
     photos: (count: number) => n(count, { one: "# photo", other: "# photos" }),
     create: "Imaginez votre écrin Signature",
     closing: "Le prolongement de votre création",
+    openTrunk: (name: string) => "Ouvrir : " + name,
+    openHint: "Ouvrir",
+    createOwn: "Créer mon écrin",
+    replay: "Revoir l’ouverture",
+    closeTrunk: "Refermer l’écrin",
   },
 
   process: {

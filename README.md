@@ -147,6 +147,9 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   vont à la fin de « Every Angle » (`AMATEUR_FILMS`). Les thèmes (`THEMES` de `src/data/collections.ts`, Jesus Pieces)
   regroupent des pièces de types différents à `/creations/<slug>`, dans le menu sous les collections. Un fond d'univers peut
   être une séquence d'images en fondu (`sequence`, `SEQUENCES` de `scripts/universe-media.mjs` : la nuit de Lasana Keita).
+  Les Signature Trunks s'ouvrent au clic (`src/components/TrunkReveal.tsx`) : image fermée, vidéo d'ouverture, image
+  ouverte et bouton WhatsApp pour créer le sien ; fichiers préparés par `npm run trunks` (`scripts/trunk-media.mjs`,
+  `src/data/trunks.generated.json`, position de la lumière de chaque écrin dans `src/data/trunks.ts`).
   La page Créations est une grille serrée (`PieceCard compact` :
   6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
@@ -277,6 +280,8 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
                         # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)
+                        # tests/trunks.spec.ts : les écrins qui s'ouvrent (vidéo, image ouverte sans saut, bouton,
+                        # message WhatsApp en 2 langues, « réduire les animations »)
                         # tests/angles.spec.ts : retours de Yoni du 21/11 (« Sous tous les angles » : un texte par photo
                         # en 6 langues, damier, iPhone, lisibilité ; 4 pièces retirées, filtres des Créations, admin)
 ```

@@ -196,33 +196,37 @@ test("players: a wall of portraits on /players and on the home page", async ({ p
   expect(problems.errors).toEqual([]);
 });
 
-test("Signature Trunks: the featured trunk and its 10 photos, Commission Your Signature Trunk at the top, beside it and at the bottom", async ({ page }, info) => {
+test("Signature Trunks: every trunk closed in a grid of squares, Commission Your Signature Trunk at the top and at the bottom", async ({ page }, info) => {
   const problems = watch(page);
   await page.goto("/boxes", { waitUntil: "load" });
   await page.waitForTimeout(1500);
   await expect(page.locator("h1")).toContainText("Signature Trunks");
   await expect(page.getByText("Every exceptional creation deserves an extraordinary presentation.")).toBeVisible();
   const buttons = page.locator("[data-create-box]");
-  await expect(buttons).toHaveCount(3);
-  for (let i = 0; i < 3; i++) {
+  await expect(buttons).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
     await expect(buttons.nth(i)).toHaveText(/Commission Your Signature Trunk/);
     expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("discovered the Signature Trunks on your website and would like to commission a trunk of my own.");
   }
   await expect(buttons.nth(0)).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "boxes-1-haut"), type: "jpeg", quality: 70 });
-  // The featured trunk: its 10 photos, each opening full screen, and "An Extension of Your Creation".
-  const featured = page.locator("[data-featured-box='signature-trunk']");
-  await featured.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1200);
-  await expect(featured.locator("[data-trunk-photo]")).toHaveCount(10);
-  await expect(featured).toContainText("An Extension of Your Creation");
-  await page.screenshot({ path: shotPath(info, "boxes-2-signature-trunk"), type: "jpeg", quality: 70 });
-  await featured.locator("[data-trunk-photo='4']").click();
+  // The trunk of the house first; every trunk a square of the same size, closed (tests/trunks.spec.ts opens them).
+  const cards = page.locator("[data-box]");
+  await expect(cards.first()).toHaveAttribute("data-box", "signature-trunk");
+  await expect(page.getByText("An Extension of Your Creation")).toBeVisible();
+  const squares = await page.locator("[data-box] .aspect-square").evaluateAll((els) => els.map((e) => [Math.round(e.getBoundingClientRect().width), Math.round(e.getBoundingClientRect().height)]));
+  expect(squares.length).toBe(await cards.count());
+  for (const [w, h] of squares) {
+    expect(Math.abs(w! - h!)).toBeLessThanOrEqual(1);
+    expect(Math.abs(w! - squares[0]![0]!)).toBeLessThanOrEqual(1);
+  }
+  // Its 10 photos, full screen.
+  await page.locator("[data-box-photos='signature-trunk']").click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.waitForTimeout(700);
   await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });
   await page.keyboard.press("Escape");
-  await buttons.nth(2).scrollIntoViewIfNeeded();
+  await buttons.nth(1).scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "boxes-4-bas"), type: "jpeg", quality: 70 });
   expect(problems.errors).toEqual([]);

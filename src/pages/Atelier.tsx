@@ -1,16 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import { ArrowRight, Maximize2, Play, X, ZoomIn } from "lucide-react";
+import { ArrowRight, Maximize2, Play, X } from "lucide-react";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
-import { Lightbox } from "@/components/HorizontalGallery";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
+import TrunkReveal from "@/components/TrunkReveal";
 import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
 import { media } from "@/data/catalogue";
 import { FEATURED_BOX } from "@/data/pieces";
+import { trunkOf } from "@/data/trunks";
 import type { Box, MediaItem, Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -224,58 +224,17 @@ function CreateBox() {
 }
 
 /**
- * The trunk of the house shown first (FEATURED_BOX, src/data/pieces.ts): all its photos, each opening full screen, and
- * the invitation to commission one.
+ * The Signature Trunks (feedback of Yoni, 21/11/2026): every trunk closed at first, aligned the same way in a grid of equal
+ * squares, with its name; a click opens it in the film of its opening (src/components/TrunkReveal.tsx), and it stays open
+ * with the button to create one's own. Its text, its photos (full screen) and its piece stay under it. The Dragon Ball
+ * trunk has no film (rights not confirmed): its photo, opening its photos.
  */
-function FeaturedTrunk({ box }: { box: Box }) {
-  const { t } = useI18n();
-  const [open, setOpen] = useState<number | null>(null);
-  return (
-    <section aria-labelledby="featured-trunk-title" data-featured-box={box.slug} className="mx-auto max-w-[1600px] px-5 pb-24 sm:px-8 lg:px-12 lg:pb-36">
-      <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-7">
-          {box.images.map((m, i) => (
-            <li key={m.src} className={i === 0 ? "col-span-2 row-span-2" : ""}>
-              <button
-                type="button"
-                onClick={() => setOpen(i)}
-                aria-label={t.gallery.open(m.alt ?? box.name)}
-                data-trunk-photo={i + 1}
-                className="group relative block aspect-[2/3] h-full w-full cursor-zoom-in overflow-hidden bg-ink-soft"
-              >
-                <MediaView item={m} alt="" fit="cover" priority={i === 0} sizes={i === 0 ? "(max-width: 1023px) 100vw, 38vw" : "(max-width: 639px) 50vw, (max-width: 1023px) 33vw, 19vw"} className="transition duration-700 group-hover:scale-[1.04]" />
-                {i === 0 ? (
-                  <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white">
-                    <ZoomIn className="size-5" aria-hidden="true" />
-                  </span>
-                ) : null}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="self-start lg:sticky lg:top-28 lg:col-span-5">
-          <p className="eyebrow">{box.name}</p>
-          <h2 id="featured-trunk-title" className="title-caps mt-5 text-[clamp(2rem,4.4vw,3.75rem)] leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">
-            {t.boxes.closing}
-          </h2>
-          <p className="mt-8 max-w-xl text-lg leading-relaxed text-bone">{box.description}</p>
-          <p className="mt-3 text-base text-mist">{t.boxes.photos(box.images.length)}</p>
-          <div className="mt-10">
-            <CreateBox />
-          </div>
-        </div>
-      </div>
-      {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
-    </section>
-  );
-}
-
 export function Boxes() {
   const { t } = useI18n();
   const { boxes: all } = useCatalogue();
   const [open, setOpen] = useState<Box | null>(null);
-  const featured = all.find((b) => b.slug === FEATURED_BOX);
-  const boxes = all.filter((b) => b !== featured);
+  // The trunk of the house first.
+  const boxes = [...all.filter((b) => b.slug === FEATURED_BOX), ...all.filter((b) => b.slug !== FEATURED_BOX)];
 
   return (
     <div className="pb-24">
@@ -283,34 +242,41 @@ export function Boxes() {
         <CreateBox />
       </PageIntro>
 
-      {featured ? <FeaturedTrunk box={featured} /> : null}
-
       <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
-        <h2 id="boxes-list-title" className="eyebrow mb-12">{t.boxes.listLabel}</h2>
-        <ul className="grid gap-16 md:grid-cols-2 md:gap-12">
-          {boxes.map((box, i) => (
-            <li key={box.slug} className={i % 2 === 1 ? "md:mt-32" : ""}>
-              <Reveal>
-                <button type="button" onClick={() => setOpen(box)} className="group relative block w-full overflow-hidden text-start" aria-label={t.boxes.open(box.name)}>
-                  <span className="block aspect-[3/2] overflow-hidden bg-ink-soft">
+        <h2 id="boxes-list-title" className="eyebrow">{t.boxes.listLabel}</h2>
+        <p className="title-caps mt-5 mb-12 text-[clamp(1.75rem,3.6vw,3rem)] leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">{t.boxes.closing}</p>
+        <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-10">
+          {boxes.map((box) => {
+            const trunk = trunkOf(box.slug);
+            return (
+              <li key={box.slug} data-box={box.slug}>
+                {trunk ? (
+                  <TrunkReveal name={box.name} trunk={trunk} />
+                ) : (
+                  <button type="button" onClick={() => setOpen(box)} className="group relative block aspect-square w-full overflow-hidden bg-ink-soft text-start" aria-label={t.boxes.open(box.name)}>
                     {box.images[0] ? <MediaView item={box.images[0]} fit="cover" className="transition duration-700 group-hover:scale-[1.03]" /> : null}
-                  </span>
-                  <span className="absolute top-3 end-3 inline-flex size-12 items-center justify-center bg-ink/70 text-white transition group-hover:text-rose-light">
-                    <Maximize2 className="size-5" aria-hidden="true" />
-                  </span>
-                </button>
-                <span aria-hidden="true" className="text-rose-gold mt-6 block font-display text-3xl">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="title-caps mt-2 text-3xl text-white md:text-4xl">{box.name}</h3>
-                <p className="mt-4 max-w-md text-lg text-bone">{box.description}</p>
-                {box.images.length > 1 ? <p className="mt-2 text-base text-mist">{t.boxes.photos(box.images.length)}</p> : null}
-                {box.pieceSlug ? (
-                  <Link to={"/pieces/" + box.pieceSlug} className="mt-4 inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
-                    {t.common.seePiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-                  </Link>
-                ) : null}
-              </Reveal>
-            </li>
-          ))}
+                    <span className="absolute top-3 end-3 inline-flex size-12 items-center justify-center bg-ink/70 text-white transition group-hover:text-rose-light">
+                      <Maximize2 className="size-5" aria-hidden="true" />
+                    </span>
+                  </button>
+                )}
+                <h3 className="title-caps mt-5 text-2xl text-white md:text-3xl">{box.name}</h3>
+                {box.description ? <p className="mt-3 max-w-md text-base text-bone md:text-lg">{box.description}</p> : null}
+                <p className="mt-2 flex flex-wrap gap-x-6">
+                  {box.images.length > 0 ? (
+                    <button type="button" onClick={() => setOpen(box)} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
+                      <Maximize2 className="size-4" aria-hidden="true" /> {t.boxes.photos(box.images.length)}
+                    </button>
+                  ) : null}
+                  {box.pieceSlug ? (
+                    <Link to={"/pieces/" + box.pieceSlug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
+                      {t.common.seePiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+                    </Link>
+                  ) : null}
+                </p>
+              </li>
+            );
+          })}
         </ul>
         <div className="rule-rose my-20" aria-hidden="true" />
         <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.common.yourStory}</p>
