@@ -505,6 +505,23 @@ html.lenis body {
   object-fit: cover;
   transform: none;
 }
+/* A sequence of images (the night of Lasana Keita): one after the other in a slow fade, each with its own lights. */
+.u-backdrop[data-frame] img {
+  transition: opacity 2.8s ease-in-out;
+}
+.u-backdrop[data-frame]:not([data-on]) img {
+  opacity: 0 !important;
+}
+.u-frame {
+  position: absolute;
+  inset: 0;
+}
+.u-frame[data-frame] {
+  transition: opacity 2.8s ease-in-out;
+}
+.u-frame[data-frame]:not([data-on]) {
+  opacity: 0;
+}
 [data-entering] .u-backdrop img {
   animation: u-ignite 1.8s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }

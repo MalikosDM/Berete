@@ -123,6 +123,7 @@ export const fr: Messages = {
       rings: { name: "Bagues", intro: "Bien plus qu’un symbole de victoire. Un héritage immortalisé dans l’or et les diamants." },
       bracelets: { name: "Bracelets", intro: "Des bracelets réalisés sur mesure, maillon par maillon." },
       watches: { name: "Montres", intro: "Des montres serties de diamants, du boîtier au bracelet." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Le visage du Christ, couronné d’épines ou de fleurs, et le Christ en croix : chaque Jesus piece sculptée en volume et sertie pierre par pierre." },
     },
     eyebrow: "Le Portfolio",
     title: "Explorer les créations",
@@ -222,7 +223,7 @@ export const fr: Messages = {
     makingEyebrow: "De la vision à la réalité",
     makingTitle: "La naissance d’un chef-d’œuvre",
     thisPiece: "Cette pièce",
-    inAtelier: "À l’atelier",
+    makingFilm: "Toute la fabrication de cette pièce, filmée à l’atelier.",
     delivered: "Livrée",
     handedOverTo: (_client: string) => "La Présentation officielle",
     handover: "La remise",
@@ -481,6 +482,10 @@ export const fr: Messages = {
     "/creations/watches": {
       title: "Montres serties de diamants",
       description: "Des montres serties de diamants du boîtier au bracelet, portées par des footballeurs : les montres Berete Jewellers, Dubaï.",
+    },
+    "/creations/jesus-pieces": {
+      title: "Jesus Pieces : pendentifs du Christ en diamants sur mesure",
+      description: "Les Jesus pieces de Berete Jewellers : le visage du Christ couronné d’épines ou de fleurs, et le Christ en croix, sculptés et sertis de diamants à Dubaï.",
     },
     "/creations/bracelets": {
       title: "Bracelets",

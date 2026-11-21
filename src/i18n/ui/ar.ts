@@ -105,6 +105,7 @@ export const ar: Messages = {
       rings: { name: "الخواتم", intro: "أكثر من مجرد رمز للنصر. إرثٌ يخلّده الذهب والألماس." },
       bracelets: { name: "الأساور", intro: "أساور تُصنع حسب المقاس، حلقة بعد حلقة." },
       watches: { name: "الساعات", intro: "ساعات مرصعة بالألماس من الهيكل إلى السوار." },
+      "jesus-pieces": { name: "مجوهرات المسيح", intro: "وجه المسيح متوَّجًا بالأشواك أو بالزهور، والمسيح على الصليب: كل قطعة منحوتة بأبعادها ومرصّعة حجرًا حجرًا." },
     },
     eyebrow: "معرض الأعمال",
     title: "استكشفوا الإبداعات",
@@ -204,7 +205,7 @@ export const ar: Messages = {
     makingEyebrow: "من الرؤية إلى الواقع",
     makingTitle: "ولادة تحفة",
     thisPiece: "هذه القطعة",
-    inAtelier: "في المشغل",
+    makingFilm: "صناعة هذه القطعة كاملةً، مصوَّرة في المشغل.",
     delivered: "تم التسليم",
     handedOverTo: (_client: string) => "مراسم التسليم",
     handover: "التسليم",
@@ -463,6 +464,10 @@ export const ar: Messages = {
     "/creations/watches": {
       title: "ساعات مرصعة بالألماس",
       description: "ساعات مرصعة بالألماس من الهيكل إلى السوار، يرتديها لاعبو كرة القدم: ساعات Berete Jewellers، دبي.",
+    },
+    "/creations/jesus-pieces": {
+      title: "مجوهرات المسيح: قلائد المسيح بالألماس حسب الطلب",
+      description: "مجوهرات المسيح من Berete Jewellers: وجه المسيح متوَّجًا بالأشواك أو بالزهور، والمسيح على الصليب، منحوتة ومرصّعة بالألماس في دبي.",
     },
     "/creations/bracelets": {
       title: "الأساور",

@@ -119,6 +119,7 @@ export const en = {
       rings: { name: "Rings", intro: "More than a symbol of victory. A legacy immortalised in gold and diamonds." },
       bracelets: { name: "Bracelets", intro: "Bracelets made to measure, link by link." },
       watches: { name: "Watches", intro: "Watches set with diamonds from the case to the bracelet." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "The face of Christ, crowned with thorns or flowers, and Christ on the cross: each Jesus piece sculpted in volume and set stone by stone." },
     },
     eyebrow: "The Portfolio",
     title: "Explore the Creations",
@@ -225,7 +226,8 @@ export const en = {
     makingEyebrow: "From Vision to Reality",
     makingTitle: "The Making of a Masterpiece",
     thisPiece: "This piece",
-    inAtelier: "In the atelier",
+    /** The complete making-of of a piece, first in "The Making of a Masterpiece". */
+    makingFilm: "The whole fabrication of this piece, filmed in the atelier.",
     delivered: "Delivered",
     handedOverTo: (_client: string) => "The Official Presentation",
     handover: "The handover",

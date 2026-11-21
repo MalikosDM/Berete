@@ -16,7 +16,18 @@
  * core: the sphere of light of the backdrop (Genkidama), where its particles go (its centre and its size, read on the
  * page). fixed: the world behind a layer that covers the screen (a story): drawn whatever the scroll of the page.
  */
-export type FxOptions = { effects: string[]; glow: string; tint: string; preset: string; impact: boolean; core?: HTMLElement | null; regions?: Record<string, HTMLElement>; fixed?: boolean };
+export type FxOptions = {
+  effects: string[];
+  glow: string;
+  tint: string;
+  preset: string;
+  impact: boolean;
+  core?: HTMLElement | null;
+  regions?: Record<string, HTMLElement>;
+  /** Where to find the regions again (the images of a sequence come later, and turn their regions off: data-off). */
+  root?: HTMLElement | null;
+  fixed?: boolean;
+};
 
 type P = { x: number; y: number; vx: number; vy: number; life: number; max: number; size: number; spin: number; angle: number; hue: number; color: string; kind: number };
 
@@ -129,9 +140,18 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   // coordinates of the canvas (read again now and then: they move with the scroll); else a share of the screen.
   type Box = { x0: number; y0: number; x1: number; y1: number };
   const boxes: Record<string, Box> = {};
+  // A region of an image of a sequence that is not on screen: its effect waits (the flashes of the crowd of the celebration).
+  const off = new Set<string>();
   const readRegions = () => {
     const c = canvas.getBoundingClientRect();
-    for (const [name, el] of Object.entries(opts.regions ?? {})) {
+    const els: Record<string, HTMLElement> = { ...opts.regions };
+    for (const el of opts.root?.querySelectorAll<HTMLElement>(".u-region") ?? []) {
+      const name = el.dataset.region ?? "";
+      if (!els[name] || els[name]!.hasAttribute("data-off") || !opts.root!.contains(els[name]!)) els[name] = el;
+    }
+    for (const [name, el] of Object.entries(els)) {
+      if (el.hasAttribute("data-off")) off.add(name);
+      else off.delete(name);
       const r = el.getBoundingClientRect();
       if (r.width > 0 && r.height > 0) boxes[name] = { x0: r.left - c.left, y0: r.top - c.top, x1: r.right - c.left, y1: r.bottom - c.top };
       else delete boxes[name];
@@ -423,7 +443,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     if (has("flashes")) {
       // The camera flashes of the crowd: a crackle of white stars, one here, three there.
       const b = box("crowd", [0.4, 0.45, 1, 0.75]);
-      if (Math.random() < (phone ? 0.05 : 0.09) + boost * 0.1) {
+      if (!off.has("crowd") && Math.random() < (phone ? 0.05 : 0.09) + boost * 0.1) {
         const n = Math.random() < 0.3 ? 3 : 1;
         for (let k = 0; k < n; k++) flashes.push({ x: rand(b.x0, b.x1), y: rand(b.y0, b.y1), vx: 0, vy: 0, life: 0, max: rand(5, 10), size: rand(4, 9) * (phone ? 0.8 : 1), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
       }

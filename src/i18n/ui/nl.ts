@@ -110,6 +110,7 @@ export const nl: Messages = {
       rings: { name: "Ringen", intro: "Meer dan een symbool van de overwinning. Een erfenis, vereeuwigd in goud en diamanten." },
       bracelets: { name: "Armbanden", intro: "Armbanden op maat, schakel voor schakel." },
       watches: { name: "Horloges", intro: "Horloges bezet met diamanten, van de kast tot de band." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Het gezicht van Christus, gekroond met doornen of bloemen, en Christus aan het kruis: elk Jesus piece in volume gebeeldhouwd en steen voor steen gezet." },
     },
     eyebrow: "Het portfolio",
     title: "Verken de creaties",
@@ -209,7 +210,7 @@ export const nl: Messages = {
     makingEyebrow: "Van visie tot werkelijkheid",
     makingTitle: "Zo ontstaat een meesterwerk",
     thisPiece: "Dit juweel",
-    inAtelier: "In het atelier",
+    makingFilm: "De hele vervaardiging van dit juweel, gefilmd in het atelier.",
     delivered: "Geleverd",
     handedOverTo: (_client: string) => "De officiële overhandiging",
     handover: "De overhandiging",
@@ -468,6 +469,10 @@ export const nl: Messages = {
     "/creations/watches": {
       title: "Horloges bezet met diamanten",
       description: "Horloges bezet met diamanten, van de kast tot de band, gedragen door voetballers: de horloges van Berete Jewellers, Dubai.",
+    },
+    "/creations/jesus-pieces": {
+      title: "Jesus Pieces: Christushangers met diamanten op maat",
+      description: "De Jesus pieces van Berete Jewellers: het gezicht van Christus met een kroon van doornen of bloemen, en Christus aan het kruis, gebeeldhouwd en met diamanten gezet in Dubai.",
     },
     "/creations/bracelets": {
       title: "Armbanden",

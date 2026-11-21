@@ -169,13 +169,19 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
   const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
+  // A sequence (the night of Lasana Keita): its images one after the other, each with its own lights; else the image.
+  const sequence = backdrop?.sequence?.filter((id) => BACKDROPS[id]) ?? null;
+  const frames = sequence ? sequence.map((id) => ({ id, b: BACKDROPS[id]! })) : backdrop ? [{ id: theme.backdrop, b: backdrop }] : [];
+  const [active, setActive] = useState(0);
+  // The other images of a sequence load once the page is there (the first one alone before).
+  const [allFrames, setAllFrames] = useState(false);
   const canvasEffects = effects.filter((e) =>
     ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops"].includes(e),
   );
   // The lights of the image that come alive, and the places where some effects of the canvas happen.
-  const spots = effects.includes("scene") ? (backdrop?.spots ?? []) : [];
-  const regions = backdrop?.regions ?? {};
-  const hasSpots = spots.length > 0 || Object.keys(regions).length > 0;
+  const frameSpots = frames.map((f) => (effects.includes("scene") ? (f.b.spots ?? []) : []));
+  const frameRegions = frames.map((f) => f.b.regions ?? {});
+  const hasSpots = frameSpots.some((l) => l.length > 0) || frameRegions.some((r) => Object.keys(r).length > 0);
   // A light laid on the image: the sphere of the Genkidama (its glow, and where the particles of light go), else the moon
   // of the backdrop, shining barely.
   const genkidama = Boolean(backdrop?.core && effects.includes("genkidama"));
@@ -185,6 +191,36 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const fxKey = canvasEffects.join(" ") + "|" + theme.glow + "|" + theme.preset;
 
   useEntrance(ref, preview || fixed ? undefined : slug);
+
+  // A sequence: each image holds its time, then the next one comes in a slow fade; it waits deep in the page and while the
+  // page is hidden. Asked for less motion: the last image (the celebration), still. The admin shows the first one.
+  const seqLength = sequence?.length ?? 0;
+  const hold = (backdrop?.hold ?? 8) * 1000;
+  useEffect(() => {
+    if (seqLength < 2 || preview) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // Known only in the browser (the page written by the server shows the first image).
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAllFrames(true);
+      setActive(seqLength - 1);
+      return undefined;
+    }
+    let timer = 0;
+    const cancel = afterLoad(
+      () => {
+        setAllFrames(true);
+        timer = window.setInterval(() => {
+          if (document.hidden || ref.current?.hasAttribute("data-deep")) return;
+          setActive((a) => (a + 1) % seqLength);
+        }, hold);
+      },
+      { delay: 400 },
+    );
+    return () => {
+      cancel();
+      window.clearInterval(timer);
+    };
+  }, [seqLength, hold, preview]);
 
   // The backdrop goes back into the depth once the opening has passed: the texts below read on a calm ground.
   useEffect(() => {
@@ -224,7 +260,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           if (cancelled) return;
           const coreEl = canvas.parentElement?.querySelector<HTMLElement>(".u-genki-core") ?? null;
           const regionEls = Object.fromEntries([...(canvas.parentElement?.querySelectorAll<HTMLElement>(".u-region") ?? [])].map((r) => [r.dataset.region ?? "", r]));
-          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, regions: regionEls, fixed });
+          fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, regions: regionEls, root: canvas.parentElement, fixed });
         });
       },
       { delay: 200, onGesture: true },
@@ -264,8 +300,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     "--u-glow": theme.glow,
     ...(backdrop ? { "--u-ratio": String(backdrop.ratio), "--u-fx": String(backdrop.focusX) } : {}),
   } as CSSProperties;
-  const base = backdrop ? "/media/universes/" + theme.backdrop : "";
-  const set = (widths: number[], kind: string, ext: string) => widths.map((w) => base + kind + w + "." + ext + " " + w + "w").join(", ");
+  const set = (id: string, widths: number[], kind: string, ext: string) => widths.map((w) => "/media/universes/" + id + kind + w + "." + ext + " " + w + "w").join(", ");
+  const on = (i: number) => (sequence ? (i === active ? "" : undefined) : undefined);
 
   return (
     <div
@@ -284,13 +320,17 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     >
       <div className="universe-stage">
         <div className="u-base" />
-        {backdrop ? (
-          <picture className="u-backdrop">
-            <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcSet={set(backdrop.mobileWidths, "-m-", "avif")} sizes="57vh" />
-            <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(backdrop.mobileWidths, "-m-", "webp")} sizes="57vh" />
-            <source type="image/avif" srcSet={set(backdrop.widths, "-", "avif")} sizes="145vw" />
-            <img src={base + "-1600.webp"} srcSet={set(backdrop.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
-          </picture>
+        {frames.length > 0 ? (
+          frames.map(({ id, b }, i) =>
+            i === 0 || allFrames ? (
+              <picture key={id} className="u-backdrop" data-frame={sequence ? i : undefined} data-frame-id={sequence ? id : undefined} data-on={on(i)}>
+                <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcSet={set(id, b.mobileWidths, "-m-", "avif")} sizes="57vh" />
+                <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(id, b.mobileWidths, "-m-", "webp")} sizes="57vh" />
+                <source type="image/avif" srcSet={set(id, b.widths, "-", "avif")} sizes="145vw" />
+                <img src={"/media/universes/" + id + "-1600.webp"} srcSet={set(id, b.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
+              </picture>
+            ) : null,
+          )
         ) : uploaded ? (
           <picture className="u-backdrop" data-uploaded="">
             <img src={uploaded} alt="" decoding="async" fetchPriority="low" />
@@ -309,23 +349,30 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           // Laid over the image exactly, like the sphere above (src/index.css, ".u-spots").
           <div className="u-spots">
             <div className="u-spots-box">
-              {spots.map((spot, i) => (
-                <span
-                  key={i}
-                  className="u-spot"
-                  data-kind={spot.k}
-                  data-tone={spot.tone}
-                  data-seq={spot.seq ? "" : undefined}
-                  data-desktop={spot.d ? undefined : "none"}
-                  data-mobile={spot.m ? undefined : "none"}
-                  style={spotStyle(spot, i)}
-                >
-                  {spot.k === "sails" ? <Sails /> : Array.from({ length: SPOT_PARTS[spot.k] ?? 0 }, (_, n) => <i key={n} />)}
-                </span>
-              ))}
-              {Object.entries(regions).map(([name, r]) => (
-                <i key={name} className="u-region" data-region={name} data-desktop={r.d ? undefined : "none"} data-mobile={r.m ? undefined : "none"} style={regionStyle(r)} />
-              ))}
+              {frames.map((f, fi) =>
+                fi === 0 || allFrames ? (
+                  // The lights of each image of a sequence come and go with it; its regions are off meanwhile (data-off).
+                  <span key={f.id} className="u-frame" data-frame={sequence ? fi : undefined} data-on={on(fi)}>
+                    {frameSpots[fi]!.map((spot, i) => (
+                      <span
+                        key={i}
+                        className="u-spot"
+                        data-kind={spot.k}
+                        data-tone={spot.tone}
+                        data-seq={spot.seq ? "" : undefined}
+                        data-desktop={spot.d ? undefined : "none"}
+                        data-mobile={spot.m ? undefined : "none"}
+                        style={spotStyle(spot, i)}
+                      >
+                        {spot.k === "sails" ? <Sails /> : Array.from({ length: SPOT_PARTS[spot.k] ?? 0 }, (_, n) => <i key={n} />)}
+                      </span>
+                    ))}
+                    {Object.entries(frameRegions[fi]!).map(([name, r]) => (
+                      <i key={name} className="u-region" data-region={name} data-off={sequence && fi !== active ? "" : undefined} data-desktop={r.d ? undefined : "none"} data-mobile={r.m ? undefined : "none"} style={regionStyle(r)} />
+                    ))}
+                  </span>
+                ) : null,
+              )}
             </div>
           </div>
         ) : null}

@@ -6,7 +6,7 @@ import { MediaView } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
 import SplitHeading from "@/components/SplitHeading";
-import { COLLECTIONS, collectionBySlug, piecesOfType, type Collection } from "@/data/collections";
+import { COLLECTIONS, collectionBySlug, piecesOfCollection, THEMES, type AnyCollection } from "@/data/collections";
 import { RENAMED_PIECES } from "@/data/pieces";
 import { collectionWords, Link, Navigate, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -14,7 +14,7 @@ import { waLink } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /**
- * /creations/:slug is a collection ("pendants", "chains"...) or, for the old
+ * /creations/:slug is a collection ("pendants", "chains"...), a theme ("jesus-pieces") or, for the old
  * addresses of the site, a piece: then it leads to /pieces/:slug.
  */
 export function CreationsParam() {
@@ -26,15 +26,15 @@ export function CreationsParam() {
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
-/** One collection: an opening with its name, then every piece of this type. */
-function CollectionPage({ collection }: { collection: Collection }) {
+/** One collection (every piece of a type) or one theme (Jesus Pieces): an opening with its name, then its pieces. */
+function CollectionPage({ collection }: { collection: AnyCollection }) {
   const { t } = useI18n();
   const waMessage = useWhatsAppMessage();
   const words = collectionWords(t, collection.slug, collection);
   const cat = useCatalogue();
-  const pieces = piecesOfType(cat, collection.type);
+  const pieces = piecesOfCollection(cat, collection);
   const hero = pieces.find((p) => p.slug === collection.hero) ?? pieces[0];
-  const others = COLLECTIONS.filter((c) => c.slug !== collection.slug && piecesOfType(cat, c.type).length > 0);
+  const others = [...COLLECTIONS, ...THEMES].filter((c) => c.slug !== collection.slug && piecesOfCollection(cat, c).length > 0);
 
   return (
     <>
@@ -103,7 +103,7 @@ function CollectionPage({ collection }: { collection: Collection }) {
                   <Link to={"/creations/" + c.slug} className="group flex min-h-16 items-center justify-between gap-4 py-4">
                     <span className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.1em] text-white group-hover:text-rose-light">{collectionWords(t, c.slug, c).name}</span>
                     <span className="flex items-center gap-4 text-base text-mist">
-                      {piecesOfType(cat, c.type).length}
+                      {piecesOfCollection(cat, c).length}
                       <ArrowRight className="size-5 text-white group-hover:text-rose-light rtl:-scale-x-100" aria-hidden="true" />
                     </span>
                   </Link>

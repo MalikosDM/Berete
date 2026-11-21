@@ -162,6 +162,47 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « Making of réel, panthère, N14, Jesus Pieces » (retours de Yoni du 21/11, 2) — état au 21/11/2026
+- [x] **The Making of a Masterpiece : seulement les vraies étapes** (`src/data/making.ts`, `making` de chaque pièce dans
+      `src/data/pieces.ts`). Toutes les vidéos des dossiers (Videos HD, Fabrication/, 08, stories) regardées image par image
+      (planches dans le dossier temporaire, rien sur le disque sauf `_verif`). Plus aucune image générique de l'atelier :
+      une étape sans média de la pièce disparaît, une pièce sans étape n'a pas de section. Le making-of complet passe en
+      premier (`COMPLETE_MAKING_OF` : 15 pièces, plus la Butterfly dont le making-of est la story 07/10), il joue muet à
+      l'écran, plein écran avec le son au clic. Étapes tirées des films (`"v2@14.6"` dans `also` de `scripts/hd-media.mjs`,
+      images des stories dans `scripts/piece-media.mjs`). Corrigées : le « sertissage » de Dragon Ball était tout le film
+      (story 20), celui du AS des logements creusés sans pierres, celui de Sirius une fraise sur la plaque brute, le
+      « polissage » de BRT Flower une fraise sur un maillon brut, celui de Tulips la pièce finie en main ; la malle
+      d'Okafor et l'étui NZ ne sont plus montrés comme remise (`BOX_NOT_ITS_OWN`) ; la remise de la Butterfly (repost de
+      story) remplacée par la chaîne dans sa malle. Aucune remise « photo seule » de la pièce finie.
+- [x] **Doutes** : planche `/Volumes/Disque externe/Berete - Dossiers icloud/_verif/making-of-doutes.jpg` (20 lignes :
+      pièce, étape, images, fichier source). Rien de cela en ligne, sauf la ligne 20 (making-of de la chaîne 14 mm, rangé
+      dans le dossier 01, la 20 mm étant presque identique).
+- [x] **Plus de séquence épinglée** entre l'ouverture et le contenu (retirée le 21/11 avec « Sous tous les angles ») :
+      un défilement mène à la section suivante (test).
+- [x] **Vidéos amateur à la fin** de « Sous tous les angles » (`AMATEUR_FILMS` dans `src/data/angles.ts` : 17 vidéos de
+      téléphone, en main, essayages ; les 8 montages pro gardent leur place). Doublon retiré : la story 11 de Noah Okafor
+      (le même montage que 32/v01) ; la story 07/10 de la Butterfly passe dans son Making of.
+- [x] **N14** : 4 photos de plus (le N et sa figure, le dos entier, le dos de biais, la marque BRT ; textes en 6 langues),
+      les gros plans des prénoms laissés de côté ; son montage pro 22/v08 (HD) en film d'ouverture et dans l'atelier (joué
+      une fois : `resolveAtelier` ne répète pas un film identique). Yoni accepte de montrer le dos gravé.
+- [x] **La panthère de Lasana Keita** : fond « keita » (`THEME_PRESETS.keita`), une séquence de 3 images en fondu lent,
+      8 s chacune (KO, cage ouverte, célébration ; `SEQUENCES` dans `scripts/universe-media.mjs`, `sequence` du fond ;
+      `src/components/Universe.tsx`), chacune avec son projecteur ; braises, confettis dorés, fumée ; flashs de la foule
+      seulement sur la célébration (région « crowd », `data-off` sinon). Version mobile de keita-tribune = recadrage de la
+      version ordinateur (la version mobile le montre assis dans la cage). Pause hors écran, la célébration fixe avec
+      « réduire les animations ». Texte de la célébration en 2e paragraphe de son histoire (6 langues, sans le nom de
+      l'organisation ; « Lasana Keita » gardé, orthographe à confirmer). Aucune story ne montre la panthère (la story
+      « Keita Losene » montre un écrin vert : même personne ? à confirmer) : sa story prendra la séquence dès qu'elle existe.
+- [x] **Jesus Pieces** dans le menu sous Les Créations (ordinateur, téléphone, pied de page) : `/creations/jesus-pieces`,
+      `THEMES` dans `src/data/collections.ts` (Red Crown, Samuel Ballet, Red Flowers, Jesus Cross), 6 langues, titre
+      Google. **5e introuvable** : toutes les photos et vidéos des dossiers 01–38, des stories et du 08 regardées ; les
+      candidates (Thuram SS23 03/04, Collectors 15, 20, 23, 24) sont des 4 connues. Peut-être dans « 99 - NE PAS ENVOYER »
+      (jamais ouvert) ou une pièce retirée : demander à Yoni. La page Thuram retirée reste hors ligne.
+- `tests/making.spec.ts` (6 capsules, N14, panthère, Jesus Pieces ; ordinateur et iPhone), captures `verification/making/`.
+- [ ] Yoni : les doutes de la planche ; la 5e Jesus Piece ; la malle d'Okafor (octogone ou OKA ?) ; l'étui NZ ; des
+      photos de fabrication pour les pièces sans étape (Baguette Cross, Cross Infinity, Oval Eternity, Red Crown, Baguette
+      Cuban, Rose 20 mm).
+
 ## Passe « Sous tous les angles » et 4 pièces retirées (retours de Yoni du 21/11) — état au 21/11/2026
 - [x] **Une photo + un texte** sur toutes les pièces (`src/components/EveryAngle.tsx`) : chaque photo et chaque vidéo de la
       pièce a un petit titre et une ou deux phrases, numérotés comme les détails de l'Inter ; ordinateur : photo et texte
@@ -258,7 +299,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       l'atelier plein écran après le clic ; aucun autre film avant. `tests/films.spec.ts` (Inter, VfB, collier T, panthère de
       Lasana Keita, Jesus Cross, Sirius ; ordinateur et iPhone ; captures dans `verification/films/`).
 - [ ] Restés en 720p, faute d'original : making-of du AS (18/v04, vidéo téléphone), de Tulips (24/v12, vidéo téléphone), de
-      la Rose 20 mm Cuban Chain (01, dossier Fabrication) et de Sirius (37/v05, 848 × 480). Dragon Ball (13/v01), OKA (34/v03),
+      la chaîne 14 mm (01, dossier Fabrication ; son original 1080p existe en 08/v09 « Videos HD ») et de Sirius (37/v05, 848 × 480). Dragon Ball (13/v01), OKA (34/v03),
       Jesus Piece Red Flowers (20/v02) et les dossiers 36, 37, 38 étaient déjà en 1080p dans « Videos/ ».
 - [x] Vidéos courtes des galeries (« Sous tous les angles », 720p, 12 s, 25 tirées des dossiers) : toutes depuis les originaux
       le 21/11 (9 refaites depuis « Videos HD », les 16 autres venaient déjà de fichiers en pleine qualité), même poids.

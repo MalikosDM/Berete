@@ -169,6 +169,48 @@ const SCENES = [
 ];
 BACKDROPS.push(...SCENES);
 
+/*
+ * The night of Lasana Keita (21/11/2026, the celebration of the "Black Panther" after a knockout in the first round, out
+ * of the cage to the front row): three images that follow one another slowly behind his panther, the knockout (the
+ * panther of smoke leaping), the open cage (the path of light to a seat of the front row), the celebration (his silhouette
+ * from behind, applauding himself before the crowd). The phone image of the celebration shows him sitting in the cage:
+ * its phone portrait is a crop of the computer image instead, around his silhouette (mobileCrop: its centre, share of
+ * the width). Each image has its spotlight; the crowd of the celebration has its camera flashes (region "crowd").
+ */
+const KEITA = [
+  scene("keita-ko", "Le KO : la panthère de fumée qui bondit (Lasana Keita)", [0.64, 0.4], {
+    spots: [
+      { k: "cone", tone: "gold", d: [0.643, 0, 0.3, 0.62, 0], m: [0.58, 0, 0.7, 0.45, 0] },
+      { k: "glow", tone: "gold", d: [0.643, 0.02, 0.07], m: [0.58, 0.01, 0.17] },
+    ],
+  }),
+  {
+    ...scene("keita-cage", "La cage ouverte, le chemin de lumière (Lasana Keita)", [0.63, 0.55], {
+      spots: [
+        { k: "cone", tone: "gold", d: [0.635, 0.08, 0.26, 0.7, 0], m: [0.58, 0, 0.62, 0.55, 0] },
+        { k: "glow", tone: "gold", d: [0.635, 0.1, 0.06], m: [0.58, 0.01, 0.16] },
+      ],
+    }),
+    file: "keita-cage-ouverte-desktop.jpg",
+    mobileFile: "keita-cage-ouverte-mobile.jpg",
+  },
+  {
+    ...scene("keita-tribune", "La célébration : il s'applaudit face à la foule (Lasana Keita)", [0.67, 0.5], {
+      spots: [
+        { k: "cone", tone: "gold", d: [0.64, 0, 0.32, 0.6, 0], m: [0.55, 0, 0.8, 0.5, 0] },
+        { k: "glow", tone: "gold", d: [0.64, 0.02, 0.08], m: [0.55, 0.01, 0.2] },
+      ],
+      regions: { crowd: { d: [0.22, 0.4, 1, 0.72], m: [0, 0.42, 1, 0.75] } },
+    }),
+    mobileFile: null,
+    mobileCrop: 0.665,
+  },
+];
+BACKDROPS.push(...KEITA);
+
+/** Backdrops made of several images that follow one another in a slow fade (src/components/Universe.tsx): hold = seconds each. */
+const SEQUENCES = [{ id: "keita", name: "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)", frames: ["keita-ko", "keita-cage", "keita-tribune"], hold: 8 }];
+
 /** The title fonts: package, file (latin letters only: the titles of the site), and the part of Yuji Boku that holds 力. */
 const FONT_FILES = [
   ["shojumaru", "shojumaru-latin-400-normal"],
@@ -221,6 +263,14 @@ async function backdrop(b) {
   const file = b.sails ? await withoutSails(b) : await master(b);
   const { width, height } = await sharp(file).metadata();
   for (const w of WIDTHS) await write(sharp(file).resize({ width: w }), join(OUT, b.id + "-" + w));
+  if (b.mobileCrop) {
+    // Its phone portrait cropped from the computer image (9:16 of its full height), around a point (share of the width).
+    const w = Math.round((height * 9) / 16);
+    const left = Math.round(Math.min(width - w, Math.max(0, b.mobileCrop * width - w / 2)));
+    for (const mw of MOBILE_WIDTHS) await write(sharp(file).extract({ left, top: 0, width: w, height }).resize({ width: mw, height: Math.round((mw * 16) / 9), kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
+    console.log("  + " + b.id + " (" + width + " x " + height + ", portrait cropped at " + b.mobileCrop + ")");
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, spots: b.spots, regions: b.regions };
+  }
   if (b.mobileFile) {
     // Its own portrait for phones: 9:16, from the middle of it.
     const src = join(SOURCE, b.mobileFile);
@@ -267,9 +317,15 @@ if (only) {
     /* first run */
   }
 }
-for (const b of BACKDROPS) if (!only || only.includes(b.id)) backdrops[b.id] = await backdrop(b);
+for (const b of BACKDROPS) if (!only || only.includes(b.id) || SEQUENCES.some((q) => only.includes(q.id) && q.frames.includes(b.id))) backdrops[b.id] = await backdrop(b);
+// A sequence: the sizes of its first image, its images in their order.
+for (const q of SEQUENCES) {
+  const first = backdrops[q.frames[0]];
+  if (first && q.frames.every((f) => backdrops[f])) backdrops[q.id] = { ...first, name: q.name, sequence: q.frames, hold: q.hold, spots: undefined, regions: undefined, portrait: q.frames.every((f) => backdrops[f].portrait) };
+}
 // In the order of the list.
-backdrops = Object.fromEntries(BACKDROPS.filter((b) => backdrops[b.id]).map((b) => [b.id, backdrops[b.id]]));
+const order = [...BACKDROPS.map((b) => b.id), ...SEQUENCES.map((q) => q.id)];
+backdrops = Object.fromEntries(order.filter((id) => backdrops[id]).map((id) => [id, backdrops[id]]));
 if (!only) await fonts();
 await writeFile(DATA, JSON.stringify({ backdrops }, null, 1) + "\n");
 console.log("  = src/data/universes.generated.json");

@@ -3,10 +3,11 @@ import { createPortal } from "react-dom";
 import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
 import AtelierPassage from "@/components/AtelierPassage";
+import AtelierRoom from "@/components/AtelierRoom";
 import BrandIcon from "@/components/BrandIcon";
 import EveryAngle from "@/components/EveryAngle";
 import { Lightbox } from "@/components/HorizontalGallery";
-import { Img, MediaView } from "@/components/Media";
+import { Img, LoopVideo, MediaView } from "@/components/Media";
 import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
 import PieceFilm from "@/components/PieceFilm";
@@ -17,17 +18,18 @@ import JewelFx from "@/components/universe/JewelFx";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import Universe, { universeProps } from "@/components/Universe";
-import { defaultCatalogue, media } from "@/data/catalogue";
+import { defaultCatalogue } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
 import { anglePhotos } from "@/data/angles";
-import { resolveAtelier, resolveReveal } from "@/data/atelier";
+import { filmTime, resolveAtelier, resolveReveal } from "@/data/atelier";
+import { completeMakingOf, makingSteps } from "@/data/making";
 import { pointsFor } from "@/data/details3d";
 import type { PublicModel } from "@/data/models";
 import { resolveShowcase } from "@/data/showcase";
 import { jewelOf, resolveTheme } from "@/data/themes";
-import { MAKING_STEPS, type MakingStep, type MediaItem, type Piece, type Story } from "@/data/types";
+import type { MakingStep, MediaItem, Piece, Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue, useRawCatalogue } from "@/lib/catalogue";
@@ -39,15 +41,6 @@ import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
-
-/** The atelier photos that illustrate a step when the piece has none of its own. */
-function atelierFor(step: MakingStep): MediaItem | null {
-  const atelier = media.groups["atelier"] ?? [];
-  if (step === "raw") return atelier[1] ?? null;
-  if (step === "setting") return media.videos["atelier/setting"] ?? null;
-  if (step === "polishing") return atelier[2] ?? null;
-  return null;
-}
 
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
@@ -270,11 +263,17 @@ export default function PiecePage() {
         <div className="lg:col-span-6 lg:col-start-7">
           <h2 className="eyebrow">{t.piece.story}</h2>
           {piece.line ? <h3 className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</h3> : null}
-          {piece.story ? <p className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">{piece.story}</p> : null}
+          {piece.story
+            ? piece.story.split("\n\n").map((par, i) => (
+                <p key={i} data-story-paragraph={i + 1} className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">
+                  {par}
+                </p>
+              ))
+            : null}
         </div>
       </section>
 
-      <MakingSection piece={piece} boxImage={box?.images[0]} />
+      <MakingSection piece={piece} boxImage={box?.images[0]} madeFor={madeFor(cat, piece)} />
 
       {piece.handover.length > 0 ? (
         <section aria-labelledby="handover-title" className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
@@ -473,15 +472,22 @@ function DetailsSection({ piece, model }: { piece: Piece; model: PublicModel | n
 }
 
 /**
- * "The Making of a Masterpiece": the five steps, with the photos of this piece when there are some, else the atelier. The photos
- * of the piece (its first sketch...) open in full screen.
+ * "The Making of a Masterpiece" (feedback of Yoni, 21/11/2026): only the real steps of this piece (src/data/making.ts), each
+ * with its own photo or film; a step without one is left out, a piece without any has no section. Its complete making-of,
+ * when it has one, comes first: it plays silently on screen, and full screen with its sound once chosen
+ * (src/components/AtelierRoom.tsx). The photos of the steps open in full screen.
  */
-function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem }) {
+function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: MediaItem; madeFor: string }) {
   const { t } = useI18n();
   const STEPS: Record<MakingStep, { title: string; text: string }> = t.piece.steps;
-  const owned = MAKING_STEPS.map((step) => piece.making[step] ?? (step === "delivery" ? boxImage : undefined));
-  const viewable = owned.filter((m): m is MediaItem => m !== undefined);
+  const steps = makingSteps(piece, boxImage);
+  const film = completeMakingOf(piece.slug, piece.atelier);
+  const viewable = steps.map((s) => s.item);
   const [open, setOpen] = useState<number | null>(null);
+  const [room, setRoom] = useState(false);
+  if (steps.length === 0 && !film) return null;
+  const count = steps.length + (film ? 1 : 0);
+  const columns = ["lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-4", "lg:grid-cols-5", "lg:grid-cols-6"][count]!;
   return (
     <section aria-labelledby="making-title" data-making className="border-y border-white/10 py-24 lg:py-32">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
@@ -490,57 +496,64 @@ function MakingSection({ piece, boxImage }: { piece: Piece; boxImage?: MediaItem
           {t.piece.makingTitle}
         </h2>
       </div>
-      <ol className="no-scrollbar mt-14 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:mx-auto lg:grid lg:max-w-[1600px] lg:grid-cols-5 lg:gap-6 lg:overflow-visible lg:px-12">
-        {MAKING_STEPS.map((step, i) => {
-          const own = owned[i];
-          const item = own ?? atelierFor(step);
-          const label = own ? (own.caption ?? t.piece.thisPiece) : item ? t.piece.inAtelier : null;
-          const picture = (
-            <>
-              {item ? (
-                // Inside its button (a photo of this piece), the photo is named by the button.
-                <MediaView item={item} alt={own ? "" : (item.alt ?? STEPS[step].title)} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
-              ) : (
-                <span className="flex h-full w-full items-center justify-center p-8">
-                  {/* A faint number in the place of a photo: drawn by the style sheet, it is decoration, not text. */}
-                  <span aria-hidden="true" data-n={String(i + 1).padStart(2, "0")} className="font-display text-[5rem] leading-none font-light text-white/10 before:content-[attr(data-n)]" />
+      <ol className={"no-scrollbar mt-14 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 sm:px-8 lg:mx-auto lg:grid lg:max-w-[1600px] lg:gap-6 lg:overflow-visible lg:px-12 " + columns}>
+        {film ? (
+          <li data-making-film className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
+            <Reveal>
+              <button
+                type="button"
+                onClick={() => setRoom(true)}
+                aria-label={t.films.making + " · " + piece.title}
+                data-making-open="film"
+                className="group relative block aspect-[3/4] w-full cursor-pointer overflow-hidden border border-rose-light/30 bg-ink-soft text-start"
+              >
+                <LoopVideo item={{ type: "video", src: film.mobile, poster: film.posters[film.poster] || film.posters[0] }} label="" className="h-full w-full object-cover" />
+                <span className="absolute inset-0 bg-linear-to-t from-black/70 via-transparent to-transparent" />
+                <span className="absolute inset-0 flex items-center justify-center">
+                  <span className="inline-flex size-16 items-center justify-center rounded-full border border-white/50 bg-black/45 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                    <Play className="size-6 translate-x-0.5 fill-current" aria-hidden="true" />
+                  </span>
                 </span>
-              )}
-              {label ? <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{label}</span> : null}
-            </>
-          );
-          return (
-            <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
-              <Reveal delay={i * 0.08}>
-                {own ? (
-                  <button
-                    type="button"
-                    onClick={() => setOpen(viewable.indexOf(own))}
-                    // The name read aloud starts with the words shown on the photo ("The first sketch").
-                    aria-label={(label ? label + " · " : "") + t.gallery.open(own.alt ?? STEPS[step].title)}
-                    data-making-open={step}
-                    className="group relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink-soft text-start"
-                  >
-                    {picture}
-                    <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white transition-colors group-hover:border-rose-light group-hover:text-rose-light">
-                      <ZoomIn className="size-5" aria-hidden="true" />
-                    </span>
-                  </button>
-                ) : (
-                  <span className="relative block aspect-[3/4] overflow-hidden border border-white/10 bg-ink-soft">{picture}</span>
-                )}
-                <p className="mt-5 flex items-baseline gap-3">
-                  <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="title-caps text-2xl tracking-[0.12em] text-white">{STEPS[step].title}</span>
-                </p>
-                <p className="mt-3 text-base text-bone">{STEPS[step].text}</p>
-              </Reveal>
-            </li>
-          );
-        })}
+                <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{filmTime(film.duration)}</span>
+              </button>
+              <p className="mt-5 flex items-baseline gap-3">
+                <Play className="text-rose-gold size-4 fill-current" aria-hidden="true" />
+                <span className="title-caps text-2xl tracking-[0.12em] text-white">{t.films.making}</span>
+              </p>
+              <p className="mt-3 text-base text-bone">{t.piece.makingFilm}</p>
+            </Reveal>
+          </li>
+        ) : null}
+        {steps.map(({ step, item }, i) => (
+          <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
+            <Reveal delay={(i + (film ? 1 : 0)) * 0.08}>
+              <button
+                type="button"
+                onClick={() => setOpen(i)}
+                // The name read aloud starts with the words shown on the photo ("The first sketch").
+                aria-label={(item.caption ? item.caption + " · " : "") + t.gallery.open(item.alt ?? STEPS[step].title)}
+                data-making-open={step}
+                className="group relative block aspect-[3/4] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink-soft text-start"
+              >
+                {/* Inside its button, the photo is named by the button. */}
+                <MediaView item={item} alt="" fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 44vw, 20vw" />
+                <span className="absolute bottom-3 start-3 bg-ink/75 px-3 py-1 text-base text-bone backdrop-blur-sm">{item.caption ?? t.piece.thisPiece}</span>
+                <span className="absolute end-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                  <ZoomIn className="size-5" aria-hidden="true" />
+                </span>
+              </button>
+              <p className="mt-5 flex items-baseline gap-3">
+                <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
+                <span className="title-caps text-2xl tracking-[0.12em] text-white">{STEPS[step].title}</span>
+              </p>
+              <p className="mt-3 text-base text-bone">{STEPS[step].text}</p>
+            </Reveal>
+          </li>
+        ))}
         <li aria-hidden="true" className="w-1 shrink-0 lg:hidden" />
       </ol>
       {open !== null ? createPortal(<Lightbox items={viewable} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
+      {room && film ? <AtelierRoom title={piece.title} madeFor={madeFor} slug={piece.slug} atelier={{ making: film, reveal: null, poster: film.posters[film.poster] || film.posters[0] || "" }} onClose={() => setRoom(false)} /> : null}
     </section>
   );
 }

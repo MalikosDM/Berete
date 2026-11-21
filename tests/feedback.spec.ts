@@ -59,6 +59,8 @@ test("Sirius, BRT Flower and the L pendant: every photo of their folders, their 
   expect(FILMS["sirius"]?.reveal?.source).toContain("37/v02");
   expect(FILMS["sirius"]?.making?.source).toContain("37/v05");
   expect(sirius.making.raw?.src).toBe("/media/hd/sirius/p30.webp");
+  // No setting of its own (21/11/2026: v05 shows a bur on the raw plate, no stone yet).
+  expect(sirius.making.setting).toBeUndefined();
   const brt = pieceOf("brt-flower-chain");
   expect(brt.title).toBe("BRT Flower Chain");
   expect(brt.clientPublic).toBe(false);
@@ -66,7 +68,8 @@ test("Sirius, BRT Flower and the L pendant: every photo of their folders, their 
   expect(FILMS["brt-flower-chain"]?.reveal?.source).toContain("36/v01");
   expect(FILMS["brt-flower-chain"]?.making?.source).toContain("36/v02");
   expect(brt.making.setting?.src).toBe("/media/hd/brt-flower-chain/v04.mp4");
-  expect(brt.making.polishing?.src).toBe("/media/hd/brt-flower-chain/v05.mp4");
+  // Its polishing: a frame of its making-of (21/11/2026: v05 was a bur on a raw link, not the polishing).
+  expect(brt.making.polishing?.src).toBe("/media/hd/brt-flower-chain/v02-24_8s.webp");
   const deniz = pieceOf("deniz-undav-l-pendant");
   expect(deniz.gallery.length + 1).toBe(10);
   expect(FILMS["deniz-undav-l-pendant"]?.making?.source).toContain("38/v01");

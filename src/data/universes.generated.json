@@ -1167,6 +1167,194 @@
      "i": 4
     }
    ]
+  },
+  "keita-ko": {
+   "name": "Le KO : la panthère de fumée qui bondit (Lasana Keita)",
+   "ratio": 1.792,
+   "focusX": 0.64,
+   "focusY": 0.4,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "cone",
+     "tone": "gold",
+     "d": [
+      0.643,
+      0,
+      0.3,
+      0.62,
+      0
+     ],
+     "m": [
+      0.58,
+      0,
+      0.7,
+      0.45,
+      0
+     ]
+    },
+    {
+     "k": "glow",
+     "tone": "gold",
+     "d": [
+      0.643,
+      0.02,
+      0.07
+     ],
+     "m": [
+      0.58,
+      0.01,
+      0.17
+     ]
+    }
+   ]
+  },
+  "keita-cage": {
+   "name": "La cage ouverte, le chemin de lumière (Lasana Keita)",
+   "ratio": 1.792,
+   "focusX": 0.63,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "cone",
+     "tone": "gold",
+     "d": [
+      0.635,
+      0.08,
+      0.26,
+      0.7,
+      0
+     ],
+     "m": [
+      0.58,
+      0,
+      0.62,
+      0.55,
+      0
+     ]
+    },
+    {
+     "k": "glow",
+     "tone": "gold",
+     "d": [
+      0.635,
+      0.1,
+      0.06
+     ],
+     "m": [
+      0.58,
+      0.01,
+      0.16
+     ]
+    }
+   ]
+  },
+  "keita-tribune": {
+   "name": "La célébration : il s'applaudit face à la foule (Lasana Keita)",
+   "ratio": 1.792,
+   "focusX": 0.67,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "cone",
+     "tone": "gold",
+     "d": [
+      0.64,
+      0,
+      0.32,
+      0.6,
+      0
+     ],
+     "m": [
+      0.55,
+      0,
+      0.8,
+      0.5,
+      0
+     ]
+    },
+    {
+     "k": "glow",
+     "tone": "gold",
+     "d": [
+      0.64,
+      0.02,
+      0.08
+     ],
+     "m": [
+      0.55,
+      0.01,
+      0.2
+     ]
+    }
+   ],
+   "regions": {
+    "crowd": {
+     "d": [
+      0.22,
+      0.4,
+      1,
+      0.72
+     ],
+     "m": [
+      0,
+      0.42,
+      1,
+      0.75
+     ]
+    }
+   }
+  },
+  "keita": {
+   "name": "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)",
+   "ratio": 1.792,
+   "focusX": 0.64,
+   "focusY": 0.4,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "sequence": [
+    "keita-ko",
+    "keita-cage",
+    "keita-tribune"
+   ],
+   "hold": 8
   }
  }
 }

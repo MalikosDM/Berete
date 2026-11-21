@@ -3,7 +3,8 @@ import { anglePhotos, anglesShownFirst } from "../src/data/angles";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
 import { resolveShowcase } from "../src/data/showcase";
-import { MAKING_STEPS, type Catalogue, type MediaItem, type Piece } from "../src/data/types";
+import { completeMakingOf, makingSteps } from "../src/data/making";
+import type { Catalogue, MediaItem, Piece } from "../src/data/types";
 import { coverSrcSet, srcSetOf } from "../src/lib/responsive";
 import { checkPage, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
@@ -104,7 +105,13 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   for (const v of await page.locator("[data-angle] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }
-  await expect(page.locator("[data-making-step]"), id + " making").toHaveCount(MAKING_STEPS.length);
+  // "The Making of a Masterpiece": only its real steps (src/data/making.ts), its complete making-of first; none: no section.
+  const box = piece.boxSlug ? cat.boxes.find((b) => b.slug === piece.boxSlug)?.images[0] : undefined;
+  const steps = makingSteps(piece, box);
+  const film = completeMakingOf(piece.slug, piece.atelier);
+  await expect(page.locator("[data-making-step]"), id + " making").toHaveCount(steps.length);
+  await expect(page.locator("[data-making-film]"), id + " making-of film").toHaveCount(film ? 1 : 0);
+  await expect(page.locator("[data-making]"), id + " making section").toHaveCount(steps.length > 0 || film ? 1 : 0);
   for (const slug of piece.people.slice(0, 3)) await expect(page.locator('[data-made-for-person="' + slug + '"]'), id + " made for " + slug).toHaveAttribute("href", "/players/" + slug);
   const sameType = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
   const similar = await page.locator("[data-similar] [data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));

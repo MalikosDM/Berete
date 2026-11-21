@@ -18,7 +18,8 @@ const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
  * chains of "facettes" were taken off the site on 21/11/2026 (too few photos): their universes wait for them.
  */
 const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
-  { backdrop: "arene", preset: "arene", pieces: ["panther-champion-pendant"] },
+  // The panther: since 21/11/2026 the night of his celebration (a sequence of three images, tests/making.spec.ts).
+  { backdrop: "keita", preset: "keita", pieces: ["panther-champion-pendant"] },
   { backdrop: "bianconero", preset: "bianconero", pieces: ["kenan-yildiz-celebration-pendant"] },
   { backdrop: "serpent", preset: "serpent", pieces: ["marcus-thuram-t-serpent-pendant"] },
   { backdrop: "sirius", preset: "sirius", pieces: ["sirius"] },
@@ -93,10 +94,10 @@ for (const u of UNIVERSES) {
     await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
     const world = page.locator("article[data-piece] > .universe[data-backdrop='" + u.backdrop + "']");
     await expect(world).toHaveCount(1);
-    const img = world.locator(".u-backdrop img");
+    const img = world.locator(".u-backdrop img").first();
     await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { timeout: 20_000 }).toBe(true);
     const src = await img.evaluate((el) => (el as HTMLImageElement).currentSrc);
-    expect(src).toContain("/media/universes/" + u.backdrop + (phone ? "-m-" : "-"));
+    expect(src).toContain("/media/universes/" + (BACKDROPS[u.backdrop]!.sequence?.[0] ?? u.backdrop) + (phone ? "-m-" : "-"));
     if (!phone) expect(src).not.toContain("-m-");
     // On arrival: its entrance playing.
     await page.waitForTimeout(1200);

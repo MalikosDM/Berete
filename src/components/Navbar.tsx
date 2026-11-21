@@ -4,7 +4,7 @@ import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks, LanguageMenu } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
-import { visibleCollections } from "@/data/collections";
+import { visibleCollections, visibleThemes } from "@/data/collections";
 import { collectionWords, Link, NavLink, stripLocale, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
@@ -29,6 +29,7 @@ export default function Navbar() {
   const CREATION_LINKS: NavLinkItem[] = [
     { label: t.common.allCreations, to: "/creations" },
     ...visibleCollections(cat).map(({ collection }) => ({ label: collectionWords(t, collection.slug, collection).name, to: "/creations/" + collection.slug })),
+    ...visibleThemes(cat).map((theme) => ({ label: collectionWords(t, theme.slug, theme).name, to: "/creations/" + theme.slug })),
   ];
   const MAIN_LINKS: NavLinkItem[] = [
     { label: t.nav.players, to: "/players" },

@@ -120,6 +120,7 @@ export const de: Messages = {
       rings: { name: "Ringe", intro: "Mehr als ein Symbol des Sieges. Ein Vermächtnis, verewigt in Gold und Diamanten." },
       bracelets: { name: "Armbänder", intro: "Armbänder nach Maß, Glied für Glied gefertigt." },
       watches: { name: "Uhren", intro: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Das Antlitz Christi, mit Dornen oder Blumen gekrönt, und Christus am Kreuz: jedes Jesus Piece plastisch modelliert und Stein für Stein gefasst." },
     },
     eyebrow: "Das Portfolio",
     title: "Die Kreationen entdecken",
@@ -221,7 +222,7 @@ export const de: Messages = {
     makingEyebrow: "Von der Vision zur Wirklichkeit",
     makingTitle: "Die Entstehung eines Meisterwerks",
     thisPiece: "Dieses Stück",
-    inAtelier: "Im Atelier",
+    makingFilm: "Die ganze Fertigung dieses Stücks, im Atelier gefilmt.",
     delivered: "Übergeben",
     handedOverTo: (_client: string) => "Die feierliche Übergabe",
     handover: "Die Übergabe",
@@ -481,6 +482,10 @@ export const de: Messages = {
     "/creations/watches": {
       title: "Diamantbesetzte Uhren",
       description: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband, getragen von Fußballern: die Uhren von Berete Jewellers, Dubai.",
+    },
+    "/creations/jesus-pieces": {
+      title: "Jesus Pieces: Christus-Anhänger mit Diamanten nach Maß",
+      description: "Die Jesus Pieces von Berete Jewellers: das Antlitz Christi mit Dornen- oder Blumenkrone und Christus am Kreuz, modelliert und mit Diamanten besetzt in Dubai.",
     },
     "/creations/bracelets": {
       title: "Armbänder",

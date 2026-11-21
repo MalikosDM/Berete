@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
-import { visibleCollections } from "@/data/collections";
+import { visibleCollections, visibleThemes } from "@/data/collections";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
@@ -18,6 +18,7 @@ export default function Footer() {
   const creations = [
     { label: t.common.allCreations, to: "/creations" },
     ...visibleCollections(cat).map(({ collection }) => ({ label: collectionWords(t, collection.slug, collection).name, to: "/creations/" + collection.slug })),
+    ...visibleThemes(cat).map((theme) => ({ label: collectionWords(t, theme.slug, theme).name, to: "/creations/" + theme.slug })),
   ];
   const house = [
     { label: t.nav.players, to: "/players" },

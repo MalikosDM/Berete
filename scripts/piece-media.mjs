@@ -15,6 +15,11 @@
  * Videos of the Boutique Bijoutier folder are listed in BOUTIQUE_VIDEOS.
  */
 export const STILLS = [
+  /* ---------- The steps of "The Making of a Masterpiece" found in the stories (21/11/2026) ---------- */
+  { key: "pieces/michy-batshuayi-butterfly-chain/setting", from: "story:07/10", at: 20.7 },
+  { key: "pieces/samuel-ballet-jesus-piece/delivery", from: "story:15/05", at: 10.2 },
+  { key: "pieces/tajon-buchanan-iced-watch/delivery", from: "story:25/01", at: 0.6 },
+
   /* ---------- Pendants ---------- */
   { key: "pieces/kenan-yildiz-celebration-pendant/angle", from: "boutique:845354996" },
   { key: "pieces/noah-okafor-oka-pendant/cover", from: "story:19/05", crop: [0.075, 0.235, 0.85, 0.52] },

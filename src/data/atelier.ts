@@ -75,7 +75,9 @@ export function resolveAtelier(slug: string, atelier: PieceAtelier | null | unde
   };
   const making = pick("making");
   if (!making) return null;
-  return { making, reveal: pick("reveal"), poster: atelier?.poster || making.posters[making.poster] || making.posters[0] || "" };
+  // The same film for both (a piece whose only film is the edit of its finished piece, shown in its atelier): played once.
+  const reveal = pick("reveal");
+  return { making, reveal: reveal && reveal.source !== making.source ? reveal : null, poster: atelier?.poster || making.posters[making.poster] || making.posters[0] || "" };
 }
 
 /** "0:48", "1:05". */

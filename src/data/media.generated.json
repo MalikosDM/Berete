@@ -289,6 +289,24 @@
     }
   },
   "stills": {
+    "pieces/michy-batshuayi-butterfly-chain/setting": {
+      "type": "image",
+      "src": "/media/pieces/michy-batshuayi-butterfly-chain/setting.webp",
+      "width": 720,
+      "height": 1280
+    },
+    "pieces/samuel-ballet-jesus-piece/delivery": {
+      "type": "image",
+      "src": "/media/pieces/samuel-ballet-jesus-piece/delivery.webp",
+      "width": 720,
+      "height": 1280
+    },
+    "pieces/tajon-buchanan-iced-watch/delivery": {
+      "type": "image",
+      "src": "/media/pieces/tajon-buchanan-iced-watch/delivery.webp",
+      "width": 720,
+      "height": 1280
+    },
     "pieces/kenan-yildiz-celebration-pendant/angle": {
       "type": "image",
       "src": "/media/pieces/kenan-yildiz-celebration-pendant/angle.webp",
@@ -964,6 +982,13 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "v01-13_6s": {
+        "type": "image",
+        "src": "/media/hd/the-hand/v01-13_6s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "kevin-schade-dragon-ball-pendant": {
@@ -1062,6 +1087,20 @@
         "type": "image",
         "src": "/media/hd/kevin-schade-dragon-ball-pendant/p21.webp",
         "width": 1440,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v01-17_5s": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/v01-17_5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "v01-10s": {
+        "type": "image",
+        "src": "/media/hd/kevin-schade-dragon-ball-pendant/v01-10s.webp",
+        "width": 1080,
         "height": 1920,
         "onBlack": false
       }
@@ -1187,6 +1226,20 @@
         "width": 1080,
         "height": 1440,
         "onBlack": false
+      },
+      "v02-13s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/v02-13s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-9s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-octagon-pendant/v02-9s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "angelo-stiller-as-pendant": {
@@ -1276,14 +1329,12 @@
         "height": 1920,
         "onBlack": false
       },
-      "v04": {
-        "type": "video",
-        "src": "/media/hd/angelo-stiller-as-pendant/v04.mp4",
-        "poster": "/media/hd/angelo-stiller-as-pendant/v04-poster.webp",
+      "v03-3s": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/v03-3s.webp",
         "width": 720,
         "height": 1280,
-        "duration": 12,
-        "audio": false
+        "onBlack": true
       }
     },
     "malik-tillman-cross-pendant": {
@@ -1428,6 +1479,13 @@
         "height": 1280,
         "duration": 9.41,
         "audio": false
+      },
+      "v02-13_5s": {
+        "type": "image",
+        "src": "/media/hd/malik-tillman-cross-pendant/v02-13_5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "michy-batshuayi-butterfly-chain": {
@@ -1612,12 +1670,19 @@
         "duration": 7.6,
         "audio": false
       },
-      "p76": {
+      "p77": {
         "type": "image",
-        "src": "/media/hd/michy-batshuayi-butterfly-chain/p76.webp",
-        "width": 1080,
-        "height": 1440,
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/p77.webp",
+        "width": 1006,
+        "height": 1341,
         "onBlack": false
+      },
+      "v01-4_8s": {
+        "type": "image",
+        "src": "/media/hd/michy-batshuayi-butterfly-chain/v01-4_8s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "tulips-on-tour-medallion": {
@@ -1783,15 +1848,6 @@
         "width": 1440,
         "height": 1920,
         "onBlack": true
-      },
-      "v13": {
-        "type": "video",
-        "src": "/media/hd/tulips-on-tour-medallion/v13.mp4",
-        "poster": "/media/hd/tulips-on-tour-medallion/v13-poster.webp",
-        "width": 1280,
-        "height": 720,
-        "duration": 7.28,
-        "audio": false
       }
     },
     "campione-d-italia-2023-2024": {
@@ -2125,6 +2181,27 @@
         "width": 1440,
         "height": 2160,
         "onBlack": false
+      },
+      "v02-14_6s": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/v02-14_6s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-27_4s": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/v02-27_4s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-34_4s": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/v02-34_4s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "marcus-thuram-ruby-t-necklace": {
@@ -2220,6 +2297,20 @@
         "height": 1280,
         "duration": 9.13,
         "audio": false
+      },
+      "v02-6_5s": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/v02-6_5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-24s": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-ruby-t-necklace/v02-24s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "marcus-thuram-t-serpent-pendant": {
@@ -2501,6 +2592,27 @@
         "width": 1440,
         "height": 810,
         "onBlack": false
+      },
+      "08-v05-6s": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/08-v05-6s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "08-v05-19s": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/08-v05-19s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "08-v05-4_6s": {
+        "type": "image",
+        "src": "/media/hd/vfb-stuttgart-dfb-pokal-2025/08-v05-4_6s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "noah-okafor-jersey-pendant": {
@@ -2638,6 +2750,20 @@
         "width": 1080,
         "height": 1440,
         "onBlack": false
+      },
+      "v02-21_2s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/v02-21_2s.webp",
+        "width": 1215,
+        "height": 2160,
+        "onBlack": true
+      },
+      "v02-12_2s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-jersey-pendant/v02-12_2s.webp",
+        "width": 1215,
+        "height": 2160,
+        "onBlack": true
       }
     },
     "noah-okafor-oka-pendant": {
@@ -2745,6 +2871,27 @@
         "width": 1440,
         "height": 2160,
         "onBlack": false
+      },
+      "v02-19_8s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/v02-19_8s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-31_9s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/v02-31_9s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-42_4s": {
+        "type": "image",
+        "src": "/media/hd/noah-okafor-oka-pendant/v02-42_4s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "rose-iced-cuban-chain": {
@@ -2803,6 +2950,27 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "f-2_6s": {
+        "type": "image",
+        "src": "/media/hd/rose-iced-cuban-chain/f-2_6s.webp",
+        "width": 720,
+        "height": 1280,
+        "onBlack": false
+      },
+      "f-14_3s": {
+        "type": "image",
+        "src": "/media/hd/rose-iced-cuban-chain/f-14_3s.webp",
+        "width": 720,
+        "height": 1280,
+        "onBlack": false
+      },
+      "f-24s": {
+        "type": "image",
+        "src": "/media/hd/rose-iced-cuban-chain/f-24s.webp",
+        "width": 720,
+        "height": 1280,
+        "onBlack": false
       }
     },
     "wide-rose-iced-cuban-chain": {
@@ -2958,6 +3126,13 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "v02-19s": {
+        "type": "image",
+        "src": "/media/hd/ampersand-initials-pendant/v02-19s.webp",
+        "width": 1215,
+        "height": 2160,
+        "onBlack": true
       }
     },
     "thorns-and-roses-crucifix": {
@@ -3009,6 +3184,27 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "v02-0_8s": {
+        "type": "image",
+        "src": "/media/hd/thorns-and-roses-crucifix/v02-0_8s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-20_5s": {
+        "type": "image",
+        "src": "/media/hd/thorns-and-roses-crucifix/v02-20_5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "v02-27_5s": {
+        "type": "image",
+        "src": "/media/hd/thorns-and-roses-crucifix/v02-27_5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "baguette-cross-pendant": {
@@ -3181,6 +3377,13 @@
         "width": 1440,
         "height": 1920,
         "onBlack": false
+      },
+      "v01-1_2s": {
+        "type": "image",
+        "src": "/media/hd/lois-openda-script-pendant/v01-1_2s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "cross-infinity-chain": {
@@ -3519,6 +3722,27 @@
         "height": 1280,
         "duration": 12,
         "audio": false
+      },
+      "v01-5s": {
+        "type": "image",
+        "src": "/media/hd/panther-champion-pendant/v01-5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v01-21s": {
+        "type": "image",
+        "src": "/media/hd/panther-champion-pendant/v01-21s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-1s": {
+        "type": "image",
+        "src": "/media/hd/panther-champion-pendant/v02-1s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "celestial-initial-medallion": {
@@ -3550,6 +3774,13 @@
         "src": "/media/hd/celestial-initial-medallion/p01.webp",
         "width": 1440,
         "height": 1919,
+        "onBlack": false
+      },
+      "p05": {
+        "type": "image",
+        "src": "/media/hd/celestial-initial-medallion/p05.webp",
+        "width": 1440,
+        "height": 2160,
         "onBlack": false
       },
       "p08": {
@@ -3593,6 +3824,34 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "p15": {
+        "type": "image",
+        "src": "/media/hd/celestial-initial-medallion/p15.webp",
+        "width": 1440,
+        "height": 2160,
+        "onBlack": true
+      },
+      "p17": {
+        "type": "image",
+        "src": "/media/hd/celestial-initial-medallion/p17.webp",
+        "width": 1440,
+        "height": 2160,
+        "onBlack": true
+      },
+      "p10": {
+        "type": "image",
+        "src": "/media/hd/celestial-initial-medallion/p10.webp",
+        "width": 1440,
+        "height": 2160,
+        "onBlack": false
+      },
+      "v03-44_8s": {
+        "type": "image",
+        "src": "/media/hd/celestial-initial-medallion/v03-44_8s.webp",
+        "width": 1215,
+        "height": 2160,
+        "onBlack": false
       }
     },
     "two-tone-iced-cuban-chain": {
@@ -3764,6 +4023,27 @@
         "width": 1440,
         "height": 2160,
         "onBlack": true
+      },
+      "v01-19s": {
+        "type": "image",
+        "src": "/media/hd/jesus-piece-red-flowers/v01-19s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "v01-30s": {
+        "type": "image",
+        "src": "/media/hd/jesus-piece-red-flowers/v01-30s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v01-40s": {
+        "type": "image",
+        "src": "/media/hd/jesus-piece-red-flowers/v01-40s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "brt-flower-chain": {
@@ -3853,14 +4133,19 @@
         "duration": 11.47,
         "audio": false
       },
-      "v05": {
-        "type": "video",
-        "src": "/media/hd/brt-flower-chain/v05.mp4",
-        "poster": "/media/hd/brt-flower-chain/v05-poster.webp",
-        "width": 720,
-        "height": 1280,
-        "duration": 11.88,
-        "audio": false
+      "v02-5s": {
+        "type": "image",
+        "src": "/media/hd/brt-flower-chain/v02-5s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v02-24_8s": {
+        "type": "image",
+        "src": "/media/hd/brt-flower-chain/v02-24_8s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
       }
     },
     "sirius": {
@@ -4068,15 +4353,6 @@
         "width": 1440,
         "height": 1920,
         "onBlack": false
-      },
-      "v05": {
-        "type": "video",
-        "src": "/media/hd/sirius/v05.mp4",
-        "poster": "/media/hd/sirius/v05-poster.webp",
-        "width": 848,
-        "height": 480,
-        "duration": 8.39,
-        "audio": false
       }
     },
     "deniz-undav-l-pendant": {
@@ -4158,6 +4434,43 @@
         "height": 1280,
         "duration": 9.64,
         "audio": false
+      },
+      "v01-2s": {
+        "type": "image",
+        "src": "/media/hd/deniz-undav-l-pendant/v01-2s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "v01-15_4s": {
+        "type": "image",
+        "src": "/media/hd/deniz-undav-l-pendant/v01-15_4s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      }
+    },
+    "samuel-ballet-jesus-piece": {
+      "v21-25_8s": {
+        "type": "image",
+        "src": "/media/hd/samuel-ballet-jesus-piece/v21-25_8s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
+      },
+      "v21-6_9s": {
+        "type": "image",
+        "src": "/media/hd/samuel-ballet-jesus-piece/v21-6_9s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": true
+      },
+      "v21-35_4s": {
+        "type": "image",
+        "src": "/media/hd/samuel-ballet-jesus-piece/v21-35_4s.webp",
+        "width": 1080,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "boxes/dragon-ball-trunk": {
@@ -5322,6 +5635,46 @@
         ],
         "poster": 4,
         "source": "30/v01 · HD 1080p",
+        "light": false
+      }
+    },
+    "celestial-initial-medallion": {
+      "making": {
+        "src": "/media/films/celestial-initial-medallion/making.mp4",
+        "mobile": "/media/films/celestial-initial-medallion/making.m.mp4",
+        "width": 1080,
+        "height": 1920,
+        "duration": 23.6,
+        "audio": true,
+        "posters": [
+          "/media/films/celestial-initial-medallion/making-1.webp",
+          "/media/films/celestial-initial-medallion/making-2.webp",
+          "/media/films/celestial-initial-medallion/making-3.webp",
+          "/media/films/celestial-initial-medallion/making-4.webp",
+          "/media/films/celestial-initial-medallion/making-5.webp",
+          "/media/films/celestial-initial-medallion/making-6.webp"
+        ],
+        "poster": 2,
+        "source": "22/v08 · HD 1080p",
+        "light": false
+      },
+      "reveal": {
+        "src": "/media/films/celestial-initial-medallion/reveal.mp4",
+        "mobile": "/media/films/celestial-initial-medallion/reveal.m.mp4",
+        "width": 1080,
+        "height": 1920,
+        "duration": 23.6,
+        "audio": true,
+        "posters": [
+          "/media/films/celestial-initial-medallion/reveal-1.webp",
+          "/media/films/celestial-initial-medallion/reveal-2.webp",
+          "/media/films/celestial-initial-medallion/reveal-3.webp",
+          "/media/films/celestial-initial-medallion/reveal-4.webp",
+          "/media/films/celestial-initial-medallion/reveal-5.webp",
+          "/media/films/celestial-initial-medallion/reveal-6.webp"
+        ],
+        "poster": 2,
+        "source": "22/v08 · HD 1080p",
         "light": false
       }
     }
@@ -6795,6 +7148,10 @@
         "view": "detail"
       },
       {
+        "file": "p05",
+        "view": "detail"
+      },
+      {
         "file": "p08",
         "view": "detail"
       },
@@ -6817,6 +7174,18 @@
       {
         "file": "p09",
         "view": "bail"
+      },
+      {
+        "file": "p15",
+        "view": "back"
+      },
+      {
+        "file": "p17",
+        "view": "back"
+      },
+      {
+        "file": "p10",
+        "view": "mark"
       }
     ],
     "two-tone-iced-cuban-chain": [

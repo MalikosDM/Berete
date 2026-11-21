@@ -91,7 +91,8 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
       ...p,
       title,
       line: p.line ? v.text(p.line, "text", ownOf(p.translations, "line", locale)) : p.line,
-      story: p.story ? v.text(p.story, "text", ownOf(p.translations, "story", locale)) : p.story,
+      // Its paragraphs one by one (a blank line between them), unless the admin gave its own translation of the whole.
+      story: p.story ? (ownOf(p.translations, "story", locale) ?? p.story.split("\n\n").map((par) => v.text(par, "text")).join("\n\n")) : p.story,
       client: p.client ? v.text(p.client, "name") : p.client,
       cover: shown(p.cover),
       gallery: p.gallery.map(shown),

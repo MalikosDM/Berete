@@ -141,7 +141,13 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   (anglais, par pièce puis par adresse de photo), traduits dans `src/i18n/content/angles/<langue>.json` ; l'admin les
   modifie (« Sous tous les angles », un titre et un texte par photo, et leurs traductions ; colonne `angles` de la base,
   une photo sans texte dans la base prend celui du catalogue). La photo d'ouverture y figure quand l'ouverture montre le
-  bijou détouré, ou quand la pièce n'a pas d'autre photo. La page Créations est une grille serrée (`PieceCard compact` :
+  bijou détouré, ou quand la pièce n'a pas d'autre photo. « The Making of a Masterpiece » ne montre que les vraies étapes de la pièce (`src/data/making.ts`, `making` de
+  `src/data/pieces.ts` : photos, images tirées des films `"v2@14.6"` dans `also` de `scripts/hd-media.mjs`, images des stories
+  dans `scripts/piece-media.mjs`), son making-of complet en premier ; sans étape réelle, pas de section. Les vidéos amateur
+  vont à la fin de « Every Angle » (`AMATEUR_FILMS`). Les thèmes (`THEMES` de `src/data/collections.ts`, Jesus Pieces)
+  regroupent des pièces de types différents à `/creations/<slug>`, dans le menu sous les collections. Un fond d'univers peut
+  être une séquence d'images en fondu (`sequence`, `SEQUENCES` de `scripts/universe-media.mjs` : la nuit de Lasana Keita).
+  La page Créations est une grille serrée (`PieceCard compact` :
   6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.

@@ -112,6 +112,7 @@ export const es: Messages = {
       rings: { name: "Anillos", intro: "Mucho más que un símbolo de victoria. Un legado inmortalizado en oro y diamantes." },
       bracelets: { name: "Pulseras", intro: "Pulseras a medida, eslabón a eslabón." },
       watches: { name: "Relojes", intro: "Relojes engastados con diamantes, de la caja al brazalete." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "El rostro de Cristo, coronado de espinas o de flores, y Cristo en la cruz: cada Jesus piece esculpida en volumen y engastada piedra a piedra." },
     },
     eyebrow: "El Portfolio",
     title: "Explorar las creaciones",
@@ -211,7 +212,7 @@ export const es: Messages = {
     makingEyebrow: "De la visión a la realidad",
     makingTitle: "El nacimiento de una obra maestra",
     thisPiece: "Esta pieza",
-    inAtelier: "En el taller",
+    makingFilm: "Toda la fabricación de esta pieza, filmada en el taller.",
     delivered: "Entregada",
     handedOverTo: (_client: string) => "La presentación oficial",
     handover: "La entrega",
@@ -470,6 +471,10 @@ export const es: Messages = {
     "/creations/watches": {
       title: "Relojes engastados con diamantes",
       description: "Relojes engastados con diamantes de la caja al brazalete, lucidos por futbolistas: los relojes de Berete Jewellers, Dubái.",
+    },
+    "/creations/jesus-pieces": {
+      title: "Jesus Pieces: colgantes de Cristo con diamantes a medida",
+      description: "Las Jesus pieces de Berete Jewellers: el rostro de Cristo coronado de espinas o de flores, y Cristo en la cruz, esculpidos y engastados con diamantes en Dubái.",
     },
     "/creations/bracelets": {
       title: "Pulseras",

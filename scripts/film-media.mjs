@@ -73,6 +73,7 @@ export const FILMS = [
   { slug: "deniz-undav-l-pendant", folder: "38", making: "38/v01" },
   // The baguette Cuban chain (folder 30): its studio film.
   { slug: "baguette-cuban-chain", folder: "30", reveal: "30/v01" },
-  // The celestial medallion (22) has no film first: its film shows the engraved back, first names of a family and a
-  // date (22/v08), kept out until Yoni says the family agrees.
+  // The celestial medallion (22): its professional edit (22/v08, the finished piece, its engraved back too: Yoni agrees,
+  // 21/11/2026) opens its page and plays in its atelier (the same film, played once there).
+  { slug: "celestial-initial-medallion", folder: "22", making: "22/v08", reveal: "22/v08" },
 ];

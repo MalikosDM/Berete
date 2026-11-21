@@ -35,8 +35,35 @@ export function angleOf(piece: Pick<Piece, "angles">, src: string): Angle | null
 export function anglePhotos(piece: Pick<Piece, "cover" | "gallery">, openingIsPhoto: boolean): MediaItem[] {
   const withCover = piece.cover.src && (!openingIsPhoto || piece.gallery.length === 0);
   const all = withCover ? [piece.cover, ...piece.gallery] : piece.gallery;
-  return all.filter((m, i) => m.src && all.findIndex((x) => x.src === m.src) === i);
+  const unique = all.filter((m, i) => m.src && all.findIndex((x) => x.src === m.src) === i);
+  // The photos and the professional films first, in their order; the amateur films at the end.
+  return [...unique.filter((m) => !AMATEUR_FILMS.has(m.src)), ...unique.filter((m) => AMATEUR_FILMS.has(m.src))];
 }
+
+/**
+ * The films of the galleries that are no professional edit (a phone video, the piece held in a hand, tried on, in its
+ * box), looked at frame by frame on 21/11/2026: at the end of "Every Angle" (feedback of Yoni), after the photos and the
+ * studio films. A film added in the admin keeps its place.
+ */
+export const AMATEUR_FILMS = new Set([
+  "/media/stories/kevin-schade/22.mp4",
+  "/media/stories/noah-okafor-ii/03.mp4",
+  "/media/stories/thuram-ss23/05.mp4",
+  "/media/hd/angelo-stiller-as-pendant/v02.mp4",
+  "/media/stories/samuel-ballet/05.mp4",
+  "/media/stories/samuel-ballet/03.mp4",
+  "/media/stories/nz/05.mp4",
+  "/media/stories/eljero-elia/02.mp4",
+  "/media/stories/collectors/54.mp4",
+  "/media/hd/michy-batshuayi-butterfly-chain/v15.mp4",
+  "/media/hd/michy-batshuayi-butterfly-chain/v09.mp4",
+  "/media/hd/michy-batshuayi-butterfly-chain/v03.mp4",
+  "/media/stories/thuram/13.mp4",
+  "/media/stories/kevin-schade/14.mp4",
+  "/media/hd/ampersand-initials-pendant/v02.mp4",
+  "/media/hd/panther-champion-pendant/08-v08.mp4",
+  "/media/hd/celestial-initial-medallion/v07.mp4",
+]);
 
 /** How many photos "Every Angle" shows before "See N more": all of them up to ANGLES_MANY, else the first ANGLES_FIRST. */
 export const ANGLES_FIRST = 6;

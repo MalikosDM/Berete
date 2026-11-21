@@ -207,6 +207,15 @@ function afterDetails({ cover, gallery }: { cover: Maybe; gallery: Maybe[] }, it
 
 /** Texts shared by the photos of many pieces. */
 const RAW = () => at("The piece in raw metal, before the setting", "This piece, before the setting");
+/* The steps of "The Making of a Masterpiece" taken from the films of each piece (21/11/2026: src/data/making.ts). */
+const SET = () => ({ ...at("The stones set by hand, under magnification", "In the setting"), onBlack: false });
+const POLISH = () => ({ ...at("The piece polished at the wheel", "At the polishing wheel"), onBlack: false });
+const MODEL = () => ({ ...at("The model of the piece, before casting", "The model"), onBlack: false });
+const CHECKED = () => ({ ...at("The finished piece checked in gloves", "Checked by hand"), onBlack: false });
+const IN_BOX = () => ({ ...at("The piece in its box", "In its box"), onBlack: false });
+const IN_TRUNK = () => ({ ...at("The piece in its trunk", "In its trunk"), onBlack: false });
+const HANDED = () => ({ ...at("The piece handed over", "Handed over"), onBlack: false });
+const raw = (dir: string, file: string) => yoni(dir, file, { ...RAW(), onBlack: false });
 const SETTING_FILM = () => at("Film: the stones set by hand", "In the setting");
 const BACK = () => at("The back of the pendant with the BRT mark", "The back");
 const BAIL = () => at("The bail set with diamonds", "The bail");
@@ -245,7 +254,7 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "Rose and white gold tones · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
     featured: true,
-    making: { delivery: vfb.presentation },
+    making: { raw: raw(VFB, "08-v05-6s"), setting: yoni(VFB, "08-v05-19s", SET()), polishing: yoni(VFB, "08-v05-4_6s", POLISH()), delivery: vfb.presentation },
   }),
   piece({
     slug: INTER,
@@ -286,7 +295,7 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "White gold tone, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
     boxSlug: "campione-d-italia-case",
-    making: { delivery: inter.case },
+    making: { raw: raw(INTER, "v02-14_6s"), setting: yoni(INTER, "v02-27_4s", SET()), polishing: yoni(INTER, "v02-34_4s", POLISH()), delivery: inter.case },
   }),
   piece({
     slug: "tanguy-nianzou-nz-ring",
@@ -350,7 +359,8 @@ const SITE_PIECES: Piece[] = [
     making: {
       sketch: st("kevin-schade", 8, at("The first hand drawing of the Dragon Ball pendant", "The Original Vision")),
       raw: yoni("kevin-schade-dragon-ball-pendant", "p21", { ...RAW(), onBlack: false }),
-      setting: st("kevin-schade", 20, at("From the 3D model to the stones set by hand", "From the 3D model to the setting")),
+      setting: yoni("kevin-schade-dragon-ball-pendant", "v01-17_5s", SET()),
+      polishing: yoni("kevin-schade-dragon-ball-pendant", "v01-10s", POLISH()),
       delivery: yoni("boxes/dragon-ball-trunk", "p01", at("The orange trunk open on the Dragon Ball pendant")),
     },
   }),
@@ -398,14 +408,14 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-jersey-pendant", "p06", at("The back of the jersey pendant")),
       yoni("noah-okafor-jersey-pendant", "p16", at("The pendant, arms crossed, from another angle")),
       yoni("noah-okafor-jersey-pendant", "p01", { ...at("Noah Okafor wearing the pendant", "Worn by Noah Okafor"), onBlack: false }),
-      st("noah-okafor", 11, at("Film: from the player to the jersey in diamonds")),
+      // Not the story 11 (the same edit as its film v01, a duplicate).
     ]),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A jersey, arms crossed, with the Swiss cross"],
     ],
     seen: "White and rose gold tones · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
-    making: { raw: yoni("noah-okafor-jersey-pendant", "p21", { ...RAW(), onBlack: false }) },
+    making: { raw: raw("noah-okafor-jersey-pendant", "p21"), setting: yoni("noah-okafor-jersey-pendant", "v02-21_2s", SET()), delivery: yoni("noah-okafor-jersey-pendant", "v02-12_2s", IN_TRUNK()) },
   }),
   piece({
     slug: "noah-okafor-oka-pendant",
@@ -433,6 +443,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "The letters OKA and a football"],
     ],
     seen: "White and rose gold tones · round diamonds, baguettes",
+    making: { raw: raw("noah-okafor-oka-pendant", "v02-19_8s"), setting: yoni("noah-okafor-oka-pendant", "v02-31_9s", SET()), polishing: yoni("noah-okafor-oka-pendant", "v02-42_4s", POLISH()), delivery: yoni("noah-okafor-oka-pendant", "p18", IN_BOX()) },
   }),
   piece({
     slug: "noah-okafor-octagon-pendant",
@@ -461,8 +472,9 @@ const SITE_PIECES: Piece[] = [
     seen: "White and rose gold tones · baguette diamonds in a herringbone, round and pear-shaped diamonds",
     boxSlug: "okafor-trunk",
     making: {
+      raw: raw("noah-okafor-octagon-pendant", "v02-13s"),
       setting: yoni("noah-okafor-octagon-pendant", "p11", { ...at("The pendant on the setting wax, its stones being set", "In the setting"), onBlack: false }),
-      delivery: still("boxes/okafor-trunk/01", at("The trunk with a photograph in its lid")),
+      polishing: yoni("noah-okafor-octagon-pendant", "v02-9s", POLISH()),
     },
   }),
   piece({
@@ -595,8 +607,8 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "White gold tone · baguette diamonds in a herringbone, round diamonds",
     making: {
-      raw: yoni("angelo-stiller-as-pendant", "p12", { ...RAW(), onBlack: false }),
-      setting: yoni("angelo-stiller-as-pendant", "v04", { ...SETTING_FILM(), onBlack: false }),
+      raw: raw("angelo-stiller-as-pendant", "p12"),
+      delivery: yoni("angelo-stiller-as-pendant", "v03-3s", CHECKED()),
     },
   }),
   piece({
@@ -634,7 +646,11 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone, rose gold cherub · round diamonds in pavé",
-    making: { polishing: yoni("deniz-undav-l-pendant", "v02", { ...at("Film: the pendant polished at the bench", "At the bench"), onBlack: false }) },
+    making: {
+      raw: raw("deniz-undav-l-pendant", "v01-2s"),
+      setting: yoni("deniz-undav-l-pendant", "v01-15_4s", SET()),
+      polishing: yoni("deniz-undav-l-pendant", "v02", { ...at("Film: the pendant polished at the bench", "At the bench"), onBlack: false }),
+    },
   }),
   piece({
     slug: "samuel-ballet-jesus-piece",
@@ -658,6 +674,12 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "Rose gold tone, white gold crown · round diamonds in pavé, pear-shaped diamonds in the crown",
+    making: {
+      raw: raw("samuel-ballet-jesus-piece", "v21-25_8s"),
+      setting: yoni("samuel-ballet-jesus-piece", "v21-6_9s", SET()),
+      polishing: yoni("samuel-ballet-jesus-piece", "v21-35_4s", POLISH()),
+      delivery: still("pieces/samuel-ballet-jesus-piece/delivery", CHECKED()),
+    },
   }),
   piece({
     slug: "malik-tillman-cross-pendant",
@@ -686,6 +708,7 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "White gold tone · round diamonds in halo and bezel settings, a frame of baguettes",
     making: {
+      raw: raw("malik-tillman-cross-pendant", "v02-13_5s"),
       setting: yoni("malik-tillman-cross-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
       delivery: st("malik-tillman", 1, at("Malik Tillman discovering his cross at the house", "Handed over at the house")),
     },
@@ -730,7 +753,6 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds in the flowers",
     boxSlug: "nz-travel-case",
-    making: { delivery: still("boxes/nz-travel-case/01", at("The NZ travel case")) },
   }),
   piece({
     slug: "tanguy-nianzou-nz-pendant",
@@ -836,7 +858,7 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "Rose gold tone · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
-    making: { raw: yoni("lois-openda-script-pendant", "p22", { ...RAW(), onBlack: false }) },
+    making: { raw: raw("lois-openda-script-pendant", "p22"), delivery: yoni("lois-openda-script-pendant", "v01-1_2s", IN_TRUNK()) },
   }),
   piece({
     slug: "the-hand",
@@ -861,6 +883,7 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark engraved"],
     ],
     seen: "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone",
+    making: { delivery: yoni("the-hand", "v01-13_6s", IN_BOX()) },
   }),
   piece({
     slug: "flaneur-medallion",
@@ -914,9 +937,8 @@ const SITE_PIECES: Piece[] = [
     ],
     boxSlug: "tulips-on-tour",
     making: {
-      raw: yoni("tulips-on-tour-medallion", "p25", { ...RAW(), onBlack: false }),
-      setting: yoni("tulips-on-tour-medallion", "v13", { ...at("Film: the medallion assembled at the bench", "At the bench"), onBlack: false }),
-      delivery: yoni("boxes/tulips-on-tour", "p03", at("The medallion in its Tulips on Tour case")),
+      setting: yoni("tulips-on-tour-medallion", "p25", { ...at("The scene set with its stones, before it goes into its frame", "In the setting"), onBlack: false }),
+      delivery: yoni("boxes/tulips-on-tour", "p04", IN_BOX()),
     },
   }),
 
@@ -940,7 +962,6 @@ const SITE_PIECES: Piece[] = [
       yoni("michy-batshuayi-butterfly-chain", "p69", BACK()),
       yoni("michy-batshuayi-butterfly-chain", "p66", at("The links of the Butterfly chain", "The links")),
       yoni("michy-batshuayi-butterfly-chain", "p60", at("The Butterfly chain and its pendant on a black bust")),
-      st("michy-batshuayi", 10, at("Film: the piece in the making, its back and the finished chain", "In the making")),
     ]),
     handover: [yoni("michy-batshuayi-butterfly-chain", "p17", { ...at("Michy Batshuayi wearing his chain"), onBlack: false })],
     specs: [
@@ -951,8 +972,9 @@ const SITE_PIECES: Piece[] = [
     seen: "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones",
     boxSlug: "butterfly-trunk",
     making: {
-      raw: yoni("michy-batshuayi-butterfly-chain", "p76", { ...RAW(), onBlack: false }),
-      delivery: st("michy-batshuayi", 1, at("Michy Batshuayi opening the trunk of his chain", "Opening the trunk")),
+      raw: raw("michy-batshuayi-butterfly-chain", "p77"),
+      setting: still("pieces/michy-batshuayi-butterfly-chain/setting", SET()),
+      delivery: yoni("michy-batshuayi-butterfly-chain", "v01-4_8s", IN_TRUNK()),
     },
   }),
   piece({
@@ -981,7 +1003,11 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark on the clasp"],
     ],
     seen: "White gold tone, rose gold details · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds, a large red pear-shaped stone",
-    making: { setting: yoni("marcus-thuram-ruby-t-necklace", "v03", { ...SETTING_FILM(), onBlack: false }) },
+    making: {
+      raw: raw("marcus-thuram-ruby-t-necklace", "v02-6_5s"),
+      setting: yoni("marcus-thuram-ruby-t-necklace", "v03", { ...SETTING_FILM(), onBlack: false }),
+      polishing: yoni("marcus-thuram-ruby-t-necklace", "v02-24s", POLISH()),
+    },
   }),
   piece({
     slug: "marcus-thuram-infinity-chain",
@@ -1062,7 +1088,7 @@ const SITE_PIECES: Piece[] = [
     boxSlug: "sirius",
     making: {
       raw: yoni("sirius", "p30", { ...at("The parts of the nameplate laid out before they are put together", "Before the assembly"), onBlack: false }),
-      setting: yoni("sirius", "v05", { ...SETTING_FILM(), onBlack: false }),
+      delivery: yoni("sirius", "p04", IN_TRUNK()),
     },
   }),
 
@@ -1099,6 +1125,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Watch"],
     ],
     seen: "White gold tone · round diamonds in pavé on the case, the dial and the bracelet",
+    making: { delivery: still("pieces/tajon-buchanan-iced-watch/delivery", HANDED()) },
   }),
   piece({
     slug: "radja-nainggolan-iced-watch",
@@ -1150,6 +1177,10 @@ export const NEW_PIECES = [
   "oval-eternity-band",
 ];
 
+/** The night of the celebration of Lasana Keita, as the press told it (5 September 2026, Paris). */
+const KEITA_NIGHT =
+  "Paris, 5 September 2026: a knockout in the first round. Then the fighter known as the “Black Panther” walked out of the cage, sat down in the front row and applauded himself, a celebration that went viral. Behind his pendant, this page tells that night: the knockout, the open cage, the celebration.";
+
 const COLLECTED: Piece[] = [
   /* Pendants */
   collected({
@@ -1165,6 +1196,7 @@ const COLLECTED: Piece[] = [
       ["Motif", "Two initials and an ampersand"],
     ],
     seen: "White gold tone · round diamonds in pavé, baguettes",
+    making: { delivery: yoni("ampersand-initials-pendant", "v02-19s", IN_BOX()) },
   }),
   collected({
     slug: "thorns-and-roses-crucifix",
@@ -1180,6 +1212,7 @@ const COLLECTED: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone cross, rose gold Christ and roses · baguettes",
+    making: { raw: yoni("thorns-and-roses-crucifix", "v02-0_8s", MODEL()), setting: yoni("thorns-and-roses-crucifix", "v02-20_5s", SET()), polishing: yoni("thorns-and-roses-crucifix", "v02-27_5s", POLISH()) },
   }),
   collected({
     slug: "baguette-cross-pendant",
@@ -1217,16 +1250,23 @@ const COLLECTED: Piece[] = [
     type: "pendant",
     client: "Lasana Keita",
     line: "A panther holding a champion's belt.",
+    // Its second paragraph: the celebration that the universe of its page tells (feedback of Yoni, 21/11/2026, from the
+    // press: nothing beyond what it said).
     story:
-      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones. The back is carved with a star pattern and the BRT mark.",
-    theme: { preset: "arene" },
+      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones. The back is carved with a star pattern and the BRT mark.\n\n" + KEITA_NIGHT,
+    theme: { preset: "keita" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A panther and a champion's belt"],
       ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone panther, yellow gold tone belt · round diamonds in pavé",
-    making: { setting: yoni("panther-champion-pendant", "v08", { ...SETTING_FILM(), onBlack: false }) },
+    making: {
+      raw: raw("panther-champion-pendant", "v01-5s"),
+      setting: yoni("panther-champion-pendant", "v08", { ...SETTING_FILM(), onBlack: false }),
+      polishing: yoni("panther-champion-pendant", "v01-21s", POLISH()),
+      delivery: yoni("panther-champion-pendant", "v02-1s", IN_TRUNK()),
+    },
   }),
   collected({
     slug: "celestial-initial-medallion",
@@ -1241,6 +1281,7 @@ const COLLECTED: Piece[] = [
       ["Motif", "An initial, a number and a web of stars"],
     ],
     seen: "Rose gold tone · baguettes, round diamonds, marquise-cut diamonds",
+    making: { delivery: yoni("celestial-initial-medallion", "v03-44_8s", CHECKED()) },
   }),
 
   collected({
@@ -1257,6 +1298,13 @@ const COLLECTED: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone, rose gold crown · round diamonds in pavé, baguettes, red pear-shaped stones",
+    making: {
+      // Its first sketch: the one drawn for it when it was shown as Marcus Thuram's (the same piece).
+      sketch: sketch("marcus-thuram-jesus-piece", at(sketchAlt("Jesus Piece — Red Flowers"), "The first sketch")) ?? undefined,
+      raw: raw("jesus-piece-red-flowers", "v01-19s"),
+      setting: yoni("jesus-piece-red-flowers", "v01-30s", SET()),
+      polishing: yoni("jesus-piece-red-flowers", "v01-40s", POLISH()),
+    },
   }),
 
   /* Chains */
@@ -1288,8 +1336,9 @@ const COLLECTED: Piece[] = [
     ],
     seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
     making: {
+      raw: raw("brt-flower-chain", "v02-5s"),
       setting: yoni("brt-flower-chain", "v04", { ...SETTING_FILM(), onBlack: false }),
-      polishing: yoni("brt-flower-chain", "v05", { ...at("Film: the clasp finished at the bench", "At the bench"), onBlack: false }),
+      polishing: yoni("brt-flower-chain", "v02-24_8s", POLISH()),
     },
   }),
   collected({
@@ -1318,6 +1367,7 @@ const COLLECTED: Piece[] = [
       ["Signature", "BRT mark on the clasp"],
     ],
     seen: "Rose gold tone · round diamonds in pavé",
+    making: { raw: raw("rose-iced-cuban-chain", "f-2_6s"), setting: yoni("rose-iced-cuban-chain", "f-14_3s", SET()), polishing: yoni("rose-iced-cuban-chain", "f-24s", POLISH()) },
   }),
   collected({
     slug: "wide-rose-iced-cuban-chain",

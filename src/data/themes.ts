@@ -133,6 +133,9 @@ export type Backdrop = {
   spots?: BackdropSpot[];
   /** Where some effects of the canvas happen: [left, top, right, bottom], shares of the image. */
   regions?: Record<string, { d?: [number, number, number, number]; m?: [number, number, number, number] }>;
+  /** A sequence: its images (backdrops of their own, with their lights), one after the other in a slow fade, `hold` seconds each. */
+  sequence?: string[];
+  hold?: number;
 };
 
 /** One light of an AI background (scripts/universe-media.mjs; the meaning of its numbers by kind: src/components/Universe.tsx). */
@@ -261,6 +264,13 @@ export const THEME_PRESETS: Record<string, Preset> = {
 THEME_PRESETS.arene = {
   name: "Arène de combat, projecteur doré (Lasana Keita)",
   theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "arene", entrance: "spotlight", effects: ["embers", "smoke", "scene", "jewel-sheen"], mark: "" },
+};
+// The night of his celebration (feedback of Yoni, 21/11/2026): the knockout, the open cage, the celebration, one after the
+// other (backdrop "keita", a sequence), with the embers, the golden confetti, the smoke and the spotlight of the arena,
+// and the camera flashes of the crowd on the image of the celebration.
+THEME_PRESETS.keita = {
+  name: "La nuit de la célébration : KO, cage ouverte, célébration (Lasana Keita)",
+  theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "keita", entrance: "spotlight", effects: ["embers", "gold-confetti", "smoke", "scene", "flashes", "jewel-sheen"], mark: "" },
 };
 THEME_PRESETS.sirius = {
   name: "Ciel étoilé, l'étoile Sirius (Sirius)",

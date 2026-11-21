@@ -1,4 +1,4 @@
-/* The collections: one per type of jewel, at /creations/<slug>. */
+/* The collections: one per type of jewel, at /creations/<slug>; and the themes that gather pieces of several types (Jesus Pieces). */
 import type { Catalogue, Piece, PieceType } from "./types.js";
 
 export type Collection = {
@@ -49,11 +49,42 @@ export const COLLECTIONS: Collection[] = [
   },
 ];
 
+/**
+ * A theme: pieces gathered by what they show, whatever their type, at /creations/<slug>, under the collections in the menu.
+ * Jesus Pieces (asked by Yoni, 21/11/2026): every Jesus piece of the house, the face of Christ or Christ on the cross. He
+ * says there are five; four are on the site (the fifth is to be found in his photos: CLAUDE.md).
+ */
+export type Theme = Omit<Collection, "type"> & { pieces: string[] };
+
+export const THEMES: Theme[] = [
+  {
+    slug: "jesus-pieces",
+    name: "Jesus Pieces",
+    intro: "The face of Christ, crowned with thorns or flowers, and Christ on the cross: each Jesus piece sculpted in volume and set stone by stone.",
+    hero: "crown-of-thorns-jesus-piece",
+    pieces: ["crown-of-thorns-jesus-piece", "samuel-ballet-jesus-piece", "jesus-piece-red-flowers", "thorns-and-roses-crucifix"],
+  },
+];
+
+export type AnyCollection = Collection | Theme;
+export const isTheme = (c: AnyCollection): c is Theme => "pieces" in c;
+
+/** The published pieces of a collection or a theme, in their order. */
+export function piecesOfCollection(cat: Catalogue, c: AnyCollection): Piece[] {
+  if (!isTheme(c)) return piecesOfType(cat, c.type);
+  return c.pieces.map((slug) => cat.pieces.find((p) => p.slug === slug)).filter((p): p is Piece => p !== undefined);
+}
+
+/** The themes that have pieces on the site. */
+export function visibleThemes(cat: Catalogue): Theme[] {
+  return THEMES.filter((t) => piecesOfCollection(cat, t).length > 0);
+}
+
 /** A collection is shown on the home page from this number of pieces. */
 export const MIN_PIECES = 2;
 
-export function collectionBySlug(slug: string): Collection | undefined {
-  return COLLECTIONS.find((c) => c.slug === slug);
+export function collectionBySlug(slug: string): AnyCollection | undefined {
+  return COLLECTIONS.find((c) => c.slug === slug) ?? THEMES.find((t) => t.slug === slug);
 }
 
 export function collectionOf(type: PieceType): Collection {
