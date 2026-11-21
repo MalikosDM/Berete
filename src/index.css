@@ -1095,6 +1095,54 @@ html.lenis body {
     transform: translate(-50%, -50%) scale(1.04);
   }
 }
+/* The endless space of The Hand ("void"): the light of the sphere breathes slowly, rings of light ripple out of it. */
+.u-genki[data-spot="void"] .u-genki-glow {
+  width: calc(var(--gr) * 340%);
+  background: radial-gradient(circle, rgb(226 238 255 / 0.4) 0%, rgb(150 186 255 / 0.2) 32%, rgb(118 120 255 / 0.08) 52%, transparent 70%);
+  animation: u-void-breathe 7s ease-in-out infinite;
+}
+@keyframes u-void-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+}
+.u-void-ring {
+  position: absolute;
+  left: calc(var(--gx) * 100%);
+  top: calc(var(--gy) * 100%);
+  width: calc(var(--gr) * 210%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px solid rgb(190 214 255 / 0.55);
+  box-shadow: 0 0 18px rgb(140 180 255 / 0.35), inset 0 0 18px rgb(140 180 255 / 0.22);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1);
+  animation: u-void-ring 9s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
+  animation-delay: calc(var(--i, 0) * -3s);
+}
+@keyframes u-void-ring {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  12% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(3.4);
+  }
+}
+.universe[data-deep] .u-void-ring {
+  animation-play-state: paused;
+}
 /* Behind a story: the world on the whole screen, a quiet veil (the story is in the middle). */
 .universe[data-fixed] {
   position: absolute;
@@ -1740,6 +1788,40 @@ html.lenis body {
 .u-jewel[data-jewel="jewel-sparkle"] > i::after {
   rotate: 90deg;
 }
+/* The endless space of The Hand: cold glints on its diamonds (white and blue-white), the halo behind it (below). */
+.u-jewel[data-jewel="jewel-void"] {
+  mix-blend-mode: screen;
+}
+.u-jewel[data-jewel="jewel-void"] > i {
+  position: absolute;
+  width: 9%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(circle, #fff 0 6%, rgb(190 214 255) 13%, transparent 42%);
+  scale: 0;
+  animation: u-jewel-twinkle 4.2s ease-in-out infinite;
+}
+.u-jewel[data-jewel="jewel-void"] > i::before,
+.u-jewel[data-jewel="jewel-void"] > i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 3%;
+  translate: -50% -50%;
+  background: linear-gradient(90deg, transparent, rgb(225 236 255), transparent);
+}
+.u-jewel[data-jewel="jewel-void"] > i::after {
+  rotate: 90deg;
+}
+.u-jewel-halo[data-jewel-halo="jewel-void"] {
+  filter: blur(22px);
+  animation-duration: 6s;
+}
+.u-jewel-halo[data-jewel-halo="jewel-void"]::before {
+  background: rgb(176 204 255);
+}
 @keyframes u-jewel-twinkle {
   0%,
   40%,
@@ -2120,6 +2202,56 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
   45%,
   100% {
+    opacity: 0;
+  }
+}
+
+/* The space unfolds (The Hand): the screen black, then the world opens from the piece in a circle of light. */
+[data-entering] .universe[data-entrance="unfold"] .universe-stage {
+  animation: u-unfold 1.9s cubic-bezier(0.65, 0, 0.25, 1) both;
+}
+@keyframes u-unfold {
+  0%,
+  22% {
+    clip-path: circle(0% at var(--u-at-x) var(--u-at-y));
+  }
+  100% {
+    clip-path: circle(150% at var(--u-at-x) var(--u-at-y));
+  }
+}
+[data-entering] [data-entrance="unfold"] .u-shock {
+  display: block;
+  border: 2px solid rgb(222 236 255 / 0.9);
+  box-shadow: 0 0 40px 8px rgb(150 190 255 / 0.55), inset 0 0 30px rgb(150 190 255 / 0.4);
+  animation: u-unfold-ring 1.9s cubic-bezier(0.65, 0, 0.25, 1) both;
+}
+@keyframes u-unfold-ring {
+  0%,
+  20% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  27% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(9);
+  }
+}
+[data-entering][data-entrance="unfold"] [data-piece-cover] > :is(img, video) {
+  animation-duration: 1.3s;
+  animation-delay: 0.8s;
+}
+[data-entering][data-entrance="unfold"] .sv-float > img {
+  animation-delay: calc(0.8s + var(--i, 0) * 0.2s);
+}
+/* Its halo and its glints come with the piece, never in the black before. */
+[data-entering][data-entrance="unfold"] :is(.sv-float, [data-piece-cover]) :is(.u-jewel-halo, .u-jewel) {
+  animation: u-unfold-fx 1.3s ease-out 0.9s both;
+}
+@keyframes u-unfold-fx {
+  from {
     opacity: 0;
   }
 }

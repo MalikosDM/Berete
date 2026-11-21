@@ -25,7 +25,8 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   { backdrop: "sirius", preset: "sirius", pieces: ["sirius"] },
   { backdrop: "tulipes", preset: "tulipes", pieces: ["tulips-on-tour-medallion"] },
   { backdrop: "trefle", preset: "emeraude", pieces: ["eljero-elia-clover-medallion"] },
-  { backdrop: "the-hand", preset: "rideau", pieces: ["the-hand"] },
+  // The Hand: since 21/11/2026 the endless space (tests/infini.spec.ts).
+  { backdrop: "infini", preset: "infini", pieces: ["the-hand"] },
   { backdrop: "forge", preset: "forge", pieces: ["kevin-schade-twisted-chain"] },
   {
     backdrop: "sacre",

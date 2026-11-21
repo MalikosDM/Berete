@@ -20,7 +20,7 @@ export const THEME_TEXTURES = ["none", "grain", "silk", "rays", "stripes", "scal
 export const THEME_LIGHTS = ["halo", "spotlight", "beam", "aura", "ember"] as const;
 /** The former slow motion of the backdrop: kept for the universes written before the effects (it maps to an effect). */
 export const THEME_MOTIONS = ["none", "drift", "pulse", "sparkle", "flutter", "rise", "rotate"] as const;
-export const THEME_ENTRANCES = ["ignite", "flash", "smoke", "stars", "flutter", "tunnel", "spotlight", "glint", "bloom", "rain", "tick"] as const;
+export const THEME_ENTRANCES = ["ignite", "flash", "smoke", "stars", "flutter", "tunnel", "spotlight", "glint", "bloom", "rain", "tick", "unfold"] as const;
 export const THEME_EFFECTS = [
   "dust",
   "embers",
@@ -51,6 +51,8 @@ export const THEME_EFFECTS = [
   "dew",
   "beam-dust",
   "drops",
+  // The endless space of The Hand: lines of light rushing to the sphere, rings rippling from it, its light breathing.
+  "void",
   // An effect on the piece itself, that ties it to its world (src/components/universe/JewelFx.tsx).
   "jewel-sheen",
   "jewel-sparkle",
@@ -58,10 +60,11 @@ export const THEME_EFFECTS = [
   "jewel-warm",
   "jewel-beam",
   "jewel-prism",
+  "jewel-void",
 ] as const;
 
 /** The effects drawn on the piece itself: a piece takes the first one of its universe. */
-export const JEWEL_EFFECTS = ["jewel-sheen", "jewel-sparkle", "jewel-halo", "jewel-warm", "jewel-beam", "jewel-prism"] as const;
+export const JEWEL_EFFECTS = ["jewel-sheen", "jewel-sparkle", "jewel-halo", "jewel-warm", "jewel-beam", "jewel-prism", "jewel-void"] as const;
 export type JewelEffect = (typeof JEWEL_EFFECTS)[number];
 export const jewelOf = (effects: readonly string[]): JewelEffect | null => (JEWEL_EFFECTS.find((e) => effects.includes(e)) ?? null);
 
@@ -280,6 +283,12 @@ THEME_PRESETS.flaneur = {
   name: "Rue de Paris la nuit sous la pluie (Flâneur)",
   theme: { base: "#070605", tint: "#2a1c10", glow: "#ffd59a", texture: "grain", light: "halo", font: "deco", backdrop: "flaneur", entrance: "rain", effects: ["rain", "drops", "scene", "jewel-sparkle"], mark: "" },
 };
+// The Hand, since 21/11/2026: the endless space (backdrop "infini"), the screen goes black and the space unfolds from the
+// centre, lines of light rush to the sphere, rings ripple from it, fine stars; on the piece a blue-white halo and cold glints.
+THEME_PRESETS.infini = {
+  name: "Espace infini, sphère de lumière (The Hand)",
+  theme: { base: "#02030a", tint: "#0b1640", glow: "#cfe0ff", texture: "grain", light: "halo", font: "etoile", backdrop: "infini", entrance: "unfold", effects: ["void", "stars", "jewel-void"], mark: "" },
+};
 THEME_PRESETS.rideau = {
   name: "Rideau de velours rouge, faisceau de lumière (The Hand)",
   theme: { base: "#0a0505", tint: "#3a0d10", glow: "#ffd7a8", texture: "grain", light: "beam", font: "bodoni", backdrop: "the-hand", entrance: "spotlight", effects: ["beam-dust", "scene", "jewel-beam"], mark: "" },
@@ -325,6 +334,7 @@ export const ENTRANCE_NAMES: Record<ThemeEntrance, string> = {
   bloom: "Les pétales s'ouvrent",
   rain: "La pluie commence",
   tick: "Les rouages se mettent en marche",
+  unfold: "Le noir, puis l'espace se déploie depuis le centre (cercle de lumière)",
 };
 export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   dust: "Poussière de lumière",
@@ -355,9 +365,11 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   dew: "Rosée qui scintille",
   "beam-dust": "Poussière dorée dans le faisceau",
   drops: "Gouttes qui brillent sous le réverbère",
+  void: "Espace infini : traits de lumière vers la sphère, anneaux, respiration de la sphère",
   "jewel-sheen": "Sur la pièce : un reflet passe (couleur de la lumière)",
   "jewel-sparkle": "Sur la pièce : des éclats scintillent",
   "jewel-halo": "Sur la pièce : un halo pulse autour",
+  "jewel-void": "Sur la pièce : un halo bleu-blanc derrière elle et des reflets froids",
   "jewel-warm": "Sur la pièce : une lumière chaude",
   "jewel-beam": "Sur la pièce : un rayon de lumière la touche",
   "jewel-prism": "Sur la pièce : reflets blancs et arcs-en-ciel",

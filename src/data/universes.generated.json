@@ -1334,6 +1334,32 @@
     }
    }
   },
+  "infini": {
+   "name": "Espace infini bleu, sphère de lumière et anneaux (The Hand)",
+   "ratio": 1.792,
+   "focusX": 0.711,
+   "focusY": 0.39,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "core": [
+    0.711,
+    0.388,
+    0.078
+   ],
+   "mobileCore": [
+    0.5,
+    0.383,
+    0.233
+   ]
+  },
   "keita": {
    "name": "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)",
    "ratio": 1.792,

@@ -866,7 +866,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "A rose gold hand, paved with diamonds and lit with rubies.",
     story: "A hand sculpted in volume, then set stone by stone. Rubies catch the light at every movement, and the BRT mark is engraved on the piece.",
-    theme: { preset: "rideau" },
+    theme: { preset: "infini" },
     ...sorted("the-hand", [
       yoni("the-hand", "p07", at("The Hand pendant, a diamond-paved rose gold hand holding a ruby")),
       yoni("the-hand", "p04", at("The Hand held by its bail, the red stone hanging below")),

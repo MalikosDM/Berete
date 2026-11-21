@@ -162,6 +162,20 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « The Hand : l'espace infini » — état au 21/11/2026
+- [x] **Nouvel univers de The Hand** (remplace le rideau de velours) : fond `infini` (images de Yoni `vide-infini-desktop/
+      -mobile.jpg` de `Univers IA (propositions)`, `npm run universes -- --only=infini` ; version téléphone sur téléphone,
+      19 à 130 Ko), preset `infini` (`src/data/themes.ts`). Entrée `unfold` : l'écran noir, puis l'espace se déploie depuis la
+      pièce dans un cercle de lumière (1,9 s ; `src/index.css`, la pièce et son halo arrivent avec lui). Effets `void` :
+      traits de lumière blancs et violets qui filent vers la sphère (`src/components/universe/fx.ts`), trois anneaux qui
+      ondulent depuis elle et la respiration lente de sa lumière (`.u-void-ring`, `.u-genki[data-spot="void"]`, position de
+      la sphère `core` / `mobileCore`), fines étoiles (`stars`). Sur la pièce : halo bleu-blanc derrière elle et reflets
+      froids (`jewel-void`, `JewelFx.tsx`). Pause en bas de page, immobile avec « réduire les animations ».
+- [x] Rien de l'animé : ni personnage, ni logo, ni police, ni nom de l'œuvre dans le site (noms neutres « infini »,
+      « unfold », « void » ; test). Titre et menu lisibles (contraste AA).
+- [ ] **Sa story** : aucune story ne montre The Hand ; le fond est fait pour un écran entier (`portrait`), il entourera sa
+      story dès qu'elle existera (comme Dragon Ball). `tests/infini.spec.ts`, captures dans `verification/infini/`.
+
 ## Passe « écrins qui s'ouvrent » (Signature Trunks) — état au 21/11/2026
 - [x] **Page des écrins** (`/boxes`, `src/pages/Atelier.tsx` « Boxes ») : une grille de carrés de même taille (3 colonnes sur
       ordinateur, 2 sur tablette, 1 sur téléphone), l'écrin Signature en premier, chacun **fermé** avec son nom ; dessous,
@@ -254,7 +268,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       `npm run universes` (AVIF + WebP, 3 tailles ordinateur, 2 mobile ; 8,7 Mo en tout, 235 Ko au plus ; originaux hors Git).
       Version mobile sur téléphone, ordinateur sinon. Chaque fond entoure aussi la story de sa pièce (`portrait`).
 - [x] **Univers propres** : arène → Lasana Keita (`arene`) ; bianconero → Kenan Yildiz ; serpent → T-Serpent ; Sirius
-      (`sirius`) ; tulipes → Tulips on Tour ; Flâneur (`flaneur`, pièce retirée le 21/11) ; trèfle → Eljero Elia (`emeraude`) ; The Hand (`rideau`) ;
+      (`sirius`) ; tulipes → Tulips on Tour ; Flâneur (`flaneur`, pièce retirée le 21/11) ; trèfle → Eljero Elia (`emeraude`) ; The Hand (`rideau`, remplacé le 21/11
+      par l'espace infini `infini`) ;
       forge → chaîne torsadée de Kevin Schade (`forge`) ; N14 (`n14`). **Partagés** (même nom de preset) : `sacre` (Deniz
       Undav L, Samuel Ballet, croix Tillman, Loïs Openda, Baguette Cross, Jesus Piece Red Crown, Cross Infinity), `roses`
       (Thorned T, FAM, Safi Link, Jesus Cross, BRT Flower), `velours` (collier T au rubis, Jesus Piece Red Flowers, 14 mm

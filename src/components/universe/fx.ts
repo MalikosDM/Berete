@@ -174,6 +174,9 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const rings: P[] = [];
   const sparks: P[] = [];
   const genki: P[] = [];
+  // The endless space: short lines of light, white and violet, rushing from everywhere to the sphere.
+  const streaks: P[] = [];
+  const violet: [number, number, number] = [196, 168, 255];
   const flashes: P[] = [];
   const trail: { x: number; y: number }[] = []; // the serpent of light
   let serpentT = rand(0, Math.PI * 2);
@@ -272,7 +275,15 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     };
   };
 
+  const newStreak = (anywhere: boolean): P => {
+    // From all around, mostly from the sides (a flattened circle around the sphere), at their own speed.
+    const a = rand(0, Math.PI * 2);
+    const far = Math.max(w, h) * rand(0.5, 0.95) * (anywhere ? rand(0.25, 1) : 1);
+    return { x: sphere.x + Math.cos(a) * far, y: sphere.y + Math.sin(a) * far * 0.6, vx: 0, vy: 0, life: 0, max: rand(260, 520), size: rand(0.6, 1.5) * (phone ? 0.9 : 1), spin: 0, angle: rand(1.1, 2.4), hue: 0, color: Math.random() < 0.38 ? "v" : "w", kind: 0 };
+  };
+
   const fill = () => {
+    if (has("void")) while (streaks.length < count(72)) streaks.push(newStreak(true));
     if (has("genkidama")) while (genki.length < count(84)) genki.push(newGenki(true));
     if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
     if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
@@ -409,6 +420,32 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
           ctx.lineTo(cx + Math.cos(l.a) * r1, cy + Math.sin(l.a) * r1);
           ctx.stroke();
         }
+      }
+    }
+
+    if (has("void")) {
+      if (frame % 12 === 1) readSphere();
+      const far = Math.max(w, h);
+      ctx.lineCap = "round";
+      for (let i = streaks.length - 1; i >= 0; i--) {
+        const p = streaks[i]!;
+        p.life++;
+        const dx = sphere.x - p.x;
+        const dy = sphere.y - p.y;
+        const d = Math.hypot(dx, dy) || 1;
+        // Faster as they come near the sphere; their trail longer with their speed.
+        const v = p.angle * (1 + (1 - Math.min(1, d / far)) * 2.2) * (1 + boost);
+        p.x += (dx / d) * v;
+        p.y += (dy / d) * v;
+        const len = 8 + v * 8;
+        const fade = Math.min(1, p.life / 40, (p.max - p.life) / 40, Math.max(0, (d - sphere.r) / (sphere.r * 0.4)));
+        ctx.strokeStyle = rgba(p.color === "v" ? violet : white, Math.max(0, fade) * (p.color === "v" ? 0.7 : 0.8));
+        ctx.lineWidth = p.size;
+        ctx.beginPath();
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - (dx / d) * len, p.y - (dy / d) * len);
+        ctx.stroke();
+        if (d < sphere.r * 1.02 || p.life > p.max) streaks[i] = newStreak(false);
       }
     }
 

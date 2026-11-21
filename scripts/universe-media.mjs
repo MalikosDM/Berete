@@ -208,6 +208,20 @@ const KEITA = [
 ];
 BACKDROPS.push(...KEITA);
 
+/*
+ * The Hand (21/11/2026): an endless space of blue and black, a sphere of light like an eclipse, lines of light rushing to
+ * it, rings of light, a mirror floor. core: the centre and the radius of the sphere (share of the width), on the computer
+ * image and on the phone one: the piece stands before it, its light breathes, the lines rush to it, the rings ripple from it
+ * (effect "void"). Nothing of the animation it recalls (no character, no logo, no font, no name of the work).
+ */
+BACKDROPS.push({
+  ...scene("infini", "Espace infini bleu, sphère de lumière et anneaux (The Hand)", [0.711, 0.39]),
+  file: "vide-infini-desktop.jpg",
+  mobileFile: "vide-infini-mobile.jpg",
+  core: [0.711, 0.388, 0.078],
+  mobileCore: [0.5, 0.383, 0.233],
+});
+
 /** Backdrops made of several images that follow one another in a slow fade (src/components/Universe.tsx): hold = seconds each. */
 const SEQUENCES = [{ id: "keita", name: "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)", frames: ["keita-ko", "keita-cage", "keita-tribune"], hold: 8 }];
 

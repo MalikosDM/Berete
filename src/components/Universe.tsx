@@ -176,7 +176,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   // The other images of a sequence load once the page is there (the first one alone before).
   const [allFrames, setAllFrames] = useState(false);
   const canvasEffects = effects.filter((e) =>
-    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops"].includes(e),
+    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops", "void"].includes(e),
   );
   // The lights of the image that come alive, and the places where some effects of the canvas happen.
   const frameSpots = frames.map((f) => (effects.includes("scene") ? (f.b.spots ?? []) : []));
@@ -185,9 +185,11 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   // A light laid on the image: the sphere of the Genkidama (its glow, and where the particles of light go), else the moon
   // of the backdrop, shining barely.
   const genkidama = Boolean(backdrop?.core && effects.includes("genkidama"));
-  const moon = !genkidama && Boolean(backdrop?.moon && effects.includes("moon"));
-  const core = genkidama ? backdrop!.core! : moon ? backdrop!.moon! : null;
-  const mobileCore = (genkidama ? backdrop?.mobileCore : backdrop?.mobileMoon) ?? core;
+  // The endless space of The Hand: the same sphere, its light breathing slowly, rings rippling from it, lines rushing to it.
+  const infinite = !genkidama && Boolean(backdrop?.core && effects.includes("void"));
+  const moon = !genkidama && !infinite && Boolean(backdrop?.moon && effects.includes("moon"));
+  const core = genkidama || infinite ? backdrop!.core! : moon ? backdrop!.moon! : null;
+  const mobileCore = (genkidama || infinite ? backdrop?.mobileCore : backdrop?.mobileMoon) ?? core;
   const fxKey = canvasEffects.join(" ") + "|" + theme.glow + "|" + theme.preset;
 
   useEntrance(ref, preview || fixed ? undefined : slug);
@@ -338,10 +340,11 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {core && mobileCore ? (
           // Laid over the image exactly (src/index.css): the glow of the sphere breathes, the particles go to its heart.
-          <div className="u-genki" data-spot={moon ? "moon" : "genkidama"} style={{ "--g-x": core[0], "--g-y": core[1], "--g-r": core[2], "--g-mx": mobileCore[0], "--g-my": mobileCore[1], "--g-mr": mobileCore[2] } as CSSProperties}>
+          <div className="u-genki" data-spot={moon ? "moon" : infinite ? "void" : "genkidama"} style={{ "--g-x": core[0], "--g-y": core[1], "--g-r": core[2], "--g-mx": mobileCore[0], "--g-my": mobileCore[1], "--g-mr": mobileCore[2] } as CSSProperties}>
             <div className="u-genki-box">
+              {infinite ? [0, 1, 2].map((n) => <span key={n} className="u-void-ring" style={{ "--i": n } as CSSProperties} />) : null}
               <span className="u-genki-glow" />
-              {genkidama ? <span className="u-genki-core" /> : null}
+              {genkidama || infinite ? <span className="u-genki-core" /> : null}
             </div>
           </div>
         ) : null}
