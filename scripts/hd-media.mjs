@@ -70,8 +70,9 @@ export const HD = [
     dir: "angelo-stiller-as-pendant",
     folder: "18",
     gallery: ["p11:front", "p7:front", "p3:bust", "p2:bust", "v2:film", "p8:angle", "p4:bail", "p5:setting", "p9:detail", "p1:back", "p10:back"],
-    // Its making-of steps (21/11/2026, frames of its films looked at one by one): the raw piece, the finished piece checked in gloves (v04 shows the seats cut, no stone yet).
-    also: ["p12", "v3@3"],
+    // Its making-of steps (21/11/2026, frames of its films looked at one by one): the raw piece, the finished piece checked in gloves;
+    // v04 shows the seats cut, no stone yet: its preparation of the setting (confirmed by Yoni, 21/11/2026).
+    also: ["p12", "v3@3", "v4@2"],
   },
   {
     dir: "malik-tillman-cross-pendant",
@@ -91,15 +92,17 @@ export const HD = [
     dir: "tulips-on-tour-medallion",
     folder: "24",
     gallery: ["p22:front", "p21:angle", "v2:film", "p16:detail", "p19:detail", "p23:bail", "p20:bail", "p18:detail", "p13:detail", "p8:detail", "p7:detail", "p12:setting", "p10:setting", "p15:setting", "p11:detail", "p5:side", "p9:side", "p6:back", "p4:case", "p2:case", "p3:case", "p1:case"],
-    // Its making-of steps (21/11/2026, frames of its films looked at one by one): its scene set with its stones, before it goes into its frame.
-    also: ["p25"],
+    // Its making-of steps (21/11/2026, frames of its films looked at one by one): its scene set with its stones, before it goes into its frame;
+    // its last adjustment at the bench (v13, confirmed by Yoni, 21/11/2026).
+    also: ["p25", "v13@0.5"],
   },
   {
     dir: "campione-d-italia-2023-2024",
     folder: "25",
     gallery: ["p40:angle", "p55:front", "p13:angle", "p54:angle", "p56:angle", "p57:angle", "p49:angle", "p1:angle", "p41:angle", "p2:side", "v10:film", "p8:front", "p14:setting", "p52:detail", "p53:setting", "p48:detail", "p6:side", "p12:side", "p15:side", "p46:side", "p47:side", "p50:side", "p51:side", "p43:mechanism", "p45:mechanism", "p3:mechanism", "p4:mechanism", "p5:mechanism", "p44:mechanism", "p42:mechanism", "p10:inside", "p11:mark", "p60:whole", "p62:whole", "p61:whole", "p58:whole", "p59:whole", "p33:worn", "p64:hand", "p65:hand", "p66:hand", "p69:hand", "p20:case", "p22:case"],
     // Its details, and making-of steps (21/11/2026, frames of its films looked at one by one): the raw ring, the setting, the polishing.
-    also: ["p17", "p25", "p28", "v2@14.6", "v2@27.4", "v2@34.4"],
+    // 08/v25: baguettes set on its side (the same session as 08/v24 and 08/v26: confirmed by Yoni, 21/11/2026).
+    also: ["p17", "p25", "p28", "v2@14.6", "v2@27.4", "v2@34.4", "08/v25@3"],
   },
   {
     dir: "marcus-thuram-ruby-t-necklace",
@@ -112,7 +115,8 @@ export const HD = [
     dir: "marcus-thuram-t-serpent-pendant",
     folder: "27",
     gallery: ["p17:angle", "p8:front", "p18:front", "p10:angle", "v1:film", "p12:detail", "p9:detail", "p11:detail", "p1:detail", "p6:detail", "p2:setting", "p16:detail", "p3:setting", "p7:detail", "p15:setting", "p14:bail", "p13:setting", "p5:side", "p4:bail"],
-    also: ["08/p2", "v3"],
+    // 08/v19: the scales set one by one, the same as in its making-of 08/v14 (confirmed by Yoni, 21/11/2026).
+    also: ["08/p2", "v3", "08/v19@2"],
   },
   {
     dir: "vfb-stuttgart-dfb-pokal-2025",
@@ -206,8 +210,10 @@ export const HD = [
     dir: "panther-champion-pendant",
     folder: "19",
     gallery: ["p10:front", "p8:angle", "v3:film", "08/v8:film", "p5:detail", "p7:detail", "p4:detail", "p6:detail", "p9:back"],
-    // Its making-of steps (21/11/2026, frames of its films looked at one by one): the setting, the raw piece, the polishing, its trunk (at 1 s, before the photograph of its lid).
-    also: ["v8", "v1@5", "v1@21", "v2@1"],
+    // Its making-of steps (21/11/2026, frames of its films looked at one by one): the setting, the raw piece, the polishing, its trunk (at 1 s, before the photograph of its lid);
+    // confirmed by Yoni (21/11/2026): the panther set, the plates of its belt not yet on (08/v08 at 1 s: the assembly), the
+    // LASANA plates (08/p01: the parts before the assembly).
+    also: ["v8", "v1@5", "v1@21", "v2@1", "08/v8@1", "08/p1"],
   },
   {
     dir: "celestial-initial-medallion",

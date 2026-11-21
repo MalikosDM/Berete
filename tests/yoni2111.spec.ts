@@ -225,7 +225,7 @@ test("Sirius: its Japanese night, the eyes of the masks, the flashes, the leaves
 test("the trunk of Sirius: the black trunk with the horned mask, its opening, its photos on the page of the trunks", async ({ page }, info) => {
   const problems = watch(page);
   const trunk = trunkOf("sirius")!;
-  expect(trunk.photos?.map((p) => p.src)).toEqual(["/media/boxes/sirius/closed.webp", "/media/boxes/sirius/open.webp"]);
+  expect(trunk.photos?.map((p) => p.src)).toEqual(["/media/trunks/sirius/photo-closed.webp", "/media/trunks/sirius/photo-open.webp"]);
   expect(BOXES.find((b) => b.slug === "sirius")!.images.map((m) => m.src)).toEqual(trunk.photos!.map((p) => p.src));
   await skipIntro(page);
   await page.goto("/fr/boxes", { waitUntil: "load" });
@@ -246,8 +246,8 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   const dialog = page.locator("[role='dialog']");
   await expect(dialog).toBeVisible();
   const srcs = await dialog.locator("img").evaluateAll((els) => els.map((e) => new URL((e as HTMLImageElement).src).pathname));
-  expect(srcs.some((s) => s.startsWith("/media/boxes/sirius/closed"))).toBe(true);
-  expect(srcs.some((s) => s.startsWith("/media/boxes/sirius/open"))).toBe(true);
+  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-closed"))).toBe(true);
+  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-open"))).toBe(true);
   expect(srcs.some((s) => s.includes("/media/hd/sirius/"))).toBe(false);
   expect(problems.errors).toEqual([]);
 });

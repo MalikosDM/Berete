@@ -301,6 +301,12 @@
       "width": 720,
       "height": 1280
     },
+    "pieces/samuel-ballet-jesus-piece/worn": {
+      "type": "image",
+      "src": "/media/pieces/samuel-ballet-jesus-piece/worn.webp",
+      "width": 720,
+      "height": 1280
+    },
     "pieces/tajon-buchanan-iced-watch/delivery": {
       "type": "image",
       "src": "/media/pieces/tajon-buchanan-iced-watch/delivery.webp",
@@ -1335,6 +1341,13 @@
         "width": 720,
         "height": 1280,
         "onBlack": true
+      },
+      "v04-2s": {
+        "type": "image",
+        "src": "/media/hd/angelo-stiller-as-pendant/v04-2s.webp",
+        "width": 720,
+        "height": 1280,
+        "onBlack": false
       }
     },
     "malik-tillman-cross-pendant": {
@@ -1848,6 +1861,13 @@
         "width": 1440,
         "height": 1920,
         "onBlack": true
+      },
+      "v13-0_5s": {
+        "type": "image",
+        "src": "/media/hd/tulips-on-tour-medallion/v13-0_5s.webp",
+        "width": 1280,
+        "height": 720,
+        "onBlack": false
       }
     },
     "campione-d-italia-2023-2024": {
@@ -2202,6 +2222,13 @@
         "width": 1080,
         "height": 1920,
         "onBlack": false
+      },
+      "08-v25-3s": {
+        "type": "image",
+        "src": "/media/hd/campione-d-italia-2023-2024/08-v25-3s.webp",
+        "width": 480,
+        "height": 848,
+        "onBlack": false
       }
     },
     "marcus-thuram-ruby-t-necklace": {
@@ -2464,6 +2491,13 @@
         "height": 1280,
         "duration": 12.01,
         "audio": false
+      },
+      "08-v19-2s": {
+        "type": "image",
+        "src": "/media/hd/marcus-thuram-t-serpent-pendant/08-v19-2s.webp",
+        "width": 1080,
+        "height": 1960,
+        "onBlack": false
       }
     },
     "vfb-stuttgart-dfb-pokal-2025": {
@@ -3743,6 +3777,20 @@
         "width": 1080,
         "height": 1920,
         "onBlack": true
+      },
+      "08-v08-1s": {
+        "type": "image",
+        "src": "/media/hd/panther-champion-pendant/08-v08-1s.webp",
+        "width": 720,
+        "height": 1280,
+        "onBlack": false
+      },
+      "08-p01": {
+        "type": "image",
+        "src": "/media/hd/panther-champion-pendant/08-p01.webp",
+        "width": 1440,
+        "height": 1920,
+        "onBlack": false
       }
     },
     "celestial-initial-medallion": {

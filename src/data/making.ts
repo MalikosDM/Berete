@@ -55,11 +55,28 @@ export function completeMakingOf(slug: string, atelier: PieceAtelier | null | un
   return resolveAtelier(slug, atelier)?.making ?? null;
 }
 
-/** Its own box is not shown as its last step (doubt: CLAUDE.md, the box may belong to another piece of the same owner). */
-const BOX_NOT_ITS_OWN = new Set(["noah-okafor-octagon-pendant", "tanguy-nianzou-fam-medallion"]);
+/**
+ * Its own box is not shown as its last step: the travel case of NZ (its pieces and the case are off the site). Since
+ * 21/11/2026 the trunk of Noah Okafor is the one of his octagon (Yoni: "the trunk with a photograph and the tennis chains").
+ */
+const BOX_NOT_ITS_OWN = new Set(["tanguy-nianzou-fam-medallion"]);
 
-/** The real steps of a piece, in their order: its own photo or film of each, its own box for the last one. */
-export function makingSteps(piece: Pick<Piece, "slug" | "making">, box?: MediaItem): { step: MakingStep; item: MediaItem }[] {
+export type ShownStep = { step: MakingStep; item: MediaItem; more?: MediaItem };
+
+/**
+ * The real steps of a piece, in their order: its own photo or film of each (and a second one of the same step, when it has
+ * one: "setting2"), its own box for the delivery when it has nothing else.
+ */
+export function makingSteps(piece: Pick<Piece, "slug" | "making">, box?: MediaItem): ShownStep[] {
   const ownBox = BOX_NOT_ITS_OWN.has(piece.slug) ? undefined : box;
-  return MAKING_STEPS.map((step) => ({ step, item: piece.making[step] ?? (step === "delivery" ? ownBox : undefined) })).filter((s): s is { step: MakingStep; item: MediaItem } => s.item !== undefined && s.item.src !== "");
+  const real = (m: MediaItem | undefined) => (m && m.src !== "" ? m : undefined);
+  const out: ShownStep[] = [];
+  for (const step of MAKING_STEPS) {
+    const first = real(piece.making[step]) ?? (step === "delivery" ? real(ownBox) : undefined);
+    const second = real(piece.making[`${step}2`]);
+    const item = first ?? second;
+    if (!item) continue;
+    out.push(first && second ? { step, item, more: second } : { step, item });
+  }
+  return out;
 }

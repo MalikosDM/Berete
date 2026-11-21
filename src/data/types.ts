@@ -70,11 +70,18 @@ export type Person = {
 export const PIECE_TYPES = ["chain", "pendant", "ring", "bracelet", "watch"] as const;
 export type PieceType = (typeof PIECE_TYPES)[number];
 
-/** The steps of "The Making of a Masterpiece", in order. */
-export const MAKING_STEPS = ["sketch", "raw", "setting", "polishing", "delivery"] as const;
+/**
+ * The steps of "The Making of a Masterpiece", in order. Since 21/11/2026 (the answers of Yoni to the doubts of the making-of):
+ * the preparation of the setting (the seats cut, no stone yet), the parts before the assembly, the assembly, the finishing
+ * at the bench, the piece worn.
+ */
+export const MAKING_STEPS = ["sketch", "raw", "preparation", "setting", "parts", "assembly", "polishing", "finishing", "delivery", "worn"] as const;
 export type MakingStep = (typeof MAKING_STEPS)[number];
-/** Photos or videos of this piece for some steps; the others show the atelier. */
-export type Making = Partial<Record<MakingStep, MediaItem>>;
+/** A step and its second photo or film ("setting2": another moment of the same step, shown beside the first in its card). */
+export type MakingKey = MakingStep | `${MakingStep}2`;
+export const MAKING_KEYS: readonly MakingKey[] = [...MAKING_STEPS, ...MAKING_STEPS.map((s) => `${s}2` as const)];
+/** Photos or videos of this piece for some steps; a step without one is left out. */
+export type Making = Partial<Record<MakingKey, MediaItem>>;
 
 export type Spec = { label: string; value: string };
 /**

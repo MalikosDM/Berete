@@ -23,7 +23,7 @@ import { cleanAtelier } from "../src/data/atelier.js";
 import { cleanDetailPoints } from "../src/data/details3d.js";
 import { cleanShowcase } from "../src/data/showcase.js";
 import { cleanTheme } from "../src/data/themes.js";
-import { MAKING_STEPS, PIECE_TYPES, type Box, type Catalogue, type Detail, type HousePhotos, type Making, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
+import { MAKING_KEYS, PIECE_TYPES, type Box, type Catalogue, type Detail, type HousePhotos, type Making, type MakingKey, type MediaItem, type Person, type Piece, type Press, type Spec, type Story, type Translations } from "../src/data/types.js";
 import { Prisma } from "./generated/prisma/client.js";
 import { prisma } from "./db.js";
 
@@ -45,7 +45,7 @@ export const MediaItemSchema = z.object({
   view: z.string().max(20).optional(),
 });
 export const MediaListSchema = z.array(MediaItemSchema).max(200);
-export const MakingSchema = z.object(Object.fromEntries(MAKING_STEPS.map((k) => [k, MediaItemSchema.optional()])) as Record<(typeof MAKING_STEPS)[number], z.ZodOptional<typeof MediaItemSchema>>);
+export const MakingSchema = z.object(Object.fromEntries(MAKING_KEYS.map((k) => [k, MediaItemSchema.optional()])) as Record<MakingKey, z.ZodOptional<typeof MediaItemSchema>>);
 /** Texts written in /admin for another language, by field: { fr: { title: "..." } }. */
 export const TranslationsSchema = z
   .object({ fr: z.record(z.string().max(40), z.string().max(5000)), es: z.record(z.string().max(40), z.string().max(5000)), de: z.record(z.string().max(40), z.string().max(5000)), nl: z.record(z.string().max(40), z.string().max(5000)), ar: z.record(z.string().max(40), z.string().max(5000)) })
@@ -80,7 +80,7 @@ function makingOf(v: unknown): Making {
   const parsed = MakingSchema.safeParse(v);
   if (!parsed.success) return {};
   const out: Making = {};
-  for (const step of MAKING_STEPS) if (parsed.data[step]) out[step] = parsed.data[step];
+  for (const step of MAKING_KEYS) if (parsed.data[step]) out[step] = parsed.data[step];
   return out;
 }
 
@@ -106,7 +106,7 @@ export function mergeImported(current: MediaItem[], defaults: MediaItem[]): Medi
  */
 function mergeMaking(current: Making, defaults: Making): Making {
   let out = current;
-  for (const step of MAKING_STEPS) {
+  for (const step of MAKING_KEYS) {
     const want = defaults[step];
     const have = current[step];
     if (!want || (have && (!have.src.startsWith(IMPORTED) || fileKey(have) === fileKey(want)))) continue;

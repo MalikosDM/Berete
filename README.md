@@ -288,6 +288,7 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # en 6 langues, damier, iPhone, lisibilité ; 4 pièces retirées, filtres des Créations, admin)
                         # tests/yoni2111.spec.ts : Dragon Ball en grand et son film, le Cercle (clic = la pièce),
                         # Sirius (écrin, nuit japonaise), écrin NZ retiré, accueil plus petit, menu dès 1 260 px
+                        # tests/doutes.spec.ts : réponses de Yoni aux doutes du Making of (8 pièces, étapes validées)
 ```
 
 ## Vitesse (Lighthouse)

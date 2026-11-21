@@ -162,6 +162,24 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « réponses aux doutes du Making of » (Yoni, 21/11/2026) — état au 21/11/2026
+- [x] **Nouvelles étapes** (`MAKING_STEPS` de `src/data/types.ts`, titres et textes en 6 langues dans `src/i18n/ui/*.ts`) :
+      « Préparation du sertissage » (`preparation`), « Les pièces avant assemblage » (`parts`), « Assemblage » (`assembly`),
+      « Finition » (`finishing`), « La pièce portée » (`worn`), dans l'ordre esquisse, brut, préparation, sertissage, pièces,
+      assemblage, polissage, finition, remise, portée. Une étape peut avoir une 2e image (`setting2` …) : petite image dans le
+      coin de la première, qui s'ouvre de même (`makingSteps` de `src/data/making.ts`).
+- [x] **Mis en ligne** (planche, lignes validées) : 1. octogone d'Okafor, remise (story 11/05 : la malle à photo est bien
+      la sienne, plus dans `BOX_NOT_ITS_OWN`) ; 3. AS, préparation du sertissage (18/v04 à 2 s) ; 4. panthère, assemblage
+      (08/v08 à 1 s) ; 5. panthère, les pièces avant assemblage (08/p01, les plaques LASANA) ; 9. T-Serpent, 2e image du
+      sertissage (08/v19 à 2 s, à côté de son film 27/v03) ; 10. Inter, 2e image du sertissage (08/v25 à 3 s) ; 16. chaîne
+      torsadée de Kevin Schade, remise (story 03/02) ; 18. Jesus piece de Samuel Ballet, la pièce portée (story 15/05 à
+      8,4 s ; rien pour la BRT Flower) ; 19. Tulips on Tour, finition (24/v13 à 0,5 s) ; 20. inchangé (making-of 14 mm).
+- [x] **Écartés** (rien en ligne) : 2 (étui NZ), 6, 8, 11 à 14 (pièce non identifiée), 7 (BRT Flower ou Sirius), 15
+      (maillons du film du maillot d'Okafor), 17 (36/v02 reste sur la BRT Flower seule).
+- [x] Planche mise à jour : chaque ligne marquée « VALIDÉ » (vert) ou « ÉCARTÉ » (rouge). `tests/doutes.spec.ts` (les 8
+      pièces, ordinateur et iPhone, chaque image ouverte en plein écran), captures dans `verification/doutes/`.
+- Les photos de l'écrin Sirius sont passées dans `public/media/trunks/sirius/photo-*` (l'import vidait `media/boxes`).
+
 ## Passe « retours de Yoni du 21/11 (3) » (Dragon Ball, Cercle, Sirius, écrin NZ, accueil, menu) — état au 21/11/2026
 - [x] **Dragon Ball** : la vue principale détourée en grand à l'ouverture (`showcase: { size: "large" }` de la pièce ; admin
       « Vitrine de l'ouverture » : « Pièce en grand ») : toute la hauteur sur ordinateur (+35 %), un cadre plus haut sur
@@ -174,8 +192,9 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       bas. Partout : mur du Cercle (/players et accueil), joueurs d'un club, « Créée pour » d'une pièce (vers sa page s'il
       n'a que cette pièce). La barre des stories en haut de l'accueil ouvre toujours les stories (la fonction Instagram).
 - [x] **Écrin Sirius** : nouveaux fichiers de Yoni (le vrai écrin noir au masque, suède rouge, braises), `npm run trunks --
-      --only=sirius` ; ses deux images remplacent ses photos sur la page des écrins (`public/media/boxes/sirius/closed|open`,
-      `photos` dans `trunks.generated.json`). Les vraies photos de l'écrin (37/p01, p03, p04) restent sur la page de la chaîne.
+      --only=sirius` ; ses deux images remplacent ses photos sur la page des écrins (`public/media/trunks/sirius/photo-closed|
+      open`, `photos` dans `trunks.generated.json` ; jamais dans `media/boxes`, que `npm run import-media` vide de ce qu'il
+      n'a pas fait). Les vraies photos de l'écrin (37/p01, p03, p04) restent sur la page de la chaîne.
 - [x] **Univers japonais de Sirius** (remplace le ciel étoilé) : fond `sirius-japon` (`sirius-japon-desktop/-mobile.jpg`),
       preset `japon` : braises rouges, feuilles d'érable rouges qui tombent (effet `maple`, `fx.ts`), brume rouge (`smoke`),
       lune de sang qui respire, yeux des masques qui s'allument par moments (spots `eye`, les 2 yeux d'un masque ensemble ;
@@ -239,11 +258,10 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       images des stories dans `scripts/piece-media.mjs`). Corrigées : le « sertissage » de Dragon Ball était tout le film
       (story 20), celui du AS des logements creusés sans pierres, celui de Sirius une fraise sur la plaque brute, le
       « polissage » de BRT Flower une fraise sur un maillon brut, celui de Tulips la pièce finie en main ; la malle
-      d'Okafor et l'étui NZ ne sont plus montrés comme remise (`BOX_NOT_ITS_OWN`) ; la remise de la Butterfly (repost de
+      d'Okafor (remise de l'octogone depuis le 21/11, réponse de Yoni) et l'étui NZ ne sont plus montrés comme remise (`BOX_NOT_ITS_OWN`) ; la remise de la Butterfly (repost de
       story) remplacée par la chaîne dans sa malle. Aucune remise « photo seule » de la pièce finie.
 - [x] **Doutes** : planche `/Volumes/Disque externe/Berete - Dossiers icloud/_verif/making-of-doutes.jpg` (20 lignes :
-      pièce, étape, images, fichier source). Rien de cela en ligne, sauf la ligne 20 (making-of de la chaîne 14 mm, rangé
-      dans le dossier 01, la 20 mm étant presque identique).
+      pièce, étape, images, fichier source). Réponses de Yoni le 21/11 (voir « Passe réponses aux doutes du Making of »).
 - [x] **Plus de séquence épinglée** entre l'ouverture et le contenu (retirée le 21/11 avec « Sous tous les angles ») :
       un défilement mène à la section suivante (test).
 - [x] **Vidéos amateur à la fin** de « Sous tous les angles » (`AMATEUR_FILMS` dans `src/data/angles.ts` : 17 vidéos de
@@ -266,8 +284,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       candidates (Thuram SS23 03/04, Collectors 15, 20, 23, 24) sont des 4 connues. Peut-être dans « 99 - NE PAS ENVOYER »
       (jamais ouvert) ou une pièce retirée : demander à Yoni. La page Thuram retirée reste hors ligne.
 - `tests/making.spec.ts` (6 capsules, N14, panthère, Jesus Pieces ; ordinateur et iPhone), captures `verification/making/`.
-- [ ] Yoni : les doutes de la planche ; la 5e Jesus Piece ; la malle d'Okafor (octogone ou OKA ?) ; l'étui NZ ; des
-      photos de fabrication pour les pièces sans étape (Baguette Cross, Cross Infinity, Oval Eternity, Red Crown, Baguette
+- [ ] Yoni : la 5e Jesus Piece ; des photos de fabrication pour les pièces sans étape (Baguette Cross, Cross Infinity, Oval Eternity, Red Crown, Baguette
       Cuban, Rose 20 mm).
 
 ## Passe « Sous tous les angles » et 4 pièces retirées (retours de Yoni du 21/11) — état au 21/11/2026

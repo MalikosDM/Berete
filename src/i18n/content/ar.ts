@@ -714,6 +714,17 @@ const content: Record<string, string> = {
   "Handed over": "التسليم",
   "Checked by hand": "تُفحَص يدويًا",
   "At the polishing wheel": "عند التلميع",
+  // The steps of the making-of confirmed by Yoni (21/11/2026).
+  "Noah Okafor opens the trunk of his octagon pendant, wearing it": "نوح أوكافور يفتح صندوق قلادته المثمنة وهو يرتديها",
+  "The seats of the stones cut into the AS, before the setting": "مواضع الأحجار محفورة في قلادة AS قبل الترصيع",
+  "The LASANA plates of the belt, before the assembly": "ألواح LASANA للحزام قبل التجميع",
+  "The panther set with its stones, before the plates of its belt": "النمر مرصّع بأحجاره قبل ألواح حزامه",
+  "Before the belt plates": "قبل ألواح الحزام",
+  "The scales of the serpent, set one by one": "حراشف الأفعى مرصّعة واحدةً تلو الأخرى",
+  "Baguettes set on the side of the ring": "أحجار باغيت مرصّعة على جانب الخاتم",
+  "Kevin Schade, wearing his chain, at its handover": "كيفن شادي، وسلسلته في عنقه، عند التسليم",
+  "The Jesus piece worn on its chain": "قطعة Jesus piece على سلسلتها",
+  "The last adjustment of the medallion at the bench": "آخر تعديل للميدالية على طاولة العمل",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

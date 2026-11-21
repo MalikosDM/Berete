@@ -485,12 +485,15 @@ function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: 
   const STEPS: Record<MakingStep, { title: string; text: string }> = t.piece.steps;
   const steps = makingSteps(piece, boxImage);
   const film = completeMakingOf(piece.slug, piece.atelier);
-  const viewable = steps.map((s) => s.item);
+  // Every photo of the steps in the full screen viewer, the second photo of a step right after its first.
+  const viewable = steps.flatMap((s) => (s.more ? [s.item, s.more] : [s.item]));
+  const indexOf = (item: MediaItem) => viewable.indexOf(item);
   const [open, setOpen] = useState<number | null>(null);
   const [room, setRoom] = useState(false);
   if (steps.length === 0 && !film) return null;
   const count = steps.length + (film ? 1 : 0);
-  const columns = ["lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-4", "lg:grid-cols-5", "lg:grid-cols-6"][count]!;
+  // One row up to six cards; more (since 21/11/2026, up to ten steps): two rows.
+  const columns = ["lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-3", "lg:grid-cols-4", "lg:grid-cols-5", "lg:grid-cols-6", "lg:grid-cols-4", "lg:grid-cols-4", "lg:grid-cols-5", "lg:grid-cols-5", "lg:grid-cols-6"][Math.min(count, 11)]!;
   return (
     <section aria-labelledby="making-title" data-making className="border-y border-white/10 py-24 lg:py-32">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
@@ -527,12 +530,12 @@ function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: 
             </Reveal>
           </li>
         ) : null}
-        {steps.map(({ step, item }, i) => (
+        {steps.map(({ step, item, more }, i) => (
           <li key={step} data-making-step={step} className="w-[72vw] shrink-0 snap-start sm:w-[44vw] lg:w-auto">
-            <Reveal delay={(i + (film ? 1 : 0)) * 0.08}>
+            <Reveal delay={(i + (film ? 1 : 0)) * 0.08} className="relative">
               <button
                 type="button"
-                onClick={() => setOpen(i)}
+                onClick={() => setOpen(indexOf(item))}
                 // The name read aloud starts with the words shown on the photo ("The first sketch").
                 aria-label={(item.caption ? item.caption + " · " : "") + t.gallery.open(item.alt ?? STEPS[step].title)}
                 data-making-open={step}
@@ -545,6 +548,18 @@ function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: 
                   <ZoomIn className="size-5" aria-hidden="true" />
                 </span>
               </button>
+              {more ? (
+                // A second moment of the same step (21/11/2026): a smaller photo in the corner of the first, opened the same way.
+                <button
+                  type="button"
+                  onClick={() => setOpen(indexOf(more))}
+                  aria-label={(more.caption ? more.caption + " · " : "") + t.gallery.open(more.alt ?? STEPS[step].title)}
+                  data-making-more={step}
+                  className="group/more absolute end-3 top-3 block aspect-square w-[38%] cursor-zoom-in overflow-hidden border border-white/40 bg-ink-soft shadow-[0_8px_30px_rgba(0,0,0,0.6)] transition-colors hover:border-rose-light"
+                >
+                  <MediaView item={more} alt="" fit="cover" sizes="(max-width: 639px) 28vw, (max-width: 1023px) 17vw, 8vw" />
+                </button>
+              ) : null}
               <p className="mt-5 flex items-baseline gap-3">
                 <span className="text-rose-gold font-display text-xl">{String(i + 1).padStart(2, "0")}</span>
                 <span className="title-caps text-2xl tracking-[0.12em] text-white">{STEPS[step].title}</span>

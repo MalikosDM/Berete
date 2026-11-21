@@ -708,6 +708,17 @@ const content: Record<string, string> = {
   "Handed over": "De overhandiging",
   "Checked by hand": "Met de hand gecontroleerd",
   "At the polishing wheel": "Aan het polijstwiel",
+  // The steps of the making-of confirmed by Yoni (21/11/2026).
+  "Noah Okafor opens the trunk of his octagon pendant, wearing it": "Noah Okafor opent de koffer van zijn achthoekige hanger, die hij draagt",
+  "The seats of the stones cut into the AS, before the setting": "De zettingen van de stenen in de AS, vóór het zetten",
+  "The LASANA plates of the belt, before the assembly": "De LASANA-platen van de riem, vóór de montage",
+  "The panther set with its stones, before the plates of its belt": "De panter gezet met zijn stenen, vóór de platen van zijn riem",
+  "Before the belt plates": "Vóór de platen van de riem",
+  "The scales of the serpent, set one by one": "De schubben van de slang, één voor één gezet",
+  "Baguettes set on the side of the ring": "Baguettes gezet op de zijkant van de ring",
+  "Kevin Schade, wearing his chain, at its handover": "Kevin Schade, met zijn ketting om, bij de overhandiging",
+  "The Jesus piece worn on its chain": "Het Jesus piece gedragen aan zijn ketting",
+  "The last adjustment of the medallion at the bench": "De laatste aanpassing van het medaillon aan de werkbank",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

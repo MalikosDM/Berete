@@ -18,6 +18,8 @@ export const STILLS = [
   /* ---------- The steps of "The Making of a Masterpiece" found in the stories (21/11/2026) ---------- */
   { key: "pieces/michy-batshuayi-butterfly-chain/setting", from: "story:07/10", at: 20.7 },
   { key: "pieces/samuel-ballet-jesus-piece/delivery", from: "story:15/05", at: 10.2 },
+  // Worn on its chain (confirmed by Yoni, 21/11/2026: for the Jesus piece of Samuel Ballet only, not the BRT Flower).
+  { key: "pieces/samuel-ballet-jesus-piece/worn", from: "story:15/05", at: 8.4 },
   { key: "pieces/tajon-buchanan-iced-watch/delivery", from: "story:25/01", at: 0.6 },
 
   /* ---------- Pendants ---------- */

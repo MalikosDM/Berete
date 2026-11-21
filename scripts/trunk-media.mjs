@@ -5,8 +5,10 @@
  * of black marble, the same angle, the same light). Read from the external disk (never modified), written for the web:
  *   public/media/trunks/<box>/closed-<w>.{avif,webp}, open-<w>.{avif,webp}   (720, 1080, 1440 px, square)
  *   public/media/trunks/<box>/opening.mp4                                   (1080 px square, H.264, silent, light)
- *   public/media/boxes/<box>/closed.webp, open.webp (1600 px, and their smaller copies): its photos on the page of the
- *                                                                           trunks, for a trunk whose photos they replace
+ *   public/media/trunks/<box>/photo-closed.webp, photo-open.webp (1600 px, and their copies of 160, 640, 1080 px): its
+ *                                                                           photos on the page of the trunks, for a trunk whose
+ *                                                                           photos they replace (here, never in media/boxes:
+ *                                                                           npm run import-media empties what it did not make there)
  * and src/data/trunks.generated.json. The originals never go in Git.
  *
  *   npm run trunks                      (every trunk)
@@ -20,7 +22,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { makeSizes } from "./media-sizes.mjs";
+import { SIZES, sizedPath } from "./media-sizes.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
@@ -76,16 +78,18 @@ for (const [name, slug] of TRUNKS) {
   run("ffmpeg", ["-loglevel", "error", "-y", "-i", film, "-an", "-vf", "scale=" + VIDEO + ":" + VIDEO + ":flags=lanczos,format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-maxrate", "2200k", "-bufsize", "4400k", "-profile:v", "high", "-movflags", "+faststart", "-map_metadata", "-1", out]);
   trunks[slug] = { base: "/media/trunks/" + slug, widths: WIDTHS, video: "/media/trunks/" + slug + "/opening.mp4", size: VIDEO, duration: Math.round(duration(out) * 100) / 100 };
   if (PHOTOS.has(name)) {
-    const photos = join(ROOT, "public", "media", "boxes", slug);
-    await mkdir(photos, { recursive: true });
-    for (const state of ["closed", "open"]) await sharp(join(SOURCE, name + "-" + state + ".jpg")).resize(PHOTO, PHOTO, { fit: "cover", kernel: "lanczos3" }).webp({ quality: 82, effort: 6 }).toFile(join(photos, state + ".webp"));
-    trunks[slug].photos = ["closed", "open"].map((state) => ({ src: "/media/boxes/" + slug + "/" + state + ".webp", width: PHOTO, height: PHOTO }));
+    for (const state of ["closed", "open"]) {
+      const file = join(dir, "photo-" + state + ".webp");
+      const img = sharp(join(SOURCE, name + "-" + state + ".jpg"));
+      await img.clone().resize(PHOTO, PHOTO, { fit: "cover", kernel: "lanczos3" }).webp({ quality: 82, effort: 6 }).toFile(file);
+      // Its smaller copies, named as the site expects them (src/lib/responsive.ts).
+      for (const size of SIZES) await img.clone().resize(size.width, size.width, { fit: "cover", kernel: "lanczos3" }).webp({ quality: size.quality, effort: 6 }).toFile(sizedPath(file, size.width));
+    }
+    trunks[slug].photos = ["closed", "open"].map((state) => ({ src: "/media/trunks/" + slug + "/photo-" + state + ".webp", width: PHOTO, height: PHOTO }));
   }
   console.log("  + " + slug + " (" + trunks[slug].duration + " s)");
 }
 // In the order of the list, whatever was made first.
 const ordered = Object.fromEntries(TRUNKS.map(([, slug]) => slug).filter((slug) => trunks[slug]).map((slug) => [slug, trunks[slug]]));
 await writeFile(DATA, JSON.stringify({ trunks: ordered }, null, 1) + "\n");
-// The smaller copies of the photos (phones, thumbnails).
-await makeSizes();
 console.log("  = src/data/trunks.generated.json");

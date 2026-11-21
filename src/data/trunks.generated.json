@@ -23,12 +23,12 @@
    "duration": 6.04,
    "photos": [
     {
-     "src": "/media/boxes/sirius/closed.webp",
+     "src": "/media/trunks/sirius/photo-closed.webp",
      "width": 1600,
      "height": 1600
     },
     {
-     "src": "/media/boxes/sirius/open.webp",
+     "src": "/media/trunks/sirius/photo-open.webp",
      "width": 1600,
      "height": 1600
     }

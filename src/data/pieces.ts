@@ -13,7 +13,7 @@ import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 import { trunkPhotos } from "./trunks.js";
-import type { Box, Making, MakingStep, MediaItem, Piece, PieceType, Press } from "./types.js";
+import type { Box, Making, MakingKey, MediaItem, Piece, PieceType, Press } from "./types.js";
 
 export const VFB = "vfb-stuttgart-dfb-pokal-2025";
 export const INTER = "campione-d-italia-2023-2024";
@@ -90,7 +90,7 @@ type PieceInput = {
   press?: Press[];
   boxSlug?: string;
   featured?: boolean;
-  making?: Partial<Record<MakingStep, Maybe>>;
+  making?: Partial<Record<MakingKey, Maybe>>;
 };
 
 /** The text of a first sketch: the site translates it with the title of the piece (src/i18n/content.ts). */
@@ -98,7 +98,7 @@ export const sketchAlt = (title: string) => "Yoni Berete's hand drawing the firs
 
 function piece(p: PieceInput): Piece {
   const making: Making = {};
-  for (const [step, item] of Object.entries(p.making ?? {}) as [MakingStep, Maybe][]) if (item) making[step] = item;
+  for (const [step, item] of Object.entries(p.making ?? {}) as [MakingKey, Maybe][]) if (item) making[step] = item;
   // The first sketch from the folder of sketches (the hand of Yoni drawing the piece, since 20/11/2026), else the image
   // the piece gives for this step (Dragon Ball: its first hand drawing, from the stories).
   making.sketch = sketch(p.slug, at(sketchAlt(p.title), "The first sketch")) ?? making.sketch;
@@ -296,7 +296,8 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "White gold tone, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
     boxSlug: "campione-d-italia-case",
-    making: { raw: raw(INTER, "v02-14_6s"), setting: yoni(INTER, "v02-27_4s", SET()), polishing: yoni(INTER, "v02-34_4s", POLISH()), delivery: inter.case },
+    // setting2: baguettes set on its side (08/v25, the same session as 08/v24 and 08/v26: confirmed by Yoni, 21/11/2026).
+    making: { raw: raw(INTER, "v02-14_6s"), setting: yoni(INTER, "v02-27_4s", SET()), setting2: yoni(INTER, "08-v25-3s", { ...at("Baguettes set on the side of the ring", "In the setting"), onBlack: false }), polishing: yoni(INTER, "v02-34_4s", POLISH()), delivery: inter.case },
   }),
   piece({
     slug: "tanguy-nianzou-nz-ring",
@@ -478,6 +479,8 @@ const SITE_PIECES: Piece[] = [
       raw: raw("noah-okafor-octagon-pendant", "v02-13s"),
       setting: yoni("noah-okafor-octagon-pendant", "p11", { ...at("The pendant on the setting wax, its stones being set", "In the setting"), onBlack: false }),
       polishing: yoni("noah-okafor-octagon-pendant", "v02-9s", POLISH()),
+      // Confirmed by Yoni (21/11/2026): the trunk with a photograph and the tennis chains are those of the octagon.
+      delivery: st("noah-okafor-ii", 5, { ...at("Noah Okafor opens the trunk of his octagon pendant, wearing it", "Handed over"), onBlack: false }),
     },
   }),
   piece({
@@ -508,6 +511,8 @@ const SITE_PIECES: Piece[] = [
     making: {
       raw: yoni("marcus-thuram-t-serpent-pendant", "08-p02", { ...at("The T-Serpent pendant before the setting", "This piece, before the setting"), onBlack: false }),
       setting: yoni("marcus-thuram-t-serpent-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
+      // The scales set one by one (08/v19, the same as in its making-of 08/v14: confirmed by Yoni, 21/11/2026).
+      setting2: yoni("marcus-thuram-t-serpent-pendant", "08-v19-2s", { ...at("The scales of the serpent, set one by one", "In the setting"), onBlack: false }),
     },
   }),
   piece({
@@ -611,6 +616,8 @@ const SITE_PIECES: Piece[] = [
     seen: "White gold tone · baguette diamonds in a herringbone, round diamonds",
     making: {
       raw: raw("angelo-stiller-as-pendant", "p12"),
+      // The seats cut, no stone yet (18/v04): the preparation of the setting (confirmed by Yoni, 21/11/2026).
+      preparation: yoni("angelo-stiller-as-pendant", "v04-2s", { ...at("The seats of the stones cut into the AS, before the setting", "This piece, before the setting"), onBlack: false }),
       delivery: yoni("angelo-stiller-as-pendant", "v03-3s", CHECKED()),
     },
   }),
@@ -682,6 +689,8 @@ const SITE_PIECES: Piece[] = [
       setting: yoni("samuel-ballet-jesus-piece", "v21-6_9s", SET()),
       polishing: yoni("samuel-ballet-jesus-piece", "v21-35_4s", POLISH()),
       delivery: still("pieces/samuel-ballet-jesus-piece/delivery", CHECKED()),
+      // Worn on its chain (story 15/05 at 8.4 s; confirmed by Yoni, 21/11/2026, for this piece only).
+      worn: still("pieces/samuel-ballet-jesus-piece/worn", { ...at("The Jesus piece worn on its chain", "Worn"), onBlack: false }),
     },
   }),
   piece({
@@ -941,6 +950,8 @@ const SITE_PIECES: Piece[] = [
     boxSlug: "tulips-on-tour",
     making: {
       setting: yoni("tulips-on-tour-medallion", "p25", { ...at("The scene set with its stones, before it goes into its frame", "In the setting"), onBlack: false }),
+      // Its last adjustment at the bench (24/v13, confirmed by Yoni, 21/11/2026).
+      finishing: yoni("tulips-on-tour-medallion", "v13-0_5s", { ...at("The last adjustment of the medallion at the bench", "At the bench"), onBlack: false }),
       delivery: yoni("boxes/tulips-on-tour", "p04", IN_BOX()),
     },
   }),
@@ -1049,6 +1060,8 @@ const SITE_PIECES: Piece[] = [
       ["Links", "Twisted, with diamond flowers"],
     ],
     seen: "Rose gold tone · round diamonds in pavé and in flowers, marquise-cut leaves",
+    // Its handover: he wears the chain only, not the Dragon Ball pendant (story 03/02, confirmed by Yoni, 21/11/2026).
+    making: { delivery: st("kevin-schade", 2, { ...at("Kevin Schade, wearing his chain, at its handover", "Handed over"), onBlack: false }) },
   }),
   piece({
     slug: "the-safi-link",
@@ -1268,6 +1281,9 @@ const COLLECTED: Piece[] = [
     making: {
       raw: raw("panther-champion-pendant", "v01-5s"),
       setting: yoni("panther-champion-pendant", "v08", { ...SETTING_FILM(), onBlack: false }),
+      // Confirmed by Yoni (21/11/2026): the LASANA plates of its belt (08/p01), then the panther set before its plates (08/v08).
+      parts: yoni("panther-champion-pendant", "08-p01", { ...at("The LASANA plates of the belt, before the assembly", "Before the assembly"), onBlack: false }),
+      assembly: yoni("panther-champion-pendant", "08-v08-1s", { ...at("The panther set with its stones, before the plates of its belt", "Before the belt plates"), onBlack: false }),
       polishing: yoni("panther-champion-pendant", "v01-21s", POLISH()),
       delivery: yoni("panther-champion-pendant", "v02-1s", IN_TRUNK()),
     },
