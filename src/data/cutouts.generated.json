@@ -1075,23 +1075,6 @@
     "note": ""
    }
   ],
-  "script-nameplate-pendant": [
-   {
-    "id": "p21",
-    "kind": "face",
-    "width": 1600,
-    "height": 1124,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/14 Pendentif nom en lettres/14 Pendentif nom en lettres - 21.jpg",
-    "note": ""
-   }
-  ],
   "crown-of-thorns-jesus-piece": [
    {
     "id": "p12",
@@ -1170,6 +1153,23 @@
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/22 Medaille gravee Nathalie Jose/22 Medaille gravee Nathalie Jose - 16.jpg",
+    "note": ""
+   }
+  ],
+  "lois-openda-script-pendant": [
+   {
+    "id": "p21",
+    "kind": "face",
+    "width": 1600,
+    "height": 1124,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/14 Pendentif nom en lettres/14 Pendentif nom en lettres - 21.jpg",
     "note": ""
    }
   ]

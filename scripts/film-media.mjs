@@ -58,7 +58,8 @@ export const FILMS = [
   // Its film opens on a trunk painted with a mural (a famous player): it begins at 7.4 s, on the pendant.
   { slug: "ampersand-initials-pendant", folder: "04", reveal: "04/v01", start: { reveal: 7.4 } },
   { slug: "thorns-and-roses-crucifix", folder: "05", making: "05/v02", reveal: "05/v01" },
-  { slug: "script-nameplate-pendant", folder: "14", reveal: "14/v01" },
+  // "Bouzou" (folder 14): the pendant of Loïs Openda (21/11/2026).
+  { slug: "lois-openda-script-pendant", folder: "14", reveal: "14/v01" },
   { slug: "panther-champion-pendant", folder: "19", making: "19/v01", reveal: "19/v02" },
   // The album "Jesus piece red ruby" of Yoni (folder 20): its studio film in HD, its making-of.
   { slug: "jesus-piece-red-flowers", folder: "20", making: "20/v01", reveal: "20/v02" },

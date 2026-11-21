@@ -21,7 +21,7 @@
  * names and dates of a private family (the back of the celestial medallion), the engraved date and time of the panther.
  * Later on 20/11/2026, the albums of Yoni (his captures): every piece of the folders is online but the 10 removed ones and the
  * tennis chain (03, crossed out by him). 07 ("Cross infinity", the chain) and 14 ("Bouzou", the pendant on it) are two
- * pieces; 01 is his "14 mm cuban", 02 (+ 28/p07) his "Rose 20 mm cuban" (the thumbnails of his albums); 20 is his
+ * pieces (on 21/11/2026 Yoni said "Bouzou" is the pendant of Loïs Openda: one piece with his); 01 is his "14 mm cuban", 02 (+ 28/p07) his "Rose 20 mm cuban" (the thumbnails of his albums); 20 is his
  * "Jesus piece red ruby"; 30 is a piece of its own. Folder 28 holds only copies of other folders and one photo of the
  * chain of 02. Folder 31 holds one piece of its own (p08, p09) and the studio film of "BRT-Flower" (v02); the rest are
  * copies of 30 and single shots of chains found nowhere else.
@@ -153,8 +153,9 @@ export const HD = [
     gallery: ["p12:front", "p9:angle", "p4:setting", "p5:detail", "p11:detail", "p8:detail", "p10:bail", "p7:bail", "p3:back", "p2:back", "p1:mark"],
   },
   // Two albums of Yoni: the pendant "Bouzou" (14) and its chain "Cross infinity" (07; the clasp shots are in both folders).
+  // "Bouzou" is the pendant of Loïs Openda (Yoni, 21/11/2026): its photos go to his piece.
   {
-    dir: "script-nameplate-pendant",
+    dir: "lois-openda-script-pendant",
     folder: "14",
     gallery: ["p21:front", "p3:bust", "p15:angle", "p20:angle", "p16:side", "p17:side", "p1:detail", "p13:detail", "p19:detail", "p14:detail", "p18:bail", "p12:engraving"],
     also: ["p22"],

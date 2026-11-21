@@ -39,9 +39,21 @@ const MOBILE_AT_Y = 0.32;
  */
 const BACKDROPS = [
   { id: "dragon", file: "Dragon Ball - aura energie.png", name: "Aura d'énergie (Dragon Ball)", focus: [0.5, 0.48], mobile: [0.5, 0.48] },
-  { id: "butterfly", file: "Butterfly - metamorphose.png", name: "Métamorphose (chrysalide et papillons)", focus: [0.66, 0.55], mobile: [0.74, 0.42] },
+  // 21/11/2026: the violet forest under the moon (its own portrait for phones). moon: the centre and the radius of the moon
+  // (shares of the width), where it shines, barely (src/components/Universe.tsx, effect "moon").
+  {
+    id: "butterfly",
+    file: "butterfly-foret-desktop.jpg",
+    mobileFile: "butterfly-foret-mobile.jpg",
+    name: "Forêt violette au clair de lune (Butterfly)",
+    focus: [0.62, 0.5],
+    mobile: [0.5, 0.5],
+    moon: [0.7105, 0.1125, 0.0475],
+    mobileMoon: [0.4985, 0.1255, 0.167],
+  },
   { id: "inter", file: "Inter Milan - stade de nuit.png", name: "Stade de nuit (Inter Milan)", focus: [0.5, 0.5], mobile: [0.5, 0.42] },
-  { id: "vfb", file: "VfB Stuttgart - finale fumee rouge.png", name: "Finale, fumée rouge (VfB Stuttgart)", focus: [0.5, 0.5], mobile: [0.5, 0.4] },
+  // 21/11/2026: the stadium at night, red flares and golden confetti (its own portrait for phones).
+  { id: "vfb", file: "vfb-stade-desktop.jpg", mobileFile: "vfb-stade-mobile.jpg", name: "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)", focus: [0.6, 0.48], mobile: [0.5, 0.5] },
   { id: "tunnel", file: "Noah Okafor - tunnel vestiaire.png", name: "Tunnel du vestiaire (Noah Okafor)", focus: [0.5, 0.55], mobile: [0.5, 0.5] },
   // Black, the sphere of light at the top (20/11/2026: large enough as they are, never enlarged; a portrait of its own
   // for phones). core: the centre and the radius of the sphere (share of the width), for its glow and the particles
@@ -77,12 +89,12 @@ const FONT_FILES = [
 ];
 
 async function master(b) {
-  const file = join(MASTERS, b.id + ".png");
-  if (existsSync(file)) return file;
   const src = join(SOURCE, b.file);
   if (!existsSync(src)) throw new Error("AI background not found: " + src);
-  // Already wider than the largest file of the site: used as it is.
+  // Already wider than the largest file of the site: used as it is (never the enlarged master of a former image).
   if (((await sharp(src).metadata()).width ?? 0) >= WIDTHS[WIDTHS.length - 1]) return src;
+  const file = join(MASTERS, b.id + ".png");
+  if (existsSync(file)) return file;
   await mkdir(MASTERS, { recursive: true });
   console.log("Enlarging " + b.file + " (a few minutes)");
   const r = spawnSync("python3", ["-I", join(ROOT, "scripts", "universe-upscale.py"), src, file], { stdio: "inherit" });
@@ -105,7 +117,8 @@ async function backdrop(b) {
     if (!existsSync(src)) throw new Error("AI background not found: " + src);
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, core: b.core, mobileCore: b.mobileCore };
+    // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;

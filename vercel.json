@@ -135,6 +135,66 @@
       "source": "/:lang(fr|es|de|nl|ar)/players/sidney-eweka",
       "destination": "/:lang/players",
       "statusCode": 301
+    },
+    {
+      "source": "/pieces/white-hands",
+      "destination": "/pieces/kenan-yildiz-celebration-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/white-hands",
+      "destination": "/:lang/pieces/kenan-yildiz-celebration-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/t-serpent",
+      "destination": "/pieces/marcus-thuram-t-serpent-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/t-serpent",
+      "destination": "/:lang/pieces/marcus-thuram-t-serpent-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/the-jersey",
+      "destination": "/pieces/noah-okafor-jersey-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/the-jersey",
+      "destination": "/:lang/pieces/noah-okafor-jersey-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/rs",
+      "destination": "/pieces/angelo-stiller-as-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/rs",
+      "destination": "/:lang/pieces/angelo-stiller-as-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/butterfly",
+      "destination": "/pieces/michy-batshuayi-butterfly-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/butterfly",
+      "destination": "/:lang/pieces/michy-batshuayi-butterfly-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/script-nameplate-pendant",
+      "destination": "/pieces/lois-openda-script-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/script-nameplate-pendant",
+      "destination": "/:lang/pieces/lois-openda-script-pendant",
+      "statusCode": 301
     }
   ],
   "rewrites": [

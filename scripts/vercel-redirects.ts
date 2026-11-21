@@ -4,12 +4,14 @@
  * - an unpublished piece (removed from the catalogue, or a draft) -> the page of its player still in the circle, else
  *   /creations;
  * - a person who left the circle (all their pieces unpublished) -> /players;
+ * - a renamed piece (RENAMED_PIECES: two pieces become one, a new address) -> its page;
  * in every language. With the server, server/index.ts does the same from the base. Run it again after publishing or
  * unpublishing a piece in src/data/pieces.ts (tests/site.spec.ts checks that vercel.json is up to date).
  */
 import fs from "node:fs";
 import path from "node:path";
 import { defaultCatalogue } from "../src/data/catalogue.js";
+import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
 
 /** statusCode 301 (Vercel answers 308 for "permanent: true"). */
@@ -27,6 +29,7 @@ export function catalogueRedirects(): Redirect[] {
     if (target) both("/pieces/" + p.slug, target);
   }
   for (const person of defaultCatalogue.people) if (leftTheCircle(defaultCatalogue, person.slug)) both("/players/" + person.slug, "/players");
+  for (const [from, to] of Object.entries(RENAMED_PIECES)) both("/pieces/" + from, "/pieces/" + to);
   return out;
 }
 

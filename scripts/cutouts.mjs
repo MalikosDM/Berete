@@ -134,7 +134,8 @@ const VIEWS = {
   ],
   // Its polished sides mirror the black background: the front view only (the angled views look cut by a black block).
   "baguette-cross-pendant": [{ id: "p12", kind: "face", from: "hd:06/p12" }],
-  "script-nameplate-pendant": [{ id: "p21", kind: "face", from: "hd:14/p21", solo: true }],
+  // "Bouzou" (folder 14), the pendant of Loïs Openda (21/11/2026).
+  "lois-openda-script-pendant": [{ id: "p21", kind: "face", from: "hd:14/p21", solo: true }],
   // The oval eternity band and the panther stand on a mirror that the cutout keeps (a reflection stuck to the jewel):
   // they open on their photo.
   "crown-of-thorns-jesus-piece": [

@@ -16,10 +16,10 @@
    ]
   },
   "butterfly": {
-   "name": "Métamorphose (chrysalide et papillons)",
-   "ratio": 1.75,
-   "focusX": 0.66,
-   "focusY": 0.55,
+   "name": "Forêt violette au clair de lune (Butterfly)",
+   "ratio": 1.792,
+   "focusX": 0.62,
+   "focusY": 0.5,
    "widths": [
     960,
     1600,
@@ -28,6 +28,17 @@
    "mobileWidths": [
     720,
     1080
+   ],
+   "portrait": true,
+   "moon": [
+    0.7105,
+    0.1125,
+    0.0475
+   ],
+   "mobileMoon": [
+    0.4985,
+    0.1255,
+    0.167
    ]
   },
   "inter": {
@@ -46,10 +57,10 @@
    ]
   },
   "vfb": {
-   "name": "Finale, fumée rouge (VfB Stuttgart)",
-   "ratio": 1.75,
-   "focusX": 0.5,
-   "focusY": 0.5,
+   "name": "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)",
+   "ratio": 1.792,
+   "focusX": 0.6,
+   "focusY": 0.48,
    "widths": [
     960,
     1600,
@@ -58,7 +69,8 @@
    "mobileWidths": [
     720,
     1080
-   ]
+   ],
+   "portrait": true
   },
   "tunnel": {
    "name": "Tunnel du vestiaire (Noah Okafor)",
@@ -89,6 +101,7 @@
     720,
     1080
    ],
+   "portrait": true,
    "core": [
     0.5,
     0.148,

@@ -49,6 +49,8 @@ export const RENAMED_PIECES: Record<string, string> = {
   "the-jersey": "noah-okafor-jersey-pendant",
   rs: "angelo-stiller-as-pendant",
   butterfly: "michy-batshuayi-butterfly-chain",
+  // "Bouzou — Pendant" (folder 14) is the pendant of Loïs Openda (Yoni, 21/11/2026): one piece, at his address.
+  "script-nameplate-pendant": "lois-openda-script-pendant",
 };
 
 type Maybe = MediaItem | null | undefined;
@@ -187,6 +189,13 @@ function sorted(dir: string, own: Maybe[]): { cover: Maybe; gallery: Maybe[] } {
 
 /** Views of photos that are not shot on black (worn, in the hand, in a case, a film): they fill their frame. */
 const OFF_BLACK = new Set(["worn", "hand", "case", "film"]);
+
+/** One more photo among the details of a sorted gallery: after the last detail (else at the end). */
+function afterDetails({ cover, gallery }: { cover: Maybe; gallery: Maybe[] }, item: Maybe): { cover: Maybe; gallery: Maybe[] } {
+  const last = gallery.map((m) => m?.view).lastIndexOf("detail");
+  const place = last < 0 ? gallery.length : last + 1;
+  return { cover, gallery: [...gallery.slice(0, place), item, ...gallery.slice(place)] };
+}
 
 /** Texts shared by the photos of many pieces. */
 const RAW = () => at("The piece in raw metal, before the setting", "This piece, before the setting");
@@ -795,21 +804,31 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "White gold tone · round diamonds in pavé",
   }),
+  /*
+   * One piece with "Bouzou — Pendant" (an album of Yoni, folder 14) since 21/11/2026 (Yoni: the same pendant): its photos,
+   * its film and its cut-out from the folder, the close-up of the stories after the other details, the hand of Yoni
+   * (its sketch). The address of "Bouzou" leads here (RENAMED_PIECES).
+   */
   piece({
     slug: "lois-openda-script-pendant",
     title: "Loïs Openda — Script Pendant",
     type: "pendant",
     line: "Script letters and a cross of baguettes.",
-    story: "Script letters drawn in rose gold over a field of white diamonds, with a cross of baguette-cut stones at the centre and pear-shaped diamonds around.",
+    story:
+      "A name written in script letters in rose gold tones, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on the Cross Infinity chain: round links paved with diamonds, joined by crosses of baguettes.",
     people: ["lois-openda"],
     theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
-    cover: still("pieces/lois-openda-nameplate-pendant/cover", at("Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes")),
-    gallery: [],
+    ...afterDetails(
+      sorted("lois-openda-script-pendant", []),
+      still("pieces/lois-openda-nameplate-pendant/cover", { ...at("Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes", "The script and its cross"), view: "detail" }),
+    ),
     specs: [
       ["Type", "Pendant"],
-      ["Motif", "Script letters and a cross"],
+      ["Motif", "A name in script letters"],
+      ["Signature", "BRT mark on the back"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, pear-shaped diamonds, a cross of baguettes",
+    seen: "Rose gold tone · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
+    making: { raw: yoni("lois-openda-script-pendant", "p22", { ...RAW(), onBlack: false }) },
   }),
   piece({
     slug: "the-hand",
@@ -1113,7 +1132,6 @@ export const NEW_PIECES = [
   "cross-infinity-chain",
   "brt-flower-chain",
   "pear-link-chain",
-  "script-nameplate-pendant",
   "jesus-piece-red-flowers",
   "ampersand-initials-pendant",
   "thorns-and-roses-crucifix",
@@ -1126,22 +1144,6 @@ export const NEW_PIECES = [
 
 const COLLECTED: Piece[] = [
   /* Pendants */
-  collected({
-    slug: "script-nameplate-pendant",
-    title: "Bouzou — Pendant",
-    type: "pendant",
-    line: "A name in script, on a chain of crosses.",
-    story:
-      "A name written in script letters in rose gold tones, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on the Cross Infinity chain: round links paved with diamonds, joined by crosses of baguettes.",
-    theme: { preset: "velours" },
-    specs: [
-      ["Type", "Pendant"],
-      ["Motif", "A name in script letters"],
-      ["Signature", "BRT mark on the back"],
-    ],
-    seen: "Rose gold tone · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
-    making: { raw: yoni("script-nameplate-pendant", "p22", { ...RAW(), onBlack: false }) },
-  }),
   collected({
     slug: "ampersand-initials-pendant",
     title: "D&E — Pendant",
@@ -1256,7 +1258,7 @@ const COLLECTED: Piece[] = [
     type: "chain",
     line: "Round links paved with diamonds, joined by crosses.",
     story:
-      "A chain of round links in rose gold tones, each one paved with diamonds, joined by crosses of baguettes. Its oval clasp is paved too, with baguettes around the BRT mark. It carries the Bouzou pendant.",
+      "A chain of round links in rose gold tones, each one paved with diamonds, joined by crosses of baguettes. Its oval clasp is paved too, with baguettes around the BRT mark. In its photos it carries the pendant of Loïs Openda.",
     theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
     specs: [
       ["Type", "Chain"],

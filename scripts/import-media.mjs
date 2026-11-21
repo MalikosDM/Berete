@@ -607,7 +607,7 @@ async function hdVideo(src, out, filter = "") {
   if (info.fps > HD_VIDEO.maxFps + 0.5) filters.push("fps=" + HD_VIDEO.maxFps);
   filters.push("format=yuv420p");
   const vf = filters.join(",");
-  await produce(out, src, "hd-video:" + JSON.stringify(HD_VIDEO) + ":" + vf, ["-i", src, "-t", String(HD_VIDEO.maxSeconds), "-map", "0:v:0", "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(HD_VIDEO.crf), "-maxrate", HD_VIDEO.maxrate, "-bufsize", "2400k", "-profile:v", "high", "-an", "-movflags", "+faststart"]);
+  await produce(out, src, "hd-video:" + JSON.stringify(HD_VIDEO) + ":" + vf, ["-i", src, "-t", String(HD_VIDEO.maxSeconds), "-map", "0:v:0", "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", String(HD_VIDEO.crf), "-maxrate", HD_VIDEO.maxrate, "-bufsize", "2400k", "-profile:v", "high", "-an", "-write_tmcd", "0", "-movflags", "+faststart"]);
   const p = await probe(out);
   return {
     type: "video",

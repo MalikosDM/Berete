@@ -3090,94 +3090,94 @@
         "onBlack": false
       }
     },
-    "script-nameplate-pendant": {
+    "lois-openda-script-pendant": {
       "p21": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p21.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p21.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p03": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p03.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p03.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p15": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p15.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p15.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p20": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p20.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p20.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p16": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p16.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p16.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p17": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p17.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p17.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p01": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p01.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p01.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p13": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p13.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p13.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": false
       },
       "p19": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p19.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p19.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p14": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p14.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p14.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p18": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p18.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p18.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p12": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p12.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p12.webp",
         "width": 1440,
         "height": 2160,
         "onBlack": true
       },
       "p22": {
         "type": "image",
-        "src": "/media/hd/script-nameplate-pendant/p22.webp",
+        "src": "/media/hd/lois-openda-script-pendant/p22.webp",
         "width": 1440,
         "height": 1920,
         "onBlack": false
@@ -5102,21 +5102,21 @@
         "light": false
       }
     },
-    "script-nameplate-pendant": {
+    "lois-openda-script-pendant": {
       "reveal": {
-        "src": "/media/films/script-nameplate-pendant/reveal.mp4",
-        "mobile": "/media/films/script-nameplate-pendant/reveal.m.mp4",
+        "src": "/media/films/lois-openda-script-pendant/reveal.mp4",
+        "mobile": "/media/films/lois-openda-script-pendant/reveal.m.mp4",
         "width": 1080,
         "height": 1920,
         "duration": 32.83,
         "audio": true,
         "posters": [
-          "/media/films/script-nameplate-pendant/reveal-1.webp",
-          "/media/films/script-nameplate-pendant/reveal-2.webp",
-          "/media/films/script-nameplate-pendant/reveal-3.webp",
-          "/media/films/script-nameplate-pendant/reveal-4.webp",
-          "/media/films/script-nameplate-pendant/reveal-5.webp",
-          "/media/films/script-nameplate-pendant/reveal-6.webp"
+          "/media/films/lois-openda-script-pendant/reveal-1.webp",
+          "/media/films/lois-openda-script-pendant/reveal-2.webp",
+          "/media/films/lois-openda-script-pendant/reveal-3.webp",
+          "/media/films/lois-openda-script-pendant/reveal-4.webp",
+          "/media/films/lois-openda-script-pendant/reveal-5.webp",
+          "/media/films/lois-openda-script-pendant/reveal-6.webp"
         ],
         "poster": 4,
         "source": "14/v01 · HD 1080p",
@@ -6537,7 +6537,7 @@
         "view": "mark"
       }
     ],
-    "script-nameplate-pendant": [
+    "lois-openda-script-pendant": [
       {
         "file": "p21",
         "view": "front"
