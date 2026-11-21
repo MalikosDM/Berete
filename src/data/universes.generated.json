@@ -112,6 +112,1061 @@
     0.223,
     0.26
    ]
+  },
+  "arene": {
+   "name": "Arène de combat, projecteur doré (Lasana Keita)",
+   "ratio": 1.778,
+   "focusX": 0.64,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "cone",
+     "tone": "gold",
+     "d": [
+      0.643,
+      0.01,
+      0.3,
+      0.62,
+      0
+     ],
+     "m": [
+      0.5,
+      0.01,
+      0.78,
+      0.5,
+      0
+     ]
+    },
+    {
+     "k": "glow",
+     "tone": "gold",
+     "d": [
+      0.643,
+      0.03,
+      0.07
+     ],
+     "m": [
+      0.5,
+      0.025,
+      0.17
+     ]
+    }
+   ]
+  },
+  "bianconero": {
+   "name": "Stade en noir et blanc, rayures de lumière (Kenan Yildiz)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "beam",
+     "tone": "white",
+     "d": [
+      0.42,
+      0,
+      0.05,
+      0.8
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "d": [
+      0.515,
+      0,
+      0.05,
+      0.8
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "d": [
+      0.64,
+      0,
+      0.05,
+      0.8
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "d": [
+      0.765,
+      0,
+      0.05,
+      0.8
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "d": [
+      0.885,
+      0,
+      0.05,
+      0.8
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "m": [
+      0.18,
+      0,
+      0.075,
+      0.7
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "m": [
+      0.395,
+      0,
+      0.075,
+      0.7
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "m": [
+      0.605,
+      0,
+      0.075,
+      0.7
+     ]
+    },
+    {
+     "k": "beam",
+     "tone": "white",
+     "m": [
+      0.805,
+      0,
+      0.075,
+      0.7
+     ]
+    }
+   ],
+   "regions": {
+    "crowd": {
+     "d": [
+      0.4,
+      0.44,
+      1,
+      0.76
+     ],
+     "m": [
+      0,
+      0.64,
+      1,
+      0.81
+     ]
+    }
+   }
+  },
+  "serpent": {
+   "name": "Temple sombre, serpents dorés, lueur rouge (Marcus Thuram)",
+   "ratio": 1.778,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "red",
+     "d": [
+      0.79,
+      0.5,
+      0.12
+     ],
+     "m": [
+      0.5,
+      0.93,
+      0.4
+     ]
+    }
+   ],
+   "regions": {
+    "path": {
+     "d": [
+      0.42,
+      0.12,
+      0.98,
+      0.86
+     ],
+     "m": [
+      0.08,
+      0.1,
+      0.92,
+      0.72
+     ]
+    }
+   }
+  },
+  "sirius": {
+   "name": "Ciel étoilé, l'étoile Sirius (Sirius)",
+   "ratio": 1.778,
+   "focusX": 0.62,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "star",
+     "tone": "blue",
+     "d": [
+      0.732,
+      0.299,
+      0.035
+     ],
+     "m": [
+      0.498,
+      0.173,
+      0.085
+     ]
+    }
+   ]
+  },
+  "tulipes": {
+   "name": "Champ de tulipes au crépuscule, moulins (Tulips on Tour)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "warm",
+     "d": [
+      0.86,
+      0.29,
+      0.16
+     ],
+     "m": [
+      0.5,
+      0.61,
+      0.42
+     ]
+    },
+    {
+     "k": "sails",
+     "d": [
+      0.8215,
+      0.1823,
+      0.062
+     ],
+     "i": 0
+    },
+    {
+     "k": "sails",
+     "d": [
+      0.6129,
+      0.2467,
+      0.028
+     ],
+     "i": 1
+    }
+   ]
+  },
+  "flaneur": {
+   "name": "Rue de Paris la nuit sous la pluie (Flâneur)",
+   "ratio": 1.792,
+   "focusX": 0.6,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "warm",
+     "d": [
+      0.411,
+      0.136,
+      0.05
+     ],
+     "m": [
+      0.249,
+      0.198,
+      0.12
+     ]
+    },
+    {
+     "k": "glow",
+     "tone": "warm",
+     "d": [
+      0.418,
+      0.425,
+      0.016
+     ],
+     "m": [
+      0.27,
+      0.442,
+      0.035
+     ]
+    },
+    {
+     "k": "ripples",
+     "tone": "warm",
+     "d": [
+      0.3,
+      0.68,
+      0.7,
+      0.32
+     ],
+     "m": [
+      0,
+      0.64,
+      1,
+      0.36
+     ]
+    }
+   ],
+   "regions": {
+    "lamp": {
+     "d": [
+      0.34,
+      0.06,
+      0.48,
+      0.34
+     ],
+     "m": [
+      0.1,
+      0.12,
+      0.42,
+      0.4
+     ]
+    }
+   }
+  },
+  "trefle": {
+   "name": "Jardin émeraude, trèfles et rosée (Eljero Elia)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "green",
+     "d": [
+      0.66,
+      0.12,
+      0.17
+     ],
+     "m": [
+      0.55,
+      0.04,
+      0.4
+     ]
+    }
+   ],
+   "regions": {
+    "dew": {
+     "d": [
+      0.42,
+      0.5,
+      0.95,
+      0.86
+     ],
+     "m": [
+      0,
+      0.62,
+      1,
+      1
+     ]
+    }
+   }
+  },
+  "the-hand": {
+   "name": "Rideau de velours rouge, faisceau de lumière (The Hand)",
+   "ratio": 1.778,
+   "focusX": 0.68,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "warm",
+     "d": [
+      0.75,
+      0.18,
+      0.06
+     ],
+     "m": [
+      0.46,
+      0,
+      0.16
+     ]
+    },
+    {
+     "k": "folds",
+     "d": [
+      0.46,
+      0,
+      0.18,
+      1
+     ],
+     "m": [
+      0,
+      0,
+      0.36,
+      1
+     ]
+    },
+    {
+     "k": "folds",
+     "d": [
+      0.78,
+      0,
+      0.2,
+      1
+     ],
+     "m": [
+      0.64,
+      0,
+      0.36,
+      1
+     ]
+    }
+   ],
+   "regions": {
+    "beam": {
+     "d": [
+      0.6,
+      0.16,
+      0.8,
+      0.66
+     ],
+     "m": [
+      0.36,
+      0,
+      0.6,
+      0.46
+     ]
+    }
+   }
+  },
+  "forge": {
+   "name": "Forge, or en fusion, étincelles (Kevin Schade)",
+   "ratio": 1.778,
+   "focusX": 0.64,
+   "focusY": 0.55,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "fire",
+     "d": [
+      0.66,
+      0.53,
+      0.1
+     ],
+     "m": [
+      0.49,
+      0.9,
+      0.3
+     ]
+    },
+    {
+     "k": "heat",
+     "d": [
+      0.58,
+      0.22,
+      0.16,
+      0.3
+     ],
+     "m": [
+      0.28,
+      0.58,
+      0.44,
+      0.3
+     ]
+    }
+   ],
+   "regions": {
+    "fire": {
+     "d": [
+      0.62,
+      0.5,
+      0.71,
+      0.57
+     ],
+     "m": [
+      0.38,
+      0.86,
+      0.6,
+      0.94
+     ]
+    }
+   }
+  },
+  "sacre": {
+   "name": "Cathédrale, rayons à travers les vitraux (Lumière sacrée)",
+   "ratio": 1.778,
+   "focusX": 0.62,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "rays",
+     "tone": "warm",
+     "d": [
+      0.76,
+      0.38,
+      0.42,
+      50
+     ],
+     "m": [
+      0.52,
+      0.2,
+      0.86,
+      19
+     ]
+    }
+   ]
+  },
+  "roses": {
+   "name": "Roseraie de nuit (Roseraie)",
+   "ratio": 1.778,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "glow",
+     "tone": "white",
+     "d": [
+      0.53,
+      0.01,
+      0.12
+     ],
+     "m": [
+      0.4,
+      0.08,
+      0.3
+     ]
+    }
+   ],
+   "regions": {
+    "dew": {
+     "d": [
+      0.45,
+      0.15,
+      1,
+      0.98
+     ],
+     "m": [
+      0,
+      0.28,
+      1,
+      0.98
+     ]
+    }
+   }
+  },
+  "velours": {
+   "name": "Salon de velours, bougies (Velours rubis)",
+   "ratio": 1.792,
+   "focusX": 0.7,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "flame",
+     "tone": "warm",
+     "d": [
+      0.589,
+      0.262,
+      0.012
+     ],
+     "i": 0
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "d": [
+      0.625,
+      0.35,
+      0.012
+     ],
+     "i": 1
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "d": [
+      0.644,
+      0.31,
+      0.012
+     ],
+     "i": 2
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "d": [
+      0.94,
+      0.352,
+      0.012
+     ],
+     "i": 3
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "d": [
+      0.897,
+      0.405,
+      0.012
+     ],
+     "i": 4
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "m": [
+      0.437,
+      0.575,
+      0.03
+     ],
+     "i": 0
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "m": [
+      0.503,
+      0.625,
+      0.03
+     ],
+     "i": 1
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "m": [
+      0.539,
+      0.588,
+      0.03
+     ],
+     "i": 2
+    },
+    {
+     "k": "flame",
+     "tone": "warm",
+     "m": [
+      0.989,
+      0.66,
+      0.03
+     ],
+     "i": 3
+    },
+    {
+     "k": "wisp",
+     "d": [
+      0.822,
+      0.585,
+      0.028
+     ],
+     "m": [
+      0.853,
+      0.765,
+      0.07
+     ]
+    }
+   ]
+  },
+  "facettes": {
+   "name": "Salle de miroirs facettés (Facettes)",
+   "ratio": 1.792,
+   "focusX": 0.6,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true
+  },
+  "mecanique": {
+   "name": "Mouvement de montre géant (Mécanique)",
+   "ratio": 1.792,
+   "focusX": 0.7,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "spin",
+     "d": [
+      0.845,
+      0.165,
+      0.11
+     ],
+     "m": [
+      0.17,
+      0.12,
+      0.2
+     ]
+    },
+    {
+     "k": "spin",
+     "d": [
+      0.928,
+      0.565,
+      0.1
+     ]
+    },
+    {
+     "k": "swing",
+     "d": [
+      0.545,
+      0.632,
+      0.12
+     ],
+     "m": [
+      0.6,
+      0.835,
+      0.19
+     ]
+    },
+    {
+     "k": "swing",
+     "m": [
+      0.79,
+      0.185,
+      0.17
+     ]
+    }
+   ]
+  },
+  "n14": {
+   "name": "Ciel doux, une constellation qui dessine un N (N14)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "spots": [
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.548,
+      0.728,
+      0.016
+     ],
+     "i": 0
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.613,
+      0.711,
+      0.016
+     ],
+     "i": 1
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.622,
+      0.669,
+      0.016
+     ],
+     "i": 2
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.68,
+      0.317,
+      0.016
+     ],
+     "i": 3
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.629,
+      0.254,
+      0.016
+     ],
+     "i": 4
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.659,
+      0.263,
+      0.016
+     ],
+     "i": 5
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.726,
+      0.369,
+      0.016
+     ],
+     "i": 6
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.712,
+      0.447,
+      0.016
+     ],
+     "i": 7
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.76,
+      0.632,
+      0.016
+     ],
+     "i": 8
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.811,
+      0.337,
+      0.016
+     ],
+     "i": 9
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.822,
+      0.269,
+      0.016
+     ],
+     "i": 10
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "d": [
+      0.843,
+      0.233,
+      0.016
+     ],
+     "i": 11
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "m": [
+      0.384,
+      0.316,
+      0.045
+     ],
+     "i": 0
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "m": [
+      0.383,
+      0.14,
+      0.045
+     ],
+     "i": 1
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "m": [
+      0.496,
+      0.229,
+      0.045
+     ],
+     "i": 2
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "m": [
+      0.605,
+      0.315,
+      0.045
+     ],
+     "i": 3
+    },
+    {
+     "k": "star",
+     "tone": "rose",
+     "seq": true,
+     "m": [
+      0.606,
+      0.142,
+      0.045
+     ],
+     "i": 4
+    }
+   ]
   }
  }
 }

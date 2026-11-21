@@ -70,6 +70,105 @@ const BACKDROPS = [
   },
 ];
 
+/**
+ * The 15 universes of 21/11/2026 (Yoni): each image in two versions, "<id>-desktop.jpg" and "<id>-mobile.jpg" (its own
+ * portrait for phones). focus: the heart of the computer image, placed behind the piece.
+ * spots: the lights of the image that come alive (src/components/Universe.tsx, effect "scene"), on the computer image (d)
+ * and on the phone image (m): x and sizes as shares of the width, y and heights as shares of the height (see SPOT_PARAMS
+ * there for the meaning of each number, by kind); tone: their colour. A spot without "m" is not drawn on a phone.
+ * regions: where some effects of the canvas happen (src/components/universe/fx.ts), [left, top, right, bottom].
+ */
+const scene = (id, name, focus, extra = {}) => ({ id, file: id + "-desktop.jpg", mobileFile: id + "-mobile.jpg", name, focus, mobile: [0.5, 0.5], ...extra });
+const SCENES = [
+  scene("arene", "Arène de combat, projecteur doré (Lasana Keita)", [0.64, 0.55], {
+    spots: [
+      { k: "cone", tone: "gold", d: [0.643, 0.01, 0.3, 0.62, 0], m: [0.5, 0.01, 0.78, 0.5, 0] },
+      { k: "glow", tone: "gold", d: [0.643, 0.03, 0.07], m: [0.5, 0.025, 0.17] },
+    ],
+  }),
+  scene("bianconero", "Stade en noir et blanc, rayures de lumière (Kenan Yildiz)", [0.66, 0.5], {
+    spots: [0.42, 0.515, 0.64, 0.765, 0.885].map((x) => ({ k: "beam", tone: "white", d: [x, 0, 0.05, 0.8] })).concat(
+      [0.18, 0.395, 0.605, 0.805].map((x) => ({ k: "beam", tone: "white", m: [x, 0, 0.075, 0.7] })),
+    ),
+    regions: { crowd: { d: [0.4, 0.44, 1, 0.76], m: [0, 0.64, 1, 0.81] } },
+  }),
+  scene("serpent", "Temple sombre, serpents dorés, lueur rouge (Marcus Thuram)", [0.66, 0.5], {
+    spots: [{ k: "glow", tone: "red", d: [0.79, 0.5, 0.12], m: [0.5, 0.93, 0.4] }],
+    regions: { path: { d: [0.42, 0.12, 0.98, 0.86], m: [0.08, 0.1, 0.92, 0.72] } },
+  }),
+  scene("sirius", "Ciel étoilé, l'étoile Sirius (Sirius)", [0.62, 0.5], {
+    spots: [{ k: "star", tone: "blue", d: [0.732, 0.299, 0.035], m: [0.498, 0.173, 0.085] }],
+  }),
+  // The sails of its two windmills turn (computer image: they are drawn by the site, the painted ones removed from a copy
+  // of the image by scripts/universe-inpaint.py; on a phone the windmill is under the texts, it stays as painted).
+  scene("tulipes", "Champ de tulipes au crépuscule, moulins (Tulips on Tour)", [0.66, 0.55], {
+    sails: ["0.8215,0.1823,0.062,-85,177,9", "0.6129,0.2467,0.028,-82,178,11"],
+    spots: [
+      { k: "glow", tone: "warm", d: [0.86, 0.29, 0.16], m: [0.5, 0.61, 0.42] },
+      { k: "sails", d: [0.8215, 0.1823, 0.062], i: 0 },
+      { k: "sails", d: [0.6129, 0.2467, 0.028], i: 1 },
+    ],
+  }),
+  scene("flaneur", "Rue de Paris la nuit sous la pluie (Flâneur)", [0.6, 0.5], {
+    spots: [
+      { k: "glow", tone: "warm", d: [0.411, 0.136, 0.05], m: [0.249, 0.198, 0.12] },
+      { k: "glow", tone: "warm", d: [0.418, 0.425, 0.016], m: [0.27, 0.442, 0.035] },
+      { k: "ripples", tone: "warm", d: [0.3, 0.68, 0.7, 0.32], m: [0, 0.64, 1, 0.36] },
+    ],
+    regions: { lamp: { d: [0.34, 0.06, 0.48, 0.34], m: [0.1, 0.12, 0.42, 0.4] } },
+  }),
+  scene("trefle", "Jardin émeraude, trèfles et rosée (Eljero Elia)", [0.66, 0.55], {
+    spots: [{ k: "glow", tone: "green", d: [0.66, 0.12, 0.17], m: [0.55, 0.04, 0.4] }],
+    regions: { dew: { d: [0.42, 0.5, 0.95, 0.86], m: [0, 0.62, 1, 1] } },
+  }),
+  scene("the-hand", "Rideau de velours rouge, faisceau de lumière (The Hand)", [0.68, 0.5], {
+    spots: [
+      { k: "glow", tone: "warm", d: [0.75, 0.18, 0.06], m: [0.46, 0, 0.16] },
+      { k: "folds", d: [0.46, 0, 0.18, 1], m: [0, 0, 0.36, 1] },
+      { k: "folds", d: [0.78, 0, 0.2, 1], m: [0.64, 0, 0.36, 1] },
+    ],
+    regions: { beam: { d: [0.6, 0.16, 0.8, 0.66], m: [0.36, 0, 0.6, 0.46] } },
+  }),
+  scene("forge", "Forge, or en fusion, étincelles (Kevin Schade)", [0.64, 0.55], {
+    spots: [
+      { k: "glow", tone: "fire", d: [0.66, 0.53, 0.1], m: [0.49, 0.9, 0.3] },
+      { k: "heat", d: [0.58, 0.22, 0.16, 0.3], m: [0.28, 0.58, 0.44, 0.3] },
+    ],
+    regions: { fire: { d: [0.62, 0.5, 0.71, 0.57], m: [0.38, 0.86, 0.6, 0.94] } },
+  }),
+  scene("sacre", "Cathédrale, rayons à travers les vitraux (Lumière sacrée)", [0.62, 0.5], {
+    spots: [{ k: "rays", tone: "warm", d: [0.76, 0.38, 0.42, 50], m: [0.52, 0.2, 0.86, 19] }],
+  }),
+  scene("roses", "Roseraie de nuit (Roseraie)", [0.66, 0.5], {
+    spots: [{ k: "glow", tone: "white", d: [0.53, 0.01, 0.12], m: [0.4, 0.08, 0.3] }],
+    regions: { dew: { d: [0.45, 0.15, 1, 0.98], m: [0, 0.28, 1, 0.98] } },
+  }),
+  scene("velours", "Salon de velours, bougies (Velours rubis)", [0.7, 0.5], {
+    spots: [
+      ...[[0.589, 0.262], [0.625, 0.35], [0.644, 0.31], [0.94, 0.352], [0.897, 0.405]].map(([x, y], i) => ({ k: "flame", tone: "warm", d: [x, y, 0.012], i })),
+      ...[[0.437, 0.575], [0.503, 0.625], [0.539, 0.588], [0.989, 0.66]].map(([x, y], i) => ({ k: "flame", tone: "warm", m: [x, y, 0.03], i })),
+      { k: "wisp", d: [0.822, 0.585, 0.028], m: [0.853, 0.765, 0.07] },
+    ],
+  }),
+  scene("facettes", "Salle de miroirs facettés (Facettes)", [0.6, 0.5]),
+  scene("mecanique", "Mouvement de montre géant (Mécanique)", [0.7, 0.5], {
+    spots: [
+      { k: "spin", d: [0.845, 0.165, 0.11], m: [0.17, 0.12, 0.2] },
+      { k: "spin", d: [0.928, 0.565, 0.1] },
+      { k: "swing", d: [0.545, 0.632, 0.12], m: [0.6, 0.835, 0.19] },
+      { k: "swing", m: [0.79, 0.185, 0.17] },
+    ],
+  }),
+  scene("n14", "Ciel doux, une constellation qui dessine un N (N14)", [0.66, 0.5], {
+    // The stars of the N, in the order they light up (the tail, the first leg, the diagonal, the last leg).
+    spots: [
+      ...[[0.548, 0.728], [0.613, 0.711], [0.622, 0.669], [0.68, 0.317], [0.629, 0.254], [0.659, 0.263], [0.726, 0.369], [0.712, 0.447], [0.76, 0.632], [0.811, 0.337], [0.822, 0.269], [0.843, 0.233]].map(([x, y], i) => ({ k: "star", tone: "rose", seq: true, d: [x, y, 0.016], i })),
+      ...[[0.384, 0.316], [0.383, 0.14], [0.496, 0.229], [0.605, 0.315], [0.606, 0.142]].map(([x, y], i) => ({ k: "star", tone: "rose", seq: true, m: [x, y, 0.045], i })),
+    ],
+  }),
+];
+BACKDROPS.push(...SCENES);
+
 /** The title fonts: package, file (latin letters only: the titles of the site), and the part of Yuji Boku that holds 力. */
 const FONT_FILES = [
   ["shojumaru", "shojumaru-latin-400-normal"],
@@ -102,13 +201,24 @@ async function master(b) {
   return file;
 }
 
+/** The computer image without the sails of its windmills (b.sails): a copy made once, kept with the masters. */
+async function withoutSails(b) {
+  const src = join(SOURCE, b.file);
+  const file = join(MASTERS, b.id + "-without-sails.png");
+  if (existsSync(file)) return file;
+  await mkdir(MASTERS, { recursive: true });
+  const r = spawnSync("python3", ["-I", join(ROOT, "scripts", "universe-inpaint.py"), src, file, ...b.sails], { stdio: "inherit" });
+  if (r.status !== 0) throw new Error("removing the sails failed: " + b.file);
+  return file;
+}
+
 async function write(image, base) {
   await image.clone().avif({ quality: 52, effort: 6 }).toFile(base + ".avif");
   await image.clone().webp({ quality: 74, effort: 6 }).toFile(base + ".webp");
 }
 
 async function backdrop(b) {
-  const file = await master(b);
+  const file = b.sails ? await withoutSails(b) : await master(b);
   const { width, height } = await sharp(file).metadata();
   for (const w of WIDTHS) await write(sharp(file).resize({ width: w }), join(OUT, b.id + "-" + w));
   if (b.mobileFile) {
@@ -118,7 +228,7 @@ async function backdrop(b) {
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
     // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;
