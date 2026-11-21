@@ -8,6 +8,9 @@ import { ar as house } from "../house/ar";
 
 const n = (count: number, forms: PluralForms) => plural("ar", count, forms);
 
+/** رسالة واتساب: من أين يأتي الزائر، ثم رغبة كل رسالة. */
+const discovered = (what: string) => "مرحباً Berete، اكتشفتُ " + what + " على موقعكم وأودّ مناقشة إبداع خاص بي حسب الطلب.";
+
 export const ar: Messages = {
   site: {
     skip: "الانتقال إلى المحتوى",
@@ -44,11 +47,22 @@ export const ar: Messages = {
   },
 
   whatsapp: {
-    hello: "مرحباً Berete Jewellers، أود البدء في تصميم قطعة حسب الطلب.",
-    createBox: "مرحباً Berete Jewellers، أودّ أن أطلب صندوق Signature خاصاً بي.",
-    piece: (name: string) => "مرحباً Berete Jewellers، أرغب في قطعة مثل «" + name + "». هل يمكننا التحدث بشأنها؟",
+    hello: "مرحباً Berete، أودّ مناقشة إبداع خاص بي حسب الطلب.",
+    createBox: "مرحباً Berete، اكتشفتُ صناديق Signature على موقعكم وأودّ طلب صندوق خاص بي.",
+    piece: (name: string) => discovered("قطعة «" + name + "»"),
+    person: (name: string) => discovered("الإبداعات المصمَّمة لـ " + name),
+    collection: (name: string) => discovered("مجموعة " + name),
+    pages: {
+      home: "مرحباً Berete، اكتشفتُ موقعكم وأودّ مناقشة إبداع خاص بي حسب الطلب.",
+      creations: discovered("إبداعاتكم"),
+      atelier: discovered("المشغل"),
+      house: discovered("قصة الدار"),
+      circle: discovered("دائرة Berete"),
+      trunks: discovered("صناديق Signature"),
+      journey: discovered("رحلة الإبداع الخاص"),
+    },
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
-      ["مرحباً Berete Jewellers، أود البدء في تصميم قطعة.", "القطعة: " + type, "الميزانية: " + budget, "التوقيت: " + timing, ...(pieceName ? ["مستوحاة من: «" + pieceName + "»"] : [])].join("\n"),
+      ["مرحباً Berete، أودّ البدء في إبداع خاص بي حسب الطلب.", "القطعة: " + type, "الميزانية: " + budget, "التوقيت: " + timing, ...(pieceName ? ["مستوحاة من: «" + pieceName + "»"] : [])].join("\n"),
   },
 
   types: {

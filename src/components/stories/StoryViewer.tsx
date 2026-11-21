@@ -3,7 +3,7 @@ import { ArrowRight, ArrowUpRight, Play, Volume2, VolumeX, X } from "lucide-reac
 import BrandIcon from "@/components/BrandIcon";
 import { Img } from "@/components/Media";
 import Universe from "@/components/Universe";
-import { resolveTheme } from "@/data/themes";
+import { BACKDROPS, resolveTheme } from "@/data/themes";
 import { srcSetOf } from "@/lib/responsive";
 import { pieceByMedia } from "@/data/relations";
 import type { Story } from "@/data/types";
@@ -50,10 +50,14 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
   // The piece shown in this photo or video, else the piece of the story.
   const pieceSlug = (item && byMedia.get(item.src)) ?? story?.pieceSlug ?? null;
   const piece = pieceSlug ? cat.pieces.find((p) => p.slug === pieceSlug) : undefined;
-  // A piece whose world surrounds its story (the Genkidama of Dragon Ball): its universe behind the story, else black.
+  // Its WhatsApp message: the piece shown, by its name as on its page; else the person of the story; else a greeting.
+  const storyPerson = story ? cat.people.find((p) => story.people.includes(p.slug)) : undefined;
+  const storyMessage = piece ? t.whatsapp.piece(piece.title) : storyPerson ? t.whatsapp.person(storyPerson.name) : t.whatsapp.hello;
+  // A piece whose world surrounds its story (an AI background made for a whole screen: the Genkidama of Dragon Ball, the
+  // stadium of VfB Stuttgart, the violet forest of the Butterfly): its universe behind the story, else black.
   const world = useMemo(() => {
     const theme = piece ? resolveTheme(piece.theme) : null;
-    return theme?.effects.includes("genkidama") ? theme : null;
+    return theme?.backdrop && BACKDROPS[theme.backdrop]?.portrait ? theme : null;
   }, [piece]);
   const isVideo = item?.type === "video";
   const stepKey = s + ":" + m;
@@ -361,7 +365,7 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
               </a>
             ) : null}
             <div className="flex gap-3">
-              <a href={waLink(t.whatsapp.piece(piece?.title ?? story.title))} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
+              <a href={waLink(storyMessage)} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
                 <BrandIcon name="whatsapp" className="size-5" /> {t.stories.want}
               </a>
               {piece ? (

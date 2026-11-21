@@ -7,6 +7,7 @@ import WhatsAppHandoff from "@/components/WhatsAppHandoff";
 import { BUDGETS, EMAIL, HAS_SERVER, INSTAGRAM_HANDLE, INSTAGRAM_URL, PIECE_CHOICES, TIMINGS, waLink } from "@/lib/site";
 import { requestCallback } from "@/lib/api";
 import { useCatalogue } from "@/lib/catalogue";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 type ContactBlockProps = {
   pieceName?: string;
@@ -28,7 +29,8 @@ function stepsOf(t: Messages): { title: string; options: Choice[] }[] {
 
 export default function ContactBlock({ pieceName, compact = false, id }: ContactBlockProps) {
   const { t } = useI18n();
-  const mainMessage = pieceName ? t.whatsapp.piece(pieceName) : t.whatsapp.hello;
+  // The message of the page it is on (a person: the creations made for them; the home page; Private Enquiries).
+  const mainMessage = useWhatsAppMessage();
   const { people } = useCatalogue();
   const proof = [...people.filter((p) => p.kind === "club"), ...people.filter((p) => p.kind === "player" && p.number !== null)].map((p) => p.name);
 

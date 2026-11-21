@@ -6,6 +6,7 @@ import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
 import { media } from "@/data/catalogue";
 import { Link, useI18n, type Messages } from "@/i18n";
 import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 type Step = {
   n: number;
@@ -220,6 +221,7 @@ function StepsOverview({ steps: STEPS }: { steps: Step[] }) {
 
 function Closing() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   return (
     <section aria-labelledby="process-cta" className="bg-ink pb-28 lg:pb-40">
       <div className="mx-auto max-w-4xl px-5 text-center sm:px-8">
@@ -236,7 +238,7 @@ function Closing() {
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
           <a
-            href={waLink(t.whatsapp.hello)}
+            href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
             className="inline-flex min-h-14 items-center justify-center gap-3 border border-rose-light/70 px-8 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink"

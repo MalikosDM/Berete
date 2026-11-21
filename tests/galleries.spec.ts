@@ -35,7 +35,7 @@ test("Créations: every published piece is there, each card with its photo", asy
 });
 
 /** Eight new pieces (the most photos, films, the albums of Yoni), and the four pieces of the site with the most photos. */
-const NEW_PAGES = ["script-nameplate-pendant", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain", "cross-infinity-chain", "brt-flower-chain", "jesus-piece-red-flowers"];
+const NEW_PAGES = ["thorns-and-roses-crucifix", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain", "cross-infinity-chain", "brt-flower-chain", "jesus-piece-red-flowers"];
 const PAGES = [
   ...NEW_PAGES,
   ...PUBLISHED.filter((p) => !NEW_PIECES.includes(p.slug))
@@ -50,7 +50,7 @@ test("the pages chosen: eight new pieces and four of the site", () => {
 });
 
 /** The new pieces with a film of the finished piece: it opens their page (src/components/PieceFilm.tsx). */
-const NEW_FILMS = ["ampersand-initials-pendant", "thorns-and-roses-crucifix", "script-nameplate-pendant", "panther-champion-pendant", "jesus-piece-red-flowers", "brt-flower-chain", "baguette-cuban-chain"];
+const NEW_FILMS = ["ampersand-initials-pendant", "thorns-and-roses-crucifix", "lois-openda-script-pendant", "panther-champion-pendant", "jesus-piece-red-flowers", "brt-flower-chain", "baguette-cuban-chain"];
 for (const slug of NEW_FILMS) {
   test(slug + ": its film first, then the piece", async ({ page }, info) => {
     const problems = watch(page);

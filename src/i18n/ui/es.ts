@@ -14,6 +14,10 @@ const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "un coleccionis
 /** The feminine names of jewels and collections: "las cadenas", "una pulsera creada…". */
 const FEMININE = new Set(["cadena", "pulsera", "cadenas", "pulseras"]);
 
+/** Un mensaje de WhatsApp: de dónde viene el visitante, y el deseo de cada mensaje. */
+const discovered = (what: string) => "Hola, Berete: he descubierto " + what + " en su web y me gustaría hablar de una creación a medida, solo para mí.";
+const lowerFirst = (s: string) => s.charAt(0).toLocaleLowerCase("es") + s.slice(1);
+
 export const es: Messages = {
   site: {
     skip: "Ir al contenido",
@@ -50,11 +54,22 @@ export const es: Messages = {
   },
 
   whatsapp: {
-    hello: "Hola, Berete Jewellers. Me gustaría encargar una pieza a medida.",
-    createBox: "Hola, Berete Jewellers. Me gustaría encargar mi propio Estuche Signature.",
-    piece: (name: string) => "Hola, Berete Jewellers. Me gustaría una pieza como “" + name + "”. ¿Podríamos hablarlo?",
+    hello: "Hola, Berete: me gustaría hablar de una creación a medida, solo para mí.",
+    createBox: "Hola, Berete: he descubierto los Estuches Signature en su web y me gustaría encargar un estuche solo para mí.",
+    piece: (name: string) => discovered("la creación “" + name + "”"),
+    person: (name: string) => discovered("las creaciones realizadas para " + name),
+    collection: (name: string) => discovered("sus " + lowerFirst(name)),
+    pages: {
+      home: "Hola, Berete: he descubierto su web y me gustaría hablar de una creación a medida, solo para mí.",
+      creations: discovered("sus creaciones"),
+      atelier: discovered("el taller"),
+      house: discovered("la historia de la Casa"),
+      circle: discovered("el Círculo Berete"),
+      trunks: discovered("los Estuches Signature"),
+      journey: discovered("la experiencia a medida"),
+    },
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
-      ["Hola, Berete Jewellers. Me gustaría empezar una pieza.", "Pieza: " + type, "Presupuesto: " + budget, "Plazo: " + timing, ...(pieceName ? ["Inspirada en: “" + pieceName + "”"] : [])].join("\n"),
+      ["Hola, Berete: me gustaría empezar una creación a medida.", "Pieza: " + type, "Presupuesto: " + budget, "Plazo: " + timing, ...(pieceName ? ["Inspirada en: “" + pieceName + "”"] : [])].join("\n"),
   },
 
   types: {

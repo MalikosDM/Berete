@@ -1,6 +1,7 @@
 /*
  * The effects of a universe (src/data/themes.ts), drawn in one canvas behind the content: dust, embers, diamond glints,
- * lightning, speed lines, butterflies of light, confetti, petals, stars, the light rising to the sphere of the Genkidama.
+ * lightning, speed lines, butterflies of light (in the colour of the universe), confetti, golden confetti, petals, stars,
+ * the light rising to the sphere of the Genkidama.
  * Loaded after the content of the page
  * (src/components/Universe.tsx); every effect answers the speed of the scroll, lightly.
  *
@@ -45,6 +46,19 @@ function sprite(color: [number, number, number]): HTMLCanvasElement {
   return c;
 }
 
+/** Golden confetti (VfB Stuttgart): metal leaves, from deep gold to pale gold. */
+const GOLD = ["rgba(243,210,122,1)", "rgba(232,182,90,1)", "rgba(255,236,186,1)", "rgba(190,140,52,1)"];
+
+/** The hue (0 to 360) of a colour. */
+function hueOf([r, g, b]: [number, number, number]): number {
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  if (max === min) return 0;
+  const d = max - min;
+  const h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return h * 60;
+}
+
 const TULIPS: [number, number, number][] = [
   [226, 72, 92],
   [242, 140, 160],
@@ -64,6 +78,8 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   const white: [number, number, number] = [255, 255, 255];
   const light = mix(glow, white, 0.55);
   const glowSprite = sprite(glow);
+  // The butterflies of light take the colour of the universe, with a few in warm gold (the lanterns, the ribbons).
+  const glowHue = hueOf(glow);
   const lightSprite = sprite(light);
   const rtl = document.documentElement.dir === "rtl";
 
@@ -151,27 +167,32 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       size: rand(7, 15) * (phone ? 0.8 : 1),
       spin: rand(0, Math.PI * 2),
       angle: 0,
-      hue: rand(0, 360),
+      hue: Math.random() < 0.72 ? glowHue + rand(-18, 18) : rand(36, 48),
       color: "",
       kind: 0,
     };
   };
   const confettiColors = [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
   const petalColors = opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
-  const newFalling = (anywhere: boolean, petal: boolean): P => ({
-    x: rand(-0.05, 1.05) * w,
-    y: anywhere ? rand(-0.1, 1) * h : rand(-60, -10),
-    vx: rand(-0.4, 0.4),
-    vy: petal ? rand(0.35, 0.9) : rand(0.5, 1.3),
-    life: 0,
-    max: 99999,
-    size: petal ? rand(6, 12) : rand(4, 8),
-    spin: rand(0, Math.PI * 2),
-    angle: rand(-0.04, 0.04),
-    hue: rand(0, Math.PI * 2),
-    color: petal ? petalColors[Math.floor(Math.random() * petalColors.length)]! : confettiColors[Math.floor(Math.random() * confettiColors.length)]!,
-    kind: petal ? 1 : 0,
-  });
+  /** kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light). */
+  const newFalling = (anywhere: boolean, kind: number): P => {
+    const petal = kind === 1;
+    const colors = petal ? petalColors : kind === 2 ? GOLD : confettiColors;
+    return {
+      x: rand(-0.05, 1.05) * w,
+      y: anywhere ? rand(-0.1, 1) * h : rand(-60, -10),
+      vx: rand(-0.4, 0.4),
+      vy: petal ? rand(0.35, 0.9) : kind === 2 ? rand(0.35, 0.85) : rand(0.5, 1.3),
+      life: 0,
+      max: 99999,
+      size: petal ? rand(6, 12) : rand(4, 8),
+      spin: rand(0, Math.PI * 2),
+      angle: rand(-0.04, 0.04),
+      hue: rand(0, Math.PI * 2),
+      color: colors[Math.floor(Math.random() * colors.length)]!,
+      kind,
+    };
+  };
 
   /** A grain of light of the Genkidama: born low on the screen, it rises to the sphere and melts into it. */
   const newGenki = (anywhere: boolean): P => {
@@ -197,8 +218,9 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     if (has("genkidama")) while (genki.length < count(84)) genki.push(newGenki(true));
     if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
     if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
-    if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, false));
-    if (has("petals")) while (falling.filter((p) => p.kind === 1).length < count(22)) falling.push(newFalling(true, true));
+    if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, 0));
+    if (has("petals")) while (falling.filter((p) => p.kind === 1).length < count(22)) falling.push(newFalling(true, 1));
+    if (has("gold-confetti")) while (falling.filter((p) => p.kind === 2).length < count(24)) falling.push(newFalling(true, 2));
     if (has("stars")) while (stars.length < count(110)) stars.push({ ...newDust(true), size: rand(0.5, 1.6), spin: rand(0, Math.PI * 2), angle: rand(0.01, 0.04) });
   };
   fill();
@@ -417,7 +439,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         const a = Math.min(1, p.life / 40, (p.max - p.life) / 70) * 0.85;
         if (a > 0) {
           const flap = 0.25 + 0.75 * Math.abs(Math.sin(p.spin));
-          const hue = (p.hue + p.life * 0.6) % 360;
+          const hue = (p.hue + Math.sin(p.life * 0.02) * 10 + 360) % 360;
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(Math.atan2(p.vy, p.vx) + Math.PI / 2);
@@ -469,7 +491,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
 
     // Confetti and petals fall in their own colours, not in light.
     ctx.globalCompositeOperation = "source-over";
-    if (has("confetti") || has("petals")) {
+    if (has("confetti") || has("petals") || has("gold-confetti")) {
       for (let i = falling.length - 1; i >= 0; i--) {
         const p = falling[i]!;
         p.hue += 0.05;
@@ -491,9 +513,15 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
           ctx.fill();
         } else {
           ctx.fillRect(-p.size / 2, (-p.size / 4) * Math.abs(turn), p.size, (p.size / 2) * Math.abs(turn) + 0.6);
+          // A leaf of gold catches the light as it turns flat to the screen.
+          if (p.kind === 2 && Math.abs(turn) > 0.86) {
+            ctx.globalAlpha = 0.55 * (Math.abs(turn) - 0.86) / 0.14;
+            ctx.fillStyle = "rgba(255,248,226,1)";
+            ctx.fillRect(-p.size / 2, (-p.size / 4) * Math.abs(turn), p.size, (p.size / 2) * Math.abs(turn) + 0.6);
+          }
         }
         ctx.restore();
-        if (p.y > h + 30) falling[i] = newFalling(false, p.kind === 1);
+        if (p.y > h + 30) falling[i] = newFalling(false, p.kind);
       }
       ctx.globalAlpha = 1;
     }

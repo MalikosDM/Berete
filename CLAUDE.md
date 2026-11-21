@@ -162,6 +162,31 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 21/11 » (WhatsApp, univers VfB et Butterfly, Openda) — état au 21/11/2026
+- [x] **WhatsApp** : chaque bouton ouvre WhatsApp avec un message déjà écrit, adapté à la page (`src/lib/whatsapp.ts`,
+      textes « whatsapp » de `src/i18n/ui/*.ts`, 6 langues). Pièce : « Hello Berete, I discovered the <nom affiché> on your
+      website and would like to discuss a bespoke creation of my own. » (phrase de Yoni ; en français « J’ai découvert la
+      création « … » sur votre site… ») ; joueur ou club : « the creations made for … » ; collection, Créations, Atelier,
+      La Maison, Le Cercle, Écrins Signature, L’Expérience sur mesure, accueil : leur message ; ailleurs un bonjour. Menu,
+      barre mobile, pied de page, boutons des pages, stories (la pièce montrée, sinon le joueur). Lien universel
+      `https://wa.me/<numéro>?text=…` (iPhone, Android, WhatsApp Web) : wa.me garde le texte entier (accents, «», —, ’),
+      vérifié le 21/11. Le numéro reste à remplacer dans `src/lib/site.ts`. `tests/whatsapp.spec.ts`.
+- [x] **Univers VfB et Butterfly** refaits avec les images de Yoni (`00 Contexte Yoni/Univers IA (propositions)/`,
+      `vfb-stade-*`, `butterfly-foret-*` : version mobile sur téléphone, ordinateur sinon ; `npm run universes`). VfB : fumée
+      de fumigènes qui monte (effet « smoke-rise ») et confettis dorés qui tombent (« gold-confetti »). Butterfly : papillons
+      de lumière aux couleurs de l’univers, scintillements, la lune qui brille à peine (« moon », position de la lune dans
+      `scripts/universe-media.mjs`), bande sombre sous le menu de l’ordinateur. Les fonds faits pour le plein écran
+      (`portrait`) entourent aussi la story de leur pièce (Genkidama, VfB dans « collectionneurs », Butterfly).
+- [x] **Loïs Openda = Bouzou** : une seule pièce, « Loïs Openda — Script Pendant » (`lois-openda-script-pendant`), créée
+      pour Loïs Openda : les 12 photos, le film, le détourage et l’étape brute du dossier 14, plus le gros plan des stories
+      (après les détails) et le croquis de Yoni. `script-nameplate-pendant` redirige (301, `RENAMED_PIECES`, aussi dans
+      `vercel.json` via `npm run redirects`). Texte de la Cross Infinity Chain : « sur ses photos, elle porte le pendentif
+      de Loïs Openda ».
+- [x] **Atelier en HD sur écran Retina** : l’aperçu du making-of prend la version HD quand son cadre montre plus de pixels
+      que la copie légère (Mac Retina) ; téléphone, connexion lente ou écran simple : copie légère (`AtelierPassage.tsx`).
+- `tests/universes.spec.ts` : univers VfB et Butterfly (ordinateur et iPhone, contraste du titre et du menu), story,
+  fusion Openda (adresses, page joueur, Créations), Retina.
+
 ## Passe « films en HD » — état au 21/11/2026
 - [x] **94 originaux** dans `<NN dossier>/Videos HD/` (« NN dossier - video NN - nom d'origine », même numéro que la copie
       de « Videos/ ») : ProRes 422 ou H.264, tous en 1080 × 1920, aucun en HDR, durées identiques aux copies ; les 25 utilisés
@@ -176,8 +201,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Restés en 720p, faute d'original : making-of du AS (18/v04, vidéo téléphone), de Tulips (24/v12, vidéo téléphone), de
       la Rose 20 mm Cuban Chain (01, dossier Fabrication) et de Sirius (37/v05, 848 × 480). Dragon Ball (13/v01), OKA (34/v03),
       Jesus Piece Red Flowers (20/v02) et les dossiers 36, 37, 38 étaient déjà en 1080p dans « Videos/ ».
-- Les vidéos courtes des galeries (« Sous tous les angles », 720p, 12 s) viennent encore des copies : elles passeront aux
-  originaux au prochain `npm run import-media -- --only=hd` (même poids, plus nettes).
+- [x] Vidéos courtes des galeries (« Sous tous les angles », 720p, 12 s, 25 tirées des dossiers) : toutes depuis les originaux
+      le 21/11 (9 refaites depuis « Videos HD », les 16 autres venaient déjà de fichiers en pleine qualité), même poids.
 
 ## Passe « toutes les photos » (galeries complètes, pièces cachées publiées) — état au 20/11/2026
 - [x] **Tri refait** de tous les dossiers iCloud (photo par photo, images de chaque vidéo regardées) : tout ce qui est
@@ -200,7 +225,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       Rose 20 mm Cuban Chain (02 + 28/p07), 14 mm Cuban Chain (01 : les vignettes de ses albums le montrent ; 01 et 02 sont
       deux chaînes), N14 — Medallion (22), Lasana Keita — Panther Pendant (19, « Created exclusively for Lasana Keita »).
       Non cochées, titre descriptif : Infinity Pear Chain (09, nom de son album), Baguette Cuban Chain (30, sans doute la
-      chaîne du pendentif OKA), Two-Tone Iced Cuban Chain (31), White Iced Cuban Chain (33). 46 pièces en ligne.
+      chaîne du pendentif OKA), Two-Tone Iced Cuban Chain (31), White Iced Cuban Chain (33). 46 pièces en ligne (45 depuis le
+      21/11 : Bouzou fondu dans la pièce de Loïs Openda).
 - [x] **Photos des joueurs** envoyées par Yoni (19/11) en photo principale, rangées dans « Photos joueurs en maillot »
       (`- 03`/`- 04`/`- 02`, `scripts/player-media.mjs`) : Kenan Yildiz (Juventus), Marcus Thuram (Inter), Noah Okafor
       (Leeds), Loïs Openda (Juventus), Michy Batshuayi (Belgique). Kenan (554 px) et Openda (479 px) sont petites, jamais
@@ -287,7 +313,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] Page Boxes : bouton **« Create your own box »** en haut et en bas (WhatsApp pré-rempli).
 - [x] Atelier : vidéo d'ouverture remplacée (plan horizontal net, noir et blanc chaud). [ ] Revoir la vidéo IA verticale.
 - [x] Photos des pièces : **haute résolution et fond noir en premier** pour les 15 pièces dont Yoni a envoyé les photos.
-- [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon le type de bijou (fait) ; Bracelet et
+- [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon la page et la pièce (21/11, voir plus haut) ; Bracelet et
       Montre ajoutés au configurateur de contact (fait).
 - [x] La Maison : biographie (fait). [ ] Photos personnelles de Yoni (il les envoie).
 - [ ] Étapes « croquis → 3D » de chaque pièce (Yoni envoie ses étapes).

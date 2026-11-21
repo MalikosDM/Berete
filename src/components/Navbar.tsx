@@ -9,6 +9,7 @@ import { collectionWords, Link, NavLink, stripLocale, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
 import { getLenis } from "@/lib/gsap";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 type NavLinkItem = { label: string; to: string };
 
@@ -23,6 +24,7 @@ function linkClass({ isActive }: { isActive: boolean }): string {
 
 export default function Navbar() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   const cat = useCatalogue();
   const CREATION_LINKS: NavLinkItem[] = [
     { label: t.common.allCreations, to: "/creations" },
@@ -129,7 +131,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageMenu className="hidden md:block" />
           <a
-            href={waLink(t.whatsapp.hello)}
+            href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
             aria-label={t.common.chatWhatsapp}

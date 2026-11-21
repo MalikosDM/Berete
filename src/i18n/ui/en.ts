@@ -13,6 +13,9 @@ const PRIVATE_COLLECTOR = "A private collector";
 /** "A private collector" in the middle of a sentence: "Created exclusively for a private collector". */
 const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "a private collector" : who);
 
+/** A WhatsApp message: where the visitor comes from, then the wish of every message (the words of Yoni, 21/11/2026). */
+const discovered = (what: string) => "Hello Berete, I discovered " + what + " on your website and would like to discuss a bespoke creation of my own.";
+
 export const en = {
   site: {
     skip: "Skip to content",
@@ -51,12 +54,28 @@ export const en = {
   },
 
   /** The messages written for the visitor in WhatsApp. */
+  /**
+   * The messages written for WhatsApp (src/lib/whatsapp.ts): the visitor only has to press Send. Each page says where the
+   * visitor comes from: the piece by its name as shown (Yoni knows at once which creation brought the contact), the
+   * person, the collection, the page.
+   */
   whatsapp: {
-    hello: "Hello Berete Jewellers, I would like to start a custom piece.",
-    createBox: "Hello Berete Jewellers, I would like to commission my own Signature Trunk.",
-    piece: (name: string) => 'Hello Berete Jewellers, I want a piece like "' + name + '". Can we talk about it?',
+    hello: "Hello Berete, I would like to discuss a bespoke creation of my own.",
+    createBox: "Hello Berete, I discovered the Signature Trunks on your website and would like to commission a trunk of my own.",
+    piece: (name: string) => discovered((/^the\s/i.test(name) ? "" : "the ") + name),
+    person: (name: string) => discovered("the creations made for " + name),
+    collection: (name: string) => discovered("your " + name),
+    pages: {
+      home: "Hello Berete, I discovered your website and would like to discuss a bespoke creation of my own.",
+      creations: discovered("your creations"),
+      atelier: discovered("The Atelier"),
+      house: discovered("the story of the House"),
+      circle: discovered("The Berete Circle"),
+      trunks: discovered("the Signature Trunks"),
+      journey: discovered("The Bespoke Journey"),
+    },
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
-      ["Hello Berete Jewellers, I would like to start a piece.", "Piece: " + type, "Budget: " + budget, "Timing: " + timing, ...(pieceName ? ['Inspired by: "' + pieceName + '"'] : [])].join("\n"),
+      ["Hello Berete, I would like to begin a bespoke creation.", "Piece: " + type, "Budget: " + budget, "Timing: " + timing, ...(pieceName ? ['Inspired by: "' + pieceName + '"'] : [])].join("\n"),
   },
 
   types: {

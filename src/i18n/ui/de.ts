@@ -23,6 +23,9 @@ const named = (name: string, c: Case) => (name === PRIVATE_COLLECTOR ? COLLECTOR
 /** "Of" + name: des VfB Stuttgart, von Inter Mailand, von Kevin Schade. */
 const ofName = (name: string) => (CLUBS_WITH_ARTICLE.has(name) ? "des " + name : "von " + named(name, "dat"));
 
+/** Eine WhatsApp-Nachricht: woher der Besucher kommt, dann der Wunsch jeder Nachricht. */
+const discovered = (what: string) => "Hallo Berete, ich habe " + what + " auf Ihrer Website entdeckt und würde gern über eine eigene Kreation nach Maß sprechen.";
+
 export const de: Messages = {
   site: {
     skip: "Zum Inhalt springen",
@@ -59,11 +62,22 @@ export const de: Messages = {
   },
 
   whatsapp: {
-    hello: "Hallo Berete Jewellers, ich möchte ein Schmuckstück nach Maß in Auftrag geben.",
-    createBox: "Hallo Berete Jewellers, ich möchte mein eigenes Signature-Etui in Auftrag geben.",
-    piece: (name: string) => "Hallo Berete Jewellers, ich hätte gern ein Stück wie „" + name + "“. Können wir darüber sprechen?",
+    hello: "Hallo Berete, ich würde gern über eine eigene Kreation nach Maß sprechen.",
+    createBox: "Hallo Berete, ich habe die Signature-Etuis auf Ihrer Website entdeckt und möchte mein eigenes Etui in Auftrag geben.",
+    piece: (name: string) => discovered("die Kreation „" + name + "“"),
+    person: (name: string) => discovered("die Kreationen für " + named(name, "acc")),
+    collection: (name: string) => discovered("Ihre " + name),
+    pages: {
+      home: "Hallo Berete, ich habe Ihre Website entdeckt und würde gern über eine eigene Kreation nach Maß sprechen.",
+      creations: discovered("Ihre Kreationen"),
+      atelier: discovered("das Atelier"),
+      house: discovered("die Geschichte des Hauses"),
+      circle: discovered("den Berete-Kreis"),
+      trunks: discovered("die Signature-Etuis"),
+      journey: discovered("den Weg zum Unikat"),
+    },
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
-      ["Hallo Berete Jewellers, ich möchte ein Schmuckstück in Auftrag geben.", "Stück: " + type, "Budget: " + budget, "Zeitrahmen: " + timing, ...(pieceName ? ["Inspiriert von: „" + pieceName + "“"] : [])].join("\n"),
+      ["Hallo Berete, ich möchte eine Kreation nach Maß in Auftrag geben.", "Stück: " + type, "Budget: " + budget, "Zeitrahmen: " + timing, ...(pieceName ? ["Inspiriert von: „" + pieceName + "“"] : [])].join("\n"),
   },
 
   types: {

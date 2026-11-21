@@ -6,7 +6,23 @@ import Reveal from "@/components/Reveal";
 import { filmTime, type ResolvedAtelier } from "@/data/atelier";
 import type { Piece } from "@/data/types";
 import { useI18n } from "@/i18n";
+import { wantsLight } from "@/lib/films";
 import { useReducedMotion } from "@/lib/gsap";
+
+/** The short side of the light copy of a film, at most (scripts/import-media.mjs: 720p, 540p from a small film). */
+const LIGHT_SHORT = 720;
+
+/**
+ * Whether the frame of the making-of shows more pixels than its light copy holds: a computer with a sharp screen (a Retina
+ * Mac: its frame of 34rem is 1088 pixels wide) takes the film in HD; a phone, a slow connection or a plain screen keep the
+ * light copy. The film covers its frame (object-fit: cover): the short side of the film drawn, in pixels of the screen.
+ */
+function wantsHd(frame: HTMLElement, width: number, height: number): boolean {
+  if (wantsLight() || !width || !height) return false;
+  const box = frame.getBoundingClientRect();
+  const scale = Math.max(box.width / width, box.height / height);
+  return Math.min(width, height) * scale * (window.devicePixelRatio || 1) > LIGHT_SHORT * 1.1;
+}
 
 /** The width of the image of a film (scripts/import-media.mjs: its long side at most 1280 px). */
 export const posterWidth = (w: number, h: number) => Math.round(w * Math.min(1, 1280 / Math.max(w, h)));
@@ -14,7 +30,8 @@ export const posterWidth = (w: number, h: number) => Math.round(w * Math.min(1, 
 /**
  * The passage of a piece page towards its atelier (after its photos): its making-of, the two films it holds, and the way
  * in. Its making-of plays here by itself, silent and in a loop, while it is on screen (like the other films of the page,
- * asked by Yoni on 20/11/2026), in its light copy; it pauses off screen and while the atelier is open. With the sound, from
+ * asked by Yoni on 20/11/2026), in its light copy, in HD on a sharp computer screen (21/11/2026); it loads only once on
+ * screen, pauses off screen and while the atelier is open. With the sound, from
  * its start: once the visitor has entered (src/components/AtelierRoom.tsx). Asked for less motion: its image only.
  */
 export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Piece; madeFor: string; atelier: ResolvedAtelier }) {
@@ -23,6 +40,13 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
   const { making, reveal, poster } = atelier;
   const reduced = useReducedMotion();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [hd, setHd] = useState(false);
+
+  // The copy the frame deserves, chosen once the page is there (the server writes the light one; nothing is loaded yet).
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) setHd(wantsHd(v, making.width, making.height));
+  }, [making.width, making.height]);
 
   useEffect(() => {
     const v = videoRef.current;
@@ -41,7 +65,7 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
       io.disconnect();
       v.pause();
     };
-  }, [reduced, open, making.mobile]);
+  }, [reduced, open, making.mobile, hd]);
 
   const chapters = [{ n: "01", name: t.films.making, time: making.duration }, ...(reveal ? [{ n: "02", name: t.films.reveal, time: reveal.duration }] : [])];
   const enter = () => setOpen(true);
@@ -86,7 +110,8 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
             <video
               ref={videoRef}
               data-atelier-preview
-              src={making.mobile}
+              data-hd={hd ? "" : undefined}
+              src={hd ? making.src : making.mobile}
               poster={poster || undefined}
               muted
               loop

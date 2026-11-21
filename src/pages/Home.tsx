@@ -54,7 +54,7 @@ const homeSteps = (t: Messages): ScrollStep[] => [
             {t.common.startPiece}
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
-          <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
+          <a href={waLink(t.whatsapp.pages.home)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 bg-ink/30 px-7 text-sm font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light max-sm:text-base max-sm:tracking-[0.14em]">
             <BrandIcon name="whatsapp" className="size-5" />
             {t.common.whatsapp}
           </a>

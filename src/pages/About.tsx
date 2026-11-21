@@ -9,6 +9,7 @@ import type { MediaItem } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /** A personal photo of Yoni, only when there is one (never an empty frame). */
 function HousePhoto({ photo, alt, className = "" }: { photo: MediaItem | null; alt: string; className?: string }) {
@@ -29,6 +30,7 @@ function HousePhoto({ photo, alt, className = "" }: { photo: MediaItem | null; a
  */
 export default function About() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   const cat = useCatalogue();
   const house = t.house;
   const portrait = housePhoto(cat, housePhotoKey.portrait);
@@ -127,7 +129,7 @@ export default function About() {
                 <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
               <a
-                href={waLink(t.whatsapp.hello)}
+                href={waLink(waMessage)}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex min-h-14 items-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light"

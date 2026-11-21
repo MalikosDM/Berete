@@ -8,9 +8,11 @@ import BrandIcon from "@/components/BrandIcon";
 import Preloader from "@/components/Preloader";
 import { Link, LocaleSync, useI18n } from "@/i18n";
 import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 export default function Layout() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   const [showBar, setShowBar] = useState(false);
 
   useEffect(() => {
@@ -47,7 +49,7 @@ export default function Layout() {
         {/* WhatsApp as wide as its name; the invitation to create takes the rest (its words are long: one or two lines). */}
         <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
           <a
-            href={waLink(t.whatsapp.hello)}
+            href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
             className="flex min-h-[52px] items-center justify-center gap-2 border border-white/40 px-4 text-base font-medium text-white transition-colors active:bg-white/10"

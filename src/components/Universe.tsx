@@ -6,7 +6,8 @@ import { afterLoad } from "@/lib/idle";
 /*
  * The universe of a piece: the world the visitor enters (src/data/themes.ts), behind the content and never over it.
  *   - The stage (sticky, one screen high): the deep base, the full-screen backdrop (an AI background, else a procedural
- *     composition), the light, the texture, a watermark, the smoke or the twenty stars, the canvas of the effects
+ *     composition), a light laid on the image (the sphere of the Genkidama, the moon), the light, the texture, a
+ *     watermark, the smoke (drifting or rising) or the twenty stars, the canvas of the effects
  *     (src/components/universe/fx.ts, loaded after the content) and the veil that keeps the texts readable.
  *   - The entrance: 1 to 2 seconds of cinema the first time the page opens in a visit, drawn by the style sheet
  *     (src/index.css, "[data-entering]") so that it starts with the page itself; never again on a return, never over
@@ -102,10 +103,13 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
   const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
-  const canvasEffects = effects.filter((e) => ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "petals", "stars", "genkidama"].includes(e));
-  // The sphere of light of the backdrop (Genkidama): its glow, and where the particles of light go.
-  const core = backdrop?.core && effects.includes("genkidama") ? backdrop.core : null;
-  const mobileCore = backdrop?.mobileCore ?? core;
+  const canvasEffects = effects.filter((e) => ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "stars", "genkidama"].includes(e));
+  // A light laid on the image: the sphere of the Genkidama (its glow, and where the particles of light go), else the moon
+  // of the backdrop, shining barely.
+  const genkidama = Boolean(backdrop?.core && effects.includes("genkidama"));
+  const moon = !genkidama && Boolean(backdrop?.moon && effects.includes("moon"));
+  const core = genkidama ? backdrop!.core! : moon ? backdrop!.moon! : null;
+  const mobileCore = (genkidama ? backdrop?.mobileCore : backdrop?.mobileMoon) ?? core;
   const fxKey = canvasEffects.join(" ") + "|" + theme.glow + "|" + theme.preset;
 
   useEntrance(ref, preview || fixed ? undefined : slug);
@@ -219,10 +223,10 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {core && mobileCore ? (
           // Laid over the image exactly (src/index.css): the glow of the sphere breathes, the particles go to its heart.
-          <div className="u-genki" style={{ "--g-x": core[0], "--g-y": core[1], "--g-r": core[2], "--g-mx": mobileCore[0], "--g-my": mobileCore[1], "--g-mr": mobileCore[2] } as CSSProperties}>
+          <div className="u-genki" data-spot={moon ? "moon" : "genkidama"} style={{ "--g-x": core[0], "--g-y": core[1], "--g-r": core[2], "--g-mx": mobileCore[0], "--g-my": mobileCore[1], "--g-mr": mobileCore[2] } as CSSProperties}>
             <div className="u-genki-box">
               <span className="u-genki-glow" />
-              <span className="u-genki-core" />
+              {genkidama ? <span className="u-genki-core" /> : null}
             </div>
           </div>
         ) : null}
@@ -235,6 +239,15 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {effects.includes("smoke") ? (
           <div className="u-smoke">
+            <span />
+            <span />
+            <span />
+          </div>
+        ) : null}
+        {effects.includes("smoke-rise") ? (
+          // The smoke of the flares: columns rising slowly from the bottom of the screen, one after the other.
+          <div className="u-smoke" data-rise="">
+            <span />
             <span />
             <span />
             <span />

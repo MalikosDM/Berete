@@ -12,6 +12,10 @@ const PRIVATE_COLLECTOR = "Een privéverzamelaar";
 /** "Een privéverzamelaar" written inside a sentence. Clubs take no article in Dutch (voor VfB Stuttgart). */
 const inSentence = (who: string) => (who === PRIVATE_COLLECTOR ? "een privéverzamelaar" : who);
 
+/** Een WhatsApp-bericht: waar de bezoeker vandaan komt, dan de wens van elk bericht. */
+const discovered = (what: string) => "Hallo Berete, ik heb " + what + " op uw website ontdekt en zou graag een eigen creatie op maat bespreken.";
+const lowerFirst = (s: string) => s.charAt(0).toLocaleLowerCase("nl") + s.slice(1);
+
 export const nl: Messages = {
   site: {
     skip: "Naar de inhoud",
@@ -48,11 +52,22 @@ export const nl: Messages = {
   },
 
   whatsapp: {
-    hello: "Hallo Berete Jewellers, ik zou graag een juweel op maat laten maken.",
-    createBox: "Hallo Berete Jewellers, ik zou graag mijn eigen Signature-koffer laten maken.",
-    piece: (name: string) => "Hallo Berete Jewellers, ik zou graag een juweel zoals “" + name + "” willen. Kunnen we het erover hebben?",
+    hello: "Hallo Berete, ik zou graag een eigen creatie op maat bespreken.",
+    createBox: "Hallo Berete, ik heb de Signature-koffers op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
+    piece: (name: string) => discovered("de creatie “" + name + "”"),
+    person: (name: string) => discovered("de creaties voor " + name),
+    collection: (name: string) => discovered("uw " + lowerFirst(name)),
+    pages: {
+      home: "Hallo Berete, ik heb uw website ontdekt en zou graag een eigen creatie op maat bespreken.",
+      creations: discovered("uw creaties"),
+      atelier: discovered("het atelier"),
+      house: discovered("het verhaal van het Huis"),
+      circle: discovered("de Kring van Berete"),
+      trunks: discovered("de Signature-koffers"),
+      journey: discovered("de ervaring op maat"),
+    },
     configurator: (type: string, budget: string, timing: string, pieceName?: string) =>
-      ["Hallo Berete Jewellers, ik zou graag een juweel laten maken.", "Juweel: " + type, "Budget: " + budget, "Termijn: " + timing, ...(pieceName ? ["Geïnspireerd door: “" + pieceName + "”"] : [])].join("\n"),
+      ["Hallo Berete, ik zou graag een creatie op maat laten maken.", "Juweel: " + type, "Budget: " + budget, "Termijn: " + timing, ...(pieceName ? ["Geïnspireerd door: “" + pieceName + "”"] : [])].join("\n"),
   },
 
   types: {

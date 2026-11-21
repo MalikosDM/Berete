@@ -21,7 +21,7 @@ export const THEME_LIGHTS = ["halo", "spotlight", "beam", "aura", "ember"] as co
 /** The former slow motion of the backdrop: kept for the universes written before the effects (it maps to an effect). */
 export const THEME_MOTIONS = ["none", "drift", "pulse", "sparkle", "flutter", "rise", "rotate"] as const;
 export const THEME_ENTRANCES = ["ignite", "flash", "smoke", "stars", "flutter", "tunnel", "spotlight", "glint", "bloom", "rain", "tick"] as const;
-export const THEME_EFFECTS = ["dust", "embers", "glints", "lightning", "speedlines", "impact", "butterflies", "iridescence", "confetti", "twenty-stars", "petals", "rain", "stars", "smoke", "genkidama"] as const;
+export const THEME_EFFECTS = ["dust", "embers", "glints", "lightning", "speedlines", "impact", "butterflies", "iridescence", "confetti", "gold-confetti", "twenty-stars", "petals", "rain", "stars", "smoke", "smoke-rise", "genkidama", "moon"] as const;
 
 export type ThemeTexture = (typeof THEME_TEXTURES)[number];
 export type ThemeLight = (typeof THEME_LIGHTS)[number];
@@ -82,6 +82,11 @@ export type Backdrop = {
   /** A sphere of light in the image (Genkidama): its centre and its radius, as shares of the width, landscape and portrait. */
   core?: [number, number, number];
   mobileCore?: [number, number, number];
+  /** Its own portrait for phones, made for a whole screen: it also surrounds the stories of its piece. */
+  portrait?: boolean;
+  /** The moon of the image (effect "moon"): its centre and its radius, the same way. */
+  moon?: [number, number, number];
+  mobileMoon?: [number, number, number];
 };
 export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
 
@@ -134,16 +139,16 @@ export const THEME_PRESETS: Record<string, Preset> = {
     theme: { base: "#080504", tint: "#3a1707", glow: "#ffb45a", texture: "grain", light: "aura", font: "pinceau", backdrop: "dragon", entrance: "flash", effects: ["embers", "lightning", "speedlines", "impact"], mark: "力" },
   },
   metamorphose: {
-    name: "Métamorphose (mouvement, élégance) : Butterfly",
-    theme: { base: "#07050b", tint: "#2a1838", glow: "#d9b8f0", texture: "grain", light: "halo", font: "aerien", backdrop: "butterfly", entrance: "flutter", effects: ["butterflies", "iridescence", "dust"], mark: "" },
+    name: "Forêt violette au clair de lune : Butterfly",
+    theme: { base: "#07050b", tint: "#2a1838", glow: "#d9b8f0", texture: "grain", light: "halo", font: "aerien", backdrop: "butterfly", entrance: "flutter", effects: ["butterflies", "glints", "dust", "moon"], mark: "" },
   },
   "victoire-nuit": {
     name: "Victoire, stade de nuit (Inter Milan)",
     theme: { base: "#03050b", tint: "#0b1733", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "inter", entrance: "stars", effects: ["twenty-stars", "confetti", "glints"], mark: "" },
   },
   "victoire-rouge": {
-    name: "Nuit de finale, fumée rouge (VfB Stuttgart)",
-    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: "vfb", entrance: "smoke", effects: ["smoke", "embers", "glints"], mark: "" },
+    name: "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)",
+    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: "vfb", entrance: "smoke", effects: ["smoke-rise", "gold-confetti", "glints"], mark: "" },
   },
   tunnel: {
     name: "Tunnel du vestiaire, avant-match (Noah Okafor)",
@@ -246,12 +251,15 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   butterflies: "Papillons de lumière au scroll",
   iridescence: "Reflets irisés",
   confetti: "Confettis",
+  "gold-confetti": "Confettis dorés qui tombent",
   "twenty-stars": "Vingt étoiles (Inter)",
   petals: "Pétales qui tombent",
   rain: "Pluie",
   stars: "Étoiles et étoile filante",
   smoke: "Fumée",
+  "smoke-rise": "Fumée qui monte (fumigènes)",
   genkidama: "Genkidama : la lumière monte vers la sphère",
+  moon: "La lune brille à peine (fond avec une lune)",
 };
 
 /** Every former motion becomes one of the effects. */

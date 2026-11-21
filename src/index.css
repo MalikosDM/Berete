@@ -803,6 +803,63 @@ html.lenis body {
   }
 }
 
+/* The smoke of the flares ("smoke-rise", VfB Stuttgart): soft columns, warm white and red, rising slowly from the bottom
+   of the screen one after the other, fading as they climb; never over the column of the texts (the veil darkens it). */
+.u-smoke[data-rise] > span {
+  width: 46vmax;
+  height: 62vmax;
+  top: auto;
+  bottom: -34vmax;
+  background: radial-gradient(closest-side, color-mix(in oklab, color-mix(in oklab, var(--u-glow) 45%, #fff) 26%, transparent), transparent);
+  opacity: 0.35;
+  animation: u-smoke-rise 26s linear infinite;
+}
+.u-smoke[data-rise] > span:nth-child(1) {
+  left: calc(var(--u-at-x) - 30vmax);
+  animation-delay: -4s;
+}
+.u-smoke[data-rise] > span:nth-child(2) {
+  left: calc(var(--u-at-x) - 4vmax);
+  animation-duration: 31s;
+  animation-delay: -17s;
+}
+.u-smoke[data-rise] > span:nth-child(3) {
+  display: block;
+  left: calc(var(--u-at-x) - 46vmax);
+  animation-duration: 36s;
+  animation-delay: -27s;
+}
+.u-smoke[data-rise] > span:nth-child(4) {
+  left: calc(var(--u-at-x) + 10vmax);
+  animation-duration: 29s;
+  animation-delay: -10s;
+}
+@media (max-width: 767px) {
+  .u-smoke[data-rise] > span {
+    width: 70vmax;
+    left: calc(50% - 35vmax);
+  }
+  .u-smoke[data-rise] > span:nth-child(n + 3) {
+    display: none;
+  }
+}
+@keyframes u-smoke-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.8);
+  }
+  18% {
+    opacity: 0.55;
+  }
+  70% {
+    opacity: 0.32;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(4vmax, -78vmax, 0) scale(1.35);
+  }
+}
+
 /* Iridescent reflections: a slow wheel of soft colours around the piece, turned by the scroll. */
 .u-iris {
   inset: -35%;
@@ -999,6 +1056,23 @@ html.lenis body {
 .universe[data-deep] .u-genki-glow {
   animation-play-state: paused;
 }
+/* The moon of a backdrop ("moon", Butterfly): a pale halo on it that brightens and fades, barely. */
+.u-genki[data-spot="moon"] .u-genki-glow {
+  width: calc(var(--gr) * 380%);
+  background: radial-gradient(circle, rgb(255 246 255 / 0.32) 0%, rgb(236 214 255 / 0.16) 30%, rgb(200 170 240 / 0.06) 50%, transparent 68%);
+  animation: u-moon 9s ease-in-out infinite;
+}
+@keyframes u-moon {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
 /* Behind a story: the world on the whole screen, a quiet veil (the story is in the middle). */
 .universe[data-fixed] {
   position: absolute;
@@ -1064,6 +1138,17 @@ html.lenis body {
   inset: 0;
   background: var(--u-base);
   opacity: calc(var(--u-scroll) * 0.4);
+}
+/* The moon of the violet forest (Butterfly) rises behind the menu of a computer: a darker band under the menu, so that its
+   words stay readable on the pale moon. */
+@media (min-width: 1024px) {
+  .universe[data-backdrop="butterfly"]:not([data-fixed]) .u-veil::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 9rem;
+    background: linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 80%, transparent) 0%, color-mix(in oklab, var(--u-base) 55%, transparent) 50%, transparent 100%);
+  }
 }
 
 /* ---------- The entrance (the first visit of the piece) ---------- */

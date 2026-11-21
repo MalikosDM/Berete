@@ -158,8 +158,10 @@ néerlandais (`/nl/...`) et arabe (`/ar/...`, lu de droite à gauche). Le menu d
   dans les autres langues tant que sa traduction n'est pas écrite dans ce bloc.
 - **Arabe** : polices Amiri (titres) et IBM Plex Sans Arabic (texte), sans espacement entre les lettres ; mise en page,
   flèches, galeries et stories en miroir (on avance vers la gauche).
-- **WhatsApp et formulaires** : les messages préremplis sont écrits dans la langue de la page ; les messages et demandes
-  de rappel indiquent dans l'admin la langue du visiteur.
+- **WhatsApp et formulaires** : les messages préremplis sont écrits dans la langue de la page ; chaque bouton WhatsApp
+  porte le message de la page où il est (`src/lib/whatsapp.ts` : la pièce par son nom affiché, le joueur, la collection,
+  la page ; textes « whatsapp » de `src/i18n/ui/*.ts`) ; les messages et demandes de rappel indiquent dans l'admin la
+  langue du visiteur.
 - **Google** : chaque langue a ses pages pré-rendues, son plan du site et ses liens `hreflang`. Pour que ces liens
   figurent dans les pages construites, définir l'adresse publique au moment du build : `SITE_URL=https://… npm run build`
   (sur Vercel, l'adresse du projet est prise d'office).

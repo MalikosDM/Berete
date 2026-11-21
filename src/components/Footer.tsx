@@ -6,11 +6,13 @@ import { visibleCollections } from "@/data/collections";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 const linkCls = "inline-flex min-h-12 items-center text-base text-bone transition-colors hover:text-rose-light";
 
 export default function Footer() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   const cat = useCatalogue();
   const year = new Date().getFullYear();
   const creations = [
@@ -64,7 +66,7 @@ export default function Footer() {
             <h2 className="eyebrow mb-4">{t.footer.contact}</h2>
             <ul>
               <li>
-                <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className={linkCls + " gap-3"}>
+                <a href={waLink(waMessage)} target="_blank" rel="noreferrer" className={linkCls + " gap-3"}>
                   <BrandIcon name="whatsapp" className="size-5" />
                   {t.common.whatsapp}
                 </a>

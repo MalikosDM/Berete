@@ -206,7 +206,7 @@ test("Signature Trunks: the featured trunk and its 10 photos, Commission Your Si
   await expect(buttons).toHaveCount(3);
   for (let i = 0; i < 3; i++) {
     await expect(buttons.nth(i)).toHaveText(/Commission Your Signature Trunk/);
-    expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("commission my own Signature Trunk");
+    expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("discovered the Signature Trunks on your website and would like to commission a trunk of my own.");
   }
   await expect(buttons.nth(0)).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "boxes-1-haut"), type: "jpeg", quality: 70 });

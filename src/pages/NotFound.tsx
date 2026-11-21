@@ -2,9 +2,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { Link, useI18n } from "@/i18n";
 import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 export default function NotFound() {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   return (
     <section className="relative flex min-h-svh items-center overflow-hidden bg-ink pt-28 pb-32 md:pb-24">
       <div
@@ -47,7 +49,7 @@ export default function NotFound() {
         </div>
 
         <a
-          href={waLink(t.whatsapp.hello)}
+          href={waLink(waMessage)}
           target="_blank"
           rel="noreferrer"
           className="mt-8 inline-flex min-h-12 items-center gap-3 text-base text-bone transition-colors hover:text-rose-light"

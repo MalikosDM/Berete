@@ -11,6 +11,7 @@ import { RENAMED_PIECES } from "@/data/pieces";
 import { collectionWords, Link, Navigate, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /**
  * /creations/:slug is a collection ("pendants", "chains"...) or, for the old
@@ -28,6 +29,7 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 /** One collection: an opening with its name, then every piece of this type. */
 function CollectionPage({ collection }: { collection: Collection }) {
   const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
   const words = collectionWords(t, collection.slug, collection);
   const cat = useCatalogue();
   const pieces = piecesOfType(cat, collection.type);
@@ -112,7 +114,7 @@ function CollectionPage({ collection }: { collection: Collection }) {
           <div className="lg:ps-12">
             <h2 className="title-caps text-[clamp(2rem,4vw,3.25rem)] tracking-[0.1em]">{t.collections.ctaTitle}</h2>
             <p className="mt-6 max-w-md text-lg text-bone">{t.collections.ctaText}</p>
-            <a href={waLink(t.whatsapp.hello)} target="_blank" rel="noreferrer" className="mt-10 inline-flex min-h-14 items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light">
+            <a href={waLink(waMessage)} target="_blank" rel="noreferrer" className="mt-10 inline-flex min-h-14 items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light">
               <BrandIcon name="whatsapp" className="size-5" /> {t.collections.ctaButton}
             </a>
           </div>
