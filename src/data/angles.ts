@@ -1,0 +1,71 @@
+/*
+ * "Every Angle" (feedback of Yoni, 21/11/2026): every photo and film of a piece comes with its text, a small title and one
+ * or two sentences that tell a detail or a bit of its story, like the details of the Inter ring. Written photo by photo
+ * after looking at each one (src/data/angles.json, by piece then by the address of the photo, in English): they say what
+ * the photo shows, or what the house already told (story, client, details); no figure that does not come from Yoni, the
+ * coloured stones by their colour only. The other languages translate them in src/i18n/content/angles/<lang>.json, keyed
+ * by the English text, like every text of the catalogue.
+ *
+ * Yoni changes them in the admin (« Sous tous les angles »): a title and a text per photo, and their translations if he
+ * wants his own. A photo the admin never wrote for keeps the text of the catalogue; one emptied in the admin has none.
+ */
+import texts from "./angles.json" with { type: "json" };
+import type { Angle, MediaItem, Piece, PieceAngles } from "./types.js";
+
+export const ANGLE_LANGUAGES = ["fr", "es", "de", "nl", "ar"] as const;
+
+/** The texts of the catalogue, by piece then by photo. */
+export const DEFAULT_ANGLES = texts as Record<string, PieceAngles>;
+
+/** The texts of a piece: those it holds (the admin), over those of the catalogue for its other photos. */
+export function anglesOf(slug: string, own: PieceAngles | null | undefined): PieceAngles {
+  return { ...DEFAULT_ANGLES[slug], ...own };
+}
+
+/** The text of one photo; null when it has none (a photo added in the admin and not written, or one emptied there). */
+export function angleOf(piece: Pick<Piece, "angles">, src: string): Angle | null {
+  const a = piece.angles[src];
+  return a && (a.title.trim() !== "" || a.text.trim() !== "") ? a : null;
+}
+
+/**
+ * The photos of "Every Angle": every photo and film of the piece, its opening photo first when the opening shows the jewel
+ * cut out (the photo itself is then seen nowhere else), or when the piece has no other photo (a watch).
+ */
+export function anglePhotos(piece: Pick<Piece, "cover" | "gallery">, openingIsPhoto: boolean): MediaItem[] {
+  const withCover = piece.cover.src && (!openingIsPhoto || piece.gallery.length === 0);
+  const all = withCover ? [piece.cover, ...piece.gallery] : piece.gallery;
+  return all.filter((m, i) => m.src && all.findIndex((x) => x.src === m.src) === i);
+}
+
+/** How many photos "Every Angle" shows before "See N more": all of them up to ANGLES_MANY, else the first ANGLES_FIRST. */
+export const ANGLES_FIRST = 6;
+export const ANGLES_MANY = 8;
+export const anglesShownFirst = (count: number) => (count <= ANGLES_MANY ? count : ANGLES_FIRST);
+
+/** The known parts only, for the base (an emptied entry is kept: that photo has no text). */
+export function cleanAngles(v: unknown): PieceAngles {
+  const out: PieceAngles = {};
+  if (v === null || typeof v !== "object") return out;
+  for (const [src, raw] of Object.entries(v as Record<string, unknown>)) {
+    if (!src || src.length > 500 || raw === null || typeof raw !== "object") continue;
+    const r = raw as Record<string, unknown>;
+    const title = typeof r.title === "string" ? r.title.trim().slice(0, 200) : "";
+    const text = typeof r.text === "string" ? r.text.trim().slice(0, 1000) : "";
+    const translations: NonNullable<Angle["translations"]> = {};
+    if (r.translations && typeof r.translations === "object") {
+      for (const l of ANGLE_LANGUAGES) {
+        const t = (r.translations as Record<string, unknown>)[l];
+        if (!t || typeof t !== "object") continue;
+        const tt = t as Record<string, unknown>;
+        const own = {
+          ...(typeof tt.title === "string" && tt.title.trim() ? { title: tt.title.trim().slice(0, 200) } : {}),
+          ...(typeof tt.text === "string" && tt.text.trim() ? { text: tt.text.trim().slice(0, 1000) } : {}),
+        };
+        if (Object.keys(own).length > 0) translations[l] = own;
+      }
+    }
+    out[src] = { title, text, ...(Object.keys(translations).length > 0 ? { translations } : {}) };
+  }
+  return out;
+}

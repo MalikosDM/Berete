@@ -48,10 +48,11 @@ export default function Creations() {
                 type="button"
                 onClick={() => select(f.param)}
                 aria-pressed={on}
+                data-filter={f.key}
                 className={"inline-flex min-h-12 shrink-0 items-center border px-6 text-base font-semibold uppercase tracking-[0.16em] transition-colors " + (on ? "border-rose-light text-rose-light" : "border-white/25 text-white hover:border-rose-light hover:text-rose-light")}
               >
                 {f.label}
-                <span className="ms-3 text-mist">{f.key === "all" ? pieces.length : pieces.filter((p) => p.type === f.key).length}</span>
+                <span data-filter-count className="ms-3 text-mist">{f.key === "all" ? pieces.length : pieces.filter((p) => p.type === f.key).length}</span>
               </button>
             );
           })}

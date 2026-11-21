@@ -108,5 +108,6 @@ test("every published piece with a file of the hand of Yoni shows it", async ({ 
     if (!drawn.includes(p.slug)) continue;
     expect(p.making.sketch?.src, p.slug).toBe("/media/sketches/" + p.slug + ".webp");
   }
-  expect(pieces!.filter((p) => drawn.includes(p.slug)).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(28);
+  // 28 drawings; the Flâneur, drawn too, is off the site since 21/11/2026 (too few photos).
+  expect(pieces!.filter((p) => drawn.includes(p.slug)).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(27);
 });

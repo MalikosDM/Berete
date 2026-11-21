@@ -1,4 +1,6 @@
 /* The catalogue texts in this language, keyed by their English text (see src/i18n/content.ts). */
+import angles from "./angles/ar.json" with { type: "json" };
+
 const content: Record<string, string> = {
   "Kenan Yildiz": "كينان يلدز",
   "Noah Okafor": "نوح أوكافور",
@@ -365,9 +367,7 @@ const content: Record<string, string> = {
   "The letters J and C, interlaced": "الحرفان J و C، متشابكين",
   "Loïs Openda — Script Pendant": "لويس أوبيندا — قلادة الخط المتصل",
   "Script letters and a cross of baguettes.": "حروف بخط متصل، وصليب من أحجار الباغيت.",
-  "Script letters drawn in rose gold over a field of white diamonds, with a cross of baguette-cut stones at the centre and pear-shaped diamonds around.": "حروف بخط متصل مرسومة بالذهب الوردي على أرضية من الألماس الأبيض، مع صليب من أحجار بقطع باغيت في الوسط، وألماس على شكل الكمثرى من حوله.",
   "Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes": "لقطة قريبة لقلادة لويس أوبيندا: خط متصل من الذهب الوردي وصليب من أحجار الباغيت",
-  "Script letters and a cross": "حروف بخط متصل وصليب",
   "The Hand — Pendant": "اليد — قلادة",
   "A rose gold hand, paved with diamonds and lit with rubies.": "يد من الذهب الوردي، مكسوة بالألماس ويضيئها الياقوت.",
   "A hand sculpted in volume, then set stone by stone. Rubies catch the light at every movement, and the BRT mark is engraved on the piece.": "يد منحوتة بتجسيم، ثم مرصعة حجراً حجراً. يلتقط الياقوت الضوء مع كل حركة، وعلامة BRT منقوشة على القطعة.",
@@ -602,7 +602,6 @@ const content: Record<string, string> = {
   "Rose and white gold tones · round diamonds in pavé": "لونا الذهب الوردي والأبيض · ألماس دائري بترصيع الباڤيه",
   "Yellow gold tone · round diamonds in pavé": "لون الذهب الأصفر · ألماس دائري بترصيع الباڤيه",
   "White and gold tones · round diamonds in pavé": "لونان أبيض وذهبي · ألماس دائري بترصيع الباڤيه",
-  "Rose gold tone · round diamonds in pavé, pear-shaped diamonds, a cross of baguettes": "لون الذهب الوردي · ألماس دائري بترصيع الباڤيه، ألماس بشكل الكمثرى، صليب من أحجار الباغيت",
   "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone": "لون الذهب الوردي · ألماس دائري بترصيع الباڤيه، ألماس باغيت وبقطع متدرّج عند المعصم، حجر أحمر بيضاوي",
   "Rose gold tone · round white stones in pavé": "لون الذهب الوردي · أحجار بيضاء دائرية بترصيع الباڤيه",
   "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones": "لون الذهب الوردي، وتفاصيل بالذهب الأبيض · ألماس دائري بترصيع الباڤيه، أحجار باغيت وماركيز، ماسة كبيرة بشكل الكمثرى، أحجار بنفسجية بشكل الكمثرى ودائرية",
@@ -628,7 +627,6 @@ const content: Record<string, string> = {
   "Two-Tone Iced Cuban Chain": "سلسلة كوبية مرصعة بلونين",
   "White Iced Cuban Chain": "سلسلة كوبية مرصعة بيضاء",
   "Two-Row Tennis Chain": "سلسلة تنس بصفّين",
-  "A name in script, on a chain of crosses.": "اسم بحروف متصلة، على سلسلة من الصلبان.",
   "Two initials joined by an ampersand.": "حرفان أولان تجمعهما علامة العطف.",
   "A Christ in rose gold, wound with thorns and roses.": "مسيح من الذهب الوردي، تلتف حوله الأشواك والورود.",
   "Rows of baguettes, inside a border of diamonds.": "صفوف من الباغيت، داخل إطار من الألماس.",
@@ -714,4 +712,5 @@ const content: Record<string, string> = {
   "Film: the pendant polished at the bench": "فيلم: القلادة تُصقل على طاولة العمل",
 };
 
-export default content;
+// The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.
+export default { ...(angles as Record<string, string>), ...content };

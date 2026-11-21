@@ -1,20 +1,21 @@
 // Every photo and film of the pieces (20/11/2026): the folders of Yoni sorted again photo by photo (scripts/hd-media.mjs),
 // the 15 hidden pieces published, and the pages still fast with many more photos. The page Créations shows every
-// published piece; each page shows its whole gallery (the first photos sideways, the others in "Every Angle", loaded as
-// the visitor comes near them), its films in their place, and loads little before the visitor scrolls.
+// published piece; each page shows its whole gallery ("Every Angle": each photo with its text, loaded as the visitor
+// comes near it), its films in their place, and loads little before the visitor scrolls.
 // Screenshots go to verification/galleries/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
+import { anglePhotos, anglesShownFirst } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { NEW_PIECES } from "../src/data/pieces";
+import { resolveShowcase } from "../src/data/showcase";
 import { skipIntro, watch } from "./helpers";
 
 const DIR = "verification/galleries";
 mkdirSync(DIR, { recursive: true });
 const shot = (page: Page, name: string) => page.screenshot({ path: DIR + "/" + name + ".jpg", type: "jpeg", quality: 65, timeout: 45_000 });
 const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
-const HIGHLIGHTS = 8;
 
 test("Créations: every published piece is there, each card with its photo", async ({ page }, info) => {
   const problems = watch(page);
@@ -99,47 +100,45 @@ for (const slug of PAGES) {
     );
     if (!phone) expect(lcp, "largest paint (ms)").toBeLessThan(4000);
 
-    // The sideways gallery: its first photos.
-    const items = page.locator("[data-gallery-item]");
-    await expect(items).toHaveCount(Math.min(HIGHLIGHTS, piece.gallery.length));
-    // "Every Angle": the others, all of them after "See N more".
-    const rest = piece.gallery.length - HIGHLIGHTS;
-    if (rest > 0) {
-      const grid = page.locator("[data-gallery-grid]");
-      await grid.scrollIntoViewIfNeeded();
-      const more = page.locator("[data-gallery-more]");
-      if (await more.count()) await more.click();
-      const tiles = page.locator("[data-gallery-tile]");
-      await expect(tiles).toHaveCount(rest);
-      // Each photo of the grid loads as the visitor comes near it (its small copy), each film shows its image.
-      for (const tile of await tiles.all()) {
-        await tile.scrollIntoViewIfNeeded();
-        if ((await tile.getAttribute("data-gallery-tile")) === "video") {
-          await expect(tile.locator("video")).toHaveAttribute("poster", /\.webp$/, { timeout: 20_000 });
-        } else {
-          await expect
-            .poll(() => tile.locator("img").evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { timeout: 20_000, message: slug + " grid photo" })
-            .toBe(true);
-          const src = await tile.locator("img").evaluate((el) => (el as HTMLImageElement).currentSrc);
-          expect(src, "the grid takes a small copy").toMatch(/\.w(640|1080)\.webp$|\.webp$/);
-        }
+    // "Every Angle": every photo and film, each with its text; all of them after "See N more".
+    const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
+    const section = page.locator("[data-every-angle]");
+    await section.scrollIntoViewIfNeeded();
+    const tiles = page.locator("[data-angle]");
+    await expect(tiles).toHaveCount(anglesShownFirst(angles.length));
+    const more = page.locator("[data-angle-more]");
+    if (await more.count()) await more.click();
+    await expect(tiles).toHaveCount(angles.length);
+    // Each photo loads as the visitor comes near it (its small copy), each film shows its image; each has its text.
+    for (const tile of await tiles.all()) {
+      await tile.scrollIntoViewIfNeeded();
+      await expect(tile.locator("[data-angle-title]")).toHaveCount(1);
+      await expect(tile.locator("[data-angle-text]")).toHaveCount(1);
+      if ((await tile.getAttribute("data-angle-type")) === "video") {
+        await expect(tile.locator("video")).toHaveAttribute("poster", /\.webp$/, { timeout: 20_000 });
+      } else {
+        await expect
+          .poll(() => tile.locator("img").evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { timeout: 20_000, message: slug + " photo" })
+          .toBe(true);
+        const src = await tile.locator("img").evaluate((el) => (el as HTMLImageElement).currentSrc);
+        expect(src, "a small copy").toMatch(/\.w(640|1080)\.webp$|\.webp$/);
       }
-      await grid.scrollIntoViewIfNeeded();
-      await shot(page, info.project.name + "-" + slug + "-grid");
-      // A photo of the grid opens full screen, among all the photos of the piece.
-      await tiles.first().click();
-      const dialog = page.locator("[role=dialog][data-lenis-prevent]");
-      await expect(dialog).toBeVisible();
-      await expect(dialog).toContainText(String(piece.gallery.length).padStart(2, "0"));
-      await page.keyboard.press("Escape");
     }
-    // Every film of the gallery is a silent loop that plays only on screen.
-    for (const v of await page.locator("[data-gallery-item] video, [data-gallery-tile] video").all()) {
+    await section.scrollIntoViewIfNeeded();
+    await shot(page, info.project.name + "-" + slug + "-angles");
+    // A photo opens full screen, among all the photos of the section.
+    await tiles.first().locator("button").click();
+    const dialog = page.locator("[role=dialog][data-lenis-prevent]");
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText(String(angles.length).padStart(2, "0"));
+    await page.keyboard.press("Escape");
+    // Every film is a silent loop that plays only on screen.
+    for (const v of await page.locator("[data-angle] video").all()) {
       expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop && (el as HTMLVideoElement).preload === "none")).toBe(true);
     }
-    // No text of the gallery names a person of a private piece.
+    // No text of the section names a person of a private piece.
     if (!piece.clientPublic && piece.people.length === 0) {
-      const words = await page.locator("[data-gallery-item] figcaption").allInnerTexts();
+      const words = await section.allInnerTexts();
       for (const w of words) expect(w).not.toMatch(/Nathalie|José|LASANA/i);
     }
     expect(problems.errors).toEqual([]);

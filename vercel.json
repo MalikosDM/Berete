@@ -87,6 +87,16 @@
       "statusCode": 301
     },
     {
+      "source": "/pieces/flaneur-medallion",
+      "destination": "/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/flaneur-medallion",
+      "destination": "/:lang/creations",
+      "statusCode": 301
+    },
+    {
       "source": "/pieces/jack-nameplate-pendant",
       "destination": "/creations",
       "statusCode": 301
@@ -107,12 +117,42 @@
       "statusCode": 301
     },
     {
+      "source": "/pieces/two-tone-iced-cuban-chain",
+      "destination": "/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/two-tone-iced-cuban-chain",
+      "destination": "/:lang/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/white-iced-cuban-chain",
+      "destination": "/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/white-iced-cuban-chain",
+      "destination": "/:lang/creations",
+      "statusCode": 301
+    },
+    {
       "source": "/pieces/two-row-tennis-chain",
       "destination": "/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/two-row-tennis-chain",
+      "destination": "/:lang/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/pear-link-chain",
+      "destination": "/creations",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/pear-link-chain",
       "destination": "/:lang/creations",
       "statusCode": 301
     },

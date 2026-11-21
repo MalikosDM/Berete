@@ -12,7 +12,7 @@ import { en } from "../src/i18n/ui/en";
 import { es } from "../src/i18n/ui/es";
 import { fr } from "../src/i18n/ui/fr";
 import { nl } from "../src/i18n/ui/nl";
-import { checkPage, scrollTo, shotPath, skipIntro, watch } from "./helpers";
+import { checkPage, shotPath, skipIntro, watch } from "./helpers";
 
 /*
  * The languages of the site (English at the root, /fr, /es, /de, /nl, /ar), on the
@@ -156,13 +156,14 @@ test("Arabic reads right to left, with its fonts and mirrored gestures", async (
   await page.keyboard.press("Escape");
 
   if (!isMobile) {
-    // The details of a piece scroll toward the left: the row moves to the right.
+    // "Every Angle" reads from the right: the first photo on the right of its text.
     await page.goto("/ar/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
-    const top = await page.locator("#piece-details").evaluate((el) => el.getBoundingClientRect().top + window.scrollY);
-    await scrollTo(page, top + 600);
-    await page.waitForTimeout(1200);
-    const x = await page.locator("[data-gallery-item]").first().evaluate((el) => new DOMMatrix(getComputedStyle(el.parentElement!).transform).m41);
-    expect(x, "gallery moves to the right").toBeGreaterThan(50);
+    const first = page.locator("[data-angle='1']");
+    await first.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(800);
+    const photo = (await first.locator("button").boundingBox())!;
+    const words = (await first.locator("[data-angle-title]").boundingBox())!;
+    expect(photo.x, "the photo on the right").toBeGreaterThan(words.x);
     await page.screenshot({ path: shotPath(info, "ar-gallery"), type: "jpeg", quality: 60 });
   }
   expect(problems.errors).toEqual([]);

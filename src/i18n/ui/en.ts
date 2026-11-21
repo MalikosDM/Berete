@@ -208,8 +208,6 @@ export const en = {
     },
     want: "Commission Your Own",
     details: "The Art of Detail",
-    /** The title of the photos of a piece that has "The details" (its symbols, one by one). */
-    upClose: "A Closer Look",
     /** Above the title "The Art of Detail". */
     detailsEyebrow: "Every Detail Tells a Story",
     seePhoto: "Discover the Detail",
@@ -252,7 +250,7 @@ export const en = {
     photo: "Photo",
     zoomIn: "Zoom in",
     zoomOut: "Zoom out",
-    /** The grid of every other photo of a piece, under its gallery. */
+    /** Every photo and film of a piece, each with its text (src/components/EveryAngle.tsx). */
     everyAngle: "Every Angle",
     more: (n: number) => "See " + n + " more",
     film: "Film",

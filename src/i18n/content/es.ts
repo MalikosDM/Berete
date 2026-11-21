@@ -1,4 +1,6 @@
 /* The catalogue texts in Spanish, keyed by their English text (see src/i18n/content.ts). */
+import angles from "./angles/es.json" with { type: "json" };
+
 const content: Record<string, string> = {
   "Kenan Yildiz": "Kenan Yildiz",
   "Noah Okafor": "Noah Okafor",
@@ -365,9 +367,7 @@ const content: Record<string, string> = {
   "The letters J and C, interlaced": "Las letras J y C, entrelazadas",
   "Loïs Openda — Script Pendant": "Loïs Openda — Colgante caligráfico",
   "Script letters and a cross of baguettes.": "Letras caligráficas y una cruz de baguettes.",
-  "Script letters drawn in rose gold over a field of white diamonds, with a cross of baguette-cut stones at the centre and pear-shaped diamonds around.": "Letras caligráficas trazadas en oro rosa sobre un campo de diamantes blancos, con una cruz de piedras talla baguette en el centro y diamantes talla pera a su alrededor.",
   "Close-up of Loïs Openda's pendant: rose gold script and a cross of baguettes": "Primer plano del colgante de Loïs Openda: caligrafía de oro rosa y una cruz de baguettes",
-  "Script letters and a cross": "Letras caligráficas y una cruz",
   "The Hand — Pendant": "La Mano — Colgante",
   "A rose gold hand, paved with diamonds and lit with rubies.": "Una mano de oro rosa, con pavé de diamantes e iluminada por rubíes.",
   "A hand sculpted in volume, then set stone by stone. Rubies catch the light at every movement, and the BRT mark is engraved on the piece.": "Una mano esculpida en volumen y después engastada piedra a piedra. Los rubíes captan la luz con cada movimiento, y la marca BRT está grabada en la pieza.",
@@ -586,7 +586,6 @@ const content: Record<string, string> = {
   "Rose and white gold tones · round diamonds in pavé": "Tonos oro rosa y oro blanco · diamantes redondos en pavé",
   "Yellow gold tone · round diamonds in pavé": "Tono oro amarillo · diamantes redondos en pavé",
   "White and gold tones · round diamonds in pavé": "Tonos blanco y dorado · diamantes redondos en pavé",
-  "Rose gold tone · round diamonds in pavé, pear-shaped diamonds, a cross of baguettes": "Tono oro rosa · diamantes redondos en pavé, diamantes en forma de pera, una cruz de baguettes",
   "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone": "Tono oro rosa · diamantes redondos en pavé, diamantes baguette y de talla escalonada en la muñeca, una piedra roja ovalada",
   "Rose gold tone · round white stones in pavé": "Tono oro rosa · piedras blancas redondas en pavé",
   "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones": "Tono oro rosa, detalles en oro blanco · diamantes redondos en pavé, baguettes, marquesas, un gran diamante en forma de pera, piedras moradas en forma de pera y redondas",
@@ -622,7 +621,6 @@ const content: Record<string, string> = {
   "Two-Tone Iced Cuban Chain": "Cadena cubana helada bicolor",
   "White Iced Cuban Chain": "Cadena cubana helada blanca",
   "Two-Row Tennis Chain": "Cadena tenis de dos hileras",
-  "A name in script, on a chain of crosses.": "Un nombre en letra cursiva, sobre una cadena de cruces.",
   "Two initials joined by an ampersand.": "Dos iniciales unidas por un ampersand.",
   "A Christ in rose gold, wound with thorns and roses.": "Un Cristo en oro rosa, rodeado de espinas y rosas.",
   "Rows of baguettes, inside a border of diamonds.": "Hileras de baguettes, dentro de un borde de diamantes.",
@@ -708,4 +706,5 @@ const content: Record<string, string> = {
   "Film: the pendant polished at the bench": "Vídeo: el colgante pulido en el banco",
 };
 
-export default content;
+// The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.
+export default { ...(angles as Record<string, string>), ...content };

@@ -25,7 +25,7 @@ test.beforeEach(async ({ page }) => {
   await skipIntro(page);
 });
 
-test("the ten removed pieces appear nowhere; their addresses lead to their player, else to the creations (301)", async ({ page }) => {
+test("the removed pieces appear nowhere; their addresses lead to their player, else to the creations (301)", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
   for (const slug of REMOVED_PIECES) expect(cat.pieces.some((p) => p.slug === slug), slug + " in the catalogue").toBe(false);
@@ -62,10 +62,10 @@ test("the ten removed pieces appear nowhere; their addresses lead to their playe
 test("the drafts made from Yoni's photos are published (20/11/2026): each with its page, made for a private collector", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
-  // Unpublished: the 10 removed pieces and the tennis chain he crossed out, only.
+  // Unpublished: the 10 removed pieces, the tennis chain he crossed out and the 4 pieces with too few photos (21/11), only.
   expect(REMOVED_PIECES).toContain("two-row-tennis-chain");
   expect(defaultCatalogue.pieces.filter((p) => !p.published).map((p) => p.slug).sort()).toEqual([...REMOVED_PIECES].sort());
-  for (const slug of NEW_PIECES) {
+  for (const slug of NEW_PIECES.filter((s) => !REMOVED_PIECES.includes(s))) {
     const piece = cat.pieces.find((p) => p.slug === slug);
     expect(piece, slug).toBeTruthy();
     expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
@@ -383,7 +383,7 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await page.getByLabel("Mot de passe").fill(password!);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page.getByRole("tab", { name: "Pièces" })).toBeVisible();
-  // The 10 removed pieces, unpublished; the pieces published on 20/11/2026 in the list, published.
+  // The removed pieces, unpublished; the pieces published on 20/11/2026 in the list.
   await expect(page.locator("[data-row-unpublished]")).toHaveCount(REMOVED_PIECES.length);
   for (const slug of REMOVED_PIECES) await expect(page.locator("[data-admin-row='" + slug + "'] [data-row-unpublished]"), slug).toHaveCount(1);
   for (const slug of NEW_PIECES) await expect(page.locator("[data-admin-row='" + slug + "']"), slug).toHaveCount(1);

@@ -13,14 +13,16 @@ const DIR = "verification/universes15";
 mkdirSync(DIR, { recursive: true });
 const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
 
-/** Each universe, the pieces it holds (from the feedback of Yoni), and the one opened here. */
+/**
+ * Each universe, the pieces it holds (from the feedback of Yoni), and the one opened here. Flâneur and the two iced Cuban
+ * chains of "facettes" were taken off the site on 21/11/2026 (too few photos): their universes wait for them.
+ */
 const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   { backdrop: "arene", preset: "arene", pieces: ["panther-champion-pendant"] },
   { backdrop: "bianconero", preset: "bianconero", pieces: ["kenan-yildiz-celebration-pendant"] },
   { backdrop: "serpent", preset: "serpent", pieces: ["marcus-thuram-t-serpent-pendant"] },
   { backdrop: "sirius", preset: "sirius", pieces: ["sirius"] },
   { backdrop: "tulipes", preset: "tulipes", pieces: ["tulips-on-tour-medallion"] },
-  { backdrop: "flaneur", preset: "flaneur", pieces: ["flaneur-medallion"] },
   { backdrop: "trefle", preset: "emeraude", pieces: ["eljero-elia-clover-medallion"] },
   { backdrop: "the-hand", preset: "rideau", pieces: ["the-hand"] },
   { backdrop: "forge", preset: "forge", pieces: ["kevin-schade-twisted-chain"] },
@@ -34,7 +36,7 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   {
     backdrop: "facettes",
     preset: "facettes",
-    pieces: ["ampersand-initials-pendant", "malik-tillman-tm-pendant", "baguette-cuban-chain", "two-tone-iced-cuban-chain", "white-iced-cuban-chain", "oval-eternity-band"],
+    pieces: ["ampersand-initials-pendant", "malik-tillman-tm-pendant", "baguette-cuban-chain", "oval-eternity-band"],
   },
   { backdrop: "mecanique", preset: "mecanique", pieces: ["marcus-thuram-skeleton-watch", "tajon-buchanan-iced-watch", "radja-nainggolan-iced-watch"] },
   { backdrop: "n14", preset: "n14", pieces: ["celestial-initial-medallion"] },

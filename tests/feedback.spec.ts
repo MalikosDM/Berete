@@ -157,18 +157,14 @@ for (const slug of CAPSULES) {
       }
     }
 
-    // "The Art of Detail": its photos about the size of those of "Every Angle".
-    const item = page.locator("[data-gallery-item]").first();
-    await item.scrollIntoViewIfNeeded();
-    const itemWidth = (await item.boundingBox())!.width;
+    // "Every Angle": each photo with its text, a photo the size of the former grid on a computer, the text under it on a phone.
+    const tile = page.locator("[data-angle]").first();
+    await tile.scrollIntoViewIfNeeded();
+    const photoBox = (await tile.locator("button").boundingBox())!;
+    const textBox = (await tile.locator("[data-angle-title]").boundingBox())!;
     const vw = page.viewportSize()!.width;
-    expect(itemWidth / vw).toBeLessThan(phone ? 0.5 : 0.26);
-    const tile = page.locator("[data-gallery-tile]").first();
-    if (await tile.count()) {
-      await tile.scrollIntoViewIfNeeded();
-      const tileWidth = (await tile.boundingBox())!.width;
-      expect(Math.abs(itemWidth - tileWidth) / tileWidth).toBeLessThan(0.3);
-    }
+    if (phone) expect(textBox.y, "the text under its photo").toBeGreaterThanOrEqual(photoBox.y + photoBox.height - 1);
+    else expect(photoBox.width / vw).toBeLessThan(0.26);
 
     // "Enter the Atelier": its making-of plays by itself on screen, silent, and pauses off screen.
     const passage = page.locator("[data-atelier-passage]");

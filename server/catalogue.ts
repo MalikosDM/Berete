@@ -18,6 +18,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { defaultCatalogue } from "../src/data/catalogue.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
+import { anglesOf, cleanAngles } from "../src/data/angles.js";
 import { cleanAtelier } from "../src/data/atelier.js";
 import { cleanDetailPoints } from "../src/data/details3d.js";
 import { cleanShowcase } from "../src/data/showcase.js";
@@ -144,7 +145,8 @@ export const toPerson = (r: PersonRow): Person => ({
   translations: translationsOf(r.translations),
 });
 
-export const toPiece = (r: PieceRow): Piece => ({
+/** A piece as the base holds it: the texts of its photos ("Every Angle") only those written in the base. */
+const storedPiece = (r: PieceRow): Piece => ({
   slug: r.slug,
   title: r.title,
   type: (PIECE_TYPES as readonly string[]).includes(r.type) ? (r.type as Piece["type"]) : "pendant",
@@ -167,9 +169,16 @@ export const toPiece = (r: PieceRow): Piece => ({
   showcase: cleanShowcase(r.showcase),
   atelier: cleanAtelier(r.atelier),
   detailPoints: cleanDetailPoints(r.detailPoints),
+  angles: cleanAngles(r.angles),
   making: makingOf(r.making),
   translations: translationsOf(r.translations),
 });
+
+/** A piece for the site and the admin: a photo without a text of its own in the base takes the one of the catalogue. */
+export const toPiece = (r: PieceRow): Piece => {
+  const p = storedPiece(r);
+  return { ...p, angles: anglesOf(p.slug, p.angles) };
+};
 
 export const toBox = (r: BoxRow): Box => ({
   slug: r.slug,
@@ -241,6 +250,7 @@ const pieceTexts = (p: Piece) => ({
   showcase: p.showcase ?? undefined,
   atelier: p.atelier ?? undefined,
   detailPoints: p.detailPoints ?? undefined,
+  angles: Object.keys(p.angles).length > 0 ? p.angles : undefined,
   making: p.making,
 });
 const boxTexts = (b: Box) => ({ name: b.name, description: b.description, pieceSlug: b.pieceSlug });
@@ -326,7 +336,8 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     const handover = mergeImported(currentHandover, p.handover);
     const cover = mediaOne(row.cover);
     const nextCover = cover.src === "" || (cover.src.startsWith(IMPORTED) && fileKey(cover) !== fileKey(p.cover)) ? p.cover : cover;
-    const texts = textUpdate(pieceTexts(toPiece(row)), pieceTexts(p), row.seedHash);
+    // The texts as the base holds them (the texts of the photos of the catalogue are not added to them here).
+    const texts = textUpdate(pieceTexts(storedPiece(row)), pieceTexts(p), row.seedHash);
     // A piece that follows the catalogue gets its steps with its texts; an edited one still gets the imported photos.
     const currentMaking = makingOf(row.making);
     const making = texts ? currentMaking : mergeMaking(currentMaking, p.making);

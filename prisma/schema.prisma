@@ -82,6 +82,8 @@ model Piece {
   atelier      Json?
   /// "The Art of Detail" in 3D (PieceDetailPoints, src/data/details3d.ts): the points of its model tied to its details.
   detailPoints Json?
+  /// The text of each photo of "Every Angle" (PieceAngles, src/data/angles.ts), by its address; a photo without one takes the catalogue's.
+  angles       Json     @default("{}")
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
   translations Json   @default("{}")

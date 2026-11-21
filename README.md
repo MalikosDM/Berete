@@ -134,9 +134,14 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   chaque photo (`"p7:front"`, mots dans `src/data/views.ts` : légende et texte pour lecteur d'écran, traduits comme le
   reste) ; `sorted()` dans `src/data/pieces.ts` en fait la photo principale et la galerie, un texte écrit à la main pour
   une photo restant prioritaire ; `yoni(<dossier>, "p07")` place un fichier ailleurs (étapes, détails). Une photo est
-  « sur noir » (fondue dans la page) sauf si son fond est clair (`shotOnBlack`). Sur la page, les 8 premières photos
-  défilent de côté (« The Art of Detail », à peu près de la taille des photos de la grille), toutes les autres sont dans la
-  grille « Every Angle » (`src/components/GalleryGrid.tsx`). La page Créations est une grille serrée (`PieceCard compact` :
+  « sur noir » (fondue dans la page) sauf si son fond est clair (`shotOnBlack`). Sur la page, toutes les photos et
+  vidéos sont dans « Every Angle / Sous tous les angles » (`src/components/EveryAngle.tsx`), chacune avec son texte (un
+  petit titre et une ou deux phrases, numérotés) : photo et texte côte à côte en damier sur ordinateur, la photo puis son
+  texte sur téléphone, 6 d'abord puis « Voir les N autres » au-delà de 8. Les textes sont dans `src/data/angles.json`
+  (anglais, par pièce puis par adresse de photo), traduits dans `src/i18n/content/angles/<langue>.json` ; l'admin les
+  modifie (« Sous tous les angles », un titre et un texte par photo, et leurs traductions ; colonne `angles` de la base,
+  une photo sans texte dans la base prend celui du catalogue). La photo d'ouverture y figure quand l'ouverture montre le
+  bijou détouré, ou quand la pièce n'a pas d'autre photo. La page Créations est une grille serrée (`PieceCard compact` :
   6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
@@ -257,7 +262,7 @@ npm run verify          # tests Playwright (ordinateur 1440 px et iPhone 390 px)
                         # (accueil → collections → chaque pièce, liens joueur ↔ pièce ↔ story, netteté des photos,
                         #  chaque langue : aucun mot anglais oublié, arabe de droite à gauche, menu de langue)
 npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.md et ses captures
-                        # tests/galleries.spec.ts : Créations complète, galeries entières (grille « Every Angle »),
+                        # tests/galleries.spec.ts : Créations complète, galeries entières (« Every Angle »),
                         # films des nouvelles pièces, peu de photos chargées avant le défilement
                         # tests/feedback.spec.ts : retours de Yoni du 20/11 (6 pièces au premier écran des Créations,
                         # ouverture discrète des capsules, atelier qui joue seul, Sirius, BRT Flower, pendentif L,
@@ -266,6 +271,8 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
                         # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)
+                        # tests/angles.spec.ts : retours de Yoni du 21/11 (« Sous tous les angles » : un texte par photo
+                        # en 6 langues, damier, iPhone, lisibilité ; 4 pièces retirées, filtres des Créations, admin)
 ```
 
 ## Vitesse (Lighthouse)

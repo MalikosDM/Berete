@@ -6,6 +6,7 @@
  * prices): "seen" is the metal and the stones the photos show, the row "Metal
  * and stones" of the technical sheet, left out when the photos say nothing sure.
  */
+import { anglesOf } from "./angles.js";
 import { group, hdGallery, list, sketch, st, still, yoni } from "./sources.js";
 import type { PieceAtelier } from "./atelier.js";
 import type { PieceDetailPoints } from "./details3d.js";
@@ -40,6 +41,11 @@ export const REMOVED_PIECES = [
   "sidney-eweka-999-pendant",
   // The tennis chain of two rows (folder 03), crossed out by Yoni on his albums (20/11/2026).
   "two-row-tennis-chain",
+  // Too few photos (feedback of Yoni, 21/11/2026): back on the site the day they have more.
+  "flaneur-medallion",
+  "two-tone-iced-cuban-chain",
+  "white-iced-cuban-chain",
+  "pear-link-chain",
 ];
 
 /** Pieces renamed since the first version of the site: old address -> new address. */
@@ -109,6 +115,8 @@ function piece(p: PieceInput): Piece {
     handover: list(...(p.handover ?? [])),
     specs: [...p.specs.map(([label, value]) => ({ label, value })), ...(p.seen ? [{ label: SEEN_LABEL, value: p.seen }] : [])],
     details: (p.details ?? []).map(([title, text, photo]) => ({ title, text, photo: photo?.src || null })),
+    // The text of each of its photos in "Every Angle" (src/data/angles.json).
+    angles: anglesOf(p.slug, null),
     press: p.press ?? [],
     people: p.people ?? [],
     boxSlug: p.boxSlug ?? null,

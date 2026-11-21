@@ -195,7 +195,6 @@ export const nl: Messages = {
     },
     want: "Ontwerp uw eigen creatie",
     details: "De kunst van het detail",
-    upClose: "Een blik van dichtbij",
     detailsEyebrow: "Elk detail vertelt een verhaal",
     seePhoto: "Ontdek het detail",
     historic: "Historische opdrachten",

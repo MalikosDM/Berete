@@ -1,6 +1,8 @@
 import { expect, test, type Page } from "./fixtures";
+import { anglePhotos, anglesShownFirst } from "../src/data/angles";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
+import { resolveShowcase } from "../src/data/showcase";
 import { MAKING_STEPS, type Catalogue, type MediaItem, type Piece } from "../src/data/types";
 import { coverSrcSet, srcSetOf } from "../src/lib/responsive";
 import { checkPage, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
@@ -85,10 +87,6 @@ async function sharpness(page: Page, selector: string): Promise<{ score: number;
   });
 }
 
-/** The photos of the sideways gallery, and of the grid before "See N more" (src/pages/PiecePage.tsx, GalleryGrid.tsx). */
-const GALLERY_HIGHLIGHTS = 8;
-const GALLERY_FIRST = 12;
-
 /** What a piece page must show: its cover (sharp), gallery, people, the five steps, similar pieces, the WhatsApp button. */
 async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   const id = piece.slug;
@@ -99,12 +97,11 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   expect(Math.min(quality.width, quality.height), id + " cover size").toBeGreaterThanOrEqual(360);
   expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
   await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-  // The first photos scroll sideways, every other one is in the grid "Every Angle" (12 at first, then "See N more").
-  await expect(page.locator("[data-gallery-item]"), id + " gallery").toHaveCount(Math.min(GALLERY_HIGHLIGHTS, piece.gallery.length));
-  const rest = Math.max(0, piece.gallery.length - GALLERY_HIGHLIGHTS);
-  await expect(page.locator("[data-gallery-tile]"), id + " every angle").toHaveCount(Math.min(GALLERY_FIRST, rest));
-  await expect(page.locator("[data-gallery-more]"), id + " see more").toHaveCount(rest > GALLERY_FIRST ? 1 : 0);
-  for (const v of await page.locator("[data-gallery-item] video").all()) {
+  // "Every Angle": every photo and film, each with its text; the first ones when there are many, then "See N more".
+  const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
+  await expect(page.locator("[data-angle]"), id + " every angle").toHaveCount(anglesShownFirst(angles.length));
+  await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > anglesShownFirst(angles.length) ? 1 : 0);
+  for (const v of await page.locator("[data-angle] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }
   await expect(page.locator("[data-making-step]"), id + " making").toHaveCount(MAKING_STEPS.length);

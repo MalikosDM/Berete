@@ -1,0 +1,1 @@
+ALTER TABLE "Piece" ADD COLUMN "angles" JSONB NOT NULL DEFAULT '{}';

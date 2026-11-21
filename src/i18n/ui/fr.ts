@@ -208,7 +208,6 @@ export const fr: Messages = {
     },
     want: "Imaginez votre propre création",
     details: "L’Art du détail",
-    upClose: "Au plus près de la création",
     detailsEyebrow: "Chaque détail raconte une histoire",
     seePhoto: "Découvrir le détail",
     historic: "Créations historiques",

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore, type ChangeEven
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, ArrowUpRight, LoaderCircle, LogOut, Pencil, Plus, Trash2, X } from "lucide-react";
 import Logo from "@/components/Logo";
 import Universe, { universeProps } from "@/components/Universe";
+import { ANGLE_LANGUAGES, cleanAngles } from "@/data/angles";
 import { cleanAtelier, filmId, FILMS, filmTime, resolveAtelier, type Film, type FilmKind, type PieceAtelier } from "@/data/atelier";
 import { cleanDetailPoints, pointsFor, type PieceDetailPoints } from "@/data/details3d";
 import type { PublicModel } from "@/data/models";
@@ -25,7 +26,7 @@ import {
   type PieceTheme,
   type ThemeFontSpec,
 } from "@/data/themes";
-import { PIECE_TYPES, type MediaItem, type Translations } from "@/data/types";
+import { PIECE_TYPES, type Angle, type MediaItem, type PieceAngles, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO, useI18n } from "@/i18n";
 import { Detail3D } from "@/viewer";
 import Clients from "@/pages/admin/Clients";
@@ -58,6 +59,8 @@ type Field =
   | { key: string; label: string; type: "model3d" }
   /** "The Art of Detail" in 3D: a point of the model for each detail, placed by a click on it (src/data/details3d.ts). */
   | { key: string; label: string; type: "detailPoints" }
+  /** "Every Angle": a small title and a text for each photo of the piece, and their translations (src/data/angles.ts). */
+  | { key: string; label: string; type: "angles" }
   /** The texts of the item in French, Spanish and Arabic: [field, its name, long text]. */
   | { key: string; label: string; type: "translations"; fields: readonly (readonly [string, string, boolean])[] };
 
@@ -123,7 +126,8 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "showcase", label: "Vitrine de l'ouverture (le bijou détouré : une vue ou plusieurs vues)", type: "showcase" },
       { key: "atelier", label: "L'atelier de la pièce (« Entrer dans l'atelier » : la vidéo de fabrication, puis la pièce finie)", type: "atelier" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
-      { key: "gallery", label: "Photos des détails", type: "medialist" },
+      { key: "gallery", label: "Photos de « Sous tous les angles », dans l'ordre", type: "medialist" },
+      { key: "angles", label: "« Sous tous les angles » : un petit titre et un texte pour chaque photo (en anglais, puis leurs traductions si vous le voulez)", type: "angles" },
       { key: "handover", label: "Remise au client", type: "medialist" },
       { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Or : 18 carats ; « Precious Materials » : d'après les photos, à faire valider par Yoni)", type: "specs" },
       { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },
@@ -133,7 +137,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "boxSlug", label: "Écrin lié (adresse web)", type: "text" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["title", "Titre", false], ["line", "Phrase d'accroche", false], ["story", "Texte", true]] },
     ],
-    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, atelier: null, detailPoints: null, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
+    empty: { title: "", slug: "", type: "ring", line: "", story: "", client: "", clientPublic: false, featured: false, draft: false, published: true, theme: null, showcase: null, atelier: null, detailPoints: null, angles: {}, cover: { type: "image", src: "" }, gallery: [], handover: [], specs: [], details: [], press: [], people: [], boxSlug: "" },
   },
   boxes: {
     label: "Écrins Signature",
@@ -352,6 +356,69 @@ function TranslationsField({ label, fields, value, source, onChange }: { label: 
   );
 }
 
+/**
+ * "Every Angle": for each photo of the piece (its opening photo first, then the others, in their order), its small title
+ * and its text in English, and below them their translations. Empty, a translation shows (in grey) the one the site
+ * already uses; written, it replaces it. A photo whose title and text are emptied shows no text on the site.
+ */
+function AnglesField({ label, photos, value, onChange }: { label: string; photos: MediaItem[]; value: PieceAngles; onChange: (v: PieceAngles) => void }) {
+  const [, setLoaded] = useState(0);
+  useEffect(() => {
+    Promise.all(ANGLE_LANGUAGES.map((l) => loadLocale(l)))
+      .then(() => setLoaded((n) => n + 1))
+      .catch(() => undefined);
+  }, []);
+  const entry = (src: string): Angle => value[src] ?? { title: "", text: "" };
+  const put = (src: string, next: Angle) => onChange({ ...value, [src]: next });
+  return (
+    <fieldset className="border border-white/15 p-4" data-angles-field>
+      <legend className="px-2 text-base text-bone">{label}</legend>
+      <p className="text-base text-mist">La photo d'ouverture n'apparaît dans « Sous tous les angles » que si l'ouverture montre le bijou détouré, ou si la pièce n'a pas d'autre photo.</p>
+      {photos.length === 0 ? <p className="mt-3 text-base text-mist">Ajoutez d'abord des photos.</p> : null}
+      <ol className="mt-4 grid gap-5">
+        {photos.map((m, i) => {
+          const a = entry(m.src);
+          return (
+            <li key={m.src} data-angle-edit={m.src} className="grid gap-3 border border-white/10 p-3 sm:grid-cols-[6rem_1fr] sm:gap-4">
+              <span className="relative block size-24 overflow-hidden bg-ink-soft">
+                <Thumb m={m} />
+                <span className="absolute start-1 top-1 bg-ink/80 px-1.5 text-sm text-white">{i === 0 ? "Ouverture" : String(i).padStart(2, "0")}</span>
+              </span>
+              <span className="grid min-w-0 gap-2">
+                <label className="block text-base text-bone">
+                  Petit titre
+                  <input type="text" value={a.title} onChange={(e) => put(m.src, { ...a, title: e.target.value })} className={inputCls} />
+                </label>
+                <label className="block text-base text-bone">
+                  Texte (une ou deux phrases)
+                  <textarea rows={2} value={a.text} onChange={(e) => put(m.src, { ...a, text: e.target.value })} className={inputCls + " py-3"} />
+                </label>
+                <details className="text-base text-bone">
+                  <summary className="cursor-pointer py-2 text-rose-light">Traductions</summary>
+                  {ANGLE_LANGUAGES.map((l) => {
+                    const own = a.translations?.[l] ?? {};
+                    const site = bundleOf(l).content;
+                    const setOwn = (k: "title" | "text", text: string) => put(m.src, { ...a, translations: { ...a.translations, [l]: { ...own, [k]: text } } });
+                    const props = { lang: l, dir: LOCALE_INFO[l].dir };
+                    return (
+                      <div key={l} className="mt-3 border-t border-white/10 pt-3">
+                        <p className="eyebrow">{LOCALE_INFO[l].name}</p>
+                        <input type="text" aria-label={"Petit titre · " + LOCALE_INFO[l].name} {...props} value={own.title ?? ""} placeholder={site[a.title] ?? ""} onChange={(e) => setOwn("title", e.target.value)} className={inputCls + " placeholder:text-mist/60"} />
+                        <textarea rows={2} aria-label={"Texte · " + LOCALE_INFO[l].name} {...props} value={own.text ?? ""} placeholder={site[a.text] ?? ""} onChange={(e) => setOwn("text", e.target.value)} className={inputCls + " py-3 placeholder:text-mist/60"} />
+                        {(a.title && !own.title && !site[a.title]) || (a.text && !own.text && !site[a.text]) ? <span className="mt-1 block text-base text-rose-light">Pas traduit : le texte anglais s'affiche.</span> : null}
+                      </div>
+                    );
+                  })}
+                </details>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </fieldset>
+  );
+}
+
 /* Form values <-> API bodies */
 
 function toForm(kind: Kind, item: Rec): Rec {
@@ -402,6 +469,11 @@ function toBody(kind: Kind, f: Rec, initial: Rec): Rec {
     else if (field.type === "showcase") body[field.key] = cleanShowcase(v);
     else if (field.type === "atelier") body[field.key] = cleanAtelier(v);
     else if (field.type === "detailPoints") body[field.key] = cleanDetailPoints(v);
+    else if (field.type === "angles") {
+      // Only the photos still in the piece.
+      const photos = new Set(photosOf(f));
+      body[field.key] = Object.fromEntries(Object.entries(cleanAngles(v)).filter(([src]) => photos.has(src)));
+    }
     else if (field.type === "model3d") continue;
     else if (field.type === "press")
       body[field.key] = asText(v)
@@ -491,7 +563,8 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
     if (d.type === "theme") return <ThemeField key={d.key} token={token} label={d.label} value={cleanTheme(v)} onChange={(t) => set(d.key, t)} />;
     if (d.type === "atelier") return <AtelierField key={d.key} label={d.label} slug={asText(f.slug)} titles={titles} value={cleanAtelier(v)} onChange={(a) => set(d.key, a)} />;
     if (d.type === "showcase") return <ShowcaseField key={d.key} label={d.label} slug={asText(f.slug)} value={cleanShowcase(v)} onChange={(c) => set(d.key, c)} />;
-    if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
+    if (d.type === "angles") return <AnglesField key={d.key} label={d.label} photos={asList([f.cover, ...asList(f.gallery)]).filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i)} value={cleanAngles(v)} onChange={(a) => set(d.key, a)} />;
+        if (d.type === "model3d") return <ModelPicker key={d.key} label={d.label} models={models} value={modelChosen} slug={asText(initial.slug)} titles={titles} onChange={setModel3d} />;
     if (d.type === "detailPoints")
       return (
         <DetailPointsField

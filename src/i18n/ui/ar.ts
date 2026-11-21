@@ -190,7 +190,6 @@ export const ar: Messages = {
     },
     want: "اطلبوا إبداعكم الخاص",
     details: "فنّ التفاصيل",
-    upClose: "نظرة عن قرب",
     detailsEyebrow: "لكل تفصيل حكاية",
     seePhoto: "اكتشفوا التفصيل",
     historic: "إبداعات تاريخية",

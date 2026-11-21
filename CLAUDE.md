@@ -101,8 +101,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       défaut sur les 5 univers prioritaires et partout où il y a 3 vues propres ; sinon une seule vue détourée.
       Admin : « Vitrine de l'ouverture » par pièce (auto / une vue / multi-vues, choix et ordre des vues) et onglet
       **Détourages** (damier + noir, Exclure/Rétablir). Aucun bijou coupé (test automatique sur les 29 pièces, 1440 et 390 px).
-- [ ] Photo actuelle gardée (pas de photo propre du bijou seul) : JL (photo coupée en bas), Loïs Openda, Flâneur,
-      chaîne torsadée de Kevin Schade, les 3 montres. Demander à Yoni des photos sur fond noir de ces pièces.
+- [ ] Photo actuelle gardée (pas de photo propre du bijou seul) : JL (photo coupée en bas), Loïs Openda, Flâneur (retiré
+      le 21/11), chaîne torsadée de Kevin Schade, les 3 montres. Demander à Yoni des photos sur fond noir de ces pièces.
 
 ## Passe « making-of : Entrer dans l'atelier » — état au 19/11/2026
 - [x] **Vidéos web** : `npm run import-media -- --only=films` (choix par pièce dans `scripts/film-media.mjs`, faits à
@@ -162,16 +162,44 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « Sous tous les angles » et 4 pièces retirées (retours de Yoni du 21/11) — état au 21/11/2026
+- [x] **Une photo + un texte** sur toutes les pièces (`src/components/EveryAngle.tsx`) : chaque photo et chaque vidéo de la
+      pièce a un petit titre et une ou deux phrases, numérotés comme les détails de l'Inter ; ordinateur : photo et texte
+      côte à côte en damier, deux par rangée ; tablette : un par rangée, à gauche puis à droite ; iPhone : la photo puis son
+      texte. 6 d'abord puis « Voir les N autres » au-delà de 8. Remplace la rangée qui défilait de côté et l'ancienne
+      grille. La photo d'ouverture y figure quand l'ouverture montre le bijou détouré, ou quand la pièce n'a pas d'autre
+      photo (les montres). L'Inter garde « L'art du détail » (ses 9 symboles) en plus.
+- [x] **455 textes** (41 pièces), écrits photo par photo après avoir regardé chacune (vidéos : images extraites, sans son) :
+      seulement ce que montre la photo ou ce que la maison a déjà écrit ; aucun chiffre qui ne vient pas de Yoni, aucun nom
+      de pierre de couleur, aucun nom de personne privée ni de marque ; corrections de la liste « À vérifier avec Yoni »
+      appliquées. Anglais dans `src/data/angles.json` (par pièce puis adresse de photo), traductions dans
+      `src/i18n/content/angles/<langue>.json` (5 langues, à faire relire comme le reste, surtout l'arabe).
+- [x] **Admin** : « Sous tous les angles » dans chaque pièce (un titre et un texte par photo, puis leurs traductions ;
+      vide = la traduction du site, en gris). Colonne `angles` de la base (migration `20261121180000_piece_angles`) ; une
+      photo sans texte dans la base prend celui du catalogue ; titre et texte vidés = pas de texte sur le site.
+- [x] **4 pièces retirées** (trop peu de photos) : Flâneur, Two-Tone Iced Cuban Chain, White Iced Cuban Chain, Infinity
+      Pear Chain. Non publiées (`REMOVED_PIECES`, gardées dans l'admin), adresses redirigées (301) vers /creations
+      (`vercel.json` refait). Partout absentes (Créations et ses filtres, « Discover More », stories, plan du site). 41
+      pièces en ligne. Les 3 Jesus pieces restent. Leurs univers (`flaneur`, `pluie`) attendent leur retour.
+- `tests/angles.spec.ts` (6 pièces dont l'Inter, des chaînes et une montre, ordinateur et iPhone, contraste AA du texte ;
+  Créations ; anciennes adresses ; admin), captures dans `verification/angles/`.
+- [ ] Yoni : relire les textes (doutes notés par photo : la date « 06-09-2024 » se lit encore sur la photo des griffes de la
+      panthère p06 et sur sa photo d'ouverture ; le pendentif de Loïs Openda porte un nom en lettres cursives jamais écrit
+      par la maison ; la lettre N sur l'octogone d'Okafor ; le motto « Furchtlos und treu » lu sur la bague VfB ; une bague
+      Inter porte « TIKUS » et le 9) ; la story de Kevin Schade dans sa galerie (stories/kevin-schade/01) garde un texte
+      d'anniversaire Instagram.
+
 ## Passe « 15 univers » (fonds IA de Yoni, effets, effet sur la pièce) — état au 21/11/2026
 - [x] **15 fonds** de `00 Contexte Yoni/Univers IA (propositions)/` (`<nom>-desktop.jpg` / `<nom>-mobile.jpg`), préparés par
       `npm run universes` (AVIF + WebP, 3 tailles ordinateur, 2 mobile ; 8,7 Mo en tout, 235 Ko au plus ; originaux hors Git).
       Version mobile sur téléphone, ordinateur sinon. Chaque fond entoure aussi la story de sa pièce (`portrait`).
 - [x] **Univers propres** : arène → Lasana Keita (`arene`) ; bianconero → Kenan Yildiz ; serpent → T-Serpent ; Sirius
-      (`sirius`) ; tulipes → Tulips on Tour ; Flâneur (`flaneur`) ; trèfle → Eljero Elia (`emeraude`) ; The Hand (`rideau`) ;
+      (`sirius`) ; tulipes → Tulips on Tour ; Flâneur (`flaneur`, pièce retirée le 21/11) ; trèfle → Eljero Elia (`emeraude`) ; The Hand (`rideau`) ;
       forge → chaîne torsadée de Kevin Schade (`forge`) ; N14 (`n14`). **Partagés** (même nom de preset) : `sacre` (Deniz
       Undav L, Samuel Ballet, croix Tillman, Loïs Openda, Baguette Cross, Jesus Piece Red Crown, Cross Infinity), `roses`
       (Thorned T, FAM, Safi Link, Jesus Cross, BRT Flower), `velours` (collier T au rubis, Jesus Piece Red Flowers, 14 mm
-      Cuban), `facettes` (TM, D&E, Baguette Cuban, Two-Tone, White Iced, Oval Eternity), `mecanique` (les 3 montres).
+      Cuban), `facettes` (TM, D&E, Baguette Cuban, Oval Eternity ; Two-Tone et White Iced retirées le 21/11), `mecanique`
+      (les 3 montres).
 - [x] **Effets** (`src/data/themes.ts`, admin « Univers de la page ») : « scene » anime les lumières propres au fond
       (projecteur qui respire, étoile qui scintille, constellation du N qui s'allume étoile par étoile, réverbères, bougies
       qui vacillent et leur fumée, faisceaux du stade, rayons des vitraux, reflets des pavés, air chaud de la forge, rideau,
@@ -189,8 +217,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
   reconstitué) et redessinées en train de tourner ; sur téléphone le moulin est sous le texte, il reste tel quel.
 - Approchés, faute de pouvoir bouger une image fixe : les rouages ne tournent pas vraiment (un reflet tourne sur les roues,
   le balancier oscille en reflet), l'air de la forge scintille au lieu d'onduler, le rideau bouge par ses plis d'ombre.
-- [ ] Hors des 15 univers (gardent l'ancien) : AS de Stiller et JL de Leweling (`stuttgart`), Rose 20 mm (`maison`),
-      Infinity Pear Chain (`pluie`). Flâneur, chaîne torsadée de Kevin Schade, panthère et les 3 montres s'ouvrent encore sur
+- [ ] Hors des 15 univers (gardent l'ancien) : AS de Stiller et JL de Leweling (`stuttgart`), Rose 20 mm (`maison`).
+      Chaîne torsadée de Kevin Schade, panthère et les 3 montres s'ouvrent encore sur
       leur photo (pas de photo du bijou seul) : le fond se voit autour.
 
 ## Passe « retours de Yoni du 21/11 » (WhatsApp, univers VfB et Butterfly, Openda) — état au 21/11/2026
@@ -243,9 +271,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       `scripts/hd-media.mjs` (`gallery` : `"p7:front"`, ce que montre chaque photo, `src/data/views.ts`, légendes
       traduites dans les 6 langues ; `also` : fichiers des étapes de fabrication). `npm run import-media -- --only=hd`.
       Ordre : la plus belle d'abord, vues d'ensemble, détails, dos et gravures, portées, écrin.
-- [x] **Page d'une pièce** : les 8 premières photos défilent comme avant, toutes les autres dans la grille « Every Angle
-      / Sous tous les angles » (`src/components/GalleryGrid.tsx` : 12 d'abord, puis « Voir les N autres », chargées au
-      fil du défilement, copie légère de chaque photo, vidéos muettes qui ne jouent qu'à l'écran). Plus de limite de 10.
+- [x] **Page d'une pièce** : toutes les photos, plus de limite de 10 (depuis le 21/11 : « Sous tous les angles », une photo
+      + un texte, voir plus haut ; chargées au fil du défilement, copie légère, vidéos muettes qui ne jouent qu'à l'écran).
 - [x] **Aucune pièce cachée** (demande de Yoni, captures de ses albums iPhone du 20/11, cochées en vert) : toutes les
       pièces des dossiers sont en ligne, sauf les 10 retirées et la chaîne **Tennis** (03, barrée par Yoni : non publiée,
       `REMOVED_PIECES`). Titres = noms de ses albums mis au propre (`NEW_PIECES` dans `src/data/pieces.ts`, jamais le nom
@@ -257,7 +284,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       deux chaînes), N14 — Medallion (22), Lasana Keita — Panther Pendant (19, « Created exclusively for Lasana Keita »).
       Non cochées, titre descriptif : Infinity Pear Chain (09, nom de son album), Baguette Cuban Chain (30, sans doute la
       chaîne du pendentif OKA), Two-Tone Iced Cuban Chain (31), White Iced Cuban Chain (33). 46 pièces en ligne (45 depuis le
-      21/11 : Bouzou fondu dans la pièce de Loïs Openda).
+      21/11 : Bouzou fondu dans la pièce de Loïs Openda ; 41 après le retrait de 4 pièces le même jour).
 - [x] **Photos des joueurs** envoyées par Yoni (19/11) en photo principale, rangées dans « Photos joueurs en maillot »
       (`- 03`/`- 04`/`- 02`, `scripts/player-media.mjs`) : Kenan Yildiz (Juventus), Marcus Thuram (Inter), Noah Okafor
       (Leeds), Loïs Openda (Juventus), Michy Batshuayi (Belgique). Kenan (554 px) et Openda (479 px) sont petites, jamais

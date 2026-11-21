@@ -4,6 +4,7 @@ import { z } from "zod";
 import { HOUSE_PHOTO_PLACES } from "../../src/data/house.js";
 import { publicCatalogue } from "../../src/data/relations.js";
 import { cleanAtelier } from "../../src/data/atelier.js";
+import { cleanAngles } from "../../src/data/angles.js";
 import { cleanDetailPoints } from "../../src/data/details3d.js";
 import { cleanShowcase } from "../../src/data/showcase.js";
 import { cleanTheme } from "../../src/data/themes.js";
@@ -303,6 +304,11 @@ const PieceIn = z.object({
     .unknown()
     .optional()
     .transform((v) => cleanDetailPoints(v) ?? Prisma.DbNull),
+  /** The text of each photo of "Every Angle", by its address: a title, a text, their translations. */
+  angles: z
+    .unknown()
+    .optional()
+    .transform((v) => cleanAngles(v)),
   making: MakingSchema.optional(),
   translations: TranslationsSchema.default({}),
 });

@@ -206,7 +206,6 @@ export const de: Messages = {
     },
     want: "Ihr Unikat in Auftrag geben",
     details: "Die Kunst des Details",
-    upClose: "Aus nächster Nähe",
     detailsEyebrow: "Jedes Detail erzählt eine Geschichte",
     seePhoto: "Das Detail entdecken",
     historic: "Historische Auftragswerke",

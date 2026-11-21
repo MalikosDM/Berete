@@ -197,7 +197,6 @@ export const es: Messages = {
     },
     want: "Encargue su propia creación",
     details: "El arte del detalle",
-    upClose: "Más de cerca",
     detailsEyebrow: "Cada detalle cuenta una historia",
     seePhoto: "Descubrir el detalle",
     historic: "Encargos históricos",

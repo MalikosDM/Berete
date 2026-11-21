@@ -83,6 +83,13 @@ export type Spec = { label: string; value: string };
  */
 export type Detail = { title: string; text: string; photo: string | null };
 export type Press = { outlet: string; title: string; url: string | null; image: string | null };
+/**
+ * The text of one photo of "Every Angle" (src/data/angles.ts): a small title and one or two sentences, in English, and
+ * the translations written in the admin, if any (else the translation of the site).
+ */
+export type Angle = { title: string; text: string; translations?: Partial<Record<"fr" | "es" | "de" | "nl" | "ar", { title?: string; text?: string }>> };
+/** The texts of the photos of a piece, by the address of each photo. */
+export type PieceAngles = Record<string, Angle>;
 
 export type Piece = {
   slug: string;
@@ -103,6 +110,8 @@ export type Piece = {
   specs: Spec[];
   /** The symbols of the piece, one by one ("The details"). */
   details: Detail[];
+  /** The text of each of its photos in "Every Angle" (src/data/angles.ts). */
+  angles: PieceAngles;
   press: Press[];
   /** Slugs of the people who wear or received it. */
   people: string[];

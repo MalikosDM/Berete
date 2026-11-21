@@ -99,6 +99,12 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
       making,
       specs: p.specs.map((s) => ({ label: v.text(s.label, "text"), value: v.text(s.value, "text") })),
       details: p.details.map((d) => ({ ...d, title: v.text(d.title, "text"), text: v.text(d.text, "text") })),
+      angles: Object.fromEntries(
+        Object.entries(p.angles).map(([src, a]) => {
+          const own = locale && locale !== "en" ? a.translations?.[locale] : undefined;
+          return [src, { ...a, title: a.title ? v.text(a.title, "text", own?.title) : a.title, text: a.text ? v.text(a.text, "text", own?.text) : a.text }];
+        }),
+      ),
       press: p.press.map((x) => ({ ...x, title: v.text(x.title, "text") })),
     };
   });
