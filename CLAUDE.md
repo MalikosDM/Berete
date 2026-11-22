@@ -193,7 +193,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       (6 langues). **Sur Vercel (sans serveur), le formulaire ouvre WhatsApp** avec le texte et demande d'y ajouter les photos :
       l'envoi avec photos et l'admin marcheront sur le VPS.
 - `tests/yoni2211.spec.ts` (ordinateur, tablette, iPhone ; formulaire avec 2 photos dont une HEIC reçu dans l'admin puis
-  supprimé, en local avec le serveur), captures dans `verification/yoni2211/`.
+  supprimé, en local avec le serveur ; en ligne, le passage par WhatsApp avec ses photos en aperçu), vérifié sur le site
+  en ligne le 22/11, captures dans `verification/yoni2211/`.
 - [ ] Yoni : la 5e Jesus Piece ; relire les textes de la Butterfly Chain et du pendentif (traductions).
 
 ## Passe « portrait de Yoni sur La Maison » — état au 22/11/2026

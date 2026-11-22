@@ -171,6 +171,15 @@ test("the Butterfly: the pendant and the chain, two pieces linked to each other,
   expect(problems.errors).toEqual([]);
 });
 
+/** Opens the private correspondence (again until the page is ready to answer the click). */
+async function openForm(page: Page): Promise<void> {
+  const toggle = page.getByRole("button", { name: /Correspondance privée/i });
+  await expect(async () => {
+    if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true", { timeout: 1500 });
+  }).toPass({ timeout: 20_000 });
+}
+
 /** Two photos for the form: a heavy JPEG (made lighter by the browser) and, on a Mac, an iPhone photo (HEIC). */
 async function testPhotos(): Promise<string[]> {
   const jpeg = SCRATCH + "/atelier-4000.jpg";
@@ -197,7 +206,7 @@ test("the private correspondence: photos previewed, removable, received in the a
   expect(statSync(heavy).size).toBeGreaterThan(1_500_000);
   const tag = "Test " + info.project.name + " " + Date.now();
   await page.goto("/fr/contact", { waitUntil: "load" });
-  await page.getByRole("button", { name: /Correspondance privée/i }).click();
+  await openForm(page);
   const form = page.locator("[data-email-form]");
   await form.getByLabel("Nom").fill(tag);
   await form.getByLabel("E-mail").fill("test@example.com");
@@ -258,4 +267,34 @@ test("the private correspondence: photos previewed, removable, received in the a
   const after = (await (await request.get("/api/admin/messages", { headers: { Authorization: "Bearer " + token } })).json()) as { messages: { name: string }[] };
   expect(after.messages.some((m) => m.name === tag)).toBe(false);
   expect(problems.errors.filter((e) => !/HTTP 401/.test(e))).toEqual([]);
+});
+
+test("online without the server (Vercel): the photos previewed, the message handed to WhatsApp, the photos to add there", async ({ page, context }, info) => {
+  test.skip(!ONLINE, "Only the version online without its server hands the form to WhatsApp.");
+  const problems = watch(page);
+  await skipIntro(page);
+  const [heavy, heic] = await testPhotos();
+  await page.goto("/fr/contact", { waitUntil: "load" });
+  await openForm(page);
+  const form = page.locator("[data-email-form]");
+  await form.getByLabel("Nom").fill("Test en ligne");
+  await form.getByLabel("E-mail").fill("test@example.com");
+  await form.getByLabel(/Instagram/).fill("@beretejewellers");
+  await form.getByLabel("Votre idée").fill("Un pendentif avec mes initiales, comme sur ces deux photos.");
+  await form.locator("[data-photo-input]").setInputFiles([heavy, heic]);
+  await expect(form.locator("[data-photo]")).toHaveCount(2);
+  await expect(form.locator("[data-photo] [role=status]")).toHaveCount(0, { timeout: 30_000 });
+  await form.locator("[data-photos]").scrollIntoViewIfNeeded();
+  await shot(page, info.project.name + "-en-ligne-formulaire-photos");
+  const popup = context.waitForEvent("page");
+  await form.getByRole("button", { name: "Envoyer le message" }).click();
+  const wa = await popup;
+  expect(wa.url()).toMatch(/wa\.me|whatsapp/);
+  await wa.close();
+  await expect(page.locator("[data-whatsapp-handoff]")).toBeVisible();
+  await expect(page.getByText("ajoutez-les dans la conversation WhatsApp")).toBeVisible();
+  await page.locator("#email-form").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.waitForTimeout(500);
+  await shot(page, info.project.name + "-en-ligne-formulaire-whatsapp");
+  expect(problems.errors).toEqual([]);
 });
