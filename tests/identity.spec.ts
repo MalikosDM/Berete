@@ -84,6 +84,8 @@ test("Enter the World / Entrer dans l'univers on every piece", async ({ page }, 
   for (const [prefix, words] of [["", "Enter the World"], ["/fr", "Entrer dans l’univers"]] as const) {
     await page.goto(prefix + "/creations?view=grid");
     const cards = page.locator("[data-piece-card]");
+    // (The grid comes once the page is ready: the first view of the page is the carousel.)
+    await expect(cards.first()).toBeVisible();
     const count = await cards.count();
     expect(count).toBe((await getCatalogue(page)).pieces.length);
     for (let i = 0; i < count; i++) await expect(cards.nth(i).locator("[data-enter-world]")).toHaveText(words);

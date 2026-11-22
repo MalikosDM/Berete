@@ -16,6 +16,7 @@ import { FEATURED_BOX, SPECIAL_PROJECT } from "@/data/pieces";
 import { Link, useI18n, type Messages } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
+import { plainStory } from "@/data/story";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
 
@@ -130,7 +131,7 @@ export default function Home() {
               <p id="featured-title" className="text-rose-gold mt-3 font-display text-xl uppercase tracking-[0.2em]">
                 {featured.title.split("—")[1]?.trim() ?? featured.line}
               </p>
-              <p className="mt-6 max-w-md text-base text-bone md:text-lg">{featured.story}</p>
+              <p className="mt-6 max-w-md text-base text-bone md:text-lg">{plainStory(featured.story)}</p>
               <Link to={"/pieces/" + featured.slug} className="mt-8 inline-flex min-h-12 items-center gap-3 border border-rose-light/80 px-7 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink">
                 {t.home.enterCapsule}
                 <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />

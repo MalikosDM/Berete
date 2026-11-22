@@ -367,9 +367,24 @@ const SITE_PIECES: Piece[] = [
     slug: "kevin-schade-dragon-ball-pendant",
     title: "Kevin Schade — Dragon Ball Pendant",
     type: "pendant",
-    line: "The hero lifts a blue sphere, wrapped by the dragon.",
+    // The official text of Yoni (22/11/2026), word for word, in two parts with their titles ("## "); its last words set apart
+    // as a closing quote ("> "), and its line (src/data/story.ts).
+    line: "Not power taken, but power entrusted.",
     story:
-      "A sculpture in miniature, made for Kevin Schade. A figure in rose gold holds up a sphere set with blue stones, while a dragon paved with white diamonds coils around him, among dragon balls in rose gold. It started as a hand drawing; several versions were drawn before this one was chosen. It hangs from a diamond-set Cuban chain.",
+      "## The Vision Behind the Creation\n\n" +
+      "A lifelong admirer of Dragon Ball Z, Kevin Schade challenged Berete to create an extraordinary, never-before-seen piece inspired by Goku and his iconic Genki Dama — a technique Kevin himself had celebrated on the football pitch.\n\n" +
+      "In the Dragon Ball universe, the Spirit Bomb gathers energy from the world around Goku — humans, animals, plants, and even the atmosphere — uniting these different sources into one immense sphere.\n\n" +
+      "We translated this principle into diamonds.\n\n" +
+      "Different cuts, settings and orientations represent the diversity of energy sources contributing to a single collective force.\n\n" +
+      "But to us, energy was never meant to remain still.\n\n" +
+      "We therefore engineered the diamond-set Spirit Bomb to rotate, bringing movement to the very heart of the creation.\n\n" +
+      "Every detail has a purpose. Nothing is accidental.\n\n" +
+      "## The Art of Craftsmanship\n\n" +
+      "The rotating Spirit Bomb combines round, emerald and princess-cut diamonds through multiple setting techniques, including prong, bezel, channel and reverse settings.\n\n" +
+      "Even the inverted diamonds carry meaning, symbolising the unseen contributions that form a greater whole.\n\n" +
+      "Beneath the sphere, Goku channels the gathered energy, surrounded by the seven iconic Dragon Balls, each distinguished by its number of stars.\n\n" +
+      "A creation where symbolism, engineering and high jewellery become one.\n\n" +
+      "> Not power taken, but power entrusted.",
     people: ["kevin-schade"],
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
@@ -387,11 +402,13 @@ const SITE_PIECES: Piece[] = [
       yoni("kevin-schade-dragon-ball-pendant", "p20", at("The pendant on its chain, on a black bust")),
       st("kevin-schade", 22, at("Film of the pendant turning in a gloved hand")),
     ]),
+    // Only what the text of Yoni says (22/11/2026); what the photos seemed to show is no longer written.
     specs: [
-      ["Type", "Pendant on a Cuban chain"],
-      ["Motif", "A hero, a dragon and the dragon balls"],
+      ["Motif", "Goku and the Spirit Bomb, surrounded by the seven Dragon Balls"],
+      ["Spirit Bomb", "Rotating, diamond-set"],
+      ["Diamond cuts", "Round, emerald, princess"],
+      ["Settings", "Prong, bezel, channel, reverse"],
     ],
-    seen: "White and rose gold tones · round diamonds in pavé; blue round, baguette and square stones",
     boxSlug: "dragon-ball-trunk",
     making: {
       sketch: st("kevin-schade", 8, at("The first hand drawing of the Dragon Ball pendant", "The Original Vision")),

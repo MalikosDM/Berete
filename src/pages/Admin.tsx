@@ -115,7 +115,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "slug", label: "Adresse web (ex. kevin-schade-pendant)", type: "text" },
       { key: "type", label: "Type", type: "select", options: PIECE_TYPES.map((t) => [t, TYPE_NAMES[t] ?? t] as const) },
       { key: "line", label: "Phrase d'accroche", type: "text" },
-      { key: "story", label: "Texte", type: "textarea" },
+      { key: "story", label: "Texte (une ligne vide entre deux paragraphes ; « ## » au début d'un paragraphe = un titre de partie, « > » = la citation de fin)", type: "textarea" },
       { key: "client", label: "Client", type: "text" },
       { key: "clientPublic", label: "Afficher le client", type: "checkbox" },
       { key: "featured", label: "Mettre à la une de l'accueil", type: "checkbox" },

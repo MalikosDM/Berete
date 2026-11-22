@@ -162,6 +162,21 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « texte officiel de la pièce Dragon Ball » (Yoni, 22/11/2026, 3) — état au 22/11/2026
+- [x] **Texte de Yoni mot pour mot** (`kevin-schade-dragon-ball-pendant`, `src/data/pieces.ts`) en deux parties titrées,
+      « The Vision Behind the Creation » et « The Art of Craftsmanship » ; sa dernière phrase « Not power taken, but power
+      entrusted. » en citation de fin (style des citations de La Maison) et en phrase sous le titre. Le texte d'une pièce
+      accepte deux repères en début de paragraphe (`src/data/story.ts`) : `## ` = titre de partie, `> ` = citation de fin
+      (hors traductions et hors description Google) ; aide dans l'admin (champ « Texte »). Quand le texte a ses titres, la
+      phrase n'est pas répétée en haut du texte.
+- [x] **Fiche technique** : seulement ce que dit le texte (Motif, Spirit Bomb, tailles des diamants, sertis) ; l'ancienne
+      ligne « Type » et la ligne « d'après les photos » (pierres bleues, baguettes) retirées. Pas d'annotations « L'art du
+      détail » sur cette pièce : rien à aligner.
+- [x] Traductions fidèles en 5 langues (« Genki Dama » et « Spirit Bomb » tels quels ; les Dragon Balls : « boules de
+      cristal » en français, « Bolas de Dragón » en espagnol, « Dragonballs » en allemand, « كرات التنين » en arabe).
+      `tests/dragonball.spec.ts` (ordinateur et iPhone, anglais et français), captures `verification/dragonball/`.
+- [ ] Yoni : relire les traductions (surtout l'arabe) ; droits Dragon Ball toujours à confirmer.
+
 ## Passe « carrousel des Créations et vraies boîtes » (Yoni, 22/11/2026, 2) — état au 22/11/2026
 - [x] **Créations en carrousel** (`src/components/PieceCarousel.tsx`), dans Toutes, chaque collection et sous-catégorie
       (Chaînes, Pendentifs > Jesus Pieces…) : la création en cours grande au centre (cadre carré), celles d'avant et

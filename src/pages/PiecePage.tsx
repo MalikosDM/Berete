@@ -28,6 +28,7 @@ import { completeMakingOf, makingSteps } from "@/data/making";
 import { pointsFor } from "@/data/details3d";
 import type { PublicModel } from "@/data/models";
 import { resolveShowcase } from "@/data/showcase";
+import { storyBlocks } from "@/data/story";
 import { jewelOf, resolveTheme } from "@/data/themes";
 import type { MakingStep, MediaItem, Piece, Story } from "@/data/types";
 import { listOf } from "@/i18n/format";
@@ -265,14 +266,9 @@ export default function PiecePage() {
 
         <div className="lg:col-span-6 lg:col-start-7">
           <h2 className="eyebrow">{t.piece.story}</h2>
-          {piece.line ? <h3 className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</h3> : null}
-          {piece.story
-            ? piece.story.split("\n\n").map((par, i) => (
-                <p key={i} data-story-paragraph={i + 1} className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">
-                  {par}
-                </p>
-              ))
-            : null}
+          {/* Its line, unless its text has its own titles (the official text of the Dragon Ball pendant). */}
+          {piece.line && !storyBlocks(piece.story).some((b) => b.kind === "title") ? <h3 className="title-caps mt-8 text-[clamp(1.75rem,3.5vw,3rem)] leading-[1.15] tracking-[0.06em] text-white [text-wrap:balance]">{piece.line}</h3> : null}
+          <StoryText story={piece.story} />
           <WornWith slug={piece.slug} />
         </div>
       </section>
@@ -481,6 +477,44 @@ function DetailsSection({ piece, model }: { piece: Piece; model: PublicModel | n
  * when it has one, comes first: it plays silently on screen, and full screen with its sound once chosen
  * (src/components/AtelierRoom.tsx). The photos of the steps open in full screen.
  */
+/**
+ * The text of a piece: its paragraphs; the titles of its parts ("## " in the text) and its closing words set apart as a
+ * quote ("> "), in the style of the quotes of the house (src/data/story.ts).
+ */
+function StoryText({ story }: { story: string }) {
+  const { t } = useI18n();
+  const blocks = storyBlocks(story);
+  // The number of each paragraph among the paragraphs.
+  const numbers = blocks.map((_, i) => blocks.slice(0, i + 1).filter((x) => x.kind === "paragraph").length);
+  return (
+    <>
+      {blocks.map((b, i) => {
+        if (b.kind === "title")
+          return (
+            <h3 key={i} data-story-title className="title-caps mt-14 flex items-center gap-4 text-[clamp(1.375rem,2.6vw,2rem)] leading-[1.2] tracking-[0.08em] text-white first:mt-8 [text-wrap:balance]">
+              <span aria-hidden="true" className="rule-rose w-10 shrink-0" />
+              {b.text}
+            </h3>
+          );
+        if (b.kind === "quote")
+          return (
+            <figure key={i} data-story-quote className="mt-14 border-t border-white/15 pt-10">
+              <blockquote>
+                <p className="font-display text-[clamp(1.875rem,4vw,3.25rem)] font-light italic leading-[1.12] text-white [text-wrap:balance]">{t.about.quoted(b.text)}</p>
+              </blockquote>
+              <span aria-hidden="true" className="rule-rose mt-8 block w-12" />
+            </figure>
+          );
+        return (
+          <p key={i} data-story-paragraph={numbers[i]} className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">
+            {b.text}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
 /** The piece worn with this one (the Butterfly pendant and its chain): a card that leads to it. */
 function WornWith({ slug }: { slug: string }) {
   const { t } = useI18n();

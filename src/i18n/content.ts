@@ -6,8 +6,10 @@
  * dictionary, else stays in English until it is translated.
  */
 import type { Box, Catalogue, MediaItem, Person, Piece, Story, Translations } from "@/data/types";
+import { storyMark } from "@/data/story";
 import { isView, VIEWS, viewAlt } from "@/data/views";
 import type { Locale } from "./locales";
+
 
 /** "text": a sentence, translated in every language. "name": a proper name, written in another script only where needed (Arabic). */
 export type TextKind = "text" | "name";
@@ -91,8 +93,18 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
       ...p,
       title,
       line: p.line ? v.text(p.line, "text", ownOf(p.translations, "line", locale)) : p.line,
-      // Its paragraphs one by one (a blank line between them), unless the admin gave its own translation of the whole.
-      story: p.story ? (ownOf(p.translations, "story", locale) ?? p.story.split("\n\n").map((par) => v.text(par, "text")).join("\n\n")) : p.story,
+      // Its paragraphs one by one (a blank line between them; a title "## " or a closing quote "> " translated without its
+      // mark, src/data/story.ts), unless the admin gave its own translation of the whole.
+      story: p.story
+        ? (ownOf(p.translations, "story", locale) ??
+          p.story
+            .split("\n\n")
+            .map((par) => {
+              const mark = storyMark(par);
+              return mark + v.text(par.slice(mark.length), "text");
+            })
+            .join("\n\n"))
+        : p.story,
       client: p.client ? v.text(p.client, "name") : p.client,
       cover: shown(p.cover),
       gallery: p.gallery.map(shown),

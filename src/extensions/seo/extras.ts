@@ -1,6 +1,7 @@
 // The title and description of the pages that show one piece or one person, in the language of the address.
 import { defaultCatalogue } from "@/data/catalogue";
 import share from "@/data/share.generated.json";
+import { plainStory } from "@/data/story";
 import { madeFor, publicCatalogue } from "@/data/relations";
 import { resolveTheme, titleFontFile } from "@/data/themes";
 import type { Catalogue } from "@/data/types";
@@ -34,7 +35,7 @@ export function extrasFor(path: string, cat?: Catalogue): SeoExtras | undefined 
     return {
       ...(font ? { preloads: [{ href: font, as: "font" as const, type: "font/woff2" }] } : {}),
       title: found.title,
-      description: clip(t.seo.pieceDescription(found.title, t.types[found.type], who) + " " + found.line + " " + found.story),
+      description: clip(t.seo.pieceDescription(found.title, t.types[found.type], who) + " " + found.line + " " + plainStory(found.story)),
       ...(image ? { image: image.src, imageWidth: image.width, imageHeight: image.height } : {}),
     };
   }
