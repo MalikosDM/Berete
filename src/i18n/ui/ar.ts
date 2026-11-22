@@ -327,7 +327,8 @@ export const ar: Messages = {
     createOwn: "صمّم صندوقك الخاص",
     discoverPiece: "اكتشف القطعة",
     replay: "إعادة مشاهدة الفتح",
-    closeTrunk: "إغلاق الصندوق",
+    closeHint: "أغلق",
+    closeTrunk: (name: string) => "إغلاق: " + name,
   },
 
   process: {

@@ -334,7 +334,8 @@ export const es: Messages = {
     createOwn: "Crear su propio estuche",
     discoverPiece: "Descubrir la pieza",
     replay: "Ver de nuevo la apertura",
-    closeTrunk: "Cerrar el estuche",
+    closeHint: "Cerrar",
+    closeTrunk: (name: string) => "Cerrar: " + name,
   },
 
   process: {

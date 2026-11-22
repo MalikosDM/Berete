@@ -147,13 +147,17 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   vont à la fin de « Every Angle » (`AMATEUR_FILMS`). Les thèmes (`THEMES` de `src/data/collections.ts`, Jesus Pieces)
   regroupent des pièces de types différents à `/creations/<slug>`, dans le menu sous les collections. Un fond d'univers peut
   être une séquence d'images en fondu (`sequence`, `SEQUENCES` de `scripts/universe-media.mjs` : la nuit de Lasana Keita).
-  Les Signature Trunks s'ouvrent au clic (`src/components/TrunkReveal.tsx`) : boîte fermée, puis la vidéo d'ouverture
-  (5 écrins, `Ecrins IA (ouverture) v2/<dossier>/` : closed.jpg, open.jpg, ouverture.mp4) ou le passage d'une vraie photo
-  fermée à une vraie photo ouverte dans une lumière (`Boites (photos pro)/<dossier>/` : 01 et 03, ou des images des films
-  de livraison pour les écrins d'avant) ; puis la pièce détourée (`public/media/cutouts/<pièce>`) monte et flotte au-dessus,
-  et deux boutons : « Créer votre écrin » (WhatsApp) et « Découvrir la pièce » (si `pieceSlug` est rempli dans
-  `BOXES` de `src/data/pieces.ts` ou dans l'admin ; vide = seulement le premier bouton). Fichiers préparés par
-  `npm run trunks` (`scripts/trunk-media.mjs` : liste `BOXES` du script, carrés 720/1080/1440, photos pro `photo-NN`,
+  Les Signature Trunks s'ouvrent et se referment (`src/components/TrunkReveal.tsx`), tous les 13 avec leurs vidéos
+  (`Ecrins IA (ouverture) v2/<dossier>/` : closed.jpg, open.jpg, ouverture.mp4, fermeture.mp4) : boîte fermée et « Ouvrir » ;
+  la vidéo d'ouverture, puis la pièce détourée (`public/media/cutouts/<pièce>`) monte et flotte au-dessus, et deux boutons :
+  « Créer votre écrin » (WhatsApp) et « Découvrir la pièce » (si `pieceSlug` est rempli dans `BOXES` de
+  `src/data/pieces.ts` ou dans l'admin ; vide = seulement le premier bouton). « Refermer » : les boutons s'en vont, la pièce
+  redescend dans la boîte, la vidéo de fermeture joue, la boîte finit fermée ; « Revoir l'ouverture » sur la boîte ouverte.
+  Chaque vidéo reste cachée tant qu'elle ne joue pas (l'image dessous est sa première image) et ne s'efface que sur l'image
+  de sa dernière ; pendant une vidéo, rien à cliquer. Vidéo d'ouverture chargée à l'approche, celle de fermeture une fois la
+  boîte ouverte. Fichiers préparés par `npm run trunks` (`scripts/trunk-media.mjs` : liste `BOXES` du script, carrés
+  720/1080/1440, deux vidéos 1080 px, photos pro `photo-NN` pour la galerie « x photos » ; chaque nom porte la version de
+  l'écrin, une empreinte de ses fichiers : `opening.<version>.mp4`, plus aucune ancienne version en cache ;
   `src/data/trunks.generated.json`) ; lumière et place de la pièce de chaque écrin dans `PLACES` de `src/data/trunks.ts` ;
   un seul écrin : `npm run trunks -- --only=the-hand-cube`. Un écrin retiré passe en « non publié » (case de l'admin,
   `REMOVED_BOXES`) ; toute adresse `/boxes/<écrin>` mène à /boxes ; `/boxes#box-<écrin>` (lien de la page d'une pièce)
@@ -289,8 +293,9 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
                         # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)
-                        # tests/trunks.spec.ts : les 13 écrins qui s'ouvrent (vidéo sans saut ou photos dans une lumière,
-                        # la pièce détourée qui sort, « Créer votre écrin » et « Découvrir la pièce », pages des pièces)
+                        # tests/trunks.spec.ts : les 13 écrins qui s'ouvrent et se referment (leurs deux vidéos, sans
+                        # saut, adresses versionnées), la pièce qui sort puis rentre, « Créer votre écrin » et
+                        # « Découvrir la pièce », plusieurs fois de suite, clavier, pages des pièces
                         # tests/carousel.spec.ts : le carrousel des Créations (flèches, glissement, clavier, compteur,
                         # retour), la grille de cartes égales (ordinateur, tablette, iPhone), 6 langues, aucun saut
                         # tests/angles.spec.ts : retours de Yoni du 21/11 (« Sous tous les angles » : un texte par photo

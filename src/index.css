@@ -2937,46 +2937,27 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
 }
 
-/* The Signature Trunks that open (src/components/TrunkReveal.tsx): the closed image, then the open one (over the last frame
-   of the film, or in a light coming out of a box that opens from its photos); the light of the open box (a halo that
-   breathes, a few sparks rising); its piece rising from it and floating above it; its two ways on. */
-.trunk-image {
+/* The Signature Trunks that open and close again (src/components/TrunkReveal.tsx): the closed image always under all; the
+   open image over it, shown at once under a film (or in a fade: watching the opening again, a film that cannot play); each
+   film over them, hidden until it plays, fading over the image it ends on; the light of the open box (a halo that breathes,
+   a few sparks rising); its piece rising from it, floating above it, going back into it; its buttons. */
+.trunk-image[data-trunk-image="open"] {
   opacity: 0;
-  transition: opacity 0.3s ease-out;
 }
-.trunk-image[data-shown] {
+.trunk-image[data-trunk-image="open"][data-shown] {
   opacity: 1;
 }
-[data-trunk-image="open"] {
-  transition-duration: 0.5s;
+[data-trunk-fade] .trunk-image[data-trunk-image="open"] {
+  transition: opacity 0.6s ease;
 }
-[data-trunk-kind="photos"] .trunk-image {
-  transition:
-    opacity 0.9s ease,
-    transform 1.7s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-[data-trunk-kind="photos"][data-trunk-state="opening"] [data-trunk-image="closed"] {
-  transform: scale(1.06);
-}
-[data-trunk-kind="photos"] [data-trunk-image="open"] {
-  transform: scale(1.05);
-}
-[data-trunk-kind="photos"] [data-trunk-image="open"][data-shown] {
-  transform: none;
-  transition-delay: 0.5s;
-}
-.trunk-burst {
-  position: absolute;
-  left: calc(var(--lx) * 100%);
-  top: calc(var(--ly) * 100%);
-  width: 150%;
-  aspect-ratio: 1;
-  translate: -50% -50%;
-  border-radius: 50%;
+.trunk-film {
+  opacity: 0;
   pointer-events: none;
-  mix-blend-mode: screen;
-  background: radial-gradient(circle, rgb(255 238 206 / 0.95) 0%, rgb(255 212 164 / 0.55) 13%, rgb(232 180 160 / 0.18) 32%, transparent 58%);
-  animation: trunk-burst 1.7s ease-out both;
+  transition: opacity 0.4s ease;
+}
+.trunk-film[data-shown] {
+  opacity: 1;
+  transition-duration: 0.2s;
 }
 .trunk-glow {
   position: absolute;
@@ -3011,18 +2992,22 @@ html[lang="ar"] [data-piece] [data-u-title] {
   opacity: 1;
   transition-delay: 2.4s;
 }
-[data-trunk-kind="photos"][data-trunk-state="opening"] .trunk-glow {
-  transition-delay: 0.7s;
-}
 [data-trunk-state="open"] .trunk-glow {
   opacity: 1;
+}
+[data-trunk-state="lowering"] .trunk-glow,
+[data-trunk-state="rewinding"] .trunk-glow {
+  transition-duration: 0.6s;
 }
 .trunk-jewel {
   position: absolute;
   inset: 0;
   pointer-events: none;
   transform-origin: calc(var(--fx) * 100%) calc(var(--fy) * 100%);
-  animation: trunk-jewel-rise 1.8s cubic-bezier(0.16, 0.8, 0.24, 1) 0.15s both;
+  animation: trunk-jewel-rise 1.6s cubic-bezier(0.16, 0.8, 0.24, 1) 0.15s both;
+}
+.trunk-jewel[data-leaving] {
+  animation: trunk-jewel-sink 0.75s cubic-bezier(0.55, 0, 0.8, 0.4) both;
 }
 .trunk-jewel img {
   position: absolute;
@@ -3049,10 +3034,15 @@ html[lang="ar"] [data-piece] [data-u-title] {
   animation: trunk-pulse 3.4s ease-in-out 1.8s infinite;
 }
 .trunk-links {
-  animation: trunk-links-in 0.8s ease-out 0.6s both;
+  animation: trunk-links-in 0.6s ease-out 1.3s both;
 }
 .trunk-actions-in {
   animation: trunk-actions-in 0.7s ease-out 0.8s both;
+}
+.trunk-links[data-leaving],
+.trunk-actions-in[data-leaving] {
+  pointer-events: none;
+  animation: trunk-leave 0.25s ease-in both;
 }
 @keyframes trunk-links-in {
   from {
@@ -3065,20 +3055,8 @@ html[lang="ar"] [data-piece] [data-u-title] {
     transform: translateY(8px);
   }
 }
-@keyframes trunk-burst {
-  0% {
-    transform: scale(0.05);
-    opacity: 0;
-  }
-  35% {
-    opacity: 1;
-  }
-  60% {
-    transform: scale(1);
-    opacity: 0.85;
-  }
-  100% {
-    transform: scale(1.15);
+@keyframes trunk-leave {
+  to {
     opacity: 0;
   }
 }
@@ -3095,6 +3073,21 @@ html[lang="ar"] [data-piece] [data-u-title] {
     opacity: 1;
     translate: 0 0;
     scale: 1;
+  }
+}
+@keyframes trunk-jewel-sink {
+  from {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: calc((var(--lx) - var(--fx)) * 100%) calc((var(--ly) - var(--fy)) * 100%);
+    scale: 0.3;
   }
 }
 @keyframes trunk-jewel-float {
@@ -3137,10 +3130,11 @@ html[lang="ar"] [data-piece] [data-u-title] {
   .trunk-jewel-glow,
   .trunk-links,
   .trunk-actions-in,
-  .trunk-burst {
+  .trunk-jewel[data-leaving] {
     animation: none;
   }
-  .trunk-image {
+  .trunk-image,
+  [data-trunk-fade] .trunk-image[data-trunk-image="open"] {
     transition: none;
   }
   .trunk-glow i {

@@ -345,7 +345,8 @@ export const fr: Messages = {
     createOwn: "Créer votre écrin",
     discoverPiece: "Découvrir la pièce",
     replay: "Revoir l’ouverture",
-    closeTrunk: "Refermer l’écrin",
+    closeHint: "Refermer",
+    closeTrunk: (name: string) => "Refermer : " + name,
   },
 
   process: {

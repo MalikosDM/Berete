@@ -332,7 +332,8 @@ export const nl: Messages = {
     createOwn: "Uw eigen koffer ontwerpen",
     discoverPiece: "Ontdek het juweel",
     replay: "Opening opnieuw bekijken",
-    closeTrunk: "Koffer sluiten",
+    closeHint: "Sluiten",
+    closeTrunk: (name: string) => "Sluiten: " + name,
   },
 
   process: {

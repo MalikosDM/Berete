@@ -345,7 +345,8 @@ export const de: Messages = {
     createOwn: "Ihr eigenes Etui gestalten",
     discoverPiece: "Das Schmuckstück entdecken",
     replay: "Öffnung noch einmal ansehen",
-    closeTrunk: "Etui schließen",
+    closeHint: "Schließen",
+    closeTrunk: (name: string) => "Schließen: " + name,
   },
 
   process: {

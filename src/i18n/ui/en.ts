@@ -354,7 +354,8 @@ export const en = {
     createOwn: "Create your own trunk",
     discoverPiece: "Discover the piece",
     replay: "Watch the opening again",
-    closeTrunk: "Close the trunk",
+    closeHint: "Close",
+    closeTrunk: (name: string) => "Close " + name,
   },
 
   process: {

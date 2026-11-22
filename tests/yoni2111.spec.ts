@@ -226,7 +226,8 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   const problems = watch(page);
   const trunk = trunkOf("sirius")!;
   // Since 22/11/2026 (2): its professional photos (00 Contexte Yoni/Boites (photos pro)/sirius), its new film.
-  expect(trunk.photos?.map((p) => p.src)).toEqual(["01", "02", "03", "04"].map((n) => "/media/trunks/sirius/photo-" + n + ".webp"));
+  // (Every name carries the version of its files since 22/11/2026, 4.)
+  expect(trunk.photos?.map((p) => p.src)).toEqual(["01", "02", "03", "04"].map((n) => "/media/trunks/sirius/photo-" + n + "." + trunk.version + ".webp"));
   expect(BOXES.find((b) => b.slug === "sirius")!.images.map((m) => m.src)).toEqual(trunk.photos!.map((p) => p.src));
   await skipIntro(page);
   await page.goto("/fr/boxes", { waitUntil: "load" });
@@ -235,9 +236,9 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   await page.waitForTimeout(900);
   await shot(page, info.project.name + "-sirius-ecrin-1-ferme");
   await card.locator("[data-trunk-open]").click();
-  const video = card.locator("[data-trunk-video]");
+  const video = card.locator("[data-trunk-video='opening']");
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 15_000 }).toBeGreaterThan(2.5);
-  expect(await video.evaluate((v) => new URL((v as HTMLVideoElement).currentSrc).pathname)).toBe("/media/trunks/sirius/opening.mp4");
+  expect(await video.evaluate((v) => new URL((v as HTMLVideoElement).currentSrc).pathname)).toBe(trunk.opening);
   await shot(page, info.project.name + "-sirius-ecrin-2-ouverture");
   await expect(card.locator("[data-trunk-create]")).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1200);

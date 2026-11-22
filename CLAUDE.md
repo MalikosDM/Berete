@@ -162,6 +162,35 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « écrins qui s'ouvrent et se referment » (Yoni, 22/11/2026, 4) — état au 22/11/2026
+- [x] **Les 13 écrins s'ouvrent ET se referment avec leurs vidéos** (`00 Contexte Yoni/Ecrins IA (ouverture) v2/<dossier>/` :
+      closed.jpg, open.jpg, ouverture.mp4, fermeture.mp4 ; carrés 1440, 6 s, sans son). Nouvelles vidéos pour Dragon Ball,
+      The Hand Cube, DFB-Pokal 2025 Display, World Cup Display, Photo Case ; nouvelles images studio + vidéos pour Campione,
+      Butterfly et Okafor (remplacent les images des stories et des films de livraison). Dossiers `malle-brt-corail` →
+      `brt-coral-case`, `malle-photo-coupe-rouge` → `trophy-trunk`. **Plus aucun écrin ne s'ouvre en fondu de photos** (code
+      et styles retirés). Raccords mesurés : première et dernière image de chaque vidéo = images fermée et ouverte (écart
+      moyen ≤ 3,4/255).
+- [x] **Comportement** (`src/components/TrunkReveal.tsx`) : fermé + « Ouvrir » ; la vidéo d'ouverture, puis la pièce détourée
+      monte, « Créer votre écrin » et « Découvrir la pièce » (ou le premier seul). « Refermer » (6 langues, à la place
+      d'« Ouvrir ») : les boutons s'en vont, la pièce redescend dans la boîte (0,75 s), la vidéo de fermeture joue, l'écrin
+      finit fermé, « Ouvrir » revient ; autant de fois qu'on veut. « Revoir l'ouverture » (coin haut) : la pièce rentre,
+      l'image fermée revient en fondu, l'ouverture rejoue. Chaque vidéo reste cachée tant qu'elle ne joue pas (l'image
+      dessous est sa première image), s'efface sur l'image de sa dernière, puis revient à son début, cachée. Pendant une
+      vidéo, aucun bouton (un clic ne casse rien). Vidéo d'ouverture chargée à l'approche, celle de fermeture dès que
+      l'écrin est ouvert. Clavier : le focus passe d'« Ouvrir » à « Refermer » et inversement. « Réduire les animations » :
+      ouvert ou fermé d'un coup. Au doigt sur iPhone (tests au toucher).
+- [x] **Adresses versionnées** : `npm run trunks` donne à chaque écrin une version (empreinte de tous ses fichiers) dans
+      chaque nom (`opening.<v>.mp4`, `closing.<v>.mp4`, `closed-720.<v>.webp`, `photo-01.<v>.webp`…) ; dossier vidé avant,
+      dossiers en trop supprimés. 34 Mo pour les 13 écrins (vidéos de 0,5 à 1,3 Mo).
+- [x] Photos pro (`Boites (photos pro)`) : seulement dans la galerie « x photos » et sur la page de la pièce, jamais dans
+      l'ouverture. Campione, Butterfly et Okafor gardent leurs vraies photos en galerie. Place de la pièce et lumière de
+      chaque écrin refaites sur les nouvelles images (`PLACES` de `src/data/trunks.ts`).
+- `tests/trunks.spec.ts` : les 13 écrins ouverts puis refermés un par un (ordinateur et iPhone) : chacun joue SA vidéo
+  d'ouverture et SA vidéo de fermeture (adresse versionnée), la pièce sort puis rentre, raccords sans saut, liens
+  (WhatsApp, capsule) ; plusieurs cycles de suite ; clavier ; chargement à l'approche. Captures `verification/trunks/`.
+- [ ] Yoni : les vidéos de la World Cup Display montrent la vitrine qui se vide (l'image ouverte n'a plus la bague) ; la
+      pièce de BRT Coral Case, Trophy Trunk, Photo Case, World Cup Display et de l'Écrin Signature.
+
 ## Passe « texte officiel de la pièce Dragon Ball » (Yoni, 22/11/2026, 3) — état au 22/11/2026
 - [x] **Texte de Yoni mot pour mot** (`kevin-schade-dragon-ball-pendant`, `src/data/pieces.ts`) en deux parties titrées,
       « The Vision Behind the Creation » et « The Art of Craftsmanship » ; sa dernière phrase « Not power taken, but power
@@ -203,6 +232,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
         inventé) ; ils s'ouvrent de leurs vraies images (Campione : photos 25/p20 → p22 ; Butterfly : film de livraison
         23/v01 HD à 0,2 s → 4 s ; Okafor : story 11/03 à 0 s → 7 s). Leurs photos de page inchangées. NZ reste retiré (son
         ouverture IA supprimée aussi).
+      Depuis le 22/11 (4) : tous s'ouvrent et se referment avec leurs vidéos, plus aucun fondu de photos (voir « écrins qui
+      s'ouvrent et se referment »).
       À la fin de l'ouverture, la **pièce détourée monte et flotte** au-dessus de la boîte (vue principale de la vitrine de
       la pièce, `resolveShowcase`) avec une lueur ; puis **« Créer votre écrin »** (WhatsApp qui nomme l'écrin, 6 langues)
       et **« Découvrir la pièce »** (sa capsule). Pièce inconnue (`pieceSlug: null`, à remplir dans `BOXES` ou l'admin
