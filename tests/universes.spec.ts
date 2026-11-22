@@ -50,7 +50,7 @@ async function groundContrast(page: Page, el: Locator): Promise<number> {
 
 const WORLDS: [string, string, string[], string][] = [
   ["vfb-stuttgart-dfb-pokal-2025", "vfb", ["smoke-rise", "gold-confetti"], "VfB"],
-  ["michy-batshuayi-butterfly-chain", "butterfly", ["butterflies", "glints", "moon"], "Butterfly"],
+  ["michy-batshuayi-butterfly-pendant", "butterfly", ["butterflies", "glints", "moon"], "Butterfly"],
 ];
 
 for (const [slug, backdrop, effects] of WORLDS) {

@@ -133,6 +133,8 @@ export const fr: Messages = {
     tileAlt: (collection: string, piece: string) => collection + " : " + piece,
     collection: "Le Portfolio",
     listLabel: (collection: string) => "Les créations de la collection " + collection,
+    subLabel: (collection: string) => collection + " : sous-catégories",
+    subAll: (collection: string) => "Tous les " + collection.toLowerCase(),
     others: "Plus loin dans le Portfolio",
     ctaTitle: "La vôtre, dès la première esquisse.",
     ctaText: "Chaque pièce commence par une conversation. Racontez-nous votre histoire, nous la dessinons.",
@@ -225,6 +227,8 @@ export const fr: Messages = {
     stories: (_count: number) => "Moments exclusifs",
     andOthers: (names: string) => "Ainsi que " + names + ".",
     seenInStories: "À voir dans nos stories",
+    wornOn: "Se porte sur",
+    itsPendant: "Son pendentif",
     story: "Au cœur de la création",
     makingEyebrow: "De la vision à la réalité",
     makingTitle: "La naissance d’un chef-d’œuvre",
@@ -402,6 +406,27 @@ export const fr: Messages = {
     failedWhatsapp: "Le formulaire n’a pas pu partir. Envoyez votre demande sur WhatsApp : elle est déjà écrite.",
     sendWhatsapp: "Envoyer sur WhatsApp",
     emailButton: "Envoyer le message",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "Instagram (facultatif)",
+    instagramPlaceholder: "@votrenom",
+    photos: "Photos (facultatif)",
+    photosHint: "Jusqu’à 6 : un croquis, une inspiration, une pièce que vous aimez. Depuis votre ordinateur ou la galerie de votre téléphone.",
+    addPhotos: "Ajouter des photos",
+    removePhoto: (name: string) => "Retirer la photo " + name,
+    preparingPhoto: "Préparation de la photo…",
+    errPhotoRead: (name: string) => "« " + name + " » n’a pas pu être lue. Choisissez une photo JPEG ou PNG.",
+    errTooManyPhotos: "6 photos au plus : les autres n’ont pas été ajoutées.",
+    sending: "Envoi en cours…",
+    emailSentPhotos: (n: number) => "Merci. Votre message et " + (n === 1 ? "votre photo sont bien arrivés" : "vos " + n + " photos sont bien arrivés") + ", nous vous répondrons personnellement.",
+    photosWhatsapp: "Vos photos ne peuvent pas partir avec ce message : ajoutez-les dans la conversation WhatsApp.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "Votre message n’a pas pu partir : pas de connexion. Vérifiez votre connexion et réessayez.",
+      "too-large": "Vos photos sont trop lourdes pour partir ensemble. Retirez-en une ou deux, puis réessayez.",
+      "too-many": "Trop de messages en peu de temps. Réessayez dans quelques minutes.",
+      invalid: "Votre message n’a pas pu partir. Vérifiez le formulaire et les photos, puis réessayez.",
+      server: "Votre message n’a pas pu partir. Réessayez dans un instant.",
+    },
   },
 
   legal: {
@@ -494,7 +519,7 @@ export const fr: Messages = {
       title: "Montres serties de diamants",
       description: "Des montres serties de diamants du boîtier au bracelet, portées par des footballeurs : les montres Berete Jewellers, Dubaï.",
     },
-    "/creations/jesus-pieces": {
+    "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces : pendentifs du Christ en diamants sur mesure",
       description: "Les Jesus pieces de Berete Jewellers : le visage du Christ couronné d’épines ou de fleurs, et le Christ en croix, sculptés et sertis de diamants à Dubaï.",
     },

@@ -134,13 +134,33 @@ model SeededEntry {
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   name      String
   email     String
+  /// Its Instagram handle, without "@" (optional).
+  instagram String?
   message   String
   /// The language of the page it was sent from (en, fr, es, de, nl, ar): answer in it.
-  language  String   @default("en")
-  createdAt DateTime @default(now())
+  language  String         @default("en")
+  photos    ContactPhoto[]
+  createdAt DateTime       @default(now())
+}
+
+/// A photo sent with a message (up to 6, made lighter in the browser first). Never public: the admin reads it
+/// (GET /api/admin/messages/:id/photos/:photoId, behind the password), the e-mail of the house carries it.
+model ContactPhoto {
+  id        String         @id @default(cuid())
+  messageId String
+  message   ContactMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  /// Its place among the photos of the message (0 = the first).
+  position  Int
+  name      String
+  mime      String
+  size      Int
+  data      Bytes
+  createdAt DateTime       @default(now())
+
+  @@index([messageId])
 }
 
 model CallbackRequest {

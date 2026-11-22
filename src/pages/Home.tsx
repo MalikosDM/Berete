@@ -86,7 +86,7 @@ const homeSteps = (t: Messages): ScrollStep[] => [
 /* A selection of pieces for the row of the home page (the collections show all of them; the two championship rings have their own section). */
 const SELECTION = [
   "kevin-schade-dragon-ball-pendant",
-  "michy-batshuayi-butterfly-chain",
+  "michy-batshuayi-butterfly-pendant",
   "marcus-thuram-t-serpent-pendant",
   "noah-okafor-jersey-pendant",
   "kenan-yildiz-celebration-pendant",

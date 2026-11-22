@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import compression from "compression";
 import express, { type NextFunction, type Request, type Response } from "express";
+import { collectionPath, subcategoryByOldSlug } from "../src/data/collections.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
 import { readCatalogue, syncCatalogue } from "./catalogue.js";
@@ -20,7 +21,10 @@ app.disable("x-powered-by");
 protect(app);
 // Pages, code and API answers travel compressed (about 5 times lighter); photos and videos already are.
 app.use(compression());
-app.use(express.json({ limit: "2mb" }));
+// The private correspondence of the contact page carries its photos (up to 6, made lighter in the browser): its own limit.
+const smallJson = express.json({ limit: "2mb" });
+const contactJson = express.json({ limit: "34mb" });
+app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact" ? contactJson : smallJson)(req, res, next));
 
 app.use("/api", models);
 app.use("/api", vip);
@@ -72,7 +76,8 @@ app.use((req, res, next) => {
 app.use(express.static(dist, { redirect: false, setHeaders: (res, file) => res.setHeader("Cache-Control", cacheFor(file)) }));
 
 // The old addresses of the site lead to the new ones (permanent redirects, in every language):
-// /pieces and /capsules/... to /creations, a piece under /creations/<slug> to /pieces/<slug>,
+// /pieces and /capsules/... to /creations, a sub-category under its old address (/creations/jesus-pieces) to its place in
+// its collection (/creations/pendants/jesus-pieces), a piece under /creations/<slug> to /pieces/<slug>,
 // a renamed piece to its new address, an unpublished piece to the page of its player (else /creations),
 // the page of a person who left the circle (all their pieces unpublished) to /players, the address of a box (a box removed
 // by Yoni, 21/11/2026, or any other) to the page of the trunks.
@@ -82,6 +87,7 @@ app.get(/^(?!\/api\/).*/, async (req, res, next) => {
   const [section = "", slug = "", ...rest] = parts;
   let target: string | null = null;
   if ((section === "pieces" && slug === "") || section === "capsules") target = "/creations";
+  else if (section === "creations" && slug !== "" && rest.length === 0 && subcategoryByOldSlug(slug)) target = collectionPath(subcategoryByOldSlug(slug)!);
   else if (section === "creations" && slug !== "" && rest.length === 0) target = "/pieces/" + (RENAMED_PIECES[slug] ?? slug);
   else if (section === "pieces" && rest.length === 0 && RENAMED_PIECES[slug]) target = "/pieces/" + RENAMED_PIECES[slug];
   else if (section === "boxes" && slug !== "") target = "/boxes";
@@ -111,6 +117,11 @@ app.get(/^(?!\/api\/).*/, (req, res) => {
 });
 
 app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  // A form too heavy (photos): the page says it in its language.
+  if (typeof error === "object" && error !== null && (error as { type?: string }).type === "entity.too.large") {
+    res.status(413).json({ error: "Too large." });
+    return;
+  }
   console.error(error);
   res.status(500).json({ error: "Something went wrong." });
 });

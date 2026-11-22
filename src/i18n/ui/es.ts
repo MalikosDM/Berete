@@ -122,6 +122,8 @@ export const es: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "El Portfolio",
     listLabel: (collection: string) => "Las creaciones: " + collection,
+    subLabel: (collection: string) => collection + ": subcategorías",
+    subAll: (collection: string) => "Todos los " + collection.toLowerCase(),
     others: "Más del Portfolio",
     ctaTitle: "La suya, desde el primer boceto.",
     ctaText: "Cada pieza empieza con una conversación. Cuéntenos su historia: nosotros la dibujamos.",
@@ -214,6 +216,8 @@ export const es: Messages = {
     stories: (_count: number) => "Los momentos",
     andOthers: (names: string) => "También " + names + ".",
     seenInStories: "Vista en nuestras historias",
+    wornOn: "Se lleva en",
+    itsPendant: "Su colgante",
     story: "Detrás de la creación",
     makingEyebrow: "De la visión a la realidad",
     makingTitle: "El nacimiento de una obra maestra",
@@ -391,6 +395,27 @@ export const es: Messages = {
     failedWhatsapp: "No se pudo enviar el formulario. Envíe su solicitud por WhatsApp: ya está redactada.",
     sendWhatsapp: "Enviar por WhatsApp",
     emailButton: "Enviar el mensaje",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "Instagram (opcional)",
+    instagramPlaceholder: "@tunombre",
+    photos: "Fotos (opcional)",
+    photosHint: "Hasta 6: un boceto, una inspiración, una pieza que te encanta. Desde tu ordenador o la galería de tu teléfono.",
+    addPhotos: "Añadir fotos",
+    removePhoto: (name: string) => "Quitar la foto " + name,
+    preparingPhoto: "Preparando la foto…",
+    errPhotoRead: (name: string) => "No se ha podido leer «" + name + "». Elige una foto JPEG o PNG.",
+    errTooManyPhotos: "6 fotos como máximo: las demás no se han añadido.",
+    sending: "Enviando…",
+    emailSentPhotos: (n: number) => "Gracias. Tu mensaje y " + (n === 1 ? "tu foto han llegado" : "tus " + n + " fotos han llegado") + ", te responderemos personalmente.",
+    photosWhatsapp: "Tus fotos no pueden viajar en este mensaje: añádelas en la conversación de WhatsApp.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "Tu mensaje no se ha podido enviar: sin conexión. Comprueba tu conexión e inténtalo de nuevo.",
+      "too-large": "Tus fotos pesan demasiado para enviarlas juntas. Quita una o dos e inténtalo de nuevo.",
+      "too-many": "Demasiados mensajes en poco tiempo. Inténtalo de nuevo dentro de unos minutos.",
+      invalid: "Tu mensaje no se ha podido enviar. Revisa el formulario y las fotos e inténtalo de nuevo.",
+      server: "Tu mensaje no se ha podido enviar. Inténtalo de nuevo en un momento.",
+    },
   },
 
   legal: {
@@ -483,7 +508,7 @@ export const es: Messages = {
       title: "Relojes engastados con diamantes",
       description: "Relojes engastados con diamantes de la caja al brazalete, lucidos por futbolistas: los relojes de Berete Jewellers, Dubái.",
     },
-    "/creations/jesus-pieces": {
+    "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces: colgantes de Cristo con diamantes a medida",
       description: "Las Jesus pieces de Berete Jewellers: el rostro de Cristo coronado de espinas o de flores, y Cristo en la cruz, esculpidos y engastados con diamantes en Dubái.",
     },

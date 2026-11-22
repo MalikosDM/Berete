@@ -162,6 +162,40 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 22/11 » (Créations, Jesus Pieces, serpent or rose, Butterfly en deux, formulaire photos) — état au 22/11/2026
+- [x] **Créations** : 3 pièces par ligne sur ordinateur (grandes cartes, celles des collections), 2 sur tablette, 1 sur
+      téléphone (`src/pages/Creations.tsx`).
+- [x] **Jesus Pieces = sous-catégorie des Pendentifs** (`SUBCATEGORIES` de `src/data/collections.ts`, `parent: "pendant"`) :
+      onglets « Tous les pendentifs / Jesus Pieces » sur la page des pendentifs, filtre sous « Pendentifs » dans Créations
+      (`?category=pendants&sub=jesus-pieces`), adresse directe `/creations/pendants/jesus-pieces` (titre Google déplacé,
+      `seo.json` et `ui/*.ts`), sous « Pendentifs » dans le menu, le menu téléphone et le pied de page. L'ancienne adresse
+      `/creations/jesus-pieces` y mène (301 : serveur et `vercel.json`). Toujours 4 pièces : la 5e reste introuvable.
+- [x] **Univers serpent en or rose** : nouvelles images de Yoni (`serpent-desktop/-mobile.jpg`, jamais `_originaux`),
+      `npm run universes -- --only=serpent` ; serpent de lumière, braises, halo et lumière en or rose (`glow: "#e8b4a0"`,
+      `fx.ts`) ; noms « écailles or rose » / « serpents or rose ». La lueur rouge de la porte (dans l'image) reste rouge.
+- [x] **Butterfly en deux pièces** : `michy-batshuayi-butterfly-pendant` (« Michy Batshuayi — Butterfly Pendant », ancienne
+      adresse `michy-batshuayi-butterfly-chain` redirigée vers lui, `RENAMED_PIECES`) garde tout sauf la chaîne seule : le
+      pendentif seul, porté sur la chaîne (p52, p54), Michy qui le porte, le brut p77, le making-of (story 07/10), l'écrin,
+      son film d'ouverture, son croquis (`sketch` : le fichier garde l'ancien nom). Les 3 vidéos v03, v09, v15 montrent toutes
+      le pendentif : elles restent sur lui. **`butterfly-chain`** (« Michy Batshuayi — Butterfly Chain », chaîne) : p60
+      (principale), p56, p59, p55, p66. Les deux pièces viennent du même dossier `public/media/hd/michy-batshuayi-butterfly-chain/`
+      (`sorted(dir, own, files)` choisit les fichiers). Lien de l'une à l'autre sur leur page (`WORN_TOGETHER`, `wornWith`,
+      « Se porte sur » / « Son pendentif »). Textes en 6 langues, détourages et film renommés, aperçus de liens refaits.
+- [x] **Fond Butterfly plus sombre** (images de Yoni, `npm run universes -- --only=butterfly`), moins de papillons de lumière
+      et plus discrets, lune moins forte (`fx.ts`, `index.css`) : la pièce d'abord.
+- [x] **Correspondance privée (formulaire de /contact)** : nom, e-mail, Instagram (facultatif), l'idée et jusqu'à 6 photos
+      (ordinateur ou galerie du téléphone, aperçu, retirer avant l'envoi), allégées dans le navigateur (`src/lib/photos.ts` :
+      2048 px, JPEG ≤ 1,6 Mo ; une photo HEIC que le navigateur ne sait pas lire part telle quelle si ≤ 3,8 Mo). Serveur :
+      `POST /api/contact` (34 Mo au plus pour cette adresse, chaque photo vérifiée par ses premiers octets, ≤ 4 Mo), photos
+      dans la base (`ContactPhoto`, migration `20261122100000_contact_photos`), jamais publiques : l'admin (onglet Messages)
+      les lit avec le mot de passe, bouton « Supprimer » ; l'e-mail de la maison les joint quand le SMTP est réglé.
+      Anti-spam discret : champ caché, envoi en moins de 3 s ignoré, 5 envois / 10 min. Confirmation et erreurs claires
+      (6 langues). **Sur Vercel (sans serveur), le formulaire ouvre WhatsApp** avec le texte et demande d'y ajouter les photos :
+      l'envoi avec photos et l'admin marcheront sur le VPS.
+- `tests/yoni2211.spec.ts` (ordinateur, tablette, iPhone ; formulaire avec 2 photos dont une HEIC reçu dans l'admin puis
+  supprimé, en local avec le serveur), captures dans `verification/yoni2211/`.
+- [ ] Yoni : la 5e Jesus Piece ; relire les textes de la Butterfly Chain et du pendentif (traductions).
+
 ## Passe « portrait de Yoni sur La Maison » — état au 22/11/2026
 - [x] **Le portrait noir et blanc** de Yoni (`Berete - La Maison/Portraits IA (propositions)/yoni-noir-blanc.jpg`, copié en
       `Berete - La Maison/portrait.jpg`, `npm run import-media -- --only=house`) est la photo principale de La Maison
@@ -290,8 +324,9 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       « réduire les animations ». Texte de la célébration en 2e paragraphe de son histoire (6 langues, sans le nom de
       l'organisation ; « Lasana Keita » gardé, orthographe à confirmer). Aucune story ne montre la panthère (la story
       « Keita Losene » montre un écrin vert : même personne ? à confirmer) : sa story prendra la séquence dès qu'elle existe.
-- [x] **Jesus Pieces** dans le menu sous Les Créations (ordinateur, téléphone, pied de page) : `/creations/jesus-pieces`,
-      `THEMES` dans `src/data/collections.ts` (Red Crown, Samuel Ballet, Red Flowers, Jesus Cross), 6 langues, titre
+- [x] **Jesus Pieces** dans le menu sous Les Créations (ordinateur, téléphone, pied de page) : depuis le 22/11 une
+      sous-catégorie des Pendentifs, `/creations/pendants/jesus-pieces` (voir « retours de Yoni du 22/11 »),
+      `SUBCATEGORIES` dans `src/data/collections.ts` (Red Crown, Samuel Ballet, Red Flowers, Jesus Cross), 6 langues, titre
       Google. **5e introuvable** : toutes les photos et vidéos des dossiers 01–38, des stories et du 08 regardées ; les
       candidates (Thuram SS23 03/04, Collectors 15, 20, 23, 24) sont des 4 connues. Peut-être dans « 99 - NE PAS ENVOYER »
       (jamais ouvert) ou une pièce retirée : demander à Yoni. La page Thuram retirée reste hors ligne.

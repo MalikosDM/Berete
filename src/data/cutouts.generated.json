@@ -54,25 +54,10 @@
     "note": ""
    }
   ],
-  "michy-batshuayi-butterfly-chain": [
-   {
-    "id": "p54",
-    "kind": "face",
-    "width": 1600,
-    "height": 2159,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
-    "note": ""
-   },
+  "michy-batshuayi-butterfly-pendant": [
    {
     "id": "p68",
-    "kind": "detail",
+    "kind": "face",
     "width": 1600,
     "height": 1550,
     "widths": [
@@ -86,8 +71,25 @@
     "note": ""
    },
    {
+    "id": "p54",
+    "kind": "worn",
+    "width": 1600,
+    "height": 2159,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
+    "note": ""
+   }
+  ],
+  "butterfly-chain": [
+   {
     "id": "p60",
-    "kind": "profile",
+    "kind": "face",
     "width": 1600,
     "height": 1285,
     "widths": [

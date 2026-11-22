@@ -76,7 +76,8 @@ test("Sirius, BRT Flower and the L pendant: every photo of their folders, their 
   expect(deniz.making.polishing?.src).toBe("/media/hd/deniz-undav-l-pendant/v02.mp4");
 });
 
-test("Créations: six pieces on the first screen, a smaller title, two columns on a phone", async ({ page }, info) => {
+// Since 22/11/2026 (Yoni): three larger pieces on a row on a computer, one on a phone (tests/yoni2211.spec.ts).
+test("Créations: three larger pieces on a row, a smaller title, one column on a phone", async ({ page }, info) => {
   const problems = watch(page);
   const phone = info.project.name !== "desktop";
   await skipIntro(page);
@@ -95,16 +96,12 @@ test("Créations: six pieces on the first screen, a smaller title, two columns o
   );
   const vh = page.viewportSize()!.height;
   if (phone) {
-    // Two columns.
-    expect(new Set(boxes.slice(0, 6).map((b) => b.x)).size).toBe(2);
+    // One column.
+    expect(new Set(boxes.slice(0, 6).map((b) => b.x)).size).toBe(1);
   } else {
-    // Six whole cards (photo, name, made for) on the first screen, side by side.
-    const seen = boxes.filter((b) => b.top >= 0 && b.bottom <= vh);
-    expect(seen.length, "cards seen whole on the first screen").toBeGreaterThanOrEqual(6);
-    expect(new Set(boxes.slice(0, 6).map((b) => b.x)).size).toBe(6);
-    // One scroll of a screen shows about six more.
-    const next = boxes.filter((b) => b.top >= vh && b.bottom <= 2 * vh);
-    expect(next.length).toBeGreaterThanOrEqual(6);
+    // Three on a row, larger.
+    expect(new Set(boxes.slice(0, 6).map((b) => b.x)).size).toBe(3);
+    expect(boxes[0]!.width).toBeGreaterThan(380);
   }
   // Every card: its photo, its name, the one it was made for, its way in; the text readable (16 px at least).
   const first = cards.first();
@@ -120,7 +117,7 @@ test("Créations: six pieces on the first screen, a smaller title, two columns o
 });
 
 /** The pieces of the feedback, and three other capsules. */
-const CAPSULES = ["sirius", "brt-flower-chain", "deniz-undav-l-pendant", "marcus-thuram-ruby-t-necklace", "campione-d-italia-2023-2024", "noah-okafor-oka-pendant", "michy-batshuayi-butterfly-chain"];
+const CAPSULES = ["sirius", "brt-flower-chain", "deniz-undav-l-pendant", "marcus-thuram-ruby-t-necklace", "campione-d-italia-2023-2024", "noah-okafor-oka-pendant", "michy-batshuayi-butterfly-pendant"];
 
 for (const slug of CAPSULES) {
   test(slug + ": a discreet opening, smaller photos of the details, its atelier playing by itself", async ({ page }, info) => {

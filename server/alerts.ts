@@ -1,6 +1,6 @@
 /*
  * An e-mail to the house for every message and every callback request sent from the site (they also stay in the
- * admin, tab « Messages »). Sent through the mailbox of the house (SMTP): SMTP_HOST, SMTP_PORT (465 or 587),
+ * admin, tab « Messages »). The photos of a message travel with it as attachments. Sent through the mailbox of the house (SMTP): SMTP_HOST, SMTP_PORT (465 or 587),
  * SMTP_USER, SMTP_PASS, ALERT_TO (one address or several, separated by commas), ALERT_FROM (default: SMTP_USER).
  * Without them, nothing is sent: the messages wait in the admin. A failed e-mail never fails the form.
  */
@@ -30,7 +30,7 @@ function adminLink(): string {
 }
 
 export type Alert =
-  | { kind: "message"; name: string; email: string; message: string; language: string }
+  | { kind: "message"; id: string; name: string; email: string; instagram: string | null; message: string; language: string; photos: { name: string; mime: string; data: Buffer }[] }
   | { kind: "callback"; name: string; phone: string; interest: string | null; language: string };
 
 /** Sends the alert in the background (the visitor does not wait for it). */
@@ -40,7 +40,17 @@ export function alertHouse(alert: Alert): void {
   const language = LANGUAGES[alert.language] ?? alert.language;
   const lines =
     alert.kind === "message"
-      ? ["Nouveau message envoyé depuis le site.", "", "Nom : " + alert.name, "E-mail : " + alert.email, "Langue : " + language, "", alert.message]
+      ? [
+          "Nouveau message envoyé depuis le site.",
+          "",
+          "Nom : " + alert.name,
+          "E-mail : " + alert.email,
+          ...(alert.instagram ? ["Instagram : " + alert.instagram] : []),
+          "Langue : " + language,
+          ...(alert.photos.length > 0 ? ["Photos : " + alert.photos.length + " (en pièces jointes, et dans l'admin)"] : []),
+          "",
+          alert.message,
+        ]
       : ["Nouvelle demande de rappel envoyée depuis le site.", "", "Nom : " + alert.name, "Téléphone : " + alert.phone, ...(alert.interest ? ["Intérêt : " + alert.interest] : []), "Langue : " + language];
   lines.push("", "Tous les messages : " + adminLink() + " (onglet « Messages »).");
   const subject = (alert.kind === "message" ? "Nouveau message de " : "Demande de rappel de ") + alert.name.replace(/[\r\n]+/g, " ").slice(0, 80);
@@ -50,7 +60,12 @@ export function alertHouse(alert: Alert): void {
       to: process.env.ALERT_TO,
       subject: "Berete Jewellers · " + subject,
       text: lines.join("\n"),
-      ...(alert.kind === "message" ? { replyTo: alert.email } : {}),
+      ...(alert.kind === "message"
+        ? {
+            replyTo: alert.email,
+            attachments: alert.photos.map((photo, i) => ({ filename: String(i + 1).padStart(2, "0") + "-" + photo.name.replace(/[^\w.\- ]+/g, "_"), content: photo.data, contentType: photo.mime })),
+          }
+        : {}),
     })
     .catch((error: unknown) => console.error("Alerte e-mail non envoyée :", error instanceof Error ? error.message : error));
 }

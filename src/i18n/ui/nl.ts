@@ -120,6 +120,8 @@ export const nl: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "Het portfolio",
     listLabel: (collection: string) => "De creaties: " + collection,
+    subLabel: (collection: string) => collection + ": subcategorieën",
+    subAll: (collection: string) => "Alle " + collection.toLowerCase(),
     others: "Meer uit het portfolio",
     ctaTitle: "De uwe, vanaf de eerste schets.",
     ctaText: "Elk stuk begint met één gesprek. Vertel ons uw verhaal, wij tekenen het.",
@@ -212,6 +214,8 @@ export const nl: Messages = {
     stories: (_count: number) => "De momenten",
     andOthers: (names: string) => "En ook " + names + ".",
     seenInStories: "Te zien in onze stories",
+    wornOn: "Gedragen aan",
+    itsPendant: "Bijpassende hanger",
     story: "Achter de creatie",
     makingEyebrow: "Van visie tot werkelijkheid",
     makingTitle: "Zo ontstaat een meesterwerk",
@@ -389,6 +393,27 @@ export const nl: Messages = {
     failedWhatsapp: "Het formulier kon niet worden verzonden. Stuur uw aanvraag via WhatsApp: hij is al uitgeschreven.",
     sendWhatsapp: "Versturen via WhatsApp",
     emailButton: "Bericht versturen",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "Instagram (optioneel)",
+    instagramPlaceholder: "@jouwnaam",
+    photos: "Foto’s (optioneel)",
+    photosHint: "Tot 6: een schets, een inspiratie, een stuk waar je van houdt. Vanaf je computer of uit de galerij van je telefoon.",
+    addPhotos: "Foto’s toevoegen",
+    removePhoto: (name: string) => "Foto " + name + " verwijderen",
+    preparingPhoto: "Foto wordt voorbereid…",
+    errPhotoRead: (name: string) => "‘" + name + "’ kon niet worden gelezen. Kies een JPEG- of PNG-foto.",
+    errTooManyPhotos: "Maximaal 6 foto’s: de andere zijn niet toegevoegd.",
+    sending: "Bezig met verzenden…",
+    emailSentPhotos: (n: number) => "Dank je. Je bericht en " + (n === 1 ? "je foto zijn" : "je " + n + " foto’s zijn") + " goed aangekomen, we antwoorden je persoonlijk.",
+    photosWhatsapp: "Je foto’s kunnen niet met dit bericht mee: voeg ze toe in het WhatsApp-gesprek.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "Je bericht kon niet worden verzonden: geen verbinding. Controleer je verbinding en probeer het opnieuw.",
+      "too-large": "Je foto’s zijn samen te zwaar. Verwijder er een of twee en probeer het opnieuw.",
+      "too-many": "Te veel berichten in korte tijd. Probeer het over een paar minuten opnieuw.",
+      invalid: "Je bericht kon niet worden verzonden. Controleer het formulier en de foto’s en probeer het opnieuw.",
+      server: "Je bericht kon niet worden verzonden. Probeer het zo meteen opnieuw.",
+    },
   },
 
   legal: {
@@ -481,7 +506,7 @@ export const nl: Messages = {
       title: "Horloges bezet met diamanten",
       description: "Horloges bezet met diamanten, van de kast tot de band, gedragen door voetballers: de horloges van Berete Jewellers, Dubai.",
     },
-    "/creations/jesus-pieces": {
+    "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces: Christushangers met diamanten op maat",
       description: "De Jesus pieces van Berete Jewellers: het gezicht van Christus met een kroon van doornen of bloemen, en Christus aan het kruis, gebeeldhouwd en met diamanten gezet in Dubai.",
     },

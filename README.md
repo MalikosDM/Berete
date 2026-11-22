@@ -290,6 +290,8 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # Sirius (écrin, nuit japonaise), écrin NZ retiré, accueil plus petit, menu dès 1 260 px
                         # tests/doutes.spec.ts : réponses de Yoni aux doutes du Making of (8 pièces, étapes validées)
                         # tests/maison.spec.ts : le portrait de Yoni en haut de La Maison (visage entier, ordinateur et iPhone)
+                        # tests/yoni2211.spec.ts : Créations à 3 par ligne, Pendentifs > Jesus Pieces, serpent or rose, Butterfly
+                        # pendentif + chaîne, formulaire avec photos reçu dans l'admin
 ```
 
 ## Vitesse (Lighthouse)

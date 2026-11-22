@@ -2,7 +2,7 @@ import { ArrowUpRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
-import { visibleCollections, visibleThemes } from "@/data/collections";
+import { collectionPath, subcategoriesOf, visibleCollections } from "@/data/collections";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
@@ -16,9 +16,11 @@ export default function Footer() {
   const cat = useCatalogue();
   const year = new Date().getFullYear();
   const creations = [
-    { label: t.common.allCreations, to: "/creations" },
-    ...visibleCollections(cat).map(({ collection }) => ({ label: collectionWords(t, collection.slug, collection).name, to: "/creations/" + collection.slug })),
-    ...visibleThemes(cat).map((theme) => ({ label: collectionWords(t, theme.slug, theme).name, to: "/creations/" + theme.slug })),
+    { label: t.common.allCreations, to: "/creations", sub: false },
+    ...visibleCollections(cat).flatMap(({ collection }) => [
+      { label: collectionWords(t, collection.slug, collection).name, to: collectionPath(collection), sub: false },
+      ...subcategoriesOf(cat, collection.type).map((s) => ({ label: collectionWords(t, s.slug, s).name, to: collectionPath(s), sub: true })),
+    ]),
   ];
   const house = [
     { label: t.nav.players, to: "/players" },
@@ -44,7 +46,8 @@ export default function Footer() {
             <ul>
               {creations.map((l) => (
                 <li key={l.to}>
-                  <Link to={l.to} className={linkCls}>
+                  <Link to={l.to} className={linkCls + (l.sub ? " gap-2 ps-4" : "")}>
+                    {l.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-2.5" /> : null}
                     {l.label}
                   </Link>
                 </li>

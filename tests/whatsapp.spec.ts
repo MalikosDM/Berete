@@ -22,7 +22,7 @@ const LANGS: [string, string, Words][] = [
   ["fr", "/fr", fr],
 ];
 
-const PIECES = ["michy-batshuayi-butterfly-chain", "lois-openda-script-pendant", "campione-d-italia-2023-2024"];
+const PIECES = ["michy-batshuayi-butterfly-pendant", "lois-openda-script-pendant", "campione-d-italia-2023-2024"];
 
 /** Every WhatsApp link of the page that a visitor can see (the menu, the bar of a phone, the page, the footer). */
 async function links(page: Page): Promise<string[]> {

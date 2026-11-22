@@ -19,7 +19,7 @@ import { limiter } from "../security.js";
 /**
  * The API of the site, mounted on /api:
  *   GET  /catalogue          stories, people, the published pieces, boxes and the photos of The House
- *   POST /contact            { name, email, message }
+ *   POST /contact            { name, email, instagram?, message, photos? (up to 6: { name, type, data in base64 }) }
  *   POST /callback           { name, phone, interest }
  *   GET  /media/:id          a file uploaded from /admin
  * and the admin (/admin/...), behind ADMIN_PASSWORD.
@@ -50,15 +50,41 @@ const formTries = limiter(5, 10);
 
 const Language = z.enum(["en", "fr", "es", "de", "nl", "ar"]).catch("en").default("en");
 
+/** The photos of a message: at most 6, each at most 4 MB (the browser makes them lighter first: about 0.3 to 1.5 MB). */
+export const MAX_PHOTOS = 6;
+const MAX_PHOTO_BYTES = 4 * 1024 * 1024;
+const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"] as const;
+
+const PhotoIn = z.object({
+  name: z.string().max(200).catch(""),
+  type: z.enum(PHOTO_TYPES),
+  /** The file in base64 (without the "data:" prefix). */
+  data: z.string().min(16).max(Math.ceil((MAX_PHOTO_BYTES * 4) / 3) + 4),
+});
+
 const ContactIn = z.object({
   name: z.string().trim().min(1).max(200),
   email: z.email().max(320),
+  instagram: z.string().max(200).optional(),
   message: z.string().trim().min(1).max(5000),
+  photos: z.array(PhotoIn).max(MAX_PHOTOS).default([]),
   /** Honeypot: humans leave it empty. */
   company: z.string().max(0).optional(),
+  /** When the form was opened (ms since 1970): a form sent in less than 3 seconds is a robot. */
+  startedAt: z.number().int().positive().optional(),
   /** The language of the page: the answer is written in it. */
   language: Language,
 });
+
+/** What the first bytes of a file say it is: a photo the house can open, else null (anything else is refused). */
+function photoKind(buf: Buffer): (typeof PHOTO_TYPES)[number] | null {
+  if (buf.length < 12) return null;
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return "image/jpeg";
+  if (buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return "image/png";
+  if (buf.toString("latin1", 0, 4) === "RIFF" && buf.toString("latin1", 8, 12) === "WEBP") return "image/webp";
+  if (buf.toString("latin1", 4, 8) === "ftyp" && /^(heic|heix|hevc|hevx|heim|heis|mif1|msf1|heif)$/.test(buf.toString("latin1", 8, 12))) return "image/heic";
+  return null;
+}
 
 site.post("/contact", async (req, res) => {
   if (!formTries.hit(req)) {
@@ -70,9 +96,35 @@ site.post("/contact", async (req, res) => {
     res.status(400).json({ error: "Please check the form and try again." });
     return;
   }
-  const { name, email, message, language } = p.data;
-  await prisma.contactMessage.create({ data: { name, email, message, language } });
-  alertHouse({ kind: "message", name, email, message, language });
+  const { name, email, message, language, startedAt } = p.data;
+  // A robot (filled in less than 3 seconds): thanked like anyone, never kept.
+  if (startedAt !== undefined && Date.now() - startedAt < 3000) {
+    res.status(201).json({ ok: true });
+    return;
+  }
+  const photos: { name: string; mime: string; data: Buffer }[] = [];
+  for (const photo of p.data.photos) {
+    const data = Buffer.from(photo.data, "base64");
+    const mime = photoKind(data);
+    if (!mime || data.length > MAX_PHOTO_BYTES) {
+      res.status(400).json({ error: "Please check the photos and try again." });
+      return;
+    }
+    photos.push({ name: photo.name.replace(/[\r\n/\\]+/g, " ").trim().slice(0, 120) || "photo", mime, data });
+  }
+  // A handle ("@name", a link to the profile) kept as its name; anything else as it was written.
+  const instagram = instagramHandle(p.data.instagram ?? null) ?? (p.data.instagram?.trim().slice(0, 100) || null);
+  const saved = await prisma.contactMessage.create({
+    data: {
+      name,
+      email,
+      instagram,
+      message,
+      language,
+      photos: { create: photos.map((photo, position) => ({ position, name: photo.name, mime: photo.mime, size: photo.data.length, data: new Uint8Array(photo.data) })) },
+    },
+  });
+  alertHouse({ kind: "message", id: saved.id, name, email, instagram, message, language, photos });
   res.status(201).json({ ok: true });
 });
 
@@ -209,10 +261,38 @@ site.post("/admin/upload", requireAdmin, express.raw({ type: () => true, limit: 
 
 site.get("/admin/messages", requireAdmin, async (_req, res) => {
   const [messages, callbacks] = await Promise.all([
-    prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" }, take: 200 }),
+    prisma.contactMessage.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 200,
+      include: { photos: { select: { id: true, name: true, mime: true, size: true, position: true }, orderBy: { position: "asc" } } },
+    }),
     prisma.callbackRequest.findMany({ orderBy: { createdAt: "desc" }, take: 200 }),
   ]);
   res.json({ messages, callbacks });
+});
+
+/** A photo of a message: for the admin only (never cached, never public). */
+site.get("/admin/messages/:id/photos/:photoId", requireAdmin, async (req, res) => {
+  const photo = await prisma.contactPhoto.findFirst({ where: { id: String(req.params.photoId), messageId: String(req.params.id) } });
+  if (!photo) {
+    res.status(404).json({ error: "Photo introuvable." });
+    return;
+  }
+  res.setHeader("Content-Type", photo.mime);
+  res.setHeader("Cache-Control", "private, no-store");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Content-Disposition", "inline; filename*=UTF-8''" + encodeURIComponent(photo.name));
+  res.end(Buffer.from(photo.data));
+});
+
+/** A message deleted from the admin, with its photos. */
+site.delete("/admin/messages/:id", requireAdmin, async (req, res) => {
+  const { count } = await prisma.contactMessage.deleteMany({ where: { id: String(req.params.id) } });
+  if (count === 0) {
+    res.status(404).json({ error: "Message introuvable, il a peut-être déjà été supprimé." });
+    return;
+  }
+  res.json({ ok: true });
 });
 
 /* One editor per kind: stories, people, pieces, boxes. */

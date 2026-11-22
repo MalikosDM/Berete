@@ -35,8 +35,8 @@ export const COMPLETE_MAKING_OF = new Set<string>([
 
 /** A complete making-of found in the stories only (story, number of its file): the piece has no atelier of its own. */
 const STORY_MAKING_OF: Record<string, [string, number]> = {
-  // The Butterfly chain: its raw pendant, its setting, its back, the finished chain (story 07/10).
-  "michy-batshuayi-butterfly-chain": ["michy-batshuayi", 10],
+  // The Butterfly: its raw pendant, its setting, its back, the finished chain (story 07/10); on the page of the pendant.
+  "michy-batshuayi-butterfly-pendant": ["michy-batshuayi", 10],
 };
 
 /** A film of the stories as a film of the atelier (played full screen by src/components/AtelierRoom.tsx). */

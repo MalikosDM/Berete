@@ -108,8 +108,8 @@ test("after the making-of comes The Final Reveal, then the end", async ({ page }
 });
 
 test("a piece without a film of its fabrication has no passage", async ({ page }) => {
-  await page.goto("/pieces/michy-batshuayi-butterfly-chain");
-  await expect(page.locator("[data-piece='michy-batshuayi-butterfly-chain']")).toBeVisible();
+  await page.goto("/pieces/butterfly-chain");
+  await expect(page.locator("[data-piece='butterfly-chain']")).toBeVisible();
   await expect(page.locator("[data-atelier-passage]")).toHaveCount(0);
 });
 

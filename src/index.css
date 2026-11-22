@@ -1144,10 +1144,10 @@ html.lenis body {
 .universe[data-deep] .u-genki-glow {
   animation-play-state: paused;
 }
-/* The moon of a backdrop ("moon", Butterfly): a pale halo on it that brightens and fades, barely. */
+/* The moon of a backdrop ("moon", Butterfly): a pale halo on it that brightens and fades, barely (softer since 22/11/2026). */
 .u-genki[data-spot="moon"] .u-genki-glow {
-  width: calc(var(--gr) * 380%);
-  background: radial-gradient(circle, rgb(255 246 255 / 0.32) 0%, rgb(236 214 255 / 0.16) 30%, rgb(200 170 240 / 0.06) 50%, transparent 68%);
+  width: calc(var(--gr) * 320%);
+  background: radial-gradient(circle, rgb(255 246 255 / 0.2) 0%, rgb(236 214 255 / 0.1) 30%, rgb(200 170 240 / 0.04) 50%, transparent 68%);
   animation: u-moon 9s ease-in-out infinite;
 }
 @keyframes u-moon {

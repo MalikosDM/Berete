@@ -1,4 +1,4 @@
-/* The collections: one per type of jewel, at /creations/<slug>; and the themes that gather pieces of several types (Jesus Pieces). */
+/* The collections: one per type of jewel, at /creations/<slug>; and their sub-categories (Jesus Pieces, inside the pendants). */
 import type { Catalogue, Piece, PieceType } from "./types.js";
 
 export type Collection = {
@@ -24,7 +24,7 @@ export const COLLECTIONS: Collection[] = [
     slug: "chains",
     name: "Chains",
     intro: "Links drawn one by one, from butterflies to infinity knots, made to be worn alone or with a pendant.",
-    hero: "michy-batshuayi-butterfly-chain",
+    hero: "butterfly-chain",
   },
   {
     type: "ring",
@@ -50,14 +50,17 @@ export const COLLECTIONS: Collection[] = [
 ];
 
 /**
- * A theme: pieces gathered by what they show, whatever their type, at /creations/<slug>, under the collections in the menu.
- * Jesus Pieces (asked by Yoni, 21/11/2026): every Jesus piece of the house, the face of Christ or Christ on the cross. He
- * says there are five; four are on the site (the fifth is to be found in his photos: CLAUDE.md).
+ * A sub-category: some pieces of a collection gathered by what they show, at /creations/<collection>/<slug>, shown inside
+ * its collection (a tab on the page of the collection, a filter of the page Créations, under its collection in the menu).
+ * Jesus Pieces (asked by Yoni, 21/11/2026; inside the pendants since 22/11/2026): every Jesus piece of the house, the face of
+ * Christ or Christ on the cross. He says there are five; four are on the site (the fifth is to be found in his photos:
+ * CLAUDE.md). Until 22/11/2026 it was a theme at /creations/jesus-pieces: that address leads here.
  */
-export type Theme = Omit<Collection, "type"> & { pieces: string[] };
+export type SubCategory = Omit<Collection, "type"> & { parent: PieceType; pieces: string[] };
 
-export const THEMES: Theme[] = [
+export const SUBCATEGORIES: SubCategory[] = [
   {
+    parent: "pendant",
     slug: "jesus-pieces",
     name: "Jesus Pieces",
     intro: "The face of Christ, crowned with thorns or flowers, and Christ on the cross: each Jesus piece sculpted in volume and set stone by stone.",
@@ -66,25 +69,41 @@ export const THEMES: Theme[] = [
   },
 ];
 
-export type AnyCollection = Collection | Theme;
-export const isTheme = (c: AnyCollection): c is Theme => "pieces" in c;
+export type AnyCollection = Collection | SubCategory;
+export const isSub = (c: AnyCollection): c is SubCategory => "parent" in c;
 
-/** The published pieces of a collection or a theme, in their order. */
+/** The published pieces of a collection or a sub-category (only the pieces of its collection), in their order. */
 export function piecesOfCollection(cat: Catalogue, c: AnyCollection): Piece[] {
-  if (!isTheme(c)) return piecesOfType(cat, c.type);
-  return c.pieces.map((slug) => cat.pieces.find((p) => p.slug === slug)).filter((p): p is Piece => p !== undefined);
+  if (!isSub(c)) return piecesOfType(cat, c.type);
+  return c.pieces.map((slug) => cat.pieces.find((p) => p.slug === slug)).filter((p): p is Piece => p !== undefined && p.type === c.parent);
 }
 
-/** The themes that have pieces on the site. */
-export function visibleThemes(cat: Catalogue): Theme[] {
-  return THEMES.filter((t) => piecesOfCollection(cat, t).length > 0);
+/** The sub-categories of a type of jewel that have pieces on the site. */
+export function subcategoriesOf(cat: Catalogue, type: PieceType): SubCategory[] {
+  return SUBCATEGORIES.filter((s) => s.parent === type && piecesOfCollection(cat, s).length > 0);
+}
+
+/** The address of a collection (/creations/pendants) or of a sub-category (/creations/pendants/jesus-pieces). */
+export function collectionPath(c: AnyCollection): string {
+  return isSub(c) ? "/creations/" + collectionOf(c.parent).slug + "/" + c.slug : "/creations/" + c.slug;
+}
+
+/** A sub-category from its address, under its collection. */
+export function subcategoryBySlug(collectionSlug: string, slug: string): SubCategory | undefined {
+  const parent = collectionBySlug(collectionSlug);
+  return parent ? SUBCATEGORIES.find((s) => s.parent === parent.type && s.slug === slug) : undefined;
+}
+
+/** A sub-category under its old address /creations/<slug> (Jesus Pieces until 22/11/2026). */
+export function subcategoryByOldSlug(slug: string): SubCategory | undefined {
+  return SUBCATEGORIES.find((s) => s.slug === slug);
 }
 
 /** A collection is shown on the home page from this number of pieces. */
 export const MIN_PIECES = 2;
 
-export function collectionBySlug(slug: string): AnyCollection | undefined {
-  return COLLECTIONS.find((c) => c.slug === slug) ?? THEMES.find((t) => t.slug === slug);
+export function collectionBySlug(slug: string): Collection | undefined {
+  return COLLECTIONS.find((c) => c.slug === slug);
 }
 
 export function collectionOf(type: PieceType): Collection {

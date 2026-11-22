@@ -1307,9 +1307,60 @@ function HouseTab({ token, onExpired }: { token: string; onExpired: () => void }
   );
 }
 
+/** A photo joined to a message: read with the password (never public), shown small, opened full size in a new tab. */
+function MessagePhoto({ token, messageId, photo }: { token: string; messageId: string; photo: Rec }) {
+  const [url, setUrl] = useState("");
+  const [failed, setFailed] = useState(false);
+  const [unreadable, setUnreadable] = useState(false);
+  useEffect(() => {
+    let made = "";
+    let live = true;
+    fetch("/api/admin/messages/" + messageId + "/photos/" + asText(photo.id), { headers: { Authorization: "Bearer " + token } })
+      .then((res) => (res.ok ? res.blob() : Promise.reject(new Error(String(res.status)))))
+      .then((blob) => {
+        made = URL.createObjectURL(blob);
+        if (live) setUrl(made);
+      })
+      .catch(() => live && setFailed(true));
+    return () => {
+      live = false;
+      if (made) URL.revokeObjectURL(made);
+    };
+  }, [token, messageId, photo.id]);
+  const name = asText(photo.name);
+  return (
+    <li data-admin-photo className="relative aspect-square overflow-hidden border border-white/15 bg-ink-soft">
+      {failed ? (
+        <span className="flex h-full items-center justify-center p-2 text-center text-base text-rose-light">Photo illisible</span>
+      ) : !url ? (
+        <span className="flex h-full items-center justify-center"><LoaderCircle className="size-5 animate-spin text-bone" aria-hidden="true" /></span>
+      ) : (
+        <a href={url} target="_blank" rel="noreferrer" download={unreadable ? name : undefined} title={name} className="block h-full w-full">
+          {unreadable ? (
+            // A photo of an iPhone (HEIC) this browser cannot show: it downloads.
+            <span className="flex h-full flex-col items-center justify-center gap-1 p-2 text-center text-base text-bone">HEIC · télécharger<span className="line-clamp-2 break-all text-mist">{name}</span></span>
+          ) : (
+            <img src={url} alt={name} onError={() => setUnreadable(true)} className="h-full w-full object-cover" />
+          )}
+        </a>
+      )}
+    </li>
+  );
+}
+
 function Messages({ token, onExpired }: { token: string; onExpired: () => void }) {
   const [data, setData] = useState<{ messages: Rec[]; callbacks: Rec[] } | null>(null);
   const [err, setErr] = useState("");
+  const remove = async (id: string) => {
+    if (!window.confirm("Supprimer ce message et ses photos ? C'est définitif.")) return;
+    try {
+      await api(token, "DELETE", "/api/admin/messages/" + id);
+      setData((d) => (d ? { ...d, messages: d.messages.filter((m) => asText(m.id) !== id) } : d));
+    } catch (x) {
+      if (x instanceof Error && x.message === "expired") onExpired();
+      else setErr(x instanceof Error ? x.message : "Suppression impossible.");
+    }
+  };
   useEffect(() => {
     api(token, "GET", "/api/admin/messages")
       .then((res) => setData({ messages: (res.messages as Rec[]) ?? [], callbacks: (res.callbacks as Rec[]) ?? [] }))
@@ -1341,13 +1392,42 @@ function Messages({ token, onExpired }: { token: string; onExpired: () => void }
         <h2 className="title-caps text-2xl tracking-[0.12em]">Messages</h2>
         {data.messages.length === 0 ? <p className="mt-4 text-bone">Aucun pour l'instant.</p> : null}
         <ul className="mt-4 border-t border-white/15">
-          {data.messages.map((m) => (
-            <li key={String(m.id)} className="border-b border-white/15 py-4 text-base">
-              <span className="text-white">{asText(m.name)}</span> · <a href={"mailto:" + asText(m.email)} className="text-rose-light">{asText(m.email)}</a>
-              <span className="block text-mist">{date(m.createdAt)} · {languageName(m.language)}</span>
-              <p className="mt-2 whitespace-pre-line text-bone" dir="auto">{asText(m.message)}</p>
-            </li>
-          ))}
+          {data.messages.map((m) => {
+            const id = asText(m.id);
+            const instagram = asText(m.instagram);
+            const photos = Array.isArray(m.photos) ? (m.photos as Rec[]) : [];
+            return (
+              <li key={id} data-admin-message={id} className="border-b border-white/15 py-5 text-base">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <span>
+                    <span className="text-white">{asText(m.name)}</span> · <a href={"mailto:" + asText(m.email)} className="text-rose-light">{asText(m.email)}</a>
+                    {instagram ? (
+                      <>
+                        {" · "}
+                        {/^[A-Za-z0-9._]{1,30}$/.test(instagram) ? (
+                          <a href={"https://www.instagram.com/" + instagram + "/"} target="_blank" rel="noreferrer" className="text-rose-light">@{instagram}</a>
+                        ) : (
+                          <span className="text-bone">Instagram : {instagram}</span>
+                        )}
+                      </>
+                    ) : null}
+                    <span className="block text-mist">{date(m.createdAt)} · {languageName(m.language)}{photos.length > 0 ? " · " + photos.length + (photos.length > 1 ? " photos" : " photo") : ""}</span>
+                  </span>
+                  <button type="button" onClick={() => void remove(id)} className={btn} data-admin-message-delete>
+                    <Trash2 className="size-4" aria-hidden="true" /> Supprimer
+                  </button>
+                </div>
+                <p className="mt-2 whitespace-pre-line text-bone" dir="auto">{asText(m.message)}</p>
+                {photos.length > 0 ? (
+                  <ul className="mt-4 grid max-w-2xl grid-cols-3 gap-3 sm:grid-cols-6">
+                    {photos.map((photo) => (
+                      <MessagePhoto key={asText(photo.id)} token={token} messageId={id} photo={photo} />
+                    ))}
+                  </ul>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>

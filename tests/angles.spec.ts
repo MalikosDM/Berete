@@ -83,7 +83,7 @@ test("every photo of every piece has its text, in the six languages, with no sto
 });
 
 /** Six pieces, the Inter ring, chains, a watch, a Jesus piece with its films from the stories. */
-const PAGES = ["campione-d-italia-2023-2024", "michy-batshuayi-butterfly-chain", "sirius", "marcus-thuram-skeleton-watch", "kevin-schade-dragon-ball-pendant", "samuel-ballet-jesus-piece"];
+const PAGES = ["campione-d-italia-2023-2024", "michy-batshuayi-butterfly-pendant", "sirius", "marcus-thuram-skeleton-watch", "kevin-schade-dragon-ball-pendant", "samuel-ballet-jesus-piece"];
 
 for (const slug of PAGES) {
   test("Every Angle on " + slug + ": each photo with its text, in turn, readable", async ({ page }, info) => {

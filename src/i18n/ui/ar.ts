@@ -115,6 +115,8 @@ export const ar: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "معرض الأعمال",
     listLabel: (collection: string) => "إبداعات " + collection,
+    subLabel: (collection: string) => collection + ": الفئات الفرعية",
+    subAll: (collection: string) => "كل " + collection,
     others: "المزيد من معرض الأعمال",
     ctaTitle: "قطعتكم، منذ الرسم الأول.",
     ctaText: "كل قطعة تبدأ بحديث واحد. أخبرونا بقصتكم، ونحن نرسمها.",
@@ -207,6 +209,8 @@ export const ar: Messages = {
     stories: (_count: number) => "اللحظات",
     andOthers: (names: string) => "وكذلك " + names + ".",
     seenInStories: "ظهرت في قصصنا",
+    wornOn: "تُرتدى على",
+    itsPendant: "قلادتها",
     story: "وراء الإبداع",
     makingEyebrow: "من الرؤية إلى الواقع",
     makingTitle: "ولادة تحفة",
@@ -384,6 +388,27 @@ export const ar: Messages = {
     failedWhatsapp: "تعذّر إرسال النموذج. أرسلوا طلبكم عبر WhatsApp، فهو مكتوب مسبقاً.",
     sendWhatsapp: "الإرسال عبر WhatsApp",
     emailButton: "إرسال الرسالة",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "إنستغرام (اختياري)",
+    instagramPlaceholder: "@اسمك",
+    photos: "صور (اختياري)",
+    photosHint: "حتى 6 صور: رسم أولي، مصدر إلهام، قطعة تحبها. من حاسوبك أو من معرض صور هاتفك.",
+    addPhotos: "أضف صورًا",
+    removePhoto: (name: string) => "إزالة الصورة " + name,
+    preparingPhoto: "جارٍ تجهيز الصورة…",
+    errPhotoRead: (name: string) => "تعذّرت قراءة «" + name + "». اختر صورة بصيغة JPEG أو PNG.",
+    errTooManyPhotos: "6 صور كحد أقصى: لم تُضَف الصور الأخرى.",
+    sending: "جارٍ الإرسال…",
+    emailSentPhotos: (n: number) => "شكرًا لك. وصلت رسالتك " + (n === 1 ? "وصورتك" : "و" + n + " صور") + "، وسنرد عليك شخصيًا.",
+    photosWhatsapp: "لا يمكن إرسال صورك مع هذه الرسالة: أضفها في محادثة واتساب.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "تعذّر إرسال رسالتك: لا يوجد اتصال. تحقّق من اتصالك ثم أعد المحاولة.",
+      "too-large": "صورك ثقيلة جدًا لإرسالها معًا. أزل صورة أو اثنتين ثم أعد المحاولة.",
+      "too-many": "رسائل كثيرة في وقت قصير. أعد المحاولة بعد بضع دقائق.",
+      invalid: "تعذّر إرسال رسالتك. تحقّق من النموذج والصور ثم أعد المحاولة.",
+      server: "تعذّر إرسال رسالتك. أعد المحاولة بعد لحظات.",
+    },
   },
 
   legal: {
@@ -476,7 +501,7 @@ export const ar: Messages = {
       title: "ساعات مرصعة بالألماس",
       description: "ساعات مرصعة بالألماس من الهيكل إلى السوار، يرتديها لاعبو كرة القدم: ساعات Berete Jewellers، دبي.",
     },
-    "/creations/jesus-pieces": {
+    "/creations/pendants/jesus-pieces": {
       title: "مجوهرات المسيح: قلائد المسيح بالألماس حسب الطلب",
       description: "مجوهرات المسيح من Berete Jewellers: وجه المسيح متوَّجًا بالأشواك أو بالزهور، والمسيح على الصليب، منحوتة ومرصّعة بالألماس في دبي.",
     },

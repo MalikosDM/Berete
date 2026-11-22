@@ -477,22 +477,14 @@
    "text": "Worn by Kevin Schade, the chain sits close around the base of the neck, bright against a black T-shirt."
   }
  },
- "michy-batshuayi-butterfly-chain": {
+ "michy-batshuayi-butterfly-pendant": {
   "/media/hd/michy-batshuayi-butterfly-chain/p54.webp": {
-   "title": "A chain of diamond butterflies",
-   "text": "Michy Batshuayi's chain: rose gold links set with diamonds, butterflies along its length, and at its centre a face with butterfly wings."
+   "title": "On the Butterfly Chain",
+   "text": "Worn on the Butterfly Chain, the pendant hangs at the centre of the rose gold links, between two diamond butterflies."
   },
   "/media/hd/michy-batshuayi-butterfly-chain/p68.webp": {
    "title": "The face with butterfly wings",
    "text": "Glasses of baguette diamonds, a grin framed in rose gold, spiky hair traced in polished metal: the face sits between wings of baguettes edged with purple stones."
-  },
-  "/media/hd/michy-batshuayi-butterfly-chain/p60.webp": {
-   "title": "The chain on its own",
-   "text": "Without its pendant, the chain falls in an even curve on the bust, a butterfly resting on each side of the neck."
-  },
-  "/media/hd/michy-batshuayi-butterfly-chain/p59.webp": {
-   "title": "A butterfly along the links",
-   "text": "Seen from the side, a diamond butterfly rides the chain, its wing tips hung with purple pear-shaped stones in rose gold bezels."
   },
   "/media/hd/michy-batshuayi-butterfly-chain/v15.mp4": {
    "title": "Close over the pendant",
@@ -534,21 +526,9 @@
    "title": "The paved bail",
    "text": "The wide bail is paved on its face with round diamonds of varying sizes, its inside left in polished rose gold."
   },
-  "/media/hd/michy-batshuayi-butterfly-chain/p56.webp": {
-   "title": "A butterfly on the chain",
-   "text": "Its veined wings are paved with diamonds; a marquise, a round and a pear diamond form the body, with purple drops along the edges."
-  },
-  "/media/hd/michy-batshuayi-butterfly-chain/p55.webp": {
-   "title": "Links wrapped in pavé",
-   "text": "Polished rose gold links are wrapped by bands of paved diamonds, with small sprays of marquise diamonds set like leaves."
-  },
-  "/media/hd/michy-batshuayi-butterfly-chain/p66.webp": {
-   "title": "Polish and pavé",
-   "text": "Close up, the bright rose gold of each link shows between the paved bands, catching the light where the metal curves."
-  },
   "/media/hd/michy-batshuayi-butterfly-chain/p52.webp": {
-   "title": "The chain from behind",
-   "text": "From the back, the links show their polished rose gold, and the pendant reveals an engraved back with the BRT mark at its centre."
+   "title": "From behind",
+   "text": "From the back, the pendant reveals its engraved back with the BRT mark at its centre, hung on the polished rose gold links of its chain."
   },
   "/media/hd/michy-batshuayi-butterfly-chain/p69.webp": {
    "title": "The engraved back",
@@ -577,6 +557,28 @@
   "/media/hd/michy-batshuayi-butterfly-chain/v03.mp4": {
    "title": "Worn, in motion",
    "text": "Filmed close in low light, the pendant sways on the chest and its diamonds flash with every movement."
+  }
+ },
+ "butterfly-chain": {
+  "/media/hd/michy-batshuayi-butterfly-chain/p60.webp": {
+   "title": "The chain on its own",
+   "text": "Without its pendant, the chain falls in an even curve on the bust, a butterfly resting on each side of the neck."
+  },
+  "/media/hd/michy-batshuayi-butterfly-chain/p56.webp": {
+   "title": "A butterfly on the chain",
+   "text": "Its veined wings are paved with diamonds; a marquise, a round and a pear diamond form the body, with purple drops along the edges."
+  },
+  "/media/hd/michy-batshuayi-butterfly-chain/p59.webp": {
+   "title": "A butterfly along the links",
+   "text": "Seen from the side, a diamond butterfly rides the chain, its wing tips hung with purple pear-shaped stones in rose gold bezels."
+  },
+  "/media/hd/michy-batshuayi-butterfly-chain/p55.webp": {
+   "title": "Links wrapped in pavé",
+   "text": "Polished rose gold links are wrapped by bands of paved diamonds, with small sprays of marquise diamonds set like leaves."
+  },
+  "/media/hd/michy-batshuayi-butterfly-chain/p66.webp": {
+   "title": "Polish and pavé",
+   "text": "Close up, the bright rose gold of each link shows between the paved bands, catching the light where the metal curves."
   }
  },
  "cross-infinity-chain": {

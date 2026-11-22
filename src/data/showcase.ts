@@ -45,7 +45,7 @@ export type PieceShowcase = {
 /** The five priority universes (Dragon Ball, Butterfly, Inter, VfB, Noah Okafor): the showcase by default. */
 export const SHOWCASE_BY_DEFAULT = new Set([
   "kevin-schade-dragon-ball-pendant",
-  "michy-batshuayi-butterfly-chain",
+  "michy-batshuayi-butterfly-pendant",
   "campione-d-italia-2023-2024",
   "vfb-stuttgart-dfb-pokal-2025",
   "noah-okafor-jersey-pendant",

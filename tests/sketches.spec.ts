@@ -103,11 +103,13 @@ test("every published piece with a file of the hand of Yoni shows it", async ({ 
   test.skip(pieces === null, "the catalogue of the server is needed");
   // The pieces published on 20/11/2026 have no drawing of his hand yet: their step shows the atelier.
   const drawn = Object.keys((media as unknown as { sketches: Record<string, unknown> }).sketches);
+  // A piece renamed keeps the file of its old address (the Butterfly pendant, 22/11/2026).
+  const fileOf = (slug: string) => (slug === "michy-batshuayi-butterfly-pendant" ? "michy-batshuayi-butterfly-chain" : slug);
   for (const p of pieces!) {
     if (p.slug === "kevin-schade-dragon-ball-pendant") continue;
-    if (!drawn.includes(p.slug)) continue;
-    expect(p.making.sketch?.src, p.slug).toBe("/media/sketches/" + p.slug + ".webp");
+    if (!drawn.includes(fileOf(p.slug))) continue;
+    expect(p.making.sketch?.src, p.slug).toBe("/media/sketches/" + fileOf(p.slug) + ".webp");
   }
   // 28 drawings; the Flâneur, drawn too, is off the site since 21/11/2026 (too few photos).
-  expect(pieces!.filter((p) => drawn.includes(p.slug)).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(27);
+  expect(pieces!.filter((p) => drawn.includes(fileOf(p.slug))).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(27);
 });

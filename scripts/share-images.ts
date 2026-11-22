@@ -83,7 +83,8 @@ const cache: Record<string, string> = fs.existsSync(CACHE) ? (JSON.parse(fs.read
 const fingerprint = (...parts: (string | number | boolean)[]) => createHash("sha1").update(parts.join("|")).digest("hex");
 const fileStamp = (file: string) => file + ":" + fs.statSync(file).size + ":" + fs.statSync(file).mtimeMs;
 
-const browser = await chromium.launch();
+// Always silent (Malik, 20/11/2026), though it only draws photos.
+const browser = await chromium.launch({ args: ["--mute-audio"] });
 const tab = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 1 });
 let made = 0;
 

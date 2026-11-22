@@ -100,18 +100,18 @@
    "width": 1200,
    "height": 630
   },
-  "flaneur-medallion": {
-   "src": "/media/share/pieces/flaneur-medallion.jpg",
-   "width": 1200,
-   "height": 630
-  },
   "tulips-on-tour-medallion": {
    "src": "/media/share/pieces/tulips-on-tour-medallion.jpg",
    "width": 1200,
    "height": 630
   },
-  "michy-batshuayi-butterfly-chain": {
-   "src": "/media/share/pieces/michy-batshuayi-butterfly-chain.jpg",
+  "michy-batshuayi-butterfly-pendant": {
+   "src": "/media/share/pieces/michy-batshuayi-butterfly-pendant.jpg",
+   "width": 1200,
+   "height": 630
+  },
+  "butterfly-chain": {
+   "src": "/media/share/pieces/butterfly-chain.jpg",
    "width": 1200,
    "height": 630
   },
@@ -207,21 +207,6 @@
   },
   "wide-rose-iced-cuban-chain": {
    "src": "/media/share/pieces/wide-rose-iced-cuban-chain.jpg",
-   "width": 1200,
-   "height": 630
-  },
-  "two-tone-iced-cuban-chain": {
-   "src": "/media/share/pieces/two-tone-iced-cuban-chain.jpg",
-   "width": 1200,
-   "height": 630
-  },
-  "white-iced-cuban-chain": {
-   "src": "/media/share/pieces/white-iced-cuban-chain.jpg",
-   "width": 1200,
-   "height": 630
-  },
-  "pear-link-chain": {
-   "src": "/media/share/pieces/pear-link-chain.jpg",
    "width": 1200,
    "height": 630
   },

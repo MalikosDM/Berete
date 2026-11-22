@@ -92,7 +92,7 @@ const SCENES = [
     ),
     regions: { crowd: { d: [0.4, 0.44, 1, 0.76], m: [0, 0.64, 1, 0.81] } },
   }),
-  scene("serpent", "Temple sombre, serpents dorés, lueur rouge (Marcus Thuram)", [0.66, 0.5], {
+  scene("serpent", "Temple sombre, serpents or rose, lueur rouge (Marcus Thuram)", [0.66, 0.5], {
     spots: [{ k: "glow", tone: "red", d: [0.79, 0.5, 0.12], m: [0.5, 0.93, 0.4] }],
     regions: { path: { d: [0.42, 0.12, 0.98, 0.86], m: [0.08, 0.1, 0.92, 0.72] } },
   }),

@@ -5366,21 +5366,21 @@
         "light": false
       }
     },
-    "michy-batshuayi-butterfly-chain": {
+    "michy-batshuayi-butterfly-pendant": {
       "reveal": {
-        "src": "/media/films/michy-batshuayi-butterfly-chain/reveal.mp4",
-        "mobile": "/media/films/michy-batshuayi-butterfly-chain/reveal.m.mp4",
+        "src": "/media/films/michy-batshuayi-butterfly-pendant/reveal.mp4",
+        "mobile": "/media/films/michy-batshuayi-butterfly-pendant/reveal.m.mp4",
         "width": 1080,
         "height": 1920,
         "duration": 34,
         "audio": true,
         "posters": [
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-1.webp",
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-2.webp",
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-3.webp",
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-4.webp",
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-5.webp",
-          "/media/films/michy-batshuayi-butterfly-chain/reveal-6.webp"
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-1.webp",
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-2.webp",
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-3.webp",
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-4.webp",
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-5.webp",
+          "/media/films/michy-batshuayi-butterfly-pendant/reveal-6.webp"
         ],
         "poster": 4,
         "source": "23/v04 · HD 1080p",

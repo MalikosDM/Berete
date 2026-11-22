@@ -49,13 +49,30 @@ export const REMOVED_PIECES = [
   "pear-link-chain",
 ];
 
+/** Pieces worn together (22/11/2026): a pendant and the chain it is worn on. The page of each leads to the other. */
+export const WORN_TOGETHER: [pendant: string, chain: string][] = [["michy-batshuayi-butterfly-pendant", "butterfly-chain"]];
+
+/** The piece worn with this one, and what it is to it (its chain, or its pendant); null when none. */
+export function wornWith(slug: string): { slug: string; is: "chain" | "pendant" } | null {
+  for (const [pendant, chain] of WORN_TOGETHER) {
+    if (slug === pendant) return { slug: chain, is: "chain" };
+    if (slug === chain) return { slug: pendant, is: "pendant" };
+  }
+  return null;
+}
+
+/** The folder of hd of the Butterfly of Michy Batshuayi (folder 23): its pendant and its chain. */
+const BUTTERFLY = "michy-batshuayi-butterfly-chain";
+
 /** Pieces renamed since the first version of the site: old address -> new address. */
 export const RENAMED_PIECES: Record<string, string> = {
   "white-hands": "kenan-yildiz-celebration-pendant",
   "t-serpent": "marcus-thuram-t-serpent-pendant",
   "the-jersey": "noah-okafor-jersey-pendant",
   rs: "angelo-stiller-as-pendant",
-  butterfly: "michy-batshuayi-butterfly-chain",
+  butterfly: "michy-batshuayi-butterfly-pendant",
+  // The Butterfly of Michy Batshuayi is two pieces since 22/11/2026 (Yoni): its old address is the pendant's.
+  "michy-batshuayi-butterfly-chain": "michy-batshuayi-butterfly-pendant",
   // "Bouzou — Pendant" (folder 14) is the pendant of Loïs Openda (Yoni, 21/11/2026): one piece, at his address.
   "script-nameplate-pendant": "lois-openda-script-pendant",
 };
@@ -77,6 +94,8 @@ type PieceInput = {
   /** The universe of the page (src/data/themes.ts). */
   theme?: PieceTheme;
   showcase?: PieceShowcase;
+  /** The name of its sketch in the folder of sketches, when it is not its address (a piece renamed: the file keeps its name). */
+  sketch?: string;
   atelier?: PieceAtelier;
   detailPoints?: PieceDetailPoints;
   cover: Maybe;
@@ -101,7 +120,7 @@ function piece(p: PieceInput): Piece {
   for (const [step, item] of Object.entries(p.making ?? {}) as [MakingKey, Maybe][]) if (item) making[step] = item;
   // The first sketch from the folder of sketches (the hand of Yoni drawing the piece, since 20/11/2026), else the image
   // the piece gives for this step (Dragon Ball: its first hand drawing, from the stories).
-  making.sketch = sketch(p.slug, at(sketchAlt(p.title), "The first sketch")) ?? making.sketch;
+  making.sketch = sketch(p.sketch ?? p.slug, at(sketchAlt(p.title), "The first sketch")) ?? making.sketch;
   if (!making.sketch) delete making.sketch;
   return {
     slug: p.slug,
@@ -180,9 +199,14 @@ const inter = {
  * others its gallery. A photo written here (`own`) keeps its texts; every other one says what it shows (src/data/views.ts).
  * Before its folder is sorted (no gallery yet), the photos written here, in their order.
  */
-function sorted(dir: string, own: Maybe[]): { cover: Maybe; gallery: Maybe[] } {
+/**
+ * The cover and the gallery of a piece from its folder of hd, in the order of the folder; `files`: only these files of the
+ * folder, in this order (a folder that serves two pieces: the Butterfly pendant and its chain).
+ */
+function sorted(dir: string, own: Maybe[], files?: string[]): { cover: Maybe; gallery: Maybe[] } {
   const known = new Map(list(...own).map((m) => [m.src, m]));
-  const order = hdGallery(dir);
+  const all = hdGallery(dir);
+  const order = files ? files.map((file) => all.find((g) => g.file === file) ?? { file }) : all;
   const items = order.length > 0 ? order.map(({ file, view }) => {
     const m = yoni(dir, file);
     if (!m) return null;
@@ -956,40 +980,71 @@ const SITE_PIECES: Piece[] = [
     },
   }),
 
-  /* Chains */
+  /*
+   * The Butterfly of Michy Batshuayi: since 22/11/2026 (Yoni) the pendant, and its chain as a piece of its own (below). Both
+   * come from folder 23 (public/media/hd/michy-batshuayi-butterfly-chain/): the five photos of the chain alone go to the
+   * chain; its three films (v03 worn, v09 in a gloved hand, v15 close over it: all three show the pendant), its raw piece,
+   * its making-of and its trunk stay with the pendant. The old address of the chain leads here (RENAMED_PIECES).
+   */
   piece({
-    slug: "michy-batshuayi-butterfly-chain",
-    title: "Michy Batshuayi — Butterfly Chain",
-    type: "chain",
-    line: "A chain of diamond butterflies, and a face with butterfly wings.",
+    slug: "michy-batshuayi-butterfly-pendant",
+    title: "Michy Batshuayi — Butterfly Pendant",
+    type: "pendant",
+    line: "A face with butterfly wings, worn on the Butterfly Chain.",
     story:
-      "Rose gold links set with diamonds, with butterflies placed along the chain and purple pear-shaped stones on their wings. At its centre, a pendant: a face with baguette-cut glasses and butterfly wings, with a large pear-shaped diamond. The back of the pendant is engraved in rose gold with the BRT mark.",
+      "A face with baguette-cut glasses and butterfly wings, with a large pear-shaped diamond. The back of the pendant is engraved in rose gold with the BRT mark.\n\nIt is worn on the Butterfly Chain.",
     people: ["michy-batshuayi"],
+    // The hand of Yoni draws it on its chain: its sketch keeps the name of its old address.
+    sketch: "michy-batshuayi-butterfly-chain",
     theme: { preset: "metamorphose" },
-    ...sorted("michy-batshuayi-butterfly-chain", [
-      yoni("michy-batshuayi-butterfly-chain", "p54", at("Michy Batshuayi's Butterfly chain on a black bust")),
-      yoni("michy-batshuayi-butterfly-chain", "p68", at("The pendant: a face with butterfly wings", "The pendant")),
-      yoni("michy-batshuayi-butterfly-chain", "p62", at("The face of the pendant", "The face")),
-      yoni("michy-batshuayi-butterfly-chain", "p74", at("The pear diamond at the heart of the butterfly", "The centre stone")),
-      yoni("michy-batshuayi-butterfly-chain", "p65", at("Close-up of a butterfly wing with purple stones", "The wing")),
-      yoni("michy-batshuayi-butterfly-chain", "p57", at("A butterfly link with purple pear-shaped stones")),
-      yoni("michy-batshuayi-butterfly-chain", "p69", BACK()),
-      yoni("michy-batshuayi-butterfly-chain", "p66", at("The links of the Butterfly chain", "The links")),
-      yoni("michy-batshuayi-butterfly-chain", "p60", at("The Butterfly chain and its pendant on a black bust")),
-    ]),
-    handover: [yoni("michy-batshuayi-butterfly-chain", "p17", { ...at("Michy Batshuayi wearing his chain"), onBlack: false })],
+    ...sorted(
+      BUTTERFLY,
+      [
+        yoni(BUTTERFLY, "p68", at("The pendant: a face with butterfly wings", "The pendant")),
+        yoni(BUTTERFLY, "p54", at("The Butterfly Pendant on its chain, on a black bust")),
+        yoni(BUTTERFLY, "p62", at("The face of the pendant", "The face")),
+        yoni(BUTTERFLY, "p74", at("The pear diamond at the heart of the butterfly", "The centre stone")),
+        yoni(BUTTERFLY, "p69", BACK()),
+      ],
+      ["p68", "p54", "v15", "v09", "p63", "p73", "p74", "p62", "p70", "p75", "p72", "p71", "p52", "p69", "p20", "p48", "p22", "p17", "p41", "v03"],
+    ),
+    handover: [yoni(BUTTERFLY, "p17", { ...at("Michy Batshuayi wearing his Butterfly Pendant"), onBlack: false })],
     specs: [
-      ["Type", "Chain and pendant"],
-      ["Motif", "Butterflies, a face with butterfly wings"],
+      ["Type", "Pendant"],
+      ["Motif", "A face with butterfly wings"],
       ["Signature", "BRT mark on the back of the pendant"],
     ],
     seen: "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones",
     boxSlug: "butterfly-trunk",
     making: {
-      raw: raw("michy-batshuayi-butterfly-chain", "p77"),
+      raw: raw(BUTTERFLY, "p77"),
       setting: still("pieces/michy-batshuayi-butterfly-chain/setting", SET()),
-      delivery: yoni("michy-batshuayi-butterfly-chain", "v01-4_8s", IN_TRUNK()),
+      delivery: yoni(BUTTERFLY, "v01-4_8s", IN_TRUNK()),
     },
+  }),
+
+  /* Chains */
+  // The chain of the Butterfly pendant, alone (22/11/2026): the five photos of the chain without its pendant.
+  piece({
+    slug: "butterfly-chain",
+    title: "Michy Batshuayi — Butterfly Chain",
+    type: "chain",
+    line: "A chain of diamond butterflies.",
+    story: "Rose gold links set with diamonds, with butterflies placed along the chain and purple pear-shaped stones on their wings.\n\nIt carries the Butterfly Pendant.",
+    people: ["michy-batshuayi"],
+    theme: { preset: "metamorphose" },
+    ...sorted(
+      BUTTERFLY,
+      [
+        yoni(BUTTERFLY, "p60", at("The Butterfly Chain on its own, on a black bust")),
+        yoni(BUTTERFLY, "p66", at("The links of the Butterfly chain", "The links")),
+      ],
+      ["p60", "p56", "p59", "p55", "p66"],
+    ),
+    specs: [
+      ["Type", "Chain"],
+      ["Motif", "Butterflies"],
+    ],
   }),
   piece({
     slug: "marcus-thuram-ruby-t-necklace",
@@ -1545,7 +1600,7 @@ export const BOXES: Box[] = ([
     name: "Butterfly Trunk",
     description: "A black trunk with rose gold corners, opened by Michy Batshuayi on his Butterfly chain.",
     images: list(still("boxes/butterfly-trunk/01", at("Michy Batshuayi opening the black trunk of his chain"))),
-    pieceSlug: "michy-batshuayi-butterfly-chain",
+    pieceSlug: "michy-batshuayi-butterfly-pendant",
   },
   {
     slug: "okafor-trunk",

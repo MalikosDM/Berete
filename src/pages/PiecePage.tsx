@@ -20,7 +20,7 @@ import StoryViewer from "@/components/stories/StoryViewer";
 import Universe, { universeProps } from "@/components/Universe";
 import { defaultCatalogue } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
-import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT } from "@/data/pieces";
+import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT, wornWith } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, personHref, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
 import { anglePhotos } from "@/data/angles";
 import { filmTime, resolveAtelier, resolveReveal } from "@/data/atelier";
@@ -273,6 +273,7 @@ export default function PiecePage() {
                 </p>
               ))
             : null}
+          <WornWith slug={piece.slug} />
         </div>
       </section>
 
@@ -480,6 +481,29 @@ function DetailsSection({ piece, model }: { piece: Piece; model: PublicModel | n
  * when it has one, comes first: it plays silently on screen, and full screen with its sound once chosen
  * (src/components/AtelierRoom.tsx). The photos of the steps open in full screen.
  */
+/** The piece worn with this one (the Butterfly pendant and its chain): a card that leads to it. */
+function WornWith({ slug }: { slug: string }) {
+  const { t } = useI18n();
+  const cat = useCatalogue();
+  const pair = wornWith(slug);
+  const other = pair ? cat.pieces.find((p) => p.slug === pair.slug) : undefined;
+  if (!pair || !other) return null;
+  return (
+    <Link to={"/pieces/" + other.slug} data-worn-with={other.slug} className="group mt-10 flex max-w-xl items-center gap-5 border border-white/15 bg-ink/60 p-4 transition-colors hover:border-rose-light">
+      <span className="relative block aspect-[4/5] w-24 shrink-0 overflow-hidden bg-ink sm:w-28">
+        <MediaView item={other.cover} alt="" fit="contain" sizes="112px" />
+      </span>
+      <span className="min-w-0">
+        <span className="eyebrow block">{pair.is === "chain" ? t.piece.wornOn : t.piece.itsPendant}</span>
+        <span className="title-caps mt-2 block text-xl leading-snug tracking-[0.06em] break-words text-white transition-colors group-hover:text-rose-light">{other.title}</span>
+        <span className="mt-1 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-rose-light transition-colors group-hover:text-white">
+          {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
 function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: MediaItem; madeFor: string }) {
   const { t } = useI18n();
   const STEPS: Record<MakingStep, { title: string; text: string }> = t.piece.steps;

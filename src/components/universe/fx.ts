@@ -1,8 +1,8 @@
 /*
  * The effects of a universe (src/data/themes.ts), drawn in one canvas behind the content: dust, embers, diamond glints,
  * lightning, speed lines, butterflies of light (in the colour of the universe), confetti, golden confetti, petals, stars,
- * the light rising to the sphere of the Genkidama; and since 21/11/2026 the camera flashes of a crowd, a serpent of golden
- * light, fireflies, the sparks of a forge, lines of light running from facet to facet, prismatic glints, sparkling dew, the
+ * the light rising to the sphere of the Genkidama; and since 21/11/2026 the camera flashes of a crowd, a serpent of rose
+ * gold light (22/11/2026), fireflies, the sparks of a forge, lines of light running from facet to facet, prismatic glints, sparkling dew, the
  * dust of a light beam, drops shining under a street lamp (their places: the regions of the backdrop, read on the page);
  * the red maple leaves of the Japanese night of Sirius, falling and turning.
  * Loaded after the content of the page
@@ -203,6 +203,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   readRegions();
   const box = (name: string, f: [number, number, number, number]): Box => boxes[name] ?? { x0: f[0] * w, y0: f[1] * h, x1: f[2] * w, y1: f[3] * h };
   const goldSprite = sprite([255, 212, 120]);
+  const roseSprite = sprite([240, 184, 164]);
   const whiteSprite = sprite([255, 255, 255]);
 
   const area = () => (w * h) / (1440 * 900);
@@ -351,7 +352,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   if (has("fireflies")) for (let i = 0; i < count(14); i++) flies.push(newFly());
   if (has("beam-dust")) for (let i = 0; i < count(40); i++) motes.push(newMote(true));
   if (has("drops")) for (let i = 0; i < count(26); i++) drops.push(newDrop(true));
-  if (has("butterflies")) for (let i = 0; i < count(6); i++) flyers.push({ ...newFlyer(false), y: rand(0.3, 1) * h });
+  if (has("butterflies")) for (let i = 0; i < count(4); i++) flyers.push({ ...newFlyer(false), y: rand(0.3, 1) * h });
 
   /* ---------- Lightning: a branching bolt from the heart of the scene ---------- */
 
@@ -547,7 +548,8 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     }
 
     if (has("serpent")) {
-      // A serpent of golden light glides slowly in the depth: its head follows a long loop and waves, its body is its trail.
+      // A serpent of rose gold light (22/11/2026, the serpents of its image are rose gold) glides slowly in the depth: its
+      // head follows a long loop and waves, its body is its trail.
       const b = box("path", [0.45, 0.12, 0.98, 0.86]);
       serpentT += 0.0042 * (1 + boost * 2);
       const hx = (b.x0 + b.x1) / 2 + ((b.x1 - b.x0) / 2) * 0.9 * Math.sin(serpentT) + 10 * Math.sin(serpentT * 11);
@@ -557,7 +559,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       ctx.lineCap = "round";
       for (let i = 1; i < trail.length; i++) {
         const t = i / trail.length;
-        ctx.strokeStyle = "rgba(240,200,120," + (0.34 * t * t).toFixed(3) + ")";
+        ctx.strokeStyle = "rgba(236,176,156," + (0.34 * t * t).toFixed(3) + ")";
         ctx.lineWidth = (phone ? 1.4 : 2) + t * (phone ? 4 : 7);
         ctx.beginPath();
         ctx.moveTo(trail[i - 1]!.x, trail[i - 1]!.y);
@@ -565,7 +567,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         ctx.stroke();
       }
       ctx.globalAlpha = 0.55;
-      ctx.drawImage(goldSprite, hx - 20, hy - 20, 40, 40);
+      ctx.drawImage(roseSprite, hx - 20, hy - 20, 40, 40);
       ctx.globalAlpha = 1;
     }
 
@@ -805,15 +807,16 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     }
 
     if (has("butterflies")) {
-      // The scroll lets them fly away: a few at rest, more when the visitor moves.
-      if (flyers.length < count(18) && (Math.random() < 0.004 + boost * 0.12)) flyers.push(newFlyer(boost > 0.15 && Math.random() < 0.5));
+      // The scroll lets them fly away: a few at rest, more when the visitor moves. Since 22/11/2026 fewer and softer (Yoni: the
+      // piece is seen first, the world never dominates it).
+      if (flyers.length < count(10) && (Math.random() < 0.003 + boost * 0.1)) flyers.push(newFlyer(boost > 0.15 && Math.random() < 0.5));
       for (let i = flyers.length - 1; i >= 0; i--) {
         const p = flyers[i]!;
         p.life++;
         p.spin += 0.32 + boost * 0.2;
         p.x += p.vx + Math.sin(p.life * 0.04) * 0.6;
         p.y += p.vy * (1 + boost * 1.4);
-        const a = Math.min(1, p.life / 40, (p.max - p.life) / 70) * 0.85;
+        const a = Math.min(1, p.life / 40, (p.max - p.life) / 70) * 0.55;
         if (a > 0) {
           const flap = 0.25 + 0.75 * Math.abs(Math.sin(p.spin));
           const hue = (p.hue + Math.sin(p.life * 0.02) * 10 + 360) % 360;

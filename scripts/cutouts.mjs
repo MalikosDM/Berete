@@ -49,11 +49,12 @@ const VIEWS = {
     { id: "p18", kind: "detail", from: "hd:13/p18" },
     { id: "p06", kind: "back", from: "hd:13/p06" },
   ],
-  "michy-batshuayi-butterfly-chain": [
-    { id: "p54", kind: "face", from: "hd:23/p54", mode: "luma" },
-    { id: "p68", kind: "detail", from: "hd:23/p68" },
-    { id: "p60", kind: "profile", from: "hd:23/p60", mode: "luma" },
+  // Since 22/11/2026 the pendant (alone, then on its chain) and the chain alone are two pieces.
+  "michy-batshuayi-butterfly-pendant": [
+    { id: "p68", kind: "face", from: "hd:23/p68" },
+    { id: "p54", kind: "worn", from: "hd:23/p54", mode: "luma" },
   ],
+  "butterfly-chain": [{ id: "p60", kind: "face", from: "hd:23/p60", mode: "luma" }],
   "campione-d-italia-2023-2024": [
     { id: "p40", kind: "face", from: "hd:25/p40" },
     { id: "p43", kind: "detail", from: "hd:25/p43", solo: true },

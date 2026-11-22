@@ -225,8 +225,9 @@ export const THEME_PRESETS: Record<string, Preset> = {
     theme: { base: "#080404", tint: "#3a0d10", glow: "#ffd9cf", texture: "facets", light: "spotlight", font: "geometrie", backdrop: "", entrance: "glint", effects: ["embers", "glints", "smoke"], mark: "" },
   },
   serpent: {
-    name: "Temple du serpent, écailles dorées, lueur rouge (Marcus Thuram)",
-    theme: { base: "#090404", tint: "#3a0d13", glow: "#ff6a5a", texture: "grain", light: "ember", font: "gothique", backdrop: "serpent", entrance: "glint", effects: ["serpent", "embers", "smoke", "scene", "jewel-halo"], mark: "" },
+    name: "Temple du serpent, écailles or rose, lueur rouge (Marcus Thuram)",
+    // 22/11/2026: the serpents of the image in rose gold (new images of Yoni); its glow, embers, halo and light in rose gold too.
+    theme: { base: "#090404", tint: "#3a0d13", glow: "#e8b4a0", texture: "grain", light: "ember", font: "gothique", backdrop: "serpent", entrance: "glint", effects: ["serpent", "embers", "smoke", "scene", "jewel-halo"], mark: "" },
   },
   velours: {
     name: "Velours rubis : salon de velours, bougies",
@@ -367,7 +368,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   moon: "La lune brille à peine (fond avec une lune)",
   scene: "Le décor s'anime (projecteur, étoile, bougies, faisceaux… propres au fond)",
   flashes: "Flashs d'appareils photo dans la foule",
-  serpent: "Un serpent de lumière dorée glisse",
+  serpent: "Un serpent de lumière or rose glisse",
   fireflies: "Lucioles dorées",
   sparks: "Gerbes d'étincelles (forge)",
   "light-lines": "Lignes de lumière qui courent",

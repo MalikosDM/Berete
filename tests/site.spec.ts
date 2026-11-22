@@ -121,7 +121,7 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
 }
 
 /** Three pieces get full screenshots, desktop and phone. */
-const SHOWCASE = ["kevin-schade-dragon-ball-pendant", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-chain"];
+const SHOWCASE = ["kevin-schade-dragon-ball-pendant", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant"];
 const CHUNK = 8;
 
 // The published pieces (the others have no page: tests/identity.spec.ts checks their redirects).
@@ -303,9 +303,9 @@ test("piece -> player and stories, story -> piece", async ({ page }) => {
   await page.goto("/");
   await page.locator('[data-story-bubble="michy-batshuayi"]').click();
   const link = page.locator('[role="dialog"] [data-see-piece]');
-  await expect(link).toHaveAttribute("href", "/pieces/michy-batshuayi-butterfly-chain");
+  await expect(link).toHaveAttribute("href", "/pieces/michy-batshuayi-butterfly-pendant");
   await link.click();
-  await expect(page).toHaveURL(/\/pieces\/michy-batshuayi-butterfly-chain$/);
+  await expect(page).toHaveURL(/\/pieces\/michy-batshuayi-butterfly-pendant$/);
   await expect(page.locator("h1#piece-title")).toContainText("Butterfly");
   // From a piece to a similar one, then to its collection and another one, without reloading.
   const similar = page.locator("[data-similar] [data-piece-card]").first();

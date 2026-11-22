@@ -4,14 +4,15 @@ import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks, LanguageMenu } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
-import { visibleCollections, visibleThemes } from "@/data/collections";
+import { collectionPath, subcategoriesOf, visibleCollections } from "@/data/collections";
 import { collectionWords, Link, NavLink, stripLocale, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
 import { getLenis } from "@/lib/gsap";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
-type NavLinkItem = { label: string; to: string };
+/** sub: a sub-category, under its collection (Jesus Pieces under Pendants). */
+type NavLinkItem = { label: string; to: string; sub?: boolean };
 
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
@@ -28,8 +29,10 @@ export default function Navbar() {
   const cat = useCatalogue();
   const CREATION_LINKS: NavLinkItem[] = [
     { label: t.common.allCreations, to: "/creations" },
-    ...visibleCollections(cat).map(({ collection }) => ({ label: collectionWords(t, collection.slug, collection).name, to: "/creations/" + collection.slug })),
-    ...visibleThemes(cat).map((theme) => ({ label: collectionWords(t, theme.slug, theme).name, to: "/creations/" + theme.slug })),
+    ...visibleCollections(cat).flatMap(({ collection }) => [
+      { label: collectionWords(t, collection.slug, collection).name, to: collectionPath(collection) },
+      ...subcategoriesOf(cat, collection.type).map((s) => ({ label: collectionWords(t, s.slug, s).name, to: collectionPath(s), sub: true })),
+    ]),
   ];
   const MAIN_LINKS: NavLinkItem[] = [
     { label: t.nav.players, to: "/players" },
@@ -113,9 +116,13 @@ export default function Navbar() {
                   <li key={item.to}>
                     <Link
                       to={item.to}
-                      className="flex min-h-12 items-center justify-between px-4 font-display text-xl uppercase tracking-[0.14em] text-white transition-colors hover:text-rose-light focus-visible:text-rose-light"
+                      data-nav-sub={item.sub ? "" : undefined}
+                      className={"flex min-h-12 items-center justify-between font-display uppercase text-white transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "ps-9 pe-4 text-lg tracking-[0.12em] text-bone" : "px-4 text-xl tracking-[0.14em]")}
                     >
-                      {item.label}
+                      <span className="flex items-center gap-2.5">
+                        {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}
+                        {item.label}
+                      </span>
                       <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                     </Link>
                   </li>
@@ -174,7 +181,8 @@ export default function Navbar() {
           <ul className="mb-8 border-s border-rose-deep ps-5">
             {CREATION_LINKS.map((item) => (
               <li key={item.to}>
-                <Link to={item.to} className="flex min-h-12 items-center text-lg text-white hover:text-rose-light">
+                <Link to={item.to} data-nav-sub={item.sub ? "" : undefined} className={"flex min-h-12 items-center gap-2.5 text-lg hover:text-rose-light " + (item.sub ? "ps-5 text-bone" : "text-white")}>
+                  {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}
                   {item.label}
                 </Link>
               </li>

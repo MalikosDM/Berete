@@ -66,7 +66,7 @@ const STORY_META: [slug: string, meta: StoryMeta][] = [
   ["thuram", { people: ["marcus-thuram"], pieceSlug: "marcus-thuram-t-serpent-pendant" }],
   ["lois-openda", { title: "Loïs Openda", pieceSlug: "lois-openda-script-pendant" }],
   ["inter-milan", { pieceSlug: INTER }],
-  ["michy-batshuayi", { pieceSlug: "michy-batshuayi-butterfly-chain" }],
+  ["michy-batshuayi", { pieceSlug: "michy-batshuayi-butterfly-pendant" }],
   ["radja-nainggolan", { pieceSlug: "radja-nainggolan-iced-watch" }],
   ["collectors", { people: [] }],
   ["press", { people: [], articleUrl: DAILY_MAIL_ARTICLE }],

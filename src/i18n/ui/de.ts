@@ -130,6 +130,8 @@ export const de: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "Das Portfolio",
     listLabel: (collection: string) => "Die Kreationen: " + collection,
+    subLabel: (collection: string) => collection + ": Unterkategorien",
+    subAll: (collection: string) => "Alle " + collection,
     others: "Mehr aus dem Portfolio",
     ctaTitle: "Ihr Stück, von der ersten Skizze an.",
     ctaText: "Jedes Stück beginnt mit einem Gespräch. Erzählen Sie uns Ihre Geschichte, wir zeichnen sie.",
@@ -224,6 +226,8 @@ export const de: Messages = {
     stories: (_count: number) => "Die Momente",
     andOthers: (names: string) => "Sowie " + names + ".",
     seenInStories: "Zu sehen in unseren Storys",
+    wornOn: "Getragen an",
+    itsPendant: "Ihr Anhänger",
     story: "Die Geschichte dahinter",
     makingEyebrow: "Von der Vision zur Wirklichkeit",
     makingTitle: "Die Entstehung eines Meisterwerks",
@@ -402,6 +406,27 @@ export const de: Messages = {
     failedWhatsapp: "Das Formular konnte nicht gesendet werden. Senden Sie Ihre Anfrage per WhatsApp: Sie ist bereits geschrieben.",
     sendWhatsapp: "Per WhatsApp senden",
     emailButton: "Nachricht senden",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "Instagram (optional)",
+    instagramPlaceholder: "@deinname",
+    photos: "Fotos (optional)",
+    photosHint: "Bis zu 6: eine Skizze, eine Inspiration, ein Stück, das Sie lieben. Von Ihrem Computer oder aus der Galerie Ihres Telefons.",
+    addPhotos: "Fotos hinzufügen",
+    removePhoto: (name: string) => "Foto " + name + " entfernen",
+    preparingPhoto: "Foto wird vorbereitet…",
+    errPhotoRead: (name: string) => "„" + name + "“ konnte nicht gelesen werden. Bitte wählen Sie ein JPEG- oder PNG-Foto.",
+    errTooManyPhotos: "Höchstens 6 Fotos: Die übrigen wurden nicht hinzugefügt.",
+    sending: "Wird gesendet…",
+    emailSentPhotos: (n: number) => "Vielen Dank. Ihre Nachricht und " + (n === 1 ? "Ihr Foto sind" : "Ihre " + n + " Fotos sind") + " angekommen, wir antworten Ihnen persönlich.",
+    photosWhatsapp: "Ihre Fotos können nicht mit dieser Nachricht reisen: Fügen Sie sie im WhatsApp-Chat hinzu.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "Ihre Nachricht konnte nicht gesendet werden: keine Verbindung. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+      "too-large": "Ihre Fotos sind zusammen zu groß. Entfernen Sie ein oder zwei und versuchen Sie es erneut.",
+      "too-many": "Zu viele Nachrichten in kurzer Zeit. Bitte versuchen Sie es in einigen Minuten erneut.",
+      invalid: "Ihre Nachricht konnte nicht gesendet werden. Bitte prüfen Sie das Formular und die Fotos und versuchen Sie es erneut.",
+      server: "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es gleich noch einmal.",
+    },
   },
 
   legal: {
@@ -494,7 +519,7 @@ export const de: Messages = {
       title: "Diamantbesetzte Uhren",
       description: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband, getragen von Fußballern: die Uhren von Berete Jewellers, Dubai.",
     },
-    "/creations/jesus-pieces": {
+    "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces: Christus-Anhänger mit Diamanten nach Maß",
       description: "Die Jesus Pieces von Berete Jewellers: das Antlitz Christi mit Dornen- oder Blumenkrone und Christus am Kreuz, modelliert und mit Diamanten besetzt in Dubai.",
     },

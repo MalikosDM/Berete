@@ -6,7 +6,7 @@ import { DEFAULT_LOCALE, LOCALES, Navigate } from "@/i18n";
 import About from "@/pages/About";
 import Atelier, { Boxes } from "@/pages/Atelier";
 import Contact from "@/pages/Contact";
-import { CreationsParam } from "@/pages/Collection";
+import { CreationsParam, CreationsSubParam } from "@/pages/Collection";
 import Creations from "@/pages/Creations";
 import Home from "@/pages/Home";
 import Legal, { Privacy } from "@/pages/Legal";
@@ -37,6 +37,7 @@ function pages(prefix: string) {
       <Route index element={<Home />} />
       <Route path="creations" element={<Creations />} />
       <Route path="creations/:slug" element={<OnePerAddress><CreationsParam /></OnePerAddress>} />
+      <Route path="creations/:slug/:sub" element={<OnePerAddress><CreationsSubParam /></OnePerAddress>} />
       <Route path="pieces" element={<Navigate to="/creations" replace />} />
       <Route path="pieces/:slug" element={<OnePerAddress><PiecePage /></OnePerAddress>} />
       <Route path="capsules/*" element={<Navigate to="/creations" replace />} />

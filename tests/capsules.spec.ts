@@ -25,7 +25,7 @@ const filmState = (page: Page) =>
 
 /* ---------- The film of the finished piece, first ---------- */
 
-const ENTERED = [INTER, "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-chain", "noah-okafor-oka-pendant", "tulips-on-tour-medallion", "the-hand"];
+const ENTERED = [INTER, "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "noah-okafor-oka-pendant", "tulips-on-tour-medallion", "the-hand"];
 
 for (const slug of ENTERED) {
   test("entering " + slug + " by a click: its finished piece first, playing with its sound, in its frame, easy to leave", async ({ page }, info) => {

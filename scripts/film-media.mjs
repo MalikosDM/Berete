@@ -51,7 +51,8 @@ export const FILMS = [
   // The finished piece only (no film of their fabrication was sent).
   { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01" },
   { slug: "the-hand", folder: "12", reveal: "12/v01" },
-  { slug: "michy-batshuayi-butterfly-chain", folder: "23", reveal: "23/v04" },
+  // The pendant of Michy Batshuayi (its chain is a piece of its own since 22/11/2026).
+  { slug: "michy-batshuayi-butterfly-pendant", folder: "23", reveal: "23/v04" },
   // The short edit of the finished pendant (32/v02 is the film of its delivery: the trunk, Noah Okafor and his friends).
   { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v03" },
 

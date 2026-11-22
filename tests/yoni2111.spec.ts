@@ -110,14 +110,14 @@ test("the rule: one piece, its capsule; several, the page of the player", () => 
   const cat = publicCatalogue(defaultCatalogue);
   const person = (slug: string) => cat.people.find((p) => p.slug === slug)!;
   expect(personHref(cat, person("kenan-yildiz"))).toBe("/pieces/kenan-yildiz-celebration-pendant");
-  expect(personHref(cat, person("michy-batshuayi"))).toBe("/pieces/michy-batshuayi-butterfly-chain");
+  expect(personHref(cat, person("lois-openda"))).toBe("/pieces/lois-openda-script-pendant");
   expect(piecesOf(cat, "kevin-schade").length).toBeGreaterThan(1);
   expect(personHref(cat, person("kevin-schade"))).toBe("/players/kevin-schade");
 });
 
 const CLICKS: [string, string, boolean][] = [
   ["kenan-yildiz", "/pieces/kenan-yildiz-celebration-pendant", false],
-  ["michy-batshuayi", "/pieces/michy-batshuayi-butterfly-chain", false],
+  ["lois-openda", "/pieces/lois-openda-script-pendant", false],
   ["kevin-schade", "/players/kevin-schade", true],
 ];
 for (const [slug, target, several] of CLICKS) {

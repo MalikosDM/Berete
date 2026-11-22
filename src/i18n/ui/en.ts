@@ -131,6 +131,8 @@ export const en = {
     /* The page of one collection */
     collection: "The Portfolio",
     listLabel: (collection: string) => "The creations: " + collection,
+    subLabel: (collection: string) => collection + ": its sub-categories",
+    subAll: (collection: string) => "All " + collection.toLowerCase(),
     others: "More of the Portfolio",
     ctaTitle: "Yours, from the first sketch.",
     ctaText: "Every piece starts with one conversation. Tell us your story, we draw it.",
@@ -229,6 +231,8 @@ export const en = {
     stories: (_count: number) => "The Moments",
     andOthers: (names: string) => "And " + names + ".",
     seenInStories: "Seen in our stories",
+    wornOn: "Worn on",
+    itsPendant: "Its pendant",
     story: "Behind the Creation",
     makingEyebrow: "From Vision to Reality",
     makingTitle: "The Making of a Masterpiece",
@@ -420,6 +424,27 @@ export const en = {
     failedWhatsapp: "The form could not be sent. Send your request on WhatsApp instead: it is already written.",
     sendWhatsapp: "Send on WhatsApp",
     emailButton: "Send message",
+    /* The private correspondence: Instagram, photos (22/11/2026) */
+    instagram: "Instagram (optional)",
+    instagramPlaceholder: "@yourname",
+    photos: "Photos (optional)",
+    photosHint: "Up to 6: a sketch, an inspiration, a piece you love. From your computer or the gallery of your phone.",
+    addPhotos: "Add photos",
+    removePhoto: (name: string) => "Remove the photo " + name,
+    preparingPhoto: "Preparing the photo…",
+    errPhotoRead: (name: string) => "“" + name + "” could not be read. Please choose a JPEG or PNG photo.",
+    errTooManyPhotos: "Up to 6 photos: the others were not added.",
+    sending: "Sending…",
+    emailSentPhotos: (n: number) => "Thank you. Your message and your " + (n === 1 ? "photo have" : n + " photos have") + " been received, we will reply personally.",
+    photosWhatsapp: "Your photos cannot travel in this message: add them in the WhatsApp conversation.",
+    /** Why the message could not leave (src/lib/api.ts). */
+    sendErrors: {
+      network: "Your message could not be sent: no connection. Please check your connection and try again.",
+      "too-large": "Your photos are too heavy to be sent together. Remove one or two, then try again.",
+      "too-many": "Too many messages in a short time. Please try again in a few minutes.",
+      invalid: "Your message could not be sent. Please check the form and the photos, then try again.",
+      server: "Your message could not be sent. Please try again in a moment.",
+    },
   },
 
   legal: {

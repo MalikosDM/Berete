@@ -5,7 +5,7 @@
  * greeting. In the language chosen on the site (src/i18n/ui/*.ts, "whatsapp"). The link itself: waLink in src/lib/site.ts.
  */
 import { useLocation } from "react-router";
-import { collectionBySlug } from "@/data/collections";
+import { collectionBySlug, subcategoryBySlug } from "@/data/collections";
 import { RENAMED_PIECES } from "@/data/pieces";
 import type { Catalogue } from "@/data/types";
 import { collectionWords, useI18n, type Messages } from "@/i18n";
@@ -14,7 +14,7 @@ import { useCatalogue } from "@/lib/catalogue";
 
 /** The message for an address of the site ("/fr/pieces/sirius" or "/pieces/sirius"), from the catalogue of its language. */
 export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string): string {
-  const [section = "", slug = ""] = stripLocale(pathname).split("/").filter(Boolean);
+  const [section = "", slug = "", sub = ""] = stripLocale(pathname).split("/").filter(Boolean);
   const w = t.whatsapp;
   switch (section) {
     case "":
@@ -24,7 +24,8 @@ export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string): 
       return piece ? w.piece(piece.title) : w.pages.creations;
     }
     case "creations": {
-      const collection = slug ? collectionBySlug(slug) : undefined;
+      // A collection, or one of its sub-categories (/creations/pendants/jesus-pieces).
+      const collection = (sub ? subcategoryBySlug(slug, sub) : undefined) ?? (slug ? collectionBySlug(slug) : undefined);
       return collection ? w.collection(collectionWords(t, collection.slug, collection).name) : w.pages.creations;
     }
     case "players": {

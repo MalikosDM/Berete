@@ -11,7 +11,7 @@ import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
 import { AMATEUR_FILMS, anglePhotos } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
-import { piecesOfCollection, THEMES } from "../src/data/collections";
+import { piecesOfCollection, SUBCATEGORIES } from "../src/data/collections";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import { publicCatalogue } from "../src/data/relations";
 import { resolveShowcase } from "../src/data/showcase";
@@ -42,7 +42,7 @@ test("the making-of of every piece: real media only, never an image of the ateli
 });
 
 /** Six capsules: the Inter ring, the VfB ring, the T-Serpent, the Butterfly chain, the panther, a piece from the stories. */
-const PAGES = ["campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "marcus-thuram-t-serpent-pendant", "michy-batshuayi-butterfly-chain", "panther-champion-pendant", "samuel-ballet-jesus-piece"];
+const PAGES = ["campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "marcus-thuram-t-serpent-pendant", "michy-batshuayi-butterfly-pendant", "panther-champion-pendant", "samuel-ballet-jesus-piece"];
 
 for (const slug of PAGES) {
   test(slug + ": one scroll from the opening to its content, its real making-of, its amateur films last", async ({ page }, info) => {
@@ -169,24 +169,24 @@ test("asked for less motion: the panther shows the celebration, still", async ({
 test("Jesus Pieces: from the menu, every Jesus piece of the house", async ({ page }, info) => {
   const problems = watch(page);
   const phone = info.project.name !== "desktop";
-  const theme = THEMES.find((t) => t.slug === "jesus-pieces")!;
+  const theme = SUBCATEGORIES.find((t) => t.slug === "jesus-pieces")!;
   const pieces = piecesOfCollection(CAT, theme);
   expect(pieces.length).toBeGreaterThanOrEqual(4);
   await skipIntro(page);
   await page.goto("/fr", { waitUntil: "load" });
   if (phone) {
     await page.locator("button[aria-controls='mobile-menu']").click();
-    await page.locator("#mobile-menu a[href='/fr/creations/jesus-pieces']").click();
+    await page.locator("#mobile-menu a[href='/fr/creations/pendants/jesus-pieces']").click();
   } else {
     // The menu of The Creations opens under its name.
     await page.locator("[data-desktop-nav] a[href='/fr/creations']").first().hover();
-    const entry = page.locator("[data-desktop-nav] a[href='/fr/creations/jesus-pieces']");
+    const entry = page.locator("[data-desktop-nav] a[href='/fr/creations/pendants/jesus-pieces']");
     await expect(entry).toBeVisible();
     await page.waitForTimeout(900);
     await shot(page, info.project.name + "-jesus-pieces-menu");
     await entry.click();
   }
-  await expect(page).toHaveURL(/\/fr\/creations\/jesus-pieces$/);
+  await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
   const cards = await page.locator("main a[data-piece-card]").evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("data-piece-card")))]);
   expect(cards).toEqual(pieces.map((p) => p.slug));

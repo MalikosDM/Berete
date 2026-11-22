@@ -218,12 +218,22 @@
     },
     {
       "source": "/pieces/butterfly",
-      "destination": "/pieces/michy-batshuayi-butterfly-chain",
+      "destination": "/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/butterfly",
-      "destination": "/:lang/pieces/michy-batshuayi-butterfly-chain",
+      "destination": "/:lang/pieces/michy-batshuayi-butterfly-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/michy-batshuayi-butterfly-chain",
+      "destination": "/pieces/michy-batshuayi-butterfly-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/michy-batshuayi-butterfly-chain",
+      "destination": "/:lang/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
@@ -244,6 +254,16 @@
     {
       "source": "/:lang(fr|es|de|nl|ar)/boxes/:slug",
       "destination": "/:lang/boxes",
+      "statusCode": 301
+    },
+    {
+      "source": "/creations/jesus-pieces",
+      "destination": "/creations/pendants/jesus-pieces",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/creations/jesus-pieces",
+      "destination": "/:lang/creations/pendants/jesus-pieces",
       "statusCode": 301
     }
   ],
