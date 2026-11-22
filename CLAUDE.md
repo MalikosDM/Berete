@@ -197,8 +197,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       Hand Cube, VfB → DFB-Pokal 2025 Display (`boxSlug`), le lien de l'écrin mène à `/boxes#box-<écrin>`. Étape « remise »
       de Dragon Ball : sa photo pro ouverte. Textes courts d'après les photos (aucune pierre, aucun nom de joueur), 6
       langues ; admin : les nouveaux écrins apparaissent seuls, aide du champ « Pièce liée ».
-- `tests/carousel.spec.ts` et `tests/trunks.spec.ts` (ordinateur, tablette, iPhone), captures `verification/carousel/` et
-  `verification/trunks/`.
+- `tests/carousel.spec.ts` et `tests/trunks.spec.ts` (ordinateur, tablette, iPhone), vérifiés sur le site en ligne le 22/11
+  (50 réussis), captures `verification/carousel/` et `verification/trunks/`.
 - [ ] Yoni : la pièce de BRT Coral Case, Trophy Trunk, Photo Case, World Cup Display (et l'Écrin Signature) ; droits des
       dessins d'anime sur la malle Dragon Ball et le cube The Hand ; la bague grise dans la vitrine Coupe du monde est-elle
       un prototype ? accord du joueur photographié sur la Photo Case.

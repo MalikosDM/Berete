@@ -212,7 +212,11 @@ test("every language: its words; in Arabic the row reads from right to left", as
   for (const [prefix, all, back] of WORDS) {
     await page.goto(prefix + "/creations", { waitUntil: "load" });
     await expect(page.locator("[data-carousel-all]")).toHaveText(all);
-    await page.locator("[data-carousel-all]").click();
+    // (A click before the page is ready does nothing: again until the grid comes.)
+    await expect(async () => {
+      await page.locator("[data-carousel-all]").click({ timeout: 2_000 });
+      await expect(page.locator("[data-carousel-back]")).toBeVisible({ timeout: 1_500 });
+    }).toPass({ timeout: 20_000 });
     await expect(page.locator("[data-carousel-back]")).toHaveText(back);
     await page.locator("[data-carousel-back]").click();
     if (prefix === "/ar") {

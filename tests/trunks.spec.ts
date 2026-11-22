@@ -115,14 +115,18 @@ for (const [slug, piece] of ORDER) {
   test(slug + ": it opens, " + (piece ? "its piece rises and floats above it, its two buttons" : "only its button to create one's own"), async ({ page }, info) => {
     const problems = watch(page);
     await skipIntro(page);
-    await page.goto("/fr/boxes", { waitUntil: "load" });
+    await page.goto("/fr/boxes", { waitUntil: "domcontentloaded" });
     const card = page.locator("[data-box='" + slug + "']");
     const sq = await square(card);
     await page.waitForTimeout(700);
     await expect(card.locator("[data-trunk-image='closed']")).toHaveAttribute("data-shown", "");
     await expect(card.locator("[data-trunk-actions]")).toHaveCount(0);
     await shot(page, info.project.name + "-" + slug + "-1-ferme");
-    await card.locator("[data-trunk-open]").click();
+    // (A click before the page is ready does nothing: again until the box starts opening.)
+    await expect(async () => {
+      await card.locator("[data-trunk-open]").click({ timeout: 2_000 });
+      await expect(card.locator("[data-trunk-state]")).not.toHaveAttribute("data-trunk-state", "closed", { timeout: 1_000 });
+    }).toPass({ timeout: 20_000 });
     if (FILMS.has(slug)) {
       // The film plays, silent; at its end its open image comes over its last frame, without a jump.
       const video = card.locator("[data-trunk-video]");
