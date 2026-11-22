@@ -54,7 +54,7 @@ export const nl: Messages = {
   whatsapp: {
     hello: "Hallo Berete, ik zou graag een eigen creatie op maat bespreken.",
     createBox: "Hallo Berete, ik heb de Signature-koffers op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
-    trunk: (name: string) => "Hallo Berete, ik heb " + (/koffer$/.test(name) ? "de " + name : /etui$/.test(name) ? "het " + name : "de koffer ‘" + name + "’") + " op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
+    trunk: (name: string) => "Hallo Berete, ik heb " + (/(koffer|vitrine|kubus)$/.test(name) ? "de " + name : /etui$/.test(name) ? "het " + name : "de koffer ‘" + name + "’") + " op uw website ontdekt en zou graag mijn eigen koffer laten maken.",
     piece: (name: string) => discovered("de creatie “" + name + "”"),
     person: (name: string) => discovered("de creaties voor " + name),
     collection: (name: string) => discovered("uw " + lowerFirst(name)),
@@ -180,6 +180,16 @@ export const nl: Messages = {
     filterLabel: "Creaties filteren",
     all: "Alle creaties",
     enterCollection: (collection: string) => "Ontdek de " + collection.toLowerCase(),
+    /* De carrousel van de creaties (src/components/PieceCarousel.tsx). */
+    carousel: "carrousel",
+    slide: "creatie",
+    counter: (i: number, total: number) => i + " van " + total,
+    counterLabel: "Creatie ",
+    showPiece: (title: string) => title + " tonen",
+    previous: "Vorige creatie",
+    next: "Volgende creatie",
+    seeAll: "Alle creaties bekijken",
+    backToCarousel: "Terug naar de carrousel",
   },
 
   piece: {
@@ -319,7 +329,8 @@ export const nl: Messages = {
     closing: "Een verlengstuk van uw creatie",
     openTrunk: (name: string) => "Openen: " + name,
     openHint: "Openen",
-    createOwn: "Mijn eigen koffer ontwerpen",
+    createOwn: "Uw eigen koffer ontwerpen",
+    discoverPiece: "Ontdek het juweel",
     replay: "Opening opnieuw bekijken",
     closeTrunk: "Koffer sluiten",
   },

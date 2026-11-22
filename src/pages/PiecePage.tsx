@@ -317,7 +317,7 @@ export default function PiecePage() {
           {/* What the photos show, written before the jeweller confirms it: said as such while the piece is a draft. */}
           {piece.draft && seenRow ? <p data-seen-note className="mt-4 text-base text-mist">{t.piece.seenNote}</p> : null}
           {box ? (
-            <Link to="/boxes" data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
+            <Link to={"/boxes#box-" + box.slug} data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
               <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" sizes={SIZES_FOR.thumb} /> : null}</span>
               <span>
                 <span className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">

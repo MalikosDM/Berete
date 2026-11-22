@@ -171,7 +171,8 @@ test("home collections lead to every type page, every card to its piece", async 
     // Reached in the page itself (no reload): the collection is really shown.
     await expect(page.locator("h1")).toContainText(c.name);
     titles.add(await checkPage(page, info, "/creations/" + c.slug, "collection-" + c.slug, 3));
-    const hrefs = await page.locator("[data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+    // (Its carousel, since 22/11/2026.)
+    const hrefs = await page.locator("[data-carousel-piece]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
     expect(hrefs.sort(), c.slug + " shows all its pieces").toEqual(cat.pieces.filter((p) => p.type === c.type).map((p) => "/pieces/" + p.slug).sort());
     await expect(page.locator("h1")).toContainText(c.name);
   }
@@ -190,7 +191,8 @@ test("creations filters and old addresses", async ({ page }) => {
   const cat = await getCatalogue(page);
   const count = (type: string) => cat.pieces.filter((p) => p.type === type).length;
   await page.goto("/creations");
-  const cards = page.locator("[data-piece-card]");
+  // (The creations of the carousel, since 22/11/2026.)
+  const cards = page.locator("[data-carousel-piece]");
   await expect(cards).toHaveCount(cat.pieces.length);
   for (const c of COLLECTIONS) {
     const button = page.getByRole("button", { name: new RegExp("^" + c.name) });
@@ -320,7 +322,7 @@ test("piece -> player and stories, story -> piece", async ({ page }) => {
   await page.locator('main a[href="/creations/chains"]').first().click();
   await expect(page.locator("h1")).toContainText("Chains");
   const chains = (await getCatalogue(page)).pieces.filter((p) => p.type === "chain").length;
-  await expect(page.locator("[data-piece-card]")).toHaveCount(chains);
+  await expect(page.locator("[data-carousel-piece]")).toHaveCount(chains);
   expect(problems.errors).toEqual([]);
 });
 

@@ -225,7 +225,8 @@ test("Sirius: its Japanese night, the eyes of the masks, the flashes, the leaves
 test("the trunk of Sirius: the black trunk with the horned mask, its opening, its photos on the page of the trunks", async ({ page }, info) => {
   const problems = watch(page);
   const trunk = trunkOf("sirius")!;
-  expect(trunk.photos?.map((p) => p.src)).toEqual(["/media/trunks/sirius/photo-closed.webp", "/media/trunks/sirius/photo-open.webp"]);
+  // Since 22/11/2026 (2): its professional photos (00 Contexte Yoni/Boites (photos pro)/sirius), its new film.
+  expect(trunk.photos?.map((p) => p.src)).toEqual(["01", "02", "03", "04"].map((n) => "/media/trunks/sirius/photo-" + n + ".webp"));
   expect(BOXES.find((b) => b.slug === "sirius")!.images.map((m) => m.src)).toEqual(trunk.photos!.map((p) => p.src));
   await skipIntro(page);
   await page.goto("/fr/boxes", { waitUntil: "load" });
@@ -241,13 +242,15 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   await expect(card.locator("[data-trunk-create]")).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1200);
   await shot(page, info.project.name + "-sirius-ecrin-3-ouvert");
-  // Its photos: the new images, closed then open.
+  // Its photos: the professional ones.
   await card.locator("[data-box-photos='sirius']").click();
   const dialog = page.locator("[role='dialog']");
   await expect(dialog).toBeVisible();
+  // (The photos appear as they come into view.)
+  await expect(dialog.locator("img").first()).toBeVisible();
   const srcs = await dialog.locator("img").evaluateAll((els) => els.map((e) => new URL((e as HTMLImageElement).src).pathname));
-  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-closed"))).toBe(true);
-  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-open"))).toBe(true);
+  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-01"))).toBe(true);
+  expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-0"))).toBe(true);
   expect(srcs.some((s) => s.includes("/media/hd/sirius/"))).toBe(false);
   expect(problems.errors).toEqual([]);
 });

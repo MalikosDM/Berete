@@ -38,7 +38,8 @@ async function firstRow(page: Page, grid: string): Promise<number> {
 test("Créations: three on a row on a computer, two on a tablet, one on a phone, larger cards", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  await page.goto("/creations", { waitUntil: "load" });
+  // (Since 22/11/2026 (2), the carousel first: this grid with "See all creations", tests/carousel.spec.ts.)
+  await page.goto("/creations?view=grid", { waitUntil: "load" });
   const grid = page.locator("[data-creations-grid]");
   await expect(grid.locator("> li").first()).toBeVisible();
   const phone = info.project.name !== "desktop";
@@ -73,7 +74,7 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
   await expect(page.locator("[data-subcategory='jesus-pieces']")).toHaveAttribute("aria-current", "page");
-  await expect(page.locator("[data-piece-card]")).toHaveCount(count);
+  await expect(page.locator("[data-carousel-piece]")).toHaveCount(count);
   await shot(page, info.project.name + "-pendentifs-jesus-pieces");
   // Its old address.
   await page.goto("/creations/jesus-pieces", { waitUntil: "load" });
@@ -100,7 +101,7 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   await page.locator("[data-filter='pendant']").click();
   await page.locator("[data-subfilter='jesus-pieces']").click();
   await expect(page).toHaveURL(/category=pendants&sub=jesus-pieces/);
-  await expect(page.locator("[data-creations-grid] > li")).toHaveCount(count);
+  await expect(page.locator("[data-carousel-piece]")).toHaveCount(count);
   await shot(page, info.project.name + "-creations-jesus-pieces");
   expect(problems.errors).toEqual([]);
 });
@@ -160,10 +161,10 @@ test("the Butterfly: the pendant and the chain, two pieces linked to each other,
   await expect(page.locator("h1")).toContainText("Chaîne Butterfly");
   await expect(page.locator("[data-worn-with='" + PENDANT + "']")).toContainText("Pendentif Butterfly");
   // Créations: the pendant among the pendants, the chain among the chains; the page of the player: both.
-  await page.goto("/creations?category=chains", { waitUntil: "load" });
+  await page.goto("/creations?category=chains&view=grid", { waitUntil: "load" });
   await expect(page.locator("[data-creations-grid] [data-piece-card='" + CHAIN + "']")).toHaveCount(1);
   await expect(page.locator("[data-creations-grid] [data-piece-card='" + PENDANT + "']")).toHaveCount(0);
-  await page.goto("/creations?category=pendants", { waitUntil: "load" });
+  await page.goto("/creations?category=pendants&view=grid", { waitUntil: "load" });
   await expect(page.locator("[data-creations-grid] [data-piece-card='" + PENDANT + "']")).toHaveCount(1);
   await page.goto("/players/michy-batshuayi", { waitUntil: "load" });
   await expect(page.locator("[data-player-piece]")).toHaveCount(2);

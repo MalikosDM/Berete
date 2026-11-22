@@ -1,17 +1,16 @@
 import { useSearchParams } from "react-router";
 import { ArrowRight } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
-import PieceCard from "@/components/PieceCard";
-import Reveal from "@/components/Reveal";
+import PieceCarousel from "@/components/PieceCarousel";
 import { COLLECTIONS, collectionPath, piecesOfCollection, subcategoriesOf } from "@/data/collections";
 import type { PieceType } from "@/data/types";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 
 /**
- * Every piece, filterable by type, then by sub-category (Pendants > Jesus Pieces, ?category=pendants&sub=jesus-pieces). Each
- * card opens /pieces/:slug. Three pieces on a row on a computer, larger (asked by Yoni, 22/11/2026: the dense grid of six
- * was too small), two on a tablet, one on a phone.
+ * Every piece, filterable by type, then by sub-category (Pendants > Jesus Pieces, ?category=pendants&sub=jesus-pieces), shown
+ * one by one in a carousel, or all at once in a grid of equal cards (3, 2, 1 on a row: src/components/PieceCarousel.tsx,
+ * asked by Yoni on 22/11/2026). Each opens /pieces/:slug.
  */
 export default function Creations() {
   const { t } = useI18n();
@@ -105,15 +104,7 @@ export default function Creations() {
               </Link>
             </div>
           ) : (
-            <ul data-creations-grid className="grid grid-cols-1 gap-y-14 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-20">
-              {list.map((p, i) => (
-                <li key={p.slug}>
-                  <Reveal delay={(i % 3) * 0.08}>
-                    <PieceCard piece={p} eager={i < 3} priority={i === 0} showType={active === "all"} />
-                  </Reveal>
-                </li>
-              ))}
-            </ul>
+            <PieceCarousel key={active + "/" + (sub?.slug ?? "")} pieces={list} label={sub ? collectionWords(t, sub.slug, sub).name : collection ? collectionName : t.creations.listLabel} memory={"creations/" + active + "/" + (sub?.slug ?? "")} showType={active === "all"} />
           )}
         </div>
       </section>

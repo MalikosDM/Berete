@@ -162,9 +162,51 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « carrousel des Créations et vraies boîtes » (Yoni, 22/11/2026, 2) — état au 22/11/2026
+- [x] **Créations en carrousel** (`src/components/PieceCarousel.tsx`), dans Toutes, chaque collection et sous-catégorie
+      (Chaînes, Pendentifs > Jesus Pieces…) : la création en cours grande au centre (cadre carré), celles d'avant et
+      d'après plus petites, floutées, qui dépassent sur les côtés ; défilement natif aimanté (doigt, trackpad), molette
+      horizontale (une création par geste), flèches (sur les côtés sur ordinateur, sous la pièce sur téléphone), clavier
+      (← →, Début, Fin), compteur « 3 / 18 ». Clic au centre = la pièce ; clic sur une floutée = elle vient au centre. Au
+      retour d'une pièce, le carrousel reprend où il était. « Voir toutes les créations » : grille de cartes identiques
+      (`?view=grid` ; 3 / 2 / 1 par rangée, même cadre 4:5, titre sur 2 lignes au plus, ligne « Créée pour » sur 2 lignes
+      réservées : titres alignés), « Revenir au carrousel ». Aucun saut de mise en page. Textes en 6 langues
+      (`creations.carousel…backToCarousel` de `src/i18n/ui/*.ts`). Avec le serveur, la liste arrive ensuite dans l'ordre de
+      la base : le carrousel revient sur la première tant que le visiteur n'y a pas touché.
+- [x] **Écrins : les vraies boîtes** (`/boxes`). 13 écrins dans l'ordre de `BOXES` (`src/data/pieces.ts`), même carré, grille
+      alignée (3 / 2 / 1). `npm run trunks` (`scripts/trunk-media.mjs`, refait en entier) :
+      - **avec vidéo** (`00 Contexte Yoni/Ecrins IA (ouverture) v2/<dossier>/`, raccord vidéo → photo ouverte < 4/255) :
+        Écrin Signature, Sirius, Tulips on Tour, **BRT Coral Case** (`brt-coral-case`, nouveau), **Trophy Trunk**
+        (`trophy-trunk`, nouveau) ;
+      - **sans vidéo** (`00 Contexte Yoni/Boites (photos pro)/<dossier>/`, 01 fermée → 03 ouverte, posées entières dans
+        le carré sur leur propre fond flouté, transition avec une lumière qui sort de la boîte) : Dragon Ball, **The Hand
+        Cube** (`the-hand-cube`), **DFB-Pokal 2025 Display** (`dfb-pokal-2025-display`), **Photo Case** (`photo-case`, le
+        joueur n'est pas nommé), **World Cup Display** (`world-cup-display` : sa 03 est le côté au blason, fermée ; elle
+        s'ouvre sur la **04**, la vitrine levée) ;
+      - **écrins d'avant** (Butterfly, Okafor, Campione d'Italia) : leurs anciennes ouvertures IA supprimées (intérieur
+        inventé) ; ils s'ouvrent de leurs vraies images (Campione : photos 25/p20 → p22 ; Butterfly : film de livraison
+        23/v01 HD à 0,2 s → 4 s ; Okafor : story 11/03 à 0 s → 7 s). Leurs photos de page inchangées. NZ reste retiré (son
+        ouverture IA supprimée aussi).
+      À la fin de l'ouverture, la **pièce détourée monte et flotte** au-dessus de la boîte (vue principale de la vitrine de
+      la pièce, `resolveShowcase`) avec une lueur ; puis **« Créer votre écrin »** (WhatsApp qui nomme l'écrin, 6 langues)
+      et **« Découvrir la pièce »** (sa capsule). Pièce inconnue (`pieceSlug: null`, à remplir dans `BOXES` ou l'admin
+      « Pièce liée ») : seulement « Créer votre écrin », rien ne sort. Lumière et place de la pièce : `PLACES` de
+      `src/data/trunks.ts`. Vidéos chargées à l'approche, image fermée en attente.
+- [x] **Photos des écrins** : les photos pro (`public/media/trunks/<écrin>/photo-NN`) remplacent les anciennes (Dragon Ball,
+      Sirius, Tulips ; Signature : les 4 pro puis 3 anciennes qui montrent autre chose). Pages des pièces : The Hand → The
+      Hand Cube, VfB → DFB-Pokal 2025 Display (`boxSlug`), le lien de l'écrin mène à `/boxes#box-<écrin>`. Étape « remise »
+      de Dragon Ball : sa photo pro ouverte. Textes courts d'après les photos (aucune pierre, aucun nom de joueur), 6
+      langues ; admin : les nouveaux écrins apparaissent seuls, aide du champ « Pièce liée ».
+- `tests/carousel.spec.ts` et `tests/trunks.spec.ts` (ordinateur, tablette, iPhone), captures `verification/carousel/` et
+  `verification/trunks/`.
+- [ ] Yoni : la pièce de BRT Coral Case, Trophy Trunk, Photo Case, World Cup Display (et l'Écrin Signature) ; droits des
+      dessins d'anime sur la malle Dragon Ball et le cube The Hand ; la bague grise dans la vitrine Coupe du monde est-elle
+      un prototype ? accord du joueur photographié sur la Photo Case.
+
 ## Passe « retours de Yoni du 22/11 » (Créations, Jesus Pieces, serpent or rose, Butterfly en deux, formulaire photos) — état au 22/11/2026
 - [x] **Créations** : 3 pièces par ligne sur ordinateur (grandes cartes, celles des collections), 2 sur tablette, 1 sur
-      téléphone (`src/pages/Creations.tsx`).
+      téléphone (`src/pages/Creations.tsx`). Depuis le 22/11 (2) : carrousel d'abord, cette grille avec « Voir toutes les
+      créations » (voir « carrousel des Créations et vraies boîtes »).
 - [x] **Jesus Pieces = sous-catégorie des Pendentifs** (`SUBCATEGORIES` de `src/data/collections.ts`, `parent: "pendant"`) :
       onglets « Tous les pendentifs / Jesus Pieces » sur la page des pendentifs, filtre sous « Pendentifs » dans Créations
       (`?category=pendants&sub=jesus-pieces`), adresse directe `/creations/pendants/jesus-pieces` (titre Google déplacé,
@@ -291,7 +333,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       préparés par `npm run trunks` (`scripts/trunk-media.mjs`) : images carrées 720/1080/1440 en AVIF et WebP (15 à 50 Ko),
       vidéo 1080 × 1080 H.264 sans son (~0,8 Mo, la même sur ordinateur et téléphone), chargée seulement quand l'écrin
       approche de l'écran ou au survol. Originaux jamais dans Git. L'écrin Dragon Ball garde ses photos (droits).
-- Depuis le 21/11 (3) : nouvel écrin Sirius, NZ Travel Case retirée (voir plus haut).
+- Depuis le 21/11 (3) : nouvel écrin Sirius, NZ Travel Case retirée (voir plus haut). Depuis le 22/11 (2) : vraies boîtes,
+  nouvelles vidéos, la pièce qui sort, 13 écrins (voir « carrousel des Créations et vraies boîtes »).
 - `tests/trunks.spec.ts` (Signature, Inter, Sirius ; ordinateur et iPhone ; messages en anglais et en français ;
   « réduire les animations » ; vidéos chargées à l'approche), captures dans `verification/trunks/`.
 

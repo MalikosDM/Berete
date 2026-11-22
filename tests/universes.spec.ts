@@ -160,7 +160,7 @@ test("Loïs Openda — Script Pendant: one piece with everything of Bouzou, no d
   await page.goto("/players", { waitUntil: "load" });
   // A click on her portrait leads straight to her piece (21/11/2026).
   await expect(page.locator("[data-player-card='lois-openda'] a[data-player-link]")).toHaveAttribute("href", "/pieces/" + OPENDA);
-  await page.goto("/creations", { waitUntil: "load" });
+  await page.goto("/creations?view=grid", { waitUntil: "load" });
   await expect(page.locator("a[data-piece-card='" + OPENDA + "']")).toHaveCount(1);
   await expect(page.locator("a[data-piece-card='" + BOUZOU + "']")).toHaveCount(0);
   // No "Discover More Creations" of any piece leads to the old address.

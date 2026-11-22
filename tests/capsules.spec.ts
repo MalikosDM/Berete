@@ -33,7 +33,7 @@ for (const slug of ENTERED) {
     const phone = info.project.name !== "desktop";
     const film = FILMS[slug]!.reveal!;
     await skipIntro(page, { films: false });
-    await page.goto("/fr/creations");
+    await page.goto("/fr/creations?view=grid");
     const card = page.locator("a[data-piece-card='" + slug + "']").first();
     await card.scrollIntoViewIfNeeded();
     await card.click();

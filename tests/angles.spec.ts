@@ -146,7 +146,8 @@ for (const slug of PAGES) {
 test("Créations: the four pieces taken off are gone, the counts of the filters follow, the three Jesus pieces stay", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  await page.goto("/fr/creations");
+  // (The grid of every creation: "See all creations".)
+  await page.goto("/fr/creations?view=grid");
   const cards = page.locator("a[data-piece-card]");
   await expect(cards).toHaveCount(PUBLISHED.length);
   const shown = await cards.evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));

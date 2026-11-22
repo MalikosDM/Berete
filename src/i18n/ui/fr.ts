@@ -67,7 +67,7 @@ export const fr: Messages = {
   whatsapp: {
     hello: "Bonjour Berete, j’aimerais vous parler d’une création sur mesure, rien qu’à moi.",
     createBox: "Bonjour Berete, j’ai découvert les Écrins Signature sur votre site et j’aimerais imaginer un écrin rien qu’à moi.",
-    trunk: (name: string) => "Bonjour Berete, j’ai découvert " + (/^Malle\b/.test(name) ? "la " + lowerFirst(name) : /^(Écrin|Étui)\b/.test(name) ? "l’" + lowerFirst(name) : "l’écrin " + name) + " sur votre site et j’aimerais créer mon propre écrin.",
+    trunk: (name: string) => "Bonjour Berete, j’ai découvert " + (/^(Malle|Vitrine)\b/.test(name) ? "la " + lowerFirst(name) : /^Cube\b/.test(name) ? "le " + lowerFirst(name) : /^(Écrin|Étui)\b/.test(name) ? "l’" + lowerFirst(name) : "l’écrin " + name) + " sur votre site et j’aimerais créer mon propre écrin.",
     piece: (name: string) => discovered("la création « " + name + " »"),
     person: (name: string) => discovered("les créations réalisées pour " + named(name)),
     collection: (name: string) => discovered("vos " + lowerFirst(name)),
@@ -193,6 +193,16 @@ export const fr: Messages = {
     filterLabel: "Filtrer les pièces",
     all: "Toutes les créations",
     enterCollection: (collection: string) => "Explorer les " + collection.toLowerCase(),
+    /* Le carrousel des créations (src/components/PieceCarousel.tsx). */
+    carousel: "carrousel",
+    slide: "création",
+    counter: (i: number, total: number) => i + " sur " + total,
+    counterLabel: "Création ",
+    showPiece: (title: string) => "Afficher " + title,
+    previous: "Création précédente",
+    next: "Création suivante",
+    seeAll: "Voir toutes les créations",
+    backToCarousel: "Revenir au carrousel",
   },
 
   piece: {
@@ -332,7 +342,8 @@ export const fr: Messages = {
     closing: "Le prolongement de votre création",
     openTrunk: (name: string) => "Ouvrir : " + name,
     openHint: "Ouvrir",
-    createOwn: "Créer mon écrin",
+    createOwn: "Créer votre écrin",
+    discoverPiece: "Découvrir la pièce",
     replay: "Revoir l’ouverture",
     closeTrunk: "Refermer l’écrin",
   },

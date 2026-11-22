@@ -20,7 +20,7 @@ const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
 test("Créations: every published piece is there, each card with its photo", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  await page.goto("/fr/creations");
+  await page.goto("/fr/creations?view=grid");
   const cards = page.locator("a[data-piece-card]");
   await expect(cards).toHaveCount(PUBLISHED.length);
   const shown = await cards.evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));
@@ -56,7 +56,7 @@ for (const slug of NEW_FILMS) {
   test(slug + ": its film first, then the piece", async ({ page }, info) => {
     const problems = watch(page);
     await skipIntro(page, { films: false });
-    await page.goto("/fr/creations");
+    await page.goto("/fr/creations?view=grid");
     const card = page.locator("a[data-piece-card='" + slug + "']").first();
     await card.scrollIntoViewIfNeeded();
     await card.click();

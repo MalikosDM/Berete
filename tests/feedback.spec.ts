@@ -81,7 +81,8 @@ test("Créations: three larger pieces on a row, a smaller title, one column on a
   const problems = watch(page);
   const phone = info.project.name !== "desktop";
   await skipIntro(page);
-  await page.goto("/fr/creations", { waitUntil: "load" });
+  // (Since 22/11/2026 (2), the carousel first: this grid with "See all creations", tests/carousel.spec.ts.)
+  await page.goto("/fr/creations?view=grid", { waitUntil: "load" });
   const cards = page.locator("a[data-piece-card]");
   await expect(cards).toHaveCount(PUBLISHED.length);
   await page.waitForTimeout(1500);

@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Count from "@/components/Count";
 import { MediaView } from "@/components/Media";
-import PieceCard from "@/components/PieceCard";
+import PieceCarousel from "@/components/PieceCarousel";
 import Reveal from "@/components/Reveal";
 import SplitHeading from "@/components/SplitHeading";
 import { COLLECTIONS, collectionBySlug, collectionOf, collectionPath, isSub, piecesOfCollection, subcategoriesOf, subcategoryByOldSlug, subcategoryBySlug, type AnyCollection } from "@/data/collections";
@@ -38,7 +38,8 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
 /**
  * One collection (every piece of a type) or one of its sub-categories (Pendants > Jesus Pieces): an opening with its name,
- * the tabs of its sub-categories when it has some, then its pieces.
+ * the tabs of its sub-categories when it has some, then its pieces: one by one in a carousel, or all of them in a grid
+ * (src/components/PieceCarousel.tsx).
  */
 function CollectionPage({ collection }: { collection: AnyCollection }) {
   const { t } = useI18n();
@@ -115,15 +116,7 @@ function CollectionPage({ collection }: { collection: AnyCollection }) {
             </Link>
           </div>
         ) : (
-          <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-12 lg:gap-y-24">
-            {pieces.map((p, i) => (
-              <li key={p.slug} className={i % 3 === 1 ? "lg:mt-28" : ""}>
-                <Reveal delay={(i % 3) * 0.12}>
-                  <PieceCard piece={p} />
-                </Reveal>
-              </li>
-            ))}
-          </ul>
+          <PieceCarousel pieces={pieces} label={t.collections.listLabel(words.name)} memory={"collection/" + collection.slug} />
         )}
       </section>
 

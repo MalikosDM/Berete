@@ -64,7 +64,7 @@ export const de: Messages = {
   whatsapp: {
     hello: "Hallo Berete, ich würde gern über eine eigene Kreation nach Maß sprechen.",
     createBox: "Hallo Berete, ich habe die Signature-Etuis auf Ihrer Website entdeckt und möchte mein eigenes Etui in Auftrag geben.",
-    trunk: (name: string) => "Hallo Berete, ich habe " + (/Koffer$/.test(name) ? "den " + name : /^(Etui|Reiseetui)\b/.test(name) ? "das " + name : "das Etui „" + name + "“") + " auf Ihrer Website entdeckt und möchte mein eigenes Etui gestalten lassen.",
+    trunk: (name: string) => "Hallo Berete, ich habe " + (/(koffer|würfel)$/i.test(name) ? "den " + name : /vitrine$/i.test(name) ? "die " + name : /^(Etui|Reiseetui)\b/.test(name) ? "das " + name : "das Etui „" + name + "“") + " auf Ihrer Website entdeckt und möchte mein eigenes Etui gestalten lassen.",
     piece: (name: string) => discovered("die Kreation „" + name + "“"),
     person: (name: string) => discovered("die Kreationen für " + named(name, "acc")),
     collection: (name: string) => discovered("Ihre " + name),
@@ -191,6 +191,16 @@ export const de: Messages = {
     all: "Alle Kreationen",
     // German nouns keep their capital letter, and every collection is a plural: "Die Anhänger entdecken".
     enterCollection: (collection: string) => "Die " + collection + " entdecken",
+    /* Das Karussell der Kreationen (src/components/PieceCarousel.tsx). */
+    carousel: "Karussell",
+    slide: "Kreation",
+    counter: (i: number, total: number) => i + " von " + total,
+    counterLabel: "Kreation ",
+    showPiece: (title: string) => title + " anzeigen",
+    previous: "Vorherige Kreation",
+    next: "Nächste Kreation",
+    seeAll: "Alle Kreationen ansehen",
+    backToCarousel: "Zurück zum Karussell",
   },
 
   piece: {
@@ -332,7 +342,8 @@ export const de: Messages = {
     closing: "Die Vollendung Ihrer Kreation",
     openTrunk: (name: string) => "Öffnen: " + name,
     openHint: "Öffnen",
-    createOwn: "Mein eigenes Etui gestalten",
+    createOwn: "Ihr eigenes Etui gestalten",
+    discoverPiece: "Das Schmuckstück entdecken",
     replay: "Öffnung noch einmal ansehen",
     closeTrunk: "Etui schließen",
   },

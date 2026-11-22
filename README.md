@@ -147,13 +147,20 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   vont à la fin de « Every Angle » (`AMATEUR_FILMS`). Les thèmes (`THEMES` de `src/data/collections.ts`, Jesus Pieces)
   regroupent des pièces de types différents à `/creations/<slug>`, dans le menu sous les collections. Un fond d'univers peut
   être une séquence d'images en fondu (`sequence`, `SEQUENCES` de `scripts/universe-media.mjs` : la nuit de Lasana Keita).
-  Les Signature Trunks s'ouvrent au clic (`src/components/TrunkReveal.tsx`) : image fermée, vidéo d'ouverture, image
-  ouverte et bouton WhatsApp pour créer le sien ; fichiers préparés par `npm run trunks` (`scripts/trunk-media.mjs`,
-  `src/data/trunks.generated.json`, position de la lumière de chaque écrin dans `src/data/trunks.ts`) ; un seul écrin :
-  `npm run trunks -- --only=sirius` (ses images remplacent aussi ses photos, `PHOTOS` du script). Un écrin retiré passe en
-  « non publié » (case de l'admin, `REMOVED_BOXES`) ; toute adresse `/boxes/<écrin>` mène à /boxes.
-  La page Créations est une grille serrée (`PieceCard compact` :
-  6 pièces par rangée dès 1280 px, puis 4, 3 et 2 colonnes, titre réduit par `PageIntro compact`).
+  Les Signature Trunks s'ouvrent au clic (`src/components/TrunkReveal.tsx`) : boîte fermée, puis la vidéo d'ouverture
+  (5 écrins, `Ecrins IA (ouverture) v2/<dossier>/` : closed.jpg, open.jpg, ouverture.mp4) ou le passage d'une vraie photo
+  fermée à une vraie photo ouverte dans une lumière (`Boites (photos pro)/<dossier>/` : 01 et 03, ou des images des films
+  de livraison pour les écrins d'avant) ; puis la pièce détourée (`public/media/cutouts/<pièce>`) monte et flotte au-dessus,
+  et deux boutons : « Créer votre écrin » (WhatsApp) et « Découvrir la pièce » (si `pieceSlug` est rempli dans
+  `BOXES` de `src/data/pieces.ts` ou dans l'admin ; vide = seulement le premier bouton). Fichiers préparés par
+  `npm run trunks` (`scripts/trunk-media.mjs` : liste `BOXES` du script, carrés 720/1080/1440, photos pro `photo-NN`,
+  `src/data/trunks.generated.json`) ; lumière et place de la pièce de chaque écrin dans `PLACES` de `src/data/trunks.ts` ;
+  un seul écrin : `npm run trunks -- --only=the-hand-cube`. Un écrin retiré passe en « non publié » (case de l'admin,
+  `REMOVED_BOXES`) ; toute adresse `/boxes/<écrin>` mène à /boxes ; `/boxes#box-<écrin>` (lien de la page d'une pièce)
+  l'amène à l'écran.
+  Les Créations (toutes, chaque collection, chaque sous-catégorie) s'affichent une par une en carrousel
+  (`src/components/PieceCarousel.tsx` : défilement natif aimanté, flèches, clavier, molette horizontale, compteur), et
+  « Voir toutes les créations » ouvre la grille de cartes égales (`?view=grid` : 3, 2, 1 par rangée).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
 - **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces (dont
@@ -282,8 +289,10 @@ npm run verify:3d       # visualiseur 3D avec le GPU : verification/3d/rapport.m
                         # (aucun ancien intitulé en anglais et en français), Enter the World, La Maison, l'univers de
                         # chaque pièce (contraste AA des textes, immobile si « réduire les animations »), le film
                         # horizontal de l'atelier, l'admin (non publiées, univers, photo de La Maison)
-                        # tests/trunks.spec.ts : les écrins qui s'ouvrent (vidéo, image ouverte sans saut, bouton,
-                        # message WhatsApp en 2 langues, « réduire les animations »)
+                        # tests/trunks.spec.ts : les 13 écrins qui s'ouvrent (vidéo sans saut ou photos dans une lumière,
+                        # la pièce détourée qui sort, « Créer votre écrin » et « Découvrir la pièce », pages des pièces)
+                        # tests/carousel.spec.ts : le carrousel des Créations (flèches, glissement, clavier, compteur,
+                        # retour), la grille de cartes égales (ordinateur, tablette, iPhone), 6 langues, aucun saut
                         # tests/angles.spec.ts : retours de Yoni du 21/11 (« Sous tous les angles » : un texte par photo
                         # en 6 langues, damier, iPhone, lisibilité ; 4 pièces retirées, filtres des Créations, admin)
                         # tests/yoni2111.spec.ts : Dragon Ball en grand et son film, le Cercle (clic = la pièce),

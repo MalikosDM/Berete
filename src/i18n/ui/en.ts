@@ -63,7 +63,7 @@ export const en = {
     hello: "Hello Berete, I would like to discuss a bespoke creation of my own.",
     createBox: "Hello Berete, I discovered the Signature Trunks on your website and would like to commission a trunk of my own.",
     /** From a trunk that opened: its name, as shown. */
-    trunk: (name: string) => "Hello Berete, I discovered the " + (/\b(trunk|case)$/i.test(name) ? name : name + " trunk") + " on your website and would like to create my own.",
+    trunk: (name: string) => "Hello Berete, I discovered " + (/^the\s/i.test(name) ? name : "the " + (/\b(trunk|case|cube|display)$/i.test(name) ? name : name + " trunk")) + " on your website and would like to create my own.",
     piece: (name: string) => discovered((/^the\s/i.test(name) ? "" : "the ") + name),
     person: (name: string) => discovered("the creations made for " + name),
     collection: (name: string) => discovered("your " + name),
@@ -193,6 +193,16 @@ export const en = {
     filterLabel: "Filter the creations",
     all: "All Creations",
     enterCollection: (collection: string) => "Discover the " + collection.toLowerCase(),
+    /* The carousel of the creations (src/components/PieceCarousel.tsx). */
+    carousel: "carousel",
+    slide: "creation",
+    counter: (i: number, total: number) => i + " of " + total,
+    counterLabel: "Creation ",
+    showPiece: (title: string) => "Show " + title,
+    previous: "Previous creation",
+    next: "Next creation",
+    seeAll: "See all creations",
+    backToCarousel: "Back to the carousel",
   },
 
   piece: {
@@ -341,7 +351,8 @@ export const en = {
     /* The trunks that open (src/components/TrunkReveal.tsx). */
     openTrunk: (name: string) => "Open " + name,
     openHint: "Open",
-    createOwn: "Create my own trunk",
+    createOwn: "Create your own trunk",
+    discoverPiece: "Discover the piece",
     replay: "Watch the opening again",
     closeTrunk: "Close the trunk",
   },

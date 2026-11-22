@@ -152,6 +152,14 @@ function piece(p: PieceInput): Piece {
 }
 
 const at = (alt: string, caption?: string): Partial<MediaItem> => (caption ? { alt, caption } : { alt });
+
+/**
+ * The professional photos of a box (00 Contexte Yoni/Boites (photos pro), scripts/trunk-media.mjs), in their order, each
+ * with its texts (what the photo shows).
+ */
+const proImages = (slug: string, texts: Partial<MediaItem>[]): MediaItem[] =>
+  trunkPhotos(slug).map((p, i) => ({ type: "image", src: p.src, width: p.width, height: p.height, onBlack: false, ...texts[i] }));
+
 /* ---------- Photos of the site folders ---------- */
 
 /** The VfB Stuttgart ring: the photos of the club (the press page of Bild) and the high-resolution photos of Yoni. */
@@ -279,6 +287,7 @@ const SITE_PIECES: Piece[] = [
     ],
     seen: "Rose and white gold tones · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
     featured: true,
+    boxSlug: "dfb-pokal-2025-display",
     making: { raw: raw(VFB, "08-v05-6s"), setting: yoni(VFB, "08-v05-19s", SET()), polishing: yoni(VFB, "08-v05-4_6s", POLISH()), delivery: vfb.presentation },
   }),
   piece({
@@ -389,7 +398,8 @@ const SITE_PIECES: Piece[] = [
       raw: yoni("kevin-schade-dragon-ball-pendant", "p21", { ...RAW(), onBlack: false }),
       setting: yoni("kevin-schade-dragon-ball-pendant", "v01-17_5s", SET()),
       polishing: yoni("kevin-schade-dragon-ball-pendant", "v01-10s", POLISH()),
-      delivery: yoni("boxes/dragon-ball-trunk", "p01", at("The orange trunk open on the Dragon Ball pendant")),
+      // Its trunk open on it, in its professional photo (22/11/2026).
+      delivery: proImages("dragon-ball-trunk", [{}, {}, at("The orange trunk open on the Dragon Ball pendant")])[2] ?? yoni("boxes/dragon-ball-trunk", "p01", at("The orange trunk open on the Dragon Ball pendant")),
     },
   }),
   piece({
@@ -919,6 +929,7 @@ const SITE_PIECES: Piece[] = [
       ["Signature", "BRT mark engraved"],
     ],
     seen: "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone",
+    boxSlug: "the-hand-cube",
     making: { delivery: yoni("the-hand", "v01-13_6s", IN_BOX()) },
   }),
   piece({
@@ -1526,14 +1537,10 @@ export const PIECES: Piece[] = [...SITE_PIECES, ...COLLECTED];
 
 /* ---------- Boxes ---------- */
 
-/** The trunk shown first on the page Signature Trunks, with all its photos. */
+/** The trunk shown first on the page Signature Trunks. */
 export const FEATURED_BOX = "signature-trunk";
 
 const T = (file: string, texts: Partial<MediaItem>) => yoni("boxes/signature-trunk", file, { ...texts, onBlack: false });
-
-/** The images of a trunk that opens (closed, open) as its photos, with their texts (src/data/trunks.ts). */
-const trunkImages = (slug: string, texts: Partial<MediaItem>[]): MediaItem[] =>
-  trunkPhotos(slug).map((p, i) => ({ type: "image", src: p.src, width: p.width, height: p.height, onBlack: false, ...texts[i] }));
 
 /**
  * The boxes Yoni asked to remove (21/11/2026): kept unpublished in the admin (he can publish them again), shown nowhere;
@@ -1541,6 +1548,11 @@ const trunkImages = (slug: string, texts: Partial<MediaItem>[]): MediaItem[] =>
  */
 export const REMOVED_BOXES = ["nz-travel-case"];
 
+/**
+ * The Signature Trunks, in the order of their page (Yoni, 22/11/2026): each opens (src/data/trunks.ts), then its piece
+ * rises from it. `pieceSlug`: the address of its piece; null while it is not known (only "Create your trunk" then, and no
+ * piece rising): fill it here or in the admin ("Pièce liée") once Yoni says which piece it holds.
+ */
 export const BOXES: Box[] = ([
   {
     // The player whose portrait it carries is not named (not confirmed).
@@ -1549,15 +1561,14 @@ export const BOXES: Box[] = ([
     description:
       "A black trunk behind a lattice of metal, a portrait engraved on its doors. Inside, a screen plays a film, and the BRT mark rests on the velvet: the presentation becomes part of the creation.",
     images: list(
-      T("p01", at("The Signature Trunk closed, a portrait engraved on its doors", "Closed")),
-      T("p02", at("The Signature Trunk from the side")),
-      T("p03", at("The version with a player engraved full length", "Full length")),
-      T("p04", at("The full-length version, from the front")),
+      ...proImages(FEATURED_BOX, [
+        at("The Signature Trunk closed, a portrait engraved on its doors", "Closed"),
+        at("The version with a player engraved full length", "Full length"),
+        at("The trunk open on its screen", "Inside"),
+        at("The trunk open, the portrait on its door"),
+      ]),
       T("p05", at("The engraved figure, up close")),
-      T("p06", at("The trunk open on its screen", "Inside")),
-      T("p08", at("A film playing on the screen inside the trunk")),
       T("p09", at("The screen inside the trunk, from the front")),
-      T("p10", at("The trunk opening")),
       T("p07", at("The BRT mark on the velvet", "The BRT mark")),
     ),
     pieceSlug: null,
@@ -1566,34 +1577,127 @@ export const BOXES: Box[] = ([
     slug: "sirius",
     name: "Sirius",
     description: "A trunk made to measure for the Sirius chain, lined in red to hold the piece like a trophy.",
-    // Its images by Yoni (21/11/2026), the black trunk with the horned mask, closed then open on its red suede: they
-    // replace its photos here (scripts/trunk-media.mjs). Its real photos stay on the page of the chain.
-    images: trunkImages("sirius", [at("The Sirius trunk, closed"), at("The Sirius trunk, opened on its red lining", "Opened")]),
+    images: proImages("sirius", [
+      at("The Sirius trunk, closed"),
+      at("The horned mask on the trunk, beside its display"),
+      at("The Sirius trunk, opened on its red lining", "Opened"),
+      at("The chain on its display, beside the open trunk"),
+    ]),
     pieceSlug: "sirius",
   },
   {
     slug: "tulips-on-tour",
     name: "Tulips on Tour",
     description: "A custom case with its own artwork, made for one piece and one story.",
-    images: list(
-      yoni("boxes/tulips-on-tour", "p02", { ...at("The Tulips on Tour custom case"), onBlack: false }),
-      yoni("boxes/tulips-on-tour", "p01", { ...at("The case from the side"), onBlack: false }),
-      yoni("boxes/tulips-on-tour", "p03", { ...at("The case open on the medallion", "Opened"), onBlack: false }),
-      yoni("boxes/tulips-on-tour", "p04", { ...at("The medallion resting in the case"), onBlack: false }),
-    ),
+    images: proImages("tulips-on-tour", [
+      at("The Tulips on Tour custom case"),
+      at("The back of the case, with the BRT mark"),
+      at("The case open", "Opened"),
+      at("The medallion on its display, beside the case"),
+    ]),
     pieceSlug: "tulips-on-tour-medallion",
   },
   {
     slug: "dragon-ball-trunk",
     name: "Dragon Ball Trunk",
     description: "A bright orange trunk with the anime artwork on its front, made to hold the Dragon Ball pendant.",
-    images: list(
-      yoni("boxes/dragon-ball-trunk", "p04", { ...at("The orange Dragon Ball trunk with its artwork"), onBlack: false }),
-      yoni("boxes/dragon-ball-trunk", "p01", { ...at("The orange trunk open on the Dragon Ball pendant", "Opened"), onBlack: false }),
-      yoni("boxes/dragon-ball-trunk", "p02", { ...at("The trunk open, from another angle"), onBlack: false }),
-      yoni("boxes/dragon-ball-trunk", "p05", { ...at("The artwork on the front of the trunk"), onBlack: false }),
-    ),
+    images: proImages("dragon-ball-trunk", [
+      at("The orange Dragon Ball trunk with its artwork"),
+      at("The back of the trunk"),
+      at("The orange trunk open on the Dragon Ball pendant", "Opened"),
+      at("The trunk open, from another angle"),
+    ]),
     pieceSlug: "kevin-schade-dragon-ball-pendant",
+  },
+  {
+    // The drawing on its front is not named (rights, as Dragon Ball).
+    slug: "the-hand-cube",
+    name: "The Hand Cube",
+    description: "A black cube with a drawing in rose gold on its front. It opens on the pendant, lit from inside, and folds into a display.",
+    images: proImages("the-hand-cube", [
+      at("The cube closed, its drawing in rose gold"),
+      at("The cube from the side"),
+      at("The cube open on The Hand, lit from inside", "Opened"),
+      at("The cube folded into a display"),
+    ]),
+    pieceSlug: "the-hand",
+  },
+  {
+    // The name and the number on its side are not written (a player of the squad).
+    slug: "dfb-pokal-2025-display",
+    name: "DFB-Pokal 2025 Display",
+    description: "A glass display on a golden base: the crest of VfB Stuttgart and its stadium drawn in gold, DFB-Pokal Sieger 2025 on its front.",
+    images: proImages("dfb-pokal-2025-display", [
+      at("The display from the front"),
+      at("The display from the side"),
+      at("The display open, its lit cushion", "Opened"),
+      at("Its back, VfB Stuttgart DFB-Pokal Sieger 2025"),
+    ]),
+    pieceSlug: VFB,
+  },
+  {
+    // Its piece is not known yet; the names on the four displays are not written.
+    slug: "world-cup-display",
+    name: "World Cup Display",
+    description: "A glass display on a blue and gold base: a golden fleur-de-lis on its front, a coat of arms on its side, and the engraving 12.06.2026 First World Cup Game.",
+    images: proImages("world-cup-display", [
+      at("The display from the front, its engraving"),
+      at("The display from the side"),
+      at("Its side with the coat of arms"),
+      at("The display open", "Opened"),
+      at("Four displays side by side"),
+    ]),
+    pieceSlug: null,
+  },
+  {
+    // Its piece is not known yet; the player on its photograph is not named.
+    slug: "photo-case",
+    name: "Photo Case",
+    description: "A grey trunk in crocodile-textured leather, a photograph on its front and the BRT mark on its back. Inside, black suede and a tray with a round place.",
+    images: proImages("photo-case", [
+      at("The trunk and its photograph"),
+      at("Its other side, with the BRT mark"),
+      at("The trunk open, beside its tray", "Opened"),
+    ]),
+    pieceSlug: null,
+  },
+  {
+    // Its piece is not known yet.
+    slug: "brt-coral-case",
+    name: "BRT Coral Case",
+    description: "A black trunk with the BRT mark. Inside, coral suede and a round tray.",
+    images: proImages("brt-coral-case", [
+      at("The trunk closed, with the BRT mark"),
+      at("The trunk from the side"),
+      at("The trunk open on its coral suede", "Opened"),
+      at("The trunk open, beside its round tray"),
+    ]),
+    pieceSlug: null,
+  },
+  {
+    // Its piece is not known yet.
+    slug: "trophy-trunk",
+    name: "Trophy Trunk",
+    description: "A black trunk with a photograph on its front: a crowd in red smoke, a trophy held high. Inside, black suede and the BRT mark.",
+    images: proImages("trophy-trunk", [
+      at("The trunk and its photograph"),
+      at("Its other side, with the BRT mark"),
+      at("The trunk open on its black suede", "Opened"),
+      at("The trunk open, from above"),
+    ]),
+    pieceSlug: null,
+  },
+  {
+    slug: "campione-d-italia-case",
+    name: "Campione d'Italia Case",
+    description: "A black case marked Campione d'Italia 2023/2024, with a place for the ring and its card.",
+    images: list(
+      inter.caseOpen,
+      inter.case,
+      still("boxes/campione-d-italia-case/01", at("The Campione d'Italia case, open, with the ring and its card")),
+      still("boxes/campione-d-italia-case/02", at("The ring in its case", "The ring in place")),
+    ),
+    pieceSlug: INTER,
   },
   {
     slug: "butterfly-trunk",
@@ -1608,18 +1712,6 @@ export const BOXES: Box[] = ([
     description: "A trunk with a photograph set in its lid; inside, the tennis chains lie in their own fitted places.",
     images: list(still("boxes/okafor-trunk/01", at("The trunk with a photograph in its lid")), still("boxes/okafor-trunk/02", at("The tennis chains in the trunk", "Inside"))),
     pieceSlug: "noah-okafor-octagon-pendant",
-  },
-  {
-    slug: "campione-d-italia-case",
-    name: "Campione d'Italia Case",
-    description: "A black case marked Campione d'Italia 2023/2024, with a place for the ring and its card.",
-    images: list(
-      inter.caseOpen,
-      inter.case,
-      still("boxes/campione-d-italia-case/01", at("The Campione d'Italia case, open, with the ring and its card")),
-      still("boxes/campione-d-italia-case/02", at("The ring in its case", "The ring in place")),
-    ),
-    pieceSlug: INTER,
   },
   {
     slug: "nz-travel-case",

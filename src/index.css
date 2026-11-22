@@ -2937,8 +2937,47 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
 }
 
-/* The Signature Trunks that open (src/components/TrunkReveal.tsx): the golden light of the open trunk, a little brighter
-   (a halo that breathes, a few sparks rising), never over the film; the button to create one's own, in that light. */
+/* The Signature Trunks that open (src/components/TrunkReveal.tsx): the closed image, then the open one (over the last frame
+   of the film, or in a light coming out of a box that opens from its photos); the light of the open box (a halo that
+   breathes, a few sparks rising); its piece rising from it and floating above it; its two ways on. */
+.trunk-image {
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+.trunk-image[data-shown] {
+  opacity: 1;
+}
+[data-trunk-image="open"] {
+  transition-duration: 0.5s;
+}
+[data-trunk-kind="photos"] .trunk-image {
+  transition:
+    opacity 0.9s ease,
+    transform 1.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+[data-trunk-kind="photos"][data-trunk-state="opening"] [data-trunk-image="closed"] {
+  transform: scale(1.06);
+}
+[data-trunk-kind="photos"] [data-trunk-image="open"] {
+  transform: scale(1.05);
+}
+[data-trunk-kind="photos"] [data-trunk-image="open"][data-shown] {
+  transform: none;
+  transition-delay: 0.5s;
+}
+.trunk-burst {
+  position: absolute;
+  left: calc(var(--lx) * 100%);
+  top: calc(var(--ly) * 100%);
+  width: 150%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgb(255 238 206 / 0.95) 0%, rgb(255 212 164 / 0.55) 13%, rgb(232 180 160 / 0.18) 32%, transparent 58%);
+  animation: trunk-burst 1.7s ease-out both;
+}
 .trunk-glow {
   position: absolute;
   left: calc(var(--lx) * 100%);
@@ -2972,21 +3011,99 @@ html[lang="ar"] [data-piece] [data-u-title] {
   opacity: 1;
   transition-delay: 2.4s;
 }
+[data-trunk-kind="photos"][data-trunk-state="opening"] .trunk-glow {
+  transition-delay: 0.7s;
+}
 [data-trunk-state="open"] .trunk-glow {
   opacity: 1;
 }
-.trunk-create {
-  left: calc(var(--lx) * 100%);
-  top: calc(var(--ly) * 100%);
+.trunk-jewel {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: calc(var(--fx) * 100%) calc(var(--fy) * 100%);
+  animation: trunk-jewel-rise 1.8s cubic-bezier(0.16, 0.8, 0.24, 1) 0.15s both;
+}
+.trunk-jewel img {
+  position: absolute;
+  left: calc(var(--fx) * 100%);
+  top: calc(var(--fy) * 100%);
+  width: calc(var(--fs) * 100%);
+  height: calc(var(--fs) * 100%);
   translate: -50% -50%;
-  animation: trunk-create-in 0.9s ease-out 0.35s both;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgb(255 222 184 / 0.5)) drop-shadow(0 14px 26px rgb(0 0 0 / 0.75));
+  animation: trunk-jewel-float 5s ease-in-out 2s infinite;
+}
+.trunk-jewel-glow {
+  position: absolute;
+  left: calc(var(--fx) * 100%);
+  top: calc(var(--fy) * 100%);
+  width: calc(var(--fs) * 200%);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgb(255 214 170 / 0.32) 0%, rgb(232 180 160 / 0.12) 30%, transparent 52%),
+    radial-gradient(circle, rgb(5 4 3 / 0.72) 0%, rgb(5 4 3 / 0.45) 34%, transparent 64%);
+  animation: trunk-pulse 3.4s ease-in-out 1.8s infinite;
 }
 .trunk-links {
   animation: trunk-links-in 0.8s ease-out 0.6s both;
 }
+.trunk-actions-in {
+  animation: trunk-actions-in 0.7s ease-out 0.8s both;
+}
 @keyframes trunk-links-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes trunk-actions-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes trunk-burst {
+  0% {
+    transform: scale(0.05);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  60% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+@keyframes trunk-jewel-rise {
+  from {
+    opacity: 0;
+    translate: calc((var(--lx) - var(--fx)) * 100%) calc((var(--ly) - var(--fy)) * 100%);
+    scale: 0.3;
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+@keyframes trunk-jewel-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3%);
   }
 }
 @keyframes trunk-pulse {
@@ -3013,23 +3130,97 @@ html[lang="ar"] [data-piece] [data-u-title] {
     opacity: 0;
   }
 }
-@keyframes trunk-create-in {
-  from {
-    opacity: 0;
-    translate: -50% -38%;
-  }
-  to {
-    opacity: 1;
-    translate: -50% -50%;
-  }
-}
 @media (prefers-reduced-motion: reduce) {
   .trunk-glow::before,
+  .trunk-jewel,
+  .trunk-jewel img,
+  .trunk-jewel-glow,
   .trunk-links,
-  .trunk-create {
+  .trunk-actions-in,
+  .trunk-burst {
     animation: none;
+  }
+  .trunk-image {
+    transition: none;
   }
   .trunk-glow i {
     display: none;
   }
 }
+
+/* The carousel of the creations (src/components/PieceCarousel.tsx): the creation in the middle large, those at its sides
+   smaller, blurred and dimmed, drawn towards it; the row slides under the finger, snapping one creation at a time. */
+.piece-carousel {
+  --pc-w: min(78vw, 46svh, 400px);
+  --pc-gap: 0.75rem;
+}
+@media (min-width: 768px) {
+  .piece-carousel {
+    --pc-w: min(44vw, 48svh, 540px);
+    --pc-gap: 1.5rem;
+  }
+}
+.pc-track {
+  display: flex;
+  gap: var(--pc-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-block: 0.5rem;
+}
+.pc-spacer {
+  flex: 0 0 calc(50% - var(--pc-w) / 2 - var(--pc-gap));
+}
+.pc-slide {
+  flex: 0 0 var(--pc-w);
+  /* Never wider than its frame because of a long line (WebKit). */
+  min-width: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+.pc-card {
+  transition:
+    transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 0.55s ease;
+}
+.pc-photo {
+  transition: filter 0.55s ease;
+}
+.pc-text {
+  transition: opacity 0.4s ease;
+}
+.pc-slide[data-side] .pc-card {
+  transform: scale(0.8);
+  opacity: 0.55;
+}
+.pc-slide[data-side] .pc-photo {
+  filter: blur(4px);
+}
+.pc-slide[data-side] .pc-text {
+  opacity: 0;
+}
+.pc-slide[data-side="before"] .pc-card {
+  transform-origin: right center;
+}
+.pc-slide[data-side="after"] .pc-card {
+  transform-origin: left center;
+}
+[dir="rtl"] .pc-slide[data-side="before"] .pc-card {
+  transform-origin: left center;
+}
+[dir="rtl"] .pc-slide[data-side="after"] .pc-card {
+  transform-origin: right center;
+}
+.pc-slide[data-far] .pc-card {
+  opacity: 0.25;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pc-card,
+  .pc-photo,
+  .pc-text {
+    transition: none;
+  }
+}
+

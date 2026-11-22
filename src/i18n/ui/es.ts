@@ -56,7 +56,7 @@ export const es: Messages = {
   whatsapp: {
     hello: "Hola, Berete: me gustaría hablar de una creación a medida, solo para mí.",
     createBox: "Hola, Berete: he descubierto los Estuches Signature en su web y me gustaría encargar un estuche solo para mí.",
-    trunk: (name: string) => "Hola, Berete: he descubierto " + (/^(Baúl|Estuche)\b/.test(name) ? "el " + name.charAt(0).toLocaleLowerCase("es") + name.slice(1) : "el estuche " + name) + " en su web y me gustaría crear mi propio estuche.",
+    trunk: (name: string) => "Hola, Berete: he descubierto " + (/^(Baúl|Estuche|Cubo)\b/.test(name) ? "el " + name.charAt(0).toLocaleLowerCase("es") + name.slice(1) : /^Vitrina\b/.test(name) ? "la " + name.charAt(0).toLocaleLowerCase("es") + name.slice(1) : "el estuche " + name) + " en su web y me gustaría crear mi propio estuche.",
     piece: (name: string) => discovered("la creación “" + name + "”"),
     person: (name: string) => discovered("las creaciones realizadas para " + name),
     collection: (name: string) => discovered("sus " + lowerFirst(name)),
@@ -182,6 +182,16 @@ export const es: Messages = {
     filterLabel: "Filtrar las creaciones",
     all: "Todas las creaciones",
     enterCollection: (collection: string) => "Descubrir " + (FEMININE.has(collection.toLowerCase()) ? "las " : "los ") + collection.toLowerCase(),
+    /* El carrusel de las creaciones (src/components/PieceCarousel.tsx). */
+    carousel: "carrusel",
+    slide: "creación",
+    counter: (i: number, total: number) => i + " de " + total,
+    counterLabel: "Creación ",
+    showPiece: (title: string) => "Mostrar " + title,
+    previous: "Creación anterior",
+    next: "Creación siguiente",
+    seeAll: "Ver todas las creaciones",
+    backToCarousel: "Volver al carrusel",
   },
 
   piece: {
@@ -321,7 +331,8 @@ export const es: Messages = {
     closing: "La prolongación de su creación",
     openTrunk: (name: string) => "Abrir: " + name,
     openHint: "Abrir",
-    createOwn: "Crear mi estuche",
+    createOwn: "Crear su propio estuche",
+    discoverPiece: "Descubrir la pieza",
     replay: "Ver de nuevo la apertura",
     closeTrunk: "Cerrar el estuche",
   },

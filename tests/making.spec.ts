@@ -188,7 +188,8 @@ test("Jesus Pieces: from the menu, every Jesus piece of the house", async ({ pag
   }
   await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
-  const cards = await page.locator("main a[data-piece-card]").evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("data-piece-card")))]);
+  // (Its carousel, since 22/11/2026.)
+  const cards = await page.locator("main [data-carousel-piece]").evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("data-carousel-piece")))]);
   expect(cards).toEqual(pieces.map((p) => p.slug));
   await shot(page, info.project.name + "-jesus-pieces");
   expect(problems.errors).toEqual([]);

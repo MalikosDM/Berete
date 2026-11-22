@@ -49,7 +49,7 @@ export const ar: Messages = {
   whatsapp: {
     hello: "مرحباً Berete، أودّ مناقشة إبداع خاص بي حسب الطلب.",
     createBox: "مرحباً Berete، اكتشفتُ صناديق Signature على موقعكم وأودّ طلب صندوق خاص بي.",
-    trunk: (name: string) => "مرحباً Berete، اكتشفتُ " + (/^(صندوق|علبة|حقيبة)/.test(name) ? name : "صندوق «" + name + "»") + " على موقعكم وأودّ تصميم صندوقي الخاص.",
+    trunk: (name: string) => "مرحباً Berete، اكتشفتُ " + (/^(صندوق|علبة|حقيبة|مكعب|واجهة)/.test(name) ? name : "صندوق «" + name + "»") + " على موقعكم وأودّ تصميم صندوقي الخاص.",
     piece: (name: string) => discovered("قطعة «" + name + "»"),
     person: (name: string) => discovered("الإبداعات المصمَّمة لـ " + name),
     collection: (name: string) => discovered("مجموعة " + name),
@@ -175,6 +175,16 @@ export const ar: Messages = {
     filterLabel: "تصفية الإبداعات",
     all: "جميع الإبداعات",
     enterCollection: (collection: string) => "اكتشفوا " + collection,
+    /* العرض الدوّار للإبداعات (src/components/PieceCarousel.tsx). */
+    carousel: "عرض دوّار",
+    slide: "إبداع",
+    counter: (i: number, total: number) => i + " من " + total,
+    counterLabel: "الإبداع ",
+    showPiece: (title: string) => "عرض " + title,
+    previous: "الإبداع السابق",
+    next: "الإبداع التالي",
+    seeAll: "عرض كل الإبداعات",
+    backToCarousel: "العودة إلى العرض الدوّار",
   },
 
   piece: {
@@ -314,7 +324,8 @@ export const ar: Messages = {
     closing: "امتدادٌ لإبداعكم",
     openTrunk: (name: string) => "فتح: " + name,
     openHint: "افتح",
-    createOwn: "صمّم صندوقي الخاص",
+    createOwn: "صمّم صندوقك الخاص",
+    discoverPiece: "اكتشف القطعة",
     replay: "إعادة مشاهدة الفتح",
     closeTrunk: "إغلاق الصندوق",
   },

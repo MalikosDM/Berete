@@ -149,7 +149,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "slug", label: "Adresse web (ex. ecrin-inter)", type: "text" },
       { key: "description", label: "Texte", type: "textarea" },
       { key: "images", label: "Photos", type: "medialist" },
-      { key: "pieceSlug", label: "Pièce liée (adresse web)", type: "text" },
+      { key: "pieceSlug", label: "Pièce liée (adresse web de la pièce, ex. the-hand : elle sort de l'écrin ouvert et « Découvrir la pièce » y mène ; vide = pièce pas encore connue, seulement « Créer votre écrin »)", type: "text" },
       { key: "published", label: "Publié sur le site (décoché : l'écrin n'apparaît nulle part sur le site)", type: "checkbox" },
       { key: "translations", label: TRANSLATIONS_LABEL, type: "translations", fields: [["name", "Nom", false], ["description", "Texte", true]] },
     ],

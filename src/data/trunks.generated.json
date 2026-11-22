@@ -7,9 +7,35 @@
     1080,
     1440
    ],
+   "size": 1440,
    "video": "/media/trunks/signature-trunk/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "duration": 6.04,
+   "photos": [
+    {
+     "src": "/media/trunks/signature-trunk/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-fermee-portrait"
+    },
+    {
+     "src": "/media/trunks/signature-trunk/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-fermee-en-pied"
+    },
+    {
+     "src": "/media/trunks/signature-trunk/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/signature-trunk/photo-04.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "04-ouverte-porte-portrait"
+    }
+   ]
   },
   "sirius": {
    "base": "/media/trunks/sirius",
@@ -18,19 +44,33 @@
     1080,
     1440
    ],
+   "size": 1440,
    "video": "/media/trunks/sirius/opening.mp4",
-   "size": 1080,
    "duration": 6.04,
    "photos": [
     {
-     "src": "/media/trunks/sirius/photo-closed.webp",
+     "src": "/media/trunks/sirius/photo-01.webp",
      "width": 1600,
-     "height": 1600
+     "height": 1036,
+     "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/sirius/photo-open.webp",
+     "src": "/media/trunks/sirius/photo-02.webp",
      "width": 1600,
-     "height": 1600
+     "height": 1067,
+     "file": "02-fermee-masque-et-presentoir"
+    },
+    {
+     "src": "/media/trunks/sirius/photo-03.webp",
+     "width": 1600,
+     "height": 1226,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/sirius/photo-04.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "04-ouverte-et-presentoir"
     }
    ]
   },
@@ -41,31 +81,284 @@
     1080,
     1440
    ],
+   "size": 1440,
    "video": "/media/trunks/tulips-on-tour/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "duration": 6.04,
+   "photos": [
+    {
+     "src": "/media/trunks/tulips-on-tour/photo-01.webp",
+     "width": 1600,
+     "height": 1079,
+     "file": "01-fermee"
+    },
+    {
+     "src": "/media/trunks/tulips-on-tour/photo-02.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "02-fermee-dos"
+    },
+    {
+     "src": "/media/trunks/tulips-on-tour/photo-03.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/tulips-on-tour/photo-04.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "04-presentoir-et-malle"
+    }
+   ]
   },
-  "butterfly-trunk": {
-   "base": "/media/trunks/butterfly-trunk",
+  "dragon-ball-trunk": {
+   "base": "/media/trunks/dragon-ball-trunk",
    "widths": [
     720,
     1080,
     1440
    ],
-   "video": "/media/trunks/butterfly-trunk/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "size": 1440,
+   "photos": [
+    {
+     "src": "/media/trunks/dragon-ball-trunk/photo-01.webp",
+     "width": 1126,
+     "height": 1600,
+     "file": "01-fermee"
+    },
+    {
+     "src": "/media/trunks/dragon-ball-trunk/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-fermee-dos"
+    },
+    {
+     "src": "/media/trunks/dragon-ball-trunk/photo-03.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/dragon-ball-trunk/photo-04.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "04-ouverte-2"
+    }
+   ]
   },
-  "okafor-trunk": {
-   "base": "/media/trunks/okafor-trunk",
+  "the-hand-cube": {
+   "base": "/media/trunks/the-hand-cube",
    "widths": [
     720,
     1080,
     1440
    ],
-   "video": "/media/trunks/okafor-trunk/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "size": 1440,
+   "photos": [
+    {
+     "src": "/media/trunks/the-hand-cube/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-fermee"
+    },
+    {
+     "src": "/media/trunks/the-hand-cube/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-fermee-3-4"
+    },
+    {
+     "src": "/media/trunks/the-hand-cube/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/the-hand-cube/photo-04.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "04-presentoir-replie"
+    }
+   ]
+  },
+  "dfb-pokal-2025-display": {
+   "base": "/media/trunks/dfb-pokal-2025-display",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440,
+   "photos": [
+    {
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-face"
+    },
+    {
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-3-4"
+    },
+    {
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-ouverte-dessus"
+    },
+    {
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-04.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "04-dos-texte"
+    }
+   ]
+  },
+  "world-cup-display": {
+   "base": "/media/trunks/world-cup-display",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440,
+   "photos": [
+    {
+     "src": "/media/trunks/world-cup-display/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-face-texte"
+    },
+    {
+     "src": "/media/trunks/world-cup-display/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-3-4"
+    },
+    {
+     "src": "/media/trunks/world-cup-display/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-cote-drapeau"
+    },
+    {
+     "src": "/media/trunks/world-cup-display/photo-04.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "04-haute"
+    },
+    {
+     "src": "/media/trunks/world-cup-display/photo-05.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "05-les-quatre"
+    }
+   ]
+  },
+  "photo-case": {
+   "base": "/media/trunks/photo-case",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440,
+   "photos": [
+    {
+     "src": "/media/trunks/photo-case/photo-01.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "01-fermee-photo"
+    },
+    {
+     "src": "/media/trunks/photo-case/photo-02.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "02-fermee-brt"
+    },
+    {
+     "src": "/media/trunks/photo-case/photo-03.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "03-ouverte"
+    }
+   ]
+  },
+  "brt-coral-case": {
+   "base": "/media/trunks/brt-coral-case",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440,
+   "video": "/media/trunks/brt-coral-case/opening.mp4",
+   "duration": 6.04,
+   "photos": [
+    {
+     "src": "/media/trunks/brt-coral-case/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-fermee"
+    },
+    {
+     "src": "/media/trunks/brt-coral-case/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-fermee-3-4"
+    },
+    {
+     "src": "/media/trunks/brt-coral-case/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/brt-coral-case/photo-04.webp",
+     "width": 1600,
+     "height": 1067,
+     "file": "04-ouverte-et-presentoir"
+    }
+   ]
+  },
+  "trophy-trunk": {
+   "base": "/media/trunks/trophy-trunk",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440,
+   "video": "/media/trunks/trophy-trunk/opening.mp4",
+   "duration": 6.04,
+   "photos": [
+    {
+     "src": "/media/trunks/trophy-trunk/photo-01.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "01-fermee-photo"
+    },
+    {
+     "src": "/media/trunks/trophy-trunk/photo-02.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "02-fermee-brt"
+    },
+    {
+     "src": "/media/trunks/trophy-trunk/photo-03.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "03-ouverte"
+    },
+    {
+     "src": "/media/trunks/trophy-trunk/photo-04.webp",
+     "width": 1067,
+     "height": 1600,
+     "file": "04-ouverte-2"
+    }
+   ]
   },
   "campione-d-italia-case": {
    "base": "/media/trunks/campione-d-italia-case",
@@ -74,20 +367,25 @@
     1080,
     1440
    ],
-   "video": "/media/trunks/campione-d-italia-case/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "size": 1440
   },
-  "nz-travel-case": {
-   "base": "/media/trunks/nz-travel-case",
+  "butterfly-trunk": {
+   "base": "/media/trunks/butterfly-trunk",
    "widths": [
     720,
     1080,
     1440
    ],
-   "video": "/media/trunks/nz-travel-case/opening.mp4",
-   "size": 1080,
-   "duration": 6.04
+   "size": 1440
+  },
+  "okafor-trunk": {
+   "base": "/media/trunks/okafor-trunk",
+   "widths": [
+    720,
+    1080,
+    1440
+   ],
+   "size": 1440
   }
  }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router";
 import { ArrowRight, Maximize2, Play, X } from "lucide-react";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
@@ -6,10 +7,11 @@ import BrandIcon from "@/components/BrandIcon";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
-import TrunkReveal from "@/components/TrunkReveal";
+import TrunkReveal, { type TrunkPiece } from "@/components/TrunkReveal";
 import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
 import { media } from "@/data/catalogue";
-import { FEATURED_BOX } from "@/data/pieces";
+import { BOXES, FEATURED_BOX } from "@/data/pieces";
+import { resolveShowcase } from "@/data/showcase";
 import { trunkOf } from "@/data/trunks";
 import type { Box, MediaItem, Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
@@ -19,6 +21,9 @@ import { srcSetOf } from "@/lib/responsive";
 import { waLink } from "@/lib/site";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
+
+/** The place of each box of the catalogue on the page of the trunks. */
+const BOX_ORDER = new Map(BOXES.map((b, i) => [b.slug, i]));
 
 export default function Atelier() {
   const { t } = useI18n();
@@ -224,17 +229,37 @@ function CreateBox() {
 }
 
 /**
- * The Signature Trunks (feedback of Yoni, 21/11/2026): every trunk closed at first, aligned the same way in a grid of equal
- * squares, with its name; a click opens it in the film of its opening (src/components/TrunkReveal.tsx), and it stays open
- * with the button to create one's own. Its text, its photos (full screen) and its piece stay under it. The Dragon Ball
- * trunk has no film (rights not confirmed): its photo, opening its photos.
+ * The Signature Trunks (Yoni, 21 and 22/11/2026): every box closed at first, aligned the same way in a grid of equal squares
+ * (one column on a phone), with its name; a click opens it (src/components/TrunkReveal.tsx), its piece rises from it, and
+ * the buttons to create one's own and to discover the piece appear. Its text, its photos (full screen) stay under it. Each
+ * has its anchor (#box-<address>): the page of its piece leads to it.
  */
 export function Boxes() {
   const { t } = useI18n();
-  const { boxes: all } = useCatalogue();
+  const cat = useCatalogue();
+  const all = cat.boxes;
+  /** The piece of a box, cut out of its photo, when it is known and on the site. */
+  const pieceOf = (box: Box): TrunkPiece | null => {
+    const piece = box.pieceSlug ? cat.pieces.find((p) => p.slug === box.pieceSlug && p.published !== false) : undefined;
+    return piece ? { slug: piece.slug, title: piece.title, view: resolveShowcase(piece.slug, piece.showcase).views[0] ?? null } : null;
+  };
   const [open, setOpen] = useState<Box | null>(null);
-  // The trunk of the house first.
-  const boxes = [...all.filter((b) => b.slug === FEATURED_BOX), ...all.filter((b) => b.slug !== FEATURED_BOX)];
+  const { hash } = useLocation();
+  // From the page of a piece (/boxes#box-<address>): its box, in view.
+  useEffect(() => {
+    if (!hash.startsWith("#box-")) return undefined;
+    const id = window.requestAnimationFrame(() => {
+      const el = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (!el) return;
+      const lenis = getLenis();
+      if (lenis) lenis.scrollTo(el, { offset: -110, immediate: true, force: true });
+      else el.scrollIntoView({ block: "start" });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [hash]);
+  // The trunk of the house first, then in the order of the catalogue (src/data/pieces.ts, BOXES); a box added in the admin after them.
+  const rank = (b: Box) => (b.slug === FEATURED_BOX ? -1 : BOX_ORDER.has(b.slug) ? BOX_ORDER.get(b.slug)! : BOX_ORDER.size + all.indexOf(b));
+  const boxes = [...all].sort((a, b) => rank(a) - rank(b));
 
   return (
     <div className="pb-24">
@@ -249,9 +274,9 @@ export function Boxes() {
           {boxes.map((box) => {
             const trunk = trunkOf(box.slug);
             return (
-              <li key={box.slug} data-box={box.slug}>
+              <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="scroll-mt-28">
                 {trunk ? (
-                  <TrunkReveal name={box.name} trunk={trunk} />
+                  <TrunkReveal slug={box.slug} name={box.name} trunk={trunk} piece={pieceOf(box)} />
                 ) : (
                   <button type="button" onClick={() => setOpen(box)} className="group relative block aspect-square w-full overflow-hidden bg-ink-soft text-start" aria-label={t.boxes.open(box.name)}>
                     {box.images[0] ? <MediaView item={box.images[0]} fit="cover" className="transition duration-700 group-hover:scale-[1.03]" /> : null}
@@ -268,7 +293,7 @@ export function Boxes() {
                       <Maximize2 className="size-4" aria-hidden="true" /> {t.boxes.photos(box.images.length)}
                     </button>
                   ) : null}
-                  {box.pieceSlug ? (
+                  {box.pieceSlug && !trunk && pieceOf(box) ? (
                     <Link to={"/pieces/" + box.pieceSlug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
                       {t.common.seePiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                     </Link>

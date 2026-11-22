@@ -120,8 +120,9 @@ test("the language menu keeps the page, the links stay in the language", async (
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
 
   // A card opens the piece in the same language, and its WhatsApp message is written in it.
-  await page.locator("[data-piece-card]").first().scrollIntoViewIfNeeded();
-  await page.locator("[data-piece-card]").first().click();
+  // (The creation in the middle of the carousel.)
+  await page.locator("[data-slide][data-active] a").scrollIntoViewIfNeeded();
+  await page.locator("[data-slide][data-active] a").click();
   await page.waitForURL("**/es/pieces/**");
   const title = (await page.locator("article[data-piece] h1").innerText()).trim();
   const href = (await page.locator("[data-want-piece]").getAttribute("href")) ?? "";

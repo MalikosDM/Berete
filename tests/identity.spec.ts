@@ -82,7 +82,7 @@ test("the drafts made from Yoni's photos are published (20/11/2026): each with i
 
 test("Enter the World / Entrer dans l'univers on every piece", async ({ page }, info) => {
   for (const [prefix, words] of [["", "Enter the World"], ["/fr", "Entrer dans l’univers"]] as const) {
-    await page.goto(prefix + "/creations");
+    await page.goto(prefix + "/creations?view=grid");
     const cards = page.locator("[data-piece-card]");
     const count = await cards.count();
     expect(count).toBe((await getCatalogue(page)).pieces.length);
