@@ -80,7 +80,7 @@ for (const lang of ["en", "fr"] as const) {
   test("its page in " + lang + ": the text in two parts, the closing quote, the line, the sheet", async ({ page }, info) => {
     const problems = watch(page);
     await skipIntro(page);
-    await page.goto((lang === "fr" ? "/fr" : "") + "/pieces/" + SLUG, { waitUntil: "load" });
+    await page.goto((lang === "fr" ? "/fr" : "") + "/pieces/" + SLUG, { waitUntil: "domcontentloaded" });
     await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     // The line under the title.
     await expect(page.locator("[data-piece-intro]")).toContainText(lang === "fr" ? FR.last : LAST);

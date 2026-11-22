@@ -174,7 +174,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       détail » sur cette pièce : rien à aligner.
 - [x] Traductions fidèles en 5 langues (« Genki Dama » et « Spirit Bomb » tels quels ; les Dragon Balls : « boules de
       cristal » en français, « Bolas de Dragón » en espagnol, « Dragonballs » en allemand, « كرات التنين » en arabe).
-      `tests/dragonball.spec.ts` (ordinateur et iPhone, anglais et français), captures `verification/dragonball/`.
+      `tests/dragonball.spec.ts` (ordinateur et iPhone, anglais et français), vérifié sur le site en ligne le 22/11, captures
+      `verification/dragonball/`.
 - [ ] Yoni : relire les traductions (surtout l'arabe) ; droits Dragon Ball toujours à confirmer.
 
 ## Passe « carrousel des Créations et vraies boîtes » (Yoni, 22/11/2026, 2) — état au 22/11/2026
