@@ -157,11 +157,14 @@ test("the Inter pendant, JL in its real photos, every gallery on black with its 
   for (const slug of ["kenan-yildiz-celebration-pendant", "eljero-elia-clover-medallion", "samuel-ballet-jesus-piece", "tajon-buchanan-iced-watch", "kevin-schade-twisted-chain", "michy-batshuayi-butterfly-pendant"]) {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("[data-worn-by]"), slug).toBeVisible();
+    // (Leave each page once its own scripts have loaded: Safari reports an import cut short by leaving as an error.)
+    await page.waitForTimeout(1200);
   }
   // The two watches now open on their jewel alone.
   for (const slug of ["marcus-thuram-skeleton-watch", "tajon-buchanan-iced-watch"]) {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("[data-piece-cover] [data-showcase]"), slug).toHaveCount(1);
+    await page.waitForTimeout(1200);
   }
   expect(problems.errors).toEqual([]);
 });

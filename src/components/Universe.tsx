@@ -267,7 +267,9 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           const coreEl = canvas.parentElement?.querySelector<HTMLElement>(".u-genki-core") ?? null;
           const regionEls = Object.fromEntries([...(canvas.parentElement?.querySelectorAll<HTMLElement>(".u-region") ?? [])].map((r) => [r.dataset.region ?? "", r]));
           fxRef.current = m.startFx(canvas, { effects: canvasEffects, glow: theme.glow, tint: theme.tint, preset: theme.preset, impact: effects.includes("impact") && !fixed, core: coreEl, regions: regionEls, root: canvas.parentElement, fixed });
-        });
+        })
+          // Its file not loaded (the visitor left the page meanwhile, a network cut): the page simply stays without effects.
+          .catch(() => undefined);
       },
       { delay: 200, onGesture: true },
     );

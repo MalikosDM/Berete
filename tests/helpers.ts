@@ -17,7 +17,7 @@ export function watch(page: Page): Problems {
     // Safari (WebKit) reports a request of the site cut short by leaving the page as "access control checks": the
     // next page.goto came before the background request (live catalogue, 3D models) had its answer. Not an error.
     if (/\/api\/\S* due to access control checks/.test(e.message)) return;
-    problems.errors.push("page error: " + e.message);
+    problems.errors.push("page error: " + e.message + (process.env.ERROR_PAGES ? " (" + page.url() + ")" : ""));
   });
   page.on("response", (r) => {
     if (r.status() >= 400) problems.errors.push("HTTP " + r.status() + ": " + r.url());
