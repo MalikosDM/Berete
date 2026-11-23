@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { BACKDROPS, THEME_FONTS, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
+import brand from "@/data/brand.generated.json" with { type: "json" };
 import { afterLoad } from "@/lib/idle";
 
 /*
@@ -305,7 +306,9 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     "--u-glow": theme.glow,
     ...(backdrop ? { "--u-ratio": String(backdrop.ratio), "--u-fx": String(backdrop.focusX) } : {}),
   } as CSSProperties;
-  const set = (id: string, widths: number[], kind: string, ext: string) => widths.map((w) => "/media/universes/" + id + kind + w + "." + ext + " " + w + "w").join(", ");
+  // Its files: "<id>-1600.<version>.webp" (a background made since 23/11/2026 carries its version), else "<id>-1600.webp".
+  const file = (id: string, kind: string, w: number, ext: string) => "/media/universes/" + id + kind + w + (BACKDROPS[id]?.version ? "." + BACKDROPS[id]!.version : "") + "." + ext;
+  const set = (id: string, widths: number[], kind: string, ext: string) => widths.map((w) => file(id, kind, w, ext) + " " + w + "w").join(", ");
   const on = (i: number) => (sequence ? (i === active ? "" : undefined) : undefined);
 
   return (
@@ -332,7 +335,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
                 <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcSet={set(id, b.mobileWidths, "-m-", "avif")} sizes="57vh" />
                 <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(id, b.mobileWidths, "-m-", "webp")} sizes="57vh" />
                 <source type="image/avif" srcSet={set(id, b.widths, "-", "avif")} sizes="145vw" />
-                <img src={"/media/universes/" + id + "-1600.webp"} srcSet={set(id, b.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
+                <img src={file(id, "-", 1600, "webp")} srcSet={set(id, b.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
               </picture>
             ) : null,
           )
@@ -382,6 +385,9 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
             </div>
           </div>
         ) : null}
+        {/* The name of the house, very discreet, in the depth of every capsule (Yoni, 23/11/2026): behind the decor, under
+            the light and the effects, never over a jewel (the whole universe is behind the page). */}
+        {preview || fixed ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
         <div className="u-light" />
         <div className="u-texture" />
         {theme.mark ? (

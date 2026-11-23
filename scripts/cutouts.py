@@ -12,6 +12,12 @@ subject lifting (scripts/cutout-mask.swift), a transparent image whose edges fol
 - Edge colours decontaminated (no dark or coloured fringe), dust and small specks removed.
 - stones: a coloured stone set inside the jewel (the red pear of the Ruby T necklace), as dark as the background, is
   kept: a hole of the jewel that is red, not the neutral black of the background, is filled.
+- ring: a ring on black, kept whole by its light (macOS misses its band in the shadow), its surfaces solid; level: the
+  least light kept (above a velvet whose threads catch the light).
+- fill: every hole of the outline filled (a ring seen from the side: the inside of its band, dark, is part of it); a
+  number: its outline also made convex from that fraction of its height down (its band open on a side).
+- floor: a jewel standing on a mirror (its reflection joined to it): everything below that line (a fraction of the
+  height of the photo) goes.
 - A jewel that leaves the photo (a chain going up) fades out on that side instead of a sharp cut.
 - Cropped on the jewel with a transparent margin of 5 % (none on a faded side).
 Prints one JSON line per job: size, faded sides, checks (touches the edge, haze).
@@ -60,7 +66,7 @@ def fill_stones(alpha, img, s):
     return alpha
 
 
-def cutout(work, mask_path, mode, solo=False, stones=False):
+def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None):
     img = cv2.cvtColor(cv2.imread(work, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
     h, w = img.shape[:2]
     m = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
@@ -82,6 +88,20 @@ def cutout(work, mask_path, mode, solo=False, stones=False):
         core = cv2.erode(solid, disk(3 * s)).astype(np.float32)
         alpha = np.maximum(alpha, cv2.GaussianBlur(core, (0, 0), 1.5 * s + 0.3))
         bg_color = np.zeros(3, np.float32)
+    elif dark and ring:
+        # A ring on black: macOS often misses its band in the shadow (the bottom, the shank going back). The whole ring is
+        # kept by its light wherever it is in the photo, its surfaces made solid (the band bottom, as dark as it is, stays
+        # whole), its edges still drawn by light; the parts apart from it go below (solo).
+        # macOS fills the opening of a ring: its mask counts only near the light of the metal (the black seen through the
+        # ring stays transparent).
+        t0 = max(bg_level + 0.025, level or 0)
+        light = smoothstep(t0, t0 + 0.14, lum)
+        lit = cv2.dilate((lum > t0 + 0.05).astype(np.uint8), disk(8 * s))
+        core = (cv2.erode((m > 0.5).astype(np.uint8), disk(7 * s)) & lit).astype(np.float32)
+        alpha = np.maximum(cv2.GaussianBlur(core, (0, 0), 1.2 * s + 0.3), light)
+        solid = cv2.morphologyEx((alpha > 0.2).astype(np.uint8), cv2.MORPH_CLOSE, disk(9 * s))
+        solid = cv2.erode(solid, disk(2 * s)).astype(np.float32)
+        alpha = np.maximum(alpha, cv2.GaussianBlur(solid, (0, 0), 1.2 * s + 0.3))
     elif dark:
         # The jewel alone on black: an opaque inside, edges drawn by its own light.
         core = cv2.erode((m > 0.5).astype(np.uint8), disk(7 * s)).astype(np.float32)
@@ -104,6 +124,40 @@ def cutout(work, mask_path, mode, solo=False, stones=False):
 
     if stones:
         alpha = fill_stones(alpha, img, s)
+    if fill:
+        # A ring seen from the side, where no background shows through it: the inside of its band, a mirror of the black
+        # background (dark between its reflections), is part of it: every hole of its outline is filled.
+        solid = cv2.morphologyEx((alpha > 0.3).astype(np.uint8), cv2.MORPH_CLOSE, disk(14 * s))
+        if not isinstance(fill, bool):
+            # Its band open on a side: the outline of the main part made convex, from that fraction of its height down
+            # (above, the ornaments of its top keep their own outline).
+            n, labels, stats, cents = cv2.connectedComponentsWithStats(solid, connectivity=8)
+            big = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+            x, y, bw0, bh0 = stats[big, :4]
+            parts = np.zeros(n, bool)
+            for i in range(1, n):
+                cx, cy = cents[i]
+                parts[i] = stats[i, cv2.CC_STAT_AREA] >= 0.005 * stats[big, cv2.CC_STAT_AREA] and x <= cx <= x + bw0 and y <= cy <= y + bh0
+            pts = cv2.findNonZero(parts[labels].astype(np.uint8))
+            hull = np.zeros_like(solid)
+            cv2.fillConvexPoly(hull, cv2.convexHull(pts), 1)
+            by, bh0 = stats[big, cv2.CC_STAT_TOP], stats[big, cv2.CC_STAT_HEIGHT]
+            hull[: by + int(float(fill) * bh0)] = 0
+            solid = solid | hull
+        holes = solid.copy()
+        ff = np.zeros((h + 2, w + 2), np.uint8)
+        cv2.floodFill(holes, ff, (0, 0), 1)
+        solid = solid | (1 - holes)
+        solid = cv2.erode(solid, disk(2 * s)).astype(np.float32)
+        alpha = np.maximum(alpha, cv2.GaussianBlur(solid, (0, 0), 1.2 * s + 0.3))
+    if floor is not None:
+        # A jewel standing on a mirror: its reflection, joined to it, starts at the line where it stands (a fraction of
+        # the height of the photo): everything below goes.
+        # A number: a straight line; a list of [x, y] points (fractions): a line through them (a ring lying down).
+        pts = [[0, floor], [1, floor]] if isinstance(floor, (int, float)) else sorted(floor)
+        line = np.interp(np.arange(w) / max(w - 1, 1), [p[0] for p in pts], [p[1] for p in pts]) * h
+        yy = np.arange(h, dtype=np.float32)[:, None]
+        alpha = alpha * np.clip(line[None, :] - yy, 0, 1)
 
     # Specks: only the parts of a reasonable size stay (a chain, a pendant, a separate stone of the piece).
     solid = (alpha > 0.15).astype(np.uint8)
@@ -184,7 +238,7 @@ def cutout(work, mask_path, mode, solo=False, stones=False):
 def main():
     jobs = json.load(open(sys.argv[1]))
     for job in jobs:
-        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False))
+        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"))
         if out is not None:
             Image.fromarray((out * 255 + 0.5).astype(np.uint8), "RGBA").save(job["out"], compress_level=3)
         print(json.dumps({"out": job["out"], **report}), flush=True)

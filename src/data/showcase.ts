@@ -17,8 +17,10 @@ export type CutoutView = {
   /** Size of the largest file. */
   width: number;
   height: number;
-  /** The widths of its files: /media/cutouts/<slug>/<id>-<w>.webp. */
+  /** The widths of its files: /media/cutouts/<slug>/<id>-<w>.<version>.webp. */
   widths: number[];
+  /** The start of a sha256 of its files, in their names: a redone cutout gets new addresses (the site caches /media). */
+  version?: string;
   /** The sides where the jewel leaves its photo and fades out (a chain going up). */
   fade: string[] | null;
   /** It passed the automatic checks and the look. */
@@ -55,7 +57,8 @@ export const SHOWCASE_BY_DEFAULT = new Set([
 
 export const MAX_VIEWS = 5;
 
-export const cutoutSrc = (slug: string, v: CutoutView, w: number) => "/media/cutouts/" + slug + "/" + v.id + "-" + w + ".webp";
+export const cutoutSrc = (slug: string, v: CutoutView, w: number) =>
+  "/media/cutouts/" + slug + "/" + v.id + "-" + w + (v.version ? "." + v.version : "") + ".webp";
 export const cutoutSrcSet = (slug: string, v: CutoutView) => v.widths.map((w) => cutoutSrc(slug, v, w) + " " + w + "w").join(", ");
 export const cutoutLargest = (slug: string, v: CutoutView) => cutoutSrc(slug, v, v.widths[v.widths.length - 1]!);
 

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
@@ -28,6 +28,7 @@ import { completeMakingOf, makingSteps } from "@/data/making";
 import { pointsFor } from "@/data/details3d";
 import type { PublicModel } from "@/data/models";
 import { resolveShowcase } from "@/data/showcase";
+import { pressOfPiece } from "@/data/press";
 import { storyBlocks } from "@/data/story";
 import { jewelOf, resolveTheme } from "@/data/themes";
 import type { MakingStep, MediaItem, Piece, Story } from "@/data/types";
@@ -35,11 +36,11 @@ import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue, useRawCatalogue } from "@/lib/catalogue";
 import { clubLogo } from "@/lib/clubs";
-import { filmSeen, markFilmSeen } from "@/lib/films";
 import { usePieceModel } from "@/lib/models";
 import { Detail3D, type DetailMark } from "@/viewer";
 import { waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
+import { pressDate } from "@/pages/Press";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
@@ -54,19 +55,10 @@ export default function PiecePage() {
   const piece = findPiece(cat, slug);
   // The 3D model the jeweller attached to this piece, if any: shown right under the opening.
   const model = usePieceModel(piece?.slug ?? slug);
-  // The film of the finished piece: the first thing seen on entering the piece, once per visit (src/components/PieceFilm.tsx).
+  // The film of the finished piece: no more at the entrance (Yoni, 23/11/2026: the piece first); its own section lower on
+  // the page, and full screen with its sound at a click (src/components/PieceFilm.tsx).
   const reveal = piece ? resolveReveal(piece.slug, piece.atelier) : null;
   const [filmOpen, setFilmOpen] = useState(false);
-  const hasReveal = reveal !== null;
-  const pieceSlug = piece?.slug;
-  useLayoutEffect(() => {
-    if (!pieceSlug || !hasReveal || filmSeen(pieceSlug) || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    markFilmSeen(pieceSlug);
-    // Before the first paint of the piece: the film comes first (the page written by the server has none).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFilmOpen(true);
-    return () => setFilmOpen(false);
-  }, [pieceSlug, hasReveal]);
   if (!piece) {
     // A renamed piece leads to its new address; an unpublished one to its player, else to the creations.
     const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug);
@@ -85,6 +77,12 @@ export default function PiecePage() {
   const seenRow = sheetRows.includes(SEEN_LABEL);
   // The championship rings of the special project: "Historic Commissions".
   const historic = SPECIAL_PROJECT.some((r) => r.slug === piece.slug);
+  // Its press (Yoni, 23/11/2026): the articles of the page In the Spotlight that tell it, then those the admin gave it with
+  // their link; an article without its link is not shown.
+  const press: { outlet: string; title: string; url: string; image?: string | null; date?: string; lang?: string }[] = [
+    ...pressOfPiece(piece.slug),
+    ...piece.press.filter((p): p is typeof p & { url: string } => Boolean(p.url) && !pressOfPiece(piece.slug).some((a) => a.url === p.url)),
+  ];
 
   // Opens stories on the first photo or video of this piece, when they show it.
   const openStories = (stories: Story[]) => {
@@ -123,14 +121,15 @@ export default function PiecePage() {
       {/* Opening: the jewel, full screen */}
       <section aria-labelledby="piece-title" data-piece-opening className="relative flex min-h-svh flex-col overflow-hidden lg:grid lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers */}
-        {/* A piece shown large (Dragon Ball, 21/11/2026): a taller frame on a phone, the whole height on a computer. */}
-        <div data-piece-cover className={"relative shrink-0 px-4 pt-20 sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 lg:pt-28 lg:pb-14 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[70svh] sm:h-[72svh]" : "h-[58svh] sm:h-[62svh]")}>
+        {/* A piece shown large (Dragon Ball, 21/11/2026): a taller frame on a phone, the whole height on a computer. Behind it
+            a calm dark light (.piece-calm): its universe never takes over the piece (Yoni, 23/11/2026). */}
+        <div data-piece-cover className={"piece-calm relative shrink-0 px-4 pt-20 sm:px-10 lg:order-2 lg:col-span-7 lg:h-svh lg:px-12 desk:pt-32 lg:pb-14 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[70svh] sm:h-[72svh]" : "h-[58svh] sm:h-[62svh]")}>
           {opening.mode === "photo" ? (
             <>
               <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
               {/* The effect of its world on the piece, over its photo (the same frame as the photo). */}
               {jewel ? (
-                <span aria-hidden="true" className="pointer-events-none absolute inset-0 px-4 pt-20 sm:px-10 lg:px-12 lg:pt-28 lg:pb-14">
+                <span aria-hidden="true" className="pointer-events-none absolute inset-0 px-4 pt-20 sm:px-10 lg:px-12 desk:pt-32 lg:pb-14">
                   <span className="relative block h-full w-full">
                     <JewelFx kind={jewel} photo />
                   </span>
@@ -163,9 +162,9 @@ export default function PiecePage() {
                 <BrandIcon name="whatsapp" className="size-4.5" /> {t.piece.want}
               </a>
               {reveal ? (
-                <button type="button" onClick={() => setFilmOpen(true)} data-watch-film className="inline-flex min-h-12 items-center justify-center gap-2.5 border border-white/35 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                <a href="#piece-film" data-watch-film className="inline-flex min-h-12 items-center justify-center gap-2.5 border border-white/35 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
                   <Play className="size-3.5 fill-current" aria-hidden="true" /> {t.films.watch}
-                </button>
+                </a>
               ) : null}
               {model ? (
                 <a href="#piece-3d-viewer" data-see-3d className="inline-flex min-h-12 items-center justify-center gap-2.5 border border-rose-light/70 px-5 text-base font-semibold tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
@@ -186,9 +185,10 @@ export default function PiecePage() {
 
       {model ? <Piece3D piece={piece} model={model} /> : null}
 
-      <div id="piece-details" className="scroll-mt-24">
+      <div id="piece-details" className="scroll-mt-32">
         {/* Every photo and film of the piece, each with its text (src/components/EveryAngle.tsx). */}
         <EveryAngle piece={piece} items={anglePhotos(piece, opening.mode === "photo")} />
+        {reveal ? <FilmSection title={piece.title} poster={reveal.poster} onPlay={() => setFilmOpen(true)} /> : null}
         {atelier ? <AtelierPassage piece={piece} madeFor={madeFor(cat, piece)} atelier={atelier} /> : null}
         {piece.details.length > 0 ? <DetailsSection piece={piece} model={model} /> : null}
       </div>
@@ -325,17 +325,18 @@ export default function PiecePage() {
           ) : null}
         </div>
 
-        {piece.press.length > 0 ? (
-          <div id="press" className="lg:col-span-5 lg:col-start-8">
+        {press.length > 0 ? (
+          <div id="press" data-piece-press className="lg:col-span-5 lg:col-start-8">
             <h2 className="eyebrow">{t.piece.press}</h2>
             <ul className="mt-5 border-t border-white/15">
-              {piece.press.map((p) => (
+              {press.map((p) => (
                 <li key={p.outlet + p.title} className="border-b border-white/15 py-5">
                   <div className="flex items-start gap-5">
                     {p.image ? <Img src={p.image} alt={t.piece.pressAlt(p.outlet)} loading="lazy" className="h-28 w-20 shrink-0 object-cover object-top" /> : <Newspaper className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />}
                     <div>
                       <p className="text-base font-semibold uppercase tracking-[0.16em] text-rose-light">{p.outlet}</p>
-                      <p className="mt-2 text-lg text-white">{p.title}</p>
+                      {p.date ? <p className="mt-1 text-base text-mist"><time dateTime={p.date}>{pressDate(p.date, intl)}</time></p> : null}
+                      <p lang={p.lang} className="mt-2 text-lg text-white">{p.title}</p>
                       {p.url ? (
                         <a href={p.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white underline-offset-4 hover:text-rose-light hover:underline">
                           {t.common.readArticle} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
@@ -630,6 +631,36 @@ function MakingSection({ piece, boxImage, madeFor }: { piece: Piece; boxImage?: 
       </ol>
       {open !== null ? createPortal(<Lightbox items={viewable} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
       {room && film ? <AtelierRoom title={piece.title} madeFor={madeFor} slug={piece.slug} atelier={{ making: film, reveal: null, poster: film.posters[film.poster] || film.posters[0] || "" }} onClose={() => setRoom(false)} /> : null}
+    </section>
+  );
+}
+
+/**
+ * The film of the finished piece, in its own section (Yoni, 23/11/2026: no more at the entrance of the capsule): its image
+ * and a button; a click plays it full screen, with its sound (src/components/PieceFilm.tsx).
+ */
+function FilmSection({ title, poster, onPlay }: { title: string; poster: string; onPlay: () => void }) {
+  const { t } = useI18n();
+  return (
+    <section id="piece-film" aria-labelledby="piece-film-title" data-piece-film-section className="mx-auto max-w-[1600px] scroll-mt-32 px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+      <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-5">
+          <p className="eyebrow">{t.films.reveal}</p>
+          <h2 id="piece-film-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">{t.films.pieceSection}</h2>
+          <p className="mt-6 max-w-md text-base leading-relaxed text-bone md:text-lg">{t.films.pieceSectionLead(title)}</p>
+        </div>
+        <div className="lg:col-span-6 lg:col-start-7">
+          <button type="button" onClick={onPlay} data-watch-film-section className="group relative mx-auto block aspect-[4/5] w-full max-w-md overflow-hidden border border-white/12 bg-ink-soft" aria-label={t.films.watch + " · " + title}>
+            {poster ? <Img src={poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]" /> : null}
+            <span aria-hidden="true" className="absolute inset-0 bg-ink/25 transition-colors group-hover:bg-ink/10" />
+            <span className="absolute inset-0 flex items-center justify-center">
+              <span className="flex size-20 items-center justify-center rounded-full border border-white/70 bg-ink/55 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                <Play className="size-7 translate-x-0.5 fill-current" aria-hidden="true" />
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

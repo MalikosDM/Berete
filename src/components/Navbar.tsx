@@ -16,9 +16,10 @@ type NavLinkItem = { label: string; to: string; sub?: boolean };
 
 function linkClass({ isActive }: { isActive: boolean }): string {
   return [
-    // Never on two lines: from 1260 to 1440 px (a laptop) the letters and the gaps are a little tighter.
-    "relative inline-flex min-h-12 items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.06em] transition-colors roomy:text-[0.8125rem] roomy:tracking-[0.12em] ultra:tracking-[0.18em]",
-    "after:absolute after:inset-x-0 after:bottom-2 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
+    // Never on two lines: the row of the menu has the whole width under the name of the house (from 900 px on a computer).
+    // From 900 to 1280 px (a narrow window of a laptop) the letters are a little smaller and tighter, so every language fits.
+    "relative inline-flex min-h-11 items-center whitespace-nowrap text-[0.6875rem] font-medium uppercase tracking-[0.04em] transition-colors xl:text-[0.75rem] xl:tracking-[0.1em] roomy:text-[0.8125rem] roomy:tracking-[0.16em]",
+    "after:absolute after:inset-x-0 after:bottom-1.5 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
 }
@@ -40,6 +41,7 @@ export default function Navbar() {
     { label: t.nav.boxes, to: "/boxes" },
     { label: t.nav.process, to: "/process" },
     { label: t.nav.about, to: "/about" },
+    { label: t.nav.press, to: "/press" },
     { label: t.nav.contact, to: "/contact" },
   ];
   const [scrolled, setScrolled] = useState(false);
@@ -92,50 +94,13 @@ export default function Navbar() {
       {/* The frosted background sits in its own layer: a blur on the header itself would make it the frame of the
           mobile menu (position: fixed), which would then open with no height. */}
       <div aria-hidden="true" className={"absolute inset-0 -z-10 transition-[background-color,backdrop-filter] duration-500 " + (scrolled || open ? "bg-ink/80 backdrop-blur-xl" : "bg-transparent")} />
-      <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-6 px-5 sm:px-8 lg:h-22 lg:px-12 nav:gap-4 nav:px-8 roomy:gap-6 roomy:px-12">
-        <Link to="/" className="group flex min-h-12 flex-col justify-center" aria-label={t.site.homeLabel}>
-          <Logo variant="mark" className="h-10 w-[3.375rem] lg:hidden" />
-          <Logo className="hidden h-14 w-[4.875rem] lg:block" />
+      {/* The name of the house beside its mark, in the letters of the logo (Yoni, 23/11/2026), then the language, WhatsApp and,
+          on a phone or a tablet, the menu button. */}
+      <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-4 px-5 sm:px-8 desk:h-16 desk:px-8 roomy:px-12">
+        <Link to="/" data-brand className="group flex min-h-12 items-center gap-2.5 sm:gap-3.5" aria-label={t.site.homeLabel}>
+          <Logo variant="mark" className="h-10 w-[3.375rem] shrink-0 desk:h-11 desk:w-[3.75rem]" />
+          <Logo variant="wordmark" className="h-[0.875rem] w-[8.9rem] shrink-0 sm:h-4 sm:w-[10.15rem] desk:h-[1.0625rem] desk:w-[10.8rem]" />
         </Link>
-
-        {/* The names of the menu are long (The Berete Circle, The Bespoke Journey…): the whole menu from 1260 px, the same on
-            every page; below, on tablets and phones, the menu button. */}
-        <nav aria-label={t.nav.main} data-desktop-nav className="hidden items-center gap-3.5 nav:flex roomy:gap-5 wide:gap-7">
-          <div className="group relative">
-            <NavLink
-              to="/creations"
-              className={() => linkClass({ isActive: creationsActive }) + " gap-1.5"}
-              aria-haspopup="true"
-            >
-              {t.nav.creations}
-              <ChevronDown className="size-3.5 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
-            </NavLink>
-            <div className="invisible absolute left-1/2 top-full w-72 -translate-x-1/2 translate-y-2 pt-3 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
-              <ul className="border border-white/15 bg-ink/95 p-3 backdrop-blur-xl">
-                {CREATION_LINKS.map((item) => (
-                  <li key={item.to}>
-                    <Link
-                      to={item.to}
-                      data-nav-sub={item.sub ? "" : undefined}
-                      className={"flex min-h-12 items-center justify-between font-display uppercase text-white transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "ps-9 pe-4 text-lg tracking-[0.12em] text-bone" : "px-4 text-xl tracking-[0.14em]")}
-                    >
-                      <span className="flex items-center gap-2.5">
-                        {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}
-                        {item.label}
-                      </span>
-                      <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-          {MAIN_LINKS.map((item) => (
-            <NavLink key={item.to} to={item.to} className={linkClass}>
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <LanguageMenu className="hidden md:block" />
@@ -150,8 +115,7 @@ export default function Navbar() {
           </a>
           <Link
             to="/contact"
-            // Beside the whole menu, from 1800 px only (the menu already leads to Private Enquiries).
-            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light md:inline-flex nav:hidden wide:inline-flex ultra:px-6 ultra:tracking-[0.18em]"
+            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light roomy:inline-flex"
           >
             {t.common.startPiece}
           </Link>
@@ -161,18 +125,57 @@ export default function Navbar() {
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? t.nav.closeMenu : t.nav.openMenu}
-            className="inline-flex size-12 items-center justify-center text-white nav:hidden"
+            className="inline-flex size-12 items-center justify-center text-white desk:hidden"
           >
             {open ? <X className="size-6" aria-hidden="true" /> : <Menu className="size-6" aria-hidden="true" />}
           </button>
         </div>
       </div>
 
+      {/* The whole menu on every computer (Yoni, 23/11/2026: a laptop under Safari at a middle width showed the menu button):
+          its own row under the name of the house, so the long names (The Berete Circle, The Bespoke Journey…) always fit. */}
+      <nav aria-label={t.nav.main} data-desktop-nav className="mx-auto hidden h-11 max-w-[1600px] items-center justify-center gap-x-3 px-4 desk:flex xl:gap-x-5 xl:px-8 roomy:gap-x-8 wide:gap-x-10">
+        <div className="group relative">
+          <NavLink
+            to="/creations"
+            className={() => linkClass({ isActive: creationsActive }) + " gap-1.5"}
+            aria-haspopup="true"
+          >
+            {t.nav.creations}
+            <ChevronDown className="size-3.5 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
+          </NavLink>
+          <div data-creations-menu className="invisible absolute start-1/2 top-full w-72 -translate-x-1/2 translate-y-2 pt-2 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 rtl:translate-x-1/2">
+            <ul className="border border-white/15 bg-ink/95 p-3 backdrop-blur-xl">
+              {CREATION_LINKS.map((item) => (
+                <li key={item.to}>
+                  <Link
+                    to={item.to}
+                    data-nav-sub={item.sub ? "" : undefined}
+                    className={"flex min-h-12 items-center justify-between font-display uppercase text-white transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "ps-9 pe-4 text-lg tracking-[0.12em] text-bone" : "px-4 text-xl tracking-[0.14em]")}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}
+                      {item.label}
+                    </span>
+                    <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        {MAIN_LINKS.map((item) => (
+          <NavLink key={item.to} to={item.to} className={linkClass}>
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+
       <div
         id="mobile-menu"
         data-lenis-prevent
         className={[
-          "fixed inset-x-0 bottom-0 top-18 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 lg:top-22 nav:hidden",
+          "fixed inset-x-0 bottom-0 top-18 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 desk:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         ].join(" ")}
       >

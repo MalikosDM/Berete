@@ -60,33 +60,39 @@ async function groundContrast(page: Page, el: Locator): Promise<number> {
   return contrast(color, stats.channels.slice(0, 3).map((c) => Math.min(255, c.mean + c.stdev)));
 }
 
-test("every photo of every piece has its text, in the six languages, with no stone named and no invented figure", () => {
+// Since 23/11/2026 (Yoni): no text that describes what is seen; at most a short caption (2 to 6 words), on a few photos only.
+test("every photo of every piece is listed; no text; a few short captions, translated, no stone named, no invented figure", () => {
   let count = 0;
+  let captions = 0;
   for (const piece of PUBLISHED) {
     const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
     expect(photos.length, piece.slug + " has photos").toBeGreaterThan(0);
     const told = [piece.title, piece.line, piece.story, ...piece.details.flatMap((d) => [d.title, d.text]), ...[piece.cover, ...piece.gallery].flatMap((m) => [m.alt ?? "", m.caption ?? ""])].join(" ");
     for (const m of photos) {
       const a = DEFAULT_ANGLES[piece.slug]?.[m.src];
-      expect(a?.title, piece.slug + " " + m.src + ": its title").toBeTruthy();
-      expect(a?.text, piece.slug + " " + m.src + ": its text").toBeTruthy();
+      // Every photo keeps its place (the admin lists it), with no text.
+      if (!a) continue;
+      expect(a.text, piece.slug + " " + m.src + ": no text").toBe("");
       expect(piece.angles[m.src], piece.slug + " " + m.src + " in the piece").toEqual(a);
-      for (const words of [a!.title, a!.text]) {
-        expect(words, piece.slug).not.toMatch(/\b(rub(y|ies)|emerald|sapphire|garnet|onyx|carat)/i);
-        for (const n of words.match(/\d+/g) ?? []) expect(told, piece.slug + ": the figure " + n + " comes from the house").toContain(n);
-        expect(fr[words], "translated: " + words).toBeTruthy();
+      if (a.title) {
+        captions++;
+        expect(a.title.split(/\s+/).length, a.title).toBeLessThanOrEqual(6);
+        expect(a.title, piece.slug).not.toMatch(/\b(rub(y|ies)|emerald|sapphire|garnet|onyx|carat)/i);
+        for (const n of a.title.match(/\d+/g) ?? []) expect(told, piece.slug + ": the figure " + n + " comes from the house").toContain(n);
+        expect(fr[a.title], "translated: " + a.title).toBeTruthy();
       }
       count++;
     }
   }
   expect(count).toBeGreaterThan(400);
+  expect(captions).toBeLessThan(count / 5);
 });
 
 /** Six pieces, the Inter ring, chains, a watch, a Jesus piece with its films from the stories. */
 const PAGES = ["campione-d-italia-2023-2024", "michy-batshuayi-butterfly-pendant", "sirius", "marcus-thuram-skeleton-watch", "kevin-schade-dragon-ball-pendant", "samuel-ballet-jesus-piece"];
 
 for (const slug of PAGES) {
-  test("Every Angle on " + slug + ": each photo with its text, in turn, readable", async ({ page }, info) => {
+  test("Every Angle on " + slug + ": a gallery, at most a short caption, readable", async ({ page }, info) => {
     const problems = watch(page);
     const phone = info.project.name !== "desktop";
     const photos = photosOf(slug);
@@ -98,25 +104,22 @@ for (const slug of PAGES) {
     await expect(section.locator("h2")).toHaveText("Sous tous les angles");
     const tiles = section.locator("[data-angle]");
     await expect(tiles).toHaveCount(anglesShownFirst(photos.length));
-    // In French: the text of the first photo, translated.
-    const first = DEFAULT_ANGLES[slug]![photos[0]!.src]!;
-    await expect(tiles.first().locator("[data-angle-title]")).toHaveText(fr[first.title]!);
-    await expect(tiles.first().locator("[data-angle-text]")).toHaveText(fr[first.text]!);
-    // Photo and text side by side, in turn (a checkerboard on a computer); on a phone the text under its photo.
-    const sides: ("left" | "right" | "under")[] = [];
-    for (const tile of (await tiles.all()).slice(0, 4)) {
-      await tile.scrollIntoViewIfNeeded();
-      const photo = (await tile.locator("button").boundingBox())!;
-      const words = (await tile.locator("[data-angle-title]").boundingBox())!;
-      sides.push(words.y >= photo.y + photo.height - 1 ? "under" : photo.x < words.x ? "left" : "right");
-      // Readable: 16 px at least, a contrast AA on its ground.
-      const text = tile.locator("[data-angle-text]");
-      expect(await text.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
-      expect(await groundContrast(page, text), "the text on its ground").toBeGreaterThanOrEqual(4.5);
-      expect(await groundContrast(page, tile.locator("[data-angle-title]")), "the title on its ground").toBeGreaterThanOrEqual(4.5);
+    // No text that describes what is seen.
+    await expect(section.locator("[data-angle-text]")).toHaveCount(0);
+    // A gallery: three on a row on a computer, two on a phone.
+    const tops = await tiles.evaluateAll((li) => li.slice(0, 4).map((x) => Math.round(x.getBoundingClientRect().top)));
+    if (tops.length >= 3) {
+      expect(tops[1]).toBe(tops[0]);
+      if (phone) expect(tops[2]).toBeGreaterThan(tops[0]!);
+      else expect(tops[2]).toBe(tops[0]);
     }
-    if (phone) expect(sides.every((s) => s === "under"), sides.join(" ")).toBe(true);
-    else expect(sides, "a checkerboard").toEqual(["left", "left", "right", "right"].slice(0, sides.length));
+    // Its captions, translated, readable (16 px at least, a contrast AA on its ground).
+    for (const caption of await section.locator("[data-angle-title]").all()) {
+      await caption.scrollIntoViewIfNeeded();
+      expect(Object.values(fr)).toContain((await caption.textContent())!.trim());
+      expect(await caption.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+      expect(await groundContrast(page, caption), "the caption on its ground").toBeGreaterThanOrEqual(4.5);
+    }
     await section.scrollIntoViewIfNeeded();
     await page.evaluate(() => window.scrollBy(0, -80));
     await page.waitForTimeout(700);
@@ -129,9 +132,8 @@ for (const slug of PAGES) {
       await shot(page, info.project.name + "-" + slug + "-2-voir-plus");
       await more.click();
       await expect(tiles).toHaveCount(photos.length);
-      await expect(section.locator("[data-angle-text]")).toHaveCount(photos.length);
     } else await expect(more).toHaveCount(0);
-    // A film keeps its place, with its text, silent.
+    // A film keeps its place, silent.
     for (const v of await section.locator("[data-angle-type='video'] video").all()) {
       expect(await v.evaluate((el) => (el as HTMLVideoElement).muted)).toBe(true);
     }
@@ -230,6 +232,7 @@ test("admin: Yoni changes the text of a photo, and its French, then puts it back
   };
   const row = await open();
   await expect(row.getByLabel("Petit titre", { exact: true })).toHaveValue(before.title);
+  // (Since 23/11/2026 the site shows only the title: every text is empty.)
   await expect(row.getByLabel(/Texte \(une ou deux phrases\)/)).toHaveValue(before.text);
   await row.getByLabel("Petit titre", { exact: true }).fill("Test title from the admin");
   await row.locator("summary").click();
@@ -250,6 +253,8 @@ test("admin: Yoni changes the text of a photo, and its French, then puts it back
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.locator("[data-angles-field]")).toHaveCount(0);
   await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
-  await expect(page.locator("[data-every-angle] [data-angle='1'] [data-angle-title]")).toHaveText(fr[before.title]!, { timeout: 15_000 });
+  const restored = page.locator("[data-every-angle] [data-angle='1'] [data-angle-title]");
+  if (before.title) await expect(restored).toHaveText(fr[before.title]!, { timeout: 15_000 });
+  else await expect(restored).toHaveCount(0, { timeout: 15_000 });
   expect(problems.errors).toEqual([]);
 });

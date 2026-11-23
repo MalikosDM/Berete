@@ -162,9 +162,14 @@ Safari avec un bloqueur de pubs (uBlock…) peut bloquer certains fichiers en mo
   un seul écrin : `npm run trunks -- --only=the-hand-cube`. Un écrin retiré passe en « non publié » (case de l'admin,
   `REMOVED_BOXES`) ; toute adresse `/boxes/<écrin>` mène à /boxes ; `/boxes#box-<écrin>` (lien de la page d'une pièce)
   l'amène à l'écran.
-  Les Créations (toutes, chaque collection, chaque sous-catégorie) s'affichent une par une en carrousel
-  (`src/components/PieceCarousel.tsx` : défilement natif aimanté, flèches, clavier, molette horizontale, compteur), et
-  « Voir toutes les créations » ouvre la grille de cartes égales (`?view=grid` : 3, 2, 1 par rangée).
+  Sous chaque écrin, « x photos » ouvre sa galerie (la boîte reste ouverte), chaque photo en plein écran avec la loupe
+  (`src/components/Lightbox.tsx`), puis « Enter the World » quand la pièce a sa page.
+  Les Créations (toutes, chaque collection, chaque sous-catégorie) : une grille de cartes égales, 3 par 3
+  (`src/components/PieceGrid.tsx` ; 2 sur tablette, 1 sur téléphone).
+  Autres préparations (disque externe branché, adresses versionnées) : `npm run brand` (le nom BERETE JEWELLERS découpé du
+  logo, pour le menu et le filigrane des capsules), `npm run mechanisms` (films des mécanismes de l'Atelier, image de la
+  planche du design de The Bespoke Journey), `npm run extra-media` (photos studio de JL, TM et T à épines, photos de la bague
+  Bosnie). La presse : `src/data/press.ts` (page `/press`, bandeau de l'accueil, capsules VfB et Inter).
   À la fin, il prépare des copies plus légères de chaque photo (`cover.w1080.webp` pour les photos HD, `cover.w640.webp`,
   `cover.w160.webp`) que le navigateur choisit sur téléphone et pour les vignettes. Pour les refaire seules : `npm run media:sizes`.
 - **L'admin** (`/admin`, mot de passe `ADMIN_PASSWORD`, sa propre page sans le menu du site) modifie les pièces (dont

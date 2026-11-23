@@ -23,12 +23,12 @@ const filmState = (page: Page) =>
     return { time: v.currentTime, paused: v.paused, muted: v.muted, src: v.currentSrc, width: v.videoWidth };
   });
 
-/* ---------- The film of the finished piece, first ---------- */
+/* ---------- The film of the finished piece: in its own section since 23/11/2026 (Yoni: the piece first) ---------- */
 
 const ENTERED = [INTER, "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "noah-okafor-oka-pendant", "tulips-on-tour-medallion", "the-hand"];
 
 for (const slug of ENTERED) {
-  test("entering " + slug + " by a click: its finished piece first, playing with its sound, in its frame, easy to leave", async ({ page }, info) => {
+  test("entering " + slug + " by a click: the piece first, its film in its section, playing with its sound, in its frame, easy to leave", async ({ page }, info) => {
     const problems = watch(page);
     const phone = info.project.name !== "desktop";
     const film = FILMS[slug]!.reveal!;
@@ -38,7 +38,14 @@ for (const slug of ENTERED) {
     await card.scrollIntoViewIfNeeded();
     await card.click();
     await expect(page).toHaveURL(new RegExp("/fr/pieces/" + slug + "$"));
-    // The first thing seen: the film, playing.
+    // The first thing seen: the piece, no film.
+    await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
+    await page.waitForTimeout(1200);
+    await expect(filmLayer(page)).toHaveCount(0);
+    // Its film, in its own section lower on the page: a click plays it full screen.
+    const section = page.locator("[data-piece-film-section]");
+    await section.scrollIntoViewIfNeeded();
+    await section.locator("[data-watch-film-section]").click();
     await expect(filmLayer(page)).toBeVisible();
     await expect.poll(async () => (await filmState(page)).time, { timeout: 30_000 }).toBeGreaterThan(0.6);
     const state = await filmState(page);
@@ -67,11 +74,12 @@ for (const slug of ENTERED) {
     await page.locator("[data-piece-film-skip]").click();
     await expect(filmLayer(page)).toHaveCount(0);
     await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
-    // Once per visit: back on the piece, straight to it; "Watch the film" plays it again; Escape leaves it.
+    // Back on the piece, straight to it; "Watch the film" leads to its section, which plays it again; Escape leaves it.
     await page.goto("/fr/pieces/" + slug);
     await ready(page);
     await expect(filmLayer(page)).toHaveCount(0);
     await page.locator("[data-watch-film]").click();
+    await page.locator("[data-watch-film-section]").click();
     await expect(filmLayer(page)).toBeVisible();
     await page.keyboard.press("Escape");
     await expect(filmLayer(page)).toHaveCount(0);

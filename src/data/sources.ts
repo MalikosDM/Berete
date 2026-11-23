@@ -3,6 +3,7 @@
  * items: the folders of the site, the photos made for the pieces, and the
  * files of the stories (a piece can show a story file without a copy).
  */
+import extras from "./extra.generated.json" with { type: "json" };
 import generatedStories from "./stories.generated.json" with { type: "json" };
 import generatedMedia from "./media.generated.json" with { type: "json" };
 import type { GeneratedMedia, GeneratedStory, MediaItem } from "./types.js";
@@ -31,6 +32,15 @@ export function sketch(slug: string, texts: Partial<MediaItem> = {}): MediaItem 
  * A high-resolution photo or video sent by Yoni (scripts/hd-media.mjs): the folder of the site and the file ("p07",
  * "v01"), or null when it is missing. Shot on black: blended into the page, unless `texts` says otherwise.
  */
+/**
+ * A photo sent apart by Yoni (scripts/extra-media.mjs, src/data/extra.generated.json): the studio image of a piece, the
+ * photos of the Bosnia ring. Null when it was not made.
+ */
+export function extra(slug: string, name: string, texts: Partial<MediaItem> = {}): MediaItem | null {
+  const m = (extras as Record<string, Record<string, { src: string; width: number; height: number }>>)[slug]?.[name];
+  return m ? { type: "image", onBlack: true, ...m, ...texts } : null;
+}
+
 export function yoni(dir: string, file: string, texts: Partial<MediaItem> = {}): MediaItem | null {
   // "p6" and "p06" name the same file.
   const key = file.replace(/^(\d\d-)?([pv])(\d+)$/, (_all, pre: string | undefined, kind: string, n: string) => (pre ?? "") + kind + n.padStart(2, "0"));

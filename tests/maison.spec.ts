@@ -20,9 +20,11 @@ for (const lang of ["", "/fr"]) {
     await skipIntro(page);
     await page.goto(lang + "/about", { waitUntil: "load" });
     const photos = page.locator("[data-house-photo]");
-    await expect(photos).toHaveCount(1);
-    await expect(page.locator("[data-house-chapter] [data-house-photo], [data-house-quote] [data-house-photo]")).toHaveCount(0);
-    const img = photos.locator("img");
+    // The portrait at the top, then one image of the house per chapter (23/11/2026, until Yoni sends his own), none on the quotes.
+    await expect(photos).toHaveCount(13);
+    await expect(page.locator("[data-house-chapter] [data-house-photo]")).toHaveCount(12);
+    await expect(page.locator("[data-house-quote] [data-house-photo]")).toHaveCount(0);
+    const img = photos.first().locator("img");
     await img.scrollIntoViewIfNeeded();
     await expect.poll(() => img.evaluate((e) => new URL((e as HTMLImageElement).currentSrc).pathname), { timeout: 15_000 }).toMatch(/^\/media\/house\/portrait(\.w\d+)?\.webp$/);
     await expect.poll(() => img.evaluate((e) => (e as HTMLImageElement).naturalWidth), { timeout: 15_000 }).toBeGreaterThan(0);

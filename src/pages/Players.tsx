@@ -3,8 +3,8 @@ import { useParams } from "react-router";
 import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
-import { Img, MediaView } from "@/components/Media";
-import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
+import { MediaView } from "@/components/Media";
+import { SIZES_FOR } from "@/lib/responsive";
 import PageIntro from "@/components/PageIntro";
 import PlayerWall, { PlayerPortrait } from "@/components/PlayerWall";
 import SplitHeading from "@/components/SplitHeading";
@@ -58,8 +58,8 @@ export function PlayerPage() {
   const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
   const instagram = instagramOf(person);
 
-  // A person with pieces: their pieces first (feedback of Yoni, 21/11/2026), their stories discreet at the bottom; a person
-  // known from the stories only keeps the button to watch them.
+  // A person with pieces: their pieces first (feedback of Yoni, 21/11/2026); a person known from the stories only keeps the
+  // button to watch them.
   const openStory = (i: number) => {
     primeStoryVideo(stories[i]!);
     setOpen(i);
@@ -162,30 +162,8 @@ export function PlayerPage() {
         </section>
       ) : null}
 
-      {stories.length > 0 ? (
-        // Their stories: in the second place, discreet, at the bottom of their page (21/11/2026).
-        <section aria-labelledby="player-stories" data-player-stories className="mx-auto max-w-[1600px] px-5 pb-16 sm:px-8 lg:px-12 lg:pb-20">
-          <div className="border-t border-white/10 pt-10">
-            <h2 id="player-stories" className="eyebrow">{t.players.stories}</h2>
-            <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-6">
-              {stories.map((s, i) => (
-                <li key={s.slug} className="w-24 sm:w-28">
-                  <button type="button" data-player-story={s.slug} onClick={() => openStory(i)} className="group block w-full text-center">
-                    <span className="relative mx-auto block size-20 overflow-hidden rounded-full bg-rose-gold p-[2px] sm:size-24">
-                      <span className="block h-full w-full overflow-hidden rounded-full border-2 border-ink">
-                        <Img src={s.cover} srcSet={coverSrcSet(s.cover)} sizes="96px" alt="" loading="lazy" className="h-full w-full object-cover opacity-85 transition-[opacity,transform] duration-700 group-hover:scale-105 group-hover:opacity-100" />
-                      </span>
-                    </span>
-                    <span data-story-title className="mt-2 block text-base leading-tight text-bone group-hover:text-rose-light">{s.title}</span>
-                    <span className="sr-only">{t.players.moments(s.media.length)}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
 
+      {/* A person known from the stories only: the button above opens them (no bubbles of stories any more, Yoni 23/11/2026). */}
       {open !== null ? <StoryViewer stories={stories} start={open} onClose={() => setOpen(null)} /> : null}
 
       <ContactBlock pieceName={pieces[0]?.title} compact id="player-contact" />

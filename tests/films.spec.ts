@@ -71,8 +71,14 @@ for (const slug of CAPSULES) {
     await skipIntro(page, { films: false });
     await page.goto("/fr/pieces/" + slug);
 
-    // 1. The finished piece opens the page: the copy made for the screen, sharp, playing; nothing else loaded meanwhile.
+    // 1. The finished piece (since 23/11/2026 in its own section, at a click): nothing loaded before the click, then the copy
+    //    made for the screen, sharp, playing.
     if (reveal) {
+      await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
+      await page.waitForTimeout(1000);
+      expect([...asked]).toEqual([]);
+      await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
+      await page.locator("[data-watch-film-section]").click();
       const video = page.locator("[data-piece-film-video]");
       await expect(page.locator("[data-piece-film]")).toBeVisible();
       await expect.poll(async () => (await play(video)).time, { timeout: 30_000 }).toBeGreaterThan(0.6);
@@ -90,7 +96,8 @@ for (const slug of CAPSULES) {
 
     // 2. The making-of: nothing before its passage is on screen, then its light copy, playing by itself, silent.
     if (making) {
-      expect([...asked].filter((p) => p.includes("/making"))).toEqual([]);
+      // (The film section stands just before the atelier: once it was scrolled to, the atelier may have come near already.)
+      if (!reveal) expect([...asked].filter((p) => p.includes("/making"))).toEqual([]);
       const passage = page.locator("[data-atelier-passage]");
       await passage.scrollIntoViewIfNeeded();
       const preview = passage.locator("[data-atelier-preview]");

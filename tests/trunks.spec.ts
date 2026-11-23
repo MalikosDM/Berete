@@ -24,7 +24,7 @@ const ORDER: [string, string | null][] = [
   ["dragon-ball-trunk", "kevin-schade-dragon-ball-pendant"],
   ["the-hand-cube", "the-hand"],
   ["dfb-pokal-2025-display", "vfb-stuttgart-dfb-pokal-2025"],
-  ["world-cup-display", null],
+  ["world-cup-display", "bosnia-and-herzegovina-world-cup-2026-ring"],
   ["photo-case", null],
   ["brt-coral-case", null],
   ["trophy-trunk", null],

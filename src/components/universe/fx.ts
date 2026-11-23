@@ -312,7 +312,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       vy: 0,
       life: 0,
       max: rand(700, 1500),
-      size: rand(0.6, 1.9),
+      size: rand(0.6, 1.9) * (phone ? 1.35 : 1),
       spin: rand(0, Math.PI * 2),
       angle: rand(0.25, 0.6),
       hue: 0,
@@ -330,7 +330,8 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
 
   const fill = () => {
     if (has("void")) while (streaks.length < count(72)) streaks.push(newStreak(true));
-    if (has("genkidama")) while (genki.length < count(84)) genki.push(newGenki(true));
+    // On a phone the light rises to the sphere as on a computer (Yoni, 23/11/2026): not thinned out like the other effects.
+    if (has("genkidama")) while (genki.length < (phone ? 60 : count(84))) genki.push(newGenki(true));
     if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
     if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
     if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, 0));

@@ -4,7 +4,7 @@ import BrandIcon from "@/components/BrandIcon";
 import { MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
 import SplitHeading from "@/components/SplitHeading";
-import { HOUSE_QUOTES_AFTER, housePhoto, housePhotoKey } from "@/data/house";
+import { HOUSE_QUOTES_AFTER, houseChapterPhoto, housePhoto, housePhotoKey } from "@/data/house";
 import type { MediaItem } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -69,7 +69,7 @@ export default function About() {
           <h2 id="house-chapters" className="eyebrow pt-6">{t.about.chapters}</h2>
           <ol className="mt-6">
             {house.chapters.map((chapter, i) => {
-              const photo = housePhoto(cat, housePhotoKey.chapter(i));
+              const photo = houseChapterPhoto(cat, i);
               const q = HOUSE_QUOTES_AFTER.indexOf(i as (typeof HOUSE_QUOTES_AFTER)[number]);
               const quote = q >= 0 ? house.quotes[q] : undefined;
               const quotePhoto = q >= 0 ? housePhoto(cat, housePhotoKey.quote(q)) : null;

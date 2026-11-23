@@ -143,10 +143,11 @@ test("the new names of the founder everywhere, in English and in French: no old 
   // A few of the new ones, where they belong.
   await page.goto("/");
   for (const name of ["The Creations", "The Berete Circle", "The Atelier", "Signature Trunks", "The Bespoke Journey", "The House", "Private Enquiries"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
-  await expect(page.locator("h1")).toContainText("The Art of Individuality");
+  // (The hook of the home page since 23/11/2026, Yoni.)
+  await expect(page.locator("h1")).toContainText("We don't begin with what has been done. We begin with what could be.");
   await page.goto("/fr");
   for (const name of ["Les Créations", "Le Cercle Berete", "L’Atelier", "Écrins Signature", "L’Expérience sur mesure", "La Maison", "Contact privé"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
-  await expect(page.locator("h1")).toContainText("L’Art de la singularité");
+  await expect(page.locator("h1")).toContainText("Nous ne partons pas de ce qui a déjà été fait.");
 });
 
 test("The House: Yoni Berete's story in chapters, his three quotes, the signature, no empty photo frame", async ({ page }, info) => {
@@ -166,8 +167,9 @@ test("The House: Yoni Berete's story in chapters, his three quotes, the signatur
     await expect(quotes.nth(i)).toContainText("Yoni Berete");
   }
   // His portrait only (22/11/2026): no photo, so no frame, in the chapters and the quotes.
-  await expect(page.locator("[data-house-photo]")).toHaveCount(1);
-  await expect(page.locator("[data-house-chapter] [data-house-photo], [data-house-quote] [data-house-photo]")).toHaveCount(0);
+  // The portrait, and one image of the house per chapter (23/11/2026); no empty frame, none on the quotes.
+  await expect(page.locator("[data-house-photo]")).toHaveCount(13);
+  await expect(page.locator("[data-house-quote] [data-house-photo]")).toHaveCount(0);
   await quotes.nth(0).scrollIntoViewIfNeeded();
   await page.waitForTimeout(1000);
   await page.screenshot({ path: shotPath(info, "house-2-citation"), type: "jpeg", quality: 70 });
@@ -265,7 +267,7 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
     ["michy-batshuayi-butterfly-pendant", "butterfly", "Italiana"],
     ["campione-d-italia-2023-2024", "inter", "Cinzel"],
     ["vfb-stuttgart-dfb-pokal-2025", "vfb", "Grenze Gotisch"],
-    ["noah-okafor-jersey-pendant", "tunnel", "Big Shoulders Display"],
+    ["noah-okafor-jersey-pendant", "okafor-jersey", "Big Shoulders Display"],
   ];
   for (const [slug, backdrop, font] of cases) {
     await page.goto("/pieces/" + slug, { waitUntil: "load" });
@@ -282,7 +284,7 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
     await expect(article, slug).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     // Its file: landscape on a computer, the portrait crop on a phone.
     await expect.poll(() => page.locator(".u-backdrop img").evaluate((i: HTMLImageElement) => (i.complete && i.naturalWidth > 0 ? i.currentSrc : "")), { message: slug + " backdrop" }).toMatch(
-      new RegExp("/media/universes/" + backdrop + (info.project.name === "desktop" ? "-\\d+" : "-m-\\d+") + "\\.(avif|webp)$"),
+      new RegExp("/media/universes/" + backdrop + (info.project.name === "desktop" ? "-\\d+" : "-m-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"),
     );
     await expect(page.locator(".u-fx"), slug).toHaveAttribute("data-running", "", { timeout: 10_000 });
     await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-2"), type: "jpeg", quality: 62 });
@@ -413,7 +415,7 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await expect(portrait.getByText("Enregistré.")).toBeVisible();
   const about = await page.context().newPage();
   await about.goto("/about", { waitUntil: "load" });
-  await expect(about.locator("[data-house-photo]")).toHaveCount(1, { timeout: 20_000 });
+  await expect(about.locator("[data-house-photo]")).toHaveCount(13, { timeout: 20_000 });
   await about.waitForTimeout(1500);
   await about.screenshot({ path: shotPath(info, "admin-4-photo-dans-la-maison"), type: "jpeg", quality: 70 });
   await about.close();

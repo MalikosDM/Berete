@@ -4,136 +4,17 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { expect, test, type Page } from "./fixtures";
-import { FILM_PIECES, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
+import { FILM_PIECES, getCatalogue, shotPath, skipIntro, watch } from "./helpers";
 
 const INTER = "campione-d-italia-2023-2024";
 const VFB = "vfb-stuttgart-dfb-pokal-2025";
-const phone = (name: string) => name !== "desktop";
 
 test.beforeEach(async ({ page }) => {
   await skipIntro(page);
 });
 
-/** Where the opening text sits against the bar of stories, and how far apart the names under the bubbles are. */
-async function heroLayout(page: Page) {
-  return page.evaluate(() => {
-    const bar = document.querySelector("[data-stories-bar]")!.getBoundingClientRect();
-    const hero = document.querySelector("[data-home-hero]")!;
-    const parts = [hero.querySelector("p"), hero.querySelector("h1"), ...Array.from(hero.querySelectorAll("a"))].filter((e): e is Element => e !== null).map((e) => e.getBoundingClientRect());
-    const names = Array.from(document.querySelectorAll("[data-story-name]"))
-      .map((n) => {
-        const range = document.createRange();
-        range.selectNodeContents(n);
-        const r = range.getBoundingClientRect();
-        return { left: r.left, right: r.right, lines: Math.round(r.height / parseFloat(getComputedStyle(n).lineHeight)), clipped: n.scrollHeight > n.clientHeight + 1 };
-      })
-      .filter((n) => n.right > 0 && n.left < innerWidth);
-    let gap = Infinity;
-    for (let i = 1; i < names.length; i++) gap = Math.min(gap, Math.abs(names[i]!.left - names[i - 1]!.right));
-    return {
-      barBottom: bar.bottom,
-      top: Math.min(...parts.map((r) => r.top)),
-      bottom: Math.max(...parts.map((r) => r.bottom)),
-      height: innerHeight,
-      gap,
-      lines: Math.max(...names.map((n) => n.lines)),
-      clipped: names.filter((n) => n.clipped).length,
-    };
-  });
-}
-
-test("home: the title, its sentence and the 3 buttons show whole under the bar of stories; names never touch", async ({ page }, info) => {
-  const problems = watch(page);
-  for (const path of ["/", "/fr", "/de", "/es", "/nl", "/ar"]) {
-    await page.goto(path, { waitUntil: "load" });
-    await page.waitForTimeout(1500);
-    const r = await heroLayout(page);
-    expect(r.top, path + ": the text starts under the bar of stories").toBeGreaterThanOrEqual(r.barBottom);
-    expect(r.bottom, path + ": the buttons are inside the screen").toBeLessThanOrEqual(r.height);
-    expect(r.gap, path + ": space between two names").toBeGreaterThanOrEqual(8);
-    expect(r.lines, path + ": two lines at most").toBeLessThanOrEqual(2);
-    expect(r.clipped, path + ": no name cut").toBe(0);
-    if (path === "/") await page.screenshot({ path: shotPath(info, "home-1-haut-de-page"), type: "jpeg", quality: 70 });
-    if (path === "/fr") await page.screenshot({ path: shotPath(info, "home-1-haut-de-page-fr"), type: "jpeg", quality: 70 });
-  }
-  expect(problems.errors).toEqual([]);
-});
-
-test("home film: each sentence on its dark halo, one screenshot per sentence", async ({ page }, info) => {
-  const problems = watch(page);
-  await page.goto("/", { waitUntil: "load" });
-  await page.waitForTimeout(3000);
-  const film = await page.evaluate(() => {
-    const el = document.querySelector("[data-scroll-video]")!;
-    return { top: el.getBoundingClientRect().top + scrollY, height: el.getBoundingClientRect().height };
-  });
-  // The middle of each text step (src/pages/Home.tsx).
-  const middles = [0.02, 0.14, 0.315, 0.495, 0.685, 0.885];
-  for (const [i, p] of middles.entries()) {
-    await scrollTo(page, film.top + p * (film.height - page.viewportSize()!.height));
-    await page.waitForTimeout(1600);
-    const step = page.locator("[data-film-step='" + i + "']");
-    await expect(step).toHaveCSS("opacity", "1");
-    await expect(step.locator("[data-text-halo]")).toHaveCount(1);
-    await page.screenshot({ path: shotPath(info, "home-2-film-phrase-" + (i + 1)), type: "jpeg", quality: 70 });
-  }
-  expect(problems.errors).toEqual([]);
-});
-
-test("stories bar: hides going down, comes back going up, never over the footer", async ({ page }) => {
-  await page.goto("/", { waitUntil: "load" });
-  await page.waitForTimeout(1500);
-  const bar = page.locator("[data-stories-bar]");
-  await expect(bar).toBeVisible();
-  // After the film (whose magnet glides the page by itself to its texts).
-  const after = await page.evaluate(() => {
-    const film = document.querySelector("[data-scroll-video]")!.getBoundingClientRect();
-    return film.bottom + scrollY;
-  });
-  await scrollTo(page, after + 200);
-  await scrollTo(page, after + 1200);
-  await expect(bar).toHaveAttribute("data-hidden", "true");
-  await expect(bar).toBeHidden();
-  await scrollTo(page, after + 800);
-  await expect(bar).not.toHaveAttribute("data-hidden", "true");
-  await expect(bar).toBeVisible();
-  // The bottom of the page: the footer is on screen, the bar stays away, even going up a little.
-  const end = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
-  await scrollTo(page, end - 1200);
-  await scrollTo(page, end);
-  await scrollTo(page, end - 150);
-  await expect(page.locator("footer")).toBeInViewport();
-  await expect(bar).toBeHidden();
-});
-
-test("special project: the Inter and VfB rings side by side, both open onto the trophy, each leads to its page", async ({ page }, info) => {
-  const problems = watch(page);
-  await page.goto("/", { waitUntil: "load" });
-  const section = page.locator("[data-special-project]");
-  // Right after the film.
-  expect(await page.evaluate(() => document.querySelector("[data-scroll-video]")?.nextElementSibling?.matches("[data-special-project]"))).toBe(true);
-  await section.scrollIntoViewIfNeeded();
-  await page.evaluate(() => window.scrollBy(0, -1));
-  await page.waitForTimeout(1500);
-  const rings = section.locator("[data-special-ring]");
-  await expect(rings).toHaveCount(2);
-  const [a, b] = [await rings.nth(0).boundingBox(), await rings.nth(1).boundingBox()];
-  if (phone(info.project.name)) expect(b!.y).toBeGreaterThan(a!.y);
-  else expect(Math.abs(b!.y - a!.y)).toBeLessThan(2);
-  await expect(rings.nth(0).locator("a[href$='/pieces/" + INTER + "']")).toHaveCount(1);
-  await expect(rings.nth(1).locator("a[href$='/pieces/" + VFB + "']")).toHaveCount(1);
-  await section.screenshot({ path: shotPath(info, "home-3-special-project"), type: "jpeg", quality: 70 });
-  for (const i of [0, 1]) {
-    const lift = rings.nth(i).locator("button[aria-pressed]");
-    await lift.click();
-    await expect(lift).toHaveAttribute("aria-pressed", "true");
-  }
-  await page.waitForTimeout(900);
-  await section.screenshot({ path: shotPath(info, "home-3-special-project-ouvertes"), type: "jpeg", quality: 70 });
-  await rings.nth(0).locator("a[href$='/pieces/" + INTER + "']").click();
-  await expect(page).toHaveURL(new RegExp("/pieces/" + INTER + "$"));
-  expect(problems.errors).toEqual([]);
-});
+// Since 23/11/2026 (Yoni) the home page is calm: no bubbles of stories, no film, the rings without their secret (it moved to
+// The Atelier). Its new sections: tests/yoni2311.spec.ts.
 
 test("Inter ring: created exclusively for Inter Milan, a historic commission, Marcus Thuram linked, the details open their photos", async ({ page }, info) => {
   const problems = watch(page);
@@ -165,7 +46,7 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   expect(problems.errors).toEqual([]);
 });
 
-test("players: a wall of portraits on /players and on the home page", async ({ page }, info) => {
+test("players: a wall of portraits on /players", async ({ page }, info) => {
   const problems = watch(page);
   const cat = await getCatalogue(page);
   await page.goto("/players", { waitUntil: "load" });
@@ -187,12 +68,6 @@ test("players: a wall of portraits on /players and on the home page", async ({ p
   });
   await page.waitForTimeout(1200);
   await page.screenshot({ path: shotPath(info, "players-1-mur"), type: "jpeg", quality: 70, fullPage: true });
-  await page.goto("/", { waitUntil: "load" });
-  const band = page.locator("#players-band-title").locator("xpath=ancestor::section[1]");
-  await band.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1500);
-  await expect(band.locator("[data-player-card]")).toHaveCount(cat.people.filter((p) => p.kind === "player").length);
-  await band.screenshot({ path: shotPath(info, "players-2-accueil"), type: "jpeg", quality: 70 });
   expect(problems.errors).toEqual([]);
 });
 
@@ -220,8 +95,9 @@ test("Signature Trunks: every trunk closed in a grid of squares, Commission Your
     expect(Math.abs(w! - h!)).toBeLessThanOrEqual(1);
     expect(Math.abs(w! - squares[0]![0]!)).toBeLessThanOrEqual(1);
   }
-  // Its 10 photos, full screen.
+  // Its 10 photos, under it (23/11/2026), each full screen with the magnifying glass.
   await page.locator("[data-box-photos='signature-trunk']").click();
+  await page.locator("[data-box='signature-trunk'] [data-box-photo]").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.waitForTimeout(700);
   await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });
@@ -233,13 +109,14 @@ test("Signature Trunks: every trunk closed in a grid of squares, Commission Your
 });
 
 test("link previews: a 1200 x 630 image on every page, the photo of the piece on a piece page, its own locale", async ({ page }) => {
+  // (Each address carries the version of its image since 23/11/2026: "?v=<fingerprint>".)
   const cases: [string, string, RegExp][] = [
-    ["/", "en_GB", /\/media\/share\/brand\.jpg$/],
-    ["/fr/players", "fr_FR", /\/media\/share\/brand\.jpg$/],
-    ["/es/boxes", "es_ES", /\/media\/share\/brand\.jpg$/],
-    ["/de/pieces/" + VFB, "de_DE", new RegExp("/media/share/pieces/" + VFB + "\\.jpg$")],
-    ["/nl/pieces/" + INTER, "nl_NL", new RegExp("/media/share/pieces/" + INTER + "\\.jpg$")],
-    ["/ar/pieces/kevin-schade-dragon-ball-pendant", "ar_AE", /\/media\/share\/pieces\/kevin-schade-dragon-ball-pendant\.jpg$/],
+    ["/", "en_GB", /\/media\/share\/brand\.jpg\?v=[0-9a-f]{10}$/],
+    ["/fr/players", "fr_FR", /\/media\/share\/brand\.jpg\?v=[0-9a-f]{10}$/],
+    ["/es/boxes", "es_ES", /\/media\/share\/brand\.jpg\?v=[0-9a-f]{10}$/],
+    ["/de/pieces/" + VFB, "de_DE", new RegExp("/media/share/pieces/" + VFB + "\\.jpg\\?v=[0-9a-f]{10}$")],
+    ["/nl/pieces/" + INTER, "nl_NL", new RegExp("/media/share/pieces/" + INTER + "\\.jpg\\?v=[0-9a-f]{10}$")],
+    ["/ar/pieces/kevin-schade-dragon-ball-pendant", "ar_AE", /\/media\/share\/pieces\/kevin-schade-dragon-ball-pendant\.jpg\?v=[0-9a-f]{10}$/],
   ];
   for (const [path, locale, image] of cases) {
     // As written in the page sent by the server (what WhatsApp and iMessage read)...

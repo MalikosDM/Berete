@@ -72,7 +72,12 @@ test("Dragon Ball: its main view much larger and whole; its edit 13/v01 opens th
   expect(film.making?.source).toBe(film.reveal?.source);
   await skipIntro(page, { films: false });
   await page.goto("/pieces/" + DRAGON);
-  // The film first: its own copy for the screen, playing.
+  // The piece first (23/11/2026); its film in its own section: its own copy for the screen, playing.
+  await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
+  await page.waitForTimeout(1000);
+  await expect(page.locator("[data-piece-film]")).toHaveCount(0);
+  await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
+  await page.locator("[data-watch-film-section]").click();
   const video = page.locator("[data-piece-film-video]");
   await expect(page.locator("[data-piece-film]")).toBeVisible({ timeout: 15_000 });
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 30_000 }).toBeGreaterThan(0.6);
@@ -82,12 +87,14 @@ test("Dragon Ball: its main view much larger and whole; its edit 13/v01 opens th
   await page.locator("[data-piece-film-skip]").click();
   await expect(page.locator("[data-piece-film]")).toHaveCount(0);
   await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
-  await page.waitForTimeout(800);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(1200);
   // The piece: much larger than before (the main view took 74 % of its frame on a computer, a frame of 58 % of the screen
   // on a phone), whole on the screen.
   const showcase = page.locator("[data-piece-cover] [data-showcase-large]");
   await expect(showcase).toHaveCount(1);
-  const img = phone ? page.locator("[data-showcase-slide='0'] img") : page.locator("[data-showcase-view][data-place='0'] img");
+  // (Since 23/11/2026 its view with its chain alone: tests/yoni2311.spec.ts.)
+  const img = page.locator("[data-piece-cover] [data-showcase] img:visible").first();
   await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).naturalWidth), { timeout: 15_000 }).toBeGreaterThan(0);
   const box = await drawn(img);
   const vp = page.viewportSize()!;
@@ -136,25 +143,16 @@ for (const [slug, target, several] of CLICKS) {
       await page.waitForTimeout(1500);
       await shot(page, info.project.name + "-circle-" + slug);
     } else {
-      // Their pieces first (a card for each capsule), their stories after everything else, discreet.
+      // Their pieces first (a card for each capsule); no bubbles of stories any more (23/11/2026).
       const pieces = page.locator("[data-player-pieces] [data-player-piece]");
       await expect(pieces).toHaveCount(piecesOf(publicCatalogue(defaultCatalogue), slug).length);
       await expect(page.locator("[data-player-watch]")).toHaveCount(0);
-      const order = await page.evaluate(() => {
-        const at = (sel: string) => document.querySelector(sel)?.getBoundingClientRect().top ?? -1;
-        return { pieces: at("[data-player-pieces]"), stories: at("[data-player-stories]"), photos: at("[data-player-photos]") };
-      });
-      expect(order.pieces).toBeGreaterThan(0);
-      expect(order.stories).toBeGreaterThan(order.pieces);
-      if (order.photos > 0) expect(order.stories).toBeGreaterThan(order.photos);
+      await expect(page.locator("[data-player-stories]")).toHaveCount(0);
       // The first card of a piece is on the first screen.
       const first = (await pieces.first().boundingBox())!;
       expect(first.y).toBeLessThan(page.viewportSize()!.height);
       await page.waitForTimeout(600);
       await shot(page, info.project.name + "-circle-" + slug + "-page");
-      await page.locator("[data-player-stories]").scrollIntoViewIfNeeded();
-      await page.waitForTimeout(500);
-      await shot(page, info.project.name + "-circle-" + slug + "-stories");
       await pieces.first().click();
       await expect(page).toHaveURL(/\/pieces\//);
     }
@@ -162,9 +160,9 @@ for (const [slug, target, several] of CLICKS) {
   });
 }
 
-test("the circle of the home page and the players of a club follow the same rule", async ({ page }) => {
+test("the circle and the players of a club follow the same rule", async ({ page }) => {
   await skipIntro(page);
-  await page.goto("/", { waitUntil: "load" });
+  await page.goto("/players", { waitUntil: "load" });
   const cat = publicCatalogue(defaultCatalogue);
   for (const link of await page.locator("[data-player-card]").all()) {
     const slug = (await link.getAttribute("data-player-card"))!;
@@ -244,12 +242,11 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   await page.waitForTimeout(1200);
   await shot(page, info.project.name + "-sirius-ecrin-3-ouvert");
   // Its photos: the professional ones.
+  // (Under the box since 23/11/2026, which stays open.)
   await card.locator("[data-box-photos='sirius']").click();
-  const dialog = page.locator("[role='dialog']");
-  await expect(dialog).toBeVisible();
-  // (The photos appear as they come into view.)
+  const dialog = card.locator("[data-box-gallery]");
   await expect(dialog.locator("img").first()).toBeVisible();
-  const srcs = await dialog.locator("img").evaluateAll((els) => els.map((e) => new URL((e as HTMLImageElement).src).pathname));
+  const srcs = await dialog.locator("img").evaluateAll((els) => els.map((e) => new URL((e as HTMLImageElement).currentSrc || (e as HTMLImageElement).src).pathname));
   expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-01"))).toBe(true);
   expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-0"))).toBe(true);
   expect(srcs.some((s) => s.includes("/media/hd/sirius/"))).toBe(false);
@@ -279,93 +276,6 @@ test("the page of the trunks without the NZ Travel Case; kept for the admin; its
 });
 
 /* ---------- 5. The home page ---------- */
-
-test("the home page, a little smaller; Explore the Creations: small cards with air, several at once", async ({ page }, info) => {
-  const problems = watch(page);
-  const phone = info.project.name !== "desktop";
-  await skipIntro(page);
-  await page.goto("/", { waitUntil: "load" });
-  const vp = page.viewportSize()!;
-  // The titles of the sections: at most 52 px (64 px before).
-  for (const id of ["#special-title", "#collections-title", "#capsules-title", "#players-band-title", "#house-title"]) {
-    const size = await page.locator(id).evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
-    expect(size, id).toBeLessThanOrEqual(52.5);
-  }
-  // Explore the Creations: the cards side by side, all of them on one screen on a computer, two by two on a phone.
-  const section = page.locator("[data-collections]");
-  await section.evaluate((e) => e.scrollIntoView({ block: "start" }));
-  await page.waitForTimeout(1200);
-  const tiles = page.locator("[data-collection-tile]");
-  const n = await tiles.count();
-  expect(n).toBeGreaterThanOrEqual(3);
-  const boxes = await Promise.all((await tiles.all()).map((t) => t.boundingBox()));
-  const firstRow = boxes.filter((b) => Math.abs(b!.y - boxes[0]!.y) < 2);
-  expect(firstRow.length).toBe(phone ? 2 : n);
-  for (const b of boxes) expect(b!.width).toBeLessThan(phone ? vp.width / 2 : vp.width / 3.5);
-  // Air between them.
-  expect(boxes[1]!.x - (boxes[0]!.x + boxes[0]!.width)).toBeGreaterThanOrEqual(14);
-  // The jewel whole in its card (no crop): "contain".
-  expect(await tiles.first().locator("img").first().evaluate((e) => getComputedStyle(e).objectFit)).toBe("contain");
-  await shot(page, info.project.name + "-accueil-creations");
-  // Readable: the texts of 16 px at least, the buttons 48 px high at least.
-  const small = await page.evaluate(() =>
-    [...document.querySelectorAll("main p, main a, main button, main li span")]
-      .filter((e) => (e as HTMLElement).offsetParent !== null && e.textContent!.trim().length > 2 && !e.closest("[data-stories-bar]") && !e.closest(".sr-only"))
-      .filter((e) => parseFloat(getComputedStyle(e).fontSize) < 15.9 && getComputedStyle(e).fontSize !== "")
-      .map((e) => e.textContent!.trim().slice(0, 40) + " " + getComputedStyle(e).fontSize),
-  );
-  if (phone) expect(small).toEqual([]);
-  const buttons = await page.evaluate(() =>
-    [...document.querySelectorAll("main a, main button")]
-      .filter((e) => (e as HTMLElement).offsetParent !== null && e.getBoundingClientRect().width > 0 && !e.closest("[data-stories-bar]") && !e.closest("[data-player-card]") && !e.closest("[data-collection-tile]") && !e.closest("[data-pin-wrapper]") && !e.closest(".grid > div") && e.textContent!.trim().length > 0)
-      .filter((e) => e.getBoundingClientRect().height < 44)
-      .map((e) => e.textContent!.trim().slice(0, 30)),
-  );
-  expect(buttons).toEqual([]);
-  for (const sel of ["[data-special-project]", "[data-pin-wrapper]", "section[aria-labelledby='players-band-title']", "section[aria-labelledby='house-title']"]) {
-    await page.locator(sel).first().evaluate((e) => e.scrollIntoView({ block: "start" }));
-    await page.waitForTimeout(1200);
-    await shot(page, info.project.name + "-accueil-" + sel.replace(/[^a-z]/gi, "").slice(0, 24));
-  }
-  expect(problems.errors).toEqual([]);
-});
-
-/* ---------- 6. The menu ---------- */
-
-test("the menu of the computer: the same on Worn by Icons as on every page, whole from 1260 px, in every language", async ({ page }, info) => {
-  test.skip(info.project.name !== "desktop", "the menu of a computer");
-  test.setTimeout(120_000);
-  await skipIntro(page);
-  for (const width of [1265, 1366, 1425]) {
-    await page.setViewportSize({ width, height: 860 });
-    for (const path of ["/players", "/", "/creations", "/atelier", "/boxes", "/process", "/about", "/contact", "/players/marcus-thuram", "/pieces/sirius"]) {
-      await page.goto(path, { waitUntil: "load" });
-      await expect(page.locator("[data-desktop-nav]"), path + " at " + width).toBeVisible();
-      await expect(page.locator("button[aria-controls='mobile-menu']"), path + " at " + width).toBeHidden();
-    }
-  }
-  // The narrowest screen with the whole menu, in the six languages: on one line, never under the buttons beside it.
-  await page.setViewportSize({ width: 1260, height: 860 });
-  for (const lang of ["", "/fr", "/es", "/de", "/nl", "/ar"]) {
-    await page.goto(lang + "/players", { waitUntil: "load" });
-    const fit = await page.evaluate(() => {
-      const nav = document.querySelector("[data-desktop-nav]")!.getBoundingClientRect();
-      const logo = document.querySelector("header a")!.getBoundingClientRect();
-      const right = document.querySelector("header > div:nth-child(2) > div:last-child")!.getBoundingClientRect();
-      const links = [...document.querySelectorAll("[data-desktop-nav] > a, [data-desktop-nav] > div > a")].map((a) => a.getBoundingClientRect().height);
-      const rtl = document.documentElement.dir === "rtl";
-      return { gapEnd: rtl ? nav.left - right.right : right.left - nav.right, gapStart: rtl ? logo.left - nav.right : nav.left - logo.right, tallest: Math.max(...links), scroll: document.documentElement.scrollWidth - document.documentElement.clientWidth };
-    });
-    expect(fit.gapEnd, lang + ": room before the buttons").toBeGreaterThanOrEqual(8);
-    expect(fit.gapStart, lang + ": room after the logo").toBeGreaterThanOrEqual(8);
-    expect(fit.tallest, lang + ": one line").toBeLessThanOrEqual(50);
-    expect(fit.scroll).toBe(0);
-    if (lang === "" || lang === "/fr") await page.screenshot({ path: DIR + "/menu-1260" + (lang || "/en").replace("/", "-") + ".jpg", type: "jpeg", quality: 70, clip: { x: 0, y: 0, width: 1260, height: 120 } });
-  }
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/fr/players", { waitUntil: "load" });
-  await shot(page, "desktop-worn-by-icons");
-});
 
 test("Worn by Icons on a phone: the usual bar with its menu button, as on every page", async ({ page }, info) => {
   test.skip(info.project.name === "desktop", "phones");

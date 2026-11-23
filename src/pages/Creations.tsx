@@ -1,16 +1,16 @@
 import { useSearchParams } from "react-router";
 import { ArrowRight } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
-import PieceCarousel from "@/components/PieceCarousel";
+import PieceGrid from "@/components/PieceGrid";
 import { COLLECTIONS, collectionPath, piecesOfCollection, subcategoriesOf } from "@/data/collections";
 import type { PieceType } from "@/data/types";
 import { collectionWords, Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 
 /**
- * Every piece, filterable by type, then by sub-category (Pendants > Jesus Pieces, ?category=pendants&sub=jesus-pieces), shown
- * one by one in a carousel, or all at once in a grid of equal cards (3, 2, 1 on a row: src/components/PieceCarousel.tsx,
- * asked by Yoni on 22/11/2026). Each opens /pieces/:slug.
+ * Every piece, filterable by type, then by sub-category (Pendants > Jesus Pieces, ?category=pendants&sub=jesus-pieces), in a
+ * grid of equal cards, 3 by 3 (src/components/PieceGrid.tsx; Yoni, 23/11/2026: no carousel any more). Each opens
+ * /pieces/:slug.
  */
 export default function Creations() {
   const { t } = useI18n();
@@ -104,7 +104,7 @@ export default function Creations() {
               </Link>
             </div>
           ) : (
-            <PieceCarousel key={active + "/" + (sub?.slug ?? "")} pieces={list} label={sub ? collectionWords(t, sub.slug, sub).name : collection ? collectionName : t.creations.listLabel} memory={"creations/" + active + "/" + (sub?.slug ?? "")} showType={active === "all"} />
+            <PieceGrid key={active + "/" + (sub?.slug ?? "")} pieces={list} showType={active === "all"} />
           )}
         </div>
       </section>

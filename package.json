@@ -26,7 +26,10 @@
     "universes": "node scripts/universe-media.mjs",
     "trunks": "node scripts/trunk-media.mjs",
     "cutouts": "node scripts/cutouts.mjs",
-    "vps": "bash deploy/vps.sh"
+    "vps": "bash deploy/vps.sh",
+    "brand": "node scripts/brand-media.mjs",
+    "mechanisms": "node scripts/mechanism-media.mjs",
+    "extra-media": "node scripts/extra-media.mjs"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",

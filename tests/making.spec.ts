@@ -102,20 +102,23 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   for (const f of ["p05", "p15", "p17", "p10"]) expect(piece.gallery.some((m) => m.src === "/media/hd/" + slug + "/" + f + ".webp"), f).toBe(true);
   await skipIntro(page, { films: false });
   await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
-  // Its film first.
+  // Its film, in its own section since 23/11/2026 (the piece first).
+  await expect(page.locator("[data-piece-film]")).toHaveCount(0);
+  await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
+  await page.locator("[data-watch-film-section]").click();
   await expect(page.locator("[data-piece-film]")).toBeVisible({ timeout: 20_000 });
   const src = await page.locator("[data-piece-film-video]").evaluate((el) => (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src);
   expect(src).toContain("/media/films/" + slug + "/reveal");
   await page.waitForTimeout(1200);
   await shot(page, info.project.name + "-n14-1-film");
   await page.locator("[data-piece-film-skip]").click();
-  // Every Angle: its photos, each with its text.
+  // Every Angle: its photos (since 23/11/2026, no text).
   const section = page.locator("[data-every-angle]");
   await section.scrollIntoViewIfNeeded();
   const more = section.locator("[data-angle-more]");
   if (await more.count()) await more.click();
   await expect(section.locator("[data-angle]")).toHaveCount(anglePhotos(piece, resolveShowcase(slug, piece.showcase).mode === "photo").length);
-  await expect(section.locator("[data-angle-text]")).toHaveCount(await section.locator("[data-angle]").count());
+  await expect(section.locator("[data-angle-text]")).toHaveCount(0);
   await shot(page, info.project.name + "-n14-2-angles");
   // Its atelier: the same film, once.
   const passage = page.locator("[data-atelier-passage]");
@@ -188,8 +191,8 @@ test("Jesus Pieces: from the menu, every Jesus piece of the house", async ({ pag
   }
   await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
-  // (Its carousel, since 22/11/2026.)
-  const cards = await page.locator("main [data-carousel-piece]").evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("data-carousel-piece")))]);
+  // (Its grid, since 23/11/2026.)
+  const cards = await page.locator("main [data-creations-grid] [data-piece-card]").evaluateAll((els) => [...new Set(els.map((e) => e.getAttribute("data-piece-card")))]);
   expect(cards).toEqual(pieces.map((p) => p.slug));
   await shot(page, info.project.name + "-jesus-pieces");
   expect(problems.errors).toEqual([]);

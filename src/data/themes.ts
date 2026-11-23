@@ -127,6 +127,8 @@ export type Backdrop = {
   /** The widths of the files, landscape ("<id>-<w>") and portrait for phones ("<id>-m-<w>"), each in AVIF and WebP. */
   widths: number[];
   mobileWidths: number[];
+  /** The fingerprint of its files, in their names (a background made since 23/11/2026): "<id>-1600.<version>.webp". */
+  version?: string;
   /** A sphere of light in the image (Genkidama): its centre and its radius, as shares of the width, landscape and portrait. */
   core?: [number, number, number];
   mobileCore?: [number, number, number];
@@ -211,6 +213,20 @@ export const THEME_PRESETS: Record<string, Preset> = {
   tunnel: {
     name: "Tunnel du vestiaire, avant-match (Noah Okafor)",
     theme: { base: "#040805", tint: "#0e2a18", glow: "#e9f5ea", texture: "origins", light: "spotlight", font: "stade", backdrop: "tunnel", entrance: "tunnel", effects: ["speedlines", "dust", "glints"], mark: "" },
+  },
+  // 23/11/2026 (Yoni): the two new worlds of Noah Okafor (the octagon keeps the tunnel). Calm: the piece first.
+  "okafor-jersey": {
+    name: "Projecteurs aux couleurs du Nigeria et de la Suisse (Noah Okafor, pendentif maillot)",
+    theme: { base: "#040404", tint: "#10140f", glow: "#f4f2ef", texture: "grain", light: "spotlight", font: "stade", backdrop: "okafor-jersey", entrance: "spotlight", effects: ["dust", "glints", "jewel-sparkle"], mark: "" },
+  },
+  "okafor-oka": {
+    name: "Camouflage or rose, cartes de la Suisse et du Nigeria (Noah Okafor, pendentif OKA)",
+    theme: { base: "#050605", tint: "#16201b", glow: "#e8b4a0", texture: "grain", light: "halo", font: "stade", backdrop: "okafor-oka", entrance: "glint", effects: ["dust", "jewel-sheen"], mark: "" },
+  },
+  // 23/11/2026 (Yoni): no universe at all, all black, the piece as the hero (Marcus Thuram's T necklace, the Bosnia ring).
+  noir: {
+    name: "Tout noir, sans univers (la pièce seule)",
+    theme: { base: "#050505", tint: "#050505", glow: "#e8b4a0", texture: "none", light: "halo", font: "maison", backdrop: "", entrance: "ignite", effects: [], mark: "" },
   },
   terrain: {
     name: "Terrain (football, joueur)",

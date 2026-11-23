@@ -28,6 +28,7 @@ export default function Footer() {
     { label: t.nav.boxes, to: "/boxes" },
     { label: t.nav.process, to: "/process" },
     { label: t.nav.about, to: "/about" },
+    { label: t.nav.press, to: "/press" },
   ];
 
   return (

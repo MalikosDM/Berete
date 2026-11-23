@@ -88,9 +88,19 @@ export const nl: Messages = {
     boxes: "Signature-koffers",
     process: "De ervaring op maat",
     about: "Het Huis",
+    press: "Pers",
     contact: "Persoonlijk contact",
     openMenu: "Menu openen",
     closeMenu: "Menu sluiten",
+  },
+
+  /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
+  press: {
+    eyebrow: "Pers",
+    title: "In de schijnwerpers",
+    lead: "Het huis in de pers: de kampioensringen van VfB Stuttgart en Inter Milan.",
+    all: "Alle artikelen",
+    about: (title: string) => "Over " + title,
   },
 
   footer: {
@@ -129,6 +139,18 @@ export const nl: Messages = {
   },
 
   home: {
+    /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
+    hook: "We beginnen niet bij wat al gedaan is. We beginnen bij wat zou kunnen zijn.",
+    who: "Berete Jewellers is een huis van haute joaillerie op maat, gevestigd in Dubai: unieke stukken, met u bedacht en met de hand gemaakt.",
+    innovation: {
+      eyebrow: "Innovatie",
+      title: "Energie was nooit bedoeld om stil te staan",
+      text: "Voor Kevin Schade ontwierp Berete de met diamanten bezette Spirit Bomb van zijn Dragon Ball-hanger zo dat hij draait: beweging in het hart van de creatie.",
+      caption: "De bol draait",
+      play: "Zie de bol draaien",
+      film: "De Spirit Bomb, aan de werkbank met de hand gedraaid, vóór het zetten",
+    },
+    selection: { eyebrow: "De Creaties", title: "Hangers, kettingen, ringen" },
     filmLabel: "Film van Berete Jewellers, afgespeeld door te scrollen",
     kicker: "Berete Jewellers · Dubai",
     title: "De kunst van individualiteit.",
@@ -248,6 +270,7 @@ export const nl: Messages = {
   },
 
   gallery: {
+    zoomHint: "Zoom met + en −, een dubbelklik of twee vingers; sleep om de foto te verplaatsen.",
     title: "Details",
     hintPinned: "Scroll om te verkennen · Tik om te zoomen",
     hint: "Tik om te zoomen",
@@ -300,6 +323,21 @@ export const nl: Messages = {
   },
 
   atelier: {
+    philosophy: {
+      eyebrow: "Onze filosofie",
+      title: "Geen visie te gedurfd, geen detail zonder betekenis.",
+      text: ["Berete werkt met teams van gespecialiseerde ambachtslieden.", "Samen verkennen ze nieuwe zettingen, nieuwe constructies en nieuwe mechanismen, en verleggen ze de grenzen van de haute joaillerie."],
+    },
+    engineering: {
+      eyebrow: "Mechanismen",
+      title: "Het buitengewone, vakkundig gebouwd",
+      lead: "Sommige stukken draaien, gaan open of onthullen wat ze verbergen: mechanismen bedacht met de ambachtslieden van het huis.",
+      sphereTitle: "De Spirit Bomb die draait",
+      sphereText: "Bij de Dragon Ball-hanger van Kevin Schade werd de met diamanten bezette bol ontworpen om te draaien: beweging in het hart van de creatie. Hier wordt hij aan de werkbank met de hand gedraaid, vóór het zetten.",
+      sphereFilm: "De bol van de Dragon Ball-hanger, aan de werkbank met de hand gedraaid, vóór het zetten",
+      liftTitle: "De bovenkant gaat eraf",
+      liftText: "Bij de kampioensringen van Inter Milan en VfB Stuttgart gaat de bovenkant eraf en onthult de trofee die eronder verborgen zit. De bovenkant van de Inter-ring kan ook los worden gedragen, als hanger.",
+    },
     steps: [
       { title: "De geboorte van de vorm", text: "Het model wordt ruw metaal: een hanger vóór zijn eerste steen." },
       { title: "Precisie in elk detail", text: "Schakel na schakel krijgt een armband vorm op de werkbank." },
@@ -319,6 +357,7 @@ export const nl: Messages = {
   },
 
   boxes: {
+    hidePhotos: "Foto's verbergen",
     eyebrow: "Stuk voor stuk vervaardigd",
     title: "Signature-koffers",
     lead: "Elke uitzonderlijke creatie verdient een buitengewone presentatie.",
@@ -337,6 +376,20 @@ export const nl: Messages = {
   },
 
   process: {
+    /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    quick: {
+      lead: "Van de eerste schets tot de onthulling in zijn etui: vier stappen, samen met u gevolgd op WhatsApp.",
+      steps: [
+        { title: "De schets", text: "Uw idee wordt een eerste tekening, met de hand." },
+        { title: "Goedkeuring van het ontwerp", text: "U keurt het ontwerp goed, elk aanzicht, voordat er iets wordt gemaakt." },
+        { title: "Gemaakt in het atelier", text: "Gegoten, gezet en gepolijst met de hand, stap voor stap." },
+        { title: "De onthulling", text: "Uw voltooide stuk, onthuld in zijn etui." },
+      ],
+      orderQ: "Hoe bestel ik?",
+      orderA: "Schrijf ons via WhatsApp of via Persoonlijk contact met uw idee, uw referenties en uw verhaal. Er volgt een persoonlijk gesprek; de ontwerpaanbetaling start daarna het ontwerp.",
+      timeQ: "Hoe lang duurt het?",
+      timeA: "Elk stuk heeft zijn eigen termijn, afhankelijk van de complexiteit: gemiddeld ongeveer tien weken.",
+    },
     filmLabel: "De werkwijze, stap voor stap, afgespeeld door te scrollen",
     steps: [
       { title: "Het privéconsult", text: "Ideeën en budget. Vertel ons welk moment u wilt vastleggen, uw referenties, uw verhaal.", meter: "0%", payNote: "Geen betaling in deze fase." },
@@ -494,6 +547,10 @@ export const nl: Messages = {
   },
 
   seoPages: {
+    "/press": {
+      title: "In de schijnwerpers — Pers",
+      description: "Berete Jewellers in de pers: de kampioensringen van VfB Stuttgart en Inter Milan, verteld door Goal.com Deutschland, de Stuttgarter Nachrichten en de Daily Mail.",
+    },
     "/": {
       title: "Berete Jewellers — De kunst van individualiteit, Dubai",
       description: "Haute joaillerie in één exemplaar, voor wie zijn eigen verhaal schrijft. Hangers, kettingen en kampioensringen uit Dubai. Door ons gemaakt. Door u geïnspireerd.",
@@ -652,6 +709,8 @@ export const nl: Messages = {
   },
 
   films: {
+    pieceSection: "Het voltooide stuk",
+    pieceSectionLead: (title: string) => "De film van het voltooide stuk: " + title + ". Op volledig scherm, met geluid.",
     eyebrow: "Achter het stuk",
     enter: "Betreed het atelier",
     lead: (title, reveal) => "Kijk achter de werkbank en zie hoe " + title + " tot leven komt" + (reveal ? ", en ontdek het stuk daarna in De grote onthulling." : "."),

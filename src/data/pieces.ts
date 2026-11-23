@@ -7,7 +7,7 @@
  * and stones" of the technical sheet, left out when the photos say nothing sure.
  */
 import { anglesOf } from "./angles.js";
-import { group, hdGallery, list, sketch, st, still, yoni } from "./sources.js";
+import { extra, group, hdGallery, list, sketch, st, still, yoni } from "./sources.js";
 import type { PieceAtelier } from "./atelier.js";
 import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
@@ -50,7 +50,11 @@ export const REMOVED_PIECES = [
 ];
 
 /** Pieces worn together (22/11/2026): a pendant and the chain it is worn on. The page of each leads to the other. */
-export const WORN_TOGETHER: [pendant: string, chain: string][] = [["michy-batshuayi-butterfly-pendant", "butterfly-chain"]];
+export const WORN_TOGETHER: [pendant: string, chain: string][] = [
+  ["michy-batshuayi-butterfly-pendant", "butterfly-chain"],
+  // The chain of Noah Okafor's jersey pendant detaches from it and closes into the Safi Link (Yoni, 23/11/2026).
+  ["noah-okafor-jersey-pendant", "the-safi-link"],
+];
 
 /** The piece worn with this one, and what it is to it (its chain, or its pendant); null when none. */
 export function wornWith(slug: string): { slug: string; is: "chain" | "pendant" } | null {
@@ -60,6 +64,9 @@ export function wornWith(slug: string): { slug: string; is: "chain" | "pendant" 
   }
   return null;
 }
+
+/** The ring of Bosnia and Herzegovina for the World Cup 2026 (Yoni, 23/11/2026). */
+export const BOSNIA = "bosnia-and-herzegovina-world-cup-2026-ring";
 
 /** The folder of hd of the Butterfly of Michy Batshuayi (folder 23): its pendant and its chain. */
 const BUTTERFLY = "michy-batshuayi-butterfly-chain";
@@ -271,8 +278,17 @@ const SITE_PIECES: Piece[] = [
     title: "VfB Stuttgart — DFB-Pokal 2025 Ring",
     type: "ring",
     line: "The top lifts off and reveals the trophy.",
+    // In four parts (22–23/11/2026): the inspiration, the design, the technique, the details; only the facts already known
+    // (the red stones around the crest are cut as shields, not pears).
     story:
-      "A championship ring for the 2025 DFB-Pokal winners. The club crest sits at its heart, framed by red pear-shaped stones. The removable top opens onto a sculpted cup, and every ring carries the name and number of the player who wears it.",
+      "## Winners of the 2025 DFB-Pokal\n\n" +
+      "A championship ring for the VfB Stuttgart squad that won the 2025 DFB-Pokal.\n\n" +
+      "## The Crest at the Centre\n\n" +
+      "At its heart, the enamelled club crest, framed by red stones cut in the shape of a shield.\n\n" +
+      "## A Top That Lifts Off\n\n" +
+      "The top is removable: lifted, it uncovers a sculpted cup, and the side of the ring carries the DFB-Pokal engraving.\n\n" +
+      "## One Ring per Player\n\n" +
+      "Every ring carries the name and number of the player who wears it.",
     people: ["deniz-undav", "angelo-stiller", "jamie-leweling", "maximilian-mittelstaedt", "chris-fuehrich", "atakan-karazor", "vfb-stuttgart"],
     client: "VfB Stuttgart",
     theme: { preset: "victoire-rouge" },
@@ -295,8 +311,17 @@ const SITE_PIECES: Piece[] = [
     title: "Inter Milan — Campione d'Italia Ring",
     type: "ring",
     line: "Twenty stars for twenty titles.",
+    // In four parts (22–23/11/2026), from the facts of its details only; the 20 is polished rose gold, not set.
     story:
-      "Twenty titles, one number. A series of rings made for the whole squad after Inter's twentieth league title: the club emblem in diamonds on a deep blue ground, a band of stars around it, and the words Campione d'Italia on the side. The top lifts off to reveal a sculpted cup, and can be worn on its own as a pendant.",
+      "## The Twentieth Title\n\n" +
+      "After Inter Milan's twentieth league title, a ring was made for every player of the squad.\n\n" +
+      "## The Club, Detail by Detail\n\n" +
+      "The emblem is set in diamonds on a deep blue ground, inside a band of stars, circled by the black and blue stripes of the shirt. On the sides: Forza Inter above the Italian flag, the Serie A logo with its 20, and the words Inter Milan Campione d'Italia.\n\n" +
+      "## The Hidden Cup\n\n" +
+      "Six months of work went into the ring. Its top lifts off onto a sculpted cup hidden beneath, and can be worn on its own as a pendant.\n\n" +
+      "## One Star for Each Title\n\n" +
+      "Twenty stars and twenty diamonds, one of each for every title, and the 20 itself in polished rose gold.\n\n" +
+      "> Twenty titles, one number.",
     people: ["inter-milan", "marcus-thuram"],
     client: "Inter Milan",
     theme: { preset: "victoire-nuit" },
@@ -390,10 +415,12 @@ const SITE_PIECES: Piece[] = [
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
     theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "impact"] },
     // Its main view much larger at the opening (feedback of Yoni, 21/11/2026), whole, on a computer and on a phone.
-    showcase: { size: "large" },
+    // 23/11/2026 (Yoni): the view with its chain alone and larger at the opening; its back no longer first (at the end of
+    // its photos).
+    showcase: { size: "large", mode: "single", views: ["p19"] },
     ...sorted("kevin-schade-dragon-ball-pendant", [
-      yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
       yoni("kevin-schade-dragon-ball-pendant", "p19", at("The Dragon Ball pendant on black, with its Cuban chain")),
+      yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
       yoni("kevin-schade-dragon-ball-pendant", "p07", at("The hero in rose gold, among the dragon balls", "The hero")),
       yoni("kevin-schade-dragon-ball-pendant", "p09", at("The sphere set with blue stones", "The sphere")),
       yoni("kevin-schade-dragon-ball-pendant", "p08", at("Close-up of the dragon scales and the rose gold spheres", "The dragon, up close")),
@@ -427,7 +454,9 @@ const SITE_PIECES: Piece[] = [
     story:
       "Two hands crossed in the gesture of his goal celebration, sculpted in volume and paved with white diamonds, with baguette-cut stones at the cuffs. A round medallion sits on the bail.",
     people: ["kenan-yildiz"],
+    // Its stadium darkened by Yoni (23/11/2026); the piece larger (Yoni: at least 30 % larger).
     theme: { preset: "bianconero" },
+    showcase: { size: "large" },
     ...sorted("kenan-yildiz-celebration-pendant", [
       yoni("kenan-yildiz-celebration-pendant", "p07", at("Kenan Yildiz's pendant: two crossed hands paved with diamonds")),
       yoni("kenan-yildiz-celebration-pendant", "p06", at("The celebration pendant from another angle")),
@@ -448,11 +477,22 @@ const SITE_PIECES: Piece[] = [
     slug: "noah-okafor-jersey-pendant",
     title: "Noah Okafor — Jersey Pendant",
     type: "pendant",
-    line: "A jersey worn arms crossed, set stone by stone.",
+    // What Yoni told of it (22–23/11/2026), in four parts: Oka4, the crown of the four siblings, the two flags, the chain that
+    // becomes the Safi Link.
+    line: "His celebration, his family and his two flags, set in diamonds.",
     story:
-      "A jersey sculpted in volume, arms crossed like its owner on the pitch, entirely set with diamonds. The Swiss cross sits on the chest and green stones run along the sleeve. Below, triangle-cut stones form the base, and the pendant hangs from a chain of diamond flowers.",
+      "## Half Swiss, Half Nigerian\n\n" +
+      "Noah Okafor is half Swiss, half Nigerian. His pendant carries both, in the pose of his goal celebration: a jersey, arms crossed.\n\n" +
+      "## Two Flags on One Jersey\n\n" +
+      "The Swiss emblem sits on the chest, a white cross on a shield of red stones. The flag of Nigeria circles the sleeve, and the three stripes of the jersey take up its colours.\n\n" +
+      "## A Chain That Becomes the Safi Link\n\n" +
+      "The chain detaches and clips into the pendant. Removed, it closes with a connecting piece and becomes a chain of its own: the Safi Link. Decorative details, down to the triangle-cut stones of the base, are there to show the craft.\n\n" +
+      "## Oka4\n\n" +
+      "On the back, OKA and the number 4: read aloud, Oka4 becomes Okafor. Above the 4, a crown for the four Okafor siblings.\n\n" +
+      "> Two flags, four siblings, one name.",
     people: ["noah-okafor"],
-    theme: { preset: "tunnel" },
+    // Its own world since 23/11/2026 (Yoni): spotlights in the colours of Nigeria and Switzerland.
+    theme: { preset: "okafor-jersey" },
     ...sorted("noah-okafor-jersey-pendant", [
       yoni("noah-okafor-jersey-pendant", "p20", at("Noah Okafor's jersey pendant on a chain of diamond flowers")),
       yoni("noah-okafor-jersey-pendant", "p18", at("The Swiss cross on the chest", "The Swiss cross")),
@@ -467,7 +507,8 @@ const SITE_PIECES: Piece[] = [
     ]),
     specs: [
       ["Type", "Pendant"],
-      ["Motif", "A jersey, arms crossed, with the Swiss cross"],
+      ["Motif", "His goal celebration: a jersey, arms crossed"],
+      ["Chain", "Detachable, worn on its own as the Safi Link"],
     ],
     seen: "White and rose gold tones · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
     making: { raw: raw("noah-okafor-jersey-pendant", "p21"), setting: yoni("noah-okafor-jersey-pendant", "v02-21_2s", SET()), delivery: yoni("noah-okafor-jersey-pendant", "v02-12_2s", IN_TRUNK()) },
@@ -476,11 +517,20 @@ const SITE_PIECES: Piece[] = [
     slug: "noah-okafor-oka-pendant",
     title: "Noah Okafor — OKA Nameplate Pendant",
     type: "pendant",
-    line: "Three letters, a ball in rose gold.",
+    // Its first piece with Berete; the camouflage of a friend's Swiss military service hides two maps (Yoni, 22–23/11/2026).
+    line: "His first piece with Berete: two maps hidden in a camouflage.",
     story:
-      "The letters OKA in white diamonds, crossed by rose gold patches, with a sculpted football in rose gold set on the letters. It hangs from a diamond-set Cuban chain.",
+      "## A Friend's Military Service\n\n" +
+      "The first piece Noah Okafor created with Berete. Its idea came from a friend's Swiss military service.\n\n" +
+      "## Three Letters in Camouflage\n\n" +
+      "The letters OKA are set in white diamonds and crossed by patches of polished rose gold, drawn like a camouflage.\n\n" +
+      "## Gold Over Diamonds\n\n" +
+      "Baguettes fill the letters and round diamonds edge them, down to their flanks, beneath raised patches of rose gold. The pendant hangs from a Cuban chain of white and rose gold links, lined with baguettes.\n\n" +
+      "## Two Maps and a Ball\n\n" +
+      "Within the camouflage hide the map of Switzerland and the map of Nigeria, side by side. On the K, a small football in rose gold, for the game.",
     people: ["noah-okafor"],
-    theme: { preset: "tunnel", mark: "OKA" },
+    // Its own world since 23/11/2026 (Yoni): a camouflage in rose gold over the lines of a map.
+    theme: { preset: "okafor-oka" },
     ...sorted("noah-okafor-oka-pendant", [
       yoni("noah-okafor-oka-pendant", "p17", at("The OKA nameplate pendant of Noah Okafor on its Cuban chain")),
       yoni("noah-okafor-oka-pendant", "p03", at("Close-up of the rose gold football", "The ball")),
@@ -495,7 +545,7 @@ const SITE_PIECES: Piece[] = [
     ]),
     specs: [
       ["Type", "Nameplate pendant"],
-      ["Motif", "The letters OKA and a football"],
+      ["Motif", "The letters OKA in camouflage, and a football"],
     ],
     seen: "White and rose gold tones · round diamonds, baguettes",
     making: { raw: raw("noah-okafor-oka-pendant", "v02-19_8s"), setting: yoni("noah-okafor-oka-pendant", "v02-31_9s", SET()), polishing: yoni("noah-okafor-oka-pendant", "v02-42_4s", POLISH()), delivery: yoni("noah-okafor-oka-pendant", "p18", IN_BOX()) },
@@ -538,9 +588,17 @@ const SITE_PIECES: Piece[] = [
     slug: "marcus-thuram-t-serpent-pendant",
     title: "Marcus Thuram — T-Serpent Pendant",
     type: "pendant",
-    line: "A letter, wrapped by a serpent.",
+    // T9 (Yoni, 22–23/11/2026): the serpent of Inter draws his 9; its scales, a setting invented by the house.
+    line: "T for Thuram, and a serpent that draws his 9.",
     story:
-      "A gothic T of white diamonds and baguettes, with a rose gold serpent coiled around it. Its scales are pear-shaped diamonds, each in its own setting, and its eye is a red pear-shaped stone.",
+      "## One T After Another\n\n" +
+      "Marcus Thuram has created several T's with Berete, each more evolved than the one before. This one carries his number and his club.\n\n" +
+      "## T9\n\n" +
+      "A gothic T of white diamonds and baguettes, and a rose gold serpent coiled around it into a 9: his number at Inter, a club whose mascot is the serpent.\n\n" +
+      "## A Setting Invented for the Scales\n\n" +
+      "The scales are a setting invented by Berete: pear-shaped diamonds, each in its own rose gold setting, laid one over the next along the body.\n\n" +
+      "## The Head of the Serpent\n\n" +
+      "Its head is a large red pear-shaped stone, resting against the letter.",
     people: ["marcus-thuram"],
     theme: { preset: "serpent", mark: "T" },
     ...sorted("marcus-thuram-t-serpent-pendant", [
@@ -556,7 +614,8 @@ const SITE_PIECES: Piece[] = [
     ]),
     specs: [
       ["Type", "Pendant"],
-      ["Motif", "A gothic T and a serpent"],
+      ["Motif", "A gothic T and a serpent that draws a 9"],
+      ["Settings", "Pear-shaped scales, in a setting invented by the house"],
     ],
     seen: "White and rose gold tones · round diamonds in pavé, baguettes, triangle, pear and marquise diamonds, a large red pear-shaped stone",
     making: {
@@ -594,8 +653,11 @@ const SITE_PIECES: Piece[] = [
     story: "A dripping T paved with white diamonds, wound with branches of rose gold thorns from top to bottom.",
     people: ["marcus-thuram"],
     theme: { preset: "roses", tint: "#2a1216", font: "gothique", mark: "T" },
-    cover: still("pieces/marcus-thuram-thorned-t-pendant/cover", at("Marcus Thuram's T pendant wound with rose gold thorns")),
+    // Its studio image first (Yoni, 23/11/2026), its older photos after it.
+    cover: extra("marcus-thuram-thorned-t-pendant", "studio", at("Marcus Thuram's T pendant wound with rose gold thorns")),
     gallery: [
+      extra("marcus-thuram-thorned-t-pendant", "studio", at("Marcus Thuram's T pendant wound with rose gold thorns")),
+      still("pieces/marcus-thuram-thorned-t-pendant/cover", { ...at("Marcus Thuram's T pendant wound with rose gold thorns"), onBlack: false }),
       st("thuram-ss23", 5, at("Film of the thorned T pendant")),
     ],
     specs: [
@@ -680,8 +742,11 @@ const SITE_PIECES: Piece[] = [
     story: "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.",
     people: ["jamie-leweling"],
     theme: { preset: "stuttgart", mark: "JL" },
-    cover: still("pieces/jamie-leweling-jl-pendant/cover", at("Jamie Leweling's JL pendant on its chain")),
+    // Its studio image first (Yoni, 23/11/2026: no clean photo of the jewel alone), its older photos after it.
+    cover: extra("jamie-leweling-jl-pendant", "studio", at("Jamie Leweling's JL initials pendant")),
     gallery: [
+      extra("jamie-leweling-jl-pendant", "studio", at("Jamie Leweling's JL initials pendant")),
+      still("pieces/jamie-leweling-jl-pendant/cover", { ...at("Jamie Leweling's JL pendant on its chain"), onBlack: false }),
       st("jamie-leweling", 2, at("Jamie Leweling wearing his JL pendant with his DFB-Pokal medal", "Worn by Jamie Leweling")),
       st("collectors", 7, at("Jamie Leweling wearing the JL pendant")),
     ],
@@ -719,7 +784,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "Rose gold, and a crown of pear-shaped diamonds.",
     story:
-      "A Jesus piece in rose gold, paved with diamonds and crowned with pear and marquise-cut stones. The back is engraved with a pattern of flowers and the BRT mark. It is worn on a twisted chain set with diamond flowers.",
+      "A Jesus piece in rose gold, paved with diamonds and crowned with pear and marquise-cut stones. Its back is engraved with flowers, the BRT mark standing in relief among them. It is worn on a twisted chain set with diamond flowers.",
     people: ["samuel-ballet"],
     theme: { preset: "sacre", tint: "#2e1a14" },
     cover: st("samuel-ballet", 2, at("Samuel Ballet's Jesus piece in rose gold with a crown of pear diamonds")),
@@ -784,8 +849,11 @@ const SITE_PIECES: Piece[] = [
     story: "His initials in gothic letters, the T set over the M, both set with diamonds. It is worn on a diamond-set Cuban chain in rose gold.",
     people: ["malik-tillman"],
     theme: { preset: "facettes", tint: "#2a1a16", glow: "#e8b4a0", font: "gothique", mark: "TM" },
-    cover: still("pieces/malik-tillman-tm-pendant/cover", at("Malik Tillman's TM pendant")),
+    // Its studio image first (Yoni, 23/11/2026), its older photos after it.
+    cover: extra("malik-tillman-tm-pendant", "studio", at("Malik Tillman's TM pendant")),
     gallery: [
+      extra("malik-tillman-tm-pendant", "studio", at("Malik Tillman's TM pendant")),
+      still("pieces/malik-tillman-tm-pendant/cover", { ...at("Malik Tillman's TM pendant"), onBlack: false }),
       st("malik-tillman-ii", 4, at("The TM pendant held up in the light")),
       st("malik-tillman-ii", 1, at("Post about Malik Tillman's TM pendant")),
     ],
@@ -927,8 +995,8 @@ const SITE_PIECES: Piece[] = [
     slug: "the-hand",
     title: "The Hand — Pendant",
     type: "pendant",
-    line: "A rose gold hand, paved with diamonds and lit with rubies.",
-    story: "A hand sculpted in volume, then set stone by stone. Rubies catch the light at every movement, and the BRT mark is engraved on the piece.",
+    line: "A rose gold hand, paved with diamonds, holding a red stone.",
+    story: "A hand in rose gold, set stone by stone with diamonds. A red oval stone catches the light at every movement, and the BRT mark is engraved at the wrist.",
     theme: { preset: "infini" },
     ...sorted("the-hand", [
       yoni("the-hand", "p07", at("The Hand pendant, a diamond-paved rose gold hand holding a ruby")),
@@ -981,8 +1049,17 @@ const SITE_PIECES: Piece[] = [
     slug: "tulips-on-tour-medallion",
     title: "Tulips on Tour — Medallion Pendant",
     type: "pendant",
-    line: "A domed medallion full of coloured stones.",
-    story: "A domed medallion set with white diamonds and red, pink and blue stones, worn on a tennis chain and delivered in the Tulips on Tour case.",
+    // The piece of a Dutch shoe designer, named after his collection (Yoni, 22–23/11/2026): neither he nor a brand is named.
+    line: "Tulips for Amsterdam, and a collection taken across Europe.",
+    story:
+      "## A Collection on Tour\n\n" +
+      "Tulips on Tour is the name of a collection by a Dutch shoe designer, which he promoted across Europe. This medallion is his.\n\n" +
+      "## Amsterdam in Bloom\n\n" +
+      "The tulips evoke Amsterdam. On a domed medallion, they bloom beside a cart and a small figure, in white diamonds and red, pink and blue stones.\n\n" +
+      "## A Scene in Relief\n\n" +
+      "The scene rises in layers above the diamond ground: tulips held in fine bezels, a wheel drawn in baguettes, red stones all around the edge.\n\n" +
+      "## The Tour on the Back\n\n" +
+      "On the back, the figure and its cart pass engraved houses, above the BRT mark. The medallion is worn on a tennis chain and comes in its own Tulips on Tour case.",
     theme: { preset: "tulipes" },
     ...sorted("tulips-on-tour-medallion", [
       yoni("tulips-on-tour-medallion", "p21", at("The Tulips on Tour medallion: tulips, a cart and a figure in coloured stones")),
@@ -997,6 +1074,7 @@ const SITE_PIECES: Piece[] = [
     ]),
     specs: [
       ["Type", "Medallion pendant"],
+      ["Motif", "Tulips, a cart and a figure"],
       ["Colours", "White diamonds, red, pink and blue stones"],
     ],
     boxSlug: "tulips-on-tour",
@@ -1078,11 +1156,14 @@ const SITE_PIECES: Piece[] = [
     slug: "marcus-thuram-ruby-t-necklace",
     title: "Marcus Thuram — Ruby T Necklace",
     type: "chain",
-    line: "Gothic T links, and a ruby at the end of the drop.",
+    line: "Gothic T links, and a red stone at the end of the drop.",
     story:
       "A necklace of diamond links shaped like infinity knots, with gothic T stations along the chain. At the front, a large T in baguettes with rose gold scrolls opens onto a drop that ends with a pear-shaped red stone framed in diamonds. The clasp carries the BRT mark, and the back of the T is engraved with a pattern of flowers.",
     people: ["marcus-thuram"],
-    theme: { preset: "velours", font: "gothique", mark: "T" },
+    // 23/11/2026 (Yoni): no universe any more, all black; the piece as the hero, large, centred on its details (the T and
+    // its drop).
+    theme: { preset: "noir" },
+    showcase: { size: "large", mode: "single", views: ["p02"] },
     ...sorted("marcus-thuram-ruby-t-necklace", [
       yoni("marcus-thuram-ruby-t-necklace", "p02", at("Marcus Thuram's T necklace: a gothic T with rose gold scrolls")),
       yoni("marcus-thuram-ruby-t-necklace", "p03", at("The baguettes of the T, up close", "Baguettes")),
@@ -1130,7 +1211,7 @@ const SITE_PIECES: Piece[] = [
     title: "Kevin Schade — Twisted Link Chain",
     type: "chain",
     line: "Twisted links, set with diamond flowers.",
-    story: "A chain of twisted links in rose and yellow gold tones, set with diamond flowers along its length.",
+    story: "Twisted links in a single tone of rose gold, with diamond flowers set along the whole chain.",
     people: ["kevin-schade"],
     theme: { preset: "forge" },
     cover: st("kevin-schade", 3, at("Kevin Schade's twisted link chain laid in its box")),
@@ -1151,7 +1232,10 @@ const SITE_PIECES: Piece[] = [
     title: "The Safi Link — Chain",
     type: "chain",
     line: "Flowers of marquise diamonds, link after link.",
-    story: "A chain whose links are flowers of marquise-cut diamonds in rose and white tones. The house introduced it as The Safi Link.",
+    // The chain of the jersey pendant of Noah Okafor, worn on its own (Yoni, 22–23/11/2026); one tone of rose gold.
+    story:
+      "This is the chain of Noah Okafor's jersey pendant. Unclipped from the jersey, it is closed by a connecting piece and worn alone, under the name the house gave it: the Safi Link.\n\n" +
+      "Its links are flowers of marquise-cut diamonds in rose gold, and the clasp is a flower too, around the BRT mark.",
     people: ["noah-okafor"],
     theme: { preset: "roses", glow: "#f6e2da" },
     ...sorted("the-safi-link", [
@@ -1320,7 +1404,7 @@ const COLLECTED: Piece[] = [
     type: "pendant",
     line: "Rows of baguettes, inside a border of diamonds.",
     story:
-      "A cross in rose gold tones filled with rows of baguette diamonds inside a border of round diamonds, under a bail set with baguettes. The back is carved with a star pattern and the BRT mark.",
+      "A cross in rose gold tones filled with rows of baguette diamonds inside a border of round diamonds, under a bail set with baguettes. Turned over, its arms are carved with stars, the BRT mark at their crossing.",
     theme: { preset: "sacre" },
     specs: [
       ["Type", "Pendant"],
@@ -1335,7 +1419,7 @@ const COLLECTED: Piece[] = [
     type: "pendant",
     line: "A crown of red stones and spikes.",
     story:
-      "A Jesus piece in rose gold tones, entirely paved with diamonds, crowned with thorns set with red pear-shaped stones and sharp polished spikes. The lips are polished gold, and the tall bail carries a cross of diamonds over baguettes. The back is carved with a pattern and the BRT mark.",
+      "A crown of thorns, set with red pear-shaped stones and sharp polished spikes, rests on a Jesus piece in rose gold tones, entirely paved with diamonds. The lips are polished gold, and the tall bail carries a cross of diamonds over baguettes. On the carved back, the BRT mark stands out in white gold.",
     theme: { preset: "sacre", tint: "#331013" },
     specs: [
       ["Type", "Pendant"],
@@ -1353,7 +1437,7 @@ const COLLECTED: Piece[] = [
     // Its second paragraph: the celebration that the universe of its page tells (feedback of Yoni, 21/11/2026, from the
     // press: nothing beyond what it said).
     story:
-      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones. The back is carved with a star pattern and the BRT mark.\n\n" + KEITA_NIGHT,
+      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones.\n\n" + KEITA_NIGHT,
     theme: { preset: "keita" },
     specs: [
       ["Type", "Pendant"],
@@ -1393,7 +1477,7 @@ const COLLECTED: Piece[] = [
     type: "pendant",
     line: "A crown of red flowers in rose gold.",
     story:
-      "A Jesus piece in white gold tones, entirely paved with diamonds, crowned with flowers of red pear-shaped stones in rose gold settings. The back is carved with a star pattern and the BRT mark in rose gold.",
+      "Flowers of red pear-shaped stones, in rose gold settings, crown a Jesus piece in white gold tones paved with diamonds from edge to edge. At the centre of its back, carved with stars, sits the BRT mark in rose gold.",
     theme: { preset: "velours", font: "sacre" },
     specs: [
       ["Type", "Pendant"],
@@ -1431,7 +1515,7 @@ const COLLECTED: Piece[] = [
     type: "chain",
     line: "Twisted links, flowers of diamonds, a clasp signed BRT.",
     story:
-      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds along its length. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.",
+      "Along twisted links in rose gold tones, paved with diamonds, run flowers of round diamonds with leaves of marquise-cut diamonds. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.",
     theme: { preset: "roses" },
     specs: [
       ["Type", "Chain"],
@@ -1547,6 +1631,43 @@ const COLLECTED: Piece[] = [
     ],
     seen: "White gold tone · oval diamonds in claw settings",
   }),
+  /* The Bosnia and Herzegovina ring (Yoni, 23/11/2026): its photos retouched on black, in his order (scripts/extra-media.mjs);
+     its texts say only what the photos show, no name of a player. All black, no universe for now. */
+  piece({
+    slug: BOSNIA,
+    title: "Bosnia and Herzegovina — World Cup 2026 Ring",
+    type: "ring",
+    line: "The map of Bosnia in yellow enamel, framed by blue baguettes.",
+    story:
+      "A ring in yellow gold. At its centre, the map of Bosnia and Herzegovina in yellow enamel, crossed by the blue band and its stars, rests on a pavé of diamonds inside a surround of blue baguette stones. World Cup runs above it, 2026 below.\n\n" +
+      "Fleurs-de-lis in polished gold stand out from the diamonds, and the words First World Cup Game run along the side of the top. Touches of green enamel edge the shank.",
+    theme: { preset: "noir" },
+    cover: extra(BOSNIA, "b04497", at("The Bosnia and Herzegovina World Cup 2026 ring, the map of Bosnia in yellow enamel at its centre")),
+    gallery: [
+      extra(BOSNIA, "b04499", at("The ring turned slightly, the words First World Cup running down its side")),
+      extra(BOSNIA, "b04512", at("The top of the ring face on: World Cup, the map of Bosnia, 2026")),
+      extra(BOSNIA, "b04509", at("The map of Bosnia with its blue band and stars, on a pavé of diamonds inside blue baguettes")),
+      extra(BOSNIA, "b04487", at("A fleur-de-lis in polished gold on the diamond pavé of the side, above a line of green enamel")),
+      extra(BOSNIA, "b04504", at("The ring seen from above and from the side, First World Cup Game in raised letters around its top")),
+      extra(BOSNIA, "b04506", at("A name and a number in polished gold over baguettes, on the side of the ring")),
+      extra(BOSNIA, "b04507", at("The side of the ring: a name and a number on a field of baguettes, under First World Cup Game")),
+      extra(BOSNIA, "b04508", at("The same side of the ring, reflected on black")),
+      extra(BOSNIA, "b04513", at("The shoulder of the ring: a fleur-de-lis on the pavé, a band of green enamel, sculpted gold beneath")),
+      extra(BOSNIA, "b04514", at("A fleur-de-lis raised over the diamonds, beside a band of green enamel")),
+      extra(BOSNIA, "b04462", at("The side of the ring, a fleur-de-lis on its pavé")),
+      extra(BOSNIA, "b04467", at("The top of the ring, tilted: the map of Bosnia between World Cup and 2026")),
+      extra(BOSNIA, "b04469", at("The top of the ring in the light, its blue baguettes all around the map")),
+      extra(BOSNIA, "b04470", at("Under the ring: sculpted gold edged with green enamel")),
+      extra(BOSNIA, "b04478", at("The side of the ring, a name and a number over baguettes, above a band of green enamel")),
+      extra(BOSNIA, "b04489", at("The ring in profile: First World Cup Game around the top, a name and a number on the side")),
+    ],
+    specs: [
+      ["Type", "Ring"],
+      ["Motif", "The map of Bosnia and Herzegovina, World Cup 2026"],
+    ],
+    seen: "Yellow gold tone · round diamonds in pavé, baguettes, blue baguette stones; yellow, blue and green enamel",
+    boxSlug: "world-cup-display",
+  }),
 ];
 
 /** Every piece: the pieces of the site, then the pieces published on 20/11/2026. */
@@ -1653,7 +1774,7 @@ export const BOXES: Box[] = ([
     pieceSlug: VFB,
   },
   {
-    // Its piece is not known yet; the names on the four displays are not written.
+    // Its piece: the Bosnia and Herzegovina ring (Yoni, 23/11/2026); the names on the four displays are not written.
     slug: "world-cup-display",
     name: "World Cup Display",
     description: "A glass display on a blue and gold base: a golden fleur-de-lis on its front, a coat of arms on its side, and the engraving 12.06.2026 First World Cup Game.",
@@ -1664,7 +1785,7 @@ export const BOXES: Box[] = ([
       at("The display open", "Opened"),
       at("Four displays side by side"),
     ]),
-    pieceSlug: null,
+    pieceSlug: BOSNIA,
   },
   {
     // Its piece is not known yet; the player on its photograph is not named.

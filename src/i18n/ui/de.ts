@@ -98,9 +98,19 @@ export const de: Messages = {
     boxes: "Signature-Etuis",
     process: "Der Weg zum Unikat",
     about: "Das Haus",
+    press: "Presse",
     contact: "Private Anfragen",
     openMenu: "Menü öffnen",
     closeMenu: "Menü schließen",
+  },
+
+  /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
+  press: {
+    eyebrow: "Presse",
+    title: "Im Rampenlicht",
+    lead: "Das Haus in der Presse: die Meisterringe des VfB Stuttgart und von Inter Mailand.",
+    all: "Alle Artikel",
+    about: (title: string) => "Über " + title,
   },
 
   footer: {
@@ -139,6 +149,18 @@ export const de: Messages = {
   },
 
   home: {
+    /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
+    hook: "Wir beginnen nicht mit dem, was schon gemacht wurde. Wir beginnen mit dem, was sein könnte.",
+    who: "Berete Jewellers ist ein Haus für maßgefertigte Haute Joaillerie mit Sitz in Dubai: Einzelstücke, mit Ihnen entworfen und von Hand gefertigt.",
+    innovation: {
+      eyebrow: "Innovation",
+      title: "Energie war nie dazu bestimmt, stillzustehen",
+      text: "Für Kevin Schade hat Berete die mit Diamanten besetzte Spirit Bomb seines Dragon-Ball-Anhängers drehbar konstruiert – Bewegung im Herzen der Kreation.",
+      caption: "Die Kugel dreht sich",
+      play: "Die Kugel drehen sehen",
+      film: "Die Spirit Bomb, an der Werkbank von Hand gedreht, vor dem Fassen",
+    },
+    selection: { eyebrow: "Die Kreationen", title: "Anhänger, Ketten, Ringe" },
     filmLabel: "Film von Berete Jewellers, der sich beim Scrollen abspielt",
     kicker: "Berete Jewellers · Dubai",
     title: "Die Kunst der Individualität.",
@@ -260,6 +282,7 @@ export const de: Messages = {
   },
 
   gallery: {
+    zoomHint: "Zoomen mit + und −, per Doppelklick oder mit zwei Fingern; ziehen, um das Foto zu verschieben.",
     title: "Details",
     hintPinned: "Scrollen zum Entdecken · Tippen zum Vergrößern",
     hint: "Tippen zum Vergrößern",
@@ -313,6 +336,21 @@ export const de: Messages = {
   },
 
   atelier: {
+    philosophy: {
+      eyebrow: "Unsere Philosophie",
+      title: "Keine Vision zu kühn, kein Detail ohne Sinn.",
+      text: ["Berete arbeitet mit Teams spezialisierter Kunsthandwerker.", "Gemeinsam erkunden sie neue Fassungen, neue Konstruktionen und neue Mechanismen und verschieben die Grenzen der Haute Joaillerie."],
+    },
+    engineering: {
+      eyebrow: "Mechanismen",
+      title: "Die Kunst des Außergewöhnlichen",
+      lead: "Manche Stücke drehen sich, öffnen sich oder enthüllen, was sie verbergen: Mechanismen, erdacht mit den Kunsthandwerkern des Hauses.",
+      sphereTitle: "Die drehbare Spirit Bomb",
+      sphereText: "Am Dragon-Ball-Anhänger von Kevin Schade wurde die mit Diamanten besetzte Kugel drehbar konstruiert – Bewegung im Herzen der Kreation. Hier wird sie an der Werkbank von Hand gedreht, vor dem Fassen.",
+      sphereFilm: "Die Kugel des Dragon-Ball-Anhängers, an der Werkbank von Hand gedreht, vor dem Fassen",
+      liftTitle: "Das Oberteil lässt sich abheben",
+      liftText: "Bei den Meisterringen von Inter Mailand und des VfB Stuttgart lässt sich das Oberteil abheben und gibt die darunter verborgene Trophäe frei. Das Oberteil des Inter-Rings lässt sich auch allein als Anhänger tragen.",
+    },
     steps: [
       { title: "Die Geburt der Form", text: "Das Modell wird zu rohem Metall: ein Anhänger vor seinem ersten Stein." },
       { title: "Präzision in jedem Detail", text: "Glied für Glied nimmt ein Armband auf der Werkbank Gestalt an." },
@@ -332,6 +370,7 @@ export const de: Messages = {
   },
 
   boxes: {
+    hidePhotos: "Fotos ausblenden",
     eyebrow: "Individuell gefertigt",
     title: "Signature-Etuis",
     lead: "Jede besondere Kreation verdient eine außergewöhnliche Präsentation.",
@@ -350,6 +389,20 @@ export const de: Messages = {
   },
 
   process: {
+    /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    quick: {
+      lead: "Von der ersten Skizze bis zur Enthüllung im Etui: vier Schritte, gemeinsam mit Ihnen auf WhatsApp begleitet.",
+      steps: [
+        { title: "Die Skizze", text: "Ihre Idee wird zu einer ersten Zeichnung, von Hand." },
+        { title: "Die Freigabe des Designs", text: "Sie geben das Design frei, jede Ansicht, bevor etwas gefertigt wird." },
+        { title: "Gefertigt im Atelier", text: "Gegossen, gefasst und poliert von Hand, Schritt für Schritt." },
+        { title: "Die Enthüllung", text: "Ihr fertiges Stück, enthüllt in seinem Etui." },
+      ],
+      orderQ: "Wie bestelle ich?",
+      orderA: "Schreiben Sie uns auf WhatsApp oder über Private Anfragen – mit Ihrer Idee, Ihren Referenzen und Ihrer Geschichte. Es folgt eine private Beratung; die Design-Anzahlung startet dann den Entwurf.",
+      timeQ: "Wie lange dauert es?",
+      timeA: "Jedes Stück hat seinen eigenen Zeitplan, je nach Komplexität: im Durchschnitt etwa zehn Wochen.",
+    },
     filmLabel: "Der Ablauf, Schritt für Schritt, der sich beim Scrollen abspielt",
     steps: [
       { title: "Die private Beratung", text: "Ideen und Budget. Erzählen Sie uns von dem Moment, den Sie festhalten möchten, von Ihren Referenzen, Ihrer Geschichte.", meter: "0 %", payNote: "In dieser Phase fällt keine Zahlung an." },
@@ -507,6 +560,10 @@ export const de: Messages = {
   },
 
   seoPages: {
+    "/press": {
+      title: "Im Rampenlicht — Presse",
+      description: "Berete Jewellers in der Presse: die Meisterringe des VfB Stuttgart und von Inter Mailand, erzählt von Goal.com Deutschland, den Stuttgarter Nachrichten und der Daily Mail.",
+    },
     "/": {
       title: "Berete Jewellers — Die Kunst der Individualität, Dubai",
       description: "Unikate der Haute Joaillerie für alle, die ihr eigenes Vermächtnis schaffen. Anhänger, Ketten, Meisterringe aus Dubai. Von uns gefertigt. Von Ihnen inspiriert.",
@@ -666,6 +723,8 @@ export const de: Messages = {
   },
 
   films: {
+    pieceSection: "Das fertige Stück",
+    pieceSectionLead: (title: string) => "Der Film des fertigen Stücks: " + title + ". Im Vollbild, mit Ton.",
     eyebrow: "Hinter dem Stück",
     enter: "Das Atelier betreten",
     lead: (title, reveal) => "Treten Sie hinter die Werkbank und sehen Sie, wie " + title + " entsteht" + (reveal ? " – dann entdecken Sie das Stück in Die große Enthüllung." : "."),

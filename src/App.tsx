@@ -12,6 +12,7 @@ import Home from "@/pages/Home";
 import Legal, { Privacy } from "@/pages/Legal";
 import NotFound from "@/pages/NotFound";
 import PiecePage from "@/pages/PiecePage";
+import Press from "@/pages/Press";
 import Players, { PlayerPage } from "@/pages/Players";
 import Process from "@/pages/Process";
 
@@ -49,6 +50,7 @@ function pages(prefix: string) {
       <Route path="boxes/:slug" element={<Navigate to="/boxes" replace />} />
       <Route path="process" element={<Process />} />
       <Route path="about" element={<About />} />
+      <Route path="press" element={<Press />} />
       <Route path="contact" element={<Contact />} />
       <Route path="legal" element={<Legal />} />
       <Route path="privacy" element={<Privacy />} />

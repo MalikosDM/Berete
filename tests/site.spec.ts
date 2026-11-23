@@ -6,7 +6,7 @@ import { resolveShowcase } from "../src/data/showcase";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import type { Catalogue, MediaItem, Piece } from "../src/data/types";
 import { coverSrcSet, srcSetOf } from "../src/lib/responsive";
-import { checkPage, getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
+import { checkPage, getCatalogue, scrollTo, skipIntro, watch } from "./helpers";
 
 /*
  * Checks of the whole site, on a 1440px desktop and a 390px iPhone:
@@ -17,13 +17,7 @@ import { checkPage, getCatalogue, scrollTo, shotPath, skipIntro, watch } from ".
  * both directions; sharp, well framed main photos. Screenshots: verification/.
  */
 
-const STORY_TITLES = [
-  "Kenan Yildiz", "Noah Okafor", "Kevin Schade", "Thuram", "Loïs Openda", "Inter Milan", "Michy Batshuayi", "Radja Nainggolan", "Collectors", "Press",
-  "Noah Okafor II", "Jamie Leweling", "Deniz Undav", "Angelo Stiller", "Samuel Ballet", "Keita Losene", "Malik Tillman", "Thuram II", "Noah Okafor S24", "Thuram SS23",
-  "Inter Squad", "Sambi Lokonga", "NZ", "Malik Tillman II", "Tajon Buchanan", "Eljero Elia", "Sidney Eweka", "Tanguy Nianzou", "Marcus Thuram", "Jeff Chabot",
-];
-
-const MAIN_PAGES = ["/", "/creations", "/players", "/atelier", "/boxes", "/process", "/about", "/contact", "/legal", "/privacy", "/admin"];
+const MAIN_PAGES = ["/", "/creations", "/players", "/atelier", "/boxes", "/process", "/about", "/press", "/contact", "/legal", "/privacy", "/admin"];
 
 test.beforeEach(async ({ page }) => {
   await skipIntro(page);
@@ -40,15 +34,6 @@ test("main pages: no error, no 404, no overflow, own title", async ({ page }, in
   expect(titles.get("/")).toBe("Berete Jewellers — The Art of Individuality, Dubai");
   expect(new Set(titles.values()).size, "every page has its own title").toBe(titles.size);
 });
-
-/** The piece shown in each story file, as the story viewer computes it. */
-function pieceByMedia(cat: Catalogue): Map<string, string> {
-  const map = new Map<string, string>();
-  for (const p of cat.pieces) {
-    for (const m of [p.cover, ...p.gallery, ...p.handover, ...Object.values(p.making)]) if (m && m.src && !map.has(m.src)) map.set(m.src, p.slug);
-  }
-  return map;
-}
 
 /**
  * Sharpness of a photo: variance of its Laplacian at 320px (same measure as the review of the photos).
@@ -147,32 +132,33 @@ test("every person has a working page", async ({ page }, info) => {
   expect(titles.size, "unique titles").toBe(cat.people.length);
 });
 
-test("home collections lead to every type page, every card to its piece", async ({ page }, info) => {
+// Since 23/11/2026 the home page has no tiles of the collections: the menu leads to each one (Yoni: under « Creations »).
+test("the menu leads to every collection, every card to its piece", async ({ page }, info) => {
   const cat = await getCatalogue(page);
   const count = (type: string) => cat.pieces.filter((p) => p.type === type).length;
   const expected = COLLECTIONS.filter((c) => count(c.type) >= MIN_PIECES);
   expect(expected.length, "at least four collections").toBeGreaterThanOrEqual(4);
-
-  await page.goto("/");
-  const tiles = page.locator("[data-collection-tile]");
-  expect(await tiles.evaluateAll((els) => els.map((e) => e.getAttribute("data-collection-tile")))).toEqual(expected.map((c) => c.slug));
-  for (const c of expected) await expect(page.locator('[data-collection-tile="' + c.slug + '"]')).toContainText(String(count(c.type)) + " creations");
-  await page.locator("[data-collections]").evaluate((el) => el.scrollIntoView({ block: "start" }));
-  await page.waitForTimeout(1500);
-  await page.screenshot({ path: shotPath(info, "home-collections"), type: "jpeg", quality: 60 });
+  const phone = info.project.name !== "desktop";
+  const openFromMenu = async (slug: string) => {
+    if (phone) {
+      await page.locator("button[aria-controls='mobile-menu']").click();
+      await page.locator("#mobile-menu a[href='/creations/" + slug + "']").click();
+    } else {
+      await page.locator("[data-desktop-nav] a[href='/creations']").first().hover();
+      await page.locator("[data-creations-menu] a[href='/creations/" + slug + "']").click();
+    }
+  };
 
   const titles = new Set<string>();
   for (const c of expected) {
     await page.goto("/");
-    const tile = page.locator('[data-collection-tile="' + c.slug + '"]');
-    await tile.evaluate((el) => el.scrollIntoView({ block: "center" }));
-    await tile.click();
+    await openFromMenu(c.slug);
     await expect(page).toHaveURL(new RegExp("/creations/" + c.slug + "$"));
     // Reached in the page itself (no reload): the collection is really shown.
     await expect(page.locator("h1")).toContainText(c.name);
     titles.add(await checkPage(page, info, "/creations/" + c.slug, "collection-" + c.slug, 3));
-    // (Its carousel, since 22/11/2026.)
-    const hrefs = await page.locator("[data-carousel-piece]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
+    // (Its grid, since 23/11/2026.)
+    const hrefs = await page.locator("[data-creations-grid] [data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("href")));
     expect(hrefs.sort(), c.slug + " shows all its pieces").toEqual(cat.pieces.filter((p) => p.type === c.type).map((p) => "/pieces/" + p.slug).sort());
     await expect(page.locator("h1")).toContainText(c.name);
   }
@@ -191,8 +177,8 @@ test("creations filters and old addresses", async ({ page }) => {
   const cat = await getCatalogue(page);
   const count = (type: string) => cat.pieces.filter((p) => p.type === type).length;
   await page.goto("/creations");
-  // (The creations of the carousel, since 22/11/2026.)
-  const cards = page.locator("[data-carousel-piece]");
+  // (The creations of the grid, since 23/11/2026.)
+  const cards = page.locator("[data-creations-grid] [data-piece-card]");
   await expect(cards).toHaveCount(cat.pieces.length);
   for (const c of COLLECTIONS) {
     const button = page.getByRole("button", { name: new RegExp("^" + c.name) });
@@ -254,26 +240,12 @@ test("every photo of the catalogue has its lighter copies (npm run media:sizes)"
   expect(missing, "missing copies").toEqual([]);
 });
 
-test("player pages show their stories and all their pieces", async ({ page }) => {
+// Since 23/11/2026 (Yoni) no bubbles of stories on their page: their pieces only.
+test("player pages show all their pieces, and no bubbles of stories", async ({ page }) => {
   const cat = await getCatalogue(page);
-  const expected: Record<string, string[]> = {
-    "noah-okafor": ["Noah Okafor", "Noah Okafor II", "Noah Okafor S24"],
-    "marcus-thuram": ["Thuram", "Thuram II", "Thuram SS23", "Marcus Thuram"],
-    "malik-tillman": ["Malik Tillman", "Malik Tillman II"],
-    "tanguy-nianzou": ["NZ", "Tanguy Nianzou"],
-    "inter-milan": ["Inter Milan", "Inter Squad"],
-    "deniz-undav": ["Deniz Undav"],
-    "angelo-stiller": ["Angelo Stiller"],
-    "jamie-leweling": ["Jamie Leweling"],
-    "maximilian-mittelstaedt": [],
-    "vfb-stuttgart": [],
-  };
   for (const person of cat.people) {
     await page.goto("/players/" + person.slug);
-    if (expected[person.slug]) {
-      const stories = await page.locator("[data-player-story] [data-story-title]").evaluateAll((els) => els.map((e) => e.textContent));
-      expect(stories, person.slug).toEqual(expected[person.slug]);
-    }
+    await expect(page.locator("[data-player-story]")).toHaveCount(0);
     // Player -> pieces: every piece made for this person, and nothing else.
     const hrefs = await page.locator('#player-pieces ~ ul a[href^="/pieces/"]').evaluateAll((els) => els.map((e) => e.getAttribute("href")));
     const own = cat.pieces.filter((p) => p.people.includes(person.slug)).map((p) => "/pieces/" + p.slug);
@@ -299,11 +271,11 @@ test("piece -> player and stories, story -> piece", async ({ page }) => {
   await page.locator('[data-made-for-person="kevin-schade"]').evaluate((el) => el.scrollIntoView({ block: "center" }));
   await page.locator('[data-made-for-person="kevin-schade"]').click();
   await expect(page).toHaveURL(/\/players\/kevin-schade$/);
-  await expect(page.locator('[data-player-story="kevin-schade"]')).toHaveCount(1);
   await expect(page.locator('a[href="/pieces/kevin-schade-dragon-ball-pendant"]').first()).toBeVisible();
-  // Story -> piece from the home bar, then the click opens the piece.
-  await page.goto("/");
-  await page.locator('[data-story-bubble="michy-batshuayi"]').click();
+  // Story -> piece (no bubbles any more, 23/11/2026: its stories open from the piece), then the click opens the piece.
+  await page.goto("/pieces/michy-batshuayi-butterfly-chain");
+  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator("[data-seen-in-stories]").click();
   const link = page.locator('[role="dialog"] [data-see-piece]');
   await expect(link).toHaveAttribute("href", "/pieces/michy-batshuayi-butterfly-pendant");
   await link.click();
@@ -322,89 +294,21 @@ test("piece -> player and stories, story -> piece", async ({ page }) => {
   await page.locator('main a[href="/creations/chains"]').first().click();
   await expect(page.locator("h1")).toContainText("Chains");
   const chains = (await getCatalogue(page)).pieces.filter((p) => p.type === "chain").length;
-  await expect(page.locator("[data-carousel-piece]")).toHaveCount(chains);
+  await expect(page.locator("[data-creations-grid] [data-piece-card]")).toHaveCount(chains);
   expect(problems.errors).toEqual([]);
 });
 
 /* ---------- Stories ---------- */
 
-test("the 30 stories, in order, every step shown, videos playing", async ({ page }, info) => {
-  const problems = watch(page);
-  const cat = await getCatalogue(page);
-  await page.goto("/");
-  const bubbles = page.locator("[data-story-bubble]");
-  await expect(bubbles).toHaveCount(30);
-  // The name read aloud starts with the title shown under the bubble.
-  const titles = await bubbles.evaluateAll((els) => els.map((e) => e.getAttribute("aria-label")?.replace(/, open the story$/, "")));
-  expect(titles).toEqual(STORY_TITLES);
-
-  // Covers: swipe the bar to its end, as a visitor would, so the lazy ones load; then check them all.
-  const bar = page.locator("[data-stories-bar] .no-scrollbar");
-  const width = await bar.evaluate((el) => el.scrollWidth);
-  for (let x = 0; x <= width; x += 200) {
-    await bar.evaluate((el, left) => el.scrollTo({ left }), x);
-    await page.waitForTimeout(120);
-  }
-  await page.waitForTimeout(1000);
-  await bar.evaluate((el) => el.scrollTo({ left: 0 }));
-  const covers = await page.locator("[data-story-bubble] img").evaluateAll((imgs) => imgs.map((i) => (i as HTMLImageElement).complete && (i as HTMLImageElement).naturalWidth > 0));
-  expect(covers.filter(Boolean).length, "covers loaded").toBe(30);
-
-  // Names: whole, on two lines at most; 16px margin on phones.
-  const names = await page.locator("[data-story-name]").evaluateAll((els) =>
-    els.map((e) => {
-      const s = getComputedStyle(e);
-      const lines = Math.round(e.scrollHeight / parseFloat(s.lineHeight));
-      return { text: e.textContent, lines, cut: e.scrollWidth > e.clientWidth + 1 };
-    }),
-  );
-  for (const n of names) {
-    expect(n.lines, n.text ?? "").toBeLessThanOrEqual(2);
-    expect(n.cut, n.text ?? "").toBe(false);
-  }
-  if (info.project.name === "iphone") {
-    const left = await bubbles.first().evaluate((el) => el.getBoundingClientRect().left);
-    expect(Math.round(left)).toBe(16);
-  }
-  await page.screenshot({ path: shotPath(info, "stories-bar"), type: "jpeg", quality: 60 });
-
-  const byMedia = pieceByMedia(cat);
-  await bubbles.first().click();
-  const dialog = page.locator('[role="dialog"][data-story]');
-  await expect(dialog).toBeVisible();
-  for (const [i, story] of cat.stories.entries()) {
-    await expect(dialog).toHaveAttribute("data-story", story.slug);
-    for (const [j, item] of story.media.entries()) {
-      await expect(dialog, story.slug + " step " + (j + 1)).toHaveAttribute("data-step", String(j));
-      // "See the piece": the piece shown in this file, else the piece of the story.
-      const piece = byMedia.get(item.src) ?? story.pieceSlug;
-      if (piece) await expect(dialog.locator("[data-see-piece]"), story.slug + " step " + (j + 1) + " piece").toHaveAttribute("data-see-piece", piece);
-      else await expect(dialog.locator("[data-see-piece]"), story.slug + " step " + (j + 1) + " no piece").toHaveCount(0);
-      if (item.type === "image") {
-        const img = dialog.locator("[data-story-surface] img");
-        await expect(img).toHaveAttribute("src", item.src);
-        await expect.poll(() => img.evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { message: story.slug + " photo " + (j + 1) }).toBe(true);
-      } else {
-        const video = dialog.locator("video[data-story-video]");
-        await expect(video).toHaveAttribute("src", item.src);
-        await expect.poll(() => video.evaluate((el) => (el as HTMLVideoElement).currentTime), { message: story.slug + " video " + (j + 1) + " plays", timeout: 15_000 }).toBeGreaterThan(0.25);
-        // ONE video element for the whole viewer.
-        expect(await page.locator("video[data-story-video]").count()).toBe(1);
-      }
-      if (j === 0 && (i === 0 || i === 9)) await page.screenshot({ path: shotPath(info, "story-" + story.slug), type: "jpeg", quality: 60 });
-      await page.keyboard.press("ArrowRight");
-    }
-  }
-  await expect(dialog).toHaveCount(0);
-  expect(problems.errors).toEqual([]);
-});
+// (The 30 stories were opened from the bubbles of the home page: no bubbles since 23/11/2026, Yoni. A story opens from its
+// piece, or from the page of a person known from the stories only.)
 
 test("story viewer: buttons, pause, close", async ({ page }) => {
-  await page.goto("/");
-  await page.locator('[data-story-bubble="press"]').click();
-  const dialog = page.locator('[role="dialog"][data-story="press"]');
-  await expect(dialog.getByRole("link", { name: /Read the Feature/ })).toBeVisible();
-  await expect(dialog.getByRole("link", { name: /Want yours\? WhatsApp/ })).toHaveAttribute("href", /wa\.me\/971XXXXXXXXX/);
+  await page.goto("/pieces/kevin-schade-dragon-ball-pendant");
+  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator("[data-seen-in-stories]").click();
+  const dialog = page.locator('[role="dialog"][data-story="kevin-schade"]');
+  await expect(dialog).toBeVisible();
   // Long press pauses the photo timer.
   const bar = dialog.locator("[data-progress]");
   const surface = dialog.locator("[data-story-surface]");
@@ -423,7 +327,8 @@ test("story viewer: buttons, pause, close", async ({ page }) => {
 
 /* ---------- Scroll-driven films ---------- */
 
-for (const path of ["/", "/process"]) {
+// The home page has no film since 23/11/2026 (Yoni).
+for (const path of ["/process"]) {
   test("the film of " + path + " is moved by the scroll only", async ({ page }) => {
     const problems = watch(page);
     await page.goto(path);
@@ -462,11 +367,12 @@ for (const path of ["/", "/process"]) {
 
 /* ---------- Logo, admin, forms ---------- */
 
-test("logo size in the navigation", async ({ page }, info) => {
+test("logo size in the navigation: the mark, and the name of the house beside it (23/11/2026)", async ({ page }, info) => {
   await page.goto("/creations");
-  const logo = page.locator('header a[aria-label="Berete Jewellers, home"] span:visible');
-  const h = await logo.evaluate((el) => el.getBoundingClientRect().height);
-  expect(Math.round(h)).toBe(info.project.name === "iphone" ? 40 : 56);
+  const [mark, name] = await page.locator('header a[aria-label="Berete Jewellers, home"] span:visible').evaluateAll((els) => els.map((el) => el.getBoundingClientRect()));
+  expect(Math.round(mark!.height)).toBe(info.project.name === "iphone" ? 40 : 44);
+  expect(name!.width).toBeGreaterThan(130);
+  expect(name!.left).toBeGreaterThan(mark!.right);
 });
 
 test("contact: call back request reaches the admin", async ({ page }) => {

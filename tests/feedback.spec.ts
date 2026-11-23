@@ -150,23 +150,15 @@ for (const slug of CAPSULES) {
     }
     await shot(page, info.project.name + "-" + slug + "-opening");
 
-    // The Ruby T necklace opens on the whole necklace; the T and its drop beside it.
-    if (slug === "marcus-thuram-ruby-t-necklace") {
-      if (phone) await expect(page.locator("[data-showcase-slide='0'] img").first()).toHaveAttribute("src", /\/cutouts\/marcus-thuram-ruby-t-necklace\/p01-/);
-      else {
-        await expect(page.locator("[data-showcase-view='p01']")).toHaveAttribute("data-place", "0");
-        await expect(page.locator("[data-showcase-view='p02']")).toHaveAttribute("data-place", "1");
-      }
-    }
+    // The Ruby T necklace: since 23/11/2026 (Yoni) all black, its T and its drop alone and large (tests/yoni2311.spec.ts).
+    if (slug === "marcus-thuram-ruby-t-necklace") await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p02");
 
-    // "Every Angle": each photo with its text, a photo the size of the former grid on a computer, the text under it on a phone.
+    // "Every Angle" (23/11/2026: a gallery, three on a row on a computer, two on a phone; no text under most photos).
     const tile = page.locator("[data-angle]").first();
     await tile.scrollIntoViewIfNeeded();
     const photoBox = (await tile.locator("button").boundingBox())!;
-    const textBox = (await tile.locator("[data-angle-title]").boundingBox())!;
     const vw = page.viewportSize()!.width;
-    if (phone) expect(textBox.y, "the text under its photo").toBeGreaterThanOrEqual(photoBox.y + photoBox.height - 1);
-    else expect(photoBox.width / vw).toBeLessThan(0.26);
+    expect(photoBox.width / vw).toBeLessThanOrEqual(phone ? 0.5 : 0.31);
 
     // "Enter the Atelier": its making-of plays by itself on screen, silent, and pauses off screen.
     const passage = page.locator("[data-atelier-passage]");

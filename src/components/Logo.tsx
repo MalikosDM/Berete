@@ -2,10 +2,12 @@
  * The owner's logo (scripts/import-media.mjs writes /media/brand/), used as a mask
  * over the metallic rose gold, with its slow sheen: sharp at every size.
  * "full": diamond, BRT and the name. "mark": the diamond and BRT only.
+ * "wordmark": BERETE JEWELLERS on one line, "berete": BERETE alone, in the letters of the logo (scripts/brand-media.mjs).
  */
+import brand from "@/data/brand.generated.json" with { type: "json" };
 import { useI18n } from "@/i18n";
 
-const FILES = { full: "/media/brand/logo.svg", mark: "/media/brand/logo-mark.svg" } as const;
+const FILES = { full: "/media/brand/logo.svg", mark: "/media/brand/logo-mark.svg", wordmark: brand.wordmark.src, berete: brand.berete.src } as const;
 
 /** "start": against the start of the line (the left, the right in Arabic). */
 type LogoProps = { variant?: keyof typeof FILES; className?: string; position?: "start" | "center" };

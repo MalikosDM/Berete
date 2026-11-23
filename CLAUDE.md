@@ -151,7 +151,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Genkidama** pour la pièce Dragon Ball (page et story) : fond noir, sphère de lumière qui respire, particules qui
       montent vers elle (`npm run universes -- --only=genkidama`, effet « genkidama »). Rien d'officiel Dragon Ball. La chaîne
       de Kevin Schade n'était pas dans l'univers Énergie (univers de la Maison, soie) : inchangée.
-- [x] **La vidéo du produit fini en premier** en entrant dans une capsule (`src/components/PieceFilm.tsx`), une fois par visite,
+- [x] **La vidéo du produit fini en premier** (depuis le 23/11 : plus à l'entrée, dans sa section « La pièce achevée ») en entrant dans une capsule (`src/components/PieceFilm.tsx`), une fois par visite,
       avec le son (sinon muette avec un bouton son en vue), dans un cadre aux couleurs de l'univers ; « Voir la pièce »,
       Échap ou la fin de la vidéo la ferment ; « Voir le film » la relance. 13 pièces : Inter, VfB, OKA, octogone et maillot
       d'Okafor, croix Tillman, AS, Ruby T, T-Serpent, Tulips, Kenan, The Hand, Butterfly (vidéos regardées image par image ;
@@ -161,6 +161,60 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
+
+## Passe « retours de Yoni des appels du 22-23/11 » (accueil calme, menu, capsules, presse…) — état au 23/11/2026
+- [x] **Accueil refait** (`src/pages/Home.tsx`) : plus de bulles de stories (supprimées partout, aussi sur les pages des joueurs ;
+      `StoriesBar` supprimé), plus de film de fond ni de défilé de pièces, aucun univers de capsule. Noir profond, lumière douce
+      or rose : la Butterfly Pendant détourée seule en grand, l'accroche « We don't begin with what has been done. We begin
+      with what could be. », une phrase (maison de haute joaillerie sur mesure à Dubaï), « Imaginez votre création » / « Explorer
+      les créations ». Puis : 1. Dragon Ball, la sphère qui tourne (film 13/v02 joué au clic seulement, jamais tout seul) et sa
+      capsule ; 2. les bagues Inter et VfB ; 3. une sélection équilibrée (The Hand, Butterfly Chain, Oval Eternity, Tulips on Tour,
+      Sirius, bague Bosnie) ; 4. le bandeau presse. L'animation « le dessus se soulève » est passée dans l'Atelier.
+- [x] **Menu** (`src/components/Navbar.tsx`) : le menu complet sur tous les ordinateurs (dès 1 024 px, et dès 900 px avec une
+      souris ou un trackpad : variante `desk` de `src/index.css`), sur sa propre ligne sous le nom ; vérifié dans les 6 langues, de
+      900 à 1 440 px, Chrome et Safari. Créations : Toutes, Pendentifs (Jesus Pieces), Chaînes, Bagues, Montres. Lien **Presse**.
+      **« BERETE JEWELLERS »** à côté du logo dans les lettres mêmes du logo (`npm run brand` : `scripts/brand-media.mjs` découpe le nom
+      du logo, `public/media/brand/wordmark.<v>.svg` et `berete.<v>.svg`). Filigrane **BERETE** très discret au fond de chaque
+      capsule, derrière le décor (`.u-brand`, jamais sur un bijou).
+- [x] **Créations** : grille 3 par 3 (2 sur tablette, 1 sur téléphone), plus de carrousel (`src/components/PieceGrid.tsx`).
+- [x] **Capsules** : plus de film à l'entrée ; le film de la pièce finie dans sa section « La pièce achevée » (plein écran avec le
+      son au clic). Lumière sombre derrière le bijou (`.piece-calm`) : l'univers ne domine jamais. **Loupe** (`src/components/Lightbox.tsx`)
+      dans les galeries des capsules et des écrins : + et −, double clic, glisser à la souris, pincer à deux doigts, molette ou
+      pincement du trackpad (Safari aussi). **Sous tous les angles** : une galerie (3 / 2 par rangée), plus aucun texte qui décrit ce
+      qu'on voit ; 42 légendes courtes gardées sur 457 photos (titres de `src/data/angles.json`, `text` vidés ; l'admin le dit).
+- [x] **Univers** : bianconero assombri (images de Yoni) ; Noah Okafor : `okafor-jersey` (projecteurs Nigeria/Suisse) pour le
+      maillot, `okafor-oka` (camouflage or rose) pour l'OKA, l'octogone garde le tunnel ; univers `noir` (tout noir, sans décor) pour le
+      collier T de Thuram (le T et sa goutte en grand, vue p02) et la bague Bosnie. Les fonds refaits portent leur version
+      (`<id>-1600.<v>.webp`, `version` dans `universes.generated.json`). Kenan : pièce en grand (`size: "large"`).
+- [x] **Dragon Ball** : la vue avec sa chaîne seule et en grand à l'ouverture (plus de dos dans la vitrine, dos en fin de galerie) ;
+      sur téléphone la sphère d'énergie plus haute et la lumière qui monte vers elle comme sur ordinateur (60 particules).
+- [x] **Détourages** refaits et vérifiés un par un (78 vues, 32 pièces, adresses versionnées `<id>-<w>.<v>.webp`) : bagues entières
+      (Inter p08, VfB p13/p12/p18, Oval Eternity enfin détourée), pendentif L de Deniz Undav, bague Bosnie, vues studio de JL, TM et
+      T à épines. Non propres (jamais montrées) : AS p03, croix Tillman p03 et p06.
+- [x] **Photos studio** (`npm run extra-media`, `scripts/extra-media.mjs`, `public/media/extra/<pièce>/<nom>.<v>.webp`) : couverture et
+      1re photo de JL, TM et T à épines, les anciennes après.
+- [x] **Textes** : Okafor maillot (Oka4, la couronne des 4 frères et sœurs, Nigeria et Suisse, la célébration, la chaîne qui devient
+      la Safi Link : lien dans les deux sens, `WORN_TOGETHER`), OKA, T-Serpent (T9), Tulips on Tour, Inter et VfB en 4 parties
+      (inspiration, design, technique, détails) ; aucune pierre nommée ; phrases répétées d'une pièce à l'autre réécrites. 5 langues.
+- [x] **Bague Bosnie** (`bosnia-and-herzegovina-world-cup-2026-ring`, `BOSNIA`) : 17 photos dans l'ordre de Yoni, cadrées sur la bague,
+      texte de ce qu'on voit (aucun nom de joueur), tout noir ; l'écrin World Cup Display mène à elle.
+- [x] **Écrins** : « x photos » ouvre la galerie sous la boîte, qui reste ouverte ; loupe ; « Enter the World » discret après la
+      galerie quand la page de la pièce existe. Vidéos d'ouverture non touchées (elles vont être refaites).
+- [x] **Atelier** : section Philosophie (« No vision too bold, no detail without purpose. ») et « Engineering the Extraordinary »
+      (`src/components/Mechanisms.tsx` : la sphère Dragon Ball qui tourne, film 13/v02 `npm run mechanisms` ; le dessus des bagues
+      qui se soulève). La croix TM qui tourne et la bague qui s'ouvre viendront avec leurs films (rien d'affiché sans média).
+- [x] **The Bespoke Journey** : en tête, 4 étapes avec de vraies images (croquis, planche du design validée tirée du film 13/v01,
+      atelier, écrin ouvert), une ligne chacune ; « Comment commander ? » et « Combien de temps ? » (chaque pièce son délai, environ
+      dix semaines en moyenne, chiffre de Yoni).
+- [x] **La Maison** : une image par chapitre (`houseChapterPhoto` de `src/data/house.ts` : croquis, atelier, diamants, pièces, écrin,
+      portrait à la fin), remplacée par la photo de Yoni dès qu'il l'envoie (admin ou dossier). Texte inchangé.
+- [x] **Presse** (`/press`, `src/pages/Press.tsx`, `src/data/press.ts`) : Goal.com Deutschland, Stuttgarter Nachrichten, Daily Mail
+      (liens ouverts le 23/11 ; Daily Mail du 29/05/2024) ; **BILD garde la 1re place, invisible tant que son lien manque** (le mettre
+      dans `PRESS`). Articles VfB dans la capsule VfB, Daily Mail dans celle de l'Inter ; bandeau sur l'accueil.
+- `tests/yoni2311.spec.ts` (ordinateur 1440, iPhone, **Safari 1280**), captures `verification/<appareil>/yoni2311-*.jpg`.
+- [ ] Yoni : le lien de l'article BILD ; « Créée pour » de la bague Bosnie (aujourd'hui « un collectionneur privé ») ; relire les
+      nouveaux textes et leurs traductions ; le titre « Ruby T Necklace » nomme une pierre (à renommer ?) ; films de la croix TM qui
+      tourne et de la bague qui s'ouvre ; ses photos personnelles pour les chapitres de La Maison.
 
 ## Passe « écrins qui s'ouvrent et se referment » (Yoni, 22/11/2026, 4) — état au 22/11/2026
 - [x] **Les 13 écrins s'ouvrent ET se referment avec leurs vidéos** (`00 Contexte Yoni/Ecrins IA (ouverture) v2/<dossier>/` :
@@ -208,7 +262,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : relire les traductions (surtout l'arabe) ; droits Dragon Ball toujours à confirmer.
 
 ## Passe « carrousel des Créations et vraies boîtes » (Yoni, 22/11/2026, 2) — état au 22/11/2026
-- [x] **Créations en carrousel** (`src/components/PieceCarousel.tsx`), dans Toutes, chaque collection et sous-catégorie
+- [x] **Créations en carrousel** (depuis le 23/11 : retour à la grille 3 par 3, carrousel supprimé) (`src/components/PieceCarousel.tsx`), dans Toutes, chaque collection et sous-catégorie
       (Chaînes, Pendentifs > Jesus Pieces…) : la création en cours grande au centre (cadre carré), celles d'avant et
       d'après plus petites, floutées, qui dépassent sur les côtés ; défilement natif aimanté (doigt, trackpad), molette
       horizontale (une création par geste), flèches (sur les côtés sur ordinateur, sous la pièce sur téléphone), clavier
@@ -426,7 +480,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       Cuban, Rose 20 mm).
 
 ## Passe « Sous tous les angles » et 4 pièces retirées (retours de Yoni du 21/11) — état au 21/11/2026
-- [x] **Une photo + un texte** sur toutes les pièces (`src/components/EveryAngle.tsx`) : chaque photo et chaque vidéo de la
+- [x] **Une photo + un texte** (depuis le 23/11 : une galerie, au plus une courte légende) sur toutes les pièces (`src/components/EveryAngle.tsx`) : chaque photo et chaque vidéo de la
       pièce a un petit titre et une ou deux phrases, numérotés comme les détails de l'Inter ; ordinateur : photo et texte
       côte à côte en damier, deux par rangée ; tablette : un par rangée, à gauche puis à droite ; iPhone : la photo puis son
       texte. 6 d'abord puis « Voir les N autres » au-delà de 8. Remplace la rangée qui défilait de côté et l'ancienne
@@ -623,7 +677,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] Pierres soudées au métal dans les STL (bague VfB 0542) : retrouvées et reconstituées automatiquement (458 sur la
       0542, aucune fausse sur les autres fichiers). Restent en métal : les cônes de la bande « DFB-POKAL » et les carrés du
       bord de la tête (diamants posés à l'envers ou sertis vides ? à demander à Yoni).
-- [x] **Section « Special Project » Inter Milan** sur l'accueil, juste après le film : les **deux bagues** (Inter et VfB,
+- [x] **Section « Special Project » Inter Milan** (depuis le 23/11 : « Les grandes commandes », sans le dessus qui se soulève, passé dans l'Atelier) sur l'accueil, juste après le film : les **deux bagues** (Inter et VfB,
       qui s'ouvrent toutes les deux sur le trophée) côte à côte, chacune mène à sa page.
 - [x] **Histoire complète de la bague Inter** : section « The details » (9 symboles, chacun avec sa photo, 6 langues) :
       6 mois de travail, 20 étoiles + 20 diamants, noir-bleu du maillot, drapeau italien, « Forza Inter », logo Serie A

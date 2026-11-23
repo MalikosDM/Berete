@@ -120,9 +120,9 @@ test("the language menu keeps the page, the links stay in the language", async (
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
 
   // A card opens the piece in the same language, and its WhatsApp message is written in it.
-  // (The creation in the middle of the carousel.)
-  await page.locator("[data-slide][data-active] a").scrollIntoViewIfNeeded();
-  await page.locator("[data-slide][data-active] a").click();
+  // (The first card of the grid.)
+  await page.locator("[data-creations-grid] a").first().scrollIntoViewIfNeeded();
+  await page.locator("[data-creations-grid] a").first().click();
   await page.waitForURL("**/es/pieces/**");
   const title = (await page.locator("article[data-piece] h1").innerText()).trim();
   const href = (await page.locator("[data-want-piece]").getAttribute("href")) ?? "";
@@ -139,32 +139,36 @@ test("Arabic reads right to left, with its fonts and mirrored gestures", async (
   const logo = await page.locator("header a").first().boundingBox();
   expect((logo?.x ?? 0) + (logo?.width ?? 0) / 2, "logo on the right").toBeGreaterThan(vw / 2);
   // No letter spacing (it would break the joined letters), the Arabic fonts loaded.
-  const spacing = await page.locator("[data-collections] h2").evaluate((el) => getComputedStyle(el).letterSpacing);
+  const spacing = await page.locator("[data-home-selection] h2").evaluate((el) => getComputedStyle(el).letterSpacing);
   expect(["normal", "0px"]).toContain(spacing);
   await page.evaluate(() => document.fonts.ready);
   const fonts = await page.evaluate(() => Array.from(document.fonts).filter((f) => f.status === "loaded").map((f) => f.family.replace(/"/g, "")));
   expect(fonts, "Arabic fonts loaded").toEqual(expect.arrayContaining(["IBM Plex Sans Arabic"]));
 
-  // A story moves forward with a tap on the left.
-  await page.locator("[data-story-bubble]").first().click();
+  // A story moves forward with a tap on the left (opened from a piece: no bubbles of stories any more, 23/11/2026).
+  await page.goto("/ar/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
+  await page.locator("[data-seen-in-stories]").scrollIntoViewIfNeeded();
+  await page.locator("[data-seen-in-stories]").click();
   const viewer = page.locator("[data-story]");
   await expect(viewer).toBeVisible();
   const surface = await page.locator("[data-story-surface]").boundingBox();
+  // (It opens on the moment that shows the piece.)
+  const step = Number(await viewer.getAttribute("data-step"));
   await page.mouse.click((surface?.x ?? 0) + (surface?.width ?? 0) * 0.15, (surface?.y ?? 0) + (surface?.height ?? 0) / 2);
-  await expect(viewer).toHaveAttribute("data-step", "1");
+  await expect(viewer).toHaveAttribute("data-step", String(step + 1));
   await page.mouse.click((surface?.x ?? 0) + (surface?.width ?? 0) * 0.85, (surface?.y ?? 0) + (surface?.height ?? 0) / 2);
-  await expect(viewer).toHaveAttribute("data-step", "0");
+  await expect(viewer).toHaveAttribute("data-step", String(step));
   await page.keyboard.press("Escape");
 
   if (!isMobile) {
-    // "Every Angle" reads from the right: the first photo on the right of its text.
+    // "Every Angle" reads from the right: the first photo on the right of the second.
     await page.goto("/ar/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
     const first = page.locator("[data-angle='1']");
     await first.scrollIntoViewIfNeeded();
     await page.waitForTimeout(800);
-    const photo = (await first.locator("button").boundingBox())!;
-    const words = (await first.locator("[data-angle-title]").boundingBox())!;
-    expect(photo.x, "the photo on the right").toBeGreaterThan(words.x);
+    const one = (await first.boundingBox())!;
+    const two = (await page.locator("[data-angle='2']").boundingBox())!;
+    expect(one.x, "the first photo on the right").toBeGreaterThan(two.x);
     await page.screenshot({ path: shotPath(info, "ar-gallery"), type: "jpeg", quality: 60 });
   }
   expect(problems.errors).toEqual([]);
@@ -179,7 +183,7 @@ test("addresses: each language has its pages, its not-found page, its hreflang a
   }
   const arHome = await (await page.request.get("/ar")).text();
   expect(arHome).toMatch(/<html lang="ar" dir="rtl">/);
-  expect(arHome).toContain(ar.home.title);
+  expect(arHome).toContain(ar.home.hook);
 
   // An unknown address: the "page not found" of its language, with the 404 status.
   for (const { code, ui } of LANGUAGES) {

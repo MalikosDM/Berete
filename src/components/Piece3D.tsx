@@ -48,7 +48,7 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
         </div>
       </div>
       {/* "See it in 3D", at the top of the page, comes here: the viewer whole on the screen, its choices and the WhatsApp button beside it. */}
-      <div id="piece-3d-viewer" className="mt-10 scroll-mt-24">
+      <div id="piece-3d-viewer" className="mt-10 scroll-mt-32">
         <Jewel3D
           model={model}
           words={t.viewer}

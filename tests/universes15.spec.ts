@@ -35,7 +35,7 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
     pieces: ["deniz-undav-l-pendant", "samuel-ballet-jesus-piece", "malik-tillman-cross-pendant", "lois-openda-script-pendant", "baguette-cross-pendant", "crown-of-thorns-jesus-piece", "cross-infinity-chain"],
   },
   { backdrop: "roses", preset: "roses", pieces: ["thorns-and-roses-crucifix", "marcus-thuram-thorned-t-pendant", "tanguy-nianzou-fam-medallion", "the-safi-link", "brt-flower-chain"] },
-  { backdrop: "velours", preset: "velours", pieces: ["marcus-thuram-ruby-t-necklace", "jesus-piece-red-flowers", "rose-iced-cuban-chain"] },
+  { backdrop: "velours", preset: "velours", pieces: ["jesus-piece-red-flowers", "rose-iced-cuban-chain"] },
   {
     backdrop: "facettes",
     preset: "facettes",
@@ -139,22 +139,27 @@ test("asked for less motion: the worlds stay still (no canvas, no animation), th
   }
 });
 
-/** A piece of each universe that has a story: its story in its world. */
-const STORIES: [string, string][] = [
-  ["kenan-yildiz", "bianconero"],
-  ["thuram", "serpent"],
-  ["deniz-undav", "sacre"],
-  ["thuram-ii", "velours"],
+/**
+ * A piece of each universe that has a story: its story in its world (opened from the piece: no bubbles of stories since
+ * 23/11/2026; the T necklace of Thuram has no universe any more).
+ */
+const STORIES: [story: string, piece: string, backdrop: string][] = [
+  ["kenan-yildiz", "kenan-yildiz-celebration-pendant", "bianconero"],
+  ["thuram", "marcus-thuram-t-serpent-pendant", "serpent"],
+  ["deniz-undav", "deniz-undav-l-pendant", "sacre"],
 ];
-for (const [story, backdrop] of STORIES) {
+for (const [story, slug, backdrop] of STORIES) {
   test("the story " + story + " in the world of its piece (" + backdrop + ")", async ({ page }, info) => {
     const problems = watch(page);
     await skipIntro(page);
-    await page.goto("/fr", { waitUntil: "load" });
-    // Clicked again until the page is ready (online, the bar may be drawn before it answers).
-    const dialog = page.locator('[role="dialog"][data-story="' + story + '"]');
+    await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
+    // Clicked again until the page is ready (online, the button may be drawn before it answers).
+    const dialog = page.locator('[role="dialog"][data-story]');
     await expect(async () => {
-      if (!(await dialog.isVisible())) await page.locator('[data-story-bubble="' + story + '"]').click();
+      if (!(await dialog.isVisible())) {
+        await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+        await page.locator("[data-seen-in-stories]").click();
+      }
       await expect(dialog).toBeVisible({ timeout: 2_000 });
     }).toPass({ timeout: 20_000 });
     await expect(page.locator(".universe[data-fixed][data-backdrop='" + backdrop + "']")).toHaveCount(1, { timeout: 15_000 });

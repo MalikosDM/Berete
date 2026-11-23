@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Count from "@/components/Count";
 import { MediaView } from "@/components/Media";
-import PieceCarousel from "@/components/PieceCarousel";
+import PieceGrid from "@/components/PieceGrid";
 import Reveal from "@/components/Reveal";
 import SplitHeading from "@/components/SplitHeading";
 import { COLLECTIONS, collectionBySlug, collectionOf, collectionPath, isSub, piecesOfCollection, subcategoriesOf, subcategoryByOldSlug, subcategoryBySlug, type AnyCollection } from "@/data/collections";
@@ -38,8 +38,7 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
 /**
  * One collection (every piece of a type) or one of its sub-categories (Pendants > Jesus Pieces): an opening with its name,
- * the tabs of its sub-categories when it has some, then its pieces: one by one in a carousel, or all of them in a grid
- * (src/components/PieceCarousel.tsx).
+ * the tabs of its sub-categories when it has some, then its pieces in a grid, 3 by 3 (src/components/PieceGrid.tsx).
  */
 function CollectionPage({ collection }: { collection: AnyCollection }) {
   const { t } = useI18n();
@@ -116,7 +115,7 @@ function CollectionPage({ collection }: { collection: AnyCollection }) {
             </Link>
           </div>
         ) : (
-          <PieceCarousel pieces={pieces} label={t.collections.listLabel(words.name)} memory={"collection/" + collection.slug} />
+          <PieceGrid pieces={pieces} showType={false} />
         )}
       </section>
 

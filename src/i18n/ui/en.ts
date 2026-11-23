@@ -97,9 +97,19 @@ export const en = {
     boxes: "Signature Trunks",
     process: "The Bespoke Journey",
     about: "The House",
+    press: "Press",
     contact: "Private Enquiries",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+  },
+
+  /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
+  press: {
+    eyebrow: "Press",
+    title: "In the Spotlight",
+    lead: "The house in the press: the championship rings of VfB Stuttgart and Inter Milan.",
+    all: "All the articles",
+    about: (title: string) => "About " + title,
   },
 
   footer: {
@@ -140,6 +150,18 @@ export const en = {
   },
 
   home: {
+    /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
+    hook: "We don't begin with what has been done. We begin with what could be.",
+    who: "Berete Jewellers is a house of bespoke high jewellery, based in Dubai: one-of-one pieces, designed with you and crafted by hand.",
+    innovation: {
+      eyebrow: "Innovation",
+      title: "Energy was never meant to remain still",
+      text: "For Kevin Schade, Berete engineered the diamond-set Spirit Bomb of his Dragon Ball pendant to rotate, bringing movement to the very heart of the creation.",
+      caption: "The sphere turns",
+      play: "Watch the sphere turn",
+      film: "The Spirit Bomb turned by hand at the bench, before the setting",
+    },
+    selection: { eyebrow: "The Creations", title: "Pendants, Chains, Rings" },
     filmLabel: "Berete Jewellers film, played by scrolling",
     kicker: "Berete Jewellers · Dubai",
     title: "The Art of Individuality.",
@@ -266,6 +288,7 @@ export const en = {
   },
 
   gallery: {
+    zoomHint: "Zoom with + and −, a double click or two fingers; drag to move the photo.",
     title: "Details",
     hintPinned: "Scroll to explore · Tap to zoom",
     hint: "Tap to zoom",
@@ -321,6 +344,21 @@ export const en = {
   },
 
   atelier: {
+    philosophy: {
+      eyebrow: "Our Philosophy",
+      title: "No vision too bold, no detail without purpose.",
+      text: ["Berete works with teams of specialised artisans.", "Together they explore new settings, new constructions and new mechanisms, and push the limits of high jewellery."],
+    },
+    engineering: {
+      eyebrow: "Mechanisms",
+      title: "Engineering the Extraordinary",
+      lead: "Some pieces turn, open or reveal what they hide: mechanisms imagined with the artisans of the house.",
+      sphereTitle: "The Spirit Bomb that rotates",
+      sphereText: "On Kevin Schade's Dragon Ball pendant, the diamond-set sphere was engineered to rotate, bringing movement to the very heart of the creation. Here it is turned by hand at the bench, before the setting.",
+      sphereFilm: "The sphere of the Dragon Ball pendant turned by hand at the bench, before the setting",
+      liftTitle: "The top lifts off",
+      liftText: "On the championship rings of Inter Milan and VfB Stuttgart, the top lifts off and reveals the trophy hidden underneath. The top of the Inter ring can also be worn on its own, as a pendant.",
+    },
     steps: [
       { title: "The Birth of Form", text: "The model becomes raw metal: a pendant before its first stone." },
       { title: "Precision in Every Detail", text: "Link by link, a bracelet takes shape on the bench." },
@@ -340,6 +378,7 @@ export const en = {
   },
 
   boxes: {
+    hidePhotos: "Hide the photos",
     eyebrow: "Individually Crafted",
     title: "Signature Trunks",
     lead: "Every exceptional creation deserves an extraordinary presentation.",
@@ -359,6 +398,20 @@ export const en = {
   },
 
   process: {
+    /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    quick: {
+      lead: "From a first sketch to the reveal in its case: four steps, followed with you on WhatsApp.",
+      steps: [
+        { title: "The Sketch", text: "Your idea becomes a first drawing, by hand." },
+        { title: "Design Approval", text: "You approve the design, every view, before anything is made." },
+        { title: "Crafted at the Atelier", text: "Cast, set and polished by hand, step by step." },
+        { title: "The Reveal", text: "Your finished piece, revealed in its case." },
+      ],
+      orderQ: "How do I order?",
+      orderA: "Write to us on WhatsApp or through Private Enquiries with your idea, your references and your story. A private consultation follows; the design deposit then starts the design.",
+      timeQ: "How long does it take?",
+      timeA: "Each piece has its own timeline, depending on its complexity: around ten weeks on average.",
+    },
     filmLabel: "The process, step by step, played by scrolling",
     steps: [
       { title: "The Private Consultation", text: "Ideas and budget. Tell us the moment you want to mark, your references, your story.", meter: "0%", payNote: "No payment at this stage." },
@@ -621,6 +674,8 @@ export const en = {
 
   /** "Enter the Atelier": the films of a piece, its making-of then the finished piece (src/components/AtelierRoom.tsx). */
   films: {
+    pieceSection: "The Finished Piece",
+    pieceSectionLead: (title: string) => "The film of " + title + ", finished. Full screen, with its sound.",
     eyebrow: "Behind the Piece",
     enter: "Enter the Atelier",
     lead: (title: string, reveal: boolean) => "Step behind the bench and watch " + title + " come to life" + (reveal ? ", then discover it in The Final Reveal." : "."),

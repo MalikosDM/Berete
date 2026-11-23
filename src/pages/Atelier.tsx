@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
-import { ArrowRight, Maximize2, Play, X } from "lucide-react";
+import { createPortal } from "react-dom";
+import { ArrowRight, Images, Play, ZoomIn } from "lucide-react";
+import Lightbox from "@/components/Lightbox";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
+import Mechanisms from "@/components/Mechanisms";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import TrunkReveal, { type TrunkPiece } from "@/components/TrunkReveal";
@@ -64,6 +67,23 @@ export default function Atelier() {
         </div>
       </section>
 
+      {/* The philosophy of the house (Yoni, 23/11/2026). */}
+      <section aria-labelledby="philosophy-title" data-philosophy className="relative z-20 bg-ink">
+        <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-32">
+          <Reveal className="lg:col-span-6">
+            <p className="eyebrow">{t.atelier.philosophy.eyebrow}</p>
+            <h2 id="philosophy-title" className="mt-5 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-light leading-[1.12] text-white [text-wrap:balance]">
+              {t.atelier.philosophy.title}
+            </h2>
+          </Reveal>
+          <Reveal className="lg:col-span-5 lg:col-start-8 lg:self-end" delay={0.1}>
+            {t.atelier.philosophy.text.map((p) => (
+              <p key={p} className="mt-5 text-base leading-relaxed text-bone first:mt-0 md:text-lg">{p}</p>
+            ))}
+          </Reveal>
+        </div>
+      </section>
+
       <section aria-labelledby="atelier-steps" className="relative">
         <h2 id="atelier-steps" className="sr-only">
           {t.atelier.making}
@@ -86,6 +106,8 @@ export default function Atelier() {
           );
         })}
       </section>
+
+      <Mechanisms />
 
       <AtelierFilms />
 
@@ -174,40 +196,47 @@ function AtelierFilms() {
 
 /* ---------- Boxes ---------- */
 
-function BoxViewer({ box, onClose }: { box: Box; onClose: () => void }) {
+/**
+ * The photos of a box, under it (Yoni, 23/11/2026): the box stays as it is (open, if it was opened) while its photos are
+ * looked at; "x photos" shows them in a row of thumbnails under the box, each opened full screen with the magnifying glass
+ * (src/components/Lightbox.tsx); after them, a discreet "Enter the World" when its piece has its page (never a redirection).
+ */
+function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
   const { t } = useI18n();
-  const closeRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    const lenis = getLenis();
-    lenis?.stop();
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      lenis?.start();
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+  const [shown, setShown] = useState(false);
+  const [open, setOpen] = useState<number | null>(null);
+  if (box.images.length === 0) return null;
+  const id = "box-photos-" + box.slug;
   return (
-    <div role="dialog" aria-modal="true" aria-label={box.name} data-lenis-prevent className="fixed inset-0 z-[90] overflow-y-auto bg-ink">
-      <div className="sticky top-0 z-10 flex items-center justify-between bg-ink/90 px-5 py-4 backdrop-blur-md sm:px-8">
-        <p className="title-caps text-2xl tracking-[0.12em]">{box.name}</p>
-        <button ref={closeRef} type="button" onClick={onClose} className="inline-flex size-12 items-center justify-center border border-white/40 text-white hover:text-rose-light" aria-label={t.common.close}>
-          <X className="size-6" aria-hidden="true" />
+    <div data-box-gallery={box.slug}>
+      <p className="mt-2 flex flex-wrap gap-x-6">
+        <button type="button" onClick={() => setShown((v) => !v)} aria-expanded={shown} aria-controls={id} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
+          <Images className="size-4" aria-hidden="true" /> {shown ? t.boxes.hidePhotos : t.boxes.photos(box.images.length)}
         </button>
-      </div>
-      <ul className="mx-auto max-w-6xl space-y-6 px-5 pb-16 sm:px-8">
-        {box.images.map((m) => (
-          <li key={m.src}>
-            <MediaView item={m} fit="contain" className="max-h-[85svh]" />
-            {m.caption ? <p className="mt-3 text-base text-bone">{m.caption}</p> : null}
-          </li>
-        ))}
-      </ul>
+      </p>
+      {shown ? (
+        <div id={id}>
+          <ul className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
+            {box.images.map((m, i) => (
+              <li key={m.src}>
+                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
+                  <MediaView item={m} fit="cover" sizes="(max-width: 639px) 30vw, 10vw" className="transition-transform duration-700 group-hover:scale-105" />
+                  <span aria-hidden="true" className="absolute end-1.5 bottom-1.5 hidden size-8 items-center justify-center rounded-full bg-ink/70 text-white group-hover:inline-flex">
+                    <ZoomIn className="size-4" />
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          {piece ? (
+            <Link to={"/pieces/" + piece.slug} data-box-enter={piece.slug} className="mt-3 inline-flex min-h-12 items-center gap-2 text-base text-mist underline-offset-4 hover:text-rose-light hover:underline">
+              {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+              <span className="sr-only"> · {piece.title}</span>
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
+      {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </div>
   );
 }
@@ -243,7 +272,6 @@ export function Boxes() {
     const piece = box.pieceSlug ? cat.pieces.find((p) => p.slug === box.pieceSlug && p.published !== false) : undefined;
     return piece ? { slug: piece.slug, title: piece.title, view: resolveShowcase(piece.slug, piece.showcase).views[0] ?? null } : null;
   };
-  const [open, setOpen] = useState<Box | null>(null);
   const { hash } = useLocation();
   // From the page of a piece (/boxes#box-<address>): its box, in view.
   useEffect(() => {
@@ -252,7 +280,7 @@ export function Boxes() {
       const el = document.getElementById(decodeURIComponent(hash.slice(1)));
       if (!el) return;
       const lenis = getLenis();
-      if (lenis) lenis.scrollTo(el, { offset: -110, immediate: true, force: true });
+      if (lenis) lenis.scrollTo(el, { offset: -130, immediate: true, force: true });
       else el.scrollIntoView({ block: "start" });
     });
     return () => window.cancelAnimationFrame(id);
@@ -274,31 +302,15 @@ export function Boxes() {
           {boxes.map((box) => {
             const trunk = trunkOf(box.slug);
             return (
-              <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="scroll-mt-28">
+              <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="scroll-mt-36">
                 {trunk ? (
                   <TrunkReveal slug={box.slug} name={box.name} trunk={trunk} piece={pieceOf(box)} />
                 ) : (
-                  <button type="button" onClick={() => setOpen(box)} className="group relative block aspect-square w-full overflow-hidden bg-ink-soft text-start" aria-label={t.boxes.open(box.name)}>
-                    {box.images[0] ? <MediaView item={box.images[0]} fit="cover" className="transition duration-700 group-hover:scale-[1.03]" /> : null}
-                    <span className="absolute top-3 end-3 inline-flex size-12 items-center justify-center bg-ink/70 text-white transition group-hover:text-rose-light">
-                      <Maximize2 className="size-5" aria-hidden="true" />
-                    </span>
-                  </button>
+                  <div className="relative aspect-square w-full overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</div>
                 )}
                 <h3 className="title-caps mt-5 text-2xl text-white md:text-3xl">{box.name}</h3>
                 {box.description ? <p className="mt-3 max-w-md text-base text-bone md:text-lg">{box.description}</p> : null}
-                <p className="mt-2 flex flex-wrap gap-x-6">
-                  {box.images.length > 0 ? (
-                    <button type="button" onClick={() => setOpen(box)} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
-                      <Maximize2 className="size-4" aria-hidden="true" /> {t.boxes.photos(box.images.length)}
-                    </button>
-                  ) : null}
-                  {box.pieceSlug && !trunk && pieceOf(box) ? (
-                    <Link to={"/pieces/" + box.pieceSlug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
-                      {t.common.seePiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-                    </Link>
-                  ) : null}
-                </p>
+                <BoxPhotos box={box} piece={pieceOf(box)} />
               </li>
             );
           })}
@@ -313,7 +325,6 @@ export function Boxes() {
         </div>
       </section>
 
-      {open ? <BoxViewer box={open} onClose={() => setOpen(null)} /> : null}
     </div>
   );
 }

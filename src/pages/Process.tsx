@@ -3,7 +3,11 @@ import { ArrowRight, Check } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Reveal from "@/components/Reveal";
 import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
+import { MediaView } from "@/components/Media";
 import { media } from "@/data/catalogue";
+import stills from "@/data/mechanisms.generated.json" with { type: "json" };
+import { trunkPhotos } from "@/data/trunks";
+import type { MediaItem } from "@/data/types";
 import { Link, useI18n, type Messages } from "@/i18n";
 import { waLink } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
@@ -46,11 +50,70 @@ function paymentAt(steps: Step[], p: number): Step | null {
   return current;
 }
 
+/** The real images of each step of the journey, from the site: the sketch, the design approved, the atelier, the trunk. */
+const JOURNEY_IMAGES: (MediaItem | null)[] = [
+  media.sketches?.["campione-d-italia-2023-2024"] ?? null,
+  stills["journey-design"] ? { type: "image", src: stills["journey-design"].image, width: stills["journey-design"].width, height: stills["journey-design"].height } : null,
+  media.groups["atelier"]?.[2] ?? null,
+  trunkPhotos("dragon-ball-trunk")[2] ? { type: "image", ...trunkPhotos("dragon-ball-trunk")[2]! } : null,
+];
+
+/**
+ * The journey understood in five seconds (Yoni, 23/11/2026): four steps, each a real image of the site and one line; then
+ * the two questions every client asks: how to order, how long it takes.
+ */
+function Journey() {
+  const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
+  return (
+    <section aria-labelledby="journey-title" data-journey className="bg-ink pt-32 pb-20 sm:pt-40 lg:pt-44 lg:pb-28">
+      <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+        <h1 id="journey-title" className="title-caps text-[clamp(2.25rem,6vw,5rem)] tracking-[0.14em] text-white">{t.process.title}</h1>
+        <p className="mt-5 max-w-2xl text-lg text-bone">{t.process.quick.lead}</p>
+        <ol className="mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4 lg:gap-x-8">
+          {t.process.quick.steps.map((step, i) => {
+            const image = JOURNEY_IMAGES[i];
+            return (
+              <li key={step.title} data-journey-step={i + 1}>
+                <div className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
+                  {image ? <MediaView item={image} alt={step.title} fit="cover" sizes="(max-width: 1023px) 46vw, 22vw" /> : null}
+                  <span aria-hidden="true" className="absolute start-0 top-0 bg-ink/80 px-3 py-1 font-display text-2xl text-rose-light">{pad(i + 1)}</span>
+                </div>
+                <h2 className="title-caps mt-4 text-lg leading-snug tracking-[0.1em] text-white sm:text-xl">{step.title}</h2>
+                <p className="mt-1.5 text-base leading-snug text-bone">{step.text}</p>
+              </li>
+            );
+          })}
+        </ol>
+        <dl className="mt-16 grid gap-px border border-white/10 bg-white/10 md:grid-cols-2">
+          <div data-journey-order className="bg-ink p-6 sm:p-8">
+            <dt className="title-caps text-xl tracking-[0.1em] text-rose-light">{t.process.quick.orderQ}</dt>
+            <dd className="mt-3 text-base leading-relaxed text-bone md:text-lg">{t.process.quick.orderA}</dd>
+            <dd className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a href={waLink(waMessage)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 text-base font-semibold text-ink transition-colors hover:bg-rose-light">
+                <BrandIcon name="whatsapp" className="size-5" /> {t.common.whatsapp}
+              </a>
+              <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 px-6 text-base font-semibold text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                {t.nav.contact} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+              </Link>
+            </dd>
+          </div>
+          <div data-journey-time className="bg-ink p-6 sm:p-8">
+            <dt className="title-caps text-xl tracking-[0.1em] text-rose-light">{t.process.quick.timeQ}</dt>
+            <dd className="mt-3 text-base leading-relaxed text-bone md:text-lg">{t.process.quick.timeA}</dd>
+          </div>
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 export default function Process() {
   const { t } = useI18n();
   const steps = stepsOf(t);
   return (
     <>
+      <Journey />
       <ScrollVideo media={media.scroll.process!} steps={filmSteps(t, steps)} label={t.process.filmLabel} overlay={(p) => <Payment progress={p} steps={steps} />} showProgress={false} magnet="strong" />
       <StepsOverview steps={steps} />
       <Closing />
@@ -66,7 +129,7 @@ const filmSteps = (t: Messages, STEPS: Step[]): ScrollStep[] => [
     content: (
       <div className="mx-auto max-w-3xl text-center [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">
         <p className="eyebrow">{t.process.eyebrow}</p>
-        <h1 className="title-caps mt-6 text-[clamp(3rem,11vw,9rem)] tracking-[0.16em] text-white">{t.process.title}</h1>
+        <h2 className="title-caps mt-6 text-[clamp(3rem,11vw,9rem)] tracking-[0.16em] text-white">{t.process.title}</h2>
         <p className="mt-6 text-lg text-bone">{t.process.lead}</p>
       </div>
     ),

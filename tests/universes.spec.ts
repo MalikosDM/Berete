@@ -101,9 +101,11 @@ for (const [slug, backdrop, effects] of WORLDS) {
 test("the Butterfly: its world around its story", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  await page.goto("/fr", { waitUntil: "load" });
-  await page.locator('[data-story-bubble="michy-batshuayi"]').click();
-  await expect(page.locator('[role="dialog"][data-story="michy-batshuayi"]')).toBeVisible();
+  // (Opened from the piece: no bubbles of stories since 23/11/2026.)
+  await page.goto("/fr/pieces/michy-batshuayi-butterfly-pendant", { waitUntil: "load" });
+  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator("[data-seen-in-stories]").click();
+  await expect(page.locator('[role="dialog"][data-story]')).toBeVisible();
   const world = page.locator(".universe[data-fixed][data-backdrop='butterfly']");
   await expect(world).toHaveCount(1, { timeout: 15_000 });
   await page.waitForTimeout(1500);

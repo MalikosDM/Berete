@@ -285,7 +285,42 @@
       0.81
      ]
     }
-   }
+   },
+   "version": "0daf078d52"
+  },
+  "okafor-jersey": {
+   "name": "Projecteurs vert, blanc et rouge sur une scène (Noah Okafor, pendentif maillot)",
+   "ratio": 1.792,
+   "focusX": 0.56,
+   "focusY": 0.66,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "ba612a2b19"
+  },
+  "okafor-oka": {
+   "name": "Camouflage or rose et lignes de carte (Noah Okafor, pendentif OKA)",
+   "ratio": 1.792,
+   "focusX": 0.6,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "0cf81f72af"
   },
   "serpent": {
    "name": "Temple sombre, serpents or rose, lueur rouge (Marcus Thuram)",

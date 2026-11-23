@@ -29,5 +29,7 @@ export default defineConfig({
     // The smallest and the largest iPhones, for the home page and the new sections (tests/home.spec.ts).
     { name: "iphone-se", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone SE"], viewport: { width: 320, height: 568 } } },
     { name: "iphone-pro-max", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone 15 Pro Max"], viewport: { width: 430, height: 932 } } },
+    // Safari on a laptop, at a middle width (Yoni, 23/11/2026: the menu of the phone showed there): tests/yoni2311.spec.ts.
+    { name: "safari", testMatch: /yoni2311\.spec\.ts/, use: { ...devices["Desktop Safari"], viewport: { width: 1280, height: 800 } } },
   ],
 });

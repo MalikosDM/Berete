@@ -14,8 +14,9 @@
  * gives another folder.
  */
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
-import { copyFile, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -92,6 +93,11 @@ const SCENES = [
     ),
     regions: { crowd: { d: [0.4, 0.44, 1, 0.76], m: [0, 0.64, 1, 0.81] } },
   }),
+  // 23/11/2026 (Yoni): the two new worlds of Noah Okafor. The jersey pendant: spotlights in the colours of Nigeria and
+  // Switzerland meeting on a stage. The OKA pendant: a camouflage in rose gold over the lines of a map (Switzerland and
+  // Nigeria hidden in it). The octagon keeps the tunnel.
+  scene("okafor-jersey", "Projecteurs vert, blanc et rouge sur une scène (Noah Okafor, pendentif maillot)", [0.56, 0.66]),
+  scene("okafor-oka", "Camouflage or rose et lignes de carte (Noah Okafor, pendentif OKA)", [0.6, 0.5]),
   scene("serpent", "Temple sombre, serpents or rose, lueur rouge (Marcus Thuram)", [0.66, 0.5], {
     spots: [{ k: "glow", tone: "red", d: [0.79, 0.5, 0.12], m: [0.5, 0.93, 0.4] }],
     regions: { path: { d: [0.42, 0.12, 0.98, 0.86], m: [0.08, 0.1, 0.92, 0.72] } },
@@ -308,12 +314,32 @@ async function withoutSails(b) {
   return file;
 }
 
+/** The files written for the background being made (their version is computed over them). */
+let written = [];
+
 async function write(image, base) {
   await image.clone().avif({ quality: 52, effort: 6 }).toFile(base + ".avif");
   await image.clone().webp({ quality: 74, effort: 6 }).toFile(base + ".webp");
+  written.push(base + ".avif", base + ".webp");
 }
 
+/**
+ * A background, its files named with its version (23/11/2026: "<id>-1600.<v>.webp", a fingerprint of its files, so that no
+ * cache keeps an older image: the darker bianconero of Yoni). Its older files go first.
+ */
 async function backdrop(b) {
+  const own = new RegExp("^" + b.id.replace(/[-]/g, "\\-") + "-(m-)?\\d+(\\.[0-9a-f]{10})?\\.(avif|webp)$");
+  for (const f of await readdir(OUT)) if (own.test(f)) await rm(join(OUT, f));
+  written = [];
+  const made = await backdropFiles(b);
+  const hash = createHash("sha256");
+  for (const f of [...written].sort()) hash.update(f.slice(OUT.length) + "\0").update(await readFile(f));
+  const version = hash.digest("hex").slice(0, 10);
+  for (const f of written) await rename(f, f.replace(/\.(avif|webp)$/, "." + version + ".$1"));
+  return { ...made, version };
+}
+
+async function backdropFiles(b) {
   const file = b.sails ? await withoutSails(b) : await master(b);
   const { width, height } = await sharp(file).metadata();
   for (const w of WIDTHS) await write(sharp(file).resize({ width: w }), join(OUT, b.id + "-" + w));

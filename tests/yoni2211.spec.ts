@@ -74,7 +74,7 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
   await expect(page.locator("[data-subcategory='jesus-pieces']")).toHaveAttribute("aria-current", "page");
-  await expect(page.locator("[data-carousel-piece]")).toHaveCount(count);
+  await expect(page.locator("[data-creations-grid] [data-piece-card]")).toHaveCount(count);
   await shot(page, info.project.name + "-pendentifs-jesus-pieces");
   // Its old address.
   await page.goto("/creations/jesus-pieces", { waitUntil: "load" });
@@ -101,7 +101,7 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   await page.locator("[data-filter='pendant']").click();
   await page.locator("[data-subfilter='jesus-pieces']").click();
   await expect(page).toHaveURL(/category=pendants&sub=jesus-pieces/);
-  await expect(page.locator("[data-carousel-piece]")).toHaveCount(count);
+  await expect(page.locator("[data-creations-grid] [data-piece-card]")).toHaveCount(count);
   await shot(page, info.project.name + "-creations-jesus-pieces");
   expect(problems.errors).toEqual([]);
 });

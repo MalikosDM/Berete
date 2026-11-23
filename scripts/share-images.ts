@@ -91,7 +91,9 @@ let made = 0;
 async function render(out: string, html: string, key: string): Promise<Share> {
   const file = path.join(OUT, out);
   const rel = "/media/share/" + out;
-  if (cache[rel] === key && fs.existsSync(file)) return { src: rel, width: W, height: H };
+  // Its address carries its version (23/11/2026): a new photo is never hidden by an older image in a cache.
+  const src = rel + "?v=" + key.slice(0, 10);
+  if (cache[rel] === key && fs.existsSync(file)) return { src, width: W, height: H };
   fs.mkdirSync(path.dirname(file), { recursive: true });
   await tab.setContent(html, { waitUntil: "load" });
   await tab.evaluate(() => document.fonts.ready.then(() => undefined));
@@ -99,7 +101,7 @@ async function render(out: string, html: string, key: string): Promise<Share> {
   cache[rel] = key;
   made += 1;
   console.log("  + public" + rel);
-  return { src: rel, width: W, height: H };
+  return { src, width: W, height: H };
 }
 
 // The brand image: the first ring of the special project, shut, on black.
@@ -121,7 +123,7 @@ for (const p of publicCatalogue(defaultCatalogue).pieces) {
 await browser.close();
 
 // Images of pieces that no longer exist are removed.
-const keep = new Set([brand.src, ...Object.values(pieces).map((s) => s.src)]);
+const keep = new Set([brand.src, ...Object.values(pieces).map((s) => s.src)].map((src) => src.split("?")[0]));
 const dir = path.join(OUT, "pieces");
 for (const name of fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
   const rel = "/media/share/pieces/" + name;

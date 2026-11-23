@@ -101,9 +101,19 @@ export const fr: Messages = {
     boxes: "Écrins Signature",
     process: "L’Expérience sur mesure",
     about: "La Maison",
+    press: "Presse",
     contact: "Contact privé",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
+  },
+
+  /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
+  press: {
+    eyebrow: "Presse",
+    title: "Sous les projecteurs",
+    lead: "La maison dans la presse : les bagues de champion du VfB Stuttgart et de l’Inter Milan.",
+    all: "Tous les articles",
+    about: (title: string) => "À propos de " + title,
   },
 
   footer: {
@@ -142,6 +152,18 @@ export const fr: Messages = {
   },
 
   home: {
+    /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
+    hook: "Nous ne partons pas de ce qui a déjà été fait. Nous partons de ce qui pourrait être.",
+    who: "Berete Jewellers est une maison de haute joaillerie sur mesure, basée à Dubaï : des pièces uniques, imaginées avec vous et créées à la main.",
+    innovation: {
+      eyebrow: "Innovation",
+      title: "L’énergie n’a jamais été faite pour rester immobile",
+      text: "Pour Kevin Schade, Berete a conçu la Spirit Bomb sertie de diamants de son pendentif Dragon Ball pour qu’elle tourne, et a placé le mouvement au cœur même de la création.",
+      caption: "La sphère tourne",
+      play: "Voir la sphère tourner",
+      film: "La Spirit Bomb tournée à la main à l’établi, avant le sertissage",
+    },
+    selection: { eyebrow: "Les Créations", title: "Pendentifs, chaînes, bagues" },
     filmLabel: "Film Berete Jewellers, qui se déroule au fil du défilement",
     kicker: "Berete Jewellers · Dubaï",
     title: "L’Art de la singularité.",
@@ -261,6 +283,7 @@ export const fr: Messages = {
   },
 
   gallery: {
+    zoomHint: "Zoomez avec + et −, un double clic ou deux doigts ; faites glisser pour déplacer la photo.",
     title: "Détails",
     hintPinned: "Faites défiler pour explorer · Touchez pour agrandir",
     hint: "Touchez pour agrandir",
@@ -313,6 +336,21 @@ export const fr: Messages = {
   },
 
   atelier: {
+    philosophy: {
+      eyebrow: "Notre philosophie",
+      title: "Aucune vision trop audacieuse, aucun détail sans raison d’être.",
+      text: ["Berete travaille avec des équipes d’artisans spécialisés.", "Ensemble, ils explorent de nouveaux sertissages, de nouvelles constructions et de nouveaux mécanismes, et repoussent les limites de la joaillerie."],
+    },
+    engineering: {
+      eyebrow: "Mécanismes",
+      title: "L’ingénierie de l’extraordinaire",
+      lead: "Certaines pièces tournent, s’ouvrent ou révèlent ce qu’elles cachent : des mécanismes imaginés avec les artisans de la maison.",
+      sphereTitle: "La Spirit Bomb qui tourne",
+      sphereText: "Sur le pendentif Dragon Ball de Kevin Schade, la sphère sertie de diamants a été conçue pour tourner, et place le mouvement au cœur même de la création. Ici, elle est tournée à la main à l’établi, avant le sertissage.",
+      sphereFilm: "La sphère du pendentif Dragon Ball tournée à la main à l’établi, avant le sertissage",
+      liftTitle: "Le dessus se soulève",
+      liftText: "Sur les bagues de champion de l’Inter Milan et du VfB Stuttgart, le dessus se soulève et révèle le trophée caché dessous. Celui de la bague de l’Inter se porte aussi seul, en pendentif.",
+    },
     steps: [
       { title: "La Naissance de la forme", text: "Le modèle devient métal brut : un pendentif avant sa première pierre." },
       { title: "La Précision du geste", text: "Maillon après maillon, un bracelet prend forme sur l’établi." },
@@ -332,6 +370,7 @@ export const fr: Messages = {
   },
 
   boxes: {
+    hidePhotos: "Masquer les photos",
     eyebrow: "Une conception unique",
     title: "Écrins Signature",
     lead: "Chaque création d’exception mérite une présentation extraordinaire.",
@@ -350,6 +389,20 @@ export const fr: Messages = {
   },
 
   process: {
+    /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    quick: {
+      lead: "Du premier croquis à la révélation dans son écrin : quatre étapes, suivies avec vous sur WhatsApp.",
+      steps: [
+        { title: "Le croquis", text: "Votre idée devient un premier dessin, à la main." },
+        { title: "La validation du design", text: "Vous validez le design, chaque vue, avant toute fabrication." },
+        { title: "La fabrication à l’atelier", text: "Fondue, sertie et polie à la main, étape par étape." },
+        { title: "La révélation", text: "Votre pièce achevée, révélée dans son écrin." },
+      ],
+      orderQ: "Comment commander ?",
+      orderA: "Envoyez-nous un message sur WhatsApp ou via le Contact privé avec votre idée, vos références et votre histoire. Une consultation privée suit ; l’acompte de design lance ensuite le dessin.",
+      timeQ: "Combien de temps ?",
+      timeA: "Chaque pièce a son propre délai, selon sa complexité : environ dix semaines en moyenne.",
+    },
     filmLabel: "Le processus, étape par étape, qui se déroule au fil du défilement",
     steps: [
       { title: "La Consultation privée", text: "Idées et budget. Racontez-nous le moment que vous souhaitez marquer, vos références, votre histoire.", meter: "0 %", payNote: "Aucun paiement à ce stade." },
@@ -507,6 +560,10 @@ export const fr: Messages = {
   },
 
   seoPages: {
+    "/press": {
+      title: "Sous les projecteurs — Presse",
+      description: "Berete Jewellers dans la presse : les bagues de champion du VfB Stuttgart et de l’Inter Milan racontées par Goal.com Deutschland, les Stuttgarter Nachrichten et le Daily Mail.",
+    },
     "/": {
       title: "Berete Jewellers — L’Art de la singularité, Dubaï",
       description: "Des créations uniques de haute joaillerie pour celles et ceux qui écrivent leur propre histoire. Pendentifs, chaînes et bagues de champion créés à Dubaï. Créé par nous. Inspiré par vous.",
@@ -666,6 +723,8 @@ export const fr: Messages = {
   },
 
   films: {
+    pieceSection: "La pièce achevée",
+    pieceSectionLead: (title: string) => "Le film de la pièce achevée : " + title + ". En plein écran, avec le son.",
     eyebrow: "Derrière la pièce",
     enter: "Entrer dans l’atelier",
     lead: (title, reveal) => "Passez derrière l’établi et regardez " + title + " prendre vie" + (reveal ? ", puis découvrez la pièce dans La Révélation finale." : "."),

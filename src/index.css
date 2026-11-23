@@ -28,6 +28,13 @@
   line-gap-override: 0%;
 }
 
+/*
+ * A computer (Yoni, 23/11/2026: a laptop under Safari at a middle width showed the menu button of the phone): the whole menu
+ * from 1024 px, or from 900 px with a mouse or a trackpad (a narrow window of a laptop). Phones and tablets held in portrait
+ * keep the menu button.
+ */
+@custom-variant desk (@media (min-width: 64rem), (min-width: 56.25rem) and (hover: hover) and (pointer: fine));
+
 @theme {
   /* The whole menu of the computer from 1260 px (21/11/2026: a laptop of 1440 px with its scroll bar, or a window a little
      narrower, kept the menu button instead of the menu on every page), a little tighter until 1440 px ("roomy"); the
@@ -738,6 +745,27 @@ html.lenis body {
 }
 
 /* The watermark: a glyph or a number, very large, in the depth. */
+/* The name of the house in the depth of the capsule (Yoni, 23/11/2026): BERETE, in the letters of the logo, very discreet, low
+   on the screen, behind the decor and under the light (src/components/Universe.tsx). */
+.u-brand {
+  inset: auto;
+  left: 50%;
+  bottom: 7svh;
+  width: min(94vw, 150svh);
+  aspect-ratio: 4.345;
+  transform: translateX(-50%);
+  background: var(--color-white);
+  -webkit-mask: var(--u-brand) center / contain no-repeat;
+  mask: var(--u-brand) center / contain no-repeat;
+  opacity: 0.045;
+  pointer-events: none;
+}
+@media (max-width: 1023px) {
+  .u-brand {
+    bottom: 3svh;
+    width: 92vw;
+  }
+}
 .u-mark {
   inset: auto;
   left: var(--u-at-x);
@@ -1278,13 +1306,14 @@ html.lenis body {
 /* The light of an AI background may rise behind the menu of a computer (the moon of the forest, the lights of a stadium,
    the sun of the clover garden): a darker band under the menu, so that its words stay readable. Not under the sphere of
    the Genkidama (its light is the heart of the image). */
-@media (min-width: 1024px) {
+/* Since 23/11/2026 the menu of a computer is two rows high (the name of the house, then the menu): the band covers both. */
+@media (min-width: 64rem), (min-width: 56.25rem) and (hover: hover) and (pointer: fine) {
   .universe[data-backdrop]:not([data-fixed], [data-backdrop="genkidama"]) .u-veil::before {
     content: "";
     position: absolute;
     inset: 0 0 auto;
-    height: 9rem;
-    background: linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 80%, transparent) 0%, color-mix(in oklab, var(--u-base) 55%, transparent) 50%, transparent 100%);
+    height: 11rem;
+    background: linear-gradient(to bottom, color-mix(in oklab, var(--u-base) 86%, transparent) 0%, color-mix(in oklab, var(--u-base) 74%, transparent) 62%, transparent 100%);
   }
 }
 
@@ -3142,79 +3171,16 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
 }
 
-/* The carousel of the creations (src/components/PieceCarousel.tsx): the creation in the middle large, those at its sides
-   smaller, blurred and dimmed, drawn towards it; the row slides under the finger, snapping one creation at a time. */
-.piece-carousel {
-  --pc-w: min(78vw, 46svh, 400px);
-  --pc-gap: 0.75rem;
-}
-@media (min-width: 768px) {
-  .piece-carousel {
-    --pc-w: min(44vw, 48svh, 540px);
-    --pc-gap: 1.5rem;
-  }
-}
-.pc-track {
-  display: flex;
-  gap: var(--pc-gap);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  padding-block: 0.5rem;
-}
-.pc-spacer {
-  flex: 0 0 calc(50% - var(--pc-w) / 2 - var(--pc-gap));
-}
-.pc-slide {
-  flex: 0 0 var(--pc-w);
-  /* Never wider than its frame because of a long line (WebKit). */
-  min-width: 0;
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-}
-.pc-card {
-  transition:
-    transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1),
-    opacity 0.55s ease;
-}
-.pc-photo {
-  transition: filter 0.55s ease;
-}
-.pc-text {
-  transition: opacity 0.4s ease;
-}
-.pc-slide[data-side] .pc-card {
-  transform: scale(0.8);
-  opacity: 0.55;
-}
-.pc-slide[data-side] .pc-photo {
-  filter: blur(4px);
-}
-.pc-slide[data-side] .pc-text {
-  opacity: 0;
-}
-.pc-slide[data-side="before"] .pc-card {
-  transform-origin: right center;
-}
-.pc-slide[data-side="after"] .pc-card {
-  transform-origin: left center;
-}
-[dir="rtl"] .pc-slide[data-side="before"] .pc-card {
-  transform-origin: left center;
-}
-[dir="rtl"] .pc-slide[data-side="after"] .pc-card {
-  transform-origin: right center;
-}
-.pc-slide[data-far] .pc-card {
-  opacity: 0.25;
-}
-@media (prefers-reduced-motion: reduce) {
-  .pc-card,
-  .pc-photo,
-  .pc-text {
-    transition: none;
-  }
+
+/* Behind the jewel of a capsule, a calm dark light (Yoni, 23/11/2026: the universe never takes over the piece): the decor stays
+   around it, softened where the piece is. */
+.piece-calm {
+  background: radial-gradient(closest-side, rgba(5, 5, 5, 0.62), rgba(5, 5, 5, 0.32) 55%, transparent 100%) center / 96% 92% no-repeat;
 }
 
+/* The Genkidama on a phone (Yoni, 23/11/2026): the sphere of energy higher, above the pendant, as on a computer. */
+@media (max-aspect-ratio: 4/5) {
+  .universe[data-backdrop="genkidama"]:not([data-fixed], [data-preview]) :is(.u-backdrop, .u-genki) {
+    translate: 0 -9svh;
+  }
+}

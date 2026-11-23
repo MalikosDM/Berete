@@ -431,7 +431,7 @@ export function headFor(settings: SeoSettings, path: string, extras?: SeoExtras,
   }
   if (image !== "") {
     meta({ property: "og:image", content: image });
-    if (/\.jpe?g$/i.test(imagePath)) meta({ property: "og:image:type", content: "image/jpeg" });
+    if (/\.jpe?g$/i.test(imagePath.split("?")[0]!)) meta({ property: "og:image:type", content: "image/jpeg" });
     if (imageSize[0] && imageSize[1]) {
       meta({ property: "og:image:width", content: String(imageSize[0]) });
       meta({ property: "og:image:height", content: String(imageSize[1]) });

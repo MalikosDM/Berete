@@ -127,7 +127,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "atelier", label: "L'atelier de la pièce (« Entrer dans l'atelier » : la vidéo de fabrication, puis la pièce finie)", type: "atelier" },
       { key: "model3d", label: "Modèle 3D sur la page", type: "model3d" },
       { key: "gallery", label: "Photos de « Sous tous les angles », dans l'ordre", type: "medialist" },
-      { key: "angles", label: "« Sous tous les angles » : un petit titre et un texte pour chaque photo (en anglais, puis leurs traductions si vous le voulez)", type: "angles" },
+      { key: "angles", label: "« Sous tous les angles » : une courte légende, seulement sur les photos où elle apprend quelque chose (en anglais, puis ses traductions si vous le voulez). Le site n'affiche que le titre, jamais le texte (Yoni, 23/11/2026)", type: "angles" },
       { key: "handover", label: "Remise au client", type: "medialist" },
       { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Or : 18 carats ; « Precious Materials » : d'après les photos, à faire valider par Yoni)", type: "specs" },
       { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },

@@ -35,7 +35,7 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
   const proof = [...people.filter((p) => p.kind === "club"), ...people.filter((p) => p.kind === "player" && p.number !== null)].map((p) => p.name);
 
   return (
-    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-24 bg-ink " + (compact ? "py-20 lg:py-28" : "py-24 lg:py-36")}>
+    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-32 bg-ink " + (compact ? "py-20 lg:py-28" : "py-24 lg:py-36")}>
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
         <div className="rule-rose mb-16 lg:mb-24" aria-hidden="true" />
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">

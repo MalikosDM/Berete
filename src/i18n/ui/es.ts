@@ -90,9 +90,19 @@ export const es: Messages = {
     boxes: "Estuches Signature",
     process: "La experiencia a medida",
     about: "La Casa",
+    press: "Prensa",
     contact: "Contacto privado",
     openMenu: "Abrir el menú",
     closeMenu: "Cerrar el menú",
+  },
+
+  /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
+  press: {
+    eyebrow: "Prensa",
+    title: "Bajo los focos",
+    lead: "La casa en la prensa: los anillos de campeón del VfB Stuttgart y del Inter de Milán.",
+    all: "Todos los artículos",
+    about: (title: string) => "Sobre " + title,
   },
 
   footer: {
@@ -131,6 +141,18 @@ export const es: Messages = {
   },
 
   home: {
+    /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
+    hook: "No partimos de lo que ya se ha hecho. Partimos de lo que podría ser.",
+    who: "Berete Jewellers es una casa de alta joyería a medida, con sede en Dubái: piezas únicas, imaginadas con usted y creadas a mano.",
+    innovation: {
+      eyebrow: "Innovación",
+      title: "La energía nunca estuvo hecha para quedarse quieta",
+      text: "Para Kevin Schade, Berete diseñó la Spirit Bomb engastada de diamantes de su colgante Dragon Ball para que gire, y llevó el movimiento al corazón mismo de la creación.",
+      caption: "La esfera gira",
+      play: "Ver girar la esfera",
+      film: "La Spirit Bomb girada a mano en el banco de trabajo, antes del engaste",
+    },
+    selection: { eyebrow: "Las Creaciones", title: "Colgantes, cadenas, anillos" },
     filmLabel: "Vídeo de Berete Jewellers, que avanza al desplazarse por la página",
     kicker: "Berete Jewellers · Dubái",
     title: "El arte de la singularidad.",
@@ -250,6 +272,7 @@ export const es: Messages = {
   },
 
   gallery: {
+    zoomHint: "Amplíe con + y −, un doble clic o dos dedos; deslice para mover la foto.",
     title: "Detalles",
     hintPinned: "Desplácese para explorar · Toque para ampliar",
     hint: "Toque para ampliar",
@@ -302,6 +325,21 @@ export const es: Messages = {
   },
 
   atelier: {
+    philosophy: {
+      eyebrow: "Nuestra filosofía",
+      title: "Ninguna visión demasiado audaz, ningún detalle sin propósito.",
+      text: ["Berete trabaja con equipos de artesanos especializados.", "Juntos exploran nuevos engastes, nuevas construcciones y nuevos mecanismos, y llevan más lejos los límites de la alta joyería."],
+    },
+    engineering: {
+      eyebrow: "Mecanismos",
+      title: "La ingeniería de lo extraordinario",
+      lead: "Algunas piezas giran, se abren o revelan lo que esconden: mecanismos imaginados con los artesanos de la casa.",
+      sphereTitle: "La Spirit Bomb que gira",
+      sphereText: "En el colgante Dragon Ball de Kevin Schade, la esfera engastada de diamantes se diseñó para girar, y lleva el movimiento al corazón mismo de la creación. Aquí se gira a mano en el banco de trabajo, antes del engaste.",
+      sphereFilm: "La esfera del colgante Dragon Ball girada a mano en el banco de trabajo, antes del engaste",
+      liftTitle: "La parte superior se levanta",
+      liftText: "En los anillos de campeón del Inter de Milán y del VfB Stuttgart, la parte superior se levanta y revela el trofeo escondido debajo. La del anillo del Inter también se lleva sola, como colgante.",
+    },
     steps: [
       { title: "El nacimiento de la forma", text: "El modelo se convierte en metal en bruto: un colgante antes de su primera piedra." },
       { title: "La precisión en cada detalle", text: "Eslabón a eslabón, una pulsera toma forma sobre el banco del joyero." },
@@ -321,6 +359,7 @@ export const es: Messages = {
   },
 
   boxes: {
+    hidePhotos: "Ocultar las fotos",
     eyebrow: "Concebidos uno a uno",
     title: "Estuches Signature",
     lead: "Toda creación excepcional merece una presentación extraordinaria.",
@@ -339,6 +378,20 @@ export const es: Messages = {
   },
 
   process: {
+    /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    quick: {
+      lead: "Del primer boceto a la revelación en su estuche: cuatro etapas, seguidas con usted por WhatsApp.",
+      steps: [
+        { title: "El boceto", text: "Su idea se convierte en un primer dibujo, a mano." },
+        { title: "La aprobación del diseño", text: "Usted aprueba el diseño, cada vista, antes de fabricar nada." },
+        { title: "La creación en el taller", text: "Fundida, engastada y pulida a mano, paso a paso." },
+        { title: "La revelación", text: "Su pieza terminada, revelada en su estuche." },
+      ],
+      orderQ: "¿Cómo hago un pedido?",
+      orderA: "Escríbanos por WhatsApp o mediante el Contacto privado con su idea, sus referencias y su historia. Sigue una consulta privada; el anticipo de diseño pone entonces en marcha el diseño.",
+      timeQ: "¿Cuánto tiempo lleva?",
+      timeA: "Cada pieza tiene su propio plazo, según su complejidad: unas diez semanas de media.",
+    },
     filmLabel: "El proceso, paso a paso, que avanza al desplazarse por la página",
     steps: [
       { title: "La consulta privada", text: "Ideas y presupuesto. Cuéntenos el momento que desea celebrar, sus referencias, su historia.", meter: "0%", payNote: "Ningún pago en esta etapa." },
@@ -496,6 +549,10 @@ export const es: Messages = {
   },
 
   seoPages: {
+    "/press": {
+      title: "Bajo los focos — Prensa",
+      description: "Berete Jewellers en la prensa: los anillos de campeón del VfB Stuttgart y del Inter de Milán contados por Goal.com Deutschland, el Stuttgarter Nachrichten y el Daily Mail.",
+    },
     "/": {
       title: "Berete Jewellers — El arte de la singularidad, Dubái",
       description: "Alta joyería única para quienes definen su propio legado. Colgantes, cadenas y anillos de campeón creados en Dubái. Creado por nosotros. Inspirado por usted.",
@@ -655,6 +712,8 @@ export const es: Messages = {
   },
 
   films: {
+    pieceSection: "La pieza terminada",
+    pieceSectionLead: (title: string) => "La película de la pieza terminada: " + title + ". A pantalla completa, con sonido.",
     eyebrow: "Detrás de la pieza",
     enter: "Entrar en el taller",
     lead: (title, reveal) => "Pase detrás del banco del joyero y vea cómo " + title + " cobra vida" + (reveal ? "; después, descubra la pieza en La revelación final." : "."),

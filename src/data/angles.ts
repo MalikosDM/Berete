@@ -1,6 +1,8 @@
 /*
- * "Every Angle" (feedback of Yoni, 21/11/2026): every photo and film of a piece comes with its text, a small title and one
- * or two sentences that tell a detail or a bit of its story, like the details of the Inter ring. Written photo by photo
+ * "Every Angle" (feedback of Yoni, 21/11/2026): every photo and film of a piece came with its text, a small title and one
+ * or two sentences. Since 23/11/2026 (Yoni: no text that describes what is already seen) the gallery shows only the title,
+ * as a short caption, and only on the few photos where it teaches something (a hidden mechanism, a meaning, an engraving,
+ * the piece worn by its player); every "text" is empty and is not shown. Written photo by photo
  * after looking at each one (src/data/angles.json, by piece then by the address of the photo, in English): they say what
  * the photo shows, or what the house already told (story, client, details); no figure that does not come from Yoni, the
  * coloured stones by their colour only. The other languages translate them in src/i18n/content/angles/<lang>.json, keyed
@@ -66,8 +68,8 @@ export const AMATEUR_FILMS = new Set([
 ]);
 
 /** How many photos "Every Angle" shows before "See N more": all of them up to ANGLES_MANY, else the first ANGLES_FIRST. */
-export const ANGLES_FIRST = 6;
-export const ANGLES_MANY = 8;
+export const ANGLES_FIRST = 9;
+export const ANGLES_MANY = 12;
 export const anglesShownFirst = (count: number) => (count <= ANGLES_MANY ? count : ANGLES_FIRST);
 
 /** The known parts only, for the base (an emptied entry is kept: that photo has no text). */
