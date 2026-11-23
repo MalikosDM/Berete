@@ -211,7 +211,9 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Presse** (`/press`, `src/pages/Press.tsx`, `src/data/press.ts`) : Goal.com Deutschland, Stuttgarter Nachrichten, Daily Mail
       (liens ouverts le 23/11 ; Daily Mail du 29/05/2024) ; **BILD garde la 1re place, invisible tant que son lien manque** (le mettre
       dans `PRESS`). Articles VfB dans la capsule VfB, Daily Mail dans celle de l'Inter ; bandeau sur l'accueil.
-- `tests/yoni2311.spec.ts` (ordinateur 1440, iPhone, **Safari 1280**), captures `verification/<appareil>/yoni2311-*.jpg`.
+- `tests/yoni2311.spec.ts` (ordinateur 1440, iPhone, **Safari 1280**), vérifié sur le site en ligne le 23/11 (24 réussis), captures
+  `verification/<appareil>/yoni2311-*.jpg`. Les anciens tests adaptés (film d'entrée, textes des galeries, carrousel, bulles) ;
+  toute la batterie passe en local sur ordinateur et iPhone. Le Mac n'a presque plus de place (moins de 1 Go libre le 23/11).
 - [ ] Yoni : le lien de l'article BILD ; « Créée pour » de la bague Bosnie (aujourd'hui « un collectionneur privé ») ; relire les
       nouveaux textes et leurs traductions ; le titre « Ruby T Necklace » nomme une pierre (à renommer ?) ; films de la croix TM qui
       tourne et de la bague qui s'ouvre ; ses photos personnelles pour les chapitres de La Maison.
