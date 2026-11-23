@@ -3,7 +3,9 @@
  * The Signature Trunks (Yoni, 22/11/2026): every box opens and closes again in its own films, in the same square frame
  * (src/components/TrunkReveal.tsx); its professional photos stay in its gallery ("x photos") and on the page of its piece.
  *
- * Each box has its folder in 00 Contexte Yoni/Ecrins IA (ouverture) v2/<folder>/ (square, silent):
+ * Each box has its folder in 00 Contexte Yoni/Ecrins IA (ouverture) v3/<folder>/ (square, silent; Yoni, 23/11/2026: every
+ * trunk in the same staging, a black marble base, a golden light from above, a fixed camera, 6 s, its real piece inside),
+ * or still in "... v2/" for the boxes not made again yet (set "v2": kept off the page of the trunks, src/data/trunks.ts):
  *   closed.jpg, open.jpg          the box closed, open
  *   ouverture.mp4                 from closed to open
  *   fermeture.mp4                 from open to closed (the same film backwards)
@@ -36,7 +38,8 @@ import { MARGIN, SIZES, sizedPath } from "./media-sizes.mjs";
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
 const YONI = join(DISK, "Berete - Dossiers icloud", "00 Contexte Yoni");
-const FILMS = join(YONI, "Ecrins IA (ouverture) v2");
+/** The folders of the films, by staging: "v3" (23/11/2026, on the page of the trunks), "v2" (the boxes waiting for theirs). */
+const SETS = { v3: join(YONI, "Ecrins IA (ouverture) v3"), v2: join(YONI, "Ecrins IA (ouverture) v2") };
 const PRO = join(YONI, "Boites (photos pro)");
 const OUT = join(ROOT, "public", "media", "trunks");
 const DATA = join(ROOT, "src", "data", "trunks.generated.json");
@@ -45,22 +48,26 @@ const VIDEO = 1080;
 const PHOTO = 1600;
 const ONLY = (process.argv.find((a) => a.startsWith("--only=")) ?? "").slice(7).split(",").filter(Boolean);
 
-/** Each box, in the order of the page: its address (src/data/pieces.ts, BOXES), the folder of its films, of its photos. */
+/**
+ * Each box, in the order of the page: its address (src/data/pieces.ts, BOXES), its staging (the folder of its films: v3 for
+ * the 9 boxes made again on 23/11/2026, v2 for the 4 waiting for their v3 files: signature-trunk, photo-case, trophy-trunk,
+ * campione-d-italia-case), the folder of its films, of its photos. A box gets "v3" the day its v3 folder arrives.
+ */
 const BOXES = [
-  { slug: "signature-trunk", film: "signature-trunk", pro: "signature-trunk" },
-  { slug: "sirius", film: "sirius", pro: "sirius" },
-  { slug: "tulips-on-tour", film: "tulips-on-tour", pro: "tulips-on-tour" },
-  { slug: "dragon-ball-trunk", film: "dragon-ball-trunk", pro: "dragon-ball-trunk" },
-  { slug: "the-hand-cube", film: "the-hand-cube", pro: "the-hand-cube" },
-  { slug: "dfb-pokal-2025-display", film: "dfb-pokal-2025-display", pro: "vfb-pokal-vitrine" },
-  { slug: "world-cup-display", film: "world-cup-display", pro: "bosnie-vitrine-coupe-du-monde" },
-  { slug: "photo-case", film: "photo-case", pro: "malle-photo-allemagne" },
-  { slug: "brt-coral-case", film: "malle-brt-corail", pro: "malle-brt-corail" },
-  { slug: "trophy-trunk", film: "malle-photo-coupe-rouge", pro: "malle-photo-coupe-rouge" },
+  { slug: "signature-trunk", set: "v2", film: "signature-trunk", pro: "signature-trunk" },
+  { slug: "sirius", set: "v3", film: "sirius", pro: "sirius" },
+  { slug: "tulips-on-tour", set: "v3", film: "tulips-on-tour", pro: "tulips-on-tour" },
+  { slug: "dragon-ball-trunk", set: "v3", film: "dragon-ball-trunk", pro: "dragon-ball-trunk" },
+  { slug: "the-hand-cube", set: "v3", film: "the-hand-cube", pro: "the-hand-cube" },
+  { slug: "dfb-pokal-2025-display", set: "v3", film: "dfb-pokal-2025-display", pro: "vfb-pokal-vitrine" },
+  { slug: "world-cup-display", set: "v3", film: "world-cup-display", pro: "bosnie-vitrine-coupe-du-monde" },
+  { slug: "photo-case", set: "v2", film: "photo-case", pro: "malle-photo-allemagne" },
+  { slug: "brt-coral-case", set: "v3", film: "malle-brt-corail", pro: "malle-brt-corail" },
+  { slug: "trophy-trunk", set: "v2", film: "malle-photo-coupe-rouge", pro: "malle-photo-coupe-rouge" },
   // No professional photos: their gallery keeps their real photos (src/data/pieces.ts).
-  { slug: "campione-d-italia-case", film: "campione-d-italia-case" },
-  { slug: "butterfly-trunk", film: "butterfly-trunk" },
-  { slug: "okafor-trunk", film: "okafor-trunk" },
+  { slug: "campione-d-italia-case", set: "v2", film: "campione-d-italia-case" },
+  { slug: "butterfly-trunk", set: "v3", film: "butterfly-trunk" },
+  { slug: "okafor-trunk", set: "v3", film: "okafor-trunk" },
 ];
 
 function run(cmd, args) {
@@ -89,14 +96,15 @@ function writeFilm(src, out) {
   return Math.round(duration(out) * 100) / 100;
 }
 
-if (!existsSync(FILMS)) {
-  console.error("Folder of the trunks not found (plug the disk in): " + FILMS);
+if (!existsSync(SETS.v3)) {
+  console.error("Folder of the trunks not found (plug the disk in): " + SETS.v3);
   process.exit(1);
 }
 for (const box of BOXES) {
+  if (ONLY.length > 0 && !ONLY.includes(box.slug)) continue;
   for (const f of ["closed.jpg", "open.jpg", "ouverture.mp4", "fermeture.mp4"]) {
-    if (!existsSync(join(FILMS, box.film, f))) {
-      console.error(box.slug + ": " + join(FILMS, box.film, f) + " is missing");
+    if (!existsSync(join(SETS[box.set], box.film, f))) {
+      console.error(box.slug + ": " + join(SETS[box.set], box.film, f) + " is missing");
       process.exit(1);
     }
   }
@@ -109,7 +117,7 @@ for (const box of BOXES) {
   const tmp = join(OUT, "." + box.slug + ".tmp");
   await rm(tmp, { recursive: true, force: true });
   await mkdir(tmp, { recursive: true });
-  const src = join(FILMS, box.film);
+  const src = join(SETS[box.set], box.film);
   for (const state of ["closed", "open"]) await writeSquare(join(src, state + ".jpg"), tmp, state);
   const openingDuration = writeFilm(join(src, "ouverture.mp4"), join(tmp, "opening.mp4"));
   const closingDuration = writeFilm(join(src, "fermeture.mp4"), join(tmp, "closing.mp4"));
@@ -138,6 +146,7 @@ for (const box of BOXES) {
   const base = "/media/trunks/" + box.slug;
   const entry = {
     base,
+    set: box.set,
     version: v,
     widths: WIDTHS,
     size: WIDTHS[WIDTHS.length - 1],

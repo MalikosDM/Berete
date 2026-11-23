@@ -162,6 +162,27 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « écrins v3 » (validés par Yoni, 23/11/2026) — état au 23/11/2026
+- [x] **9 écrins dans la même mise en scène** (socle en marbre noir, lumière dorée du dessus, caméra fixe, 6 s, la vraie pièce
+      dedans) : `00 Contexte Yoni/Ecrins IA (ouverture) v3/<dossier>/` (closed.jpg et open.jpg en 4096, ouverture.mp4 et
+      fermeture.mp4 en 1440, 24 im/s). `scripts/trunk-media.mjs` : chaque écrin a sa mise en scène (`set` : v3 pour dragon-ball,
+      the-hand-cube, sirius, tulips-on-tour, dfb-pokal-2025-display, world-cup-display, brt-coral-case (dossier `malle-brt-corail`),
+      okafor-trunk, butterfly-trunk ; v2 pour les 4 autres), `npm run trunks -- --only=…`. Nouvelles versions dans tous les noms.
+- [x] **La page des écrins ne montre que la mise en scène v3** (`TRUNK_SET` et `onTrunksPage` de `src/data/trunks.ts`) :
+      signature-trunk, photo-case, trophy-trunk, campione-d-italia-case restent publiés, avec leurs fichiers v2 (rien supprimé),
+      visibles sur la page de leur pièce, et reviendront sur la page dès que leur dossier v3 sera passé en `set: "v3"`.
+- [x] **Hero de la page des écrins** : l'image fermée v3 de la malle Dragon Ball (c'était déjà le même fichier ; le script lit
+      maintenant le dossier v3).
+- [x] **Lumière et pièce recalées** sur chaque image ouverte (`PLACES`) : la lumière part de la pièce posée dans l'écrin, la
+      pièce sort de là et flotte devant le couvercle ouvert, au-dessus de « Refermer », loin de « Revoir l'ouverture » (iPhone
+      compris) ; Dragon Ball : devant son crochet (un seul pendentif visible) ; les deux vitrines : la bague monte un peu.
+- [x] **Raccords** : images fixes et films ont le même cadre et la même lumière (écart moyen 2 à 3,7 / 255 entre l'image et la
+      première ou la dernière image de son film) ; aucun saut d'une image à la suivante dans les 18 films (le plus fort : les
+      portes de la malle Dragon Ball qui pivotent) ; la fermeture est l'ouverture à l'envers. Test image par image dans
+      `tests/trunks.spec.ts`.
+- [ ] Yoni : les fichiers v3 de l'écrin Campione (photo fermée), de l'écrin Signature, de la Photo Case et de la malle au
+      trophée (pièce à mettre dedans) ; la pièce de la BRT Coral Case.
+
 ## Passe « retours de Yoni du 23/11 au soir » (WhatsApp 16 h 25 – 17 h 22, fin de l'appel du 22/11) — état au 23/11/2026
 - [ ] **Making-of Dragon Ball (« la vidéo héros »)** : introuvable sur le Mac le 23/11 au soir (disque externe, Bureau, iCloud
       Drive, Téléchargements, Vidéos ; la photothèque Photos est fermée à Claude) : **chemin demandé à Malik**. Dès qu'on l'a :

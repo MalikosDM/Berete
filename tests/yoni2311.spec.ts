@@ -251,7 +251,7 @@ test("trunks: the box stays open while its photos are looked at, the magnifying 
   await expect(card.locator('[data-box-enter="kevin-schade-dragon-ball-pendant"]')).toBeVisible();
   await card.screenshot({ path: shotPath(info, "yoni2311-trunk") });
   // A box whose piece is not known: no way to a piece.
-  const other = page.locator('[data-box="photo-case"]');
+  const other = page.locator('[data-box="brt-coral-case"]');
   await other.locator("[data-box-photos]").click();
   await expect(other.locator("[data-box-enter]")).toHaveCount(0);
 });

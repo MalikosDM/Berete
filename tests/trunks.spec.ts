@@ -10,27 +10,33 @@ import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync } from "node:fs";
 import { expect, test, type Locator, type Page, type TestInfo } from "./fixtures";
 import { BOXES, REMOVED_BOXES } from "../src/data/pieces";
-import { trunkImage, trunkOf } from "../src/data/trunks";
+import { onTrunksPage, trunkImage, trunkOf } from "../src/data/trunks";
 import { skipIntro, watch } from "./helpers";
 
 const DIR = "verification/trunks";
 mkdirSync(DIR, { recursive: true });
 
-/** The boxes of the page, in their order, and their piece (null: not known yet). */
+/**
+ * The boxes of the page (Yoni, 23/11/2026: the v3, one staging for all), in their order, and their piece (null: not known
+ * yet).
+ */
 const ORDER: [string, string | null][] = [
-  ["signature-trunk", null],
   ["sirius", "sirius"],
   ["tulips-on-tour", "tulips-on-tour-medallion"],
   ["dragon-ball-trunk", "kevin-schade-dragon-ball-pendant"],
   ["the-hand-cube", "the-hand"],
   ["dfb-pokal-2025-display", "vfb-stuttgart-dfb-pokal-2025"],
   ["world-cup-display", "bosnia-and-herzegovina-world-cup-2026-ring"],
-  ["photo-case", null],
   ["brt-coral-case", null],
-  ["trophy-trunk", null],
-  ["campione-d-italia-case", "campione-d-italia-2023-2024"],
   ["butterfly-trunk", "michy-batshuayi-butterfly-pendant"],
   ["okafor-trunk", "noah-okafor-octagon-pendant"],
+];
+/** Still in their v2 films, waiting for their v3 files: kept (nothing removed), off the page of the trunks. */
+const WAITING: [string, string | null][] = [
+  ["signature-trunk", null],
+  ["photo-case", null],
+  ["trophy-trunk", null],
+  ["campione-d-italia-case", "campione-d-italia-2023-2024"],
 ];
 /** Without professional photos: their gallery keeps their real photos. */
 const NO_PRO = new Set(["campione-d-italia-case", "butterfly-trunk", "okafor-trunk"]);
@@ -67,7 +73,7 @@ function frame(file: string, last: boolean): Buffer {
   return r.stdout;
 }
 
-const phoneOf = (info: TestInfo) => info.project.name !== "desktop";
+const phoneOf = (info: TestInfo) => info.project.name.startsWith("iphone");
 /** A finger on the iPhone, the mouse on the computer. */
 const press = (info: TestInfo, l: Locator, options: { force?: boolean; position?: { x: number; y: number } } = {}) => (phoneOf(info) ? l.tap(options) : l.click(options));
 
@@ -120,14 +126,20 @@ async function playsIts(card: Locator, which: "opening" | "closing", src: string
   return video;
 }
 
-test("the data: 13 boxes, each its two images and its two films, every name with its version; their photos", async () => {
-  // On the page: the published trunks that open in their film (Keita and Malik Tillman wait for theirs, 23/11/2026).
-  const shown = BOXES.filter((b) => b.published && trunkOf(b.slug)).map((b) => b.slug);
+test("the data: 13 boxes, each its two images and its two films, every name with its version; the 9 of the v3 on the page", async () => {
+  // On the page: the published trunks that open in their film of the v3 (Keita and Malik Tillman wait for their films, the
+  // four of WAITING for their v3 files, 23/11/2026).
+  const shown = BOXES.filter((b) => b.published && onTrunksPage(b.slug)).map((b) => b.slug);
   expect(BOXES.filter((b) => b.published && !trunkOf(b.slug)).map((b) => b.slug)).toEqual(["keita-trunk", "tillman-trunk"]);
   expect(shown).toEqual(ORDER.map(([s]) => s));
+  for (const [slug] of ORDER) expect(trunkOf(slug)!.set, slug).toBe("v3");
+  for (const [slug] of WAITING) {
+    expect(trunkOf(slug)!.set, slug).toBe("v2");
+    expect(BOXES.find((b) => b.slug === slug)!.published, slug).toBe(true);
+  }
   // Nothing else in the folder of the trunks (no old box, no old opening).
-  expect(readdirSync("public/media/trunks").sort()).toEqual(ORDER.map(([s]) => s).sort());
-  for (const [slug, piece] of ORDER) {
+  expect(readdirSync("public/media/trunks").sort()).toEqual([...ORDER, ...WAITING].map(([s]) => s).sort());
+  for (const [slug, piece] of [...ORDER, ...WAITING]) {
     const box = BOXES.find((b) => b.slug === slug)!;
     expect(box.pieceSlug, slug).toBe(piece);
     const trunk = trunkOf(slug)!;
@@ -159,6 +171,33 @@ test("the data: 13 boxes, each its two images and its two films, every name with
   }
   expect(REMOVED_BOXES).toContain("nz-travel-case");
   expect(trunkOf("nz-travel-case")).toBeNull();
+});
+
+/** Every frame of a film, in grey, small: to look for a jump from one frame to the next. */
+function frames(file: string, n = 120): Buffer[] {
+  const r = spawnSync("ffmpeg", ["-loglevel", "error", "-i", file, "-vf", "scale=" + n + ":" + n, "-f", "rawvideo", "-pix_fmt", "gray", "-"], { maxBuffer: 1 << 28 });
+  const size = n * n;
+  return Array.from({ length: Math.floor(r.stdout.length / size) }, (_, k) => r.stdout.subarray(k * size, (k + 1) * size));
+}
+const gap = (a: Buffer, b: Buffer) => a.reduce((sum, x, i) => sum + Math.abs(x - b[i]!), 0) / a.length;
+
+test("the 9 trunks of the v3, frame by frame: no jump inside their films, the closing the opening backwards", async () => {
+  test.skip(!!process.env.BASE_URL && /vercel\.app/.test(process.env.BASE_URL), "the files of the repository (checked before they go online)");
+  for (const [slug] of ORDER) {
+    const trunk = trunkOf(slug)!;
+    const opening = frames("public" + trunk.opening);
+    const closing = frames("public" + trunk.closing);
+    // 6 s at 24 images a second.
+    expect(opening.length, slug).toBeGreaterThanOrEqual(140);
+    expect(closing.length, slug).toBeGreaterThanOrEqual(140);
+    for (const [name, film] of [["opening", opening], ["closing", closing]] as const) {
+      const worst = Math.max(...film.slice(1).map((f, k) => gap(f, film[k]!)));
+      expect(worst, slug + " " + name + ": the largest change from one frame to the next").toBeLessThan(10);
+    }
+    // The closing starts where the opening ends, and ends where it starts.
+    expect(gap(closing[0]!, opening[opening.length - 1]!), slug + ": start of the closing").toBeLessThan(4);
+    expect(gap(closing[closing.length - 1]!, opening[0]!), slug + ": end of the closing").toBeLessThan(4);
+  }
 });
 
 test("the page: every box closed, in the same square, aligned (three on a row on a computer, one on a phone)", async ({ page }, info) => {
@@ -357,7 +396,7 @@ test("with the keyboard: Enter opens, the focus goes to Close; Enter closes, the
   test.skip(phoneOf(info), "the keyboard: on a computer");
   await skipIntro(page);
   await page.goto("/fr/boxes", { waitUntil: "load" });
-  const card = page.locator("[data-box='signature-trunk']");
+  const card = page.locator("[data-box='" + ORDER[0]![0] + "']");
   await square(card);
   await page.waitForTimeout(500);
   await card.locator("[data-trunk-open]").focus();

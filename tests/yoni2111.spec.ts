@@ -16,7 +16,7 @@ import { defaultCatalogue } from "../src/data/catalogue";
 import { BOXES } from "../src/data/pieces";
 import { personHref, piecesOf, publicCatalogue } from "../src/data/relations";
 import { BACKDROPS, resolveTheme } from "../src/data/themes";
-import { trunkOf } from "../src/data/trunks";
+import { onTrunksPage, trunkOf } from "../src/data/trunks";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { skipIntro, watch } from "./helpers";
 
@@ -258,7 +258,7 @@ test("the page of the trunks without the NZ Travel Case; kept for the admin; its
   expect(publicCatalogue(defaultCatalogue).boxes.map((b) => b.slug)).not.toContain("nz-travel-case");
   await skipIntro(page);
   await page.goto("/boxes", { waitUntil: "load" });
-  await expect(page.locator("[data-box]")).toHaveCount(BOXES.filter((b) => b.published && trunkOf(b.slug)).length);
+  await expect(page.locator("[data-box]")).toHaveCount(BOXES.filter((b) => b.published && onTrunksPage(b.slug)).length);
   await expect(page.locator("[data-box='nz-travel-case']")).toHaveCount(0);
   expect(await page.locator("main").innerText()).not.toMatch(/NZ Travel Case/i);
   await shot(page, info.project.name + "-ecrins-sans-nz", true);

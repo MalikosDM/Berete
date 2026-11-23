@@ -289,8 +289,9 @@ export function Boxes() {
   }, [hash]);
   // The trunk of the house first, then in the order of the catalogue (src/data/pieces.ts, BOXES); a box added in the admin after them.
   const rank = (b: Box) => (b.slug === FEATURED_BOX ? -1 : BOX_ORDER.has(b.slug) ? BOX_ORDER.get(b.slug)! : BOX_ORDER.size + all.indexOf(b));
-  // Only the trunks that open in their film (Malik, 23/11/2026: every trunk of the page the same way); one still waiting for
-  // its film (the trunks of Keita and of Malik Tillman) is shown on the page of its piece and on the profile of its person.
+  // Only the trunks that open in their film, in the staging of the page (Malik, 23/11/2026: one staging on the page, the v3);
+  // one still waiting for its film (Keita, Malik Tillman) or for its v3 files (Signature, Photo Case, Trophy Trunk, Campione)
+  // stays on the page of its piece and on the profile of its person.
   const boxes = all.filter(onTrunksPage).sort((a, b) => rank(a) - rank(b));
   const heroTrunk = extra("boxes/hero", "dragon-ball-closed", { alt: t.boxes.heroAlt, onBlack: false });
 

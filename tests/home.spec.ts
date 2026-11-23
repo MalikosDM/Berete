@@ -85,9 +85,10 @@ test("Signature Trunks: every trunk closed in a grid of squares, Commission Your
   }
   await expect(buttons.nth(0)).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "boxes-1-haut"), type: "jpeg", quality: 70 });
-  // The trunk of the house first; every trunk a square of the same size, closed (tests/trunks.spec.ts opens them).
+  // The trunks of the v3 (23/11/2026; the trunk of the house waits for its v3 files), Sirius first; every trunk a square of
+  // the same size, closed (tests/trunks.spec.ts opens them).
   const cards = page.locator("[data-box]");
-  await expect(cards.first()).toHaveAttribute("data-box", "signature-trunk");
+  await expect(cards.first()).toHaveAttribute("data-box", "sirius");
   await expect(page.getByText("An Extension of Your Creation")).toBeVisible();
   const squares = await page.locator("[data-box] .aspect-square").evaluateAll((els) => els.map((e) => [Math.round(e.getBoundingClientRect().width), Math.round(e.getBoundingClientRect().height)]));
   expect(squares.length).toBe(await cards.count());
@@ -95,9 +96,9 @@ test("Signature Trunks: every trunk closed in a grid of squares, Commission Your
     expect(Math.abs(w! - h!)).toBeLessThanOrEqual(1);
     expect(Math.abs(w! - squares[0]![0]!)).toBeLessThanOrEqual(1);
   }
-  // Its 10 photos, under it (23/11/2026), each full screen with the magnifying glass.
-  await page.locator("[data-box-photos='signature-trunk']").click();
-  await page.locator("[data-box='signature-trunk'] [data-box-photo]").first().click();
+  // Its photos, under it (23/11/2026), each full screen with the magnifying glass.
+  await page.locator("[data-box-photos='sirius']").click();
+  await page.locator("[data-box='sirius'] [data-box-photo]").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.waitForTimeout(700);
   await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });

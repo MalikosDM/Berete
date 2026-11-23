@@ -12,7 +12,7 @@
  *   - the real photos of the Campione d'Italia case, for its gallery (WhatsApp), whole;
  *   - the photos of Yoni for the page The House (WhatsApp), whole;
  *   - the large image at the top of the page of the trunks: the Dragon Ball trunk closed, its artwork and the BRT mark
- *     (00 Contexte Yoni/Ecrins v3 (lumiere du dessus)/), whole.
+ *     (00 Contexte Yoni/Ecrins IA (ouverture) v3/dragon-ball-trunk/closed.jpg), whole.
  *   - the evening of 23/11/2026 (WhatsApp): the Butterfly trunk open on its chain, the trunks of Keita and of Malik Tillman,
  *     Keita at the boutique, and a film: the setting of the wings of the Butterfly (copied as it was sent, without sound).
  * A photo on black of a whole jewel is framed on it (the black around it trimmed, an even margin kept, 4:5); a close-up
@@ -111,8 +111,8 @@ const PIECES = {
     ["inter-ring", wa("09.34.18 (2)")],
     ["inter-rings", wa("09.40.13")],
   ],
-  // The top of the page of the trunks: the Dragon Ball trunk closed, lit from above (23/11/2026), whole.
-  "boxes/hero": [["dragon-ball-closed", join("Ecrins v3 (lumiere du dessus)", "dragonball-closed.jpg")]],
+  // The top of the page of the trunks: the Dragon Ball trunk closed, lit from above (23/11/2026, its v3 image), whole.
+  "boxes/hero": [["dragon-ball-closed", join("Ecrins IA (ouverture) v3", "dragon-ball-trunk", "closed.jpg")]],
   // The evening of 23/11/2026 (WhatsApp, 16 h 25 to 17 h 22), looked at one by one, every photo whole:
   // the Butterfly trunk open, its chain and its pendant inside; the best first (open, from the front).
   "boxes/butterfly-trunk": [

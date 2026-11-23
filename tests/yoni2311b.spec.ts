@@ -185,8 +185,9 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   const hero = page.locator("[data-boxes-hero] img");
   await expect(hero).toHaveAttribute("src", new RegExp("/media/extra/boxes/hero/dragon-ball-closed" + V));
   await page.screenshot({ path: shotPath(info, "yoni2311b-ecrins") });
-  await page.locator("[data-box-photos='campione-d-italia-case']").click();
-  await expect(page.locator("[data-box='campione-d-italia-case'] [data-box-photo]")).toHaveCount(10);
+  // The Campione case waits for its v3 files (off the page of the trunks): its real photos on the page of the ring.
+  await open(page, "/pieces/campione-d-italia-2023-2024");
+  await expect(page.locator("[data-custom-box='campione-d-italia-case'] [data-box-section-photo]")).toHaveCount(10);
   // The house: the photos of Yoni in his chapters.
   await open(page, "/about");
   await expect(page.locator("[data-house-chapter] img[src*='/media/extra/house/']")).toHaveCount(9);

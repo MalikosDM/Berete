@@ -4,12 +4,15 @@ import { ArrowRight, Gift, ZoomIn } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
 import { MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
-import { trunkOf } from "@/data/trunks";
+import { onTrunksPage as onPage } from "@/data/trunks";
 import type { Box } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 
-/** Whether a trunk is on the page of the trunks: only those that open in their film (every trunk there opens the same way). */
-export const onTrunksPage = (box: Box): boolean => trunkOf(box.slug) !== null;
+/**
+ * Whether a trunk is on the page of the trunks: only those that open in their film, in the staging of the page (every trunk
+ * there opens the same way: src/data/trunks.ts).
+ */
+export const onTrunksPage = (box: Box): boolean => onPage(box.slug);
 
 /**
  * The trunk of a piece, or the trunks of a person (Yoni, 23/11/2026): its name, its words and all its photos, whole (a
