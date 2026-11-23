@@ -69,7 +69,8 @@ test("the drafts made from Yoni's photos are published (20/11/2026): each with i
     const piece = cat.pieces.find((p) => p.slug === slug);
     expect(piece, slug).toBeTruthy();
     expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
-    expect(piece!.people, slug + " linked to no page of a person").toEqual([]);
+    // (The panther is the piece of the fighter of the circle, Keita Losene: linked on 23/11/2026.)
+    expect(piece!.people, slug + " linked to no page of a person").toEqual(slug === "panther-champion-pendant" ? ["keita-losene"] : []);
     // Made for a private collector, but the panther: made for Lasana Keita (the album of Yoni, 20/11/2026).
     if (slug === "panther-champion-pendant") expect(piece!.client).toBe("Lasana Keita");
     else expect(piece!.clientPublic, slug).toBe(false);

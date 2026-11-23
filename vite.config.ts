@@ -34,7 +34,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   build: {
     // The build for the pages written in advance (dist-ssr) needs only its code: no copy of the photos and videos (1.5 GB).
-    copyPublicDir: !isSsrBuild,
+    // BERETE_LINK_PUBLIC=1 (a Mac short of room): no copy at all, scripts/link-public.mjs links public/ into dist afterwards.
+    copyPublicDir: !isSsrBuild && process.env.BERETE_LINK_PUBLIC !== "1",
     // The 3D viewer (three.js and its tools, about 1.2 MB) is its own chunk, loaded only on the pages that show a model.
     chunkSizeWarningLimit: 1300,
     rolldownOptions: {

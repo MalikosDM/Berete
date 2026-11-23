@@ -1,7 +1,8 @@
 /*
  * Runs the 3D pipeline on one file, outside the server (tests, big files):
- *   npx tsx scripts/model-optimize.ts <file.stl|.glb|.3dm> <output folder>
+ *   npx tsx scripts/model-optimize.ts <file.stl|.obj|.glb|.gltf|.3dm> <output folder>
  * Writes full.glb, light.glb and result.json in the folder. The file itself is only read.
+ * Says it when volumes are missing (a .3dm saved without its render meshes): the admin keeps such a model as a draft.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -21,3 +22,6 @@ const result = await runPipeline(input, kind, out, (percent, step) => {
 });
 fs.writeFileSync(path.join(out, "result.json"), JSON.stringify(result, null, 2));
 console.log(JSON.stringify(result, null, 2));
+const { incomplete, skipped } = result.stats;
+if (incomplete > 0) console.log("\nINCOMPLET : " + incomplete + (incomplete > 1 ? " volumes de métal ignorés" : " volume de métal ignoré") + " : réenregistrer depuis Rhino avec les maillages de rendu, ou exporter en STL/OBJ/GLB");
+if (skipped?.stray.count) console.log("Images de référence écartées : " + skipped.stray.count);

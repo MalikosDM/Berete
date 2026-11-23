@@ -96,6 +96,7 @@ export const nl: Messages = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "Ontdek de wereld van de creatie",
     eyebrow: "Pers",
     title: "In de schijnwerpers",
     lead: "Het huis in de pers: de kampioensringen van VfB Stuttgart en Inter Milan.",
@@ -121,7 +122,7 @@ export const nl: Messages = {
       rings: { name: "Ringen", intro: "Meer dan een symbool van de overwinning. Een erfenis, vereeuwigd in goud en diamanten." },
       bracelets: { name: "Armbanden", intro: "Armbanden op maat, schakel voor schakel." },
       watches: { name: "Horloges", intro: "Horloges bezet met diamanten, van de kast tot de band." },
-      "jesus-pieces": { name: "Jesus Pieces", intro: "Het gezicht van Christus, gekroond met doornen of bloemen, en Christus aan het kruis: elk Jesus piece in volume gebeeldhouwd en steen voor steen gezet." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Van de straten van New York tot Biggie die het legendarisch maakte: het Jesus piece werd een van de herkenbaarste symbolen van de cultuur. We veranderen dat verhaal niet, we voegen er alleen ons deel aan toe." },
     },
     eyebrow: "Het portfolio",
     title: "Verken de creaties",
@@ -139,6 +140,7 @@ export const nl: Messages = {
   },
 
   home: {
+    sketchLabel: "Van de eerste schets tot het juweel, al scrollend",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "We beginnen niet bij wat al gedaan is. We beginnen bij wat zou kunnen zijn.",
     who: "Berete Jewellers is een huis van haute joaillerie op maat, gevestigd in Dubai: unieke stukken, met u bedacht en met de hand gemaakt.",
@@ -215,6 +217,9 @@ export const nl: Messages = {
   },
 
   piece: {
+    spin: "Laat de bol draaien",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "Gedragen door " + who : "Gedragen"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "voorkant", profile: "profiel", back: "achterkant", detail: "detail", worn: "gedragen" },
     showView: (view: string) => "Toon het aanzicht: " + view,
@@ -357,6 +362,8 @@ export const nl: Messages = {
   },
 
   boxes: {
+    heroLink: "Bekijk alle etuis",
+    heroAlt: "Het Dragon Ball-etui gesloten: het kunstwerk en het BRT-merk op de voorkant",
     hidePhotos: "Foto's verbergen",
     eyebrow: "Stuk voor stuk vervaardigd",
     title: "Signature-koffers",

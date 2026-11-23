@@ -2,7 +2,16 @@
 import angles from "./angles/es.json" with { type: "json" };
 
 const content: Record<string, string> = {
-  "Jamie Leweling's JL initials pendant": "El colgante con las iniciales JL de Jamie Leweling",
+  "The lid of the Campione d'Italia case, up close": "La tapa del estuche Campione d’Italia, de cerca",
+  "The Campione d'Italia case open, with the small ring box and the card": "El estuche Campione d’Italia abierto, con la cajita del anillo y la tarjeta",
+  "The Campione d'Italia case open, with the medal on its ribbon and the card": "El estuche Campione d’Italia abierto, con la medalla en su cinta y la tarjeta",
+  "Inter Milan — Campione d'Italia Pendant": "Inter de Milán — Colgante Campione d’Italia",
+  "The top of the Inter ring, worn as a pendant.": "La parte superior del anillo del Inter, llevada como colgante.",
+  "The top of the Campione d'Italia ring lifts off and becomes a pendant.": "La parte superior del anillo Campione d’Italia se levanta y se convierte en colgante.",
+  "The Inter emblem in diamonds on its deep blue ground, inside its band of stars, is then worn on a chain, close to the heart.": "El emblema del Inter en diamantes sobre su fondo azul profundo, dentro de su banda de estrellas, se lleva entonces en una cadena, cerca del corazón.",
+  "The top of the Inter ring worn as a pendant, on black": "La parte superior del anillo del Inter llevada como colgante, sobre negro",
+  "The Inter pendant worn on a chain": "El colgante del Inter llevado en una cadena",
+  "The top of the Campione d'Italia ring": "La parte superior del anillo Campione d’Italia",
   "The script and its cross": "La caligrafía y su cruz",
   "Kenan Yildiz": "Kenan Yildiz",
   "Noah Okafor": "Noah Okafor",
@@ -250,7 +259,6 @@ const content: Record<string, string> = {
   "Jamie Leweling — JL Initials Pendant": "Jamie Leweling — Colgante de iniciales JL",
   "His initials, in baguettes framed with rose gold.": "Sus iniciales, en baguettes enmarcadas en oro rosa.",
   "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.": "Las letras J y L, rellenas de diamantes talla baguette y perfiladas con piedras redondas y un fino borde de oro rosa.",
-  "Jamie Leweling's JL pendant on its chain": "El colgante JL de Jamie Leweling en su cadena",
   "Jamie Leweling wearing his JL pendant with his DFB-Pokal medal": "Jamie Leweling luciendo su colgante JL con su medalla de la DFB-Pokal",
   "Worn by Jamie Leweling": "Lucida por Jamie Leweling",
   "Jamie Leweling wearing the JL pendant": "Jamie Leweling luciendo el colgante JL",

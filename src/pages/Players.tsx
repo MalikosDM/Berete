@@ -58,8 +58,7 @@ export function PlayerPage() {
   const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
   const instagram = instagramOf(person);
 
-  // A person with pieces: their pieces first (feedback of Yoni, 21/11/2026); a person known from the stories only keeps the
-  // button to watch them.
+  // Their moments (the stories that show them) open from the button of their photos.
   const openStory = (i: number) => {
     primeStoryVideo(stories[i]!);
     setOpen(i);
@@ -67,47 +66,45 @@ export function PlayerPage() {
 
   return (
     <>
-      <section data-player-hero className="mx-auto max-w-[1600px] px-5 pt-28 pb-10 sm:px-8 lg:px-12 lg:pt-36 lg:pb-14">
+      {/* One model for every profile (Yoni, 23/11/2026): their portrait large, who they are (club, number), their words and
+          their Instagram when known, then all their pieces, then their photos and their moments. A part not known yet is
+          simply not there (no empty frame, no generic sentence). */}
+      <section data-player-hero className="mx-auto max-w-[1600px] px-5 pt-28 pb-12 sm:px-8 lg:px-12 lg:pt-36 lg:pb-16">
         <Link to="/players" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-bone hover:text-rose-light">
           <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" /> {t.common.allPlayers}
         </Link>
-        <div className="mt-6 flex items-center gap-5 sm:gap-8 lg:mt-8">
-          <PlayerPortrait person={person} priority sizes="(max-width: 639px) 112px, (max-width: 1023px) 160px, 208px" className="aspect-[4/5] w-28 shrink-0 border border-white/10 sm:w-40 lg:w-52" />
-          <div className="min-w-0">
-            {kindLabel ? <p className="eyebrow">{kindLabel}</p> : null}
-            <SplitHeading as="h1" className="mt-3 text-[clamp(2rem,5.5vw,4.5rem)] tracking-[0.05em] break-words">
+        <div className="mt-6 grid items-end gap-8 lg:mt-8 lg:grid-cols-12 lg:gap-14">
+          <div data-player-portrait className="lg:col-span-5">
+            <PlayerPortrait person={person} big priority sizes="(max-width: 1023px) 92vw, 40vw" className="aspect-[4/5] w-full border border-white/10" />
+          </div>
+          <div className="min-w-0 lg:col-span-7 lg:pb-4">
+            {kindLabel ? <p data-player-club className="eyebrow">{kindLabel}</p> : null}
+            <SplitHeading as="h1" className="mt-3 text-[clamp(2.25rem,6vw,5rem)] tracking-[0.05em] break-words">
               {person.name}
             </SplitHeading>
             {person.number !== null ? (
-              <p className="mt-3 flex items-baseline gap-3">
+              <p data-player-number className="mt-4 flex items-baseline gap-3">
                 <span className="text-base font-semibold uppercase tracking-[0.24em] text-bone">{t.players.number}</span>
-                <span className="text-rose-gold font-display text-[clamp(2rem,4vw,3rem)] leading-none font-light">{person.number}</span>
+                <span className="text-rose-gold font-display text-[clamp(2.25rem,4vw,3.25rem)] leading-none font-light">{person.number}</span>
               </p>
+            ) : null}
+            {person.bio ? <p data-player-bio className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">{person.bio}</p> : null}
+            {instagram ? (
+              <a href={instagram} target="_blank" rel="noreferrer" data-player-instagram className="mt-6 inline-flex min-h-12 w-fit items-center gap-3 text-base font-semibold text-white hover:text-rose-light">
+                <BrandIcon name="instagram" className="size-5" /> @{person.instagram}
+              </a>
+            ) : null}
+            {pieces.length > 0 ? (
+              <a href="#player-pieces" className="mt-8 flex min-h-12 w-fit items-center gap-3 border border-rose-light/70 px-6 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                {t.players.pieces(pieces.length)} <ArrowRight className="size-4 rotate-90" aria-hidden="true" />
+              </a>
             ) : null}
           </div>
         </div>
-        <p className="mt-8 max-w-2xl text-lg text-bone">
-          {person.bio || (pieces.length > 0 ? t.players.bioWithPieces(person.name) : t.players.bioStories(person.name))}
-        </p>
-        {instagram ? (
-          <a href={instagram} target="_blank" rel="noreferrer" data-player-instagram className="mt-4 inline-flex min-h-12 w-fit items-center gap-3 text-base font-semibold text-white hover:text-rose-light">
-            <BrandIcon name="instagram" className="size-5" /> @{person.instagram}
-          </a>
-        ) : null}
-        {pieces.length === 0 && stories.length > 0 ? (
-          <button
-            type="button"
-            onClick={() => openStory(0)}
-            data-player-watch
-            className="mt-8 flex min-h-14 w-fit items-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light"
-          >
-            <Play className="size-5 fill-current" aria-hidden="true" /> {t.players.watch(stories.length)}
-          </button>
-        ) : null}
       </section>
 
       {pieces.length > 0 ? (
-        <section aria-labelledby="player-pieces" data-player-pieces className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <section aria-labelledby="player-pieces" data-player-pieces className="mx-auto max-w-[1600px] scroll-mt-32 px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
           <h2 id="player-pieces" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">{t.players.pieces(pieces.length)}</h2>
           <ul className="mt-8 grid gap-8 sm:grid-cols-2 lg:mt-10 lg:grid-cols-3 lg:gap-10">
             {pieces.map((p) => {
@@ -133,16 +130,28 @@ export function PlayerPage() {
         </section>
       ) : null}
 
-      {photos.length > 0 ? (
-        <section aria-labelledby="player-photos" className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-          <h2 id="player-photos" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.14em]">{t.players.photos}</h2>
-          <ul data-player-photos className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
-            {photos.map((m, i) => (
-              <li key={m.src} className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
-                <MediaView item={m} alt={t.players.photo(person.name, i + 1)} fit="cover" fade sizes="(max-width: 1023px) 50vw, 33vw" />
-              </li>
-            ))}
-          </ul>
+      {photos.length > 0 || stories.length > 0 ? (
+        <section aria-labelledby="player-photos" data-player-moments className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+          <h2 id="player-photos" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">{photos.length > 0 ? t.players.photos : t.players.stories}</h2>
+          {photos.length > 0 ? (
+            <ul data-player-photos className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
+              {photos.map((m, i) => (
+                <li key={m.src} className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
+                  <MediaView item={m} alt={t.players.photo(person.name, i + 1)} fit="cover" fade sizes="(max-width: 1023px) 50vw, 33vw" />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {stories.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => openStory(0)}
+              data-player-watch
+              className="mt-10 flex min-h-14 w-fit items-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
+            >
+              <Play className="size-5 fill-current" aria-hidden="true" /> {t.players.watch(stories.length)}
+            </button>
+          ) : null}
         </section>
       ) : null}
 

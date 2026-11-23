@@ -2,7 +2,16 @@
 import angles from "./angles/nl.json" with { type: "json" };
 
 const content: Record<string, string> = {
-  "Jamie Leweling's JL initials pendant": "De JL-initialenhanger van Jamie Leweling",
+  "The lid of the Campione d'Italia case, up close": "Het deksel van het Campione d’Italia-etui, van dichtbij",
+  "The Campione d'Italia case open, with the small ring box and the card": "Het Campione d’Italia-etui open, met het kleine ringdoosje en de kaart",
+  "The Campione d'Italia case open, with the medal on its ribbon and the card": "Het Campione d’Italia-etui open, met de medaille aan haar lint en de kaart",
+  "Inter Milan — Campione d'Italia Pendant": "Inter Milan — Campione d’Italia-hanger",
+  "The top of the Inter ring, worn as a pendant.": "De bovenkant van de Inter-ring, gedragen als hanger.",
+  "The top of the Campione d'Italia ring lifts off and becomes a pendant.": "De bovenkant van de Campione d’Italia-ring gaat eraf en wordt een hanger.",
+  "The Inter emblem in diamonds on its deep blue ground, inside its band of stars, is then worn on a chain, close to the heart.": "Het Inter-embleem in diamanten op zijn diepblauwe grond, binnen zijn krans van sterren, wordt dan aan een ketting gedragen, dicht bij het hart.",
+  "The top of the Inter ring worn as a pendant, on black": "De bovenkant van de Inter-ring als hanger, op zwart",
+  "The Inter pendant worn on a chain": "De Inter-hanger aan een ketting gedragen",
+  "The top of the Campione d'Italia ring": "De bovenkant van de Campione d’Italia-ring",
   "The script and its cross": "Het schrift en zijn kruis",
   "Kenan Yildiz": "Kenan Yildiz",
   "Noah Okafor": "Noah Okafor",
@@ -250,7 +259,6 @@ const content: Record<string, string> = {
   "Jamie Leweling — JL Initials Pendant": "Jamie Leweling — Hanger met initialen JL",
   "His initials, in baguettes framed with rose gold.": "Zijn initialen, in baguettes omlijst met roségoud.",
   "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.": "De letters J en L, gevuld met diamanten in baguetteslijpsel en afgezet met ronde stenen en een fijn randje roségoud.",
-  "Jamie Leweling's JL pendant on its chain": "De JL-hanger van Jamie Leweling aan zijn ketting",
   "Jamie Leweling wearing his JL pendant with his DFB-Pokal medal": "Jamie Leweling draagt zijn JL-hanger en zijn DFB-Pokal-medaille",
   "Worn by Jamie Leweling": "Gedragen door Jamie Leweling",
   "Jamie Leweling wearing the JL pendant": "Jamie Leweling draagt de JL-hanger",

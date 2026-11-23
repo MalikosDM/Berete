@@ -63,7 +63,8 @@ export const SUBCATEGORIES: SubCategory[] = [
     parent: "pendant",
     slug: "jesus-pieces",
     name: "Jesus Pieces",
-    intro: "The face of Christ, crowned with thorns or flowers, and Christ on the cross: each Jesus piece sculpted in volume and set stone by stone.",
+    // The words of Yoni (23/11/2026).
+    intro: "From the streets of New York to Biggie making it legendary, the Jesus piece became one of the most recognizable symbols in the culture. We're not changing that story just adding our part to it.",
     hero: "crown-of-thorns-jesus-piece",
     pieces: ["crown-of-thorns-jesus-piece", "samuel-ballet-jesus-piece", "jesus-piece-red-flowers", "thorns-and-roses-crucifix"],
   },

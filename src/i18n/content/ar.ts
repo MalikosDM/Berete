@@ -2,7 +2,16 @@
 import angles from "./angles/ar.json" with { type: "json" };
 
 const content: Record<string, string> = {
-  "Jamie Leweling's JL initials pendant": "قلادة الحرفين JL لجيمي ليولينغ",
+  "The lid of the Campione d'Italia case, up close": "غطاء علبة كامبيوني ديتاليا عن قرب",
+  "The Campione d'Italia case open, with the small ring box and the card": "علبة كامبيوني ديتاليا مفتوحة، مع علبة الخاتم الصغيرة والبطاقة",
+  "The Campione d'Italia case open, with the medal on its ribbon and the card": "علبة كامبيوني ديتاليا مفتوحة، مع الميدالية على شريطها والبطاقة",
+  "Inter Milan — Campione d'Italia Pendant": "إنتر ميلان — قلادة كامبيوني ديتاليا",
+  "The top of the Inter ring, worn as a pendant.": "الجزء العلوي من خاتم إنتر، يُرتدى كقلادة.",
+  "The top of the Campione d'Italia ring lifts off and becomes a pendant.": "يُرفع الجزء العلوي من خاتم كامبيوني ديتاليا فيصبح قلادة.",
+  "The Inter emblem in diamonds on its deep blue ground, inside its band of stars, is then worn on a chain, close to the heart.": "يُرتدى عندها شعار إنتر المرصّع بالألماس على أرضيته الزرقاء العميقة، داخل حلقة نجومه، على سلسلة قريبًا من القلب.",
+  "The top of the Inter ring worn as a pendant, on black": "الجزء العلوي من خاتم إنتر كقلادة، على خلفية سوداء",
+  "The Inter pendant worn on a chain": "قلادة إنتر مرتداة على سلسلة",
+  "The top of the Campione d'Italia ring": "الجزء العلوي من خاتم كامبيوني ديتاليا",
   "The script and its cross": "الكتابة وصليبها",
   "Kenan Yildiz": "كينان يلدز",
   "Noah Okafor": "نوح أوكافور",
@@ -251,7 +260,6 @@ const content: Record<string, string> = {
   "Jamie Leweling — JL Initials Pendant": "جيمي ليفيلينغ — قلادة الحروف JL",
   "His initials, in baguettes framed with rose gold.": "الحرفان الأولان من اسمه، من أحجار الباغيت بإطار من الذهب الوردي.",
   "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.": "الحرفان J و L، مملوءان بألماس بقطع باغيت، ومحددان بأحجار مستديرة وحافة رفيعة من الذهب الوردي.",
-  "Jamie Leweling's JL pendant on its chain": "قلادة JL لجيمي ليفيلينغ على سلسلتها",
   "Jamie Leweling wearing his JL pendant with his DFB-Pokal medal": "جيمي ليفيلينغ يرتدي قلادته JL مع ميداليته في كأس DFB-Pokal",
   "Worn by Jamie Leweling": "يرتديها جيمي ليفيلينغ",
   "Jamie Leweling wearing the JL pendant": "جيمي ليفيلينغ يرتدي قلادة JL",

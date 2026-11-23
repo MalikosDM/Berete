@@ -150,8 +150,8 @@ for (const slug of CAPSULES) {
     }
     await shot(page, info.project.name + "-" + slug + "-opening");
 
-    // The Ruby T necklace: since 23/11/2026 (Yoni) all black, its T and its drop alone and large (tests/yoni2311.spec.ts).
-    if (slug === "marcus-thuram-ruby-t-necklace") await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p02");
+    // The Ruby T necklace: since 23/11/2026 (Yoni) all black, the full necklace alone and large (tests/yoni2311b.spec.ts).
+    if (slug === "marcus-thuram-ruby-t-necklace") await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p01");
 
     // "Every Angle" (23/11/2026: a gallery, three on a row on a computer, two on a phone; no text under most photos).
     const tile = page.locator("[data-angle]").first();

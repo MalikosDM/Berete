@@ -31,7 +31,8 @@ const PEOPLE: Person[] = [
   person("kenan-yildiz", "Kenan Yildiz"),
   person("noah-okafor", "Noah Okafor"),
   person("kevin-schade", "Kevin Schade"),
-  person("marcus-thuram", "Marcus Thuram", { club: "Inter Milan" }),
+  // His number at Inter, 9, is told by the text of his T-Serpent (Yoni, 23/11/2026).
+  person("marcus-thuram", "Marcus Thuram", { club: "Inter Milan", number: 9 }),
   person("lois-openda", "Loïs Openda"),
   person("michy-batshuayi", "Michy Batshuayi"),
   person("radja-nainggolan", "Radja Nainggolan"),
@@ -48,7 +49,8 @@ const PEOPLE: Person[] = [
   person("jeff-chabot", "Jeff Chabot"),
   person("maximilian-mittelstaedt", "Maximilian Mittelstädt", { ...vfb, number: 7 }),
   person("chris-fuehrich", "Chris Führich", vfb),
-  person("atakan-karazor", "Atakan Karazor", vfb),
+  // His number, 16, is engraved on his VfB ring (src/data/pieces.ts).
+  person("atakan-karazor", "Atakan Karazor", { ...vfb, number: 16 }),
   person("inter-milan", "Inter Milan", { kind: "club" }),
   person("vfb-stuttgart", "VfB Stuttgart", { kind: "club" }),
   person("sidney-eweka", "Sidney Eweka", { kind: "personality" }),

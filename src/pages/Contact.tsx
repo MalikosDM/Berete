@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useImperativeHandle, useRef, useState, type FormEvent, type Ref } from "react";
 import { useLocation } from "react-router";
 import { Check, ChevronDown, ImageIcon, ImagePlus, LoaderCircle, Mail, X } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
 import ContactBlock from "@/components/ContactBlock";
+import Imagine from "@/components/Imagine";
 import { useI18n } from "@/i18n";
 import WhatsAppHandoff from "@/components/WhatsAppHandoff";
 import { sendMessage, type MessagePhoto, type SendError } from "@/lib/api";
@@ -13,6 +14,7 @@ import { getLenis } from "@/lib/gsap";
 export default function Contact() {
   const { t } = useI18n();
   const location = useLocation();
+  const form = useRef<EmailFormHandle>(null);
 
   useEffect(() => {
     if (location.hash !== "#configurator") return undefined;
@@ -30,12 +32,18 @@ export default function Contact() {
     <>
       <PageIntro eyebrow={t.contact.eyebrow} title={t.contact.title} lead={t.contact.lead} />
       <ContactBlock id="configurator" />
-      <EmailForm />
+      {/* « Imaginez votre création »: shown only when the server has its image service (src/components/Imagine.tsx). */}
+      <Imagine onFinalise={(message, file) => form.current?.receive(message, file)} />
+      <EmailForm ref={form} />
     </>
   );
 }
 
-type PhotoEntry = { id: string; name: string; prepared: PreparedPhoto | null };
+/** `ai`: the proposal of « Imaginez votre création » (one at most: a new one replaces it). */
+type PhotoEntry = { id: string; name: string; prepared: PreparedPhoto | null; ai?: boolean };
+
+/** What « Contacter la maison pour finaliser » (src/components/Imagine.tsx) does with the form: the idea, the image. */
+export type EmailFormHandle = { receive: (message: string, file: File) => void };
 
 /**
  * The private correspondence (22/11/2026): name, email, Instagram (optional), the idea and up to 6 photos (from the
@@ -43,8 +51,10 @@ type PhotoEntry = { id: string; name: string; prepared: PreparedPhoto | null };
  * (src/lib/photos.ts). With the server, the message and its photos go to the admin (tab « Messages », never public) and
  * to the mailbox of the house; without it (the version online before the server), the message opens in WhatsApp.
  * Discreet anti-spam: a hidden field and a minimum time (server/routes/site.ts). Nothing personal in the address.
+ * « Imaginez votre création » fills it (`receive`): the idea in the message, the image among the photos, the form opened
+ * and brought into view; nothing leaves before the visitor presses its own button.
  */
-function EmailForm() {
+function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
   const { t, locale } = useI18n();
   const [open, setOpen] = useState(false);
   const [startedAt, setStartedAt] = useState(0);
@@ -71,15 +81,17 @@ function EmailForm() {
     if (!startedAt) setStartedAt(Date.now());
   };
 
-  const addPhotos = (list: FileList | null) => {
-    const files = Array.from(list ?? []);
+  /** Joins photos, made lighter (src/lib/photos.ts); `dropped`: the entries they replace (the previous AI proposal). */
+  const addFiles = (files: File[], ai = false, dropped: PhotoEntry[] = []) => {
     if (files.length === 0) return;
-    const room = MAX_PHOTOS - photos.length;
+    const gone = new Set(dropped.map((p) => p.id));
+    dropped.forEach((p) => p.prepared?.preview && URL.revokeObjectURL(p.prepared.preview));
+    const room = MAX_PHOTOS - photos.filter((p) => !gone.has(p.id)).length;
     const taken = files.slice(0, Math.max(0, room));
     const notes: string[] = files.length > taken.length ? [t.contact.errTooManyPhotos] : [];
     setPhotoNotes(notes);
-    const entries = taken.map((file) => ({ id: Math.random().toString(36).slice(2), name: file.name, prepared: null }));
-    setPhotos((current) => [...current, ...entries]);
+    const entries: PhotoEntry[] = taken.map((file) => ({ id: Math.random().toString(36).slice(2), name: file.name, prepared: null, ai }));
+    setPhotos((current) => [...current.filter((p) => !gone.has(p.id)), ...entries]);
     entries.forEach((entry, i) => {
       void preparePhoto(taken[i]!).then((prepared) => {
         if (prepared?.preview) previews.current.push(prepared.preview);
@@ -88,6 +100,39 @@ function EmailForm() {
       });
     });
   };
+
+  // « Contacter la maison pour finaliser »: the idea in the message (after what the visitor already wrote), the image in
+  // place of the previous proposal, the form opened and brought into view. Sent only by the button of the form.
+  const prefilled = useRef("");
+  const box = useRef<HTMLDivElement>(null);
+  const receive = (text: string, file: File) => {
+    // After a message already sent, a new one starts empty.
+    const fresh = status === "sent";
+    const current = fresh ? "" : message;
+    const before = prefilled.current;
+    let next: string;
+    if (!current.trim()) next = text;
+    else if (before && current.includes(before)) next = current.replace(before, () => text);
+    else if (current.includes(text)) next = current;
+    else next = current.trimEnd() + "\n\n" + text;
+    setMessage(next);
+    prefilled.current = text;
+    setFieldErrors({});
+    if (status !== "sending") setStatus("idle");
+    setOpen(true);
+    if (!startedAt) setStartedAt(Date.now());
+    addFiles([file], true, photos.filter((p) => fresh || p.ai));
+    window.setTimeout(() => {
+      const section = document.getElementById("private-correspondence");
+      if (section) {
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(section, { offset: -96 });
+        else section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+      box.current?.focus({ preventScroll: true });
+    }, 60);
+  };
+  useImperativeHandle(ref, () => ({ receive }));
 
   const removePhoto = (id: string) => {
     setPhotos((current) => {
@@ -138,7 +183,7 @@ function EmailForm() {
     "mt-2 block w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
 
   return (
-    <section aria-labelledby="email-title" className="bg-ink pb-24 lg:pb-32">
+    <section id="private-correspondence" aria-labelledby="email-title" className="scroll-mt-28 bg-ink pb-24 lg:pb-32">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
         <div className="border border-white/15 p-6 sm:p-10">
           <button
@@ -156,7 +201,7 @@ function EmailForm() {
           </button>
 
           {open ? (
-            <div id="email-form" className="mt-8">
+            <div id="email-form" ref={box} tabIndex={-1} className="mt-8 focus:outline-none">
               {status === "sent" ? (
                 <p role="status" data-email-sent className="flex items-start gap-3 text-lg text-bone">
                   <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />
@@ -273,7 +318,7 @@ function EmailForm() {
                           data-photo-input
                           className="sr-only"
                           onChange={(e) => {
-                            addPhotos(e.currentTarget.files);
+                            addFiles(Array.from(e.currentTarget.files ?? []));
                             e.currentTarget.value = "";
                           }}
                         />

@@ -1,23 +1,36 @@
 #!/usr/bin/env node
 /**
  * Photos sent by Yoni outside the folders of the pieces (23/11/2026), for the site:
- *   - the studio images of three pieces that had no clean photo of the jewel alone (00 Contexte Yoni/Pieces sans photo pro
- *     (IA)/): the cover and the first photo of their page (JL of Jamie Leweling, TM of Malik Tillman, Thorned T of Marcus
- *     Thuram), their older photos after them;
+ *   - the studio images of two pieces that had no clean photo of the jewel alone (00 Contexte Yoni/Pieces sans photo pro
+ *     (IA)/): the cover and the first photo of their page (TM of Malik Tillman, Thorned T of Marcus Thuram), their older
+ *     photos after them;
+ *   - the real studio photos of the JL pendant of Jamie Leweling, sent on WhatsApp (they replace its studio image), the
+ *     best front view first;
  *   - the photos of the Bosnia and Herzegovina ring, retouched on black (00 Contexte Yoni/Bague Bosnie (retouche fond noir)/),
- *     in the order of Yoni; each framed on the ring (the black around it trimmed, an even margin kept, 4:5).
- * Read on the external disk (never modified), written for the web with their version in their name (no cache keeps an
- * older one): public/media/extra/<piece>/<name>.<v>.webp (1600 px on the long side) and its copies .w160, .w640, .w1080
- * (src/lib/responsive.ts), listed in src/data/extra.generated.json. The originals never go in Git.
+ *     in the order of Yoni;
+ *   - the Inter Milan pendant (the top of the Inter ring worn on a chain): on black, and worn (WhatsApp);
+ *   - the real photos of the Campione d'Italia case, for its gallery (WhatsApp), whole;
+ *   - the photos of Yoni for the page The House (WhatsApp), whole;
+ *   - the large image at the top of the page of the trunks: the Dragon Ball trunk closed, its artwork and the BRT mark
+ *     (00 Contexte Yoni/Ecrins v3 (lumiere du dessus)/), whole.
+ * A photo on black of a whole jewel is framed on it (the black around it trimmed, an even margin kept, 4:5); a close-up
+ * that fills its photo, a photo of a box, of a person or of a scene is kept whole (resized only: nothing cut away, never
+ * an artwork of a piece or of a box).
+ * Read on the external disk and in the WhatsApp folder of the Desktop (never modified), written for the web with their
+ * version in their name (no cache keeps an older one): public/media/extra/<key>/<name>.<v>.webp (1600 px on the long side)
+ * and its copies .w160, .w640, .w1080 (src/lib/responsive.ts), listed in src/data/extra.generated.json. The originals never
+ * go in Git.
  *
  *   npm run extra-media
+ *   npm run extra-media -- --only=<key>,<key>      (the other keys keep their files and their entry)
  *
- * BERETE_DISK gives another disk.
+ * BERETE_DISK gives another disk, BERETE_WA_DIR another folder for the photos sent on WhatsApp.
  */
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { homedir } from "node:os";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { MARGIN, SIZES, sizedPath } from "./media-sizes.mjs";
@@ -25,22 +38,79 @@ import { MARGIN, SIZES, sizedPath } from "./media-sizes.mjs";
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
 const YONI = join(DISK, "Berete - Dossiers icloud", "00 Contexte Yoni");
+const WA = process.env.BERETE_WA_DIR ?? join(homedir(), "Desktop", "Yoni envoie whatsapp");
 const OUT = join(ROOT, "public", "media", "extra");
 const DATA = join(ROOT, "src", "data", "extra.generated.json");
 const LONG = 1600;
+
+const onlyArg = process.argv.find((a) => a.startsWith("--only="));
+const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 
 const STUDIO = "Pieces sans photo pro (IA)";
 const BOSNIA = "Bague Bosnie (retouche fond noir)";
 /** The order of Yoni (23/11/2026): the face first. */
 const BOSNIA_ORDER = ["04497", "04499", "04512", "04509", "04487", "04504", "04506", "04507", "04508", "04513", "04514", "04462", "04467", "04469", "04470", "04478", "04489"];
+/** A photo sent on WhatsApp on 23/11/2026, by the time in its name ("09.50.36 (2)"). */
+const wa = (time) => "wa:WhatsApp Image 2026-11-23 at " + time + ".jpeg";
 
-/** Each piece: its photos, [name on the site, file in 00 Contexte Yoni, framed on the jewel]. */
+/*
+ * Each key (a piece, "boxes/<box>", "house"): its photos, [name on the site, file, how]. The file: a path in 00 Contexte
+ * Yoni, or "wa:<file>" (the WhatsApp folder). How: "frame" (a whole jewel on black, framed on it in 4:5), [x, y, w, h]
+ * (the part kept, fractions of the photo), else the photo whole.
+ */
 const PIECES = {
-  "jamie-leweling-jl-pendant": [["studio", join(STUDIO, "jamie-leweling-jl-pendant-studio-ia.jpg"), false]],
-  "malik-tillman-tm-pendant": [["studio", join(STUDIO, "malik-tillman-tm-pendant-studio-ia.jpg"), false]],
-  "marcus-thuram-thorned-t-pendant": [["studio", join(STUDIO, "marcus-thuram-thorned-t-pendant-studio-ia.jpg"), false]],
-  "bosnia-and-herzegovina-world-cup-2026-ring": BOSNIA_ORDER.map((n) => ["b" + n, join(BOSNIA, "bosnie-" + n + "-fond-noir.jpg"), true]),
+  "malik-tillman-tm-pendant": [["studio", join(STUDIO, "malik-tillman-tm-pendant-studio-ia.jpg")]],
+  "marcus-thuram-thorned-t-pendant": [["studio", join(STUDIO, "marcus-thuram-thorned-t-pendant-studio-ia.jpg")]],
+  // The real studio photos of the JL (23/11/2026), looked at one by one; "09.50.36 (5)" is the same file as (3): left out.
+  // On black: the front view (the left corner of the J touches the edge of the photo), the pendant turned to the left
+  // (its bail on the left, the only one with black all around it), turned to the right (its bail touches the right edge),
+  // then the close-ups, kept whole: the J and its bail, the baguettes, the foot of the L, the back with the BRT mark. Last,
+  // the two on dark red velvet (not black): the whole pendant, a close-up.
+  "jamie-leweling-jl-pendant": [
+    ["front", wa("09.50.36"), "frame"],
+    ["left", wa("09.50.35"), "frame"],
+    ["right", wa("09.50.36 (2)"), "frame"],
+    ["bail", wa("09.50.36 (3)")],
+    ["baguettes", wa("09.50.36 (6)")],
+    ["foot", wa("09.50.36 (7)")],
+    ["back", wa("09.50.36 (8)")],
+    ["velvet", wa("09.50.36 (1)")],
+    ["velvet-detail", wa("09.50.36 (4)")],
+  ],
+  "bosnia-and-herzegovina-world-cup-2026-ring": BOSNIA_ORDER.map((n) => ["b" + n, join(BOSNIA, "bosnie-" + n + "-fond-noir.jpg"), "frame"]),
+  // The top of the Inter ring worn as a pendant (23/11/2026): on black, its chain leaving the photo at the top (4:5 around
+  // the pendant, the chain above it), and worn on a black T-shirt (whole).
+  "campione-d-italia-pendant": [
+    ["black", wa("09.43.30"), [0, 0.1484, 1, 0.7031]],
+    ["worn", wa("09.42.43")],
+  ],
+  // The real Campione d'Italia case, open on the ring, the medal and the card, then closed (23/11/2026): whole.
+  "boxes/campione-d-italia-case": [
+    ["p1", wa("09.36.59")],
+    ["p2", wa("09.36.59 (1)")],
+    ["p3", wa("09.36.59 (2)")],
+    ["p4", wa("09.36.59 (3)")],
+    ["p5", wa("09.36.59 (4)")],
+    ["p6", wa("09.36.59 (5)")],
+  ],
+  // Yoni for The House (23/11/2026), whole. Not "09.34.58" (an evening, a person not identified).
+  house: [
+    ["desk-smile", wa("00.50.54")],
+    ["loupe", wa("00.50.56")],
+    ["desk-tray", wa("09.59.50")],
+    ["desk-smile-wide", wa("09.59.50 (1)")],
+    ["desk-scale", wa("09.59.50 (2)")],
+    ["desk-pointing", wa("09.59.50 (3)")],
+    ["inter-case-open", wa("09.34.18")],
+    ["inter-case-closed", wa("09.34.18 (1)")],
+    ["inter-ring", wa("09.34.18 (2)")],
+    ["inter-rings", wa("09.40.13")],
+  ],
+  // The top of the page of the trunks: the Dragon Ball trunk closed, lit from above (23/11/2026), whole.
+  "boxes/hero": [["dragon-ball-closed", join("Ecrins v3 (lumiere du dessus)", "dragonball-closed.jpg")]],
 };
+
+const sourceOf = (file) => (file.startsWith("wa:") ? join(WA, file.slice(3)) : join(YONI, file));
 
 /** The photo framed on the jewel: the black around it trimmed, then an even margin, in a 4:5 frame (black). */
 async function framed(file) {
@@ -56,6 +126,11 @@ async function framed(file) {
   let fh = (fw * 5) / 4;
   fw = Math.round(Math.min(fw, width));
   fh = Math.round(Math.min(fh, height));
+  // Larger than the photo on one side: still 4:5, smaller on the other side.
+  if (Math.abs(fw / fh - 0.8) > 0.01) {
+    if (fw / fh > 0.8) fw = Math.round((fh * 4) / 5);
+    else fh = Math.round((fw * 5) / 4);
+  }
   const cx = left + w / 2;
   const cy = top + h / 2;
   const x = Math.round(Math.min(width - fw, Math.max(0, cx - fw / 2)));
@@ -63,27 +138,43 @@ async function framed(file) {
   return sharp(await img.clone().extract({ left: x, top: y, width: fw, height: fh }).toBuffer());
 }
 
-for (const photos of Object.values(PIECES)) {
-  for (const [, file] of photos) {
-    if (!existsSync(join(YONI, file))) {
-      console.error("Not found (plug the disk in): " + join(YONI, file));
+/** The part of a photo kept, [x, y, w, h] in fractions of it. */
+async function cropped(file, [x, y, w, h]) {
+  const img = sharp(file).rotate();
+  const { width, height } = await img.metadata();
+  const left = Math.round(x * width);
+  const top = Math.round(y * height);
+  return sharp(await img.clone().extract({ left, top, width: Math.min(width - left, Math.round(w * width)), height: Math.min(height - top, Math.round(h * height)) }).toBuffer());
+}
+
+const keys = Object.keys(PIECES).filter((k) => !ONLY || ONLY.has(k));
+for (const key of keys) {
+  for (const [, file] of PIECES[key]) {
+    if (!existsSync(sourceOf(file))) {
+      console.error("Not found (plug the disk in, or check the WhatsApp folder): " + sourceOf(file) + "\nNothing was changed.");
       process.exit(1);
     }
   }
 }
+let data = {};
+try {
+  data = JSON.parse(readFileSync(DATA, "utf8"));
+} catch {
+  /* first run */
+}
 await mkdir(OUT, { recursive: true });
-const data = {};
-for (const [slug, photos] of Object.entries(PIECES)) {
-  const dir = join(OUT, slug);
-  const tmp = join(OUT, "." + slug + ".tmp");
+for (const key of keys) {
+  const photos = PIECES[key];
+  const dir = join(OUT, key);
+  const tmp = join(dirname(dir), "." + basename(dir) + ".tmp");
   await rm(tmp, { recursive: true, force: true });
   await mkdir(tmp, { recursive: true });
   const made = [];
-  for (const [name, file, frame] of photos) {
-    const src = join(YONI, file);
-    const img = frame ? await framed(src) : sharp(src).rotate();
+  for (const [name, file, how] of photos) {
+    const src = sourceOf(file);
+    const img = how === "frame" ? await framed(src) : Array.isArray(how) ? await cropped(src, how) : sharp(src).rotate();
     const out = join(tmp, name + ".webp");
-    const { width, height } = await img.clone().resize(LONG, LONG, { fit: "inside", kernel: "lanczos3" }).webp({ quality: 84, effort: 6 }).toFile(out);
+    const { width, height } = await img.clone().resize(LONG, LONG, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: 84, effort: 6 }).toFile(out);
     for (const size of SIZES) {
       if (width < size.width * MARGIN) continue;
       await img.clone().resize(size.width, null, { kernel: "lanczos3" }).webp({ quality: size.quality, effort: 6 }).toFile(sizedPath(out, size.width));
@@ -97,9 +188,18 @@ for (const [slug, photos] of Object.entries(PIECES)) {
   const v = hash.digest("hex").slice(0, 10);
   for (const f of files) await rename(join(tmp, f), join(tmp, f.replace(/^([^.]+)\./, "$1." + v + ".")));
   await rm(dir, { recursive: true, force: true });
+  await mkdir(dirname(dir), { recursive: true });
   await rename(tmp, dir);
-  data[slug] = Object.fromEntries(made.map((m) => [m.name, { src: "/media/extra/" + slug + "/" + m.name + "." + v + ".webp", width: m.width, height: m.height }]));
-  console.log("  + " + slug + " (" + v + ", " + made.length + " photo" + (made.length > 1 ? "s" : "") + ")");
+  data[key] = Object.fromEntries(made.map((m) => [m.name, { src: "/media/extra/" + key + "/" + m.name + "." + v + ".webp", width: m.width, height: m.height }]));
+  console.log("  + " + key + " (" + v + ", " + made.length + " photo" + (made.length > 1 ? "s" : "") + ")");
 }
-await writeFile(DATA, JSON.stringify(data, null, 1) + "\n");
+// A key no longer listed loses its files and its entry.
+for (const key of Object.keys(data)) {
+  if (!PIECES[key]) {
+    delete data[key];
+    await rm(join(OUT, key), { recursive: true, force: true });
+    console.log("  - " + key);
+  }
+}
+await writeFile(DATA, JSON.stringify(Object.fromEntries(Object.keys(PIECES).filter((k) => data[k]).map((k) => [k, data[k]])), null, 1) + "\n");
 console.log("  = src/data/extra.generated.json");

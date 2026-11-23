@@ -65,6 +65,12 @@ export function wornWith(slug: string): { slug: string; is: "chain" | "pendant" 
   return null;
 }
 
+/** A professional photo of the JL pendant of Jamie Leweling (23/11/2026), with what it shows (src/data/views.ts). */
+const JL = (name: string, view: string) => extra("jamie-leweling-jl-pendant", name, { view });
+
+/** The top of the Inter ring, a pendant of its own (Yoni, 23/11/2026). */
+export const INTER_PENDANT = "campione-d-italia-pendant";
+
 /** The ring of Bosnia and Herzegovina for the World Cup 2026 (Yoni, 23/11/2026). */
 export const BOSNIA = "bosnia-and-herzegovina-world-cup-2026-ring";
 
@@ -218,6 +224,11 @@ const inter = {
  * The cover and the gallery of a piece from its folder of hd, in the order of the folder; `files`: only these files of the
  * folder, in this order (a folder that serves two pieces: the Butterfly pendant and its chain).
  */
+/** The photos of a folder in their order, one of them first (the hero and the cover asked by Yoni, 23/11/2026). */
+function lead(dir: string, file: string): string[] {
+  return [file, ...hdGallery(dir).map((g) => g.file).filter((f) => f !== file)];
+}
+
 function sorted(dir: string, own: Maybe[], files?: string[]): { cover: Maybe; gallery: Maybe[] } {
   const known = new Map(list(...own).map((m) => [m.src, m]));
   const all = hdGallery(dir);
@@ -292,6 +303,8 @@ const SITE_PIECES: Piece[] = [
     people: ["deniz-undav", "angelo-stiller", "jamie-leweling", "maximilian-mittelstaedt", "chris-fuehrich", "atakan-karazor", "vfb-stuttgart"],
     client: "VfB Stuttgart",
     theme: { preset: "victoire-rouge" },
+    // The crest ring face on as the hero (Yoni, 23/11/2026).
+    showcase: { size: "large", views: ["p13", "p12", "p18"] },
     ...sorted(VFB, [vfb.front, vfb.open, vfb.cup, vfb.engraving, vfb.profile, vfb.crest, vfb.undav, vfb.stiller, vfb.mittelstaedt, vfb.karazor, vfb.squad]),
     handover: [vfb.presentation, vfb.showcase, vfb.shown, st("collectors", 41, at("VfB Stuttgart players with the ring", "The squad and its ring"))],
     press: [{ outlet: "Bild", title: "The VfB champions receive their rings", url: null, image: vfbPhotos[10]?.src ?? null }],
@@ -325,6 +338,8 @@ const SITE_PIECES: Piece[] = [
     people: ["inter-milan", "marcus-thuram"],
     client: "Inter Milan",
     theme: { preset: "victoire-nuit" },
+    // Its face view as the hero (Yoni, 23/11/2026).
+    showcase: { size: "large", views: ["p08", "p13", "p54", "p04", "p44"] },
     ...sorted(INTER, [inter.ring, inter.emblem, inter.stars, inter.flag, inter.side, inter.serieA, inter.cup, inter.pendant, inter.brt, inter.squad, inter.glove]),
     handover: [st("inter-squad", 2, at("Inter players with their rings", "The Moment of Victory")), ...inter.received, st("inter-squad", 5, at("An Inter player receives his ring"))],
     press: [
@@ -493,6 +508,8 @@ const SITE_PIECES: Piece[] = [
     people: ["noah-okafor"],
     // Its own world since 23/11/2026 (Yoni): spotlights in the colours of Nigeria and Switzerland.
     theme: { preset: "okafor-jersey" },
+    // The jersey with its chain as the hero (Yoni, 23/11/2026).
+    showcase: { size: "large", views: ["p20", "p06", "p02"] },
     ...sorted("noah-okafor-jersey-pendant", [
       yoni("noah-okafor-jersey-pendant", "p20", at("Noah Okafor's jersey pendant on a chain of diamond flowers")),
       yoni("noah-okafor-jersey-pendant", "p18", at("The Swiss cross on the chest", "The Swiss cross")),
@@ -601,6 +618,7 @@ const SITE_PIECES: Piece[] = [
       "Its head is a large red pear-shaped stone, resting against the letter.",
     people: ["marcus-thuram"],
     theme: { preset: "serpent", mark: "T" },
+    // Its front view as the cover of its world in the gallery (Yoni, 23/11/2026).
     ...sorted("marcus-thuram-t-serpent-pendant", [
       yoni("marcus-thuram-t-serpent-pendant", "p08", at("Marcus Thuram's T-Serpent pendant: a diamond T with a rose gold serpent")),
       yoni("marcus-thuram-t-serpent-pendant", "p12", at("The serpent coiled around the T")),
@@ -611,7 +629,7 @@ const SITE_PIECES: Piece[] = [
       yoni("marcus-thuram-t-serpent-pendant", "p04", at("The pendant with its bail")),
       yoni("marcus-thuram-t-serpent-pendant", "p18", at("The T-Serpent pendant on black")),
       yoni("marcus-thuram-t-serpent-pendant", "v01", at("Details of the T-Serpent pendant")),
-    ]),
+    ], lead("marcus-thuram-t-serpent-pendant", "p08")),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A gothic T and a serpent that draws a 9"],
@@ -742,11 +760,17 @@ const SITE_PIECES: Piece[] = [
     story: "The letters J and L, filled with baguette-cut diamonds and outlined with round stones and a fine rose gold edge.",
     people: ["jamie-leweling"],
     theme: { preset: "stuttgart", mark: "JL" },
-    // Its studio image first (Yoni, 23/11/2026: no clean photo of the jewel alone), its older photos after it.
-    cover: extra("jamie-leweling-jl-pendant", "studio", at("Jamie Leweling's JL initials pendant")),
+    // The real professional photos sent by Yoni (23/11/2026, scripts/extra-media.mjs), on black, the front view as the hero:
+    // they replace the AI studio image; the photos where Jamie Leweling wears it go to "Worn by".
+    cover: JL("front", "front"),
     gallery: [
-      extra("jamie-leweling-jl-pendant", "studio", at("Jamie Leweling's JL initials pendant")),
-      still("pieces/jamie-leweling-jl-pendant/cover", { ...at("Jamie Leweling's JL pendant on its chain"), onBlack: false }),
+      JL("front", "front"),
+      JL("left", "angle"),
+      JL("right", "angle"),
+      JL("bail", "bail"),
+      JL("baguettes", "detail"),
+      JL("foot", "detail"),
+      JL("back", "back"),
       st("jamie-leweling", 2, at("Jamie Leweling wearing his JL pendant with his DFB-Pokal medal", "Worn by Jamie Leweling")),
       st("collectors", 7, at("Jamie Leweling wearing the JL pendant")),
     ],
@@ -1103,6 +1127,7 @@ const SITE_PIECES: Piece[] = [
     // The hand of Yoni draws it on its chain: its sketch keeps the name of its old address.
     sketch: "michy-batshuayi-butterfly-chain",
     theme: { preset: "metamorphose" },
+    showcase: { size: "large", views: ["p54", "p68"] },
     ...sorted(
       BUTTERFLY,
       [
@@ -1112,7 +1137,8 @@ const SITE_PIECES: Piece[] = [
         yoni(BUTTERFLY, "p74", at("The pear diamond at the heart of the butterfly", "The centre stone")),
         yoni(BUTTERFLY, "p69", BACK()),
       ],
-      ["p68", "p54", "v15", "v09", "p63", "p73", "p74", "p62", "p70", "p75", "p72", "p71", "p52", "p69", "p20", "p48", "p22", "p17", "p41", "v03"],
+      // The pendant on its chain first (Yoni, 23/11/2026: the hero, the first photo and the cover of its gallery).
+      ["p54", "p68", "v15", "v09", "p63", "p73", "p74", "p62", "p70", "p75", "p72", "p71", "p52", "p69", "p20", "p48", "p22", "p17", "p41", "v03"],
     ),
     handover: [yoni(BUTTERFLY, "p17", { ...at("Michy Batshuayi wearing his Butterfly Pendant"), onBlack: false })],
     specs: [
@@ -1160,10 +1186,10 @@ const SITE_PIECES: Piece[] = [
     story:
       "A necklace of diamond links shaped like infinity knots, with gothic T stations along the chain. At the front, a large T in baguettes with rose gold scrolls opens onto a drop that ends with a pear-shaped red stone framed in diamonds. The clasp carries the BRT mark, and the back of the T is engraved with a pattern of flowers.",
     people: ["marcus-thuram"],
-    // 23/11/2026 (Yoni): no universe any more, all black; the piece as the hero, large, centred on its details (the T and
-    // its drop).
+    // 23/11/2026 (Yoni): no universe any more, all black; the full piece as the hero and the first photo, as large as
+    // possible (second call: « première photo hero full piece, agrandir au max »).
     theme: { preset: "noir" },
-    showcase: { size: "large", mode: "single", views: ["p02"] },
+    showcase: { size: "large", mode: "single", views: ["p01"] },
     ...sorted("marcus-thuram-ruby-t-necklace", [
       yoni("marcus-thuram-ruby-t-necklace", "p02", at("Marcus Thuram's T necklace: a gothic T with rose gold scrolls")),
       yoni("marcus-thuram-ruby-t-necklace", "p03", at("The baguettes of the T, up close", "Baguettes")),
@@ -1174,7 +1200,7 @@ const SITE_PIECES: Piece[] = [
       yoni("marcus-thuram-ruby-t-necklace", "p07", at("The infinity links of the necklace", "The links")),
       yoni("marcus-thuram-ruby-t-necklace", "p01", at("The whole necklace on black velvet")),
       st("thuram", 13, at("Film of the drop held in a gloved hand")),
-    ]),
+    ], lead("marcus-thuram-ruby-t-necklace", "p01")),
     specs: [
       ["Type", "Necklace with a drop"],
       ["Motif", "Gothic T and infinity links"],
@@ -1433,6 +1459,9 @@ const COLLECTED: Piece[] = [
     title: "Lasana Keita — Panther Pendant",
     type: "pendant",
     client: "Lasana Keita",
+    // The fighter on its photos, with his belts, is the person of the circle « Keita Losene » (Malik, 23/11/2026; which name is
+    // right is to be confirmed: nothing renamed).
+    people: ["keita-losene"],
     line: "A panther holding a champion's belt.",
     // Its second paragraph: the celebration that the universe of its page tells (feedback of Yoni, 21/11/2026, from the
     // press: nothing beyond what it said).
@@ -1631,6 +1660,31 @@ const COLLECTED: Piece[] = [
     ],
     seen: "White gold tone · oval diamonds in claw settings",
   }),
+  /* The top of the Inter ring worn as a pendant (Yoni, 23/11/2026: « le top de l'Inter Milan devient une chaîne »): its photos
+     sent on WhatsApp (scripts/extra-media.mjs), the same players and the same world as the ring. Its 3D file (ZP0975-BJ001.3dm)
+     lacks the meshes of its metal: not published. */
+  piece({
+    slug: INTER_PENDANT,
+    title: "Inter Milan — Campione d'Italia Pendant",
+    type: "pendant",
+    line: "The top of the Inter ring, worn as a pendant.",
+    story:
+      "The top of the Campione d'Italia ring lifts off and becomes a pendant.\n\n" +
+      "The Inter emblem in diamonds on its deep blue ground, inside its band of stars, is then worn on a chain, close to the heart.",
+    people: ["inter-milan", "marcus-thuram"],
+    client: "Inter Milan",
+    theme: { preset: "victoire-nuit" },
+    cover: extra(INTER_PENDANT, "black", at("The top of the Inter ring worn as a pendant, on black")),
+    gallery: [
+      extra(INTER_PENDANT, "black", at("The top of the Inter ring worn as a pendant, on black")),
+      extra(INTER_PENDANT, "worn", { ...at("The Inter pendant worn on a chain"), onBlack: false }),
+    ],
+    specs: [
+      ["Type", "Pendant"],
+      ["Motif", "The top of the Campione d'Italia ring"],
+    ],
+  }),
+
   /* The Bosnia and Herzegovina ring (Yoni, 23/11/2026): its photos retouched on black, in his order (scripts/extra-media.mjs);
      its texts say only what the photos show, no name of a player. All black, no universe for now. */
   piece({
@@ -1834,6 +1888,13 @@ export const BOXES: Box[] = ([
       inter.case,
       still("boxes/campione-d-italia-case/01", at("The Campione d'Italia case, open, with the ring and its card")),
       still("boxes/campione-d-italia-case/02", at("The ring in its case", "The ring in place")),
+      // Its real photos sent by Yoni (23/11/2026).
+      ...[1, 2, 3, 4, 5, 6].map((n) =>
+        extra("boxes/campione-d-italia-case", "p" + n, {
+          ...at(n === 3 ? "The lid of the Campione d'Italia case, up close" : n >= 5 ? "The Campione d'Italia case open, with the small ring box and the card" : "The Campione d'Italia case open, with the medal on its ribbon and the card"),
+          onBlack: false,
+        }),
+      ),
     ),
     pieceSlug: INTER,
   },

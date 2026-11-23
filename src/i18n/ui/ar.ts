@@ -91,6 +91,7 @@ export const ar: Messages = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "اكتشف عالم الإبداع",
     eyebrow: "الصحافة",
     title: "تحت الأضواء",
     lead: "الدار في الصحافة: خواتم البطولة لنادي في إف بي شتوتغارت وإنتر ميلان.",
@@ -116,7 +117,7 @@ export const ar: Messages = {
       rings: { name: "الخواتم", intro: "أكثر من مجرد رمز للنصر. إرثٌ يخلّده الذهب والألماس." },
       bracelets: { name: "الأساور", intro: "أساور تُصنع حسب المقاس، حلقة بعد حلقة." },
       watches: { name: "الساعات", intro: "ساعات مرصعة بالألماس من الهيكل إلى السوار." },
-      "jesus-pieces": { name: "مجوهرات المسيح", intro: "وجه المسيح متوَّجًا بالأشواك أو بالزهور، والمسيح على الصليب: كل قطعة منحوتة بأبعادها ومرصّعة حجرًا حجرًا." },
+      "jesus-pieces": { name: "مجوهرات المسيح", intro: "من شوارع نيويورك إلى بيغي الذي جعلها أسطورية، أصبحت قطعة «جيزس بيس» واحدة من أكثر الرموز شهرةً في الثقافة. نحن لا نغيّر هذه القصة، بل نضيف إليها فصلنا فقط." },
     },
     eyebrow: "معرض الأعمال",
     title: "استكشفوا الإبداعات",
@@ -134,6 +135,7 @@ export const ar: Messages = {
   },
 
   home: {
+    sketchLabel: "من الرسم الأول إلى القطعة، مع التمرير",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "لا نبدأ مما صُنع من قبل. نبدأ مما يمكن أن يكون.",
     who: "بيريتي جولرز دارٌ للمجوهرات الراقية حسب الطلب، مقرّها دبي: قطع فريدة نتصوّرها معكم ونصنعها يدويًا.",
@@ -210,6 +212,9 @@ export const ar: Messages = {
   },
 
   piece: {
+    spin: "أدر الكرة",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "يرتديها " + who : "مرتداة"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "الأمام", profile: "الجانب", back: "الخلف", detail: "التفاصيل", worn: "مرتداة" },
     showView: (view: string) => "عرض منظر " + view,
@@ -352,6 +357,8 @@ export const ar: Messages = {
   },
 
   boxes: {
+    heroLink: "شاهد كل العلب",
+    heroAlt: "علبة دراغون بول مغلقة: عملها الفني وعلامة BRT على واجهتها",
     hidePhotos: "إخفاء الصور",
     eyebrow: "صنعة فريدة",
     title: "صناديق Signature",

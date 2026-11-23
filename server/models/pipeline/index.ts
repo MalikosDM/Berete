@@ -1,15 +1,17 @@
 /*
- * The 3D pipeline: a file of the jeweller (.3dm, .glb, .stl) becomes two
- * versions for the viewer, "full" (computers) and "light" (phones), plus the
- * list of its layers with a guessed role. The original is never changed.
+ * The 3D pipeline: a file of the jeweller (.3dm, .glb, .gltf, .obj, .stl) becomes
+ * two versions for the viewer, "full" (computers) and "light" (phones), plus the
+ * list of its layers with a guessed role. The original is never changed. What the
+ * file holds and the model does not show is reported (stats.skipped): a model with
+ * volumes missing (stats.incomplete > 0) stays a draft, never shown on the site.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { analyse, type StoneCount } from "./build.js";
-import { readModel, type Progress } from "./read.js";
+import { missingVolumes, readModel, type Progress, type Skipped, type SourceKind } from "./read.js";
 import { VERSIONS, writeVersion } from "./write.js";
 
-export type SourceKind = "stl" | "glb" | "3dm";
+export type { Skipped, SourceKind };
 
 export type LayerRole = "metal" | "diamond" | "stone" | "enamel" | "hide";
 
@@ -35,8 +37,12 @@ export type ModelStats = {
   /** Size of the jewel (mm). */
   size: [number, number, number];
   stones: StoneCount[];
-  /** An STL without separable stones: they are fused into the metal or missing. */
+  /** An STL (or an OBJ without layers) without separable stones: they are fused into the metal or missing. */
   stonesMissing: boolean;
+  /** What the file holds and the model does not show (a .3dm). */
+  skipped?: Skipped;
+  /** Volumes missing from the model (saved without their render mesh): more than 0, the model is incomplete. */
+  incomplete: number;
   versions: Record<keyof typeof VERSIONS, { bytes: number; triangles: number; drawn: number }>;
   seconds: number;
 };
@@ -129,7 +135,9 @@ export async function runPipeline(input: string, kind: SourceKind, outDir: strin
     unaligned: analysis.unaligned,
     size: analysis.size,
     stones: analysis.stones,
-    stonesMissing: kind === "stl" && analysis.stones.length === 0,
+    stonesMissing: !source.layered && analysis.stones.length === 0,
+    ...(source.skipped ? { skipped: source.skipped } : {}),
+    incomplete: missingVolumes(source.skipped),
     versions: { full, light },
     seconds: Math.round((Date.now() - started) / 100) / 10,
   };

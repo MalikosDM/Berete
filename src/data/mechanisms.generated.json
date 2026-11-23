@@ -9,5 +9,11 @@
   "image": "/media/mechanisms/journey-design.bb0684b5b6.webp",
   "width": 1080,
   "height": 1350
+ },
+ "dragon-ball-spin": {
+  "video": "/media/mechanisms/dragon-ball-spin.88099baeb7.mp4",
+  "poster": "/media/mechanisms/dragon-ball-spin-poster.88099baeb7.webp",
+  "width": 720,
+  "height": 1120
  }
 }

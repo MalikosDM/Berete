@@ -7,9 +7,9 @@
  *   npm run cutouts -- --only=<slug>,<slug>
  *   npm run cutouts -- --force      # redo the working photos and the masks too
  *
- * 1. The original photo (HD folders of Yoni on the external disk, a file of "00 Contexte Yoni", else the photo of the
- *    site), cropped if asked, is reduced to 3600 px at most (.local/cutouts/<slug>/<id>.jpg; the originals never go in
- *    Git).
+ * 1. The original photo (HD folders of Yoni on the external disk, a file of "00 Contexte Yoni", a photo sent on WhatsApp,
+ *    a story of the folder "Berete - Stories" or one image of its film, else the photo of the site), cropped if asked, is
+ *    reduced to 3600 px at most (.local/cutouts/<slug>/<id>.jpg; the originals never go in Git).
  * 2. macOS lifts the subject (scripts/cutout-mask.swift, built once into .local/bin/cutout-mask): its mask.
  * 3. scripts/cutouts.py redraws the edges from the photo, decontaminates them, fades a chain that leaves the photo, crops
  *    with a margin and checks the result.
@@ -18,12 +18,14 @@
  *    /media): public/media/cutouts/<slug>/<id>-<w>.<version>.webp, listed in src/data/cutouts.generated.json. The
  *    folder of a piece redone is emptied first; a piece no longer listed loses its folder. The views of the other
  *    pieces are left as they are (an old file without version is renamed with its version).
- * The disk must be connected for the HD photos (BERETE_DISK, default "/Volumes/Disque externe").
+ * The disk must be connected for the HD photos (BERETE_DISK, default "/Volumes/Disque externe"); BERETE_WA_DIR gives
+ * another folder for the photos sent on WhatsApp (default: "Yoni envoie whatsapp" on the Desktop).
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -32,6 +34,8 @@ const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
 const HD_DIR = join(DISK, "Berete - Dossiers icloud");
 const YONI_DIR = join(HD_DIR, "00 Contexte Yoni");
+const STORIES_DIR = join(DISK, "Berete - Stories");
+const WA_DIR = process.env.BERETE_WA_DIR ?? join(homedir(), "Desktop", "Yoni envoie whatsapp");
 const WORK = join(ROOT, ".local", "cutouts");
 const TOOL = join(ROOT, ".local", "bin", "cutout-mask");
 const OUT = join(ROOT, "public", "media", "cutouts");
@@ -45,7 +49,9 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 
 /*
  * The views of each piece, the main one first: "hd:<folder>/<photo>" (an HD photo of Yoni), "yoni:<path>" (a file of
- * "00 Contexte Yoni"), or a photo of the site. kind: face, profile, back, detail, worn.
+ * "00 Contexte Yoni"), "wa:<file>" (a photo sent on WhatsApp), "story:<folder>/<n>" (a story of "Berete - Stories", its
+ * image; "story:25/02@6.75": the image of its film at 6.75 s), or a photo of the site. kind: face, profile, back, detail,
+ * worn. A photo sent on WhatsApp or a story is never enlarged.
  * - mode "luma": a jewel on a dark bust (only its light is kept). solo: one object only (a reflection on a mirror under
  *   it goes). stones: a coloured stone as dark as the background is kept. crop: [x0, y0, x1, y1] (fractions of the
  *   photo), when the photo shows something else beside the jewel.
@@ -54,6 +60,10 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
  *   sees only in part (level: the least light kept, above a velvet whose threads catch the light). fill: the holes of its outline filled (the
  *   inside of its band, dark); a number: its outline also made convex from that fraction of its height down (a band open
  *   on a side). floor: the line where it stands on a mirror (a fraction of the height, or [x, y] points): below goes.
+ * - neutral: a white-metal jewel on skin (a watch on a wrist), kept by its neutral light, the skin left out. seed: [x, y]
+ *   (fractions of the photo, after the crop): only the part of the jewel at that point (a watch, not the chain beside it).
+ * - keepEdge: a jewel that touches the edge of its photo keeps its sharp cut (no fade). fade: { top: 0.1 }: a fade asked
+ *   on that side, over that fraction of the jewel (ends of a chain blurred behind the neck of a bust).
  * - clean: false: never shown (with its reason in note). note: what to look at by eye (French, shown in the admin).
  * Every view was looked at one by one (on a checkerboard and on black) on 23/11/2026.
  */
@@ -64,11 +74,14 @@ const VIEWS = {
     { id: "p06", kind: "back", from: "hd:13/p06" },
   ],
   // Since 22/11/2026 the pendant (alone, then on its chain) and the chain alone are two pieces.
-  // p68, the pendant alone, is also the large image of the home page on black: from its photo at full resolution
-  // (cropped on the pendant), so that its 1600 px file comes from a cutout twice as large.
+  // The pendant on its chain, on the black bust, first (asked by Yoni, 23/11/2026: the hero of its page and of the home
+  // page); its photo is the largest there is of it (2160 x 3240, p53 is the same shot). The two ends of the chain go behind
+  // the neck of the bust, out of focus: they fade out instead of ending in ragged pieces.
+  // p68, the pendant alone: from its photo at full resolution (cropped on the pendant), so that its 1600 px file comes
+  // from a cutout twice as large.
   "michy-batshuayi-butterfly-pendant": [
-    { id: "p68", kind: "face", from: "hd:23/p68", crop: [0, 0.2, 1, 0.88] },
-    { id: "p54", kind: "worn", from: "hd:23/p54", mode: "luma" },
+    { id: "p54", kind: "face", from: "hd:23/p54", mode: "luma", fade: { top: 0.12 } },
+    { id: "p68", kind: "detail", from: "hd:23/p68", crop: [0, 0.2, 1, 0.88] },
   ],
   "butterfly-chain": [{ id: "p60", kind: "face", from: "hd:23/p60", mode: "luma" }],
   // The rings whole (23/11/2026, the bottom of their band was cut): only photos where the whole ring is inside the frame
@@ -189,7 +202,13 @@ const VIEWS = {
     { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-thorned-t-pendant-studio-ia.jpg" },
     { id: "cover", kind: "face", from: "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp" },
   ],
-  "jamie-leweling-jl-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/jamie-leweling-jl-pendant-studio-ia.jpg" }],
+  // Its real studio photos on black (WhatsApp, 23/11/2026; they replace its studio image): the front view first (the left
+  // corner of the J touches the edge of the photo: its cut kept sharp, a fade would dissolve the J), then the pendant
+  // turned to the left (black all around it).
+  "jamie-leweling-jl-pendant": [
+    { id: "front", kind: "face", from: "wa:WhatsApp Image 2026-11-23 at 09.50.36.jpeg", solo: true, keepEdge: true, note: "le coin gauche du J touche le bord de la photo (coupé net)" },
+    { id: "left", kind: "profile", from: "wa:WhatsApp Image 2026-11-23 at 09.50.35.jpeg", solo: true },
+  ],
   // Its HD photos (folder 38): macOS sees the angel only on the front view, and by its light alone (luma) the letter lost
   // the dark stones of its foot: the whole letter kept by its light above the velvet (level), its foot made solid (fill).
   // The two others are whole for macOS.
@@ -211,12 +230,28 @@ const VIEWS = {
     { id: "s04", kind: "face", from: "/media/stories/eljero-elia/04.webp" },
     { id: "s05", kind: "profile", from: "/media/stories/eljero-elia/05.webp" },
   ],
-  // Its HD photos (folder 37, 20/11/2026): the chain and its plate on the bust (by its light), the plate, its back.
+  // Its HD photos (folder 37, 20/11/2026): the plate alone first (asked by Yoni, 23/11/2026: the piece alone in hero; p28
+  // is its only photo of the whole plate face on), the chain and its plate on the bust (by its light), its back.
   sirius: [
-    { id: "p27", kind: "face", from: "hd:37/p27", mode: "luma", solo: true },
-    { id: "p28", kind: "detail", from: "hd:37/p28" },
+    { id: "p28", kind: "face", from: "hd:37/p28" },
+    { id: "p27", kind: "worn", from: "hd:37/p27", mode: "luma", solo: true },
     { id: "p26", kind: "back", from: "hd:37/p26" },
   ],
+  // The Inter Milan pendant (the top of the Inter ring on a chain, WhatsApp 23/11/2026): on black, by its light; its chain
+  // leaves the photo at the top (faded).
+  "campione-d-italia-pendant": [{ id: "black", kind: "face", from: "wa:WhatsApp Image 2026-11-23 at 09.43.30.jpeg", mode: "luma" }],
+  // The pieces that had only a photo in context (23/11/2026): the jewel alone, until the studio photos Yoni will send (to
+  // use one: put it as their first view here, "yoni:<file>" or "wa:<file>", and run npm run cutouts -- --only=<slug>).
+  // The square watch of Tajon Buchanan on his wrist (story 25/02 at 6.75 s, 720 px wide): kept by its neutral light, the
+  // skin left out, its screws and numerals filled; its bracelet ends where it goes under the wrist.
+  "tajon-buchanan-iced-watch": [{ id: "s02", kind: "face", from: "story:25/02@6.75", crop: [0.04, 0.12, 0.96, 0.8], neutral: true, seed: [0.48, 0.42], fill: true, note: "image d'un film de story (464 px de large)" }],
+  // The skeleton watch of Marcus Thuram on a black cushion (story 29/01, the photo inside the repost): the watch alone (the
+  // Cuban chain behind it and the bangle beside it left out), its open dial kept as it is seen (filled). Its bracelet
+  // goes behind the cushion at the top and out of the photo at the bottom.
+  "marcus-thuram-skeleton-watch": [{ id: "s01", kind: "face", from: "story:29/01", crop: [0.07, 0.25, 0.93, 0.745], mode: "luma", level: 0.2, seed: [0.22, 0.44], fill: true, note: "photo de story (610 px) ; le haut du bracelet passe derrière le coussin : bord irrégulier en haut à droite" }],
+  // Not cut out (23/11/2026): the iced watch of Radja Nainggolan (an image of a 720 px film, the watch small and touching
+  // the grey sleeve: no clean outline) and the twisted chain of Kevin Schade (its only photo of the whole chain has two
+  // fingers over it; its film shows a part of it held by a glove): they keep their photo until their studio photos.
   // BRT Flower (folder 36): its chain leaves the photo on three sides and its ends come out torn: it opens on its photo.
 };
 
@@ -243,6 +278,30 @@ async function hdFile(ref) {
   const file = files.find((f) => new RegExp(" - " + n + "\\.(jpe?g|png|heic)$", "i").test(f));
   if (!file) throw new Error("HD photo not found: " + ref);
   return { path: join(HD_DIR, dir, "Photos", file), label: dir + "/" + file };
+}
+
+/** A story of "Berete - Stories" ("25/02", "25/02@6.75": the image of its film at 6.75 s): its file and the time asked. */
+async function storyFile(ref) {
+  const [path, at] = ref.split("@");
+  const [folder, n] = path.split("/");
+  const dir = (await readdir(STORIES_DIR)).find((d) => d.startsWith(folder + " "));
+  if (!dir) throw new Error("Story folder not found: " + folder);
+  const file = (await readdir(join(STORIES_DIR, dir))).find((f) => new RegExp(" - " + pad2(Number(n)) + "\\.(jpe?g|png|heic|mp4|mov)$", "i").test(f));
+  if (!file) throw new Error("Story not found: " + ref);
+  return { path: join(STORIES_DIR, dir, file), label: dir + "/" + file + (at ? " @ " + at + " s" : ""), at: at ? Number(at) : null };
+}
+
+/** The working photo of a photo sent on WhatsApp or of a story: cropped if asked, never enlarged, 3600 px at most. */
+async function workPhotoAsIs(file, work, crop) {
+  let img = sharp(file).rotate();
+  if (crop) {
+    const { width, height } = await img.metadata();
+    const [x0, y0, x1, y1] = crop;
+    const left = Math.round(x0 * width);
+    const top = Math.round(y0 * height);
+    img = sharp(await img.extract({ left, top, width: Math.round(x1 * width) - left, height: Math.round(y1 * height) - top }).toBuffer());
+  }
+  await img.resize({ width: 3600, height: 3600, fit: "inside", withoutEnlargement: true, kernel: "lanczos3" }).jpeg({ quality: 95 }).toFile(work);
 }
 
 /** The working photo: the original (converted by macOS, HEIC included), cropped if asked, 3600 px at most. */
@@ -280,6 +339,24 @@ async function prepare(slug, view) {
     if (!existsSync(file)) throw new Error("File of 00 Contexte Yoni not found: " + view.from);
     source = "Dossiers icloud/00 Contexte Yoni/" + view.from.slice(5);
     if (FORCE || !existsSync(work)) await workPhoto(file, work, view.crop);
+  } else if (view.from.startsWith("wa:")) {
+    const file = join(WA_DIR, view.from.slice(3));
+    if (!existsSync(file)) throw new Error("Photo sent on WhatsApp not found: " + file);
+    source = "WhatsApp/" + view.from.slice(3);
+    if (FORCE || !existsSync(work)) await workPhotoAsIs(file, work, view.crop);
+  } else if (view.from.startsWith("story:")) {
+    const f = await storyFile(view.from.slice(6));
+    source = "Stories/" + f.label;
+    if (FORCE || !existsSync(work)) {
+      if (f.at === null) await workPhotoAsIs(f.path, work, view.crop);
+      else {
+        // One image of its film, at its own size.
+        const still = work.replace(/\.jpg$/, ".still.png");
+        execFileSync("ffmpeg", ["-v", "error", "-y", "-ss", String(f.at), "-i", f.path, "-frames:v", "1", still], { stdio: "ignore" });
+        await workPhotoAsIs(still, work, view.crop);
+        await rm(still, { force: true });
+      }
+    }
   } else {
     // A photo of the site (a story at 1080 px): never enlarged.
     source = "site " + view.from;
@@ -289,7 +366,7 @@ async function prepare(slug, view) {
     const r = spawnSync(TOOL, [work, mask], { encoding: "utf8" });
     if (r.status !== 0) {
       // No subject found: a jewel on a bust is kept by its light alone (the whole photo is "near"); else the view goes.
-      if ((view.mode ?? "mask") !== "luma") return null;
+      if ((view.mode ?? "mask") !== "luma" && !view.neutral) return null;
       const { width, height } = await sharp(work).metadata();
       await sharp({ create: { width, height, channels: 3, background: "#ffffff" } }).grayscale().png().toFile(mask);
     }
@@ -326,7 +403,7 @@ for (const [slug, views] of Object.entries(VIEWS)) {
   await writeFile(
     jobFile,
     JSON.stringify(
-      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null })),
+      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null, neutral: !!view.neutral, seed: view.seed ?? null, keepEdge: !!view.keepEdge, fade: view.fade ?? null })),
     ),
   );
   const py = spawnSync("python3", [join(ROOT, "scripts", "cutouts.py"), jobFile], { encoding: "utf8", maxBuffer: 1 << 24 });

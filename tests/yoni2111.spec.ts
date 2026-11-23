@@ -113,18 +113,16 @@ test("Dragon Ball: its main view much larger and whole; its edit 13/v01 opens th
 
 /* ---------- 2. The circle of the players ---------- */
 
-test("the rule: one piece, its capsule; several, the page of the player", () => {
+// Since 23/11/2026 (Yoni): a click on anyone always opens their own page, one piece or several.
+test("the rule: every person opens their own page", () => {
   const cat = publicCatalogue(defaultCatalogue);
-  const person = (slug: string) => cat.people.find((p) => p.slug === slug)!;
-  expect(personHref(cat, person("kenan-yildiz"))).toBe("/pieces/kenan-yildiz-celebration-pendant");
-  expect(personHref(cat, person("lois-openda"))).toBe("/pieces/lois-openda-script-pendant");
+  for (const p of cat.people) expect(personHref(cat, p), p.slug).toBe("/players/" + p.slug);
   expect(piecesOf(cat, "kevin-schade").length).toBeGreaterThan(1);
-  expect(personHref(cat, person("kevin-schade"))).toBe("/players/kevin-schade");
 });
 
 const CLICKS: [string, string, boolean][] = [
-  ["kenan-yildiz", "/pieces/kenan-yildiz-celebration-pendant", false],
-  ["lois-openda", "/pieces/lois-openda-script-pendant", false],
+  ["kenan-yildiz", "/players/kenan-yildiz", true],
+  ["lois-openda", "/players/lois-openda", true],
   ["kevin-schade", "/players/kevin-schade", true],
 ];
 for (const [slug, target, several] of CLICKS) {
@@ -146,11 +144,10 @@ for (const [slug, target, several] of CLICKS) {
       // Their pieces first (a card for each capsule); no bubbles of stories any more (23/11/2026).
       const pieces = page.locator("[data-player-pieces] [data-player-piece]");
       await expect(pieces).toHaveCount(piecesOf(publicCatalogue(defaultCatalogue), slug).length);
-      await expect(page.locator("[data-player-watch]")).toHaveCount(0);
       await expect(page.locator("[data-player-stories]")).toHaveCount(0);
-      // The first card of a piece is on the first screen.
-      const first = (await pieces.first().boundingBox())!;
-      expect(first.y).toBeLessThan(page.viewportSize()!.height);
+      // Its portrait large first (23/11/2026), then its pieces.
+      await expect(page.locator("[data-player-portrait]")).toBeVisible();
+      await pieces.first().scrollIntoViewIfNeeded();
       await page.waitForTimeout(600);
       await shot(page, info.project.name + "-circle-" + slug + "-page");
       await pieces.first().click();

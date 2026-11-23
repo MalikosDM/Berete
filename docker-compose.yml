@@ -45,6 +45,10 @@ services:
       MODEL_SECRET: ${MODEL_SECRET:-}
       SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
       SITE_INDEXING: ${SITE_INDEXING:-off}
+      # The step « Imaginez votre création » of /contact (OpenAI Images, gpt-image-1): hidden while the key is empty.
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_IMAGE_QUALITY: ${OPENAI_IMAGE_QUALITY:-medium}
+      IMAGINE_DAILY_MAX: ${IMAGINE_DAILY_MAX:-200}
       SMTP_HOST: ${SMTP_HOST:-}
       SMTP_PORT: ${SMTP_PORT:-465}
       SMTP_USER: ${SMTP_USER:-}

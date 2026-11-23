@@ -9,9 +9,11 @@ type RevealProps = {
   mask?: boolean;
   delay?: number;
   as?: RevealTag;
+  /** Only a fade and a rise, never hidden (still reachable by the keyboard and found by a link to it): the trunks. */
+  soft?: boolean;
 };
 
-export default function Reveal({ children, className = "", mask = false, delay = 0, as = "div" }: RevealProps) {
+export default function Reveal({ children, className = "", mask = false, delay = 0, as = "div", soft = false }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
 
@@ -36,10 +38,10 @@ export default function Reveal({ children, className = "", mask = false, delay =
       } else {
         gsap.fromTo(
           el,
-          { y: 40, autoAlpha: 0 },
+          soft ? { y: 40, opacity: 0 } : { y: 40, autoAlpha: 0 },
           {
             y: 0,
-            autoAlpha: 1,
+            ...(soft ? { opacity: 1 } : { autoAlpha: 1 }),
             duration: 1.1,
             ease: "power3.out",
             delay,
@@ -50,7 +52,7 @@ export default function Reveal({ children, className = "", mask = false, delay =
       }
     }, el);
     return () => ctx.revert();
-  }, [mask, delay, reduced]);
+  }, [mask, delay, reduced, soft]);
 
   const Tag = as;
   return (

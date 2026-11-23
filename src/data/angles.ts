@@ -30,13 +30,30 @@ export function angleOf(piece: Pick<Piece, "angles">, src: string): Angle | null
   return a && (a.title.trim() !== "" || a.text.trim() !== "") ? a : null;
 }
 
+/** The words of a photo that show it worn or held (its English text, as written in the catalogue). */
+const WORN_TEXT = /\b(wearing|worn by|being worn|worn for the first|worn on|held in|held up|gloved hand|on (his|the) wrist|at the house)\b|, worn\b/i;
+
+/**
+ * A photo or a film of the piece worn, held in a hand, tried on (Yoni, 23/11/2026: "Every Angle" shows only the piece on
+ * black; these go to "Worn by", the same block on every piece). Judged on the English texts of the catalogue.
+ */
+export function isWorn(m: MediaItem): boolean {
+  return m.view === "worn" || m.view === "hand" || AMATEUR_FILMS.has(m.src) || WORN_TEXT.test(m.alt ?? "") || WORN_TEXT.test(m.caption ?? "") || /^Worn by\b/.test(m.caption ?? "");
+}
+
+/** The addresses of the photos of a piece (as written in English in the catalogue) worn or held. */
+export function wornSet(piece: Pick<Piece, "cover" | "gallery"> | undefined): Set<string> {
+  return new Set([piece?.cover, ...(piece?.gallery ?? [])].filter((m): m is MediaItem => Boolean(m?.src && isWorn(m))).map((m) => m.src));
+}
+
 /**
  * The photos of "Every Angle": every photo and film of the piece, its opening photo first when the opening shows the jewel
- * cut out (the photo itself is then seen nowhere else), or when the piece has no other photo (a watch).
+ * cut out (the photo itself is then seen nowhere else), or when the piece has no other photo (a watch). `worn`: the
+ * addresses of its photos worn or held (isWorn, judged on the English catalogue), left out (they go to "Worn by").
  */
-export function anglePhotos(piece: Pick<Piece, "cover" | "gallery">, openingIsPhoto: boolean): MediaItem[] {
+export function anglePhotos(piece: Pick<Piece, "cover" | "gallery">, openingIsPhoto: boolean, worn: Set<string> = new Set()): MediaItem[] {
   const withCover = piece.cover.src && (!openingIsPhoto || piece.gallery.length === 0);
-  const all = withCover ? [piece.cover, ...piece.gallery] : piece.gallery;
+  const all = (withCover ? [piece.cover, ...piece.gallery] : piece.gallery).filter((m) => !worn.has(m.src));
   const unique = all.filter((m, i) => m.src && all.findIndex((x) => x.src === m.src) === i);
   // The photos and the professional films first, in their order; the amateur films at the end.
   return [...unique.filter((m) => !AMATEUR_FILMS.has(m.src)), ...unique.filter((m) => AMATEUR_FILMS.has(m.src))];

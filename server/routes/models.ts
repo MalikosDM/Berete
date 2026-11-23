@@ -5,8 +5,10 @@
  *   GET  /view/:token                 a private link (POST with { password } when it has one)
  *   GET  /models/:id/files/:file      full.glb, light.glb, poster.webp (signed address, given by the two above)
  * and the admin (/admin/models..., /admin/links..., /admin/pieces/:slug/model), behind ADMIN_PASSWORD:
- *   upload by pieces (big files), processing in the background, layers and
- *   their roles, the piece it is shown on (one model per piece), private links.
+ *   upload by pieces (big files: .3dm, .glb, .gltf, .obj, .stl), processing in the background, layers
+ *   and their roles, the piece it is shown on (one model per piece), private links.
+ * A model "incomplete" (volumes of its .3dm saved without their render mesh) is a draft: the admin
+ * sees it, but it can be put on no page, in no private link (and the VIP space shows only "ready").
  */
 import express, { Router, type Request, type Response } from "express";
 import { createHmac, randomBytes, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
@@ -16,6 +18,7 @@ import { z } from "zod";
 import { AMBIANCES, BACKGROUNDS, backgroundOf, DEFAULT_SETTINGS, LAYER_ROLES, METALS, type ModelSettings, type PublicModel } from "../../src/data/models.js";
 import { prisma } from "../db.js";
 import { enqueue, rememberLayers } from "../models/jobs.js";
+import type { SourceKind } from "../models/pipeline/index.js";
 import { MODEL_FILES, storage, type ModelFile } from "../models/storage.js";
 import { serverSecret } from "../secret.js";
 import { limiter } from "../security.js";
@@ -191,7 +194,9 @@ models.post("/view/:token", (req, res) => {
 
 /* ---------- Admin ---------- */
 
-const KINDS: Record<string, "stl" | "glb" | "3dm"> = { ".stl": "stl", ".glb": "glb", ".3dm": "3dm" };
+const KINDS: Record<string, SourceKind> = { ".stl": "stl", ".obj": "obj", ".glb": "glb", ".gltf": "gltf", ".3dm": "3dm" };
+/** Why an incomplete model cannot be shown. */
+const DRAFT = "Ce modèle 3D est incomplet (des volumes de métal manquent) : il reste un brouillon. Réenregistrez le fichier depuis Rhino avec les maillages de rendu, ou exportez-le en STL/OBJ/GLB, puis envoyez-le à nouveau.";
 const MAX_BYTES = 800 * 1024 * 1024;
 const CHUNK_BYTES = 8 * 1024 * 1024;
 
@@ -211,7 +216,8 @@ function adminView(row: Row & { links?: { id: string; token: string; title: stri
     settings: settingsOf(row.settings),
     pieceSlug: row.pieceSlug,
     createdAt: row.createdAt,
-    preview: row.status === "ready" ? publicModel(row, Math.floor(Date.now() / 1000) + 12 * 3600) : null,
+    // An incomplete model is seen in the admin only.
+    preview: row.status === "ready" || row.status === "incomplete" ? publicModel(row, Math.floor(Date.now() / 1000) + 12 * 3600) : null,
     links: (row.links ?? []).map((l) => ({ id: l.id, token: l.token, title: l.title, expiresAt: l.expiresAt, hasPassword: Boolean(l.passwordHash), createdAt: l.createdAt })),
   };
 }
@@ -224,7 +230,7 @@ models.post("/admin/models/uploads", requireAdmin, (req, res) => {
   }
   const ext = path.extname(body.data.name).toLowerCase();
   if (!KINDS[ext]) {
-    res.status(415).json({ error: "Formats acceptés : .3dm (Rhino), .glb, .stl." });
+    res.status(415).json({ error: "Formats acceptés : .3dm (Rhino), .glb, .gltf, .obj, .stl." });
     return;
   }
   if (body.data.size > MAX_BYTES) {
@@ -311,6 +317,10 @@ models.put("/admin/models/:id", requireAdmin, async (req, res) => {
   const id = String(req.params.id);
   // One model per piece: the one chosen here replaces the one the piece had.
   const slug = body.data.pieceSlug;
+  if (slug && (await prisma.model3D.findUnique({ where: { id }, select: { status: true } }))?.status === "incomplete") {
+    res.status(409).json({ error: DRAFT });
+    return;
+  }
   const row = await prisma
     .$transaction([...(slug ? [prisma.model3D.updateMany({ where: { pieceSlug: slug, id: { not: id } }, data: { pieceSlug: null } })] : []), prisma.model3D.update({ where: { id }, data: body.data })])
     .catch(() => null);
@@ -331,6 +341,10 @@ models.put("/admin/pieces/:slug/model", requireAdmin, async (req, res) => {
     return;
   }
   const { modelId } = body.data;
+  if (modelId && (await prisma.model3D.findUnique({ where: { id: modelId }, select: { status: true } }))?.status === "incomplete") {
+    res.status(409).json({ error: DRAFT });
+    return;
+  }
   const done = await prisma
     .$transaction([prisma.model3D.updateMany({ where: { pieceSlug: slug, ...(modelId ? { id: { not: modelId } } : {}) }, data: { pieceSlug: null } }), ...(modelId ? [prisma.model3D.update({ where: { id: modelId }, data: { pieceSlug: slug } })] : [])])
     .catch(() => null);
@@ -392,6 +406,10 @@ models.post("/admin/models/:id/links", requireAdmin, async (req, res) => {
   const model = await prisma.model3D.findUnique({ where: { id: String(req.params.id) } });
   if (!model) {
     res.status(404).json({ error: "Modèle introuvable." });
+    return;
+  }
+  if (model.status === "incomplete") {
+    res.status(409).json({ error: DRAFT });
     return;
   }
   let passwordHash: string | null = null;

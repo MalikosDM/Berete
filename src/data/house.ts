@@ -5,8 +5,7 @@
  * named after its place ("portrait.jpg", "citation-1.jpg", "chapitre-03.jpg"...) in the folder "Berete - La Maison" of
  * the external disk, then npm run import-media.
  */
-import { media, yoni } from "./sources.js";
-import { trunkPhotos } from "./trunks.js";
+import { extra, media } from "./sources.js";
 import type { Catalogue, MediaItem } from "./types.js";
 
 /** The 12 chapters of the story, in order (the texts give them in the same order). */
@@ -42,29 +41,27 @@ export function housePhoto(cat: Catalogue, key: string): MediaItem | null {
 
 /** An image of the house, decorative (its text is the chapter beside it). */
 const plain = (m: MediaItem | null | undefined): MediaItem | null => (m?.src ? { ...m, alt: "", caption: undefined } : null);
-const trunk = (slug: string, i: number): MediaItem | null => {
-  const p = trunkPhotos(slug)[i];
-  return p ? { type: "image", src: p.src, width: p.width, height: p.height } : null;
-};
 
 /**
- * Until Yoni sends his own photos (Yoni, 23/11/2026): one image of the house per chapter, from those of the site, chosen to
- * accompany the text without pretending to show his life (his hand drawing, the atelier, the diamonds, the pieces, a trunk,
- * his portrait in black and white at the end).
+ * One image per chapter (Yoni, 23/11/2026): his own photos where they fit the chapter (sent on WhatsApp,
+ * scripts/extra-media.mjs), and for his early years an image of the house (his hand drawing, the atelier).
  */
+const own = (name: string): MediaItem | null => plain(extra("house", name, { onBlack: false }));
 const CHAPTER_IMAGES: (() => MediaItem | null)[] = [
   () => plain(media.sketches?.["campione-d-italia-2023-2024"]),
   () => plain(media.groups["atelier"]?.[0]),
   () => plain(media.groups["atelier"]?.[1]),
-  () => plain(yoni("kevin-schade-dragon-ball-pendant", "p12")),
-  () => plain(media.sketches?.["angelo-stiller-as-pendant"]),
-  () => plain(media.groups["atelier"]?.[2]),
-  () => plain(yoni("michy-batshuayi-butterfly-chain", "p68")),
-  () => plain(yoni("marcus-thuram-t-serpent-pendant", "p08")),
-  () => plain(yoni("kevin-schade-dragon-ball-pendant", "p19")),
-  () => plain(yoni("campione-d-italia-2023-2024", "p40")),
-  () => plain(trunk("signature-trunk", 0)),
-  () => plain(media.house?.[housePhotoKey.portrait]),
+  // His own photos (Yoni, 23/11/2026): the loupe on a stone, the tray of diamonds at his desk, at Inter with the Campione
+  // case, his head in his hands among four Inter rings. Not the photo of an evening with a person not known.
+  () => own("loupe"),
+  () => own("desk-tray"),
+  () => own("desk-pointing"),
+  () => own("desk-scale"),
+  () => own("desk-smile"),
+  () => own("inter-rings"),
+  () => own("inter-case-open"),
+  () => own("desk-smile-wide"),
+  () => own("inter-ring"),
 ];
 
 /** The photo of a chapter: his own (the admin, the folder), else the image of the house chosen for it. */

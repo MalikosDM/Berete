@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "./fixtures";
-import { anglePhotos, anglesShownFirst } from "../src/data/angles";
+import { anglePhotos, wornSet, anglesShownFirst } from "../src/data/angles";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
 import { resolveShowcase } from "../src/data/showcase";
@@ -84,7 +84,7 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
   await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   // "Every Angle": every photo and film, each with its text; the first ones when there are many, then "See N more".
-  const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
+  const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
   await expect(page.locator("[data-angle]"), id + " every angle").toHaveCount(anglesShownFirst(angles.length));
   await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > anglesShownFirst(angles.length) ? 1 : 0);
   for (const v of await page.locator("[data-angle] video").all()) {
@@ -367,12 +367,17 @@ for (const path of ["/process"]) {
 
 /* ---------- Logo, admin, forms ---------- */
 
-test("logo size in the navigation: the mark, and the name of the house beside it (23/11/2026)", async ({ page }, info) => {
+test("logo in the navigation: the logo as it was, and the name of the house again, large, in the bar (23/11/2026)", async ({ page }, info) => {
   await page.goto("/creations");
-  const [mark, name] = await page.locator('header a[aria-label="Berete Jewellers, home"] span:visible').evaluateAll((els) => els.map((el) => el.getBoundingClientRect()));
-  expect(Math.round(mark!.height)).toBe(info.project.name === "iphone" ? 40 : 44);
-  expect(name!.width).toBeGreaterThan(130);
-  expect(name!.left).toBeGreaterThan(mark!.right);
+  const logo = page.locator('header a[aria-label="Berete Jewellers, home"] span:visible');
+  expect(Math.round((await logo.boundingBox())!.height)).toBe(info.project.name === "iphone" ? 44 : 56);
+  const name = page.locator("header [data-wordmark] span");
+  await expect(name).toBeVisible();
+  expect((await name.boundingBox())!.width).toBeGreaterThan(info.project.name === "iphone" ? 160 : 300);
+  // Still there once the page has scrolled.
+  await page.evaluate(() => window.scrollTo(0, 2400));
+  await page.waitForTimeout(600);
+  await expect(name).toBeInViewport();
 });
 
 test("contact: call back request reaches the admin", async ({ page }) => {

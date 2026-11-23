@@ -22,6 +22,8 @@ export type PressArticle = {
 export const PRESS: PressArticle[] = [
   // Its place is kept, first; Yoni sends its link.
   { outlet: "BILD", title: "", date: "2025-09-24", url: null, lang: "de", pieces: [VFB] },
+  // Second (Yoni, 23/11/2026): its headline, day and link are awaited.
+  { outlet: "sport.de", title: "", date: "", url: null, lang: "de", pieces: [VFB] },
   {
     outlet: "Goal.com Deutschland",
     title: "Schon vor dem Pokalsieg in Auftrag gegeben! Spieler des VfB Stuttgart beschenken sich mit 30.000-Euro-Ringen selbst",

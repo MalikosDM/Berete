@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import PieceLens from "@/components/PieceLens";
 import JewelFx, { jewelSource } from "@/components/universe/JewelFx";
 import { cutoutLargest, cutoutSrcSet, type CutoutView } from "@/data/showcase";
 import type { JewelEffect } from "@/data/themes";
@@ -33,9 +34,25 @@ const AROUND = [
  * jewel: the effect of its universe on the piece itself (src/components/universe/JewelFx.tsx), on its main view. large: its
  * main view much larger (the whole box).
  */
-export default function Showcase({ slug, title, views, jewel = null, large = false }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean }) {
+/** A film of the piece turning, played while the piece is hovered (a touch on a phone): Dragon Ball (Yoni, 23/11/2026). */
+export type ShowcaseSpin = { video: string; poster: string; width: number; height: number };
+
+export default function Showcase({ slug, title, views, jewel = null, large = false, spin = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; spin?: ShowcaseSpin | null }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
+  // The film of the piece turning: it plays while the piece is hovered, stops when the pointer leaves (a touch on a phone).
+  const spinDesk = useRef<HTMLVideoElement>(null);
+  const spinPhone = useRef<HTMLVideoElement>(null);
+  const [spinning, setSpinning] = useState(false);
+  useEffect(() => {
+    for (const v of [spinDesk.current, spinPhone.current]) {
+      if (!v) continue;
+      if (spinning && v.offsetParent !== null) void v.play().catch(() => undefined);
+      else v.pause();
+    }
+  }, [spinning]);
+  const mainImage = useCallback(() => rootRef.current?.querySelector<HTMLImageElement>("[data-place='0'] img") ?? null, []);
+  const spinVideo = useCallback(() => spinDesk.current, []);
   const trackRef = useRef<HTMLDivElement>(null);
   // order[k]: the view in place k (place 0 is the middle).
   const [order, setOrder] = useState(() => views.map((_, i) => i));
@@ -129,15 +146,40 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
     />
   );
   // The jewel and the effect of its world on it, in one frame (isolated: the halo stays behind it).
-  const framed = (v: CutoutView, main: boolean, sizes: string) => (
-    <span className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
+  const framed = (v: CutoutView, main: boolean, sizes: string, phone = false) => (
+    <span className={"sv-float block h-full w-full" + (jewel || (main && spin) ? " relative isolate" : "")}>
       {img(v, main, sizes)}
+      {main && spin ? (
+        <video
+          ref={phone ? spinPhone : spinDesk}
+          data-showcase-spin
+          src={spin.video}
+          poster={spin.poster}
+          muted
+          loop
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="sv-spin"
+        />
+      ) : null}
       {jewel ? <JewelFx kind={jewel} /> : null}
     </span>
   );
 
   return (
-    <div ref={rootRef} data-showcase={multi ? "multi" : "single"} data-showcase-large={large ? "" : undefined} className="relative h-full w-full">
+    <div
+      ref={rootRef}
+      data-showcase={multi ? "multi" : "single"}
+      data-showcase-large={large ? "" : undefined}
+      data-spinning={spinning ? "" : undefined}
+      onPointerEnter={spin ? (e) => e.pointerType === "mouse" && setSpinning(true) : undefined}
+      onPointerLeave={spin ? (e) => e.pointerType === "mouse" && setSpinning(false) : undefined}
+      className="relative h-full w-full"
+    >
+      {/* The magnifying glass that follows the pointer over the jewel (computers). */}
+      <PieceLens root={rootRef} image={mainImage} full={cutoutLargest(slug, views[places[0] ?? 0]!)} video={spin ? spinVideo : undefined} />
       {/* Computer: the views in depth */}
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
         {places.map((viewIndex, place) => {
@@ -181,7 +223,14 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
         >
           {views.map((v, i) => (
             <div key={v.id} data-showcase-slide={i} className={"h-full w-full shrink-0 snap-center " + (multi ? "pb-12" : "")} style={{ "--i": i } as CSSProperties}>
-              {framed(v, i === 0, "92vw")}
+              {spin && i === 0 ? (
+                // A touch makes it turn, another one stops it.
+                <button type="button" onClick={() => setSpinning((s) => !s)} aria-pressed={spinning} aria-label={t.piece.spin} className="block h-full w-full">
+                  {framed(v, true, "92vw", true)}
+                </button>
+              ) : (
+                framed(v, i === 0, "92vw")
+              )}
             </div>
           ))}
         </div>

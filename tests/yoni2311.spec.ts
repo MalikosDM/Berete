@@ -20,22 +20,24 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   // No bubbles of stories, no film in the background, no universe of a capsule.
   await expect(page.locator("[data-stories-bar], [data-story-bubble]")).toHaveCount(0);
   await expect(page.locator(".universe")).toHaveCount(0);
-  await expect(page.locator("[data-home-hero] video, [data-scroll-video], canvas")).toHaveCount(0);
+  // (Since the second call of 23/11/2026: the pencil sketch that becomes the jewel comes first, moved by the scroll only.)
+  await expect(page.locator("[data-home-hero] video")).toHaveCount(0);
+  await expect(page.locator("[data-scroll-video]")).toHaveCount(1);
   // One sentence of who Berete is, the hook, two buttons.
   const hero = page.locator("[data-home-hero]");
   await expect(hero.locator("h1")).toHaveText("We don't begin with what has been done. We begin with what could be.");
   await expect(hero).toContainText("house of bespoke high jewellery");
   await expect(hero.locator('a[href="/contact"]')).toBeVisible();
   await expect(hero.locator('a[href="/creations"]')).toBeVisible();
-  // The Butterfly pendant cut out, alone on black, large.
+  // The Butterfly pendant on its chain, on the black bust, large.
   const jewel = hero.locator("[data-hero-piece] img");
-  await expect(jewel).toHaveAttribute("src", new RegExp("^/media/cutouts/michy-batshuayi-butterfly-pendant/p68-\\d+" + V + "webp$"));
+  await expect(jewel).toHaveAttribute("src", /^\/media\/hd\/michy-batshuayi-butterfly-chain\/p54(\.w\d+)?\.webp$/);
   await expect.poll(() => jewel.evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
   const box = (await jewel.boundingBox())!;
   expect(box.height).toBeGreaterThan(desktop(info.project.name) ? 450 : 300);
   await page.screenshot({ path: shotPath(info, "yoni2311-home") });
   // In this order: the innovation, the commissions, the selection, the press.
-  const order = await page.evaluate(() => ["[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
+  const order = await page.evaluate(() => ["[data-scroll-video]", "[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
   expect(order.every((y, i) => y >= 0 && (i === 0 || y > order[i - 1]!))).toBe(true);
   // The Dragon Ball: its sphere turns at a click (never by itself), its capsule.
   const inno = page.locator("[data-home-innovation]");
@@ -62,9 +64,10 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
 test("menu: the name of the house, the whole menu on a computer, the creations, the press", async ({ page }, info) => {
   await open(page, "/atelier");
   // BERETE JEWELLERS in the letters of the logo, beside the mark.
-  const wordmark = page.locator("[data-brand] span").nth(1);
+  // (Since the second call of 23/11/2026: the logo as it was, the name again, large, in the middle of the bar.)
+  const wordmark = page.locator("[data-wordmark] span");
   await expect(wordmark).toBeVisible();
-  expect((await wordmark.boundingBox())!.width).toBeGreaterThan(120);
+  expect((await wordmark.boundingBox())!.width).toBeGreaterThan(150);
   expect(await wordmark.evaluate((el) => getComputedStyle(el).maskImage || getComputedStyle(el).webkitMaskImage)).toMatch(new RegExp("wordmark" + V + "svg"));
   const nav = page.locator("[data-desktop-nav]");
   const burger = page.locator('button[aria-controls="mobile-menu"]');
@@ -187,7 +190,7 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   await expect(page.locator(".universe")).toHaveAttribute("data-universe", "noir");
   await expect(page.locator(".u-backdrop")).toHaveCount(0);
   await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase", "single");
-  await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p02");
+  await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p01");
   await page.screenshot({ path: shotPath(info, "yoni2311-ruby-t") });
   // Dragon Ball: the view with its chain alone and large; its back no longer first; the sphere higher on a phone.
   await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
@@ -202,7 +205,8 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   for (const slug of ["jamie-leweling-jl-pendant", "malik-tillman-tm-pendant", "marcus-thuram-thorned-t-pendant"]) {
     await open(page, "/pieces/" + slug);
     const src = await page.locator("[data-angle='1'] img").first().getAttribute("src");
-    expect(src).toMatch(new RegExp("^/media/extra/" + slug + "/studio" + V + "(w\\d+\\.)?webp$"));
+    // (JL in its real professional photos since the second call of 23/11/2026: its front view.)
+    expect(src).toMatch(new RegExp("^/media/extra/" + slug + "/" + (slug === "jamie-leweling-jl-pendant" ? "front" : "studio") + V + "(w\\d+\\.)?webp$"));
   }
 });
 

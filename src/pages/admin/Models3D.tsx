@@ -6,23 +6,39 @@ import { Jewel3D, type ViewerHandle } from "@/viewer";
 import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
 
 /*
- * Admin "3D": send a model of the jeweller (.3dm, .glb, .stl, up to 800 MB,
- * sent in pieces), follow its processing, put it on the page of a piece (one
- * model per piece), give each layer its role, choose the metals offered and
+ * Admin "3D": send a model of the jeweller (.3dm, .glb, .gltf, .obj, .stl, up to
+ * 800 MB, sent in pieces), follow its processing, put it on the page of a piece
+ * (one model per piece), give each layer its role, choose the metals offered and
  * the first view, share it with VIP clients or by a private link. In French,
- * for the owner.
+ * for the owner. A model with volumes missing (a .3dm saved without its render
+ * meshes) is "incomplete": a draft, shown here with a warning, never on the site.
  */
 
 type LayerInfo = { name: string; meshes: number; copies: number; triangles: number; size: [number, number, number]; guess: LayerRole; check: boolean };
 type StoneCount = { material: string; count: number; triangles: number; size: string; known: boolean; fused?: boolean };
-type Stats = { kind?: string; sourceTriangles?: number; pieces?: number; unaligned?: number; size?: [number, number, number]; stones?: StoneCount[]; stonesMissing?: boolean; seconds?: number; versions?: Record<"full" | "light", { bytes: number; triangles: number; drawn: number }> };
+/** What a .3dm held and the model does not show (server/models/pipeline/read.ts). */
+type Skipped = { noMesh: { breps: number; extrusions: number; subds: number; layers: string[] }; stray: { count: number; names: string[] }; hidden: number; drawings: number };
+type Stats = {
+  kind?: string;
+  sourceTriangles?: number;
+  pieces?: number;
+  unaligned?: number;
+  size?: [number, number, number];
+  stones?: StoneCount[];
+  stonesMissing?: boolean;
+  skipped?: Skipped;
+  /** Volumes missing from the model: more than 0, it is a draft. */
+  incomplete?: number;
+  seconds?: number;
+  versions?: Record<"full" | "light", { bytes: number; triangles: number; drawn: number }>;
+};
 type LinkRow = { id: string; token: string; title: string; expiresAt: string | null; hasPassword: boolean; createdAt: string };
 type ModelRow = {
   id: string;
   name: string;
   sourceName: string;
   sourceKind: string;
-  status: "queued" | "processing" | "ready" | "failed";
+  status: "queued" | "processing" | "ready" | "incomplete" | "failed";
   progress: number;
   step: string;
   error: string | null;
@@ -166,6 +182,42 @@ function StonesTable({ stats }: { stats: Stats }) {
   );
 }
 
+/** « 59 volumes de métal ignorés : … », for a .3dm saved without its render meshes. */
+function missingText(n: number): string {
+  return count(n) + (n > 1 ? " volumes de métal ignorés" : " volume de métal ignoré") + " : réenregistrer depuis Rhino avec les maillages de rendu, ou exporter en STL/OBJ/GLB";
+}
+
+/** An incomplete model: what is missing, and why it stays a draft. */
+function IncompleteWarning({ stats }: { stats: Stats }) {
+  return (
+    <div role="alert" className="grid gap-1 border border-rose-light/60 p-4 text-base" data-model-incomplete={stats.incomplete ?? 0}>
+      <p className="text-rose-light">{missingText(stats.incomplete ?? 0)}</p>
+      <p className="text-mist">Modèle incomplet, gardé comme brouillon : il ne peut aller ni sur une page du site, ni dans l'espace VIP, ni dans un lien privé.</p>
+    </div>
+  );
+}
+
+/** What the file held and the model leaves out: volumes without render mesh, reference pictures, hidden objects, curves. */
+function SkippedNotes({ stats }: { stats: Stats }) {
+  const s = stats.skipped;
+  if (!s) return null;
+  const missing = s.noMesh.breps + s.noMesh.extrusions + s.noMesh.subds;
+  const notes = [
+    missing > 0 ? "Volumes sans maillage de rendu : " + count(missing) + (s.noMesh.layers.length ? " (calques " + s.noMesh.layers.join(", ") + ")" : "") : "",
+    s.stray.count > 0 ? "Images de référence écartées (cadre plat avec une photo) : " + count(s.stray.count) : "",
+    s.hidden > 0 ? "Objets masqués dans Rhino, laissés de côté : " + count(s.hidden) : "",
+    s.drawings > 0 ? "Courbes, cotes et textes (jamais montrés) : " + count(s.drawings) : "",
+  ].filter(Boolean);
+  if (notes.length === 0) return null;
+  return (
+    <ul className="grid gap-1 text-base text-mist" data-skipped>
+      {notes.map((n) => (
+        <li key={n}>{n}</li>
+      ))}
+    </ul>
+  );
+}
+
 function Weights({ m }: { m: ModelRow }) {
   const v = m.stats.versions;
   return (
@@ -274,11 +326,11 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
     <div className="mt-8 grid gap-8" data-admin-3d>
       <div className="border border-white/15 p-5 sm:p-6">
         <h2 className="title-caps text-2xl tracking-[0.12em]">Envoyer un modèle 3D</h2>
-        <p className="mt-2 text-base text-mist">.3dm (le mieux), .glb ou .stl, jusqu'à 800 Mo.</p>
+        <p className="mt-2 text-base text-mist">.3dm (le mieux, enregistré avec les maillages de rendu), .glb, .gltf, .obj ou .stl, jusqu'à 800 Mo.</p>
         <label className={btnMain + " mt-4 cursor-pointer"}>
           {sending ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Upload className="size-4" aria-hidden="true" />}
           Choisir un fichier
-          <input type="file" accept=".3dm,.glb,.stl" onChange={onFile} className="sr-only" disabled={sending !== null} data-model-input />
+          <input type="file" accept=".3dm,.glb,.gltf,.obj,.stl" onChange={onFile} className="sr-only" disabled={sending !== null} data-model-input />
         </label>
         {sending ? (
           <div className="mt-4">
@@ -310,12 +362,14 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                       ) : (
                         <p className="mt-1 text-base text-rose-light">Pas encore sur le site</p>
                       )
+                    ) : m.status === "incomplete" ? (
+                      <p className="mt-1 text-base text-rose-light">Brouillon incomplet : pas sur le site</p>
                     ) : null}
                   </div>
                   <div className="flex gap-2">
-                    {m.status === "ready" ? (
+                    {m.status === "ready" || m.status === "incomplete" ? (
                       <button type="button" className={btn} onClick={() => setOpen(m.id)} data-open-model>
-                        Régler le modèle
+                        {m.status === "ready" ? "Régler le modèle" : "Voir le brouillon"}
                       </button>
                     ) : null}
                     <button type="button" aria-label="Supprimer le modèle" className={iconBtn} onClick={() => void remove(m)}>
@@ -332,6 +386,21 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                   </div>
                 ) : null}
                 {m.status === "failed" ? <p role="alert" className="text-base text-rose-light">Échec du traitement : {m.error}</p> : null}
+                {m.status === "incomplete" ? (
+                  <>
+                    <IncompleteWarning stats={m.stats} />
+                    <details className="group">
+                      <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-mist hover:text-white">
+                        <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" /> Détails techniques
+                      </summary>
+                      <div className="mt-2 grid gap-3">
+                        <p className="text-base text-mist">Fichier : {m.sourceName}</p>
+                        <SkippedNotes stats={m.stats} />
+                        <Weights m={m} />
+                      </div>
+                    </details>
+                  </>
+                ) : null}
                 {m.status === "ready" ? (
                   <>
                     <div className="grid gap-2 sm:max-w-md">
@@ -346,6 +415,7 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                       <div className="mt-2 grid gap-3">
                         <p className="text-base text-mist">Fichier : {m.sourceName}{m.links.length > 0 ? " · " + m.links.length + (m.links.length > 1 ? " liens privés" : " lien privé") : ""}</p>
                         <Weights m={m} />
+                        <SkippedNotes stats={m.stats} />
                         {!m.stats.stonesMissing ? <StonesTable stats={m.stats} /> : null}
                       </div>
                     </details>
@@ -438,6 +508,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
 
   if (!model || !settings) return <p className="mt-8 flex items-center gap-3 text-bone"><LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> Chargement</p>;
 
+  // An incomplete model (volumes missing): a draft, seen here only.
+  const draft = model.status === "incomplete";
   const setLayer = (layer: string, patch: Partial<LayerSetting>) => setSettings((s) => (s ? { ...s, layers: { ...s.layers, [layer]: { ...(s.layers[layer] ?? { role: "metal" }), ...patch } } } : s));
 
   const save = async (extra?: Partial<ModelSettings>) => {
@@ -446,7 +518,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
     setNote("");
     try {
       const next = { ...settings, ...extra };
-      await call(token, "PUT", "/api/admin/models/" + id, { name, settings: next, pieceSlug: pieceSlug || null });
+      // A draft never goes on a page of the site.
+      await call(token, "PUT", "/api/admin/models/" + id, { name, settings: next, pieceSlug: draft ? null : pieceSlug || null });
       setSettings(next);
       setNote("Enregistré.");
       await load();
@@ -473,14 +546,16 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         <ArrowLeft className="size-4" aria-hidden="true" /> Revenir aux modèles
       </button>
 
+      {draft ? <IncompleteWarning stats={model.stats} /> : null}
+
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block text-base text-bone">
           Nom du modèle
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} />
         </label>
         <div className="grid gap-2">
-          <PieceSelect value={pieceSlug} pieces={pieces} onChange={setPieceSlug} />
-          {model.pieceSlug ? (
+          {draft ? <p className="text-base text-bone">Page du site où il apparaît : aucune (brouillon incomplet)</p> : <PieceSelect value={pieceSlug} pieces={pieces} onChange={setPieceSlug} />}
+          {model.pieceSlug && !draft ? (
             <a href={"/pieces/" + model.pieceSlug} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center gap-2 text-base text-bone hover:text-rose-light">
               Voir la page <ArrowUpRight className="size-4" aria-hidden="true" />
             </a>
@@ -598,8 +673,12 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </div>
       </fieldset>
 
-      <ShareVip model={model} token={token} onError={fail} />
-      <Links model={model} token={token} onChange={() => void load()} onError={fail} />
+      {draft ? null : (
+        <>
+          <ShareVip model={model} token={token} onError={fail} />
+          <Links model={model} token={token} onChange={() => void load()} onError={fail} />
+        </>
+      )}
 
       <details className="group border border-white/15 p-4 sm:p-5">
         <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-lg text-white">
@@ -608,6 +687,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         <div className="mt-3 grid gap-4">
           <p className="text-base text-mist">Fichier : {model.sourceName}</p>
           <Weights m={model} />
+          <SkippedNotes stats={model.stats} />
           <StonesTable stats={model.stats} />
           <button type="button" onClick={() => void call(token, "POST", "/api/admin/models/" + id + "/reprocess").then(onClose, fail)} className={btn + " justify-self-start"}>
             <RefreshCw className="size-4" aria-hidden="true" /> Relancer l'optimisation

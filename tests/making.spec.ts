@@ -9,7 +9,7 @@
 // Screenshots go to verification/making/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
-import { AMATEUR_FILMS, anglePhotos } from "../src/data/angles";
+import { AMATEUR_FILMS, anglePhotos, wornSet } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { piecesOfCollection, SUBCATEGORIES } from "../src/data/collections";
 import { completeMakingOf, makingSteps } from "../src/data/making";
@@ -60,7 +60,7 @@ for (const slug of PAGES) {
     await shot(page, info.project.name + "-" + slug + "-1-apres-ouverture");
 
     // "Every Angle": the amateur films after everything else.
-    const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
+    const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
     const firstAmateur = photos.findIndex((m) => AMATEUR_FILMS.has(m.src));
     if (firstAmateur >= 0) expect(photos.slice(firstAmateur).every((m) => AMATEUR_FILMS.has(m.src)), "amateur films last").toBe(true);
     const more = page.locator("[data-angle-more]");
@@ -117,7 +117,7 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   await section.scrollIntoViewIfNeeded();
   const more = section.locator("[data-angle-more]");
   if (await more.count()) await more.click();
-  await expect(section.locator("[data-angle]")).toHaveCount(anglePhotos(piece, resolveShowcase(slug, piece.showcase).mode === "photo").length);
+  await expect(section.locator("[data-angle]")).toHaveCount(anglePhotos(piece, resolveShowcase(slug, piece.showcase).mode === "photo", wornSet(piece)).length);
   await expect(section.locator("[data-angle-text]")).toHaveCount(0);
   await shot(page, info.project.name + "-n14-2-angles");
   // Its atelier: the same film, once.

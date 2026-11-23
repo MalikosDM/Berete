@@ -7,6 +7,7 @@ import { collectionPath, subcategoryByOldSlug } from "../src/data/collections.js
 import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
 import { readCatalogue, syncCatalogue } from "./catalogue.js";
+import { imagine } from "./imagine.js";
 import { seedDemo } from "./models/demo.js";
 import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
@@ -29,6 +30,8 @@ app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact
 app.use("/api", models);
 app.use("/api", vip);
 app.use("/api", site);
+// « Imaginez votre création » (Private Enquiries): a first image of the idea of the visitor, made by OpenAI (server/imagine.ts).
+app.use("/api", imagine);
 app.use("/api", (_req, res) => {
   res.status(404).json({ error: "Not found" });
 });

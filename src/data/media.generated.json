@@ -4666,6 +4666,14 @@
     }
   },
   "players": {
+    "angelo-stiller": [
+      {
+        "type": "image",
+        "src": "/media/players/angelo-stiller.webp",
+        "width": 488,
+        "height": 610
+      }
+    ],
     "atakan-karazor": [
       {
         "type": "image",

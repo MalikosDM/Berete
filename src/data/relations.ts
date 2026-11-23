@@ -58,13 +58,11 @@ export function piecesOf(cat: Catalogue, personSlug: string): Piece[] {
 }
 
 /**
- * Where a click on a person leads (feedback of Yoni, 21/11/2026): straight to the capsule of the piece made for them, in
- * its universe, when they have one; else to their page (their pieces first, their stories discreet at the bottom). The
- * catalogue the visitors see (published pieces only).
+ * Where a click on a person leads (Yoni, 23/11/2026): always to their own page, /players/<slug>: their portrait, who they
+ * are, all their pieces, their photos and moments; from there the visitor enters the world of a piece.
  */
-export function personHref(cat: Catalogue, person: Person): string {
-  const pieces = piecesOf(cat, person.slug);
-  return pieces.length === 1 ? "/pieces/" + pieces[0]!.slug : "/players/" + person.slug;
+export function personHref(_cat: Catalogue, person: Person): string {
+  return "/players/" + person.slug;
 }
 
 export function peopleOf(cat: Catalogue, piece: Piece): Person[] {

@@ -1,7 +1,9 @@
 /*
  * The processing of the 3D models, one at a time, each in a child process
  * (worker.ts): its progress is written in the base, read by the admin. A job
- * cut by a restart of the server starts again.
+ * cut by a restart of the server starts again. A model with volumes missing
+ * (a .3dm saved without its render meshes) ends "incomplete": a draft the admin
+ * shows with a warning, never on a page of the site, in the VIP space or a link.
  */
 import { fork } from "node:child_process";
 import path from "node:path";
@@ -89,10 +91,13 @@ async function run(id: string): Promise<void> {
   }
   const fresh = await prisma.model3D.findUnique({ where: { id } });
   const settings = await mergeSettings((fresh?.settings ?? {}) as Partial<ModelSettings>, done);
+  const incomplete = (done.stats.incomplete ?? 0) > 0;
   await prisma.model3D.update({
     where: { id },
     data: {
-      status: "ready",
+      status: incomplete ? "incomplete" : "ready",
+      // Never left on the page of a piece.
+      ...(incomplete ? { pieceSlug: null } : {}),
       progress: 100,
       step: "",
       sizes: { original: storage.size(id, path.basename(original)), full: storage.size(id, "full.glb"), light: storage.size(id, "light.glb") },

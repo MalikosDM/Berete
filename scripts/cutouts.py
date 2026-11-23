@@ -18,7 +18,14 @@ subject lifting (scripts/cutout-mask.swift), a transparent image whose edges fol
   number: its outline also made convex from that fraction of its height down (its band open on a side).
 - floor: a jewel standing on a mirror (its reflection joined to it): everything below that line (a fraction of the
   height of the photo) goes.
-- A jewel that leaves the photo (a chain going up) fades out on that side instead of a sharp cut.
+- neutral: a white-metal jewel on skin (a watch on a wrist): kept where the photo is neutral and light (its diamonds and
+  steel), not where it is coloured (the skin) or dark (a sleeve, the background).
+- seed: [x, y] (fractions of the photo): only the part of the jewel at that point (or the nearest one) is kept (a watch
+  beside a chain and a bangle on the same cushion).
+- A jewel that leaves the photo (a chain going up) fades out on that side instead of a sharp cut; keep_edge: the cut kept
+  sharp instead (a pendant whose corner only touches the edge: a fade would dissolve half of it). fade: {side: fraction}:
+  a fade asked on a side, over that fraction of the jewel from its own edge (a chain whose ends go behind the neck of the
+  bust, blurred: they fade out instead of ending in ragged pieces).
 - Cropped on the jewel with a transparent margin of 5 % (none on a faded side).
 Prints one JSON line per job: size, faded sides, checks (touches the edge, haze).
 """
@@ -66,7 +73,7 @@ def fill_stones(alpha, img, s):
     return alpha
 
 
-def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None):
+def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None, neutral=False, seed=None, keep_edge=False, fade=None):
     img = cv2.cvtColor(cv2.imread(work, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
     h, w = img.shape[:2]
     m = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
@@ -79,10 +86,22 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
     bg_level = float(np.percentile(border.max(axis=1), 70))
     dark = bg_level < 0.14
 
-    if mode == "luma":
+    if neutral:
+        # A white-metal jewel on skin: neutral and light (diamonds, steel, a white dial), against the colour of the skin and
+        # the dark of a sleeve or a background. Its dark details (screws, numerals) are holes filled below (fill).
+        sat = (lum - img.min(axis=2)) / np.maximum(lum, 1e-3)
+        alpha = (1 - smoothstep(0.16, 0.32, sat)) * smoothstep(0.28, 0.45, lum)
+        # The skin behind the edges, from the nearby background (normalized convolution), for clean edge colours.
+        bgmask = (alpha < 0.03).astype(np.float32)
+        k = max(15, int(round(40 * s)) | 1)
+        num = cv2.GaussianBlur(img * bgmask[..., None], (0, 0), k)
+        den = cv2.GaussianBlur(bgmask, (0, 0), k)[..., None]
+        bg_color = num / np.maximum(den, 1e-4)
+    elif mode == "luma":
         # The jewel on a dark bust or velvet: its light only (the bust is darker than the metal), then its surfaces made
         # solid (the gaps between the stones of a pavé closed) so that the jewel is opaque, its edges still drawn by light.
-        t0 = max(0.17, bg_level + 0.08)
+        # level: the least light kept, when the border of the photo is not the background (a chain beside the jewel).
+        t0 = level if level is not None else max(0.17, bg_level + 0.08)
         alpha = smoothstep(t0, t0 + 0.26, lum)
         solid = cv2.morphologyEx((alpha > 0.35).astype(np.uint8), cv2.MORPH_CLOSE, disk(6 * s))
         core = cv2.erode(solid, disk(3 * s)).astype(np.float32)
@@ -122,6 +141,18 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         den = cv2.GaussianBlur(bgmask, (0, 0), k)[..., None]
         bg_color = num / np.maximum(den, 1e-4)
 
+    if seed is not None:
+        # Only the part at the seed (or the nearest part): the jewel, not what lies beside it in the photo.
+        solid = cv2.morphologyEx((alpha > 0.35).astype(np.uint8), cv2.MORPH_CLOSE, disk(5 * s))
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(solid, connectivity=8)
+        sx, sy = int(seed[0] * (w - 1)), int(seed[1] * (h - 1))
+        k = labels[sy, sx]
+        if k == 0 and n > 1:
+            ys, xs = np.nonzero(labels)
+            i = int(np.argmin((ys - sy) ** 2 + (xs - sx) ** 2))
+            k = labels[ys[i], xs[i]]
+        if k:
+            alpha = alpha * (cv2.dilate((labels == k).astype(np.uint8), disk(3 * s)) > 0)
     if stones:
         alpha = fill_stones(alpha, img, s)
     if fill:
@@ -193,7 +224,7 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
     band = max(2, int(round(3 * s)))
     touches = []
     for side, strip in (("top", alpha[:band]), ("bottom", alpha[-band:]), ("left", alpha[:, :band]), ("right", alpha[:, -band:])):
-        if (strip > 0.08).sum() > 3 * band:
+        if (strip > 0.08).sum() > 3 * band and not keep_edge:
             touches.append(side)
     ys, xs = np.nonzero(alpha > 0.02)
     if len(ys) == 0:
@@ -211,6 +242,16 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
             alpha = alpha * smoothstep(0, FADE * bw, xx - 0)
         else:
             alpha = alpha * smoothstep(0, FADE * bw, (w - 1) - xx)
+    # A fade asked on a side, from the edge of the jewel itself.
+    for side, f in (fade or {}).items():
+        if side == "top":
+            alpha = alpha * smoothstep(0, f * bh, yy - y0)
+        elif side == "bottom":
+            alpha = alpha * smoothstep(0, f * bh, y1 - yy)
+        elif side == "left":
+            alpha = alpha * smoothstep(0, f * bw, xx - x0)
+        elif side == "right":
+            alpha = alpha * smoothstep(0, f * bw, x1 - xx)
 
     # Cropped on the jewel, with its margin (none on a faded side).
     mg = int(round(MARGIN * max(bh, bw)))
@@ -238,7 +279,7 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
 def main():
     jobs = json.load(open(sys.argv[1]))
     for job in jobs:
-        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"))
+        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"), job.get("neutral", False), job.get("seed"), job.get("keepEdge", False), job.get("fade"))
         if out is not None:
             Image.fromarray((out * 255 + 0.5).astype(np.uint8), "RGBA").save(job["out"], compress_level=3)
         print(json.dumps({"out": job["out"], **report}), flush=True)

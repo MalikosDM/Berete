@@ -109,6 +109,7 @@ export const fr: Messages = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "Découvrir l’univers de la création",
     eyebrow: "Presse",
     title: "Sous les projecteurs",
     lead: "La maison dans la presse : les bagues de champion du VfB Stuttgart et de l’Inter Milan.",
@@ -134,7 +135,7 @@ export const fr: Messages = {
       rings: { name: "Bagues", intro: "Bien plus qu’un symbole de victoire. Un héritage immortalisé dans l’or et les diamants." },
       bracelets: { name: "Bracelets", intro: "Des bracelets réalisés sur mesure, maillon par maillon." },
       watches: { name: "Montres", intro: "Des montres serties de diamants, du boîtier au bracelet." },
-      "jesus-pieces": { name: "Jesus Pieces", intro: "Le visage du Christ, couronné d’épines ou de fleurs, et le Christ en croix : chaque Jesus piece sculptée en volume et sertie pierre par pierre." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Des rues de New York à Biggie qui l’a rendue légendaire, la Jesus piece est devenue l’un des symboles les plus reconnaissables de la culture. Nous ne changeons pas cette histoire, nous y ajoutons simplement notre part." },
     },
     eyebrow: "Le Portfolio",
     title: "Explorer les créations",
@@ -152,6 +153,7 @@ export const fr: Messages = {
   },
 
   home: {
+    sketchLabel: "Du premier croquis au bijou, au fil du défilement",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "Nous ne partons pas de ce qui a déjà été fait. Nous partons de ce qui pourrait être.",
     who: "Berete Jewellers est une maison de haute joaillerie sur mesure, basée à Dubaï : des pièces uniques, imaginées avec vous et créées à la main.",
@@ -228,6 +230,9 @@ export const fr: Messages = {
   },
 
   piece: {
+    spin: "Faire tourner la sphère",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "Porté par " + who : "Porté"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "face", profile: "profil", back: "dos", detail: "détail", worn: "portée" },
     showView: (view: string) => "Voir la vue " + view,
@@ -370,6 +375,8 @@ export const fr: Messages = {
   },
 
   boxes: {
+    heroLink: "Voir tous les écrins",
+    heroAlt: "L’écrin Dragon Ball fermé : son œuvre et la marque BRT sur sa face",
     hidePhotos: "Masquer les photos",
     eyebrow: "Une conception unique",
     title: "Écrins Signature",

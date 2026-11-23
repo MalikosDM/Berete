@@ -94,12 +94,15 @@ export default function Navbar() {
       {/* The frosted background sits in its own layer: a blur on the header itself would make it the frame of the
           mobile menu (position: fixed), which would then open with no height. */}
       <div aria-hidden="true" className={"absolute inset-0 -z-10 transition-[background-color,backdrop-filter] duration-500 " + (scrolled || open ? "bg-ink/80 backdrop-blur-xl" : "bg-transparent")} />
-      {/* The name of the house beside its mark, in the letters of the logo (Yoni, 23/11/2026), then the language, WhatsApp and,
-          on a phone or a tablet, the menu button. */}
-      <div className="mx-auto flex h-18 max-w-[1600px] items-center justify-between gap-4 px-5 sm:px-8 desk:h-16 desk:px-8 roomy:px-12">
-        <Link to="/" data-brand className="group flex min-h-12 items-center gap-2.5 sm:gap-3.5" aria-label={t.site.homeLabel}>
-          <Logo variant="mark" className="h-10 w-[3.375rem] shrink-0 desk:h-11 desk:w-[3.75rem]" />
-          <Logo variant="wordmark" className="h-[0.875rem] w-[8.9rem] shrink-0 sm:h-4 sm:w-[10.15rem] desk:h-[1.0625rem] desk:w-[10.8rem]" />
+      {/* The logo as it was, the BRT diamond with BERETE JEWELLERS under it, and the name of the house again, much larger, in
+          the middle of the bar, always in view while the page scrolls (Yoni, 23/11/2026: computer and iPhone); then the
+          language, WhatsApp and, on a phone or a tablet, the menu button. */}
+      <div className="mx-auto grid h-18 max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:gap-4 sm:px-8 desk:h-16 desk:px-8 roomy:px-12">
+        <Link to="/" data-brand className="group flex min-h-12 items-center" aria-label={t.site.homeLabel}>
+          <Logo className="h-11 w-[3.8rem] shrink-0 desk:h-14 desk:w-[4.875rem]" />
+        </Link>
+        <Link to="/" data-wordmark tabIndex={-1} aria-hidden="true" className="flex min-h-12 items-center justify-center">
+          <Logo variant="wordmark" position="center" className="aspect-[10.152] w-full max-w-[12.5rem] sm:max-w-[16rem] desk:max-w-[22rem]" />
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-3">

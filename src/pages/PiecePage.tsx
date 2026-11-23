@@ -13,7 +13,8 @@ import PieceCard from "@/components/PieceCard";
 import PieceFilm from "@/components/PieceFilm";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
-import Showcase from "@/components/Showcase";
+import Showcase, { type ShowcaseSpin } from "@/components/Showcase";
+import mechanisms from "@/data/mechanisms.generated.json" with { type: "json" };
 import JewelFx from "@/components/universe/JewelFx";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
@@ -22,7 +23,7 @@ import { defaultCatalogue } from "@/data/catalogue";
 import { collectionOf } from "@/data/collections";
 import { OLD_SEEN_LABEL, RENAMED_PIECES, SEEN_LABEL, SPECIAL_PROJECT, wornWith } from "@/data/pieces";
 import { findPiece, initials, mediaOfPiece, peopleOf, personHref, portraitOf, removedPieceTarget, similarPieces, storiesOf, storiesOfPiece } from "@/data/relations";
-import { anglePhotos } from "@/data/angles";
+import { anglePhotos, wornSet } from "@/data/angles";
 import { filmTime, resolveAtelier, resolveReveal } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
 import { pointsFor } from "@/data/details3d";
@@ -44,6 +45,16 @@ import { pressDate } from "@/pages/Press";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
+/**
+ * The film of a piece that turns while it is hovered (Yoni, 23/11/2026: the Spirit Bomb of the Dragon Ball pendant), from
+ * scripts/mechanism-media.mjs: one key per piece, its file replaced the day a better film arrives.
+ */
+const SPINS: Record<string, string> = { "kevin-schade-dragon-ball-pendant": "dragon-ball-spin" };
+function spinOf(slug: string): ShowcaseSpin | null {
+  const m = (mechanisms as Record<string, Partial<ShowcaseSpin>>)[SPINS[slug] ?? ""];
+  return m?.video && m.poster && m.width && m.height ? { video: m.video, poster: m.poster, width: m.width, height: m.height } : null;
+}
+
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
   const { slug = "" } = useParams();
@@ -59,6 +70,7 @@ export default function PiecePage() {
   // the page, and full screen with its sound at a click (src/components/PieceFilm.tsx).
   const reveal = piece ? resolveReveal(piece.slug, piece.atelier) : null;
   const [filmOpen, setFilmOpen] = useState(false);
+  const [wornOpen, setWornOpen] = useState<number | null>(null);
   if (!piece) {
     // A renamed piece leads to its new address; an unpublished one to its player, else to the creations.
     const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug);
@@ -72,11 +84,16 @@ export default function PiecePage() {
   const similar = similarPieces(cat, piece, 4);
   const seenIn = storiesOfPiece(cat, piece);
   const wa = waLink(t.whatsapp.piece(piece.title));
+  // Who wears it, when the house may name them (else simply "Worn").
+  const wornName = madeFor(cat, piece) === t.common.privateCollector ? null : madeFor(cat, piece);
   // The rows of the sheet by their English label (the page shows them translated): the row "Precious Materials" says what the photos show.
   const sheetRows = (raw.pieces.find((p) => p.slug === piece.slug)?.specs.map((s) => s.label) ?? []).map((l) => (l === OLD_SEEN_LABEL ? SEEN_LABEL : l));
   const seenRow = sheetRows.includes(SEEN_LABEL);
   // The championship rings of the special project: "Historic Commissions".
   const historic = SPECIAL_PROJECT.some((r) => r.slug === piece.slug);
+  // Its photos worn or held (judged on the English catalogue): out of "Every Angle", into "Worn by" with its handover.
+  const wornSrcs = wornSet(raw.pieces.find((p) => p.slug === piece.slug));
+  const worn = [...piece.handover, ...[piece.cover, ...piece.gallery].filter((m) => wornSrcs.has(m.src))].filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i);
   // Its press (Yoni, 23/11/2026): the articles of the page In the Spotlight that tell it, then those the admin gave it with
   // their link; an article without its link is not shown.
   const press: { outlet: string; title: string; url: string; image?: string | null; date?: string; lang?: string }[] = [
@@ -137,7 +154,7 @@ export default function PiecePage() {
               ) : null}
             </>
           ) : (
-            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} />
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} spin={spinOf(piece.slug)} />
           )}
         </div>
         {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the
@@ -187,7 +204,7 @@ export default function PiecePage() {
 
       <div id="piece-details" className="scroll-mt-32">
         {/* Every photo and film of the piece, each with its text (src/components/EveryAngle.tsx). */}
-        <EveryAngle piece={piece} items={anglePhotos(piece, opening.mode === "photo")} />
+        <EveryAngle piece={piece} items={anglePhotos(piece, opening.mode === "photo", wornSrcs)} />
         {reveal ? <FilmSection title={piece.title} poster={reveal.poster} onPlay={() => setFilmOpen(true)} /> : null}
         {atelier ? <AtelierPassage piece={piece} madeFor={madeFor(cat, piece)} atelier={atelier} /> : null}
         {piece.details.length > 0 ? <DetailsSection piece={piece} model={model} /> : null}
@@ -203,7 +220,7 @@ export default function PiecePage() {
                 const portrait = portraitOf(cat, person);
                 const stories = storiesOf(cat, person.slug);
                 // Their other piece, when they have one other than this one; else their page (21/11/2026).
-                const href = personHref(cat, person) === "/pieces/" + piece.slug ? "/players/" + person.slug : personHref(cat, person);
+                const href = personHref(cat, person);
                 // A club with its official logo (src/lib/clubs.ts): the logo, in the light of the universe of the piece.
                 const logo = person.kind === "club" ? clubLogo(person.slug) : null;
                 return (
@@ -275,26 +292,26 @@ export default function PiecePage() {
 
       <MakingSection piece={piece} boxImage={box?.images[0]} madeFor={madeFor(cat, piece)} />
 
-      {piece.handover.length > 0 ? (
-        <section aria-labelledby="handover-title" className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
-          <p className="eyebrow">{t.piece.delivered}</p>
-          <h2 id="handover-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
-            {piece.clientPublic && piece.client ? t.piece.handedOverTo(piece.client) : t.piece.handover}
+      {/* "Worn by" (Yoni, 23/11/2026): the same block on every piece that has photos worn, held or handed over. */}
+      {worn.length > 0 ? (
+        <section aria-labelledby="handover-title" data-worn-by className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+          <h2 id="handover-title" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
+            {t.piece.wornBy(wornName)}
           </h2>
-          <ul className={"mt-12 grid gap-8 " + (piece.handover.length > 1 ? "md:grid-cols-2 xl:grid-cols-3" : "")}>
-            {piece.handover.map((m) => (
+          <ul className={"mt-12 grid gap-6 sm:gap-8 " + (worn.length > 1 ? "grid-cols-2 xl:grid-cols-3" : "max-w-xl")}>
+            {worn.map((m, i) => (
               <li key={m.src}>
                 <Reveal>
-                  <figure>
+                  <button type="button" onClick={() => setWornOpen(i)} className="group block w-full cursor-zoom-in text-start" aria-label={t.gallery.open(m.alt ?? piece.title)}>
                     <span className="block aspect-[4/5] overflow-hidden bg-ink-soft">
-                      <MediaView item={m} fit="cover" sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw" />
+                      <MediaView item={m} fit="cover" sizes="(max-width: 1279px) 46vw, 30vw" className="transition-transform duration-[1.2s] group-hover:scale-[1.03]" />
                     </span>
-                    {m.caption ? <figcaption className="mt-4 text-base text-bone">{m.caption}</figcaption> : null}
-                  </figure>
+                  </button>
                 </Reveal>
               </li>
             ))}
           </ul>
+          {wornOpen !== null ? createPortal(<Lightbox items={worn.map((m) => ({ ...m, caption: undefined }))} index={wornOpen} onIndex={setWornOpen} onClose={() => setWornOpen(null)} />, document.body) : null}
         </section>
       ) : null}
 

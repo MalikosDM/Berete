@@ -2,7 +2,8 @@
 /*
  * Checks the 3D viewer end to end and writes verification/3d/ (npm run verify:3d):
  *   - sends the jeweller's files through the admin (the .glb test model through the page
- *     itself, the STL through the same API), waits for their processing;
+ *     itself, the STL through the same API), waits for their processing; also a .3dm and an
+ *     .obj made here, and a .3dm saved without its render meshes (it must stay a draft);
  *   - opens each model in a private link, on a computer (1440 px) and an iPhone (390 px),
  *     with the GPU (Chromium, ANGLE Metal): load time, images per second while turning
  *     (the phone with a processor slowed down 4 times), images of the default view, the
@@ -46,6 +47,8 @@ const password = fs.readFileSync(".env", "utf8").match(/ADMIN_PASSWORD="?([^"\n]
 const errors = [];
 const results = {};
 let rhinoCheck;
+let incompleteCheck;
+let objCheck;
 
 async function api(method, url, body, token) {
   const res = await fetch(BASE + url, { method, headers: { ...(token ? { Authorization: "Bearer " + token } : {}), ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
@@ -75,13 +78,13 @@ async function upload(file) {
   const sent = Date.now();
   const { id } = await api("POST", "/api/admin/models/uploads/" + start.uploadId + "/complete", { name, size }, token);
   const m = await waitReady(id, t0, sent);
-  return m.status === "ready" ? { ...(await markAsTest(m)), uploadSeconds: m.uploadSeconds, processSeconds: m.processSeconds } : m;
+  return m.status === "ready" || m.status === "incomplete" ? { ...(await markAsTest(m)), uploadSeconds: m.uploadSeconds, processSeconds: m.processSeconds } : m;
 }
 
 async function waitReady(id, t0 = Date.now(), sent = Date.now()) {
   for (;;) {
     const m = await api("GET", "/api/admin/models/" + id, undefined, token);
-    if (m.status === "ready" || m.status === "failed") return { ...m, uploadSeconds: (sent - t0) / 1000, processSeconds: (Date.now() - sent) / 1000 };
+    if (m.status === "ready" || m.status === "incomplete" || m.status === "failed") return { ...m, uploadSeconds: (sent - t0) / 1000, processSeconds: (Date.now() - sent) / 1000 };
     await new Promise((r) => setTimeout(r, 400));
   }
 }
@@ -432,6 +435,55 @@ if (models["ZR0982-BJ001.stl"] && models["0542.stl"]) {
   const gems = m.layers.find((l) => l.name === "Diamonds");
   rhinoCheck = ["Import .3dm (fichier Rhino fabriqué pour le test) : calques « Metal 18K » → " + metal?.guess + ", « Diamonds » → " + gems?.guess + ", " + m.stats.pieces + " morceaux lus (la pièce de métal et 20 pierres : un bloc posé 12 fois et 8 copies tournées)", metal?.guess === "metal" && gems?.guess === "diamond" && m.stats.pieces === 21];
   fs.rmSync(file, { force: true });
+
+  // Saved without the render mesh of a polysurface (as ZP0975, sent by Yoni on 23/11), with a reference picture: the
+  // volume it lacks is counted, the picture left out, and the model stays a draft (refused on a page and in a link).
+  const draft = new rhino.File3dm();
+  draft.settings().modelUnitSystem = rhino.UnitSystem.Millimeters;
+  const draftLayer = new rhino.Layer();
+  draftLayer.name = "Metal 18K";
+  const da = new rhino.ObjectAttributes();
+  da.layerIndex = draft.layers().add(draftLayer);
+  draft.objects().add(box, da);
+  draft.objects().add(rhino.Brep.createFromSphere(new rhino.Sphere([0, 0, 6], 2)), da);
+  const picture = new rhino.Mesh();
+  for (const [x, y, z] of [[-30, -30, 0], [30, -30, 0], [30, 30, 0], [-30, 30, 0]]) picture.vertices().add(x, y, z);
+  picture.faces().addQuadFace(0, 1, 2, 3);
+  const pa = new rhino.ObjectAttributes();
+  pa.layerIndex = da.layerIndex;
+  pa.name = "reference.jpg";
+  draft.objects().add(picture, pa);
+  const draftFile = path.join(os.tmpdir(), "berete-test-incomplete.3dm");
+  fs.writeFileSync(draftFile, draft.toByteArray());
+  const d = await upload(draftFile);
+  const refused = async (call) => call().then(() => false, (e) => String(e.message).includes("→ 409"));
+  const noPiece = d.status === "incomplete" && (await refused(() => api("PUT", "/api/admin/pieces/verification-3d/model", { modelId: d.id }, token)));
+  const noLink = d.status === "incomplete" && (await refused(() => link(d.id)));
+  const missing = d.stats?.incomplete ?? 0;
+  const pictures = d.stats?.skipped?.stray?.count ?? 0;
+  incompleteCheck = ["Import .3dm sans maillages de rendu : état « " + d.status + " », " + missing + " volume ignoré (1 attendu), " + pictures + " image de référence écartée (1 attendue), refusé sur une page : " + (noPiece ? "oui" : "non") + ", refusé dans un lien : " + (noLink ? "oui" : "non"), d.status === "incomplete" && missing === 1 && pictures === 1 && noPiece && noLink];
+  fs.rmSync(draftFile, { force: true });
+}
+
+// An OBJ made here: a gold bar and 20 small stones, one material each (the layers of an OBJ).
+{
+  const lines = ["o bar", "usemtl Gold 18K"];
+  let n = 0;
+  const v = (x, y, z) => (lines.push("v " + x + " " + y + " " + z), ++n);
+  const bar = [[-10, 0, -2], [10, 0, -2], [10, 0, 2], [-10, 0, 2], [-10, 3, -2], [10, 3, -2], [10, 3, 2], [-10, 3, 2]].map(([x, y, z]) => v(x, y, z));
+  for (const f of [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]]) lines.push("f " + f.map((i) => bar[i]).join(" "));
+  lines.push("o stones", "usemtl Diamonds");
+  for (let s = 0; s < 20; s++) {
+    for (const [x, y, z] of [[0, 0.6, 0], [0.5, 0, 0], [0, 0, 0.5], [-0.5, 0, 0], [0, 0, -0.5], [0, -0.4, 0]]) v((-9 + s * 0.95 + x).toFixed(4), (3.4 + y).toFixed(4), z);
+    for (const f of [[0, 2, 1], [0, 3, 2], [0, 4, 3], [0, 1, 4], [5, 1, 2], [5, 2, 3], [5, 3, 4], [5, 4, 1]]) lines.push("f " + f.map((i) => i - 6).join(" "));
+  }
+  const file = path.join(os.tmpdir(), "berete-test.obj");
+  fs.writeFileSync(file, lines.join("\n") + "\n");
+  const m = await upload(file);
+  const gold = m.layers?.find((l) => l.name === "Gold 18K");
+  const gems = m.layers?.find((l) => l.name === "Diamonds");
+  objCheck = ["Import .obj (fichier fabriqué pour le test) : « Gold 18K » → " + gold?.guess + ", « Diamonds » → " + gems?.guess + " (" + (gems?.copies ?? 0) + " pierres, 20 attendues)", m.status === "ready" && gold?.guess === "metal" && gems?.guess === "diamond" && gems?.copies === 20];
+  fs.rmSync(file, { force: true });
 }
 
 /* ---------- 2. Each model, computer and iPhone ---------- */
@@ -459,7 +511,7 @@ for (const [name, model] of Object.entries(models)) {
 
 /* ---------- 3. Links, piece page ---------- */
 
-const checks = [rhinoCheck, mirrorCheck, ...(shapeCheck ? [shapeCheck] : []), ...(fusedCheck ? [fusedCheck] : [])];
+const checks = [rhinoCheck, incompleteCheck, objCheck, mirrorCheck, ...(shapeCheck ? [shapeCheck] : []), ...(fusedCheck ? [fusedCheck] : [])];
 // The demonstration model was made before the pipeline turned copies seen in a mirror over: the viewer does it when
 // it loads (665 small diamonds and 55 large stones that showed an empty setting).
 {

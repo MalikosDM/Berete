@@ -8,7 +8,7 @@
 // Screenshots go to verification/angles/.
 import { mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Locator, type Page } from "./fixtures";
-import { anglePhotos, anglesShownFirst, DEFAULT_ANGLES } from "../src/data/angles";
+import { anglePhotos, wornSet, anglesShownFirst, DEFAULT_ANGLES } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { REMOVED_PIECES } from "../src/data/pieces";
 import { publicCatalogue } from "../src/data/relations";
@@ -27,7 +27,7 @@ const JESUS_PIECES = ["samuel-ballet-jesus-piece", "crown-of-thorns-jesus-piece"
 const PUBLISHED = publicCatalogue(defaultCatalogue).pieces;
 const photosOf = (slug: string) => {
   const piece = PUBLISHED.find((p) => p.slug === slug)!;
-  return anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
+  return anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
 };
 
 /** The contrast of two colours (WCAG). */
@@ -65,8 +65,9 @@ test("every photo of every piece is listed; no text; a few short captions, trans
   let count = 0;
   let captions = 0;
   for (const piece of PUBLISHED) {
-    const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo");
-    expect(photos.length, piece.slug + " has photos").toBeGreaterThan(0);
+    const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
+    // (A piece whose only photos are worn or held shows them in "Worn by", 23/11/2026.)
+    expect(photos.length + wornSet(piece).size, piece.slug + " has photos").toBeGreaterThan(0);
     const told = [piece.title, piece.line, piece.story, ...piece.details.flatMap((d) => [d.title, d.text]), ...[piece.cover, ...piece.gallery].flatMap((m) => [m.alt ?? "", m.caption ?? ""])].join(" ");
     for (const m of photos) {
       const a = DEFAULT_ANGLES[piece.slug]?.[m.src];

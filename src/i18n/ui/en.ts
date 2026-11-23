@@ -105,6 +105,7 @@ export const en = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "Discover the world of the creation",
     eyebrow: "Press",
     title: "In the Spotlight",
     lead: "The house in the press: the championship rings of VfB Stuttgart and Inter Milan.",
@@ -131,7 +132,7 @@ export const en = {
       rings: { name: "Rings", intro: "More than a symbol of victory. A legacy immortalised in gold and diamonds." },
       bracelets: { name: "Bracelets", intro: "Bracelets made to measure, link by link." },
       watches: { name: "Watches", intro: "Watches set with diamonds from the case to the bracelet." },
-      "jesus-pieces": { name: "Jesus Pieces", intro: "The face of Christ, crowned with thorns or flowers, and Christ on the cross: each Jesus piece sculpted in volume and set stone by stone." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "From the streets of New York to Biggie making it legendary, the Jesus piece became one of the most recognizable symbols in the culture. We're not changing that story just adding our part to it." },
     },
     eyebrow: "The Portfolio",
     title: "Explore the Creations",
@@ -150,6 +151,7 @@ export const en = {
   },
 
   home: {
+    sketchLabel: "From the first sketch to the jewel, played by scrolling",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "We don't begin with what has been done. We begin with what could be.",
     who: "Berete Jewellers is a house of bespoke high jewellery, based in Dubai: one-of-one pieces, designed with you and crafted by hand.",
@@ -228,6 +230,9 @@ export const en = {
   },
 
   piece: {
+    spin: "Make the sphere turn",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "Worn by " + who : "Worn"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "front", profile: "profile", back: "back", detail: "detail", worn: "worn" },
     showView: (view: string) => "Show the " + view + " view",
@@ -378,6 +383,8 @@ export const en = {
   },
 
   boxes: {
+    heroLink: "See all the trunks",
+    heroAlt: "The Dragon Ball trunk, closed: its artwork and the BRT mark on its face",
     hidePhotos: "Hide the photos",
     eyebrow: "Individually Crafted",
     title: "Signature Trunks",

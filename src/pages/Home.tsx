@@ -4,7 +4,10 @@ import ContactBlock from "@/components/ContactBlock";
 import { MediaView } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
+import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
+import { media } from "@/data/catalogue";
 import mechanisms from "@/data/mechanisms.generated.json" with { type: "json" };
+import { yoni } from "@/data/sources";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import { publishedPress } from "@/data/press";
 import { CUTOUTS, cutoutSrc, cutoutSrcSet, type CutoutView } from "@/data/showcase";
@@ -21,6 +24,12 @@ import { useCatalogue } from "@/lib/catalogue";
 
 /** The piece of the opening: the Butterfly pendant, cut out of its photo, alone on black (without its purple forest). */
 const HERO_PIECE = "michy-batshuayi-butterfly-pendant";
+/**
+ * Its photo (Yoni, 23/11/2026): the pendant on its chain, on the black bust ("chain", by default); "wing", the close-up of a
+ * wing, may take its place at the top of the page one day.
+ */
+const HERO_PHOTOS = { chain: ["michy-batshuayi-butterfly-chain", "p54"], wing: ["michy-batshuayi-butterfly-chain", "p75"] } as const;
+const HERO_PHOTO: keyof typeof HERO_PHOTOS = "chain";
 /** The innovation: the Dragon Ball pendant and its Spirit Bomb that turns. */
 const INNOVATION = "kevin-schade-dragon-ball-pendant";
 /** A balanced selection (not only football): two pendants, two chains, two rings, in turn. */
@@ -55,7 +64,8 @@ function Hero() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const piece = cat.pieces.find((p) => p.slug === HERO_PIECE);
-  const view = faceOf(HERO_PIECE);
+  const [dir, file] = HERO_PHOTOS[HERO_PHOTO];
+  const photo = yoni(dir, file, { alt: piece?.title ?? "" });
   return (
     <section aria-labelledby="home-title" data-home-hero className="relative isolate overflow-hidden bg-[#050505]">
       {/* The light: a soft warm glow behind the piece, a touch of rose gold, the edges in deep black. */}
@@ -63,9 +73,9 @@ function Hero() {
       <div className="mx-auto grid min-h-svh max-w-[1600px] items-center gap-6 px-5 pt-24 pb-14 sm:px-8 desk:pt-32 lg:grid-cols-12 lg:gap-10 lg:px-12 lg:pb-16">
         {/* The piece: the top of the screen on a phone, the right on a computer. */}
         <div className="relative h-[46svh] min-h-64 lg:order-2 lg:col-span-6 lg:h-[76svh] xl:col-span-7">
-          {piece && view ? (
-            <Link to={"/pieces/" + piece.slug} data-hero-piece={piece.slug} className="home-hero-piece block h-full w-full" aria-label={t.common.enterWorld + " · " + piece.title}>
-              <Cutout slug={piece.slug} view={view} alt={piece.title} sizes="(max-width: 1023px) 80vw, 50vw" priority className="drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)]" />
+          {piece && photo ? (
+            <Link to={"/pieces/" + piece.slug} data-hero-piece={piece.slug} data-hero-photo={HERO_PHOTO} className="home-hero-piece block h-full w-full" aria-label={t.common.enterWorld + " · " + piece.title}>
+              <MediaView item={photo} alt={piece.title} fit="contain" priority sizes="(max-width: 1023px) 92vw, 55vw" />
             </Link>
           ) : piece ? (
             <MediaView item={piece.cover} alt={piece.title} fit="contain" priority sizes="(max-width: 1023px) 80vw, 50vw" />
@@ -284,9 +294,40 @@ function PressBand() {
   );
 }
 
+/**
+ * The very first thing seen (Yoni, 23/11/2026): the pencil sketch that becomes the jewel, the film of The Bespoke Journey,
+ * moved by the scroll only (never by itself), with the name of the house at its start and its signature at its end.
+ */
+function SketchToJewel() {
+  const { t } = useI18n();
+  const film = media.scroll.process;
+  if (!film) return null;
+  const steps: ScrollStep[] = [
+    {
+      from: 0,
+      to: 0.12,
+      align: "center",
+      content: (
+        <div data-sketch-intro className="mx-auto max-w-3xl text-center [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">
+          <p className="font-display text-base uppercase tracking-[0.28em] text-rose-light">{t.home.kicker}</p>
+          <p className="mt-6 text-base text-bone">{t.scroll.hint}</p>
+        </div>
+      ),
+    },
+    {
+      from: 0.82,
+      to: 1,
+      align: "center",
+      content: <p className="title-caps mx-auto max-w-4xl text-center text-[clamp(1.75rem,4.6vw,4rem)] tracking-[0.12em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">{t.site.tagline}</p>,
+    },
+  ];
+  return <ScrollVideo media={film} steps={steps} label={t.home.sketchLabel} heightVh={320} showProgress={false} />;
+}
+
 export default function Home() {
   return (
     <>
+      <SketchToJewel />
       <Hero />
       <Innovation />
       <Commissions />

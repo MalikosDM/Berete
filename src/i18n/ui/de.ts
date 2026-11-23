@@ -106,6 +106,7 @@ export const de: Messages = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "Die Welt der Kreation entdecken",
     eyebrow: "Presse",
     title: "Im Rampenlicht",
     lead: "Das Haus in der Presse: die Meisterringe des VfB Stuttgart und von Inter Mailand.",
@@ -131,7 +132,7 @@ export const de: Messages = {
       rings: { name: "Ringe", intro: "Mehr als ein Symbol des Sieges. Ein Vermächtnis, verewigt in Gold und Diamanten." },
       bracelets: { name: "Armbänder", intro: "Armbänder nach Maß, Glied für Glied gefertigt." },
       watches: { name: "Uhren", intro: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband." },
-      "jesus-pieces": { name: "Jesus Pieces", intro: "Das Antlitz Christi, mit Dornen oder Blumen gekrönt, und Christus am Kreuz: jedes Jesus Piece plastisch modelliert und Stein für Stein gefasst." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "Von den Straßen New Yorks bis zu Biggie, der es legendär machte, wurde das Jesus Piece zu einem der bekanntesten Symbole der Kultur. Wir ändern diese Geschichte nicht, wir fügen ihr nur unseren Teil hinzu." },
     },
     eyebrow: "Das Portfolio",
     title: "Die Kreationen entdecken",
@@ -149,6 +150,7 @@ export const de: Messages = {
   },
 
   home: {
+    sketchLabel: "Von der ersten Skizze zum Schmuckstück, beim Scrollen",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "Wir beginnen nicht mit dem, was schon gemacht wurde. Wir beginnen mit dem, was sein könnte.",
     who: "Berete Jewellers ist ein Haus für maßgefertigte Haute Joaillerie mit Sitz in Dubai: Einzelstücke, mit Ihnen entworfen und von Hand gefertigt.",
@@ -226,6 +228,9 @@ export const de: Messages = {
   },
 
   piece: {
+    spin: "Die Kugel drehen lassen",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "Getragen von " + who : "Getragen"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "Vorderseite", profile: "Profil", back: "Rückseite", detail: "Detail", worn: "getragen" },
     showView: (view: string) => "Ansicht anzeigen: " + view,
@@ -370,6 +375,8 @@ export const de: Messages = {
   },
 
   boxes: {
+    heroLink: "Alle Etuis ansehen",
+    heroAlt: "Das Dragon-Ball-Etui geschlossen: sein Kunstwerk und die BRT-Marke auf der Vorderseite",
     hidePhotos: "Fotos ausblenden",
     eyebrow: "Individuell gefertigt",
     title: "Signature-Etuis",

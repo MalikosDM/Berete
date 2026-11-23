@@ -15,6 +15,7 @@ import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
 import { resolveShowcase } from "@/data/showcase";
+import { extra } from "@/data/sources";
 import { trunkOf } from "@/data/trunks";
 import type { Box, MediaItem, Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
@@ -288,12 +289,25 @@ export function Boxes() {
   // The trunk of the house first, then in the order of the catalogue (src/data/pieces.ts, BOXES); a box added in the admin after them.
   const rank = (b: Box) => (b.slug === FEATURED_BOX ? -1 : BOX_ORDER.has(b.slug) ? BOX_ORDER.get(b.slug)! : BOX_ORDER.size + all.indexOf(b));
   const boxes = [...all].sort((a, b) => rank(a) - rank(b));
+  const heroTrunk = extra("boxes/hero", "dragon-ball-closed", { alt: t.boxes.heroAlt, onBlack: false });
 
   return (
     <div className="pb-24">
       <PageIntro eyebrow={t.boxes.eyebrow} title={t.boxes.title} lead={t.boxes.lead}>
         <CreateBox />
       </PageIntro>
+
+      {/* An example, large, first (Yoni, 23/11/2026): the Dragon Ball trunk as it is, its artwork and the BRT mark on its face. */}
+      {heroTrunk ? (
+        <section aria-label={heroTrunk.alt} data-boxes-hero className="mx-auto mb-20 max-w-[1600px] px-5 sm:px-8 lg:mb-28 lg:px-12">
+          <div className="relative overflow-hidden border border-white/10 bg-ink-soft">
+            <MediaView item={heroTrunk} fit="contain" priority sizes="(max-width: 1599px) 100vw, 1600px" className="max-h-[82svh] w-full" />
+          </div>
+          <a href="#box-dragon-ball-trunk" className="mt-4 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
+            {t.boxes.heroLink} <ArrowRight className="size-4 rotate-90" aria-hidden="true" />
+          </a>
+        </section>
+      ) : null}
 
       <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
         <h2 id="boxes-list-title" className="eyebrow">{t.boxes.listLabel}</h2>
@@ -303,6 +317,8 @@ export function Boxes() {
             const trunk = trunkOf(box.slug);
             return (
               <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="scroll-mt-36">
+                {/* The selection appears as the page scrolls. */}
+                <Reveal soft>
                 {trunk ? (
                   <TrunkReveal slug={box.slug} name={box.name} trunk={trunk} piece={pieceOf(box)} />
                 ) : (
@@ -311,6 +327,7 @@ export function Boxes() {
                 <h3 className="title-caps mt-5 text-2xl text-white md:text-3xl">{box.name}</h3>
                 {box.description ? <p className="mt-3 max-w-md text-base text-bone md:text-lg">{box.description}</p> : null}
                 <BoxPhotos box={box} piece={pieceOf(box)} />
+                </Reveal>
               </li>
             );
           })}

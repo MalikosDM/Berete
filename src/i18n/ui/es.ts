@@ -98,6 +98,7 @@ export const es: Messages = {
 
   /** In the Spotlight: the press (src/pages/Press.tsx, the band of the home page). */
   press: {
+    discover: "Descubrir el universo de la creación",
     eyebrow: "Prensa",
     title: "Bajo los focos",
     lead: "La casa en la prensa: los anillos de campeón del VfB Stuttgart y del Inter de Milán.",
@@ -123,7 +124,7 @@ export const es: Messages = {
       rings: { name: "Anillos", intro: "Mucho más que un símbolo de victoria. Un legado inmortalizado en oro y diamantes." },
       bracelets: { name: "Pulseras", intro: "Pulseras a medida, eslabón a eslabón." },
       watches: { name: "Relojes", intro: "Relojes engastados con diamantes, de la caja al brazalete." },
-      "jesus-pieces": { name: "Jesus Pieces", intro: "El rostro de Cristo, coronado de espinas o de flores, y Cristo en la cruz: cada Jesus piece esculpida en volumen y engastada piedra a piedra." },
+      "jesus-pieces": { name: "Jesus Pieces", intro: "De las calles de Nueva York a Biggie, que la hizo legendaria, la Jesus piece se convirtió en uno de los símbolos más reconocibles de la cultura. No cambiamos esa historia, solo le añadimos nuestra parte." },
     },
     eyebrow: "El Portfolio",
     title: "Explorar las creaciones",
@@ -141,6 +142,7 @@ export const es: Messages = {
   },
 
   home: {
+    sketchLabel: "Del primer boceto a la joya, al desplazarse",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "No partimos de lo que ya se ha hecho. Partimos de lo que podría ser.",
     who: "Berete Jewellers es una casa de alta joyería a medida, con sede en Dubái: piezas únicas, imaginadas con usted y creadas a mano.",
@@ -217,6 +219,9 @@ export const es: Messages = {
   },
 
   piece: {
+    spin: "Hacer girar la esfera",
+    /** "Worn by" (23/11/2026): the photos of the piece worn, held, handed over. */
+    wornBy: (who: string | null) => (who ? "Llevado por " + who : "Llevado"),
     /** The views of the showcase of a piece (src/components/Showcase.tsx). */
     views: { face: "frontal", profile: "de perfil", back: "trasera", detail: "de detalle", worn: "puesta" },
     showView: (view: string) => "Ver la vista " + view,
@@ -359,6 +364,8 @@ export const es: Messages = {
   },
 
   boxes: {
+    heroLink: "Ver todos los estuches",
+    heroAlt: "El estuche Dragon Ball cerrado: su obra y la marca BRT en su frente",
     hidePhotos: "Ocultar las fotos",
     eyebrow: "Concebidos uno a uno",
     title: "Estuches Signature",

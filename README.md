@@ -212,7 +212,7 @@ néerlandais (`/nl/...`) et arabe (`/ar/...`, lu de droite à gauche). Le menu d
 
 Remplace iJewel3D : les modèles du joaillier, montrés sur le site et par lien privé.
 
-- **Admin, onglet « Modèles 3D »** : envoyer un fichier `.3dm` (Rhino, le mieux : il garde les calques), `.glb` ou `.stl`,
+- **Admin, onglet « Modèles 3D »** : envoyer un fichier `.3dm` (Rhino, le mieux : il garde les calques), `.glb`, `.gltf` (en un seul fichier), `.obj` ou `.stl` (depuis le 23/11/2026 ; un `.3dm` dont des volumes de métal n'ont pas de maillage de rendu est gardé en brouillon « incomplet », jamais publié, avec l'avertissement « X volumes de métal ignorés : réenregistrer depuis Rhino avec les maillages de rendu, ou exporter en STL/OBJ/GLB »),
   jusqu'à 800 Mo (envoi par morceaux), suivre l'optimisation, choisir **la page du site où il apparaît** (menu de la
   liste, enregistré tout de suite), donner un rôle à chaque calque (Métal avec son métal par défaut, Diamant, Pierre de
   couleur avec sa couleur, Émail, Masquer ; « Voir seul » montre un calque), choisir les métaux proposés, la lumière, le

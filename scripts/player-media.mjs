@@ -11,13 +11,17 @@
  *         then checked by eye: the face in the upper third, the jersey below, never the head or the number cut.
  *
  * Not used: photos under 1000 px on their short side (Instagram copies), or blurry; but the photos Yoni chose himself
- * (19/11/2026: Kenan Yildiz, Marcus Thuram, Noah Okafor, Loïs Openda, Michy Batshuayi) come first, whatever their size. A person left out keeps the photo
+ * (19/11/2026: Kenan Yildiz, Marcus Thuram, Noah Okafor, Loïs Openda, Michy Batshuayi) come first, whatever their size, and
+ * so does the only photo of Angelo Stiller (23/11/2026: better than his initials). A person left out keeps the photo
  * from the stories (scripts/piece-media.mjs, PORTRAITS), else their initials:
- *   Angelo Stiller  only "- 01" (1080 x 720, a back view in the crowd around the cup): too small
  *   Sambi Lokonga   folder empty
  *   Noah Okafor     "- 01" (720 x 480) and "- 02" (1080 x 719): too small; "- 03" is used
  */
 export const PLAYERS = [
+  // His only photo (1080 x 720, 23/11/2026): his VfB jersey (6, his name on the back), turned towards the DFB-Pokal he
+  // holds, in the celebration; framed on him, the cup beside him, the teammate on his left out of the frame. Small
+  // (488 px), never enlarged.
+  { slug: "angelo-stiller", photos: [{ n: 1, crop: [0.199, 0.15, 0.4537, 0.85] }] },
   { slug: "atakan-karazor", photos: [{ n: 1, crop: [0.2044, 0, 0.6997, 0.7005] }] },
   { slug: "chris-fuehrich", photos: [{ n: 1, crop: [0.3604, 0.2017, 0.3868, 0.3626] }] },
   // Sharper than the story portrait, and in the jersey.

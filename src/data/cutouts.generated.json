@@ -59,8 +59,24 @@
   ],
   "michy-batshuayi-butterfly-pendant": [
    {
-    "id": "p68",
+    "id": "p54",
     "kind": "face",
+    "width": 1600,
+    "height": 2159,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "22488c5b79",
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
+    "note": ""
+   },
+   {
+    "id": "p68",
+    "kind": "detail",
     "width": 1600,
     "height": 1550,
     "widths": [
@@ -72,22 +88,6 @@
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 68.jpg",
-    "note": ""
-   },
-   {
-    "id": "p54",
-    "kind": "worn",
-    "width": 1600,
-    "height": 2159,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "version": "70dd574f9e",
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
     "note": ""
    }
   ],
@@ -1003,24 +1003,8 @@
   ],
   "sirius": [
    {
-    "id": "p27",
-    "kind": "face",
-    "width": 1600,
-    "height": 1802,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 27.jpg",
-    "note": "",
-    "version": "b9b81a52d4"
-   },
-   {
     "id": "p28",
-    "kind": "detail",
+    "kind": "face",
     "width": 1600,
     "height": 1205,
     "widths": [
@@ -1028,11 +1012,27 @@
      960,
      1600
     ],
+    "version": "312a700bed",
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 28.jpg",
-    "note": "",
-    "version": "737700fea4"
+    "note": ""
+   },
+   {
+    "id": "p27",
+    "kind": "worn",
+    "width": 1600,
+    "height": 1802,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "1a2e262e03",
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 27.jpg",
+    "note": ""
    },
    {
     "id": "p26",
@@ -1044,11 +1044,11 @@
      960,
      1600
     ],
+    "version": "6f14971063",
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 26.jpg",
-    "note": "",
-    "version": "fb67326139"
+    "note": ""
    }
   ],
   "ampersand-initials-pendant": [
@@ -1345,20 +1345,88 @@
   ],
   "jamie-leweling-jl-pendant": [
    {
-    "id": "studio",
+    "id": "front",
     "kind": "face",
     "width": 1600,
-    "height": 1692,
+    "height": 1528,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "c0f854acf2",
+    "version": "645bf6528c",
     "fade": null,
     "clean": true,
-    "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/jamie-leweling-jl-pendant-studio-ia.jpg",
+    "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.50.36.jpeg",
+    "note": "le coin gauche du J touche le bord de la photo (coupé net)"
+   },
+   {
+    "id": "left",
+    "kind": "profile",
+    "width": 1600,
+    "height": 1419,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "7afd29a44c",
+    "fade": null,
+    "clean": true,
+    "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.50.35.jpeg",
     "note": ""
+   }
+  ],
+  "campione-d-italia-pendant": [
+   {
+    "id": "black",
+    "kind": "face",
+    "width": 953,
+    "height": 1105,
+    "widths": [
+     480,
+     953
+    ],
+    "version": "852d36dc42",
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.43.30.jpeg",
+    "note": ""
+   }
+  ],
+  "tajon-buchanan-iced-watch": [
+   {
+    "id": "s02",
+    "kind": "face",
+    "width": 464,
+    "height": 653,
+    "widths": [
+     464
+    ],
+    "version": "09d6b3e19d",
+    "fade": null,
+    "clean": true,
+    "source": "Stories/25 Tajon Buchanan/25 Tajon Buchanan - 02.mp4 @ 6.75 s",
+    "note": "image d'un film de story (464 px de large)"
+   }
+  ],
+  "marcus-thuram-skeleton-watch": [
+   {
+    "id": "s01",
+    "kind": "face",
+    "width": 610,
+    "height": 801,
+    "widths": [
+     480,
+     610
+    ],
+    "version": "071f48f239",
+    "fade": null,
+    "clean": true,
+    "source": "Stories/29 Marcus Thuram/29 Marcus Thuram - 01.jpg",
+    "note": "photo de story (610 px) ; le haut du bracelet passe derrière le coussin : bord irrégulier en haut à droite"
    }
   ]
  }

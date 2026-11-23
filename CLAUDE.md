@@ -162,6 +162,47 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 23/11 (2) » (WhatsApp : vocal, 5 vidéos, 13 captures, 29 photos, 1 fichier 3D) + audit — état au 23/11/2026
+- [x] **Cercle** : un clic sur un joueur ou un club ouvre toujours `/players/<slug>` (`personHref`), partout (mur, clubs, « Créée pour »).
+- [x] **Profils sur un seul modèle** (`PlayerPage`, `src/pages/Players.tsx`) : grand portrait (initiales en grand sinon), nom, club,
+      numéro, présentation et Instagram seulement s'ils existent (plus de phrase générique), toutes ses pièces, ses photos et ses
+      stories (bouton). Ajoutés : portrait d'Angelo Stiller (`Photos joueurs en maillot/Angelo Stiller - 01.jpg`), numéro 16 de
+      Karazor (gravé sur sa bague), 9 de Thuram (texte du T-Serpent). Pendentif panthère relié à `keita-losene` (rien renommé).
+- [x] **En-tête** : le logo d'origine (losange BRT, BERETE JEWELLERS dessous) et, en plus, le nom en grand au centre de la barre,
+      toujours visible (`[data-wordmark]`).
+- [x] **Accueil** : d'abord le film croquis → bijou de The Bespoke Journey (piloté par le défilement), puis la photo du Butterfly
+      sur sa chaîne sur le buste noir (p54) ; le gros plan de l'aile (p75) est prêt (`HERO_PHOTO` de `src/pages/Home.tsx`).
+- [x] **Photos principales demandées** : Butterfly sur sa chaîne (vitrine, 1re photo, couverture), collier T entier (p01, en grand),
+      Sirius plaque seule (p28), maillot d'Okafor avec sa chaîne (p20), Inter de face (p08), VfB (p13), T-Serpent p08 en couverture.
+- [x] **Dragon Ball** : loupe qui suit la souris (`src/components/PieceLens.tsx`, détail tiré du fichier, jamais agrandi au-delà de
+      ses pixels ; sur toutes les pièces, ordinateur) ; au survol la pièce tourne (film `dragon-ball-spin`, story 03/12 en
+      720 × 1120 d'origine, aller-retour sans saut), elle s'arrête quand on sort ; au toucher sur iPhone. **Vidéo pro HD attendue** :
+      changer `DRAGON_BALL_SPIN_SOURCE` dans `scripts/mechanism-media.mjs`, puis `npm run mechanisms -- --only=dragon-ball-spin`.
+- [x] **Pendentif Inter** (`campione-d-italia-pendant`) : 2 photos WhatsApp (fond noir + porté), détourage, joueurs et univers de la
+      bague. Son fichier 3D ZP0975-BJ001.3dm n'est **pas publié** : 59 volumes de métal sans maillage de rendu (+ 2 images de
+      référence). L'admin le garde en brouillon « incomplet » avec l'avertissement ; formats acceptés : .3dm, .glb, .gltf, .obj, .stl.
+- [x] **JL** : les 7 vraies photos pro sur fond noir (vue de face en hero, détourage refait), l'image IA retirée.
+- [x] **Jesus Pieces** : texte de Yoni (« From the streets of New York to Biggie… »), 6 langues.
+- [x] **Presse** : la carte entière ouvre l'article (nouvel onglet), « Découvrir l'univers de la création » dessous. BILD et
+      sport.de réservés en tête, **cachés tant que leurs liens manquent** (jamais reçus).
+- [x] **Contact** : étape « Imaginez votre création » (`src/components/Imagine.tsx`, `server/imagine.ts`) : OpenAI Images
+      (`gpt-image-1`), clé `OPENAI_API_KEY` sur le serveur seulement (docker-compose, `.env.example`), 5 images / 10 min par
+      visiteur, 200 / jour en tout ; « Contacter la maison pour finaliser » remplit le formulaire (idée + image jointe). Cachée sur
+      Vercel et sans clé.
+- [x] **Écrins** : l'écrin Dragon Ball en grand en haut (`Ecrins v3/dragonball-closed.jpg`), la sélection apparaît au défilement ;
+      6 vraies photos de l'écrin Campione dans sa galerie. Vidéos des écrins non touchées.
+- [x] **La Maison** : 9 photos de Yoni dans les chapitres 4 à 12 (loupe, plateau de diamants, Inter et l'écrin Campione, la tête dans
+      les mains avec 4 bagues) ; chapitres 1 à 3 : croquis et atelier. 09.34.58 jamais publiée.
+- [x] **Pièces sur un modèle** : « Sous tous les angles » = la pièce seule ; les photos portées, en main, essayées vont dans
+      **« Porté par »** (même bloc partout, avec la remise ; `isWorn`/`wornSet` de `src/data/angles.ts`). Montres de Tajon et Thuram
+      détourées ; montre de Radja et chaîne torsadée : pas de détourage propre possible (photos en main), elles gardent leur photo.
+- [x] Construction locale sans recopier les photos (Mac plein) : `BERETE_LINK_PUBLIC=1 SITE_URL=http://localhost:3001 npm run build`
+      puis `node scripts/link-public.mjs`.
+- `tests/yoni2311b.spec.ts` (ordinateur et iPhone, anglais et français), captures `verification/<appareil>/yoni2311b-*.jpg`.
+- [ ] Yoni / Malik : liens BILD et sport.de ; clé OpenAI pour le VPS ; vidéo pro HD de la sphère ; photos studio de la chaîne
+      torsadée et des 3 montres ; le bon nom du combattant (Lasana Keita ou Keita Losene) ; présentations, clubs, numéros et
+      Instagram des joueurs ; .3dm du pendentif Inter réenregistré avec ses maillages (ou STL/OBJ/GLB).
+
 ## Passe « retours de Yoni des appels du 22-23/11 » (accueil calme, menu, capsules, presse…) — état au 23/11/2026
 - [x] **Accueil refait** (`src/pages/Home.tsx`) : plus de bulles de stories (supprimées partout, aussi sur les pages des joueurs ;
       `StoriesBar` supprimé), plus de film de fond ni de défilé de pièces, aucun univers de capsule. Noir profond, lumière douce

@@ -1,11 +1,4 @@
 {
- "jamie-leweling-jl-pendant": {
-  "studio": {
-   "src": "/media/extra/jamie-leweling-jl-pendant/studio.e03e8f4273.webp",
-   "width": 1289,
-   "height": 1600
-  }
- },
  "malik-tillman-tm-pendant": {
   "studio": {
    "src": "/media/extra/malik-tillman-tm-pendant/studio.bce5024630.webp",
@@ -17,6 +10,53 @@
   "studio": {
    "src": "/media/extra/marcus-thuram-thorned-t-pendant/studio.b18a7847b8.webp",
    "width": 1289,
+   "height": 1600
+  }
+ },
+ "jamie-leweling-jl-pendant": {
+  "front": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/front.cad057f04e.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "left": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/left.cad057f04e.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "right": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/right.cad057f04e.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "bail": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/bail.cad057f04e.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "baguettes": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/baguettes.cad057f04e.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "foot": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/foot.cad057f04e.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "back": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/back.cad057f04e.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "velvet": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/velvet.cad057f04e.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "velvet-detail": {
+   "src": "/media/extra/jamie-leweling-jl-pendant/velvet-detail.cad057f04e.webp",
+   "width": 1067,
    "height": 1600
   }
  },
@@ -104,6 +144,109 @@
   "b04489": {
    "src": "/media/extra/bosnia-and-herzegovina-world-cup-2026-ring/b04489.83cd1c1daf.webp",
    "width": 1280,
+   "height": 1600
+  }
+ },
+ "campione-d-italia-pendant": {
+  "black": {
+   "src": "/media/extra/campione-d-italia-pendant/black.6ee0e75501.webp",
+   "width": 900,
+   "height": 1125
+  },
+  "worn": {
+   "src": "/media/extra/campione-d-italia-pendant/worn.6ee0e75501.webp",
+   "width": 900,
+   "height": 1600
+  }
+ },
+ "boxes/campione-d-italia-case": {
+  "p1": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p1.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "p2": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p2.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "p3": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p3.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "p4": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p4.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "p5": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p5.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "p6": {
+   "src": "/media/extra/boxes/campione-d-italia-case/p6.6b31c6ab6b.webp",
+   "width": 900,
+   "height": 1600
+  }
+ },
+ "house": {
+  "desk-smile": {
+   "src": "/media/extra/house/desk-smile.268a69dba8.webp",
+   "width": 1440,
+   "height": 1440
+  },
+  "loupe": {
+   "src": "/media/extra/house/loupe.268a69dba8.webp",
+   "width": 1600,
+   "height": 1068
+  },
+  "desk-tray": {
+   "src": "/media/extra/house/desk-tray.268a69dba8.webp",
+   "width": 1600,
+   "height": 1531
+  },
+  "desk-smile-wide": {
+   "src": "/media/extra/house/desk-smile-wide.268a69dba8.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "desk-scale": {
+   "src": "/media/extra/house/desk-scale.268a69dba8.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "desk-pointing": {
+   "src": "/media/extra/house/desk-pointing.268a69dba8.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "inter-case-open": {
+   "src": "/media/extra/house/inter-case-open.268a69dba8.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "inter-case-closed": {
+   "src": "/media/extra/house/inter-case-closed.268a69dba8.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "inter-ring": {
+   "src": "/media/extra/house/inter-ring.268a69dba8.webp",
+   "width": 1280,
+   "height": 1600
+  },
+  "inter-rings": {
+   "src": "/media/extra/house/inter-rings.268a69dba8.webp",
+   "width": 900,
+   "height": 1600
+  }
+ },
+ "boxes/hero": {
+  "dragon-ball-closed": {
+   "src": "/media/extra/boxes/hero/dragon-ball-closed.e1e93421d7.webp",
+   "width": 1600,
    "height": 1600
   }
  }

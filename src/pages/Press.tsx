@@ -12,40 +12,43 @@ export function pressDate(date: string, intl: string): string {
   return new Intl.DateTimeFormat(intl, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(date + "T12:00:00Z"));
 }
 
-/** One article: the newspaper, its headline (in its own language), its day, its link, and the piece it tells. */
+/**
+ * One article (Yoni, 23/11/2026): the whole card opens the article in a new tab (the newspaper, its headline in its own
+ * language, its day); under the card, a discreet way to the world of the piece it tells.
+ */
 export function PressCard({ article, withPiece = true }: { article: PublishedArticle; withPiece?: boolean }) {
   const { t, intl } = useI18n();
   const cat = useCatalogue();
   const piece = withPiece ? cat.pieces.find((p) => article.pieces.includes(p.slug)) : undefined;
   return (
-    <article data-press-card={article.outlet} className="flex h-full flex-col border border-white/12 bg-ink-soft/60 transition-colors hover:border-rose-light/50">
-      {piece ? (
-        <Link to={"/pieces/" + piece.slug} className="group relative block aspect-[16/10] overflow-hidden bg-ink" aria-label={t.press.about(piece.title)}>
-          <span className="absolute inset-0 p-6 transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]">
-            <MediaView item={piece.cover} alt="" fit="contain" sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 30vw" />
+    <article data-press-card={article.outlet} className="flex h-full flex-col">
+      <a href={article.url} target="_blank" rel="noreferrer" data-press-link className="group flex flex-1 flex-col border border-white/12 bg-ink-soft/60 transition-colors hover:border-rose-light/60">
+        {piece ? (
+          <span className="relative block aspect-[16/10] overflow-hidden bg-ink">
+            <span className="absolute inset-0 p-6 transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]">
+              <MediaView item={piece.cover} alt="" fit="contain" sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 30vw" />
+            </span>
           </span>
+        ) : null}
+        <span className="flex flex-1 flex-col p-6 sm:p-7">
+          <span className="text-base font-semibold uppercase tracking-[0.18em] text-rose-light">{article.outlet}</span>
+          <span className="mt-1 text-base text-mist">
+            <time dateTime={article.date}>{pressDate(article.date, intl)}</time>
+          </span>
+          <span lang={article.lang} className="mt-4 font-display text-[clamp(1.375rem,2vw,1.75rem)] leading-snug text-white [text-wrap:pretty] group-hover:text-rose-light">
+            {article.title}
+          </span>
+          <span className="mt-auto inline-flex min-h-12 items-center gap-2 pt-6 text-base font-semibold text-white">
+            {t.common.readArticle} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+          </span>
+        </span>
+      </a>
+      {piece ? (
+        <Link to={"/pieces/" + piece.slug} data-press-piece={piece.slug} className="mt-2 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
+          {t.press.discover} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+          <span className="sr-only"> · {piece.title}</span>
         </Link>
       ) : null}
-      <div className="flex flex-1 flex-col p-6 sm:p-7">
-        <p className="text-base font-semibold uppercase tracking-[0.18em] text-rose-light">{article.outlet}</p>
-        <p className="mt-1 text-base text-mist">
-          <time dateTime={article.date}>{pressDate(article.date, intl)}</time>
-        </p>
-        <h2 lang={article.lang} className="mt-4 font-display text-[clamp(1.375rem,2vw,1.75rem)] leading-snug text-white [text-wrap:pretty]">
-          {article.title}
-        </h2>
-        <div className="mt-auto flex flex-col gap-1 pt-6">
-          <a href={article.url} target="_blank" rel="noreferrer" data-press-link className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white underline-offset-4 hover:text-rose-light hover:underline">
-            {t.common.readArticle} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-            <span className="sr-only"> · {article.outlet}</span>
-          </a>
-          {piece ? (
-            <Link to={"/pieces/" + piece.slug} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-              {piece.title} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-            </Link>
-          ) : null}
-        </div>
-      </div>
     </article>
   );
 }
