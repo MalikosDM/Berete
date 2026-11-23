@@ -87,12 +87,18 @@ test("the film of the Dragon Ball pendant: on the home page after its opening, a
   const problems = watch(page);
   for (const lang of ["", "/fr"]) {
     await open(page, lang + "/");
+    // The page settles first (its language loaded, it may come back to its top once).
+    await page.waitForTimeout(2500);
     const section = page.locator("[data-feature-film='home']");
     // Right after the opening of the home page.
     const order = await page.evaluate(() => ["[data-home-hero]", "[data-feature-film='home']", "[data-special-project]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
     expect(order[0]!).toBeLessThan(order[1]!);
     expect(order[1]!).toBeLessThan(order[2]!);
-    await section.scrollIntoViewIfNeeded();
+    // (Scrolled again until it is on screen: the page may come back to its top while it settles.)
+    await expect(async () => {
+      await section.scrollIntoViewIfNeeded();
+      await expect(section.locator("[data-feature-frame]")).toBeInViewport({ ratio: 0.4, timeout: 1_500 });
+    }).toPass({ timeout: 20_000 });
     const video = section.locator("[data-feature-video]");
     await expect(video).toHaveAttribute("src", new RegExp("^/media/mechanisms/dragon-ball-hero" + (desktop(info.project.name) ? "" : "-mobile") + V + "mp4$"), { timeout: 15_000 });
     await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
