@@ -1120,6 +1120,7 @@ function ShowcaseField({ label, slug, value, onChange }: { label: string; slug: 
             {[
               ["normal", "Taille normale"],
               ["large", "Pièce en grand (vue principale nettement plus grande)"],
+              ["xl", "Pièce en très grand (ordinateur : encore +20 %, la chaîne sort en fondu par le haut ; une vue seule)"],
             ].map(([key, name]) => (
               <label key={key} className="flex min-h-12 items-center gap-3 text-base text-bone">
                 <input
@@ -1127,7 +1128,7 @@ function ShowcaseField({ label, slug, value, onChange }: { label: string; slug: 
                   name={"showcase-size-" + slug}
                   data-showcase-size={key}
                   checked={(value?.size ?? "normal") === key}
-                  onChange={() => set({ size: key === "large" ? "large" : undefined })}
+                  onChange={() => set({ size: key === "large" || key === "xl" ? key : undefined })}
                   className="size-5 accent-[#b76e79]"
                 />
                 {name}

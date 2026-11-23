@@ -162,6 +162,38 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 23/11 au soir » (WhatsApp 16 h 25 – 17 h 22, fin de l'appel du 22/11) — état au 23/11/2026
+- [ ] **Making-of Dragon Ball (« la vidéo héros »)** : introuvable sur le Mac le 23/11 au soir (disque externe, Bureau, iCloud
+      Drive, Téléchargements, Vidéos ; la photothèque Photos est fermée à Claude) : **chemin demandé à Malik**. Dès qu'on l'a :
+      grande section sur l'accueil juste après le hero (muette en boucle à l'écran, boutons son et plein écran, lien vers la
+      pièce, texte tiré de son histoire), en haut de la pièce Dragon Ball (pas en film d'entrée), en tête des making-of de
+      l'Atelier ; et, si elle a le plan HD de la sphère qui tourne, `DRAGON_BALL_SPIN_SOURCE` (`scripts/mechanism-media.mjs`).
+- [x] **Dragon Ball** : la vue avec sa chaîne (p19) en très grand sur ordinateur (`showcase.size: "xl"`, admin « Pièce en très
+      grand ») : +20 %, la chaîne sort en fondu par le haut sous le menu (`.sv-xl`), le bijou entier au-dessus du bas de l'écran ;
+      iPhone inchangé (déjà plein cadre). Le dos (p06) n'est plus dans les 3 premières photos depuis le 23/11 (2) : vérifié.
+- [x] **Butterfly** : le sertissage des ailes (WA 16.32.56, « Sertissage papillon ») = étape « sertissage » du pendentif (vidéo
+      copiée telle quelle, sans réencodage, sans son ; l'ancienne image de la story en 2e image). Malle ouverte (WA 16.36.49…50) :
+      5 vraies photos, la malle ouverte de face en premier, dans la galerie de l'écrin (/boxes) et dans la section écrin de la
+      pièce. Vidéo d'ouverture de l'écrin non touchée.
+- [x] **Écrins `keita-trunk`** (relié à la panthère, `boxSlug`) et **`tillman-trunk`** (relié au profil de Malik Tillman par
+      `BOX_PEOPLE` de `src/data/pieces.ts`, à aucune pièce) : photos de Yoni entières. **La page des écrins ne montre que les
+      écrins qui s'ouvrent avec leur film** (`onTrunksPage` = `trunkOf`) : ces deux-là y arriveront seuls avec leurs vidéos
+      (`npm run trunks`). Textes en 6 langues.
+- [x] **Section « Présentation sur mesure »** (`src/components/BoxSection.tsx`) : sur chaque pièce qui a un écrin (remplace la
+      petite carte de la fiche technique) et sur chaque profil (« Son écrin » : les écrins de ses pièces + `BOX_PEOPLE`) : nom,
+      texte, toutes les photos entières (plein écran au clic), « L'ouvrir dans les Écrins Signature » quand l'écrin y est.
+- [x] **Keita** (WA 16.50.18, à la boutique avec sa malle) : dans ses photos (`extra-media` « players/keita-losene », ajoutées par
+      `photosOf`) et dans « Porté par » de la panthère.
+- [x] **Le nom BERETE en filigrane** : **un seul réglage, `BRAND_WATERMARK` de `src/lib/site.ts`** (true / false). Accueil et
+      Cercle (`src/components/BrandMark.tsx`, fixe en bas de l'écran, sous tout le contenu : le cadre des pages est isolé), pièces
+      (le `.u-brand` de leur univers). Pour comparer sur le site sans toucher au réglage : `?filigrane=0` ou `?filigrane=1` (gardé
+      pour la visite). Les sections de l'accueil n'ont plus leur propre fond noir (même noir que la page) pour qu'il se voie.
+- [ ] **WhatsApp et presse** : le prompt avait encore « [NUMÉRO] », « [LIEN BILD] », « [LIEN SPORT.DE] » : rien changé
+      (`WHATSAPP_NUMBER` de `src/lib/site.ts`, `PRESS` de `src/data/press.ts`).
+- `npm run extra-media` sait aussi préparer une vidéo (`"video"` : copie H.264 sans son, image d'attente).
+- `tests/yoni2311c.spec.ts` (ordinateur et iPhone, anglais et français), captures `verification/<appareil>/yoni2311c-*.jpg`
+  (filigrane avec / sans : `yoni2311c-filigrane-avec-*` et `-sans-*`).
+
 ## Passe « retours de Yoni du 23/11 (2) » (WhatsApp : vocal, 5 vidéos, 13 captures, 29 photos, 1 fichier 3D) + audit — état au 23/11/2026
 - [x] **Cercle** : un clic sur un joueur ou un club ouvre toujours `/players/<slug>` (`personHref`), partout (mur, clubs, « Créée pour »).
 - [x] **Profils sur un seul modèle** (`PlayerPage`, `src/pages/Players.tsx`) : grand portrait (initiales en grand sinon), nom, club,

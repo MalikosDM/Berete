@@ -857,6 +857,24 @@ const content: Record<string, string> = {
   "Under the ring: sculpted gold edged with green enamel": "Bajo el anillo: oro esculpido bordeado de esmalte verde",
   "The side of the ring, a name and a number over baguettes, above a band of green enamel": "El lateral del anillo, con un nombre y un número sobre baguettes, encima de una franja de esmalte verde",
   "The ring in profile: First World Cup Game around the top, a name and a number on the side": "El anillo de perfil: First World Cup Game alrededor de la parte superior, un nombre y un número en el lateral",
+  // The evening of 23/11/2026: the trunks of Keita and Malik Tillman, the Butterfly trunk, the setting of its wings.
+  "Film: the wings of the butterfly set by hand": "Película: las alas de la mariposa engastadas a mano",
+  "Keita at the Berete boutique, with his trunk": "Keita en la boutique Berete, con su baúl",
+  "The Butterfly trunk open, the chain and its pendant inside": "El baúl Butterfly abierto, con la cadena y su colgante dentro",
+  "The trunk open, its tray with the chain beside it": "El baúl abierto, con su bandeja y la cadena al lado",
+  "The tray with the chain, in front of the open trunk": "La bandeja con la cadena, delante del baúl abierto",
+  "The Butterfly chain and its pendant on the black suede, up close": "La cadena Butterfly y su colgante sobre el ante negro, de cerca",
+  "The emblem in rose gold in its lid, above the chain": "El emblema en oro rosa en su tapa, sobre la cadena",
+  "Keita Trunk": "Baúl de Keita",
+  "A black trunk with rose gold corners: on one face, his photograph with his champion's belts; on the other, the BRT mark and Berete Jewellers.": "Un baúl negro con esquinas de oro rosa: en una cara, su fotografía con sus cinturones de campeón; en la otra, la marca BRT y Berete Jewellers.",
+  "The trunk and its photograph: the champion with his belts": "El baúl y su fotografía: el campeón con sus cinturones",
+  "Its other face, the BRT mark and Berete Jewellers": "Su otra cara, la marca BRT y Berete Jewellers",
+  "The BRT face of the trunk, from above": "La cara BRT del baúl, vista desde arriba",
+  "Tillman Trunk": "Baúl de Tillman",
+  "A trunk in grey python leather: on one face, his photograph and the letters USA; on the other, the BRT mark. Inside, black suede, the BRT mark in its lid and a round place held by straps.": "Un baúl de piel de pitón gris: en una cara, su fotografía y las letras USA; en la otra, la marca BRT. Dentro, ante negro, la marca BRT en la tapa y un hueco redondo sujeto con correas.",
+  "The trunk and its photograph: USA": "El baúl y su fotografía: USA",
+  "Its other face in grey python leather, with the BRT mark": "Su otra cara de piel de pitón gris, con la marca BRT",
+  "The trunk open: black suede, the BRT mark in its lid, a round place held by straps": "El baúl abierto: ante negro, la marca BRT en la tapa, un hueco redondo sujeto con correas",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

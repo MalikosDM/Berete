@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Gift, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
 import AtelierPassage from "@/components/AtelierPassage";
 import AtelierRoom from "@/components/AtelierRoom";
 import BrandIcon from "@/components/BrandIcon";
 import EveryAngle from "@/components/EveryAngle";
 import { Lightbox } from "@/components/HorizontalGallery";
+import BoxSection from "@/components/BoxSection";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
-import { coverSrcSet, SIZES_FOR } from "@/lib/responsive";
+import { coverSrcSet } from "@/lib/responsive";
 import PieceCard from "@/components/PieceCard";
 import PieceFilm from "@/components/PieceFilm";
 import Piece3D from "@/components/Piece3D";
@@ -154,7 +155,7 @@ export default function PiecePage() {
               ) : null}
             </>
           ) : (
-            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} spin={spinOf(piece.slug)} />
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} xl={opening.xl} spin={spinOf(piece.slug)} />
           )}
         </div>
         {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the
@@ -315,7 +316,10 @@ export default function PiecePage() {
         </section>
       ) : null}
 
-      {/* Technical sheet, box, press */}
+      {/* Its trunk (Yoni, 23/11/2026): all its photos, whole; the way to it on the page of the trunks when it opens there. */}
+      {box ? <BoxSection boxes={[box]} title={box.name} id="piece-trunk" /> : null}
+
+      {/* Technical sheet, press */}
       <section aria-labelledby="sheet-title" className="mx-auto grid max-w-[1600px] gap-16 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:px-12 lg:py-32">
         <div className="lg:col-span-6">
           <h2 id="sheet-title" className="title-caps text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em]">{t.piece.sheet}</h2>
@@ -329,17 +333,6 @@ export default function PiecePage() {
           </dl>
           {/* What the photos show, written before the jeweller confirms it: said as such while the piece is a draft. */}
           {piece.draft && seenRow ? <p data-seen-note className="mt-4 text-base text-mist">{t.piece.seenNote}</p> : null}
-          {box ? (
-            <Link to={"/boxes#box-" + box.slug} data-custom-box={box.slug} className="group mt-10 flex items-center gap-5 border border-white/15 p-4 transition-colors hover:border-rose-light">
-              <span className="block size-24 shrink-0 overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" sizes={SIZES_FOR.thumb} /> : null}</span>
-              <span>
-                <span className="inline-flex items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
-                  <Gift className="size-5 text-rose-light" aria-hidden="true" /> {t.piece.customBox}
-                </span>
-                <span className="mt-2 block text-base text-bone">{t.piece.deliveredIn(box.name)}</span>
-              </span>
-            </Link>
-          ) : null}
         </div>
 
         {press.length > 0 ? (

@@ -13,6 +13,8 @@
  *   - the photos of Yoni for the page The House (WhatsApp), whole;
  *   - the large image at the top of the page of the trunks: the Dragon Ball trunk closed, its artwork and the BRT mark
  *     (00 Contexte Yoni/Ecrins v3 (lumiere du dessus)/), whole.
+ *   - the evening of 23/11/2026 (WhatsApp): the Butterfly trunk open on its chain, the trunks of Keita and of Malik Tillman,
+ *     Keita at the boutique, and a film: the setting of the wings of the Butterfly (copied as it was sent, without sound).
  * A photo on black of a whole jewel is framed on it (the black around it trimmed, an even margin kept, 4:5); a close-up
  * that fills its photo, a photo of a box, of a person or of a scene is kept whole (resized only: nothing cut away, never
  * an artwork of a piece or of a box).
@@ -26,6 +28,7 @@
  *
  * BERETE_DISK gives another disk, BERETE_WA_DIR another folder for the photos sent on WhatsApp.
  */
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
@@ -52,6 +55,8 @@ const BOSNIA = "Bague Bosnie (retouche fond noir)";
 const BOSNIA_ORDER = ["04497", "04499", "04512", "04509", "04487", "04504", "04506", "04507", "04508", "04513", "04514", "04462", "04467", "04469", "04470", "04478", "04489"];
 /** A photo sent on WhatsApp on 23/11/2026, by the time in its name ("09.50.36 (2)"). */
 const wa = (time) => "wa:WhatsApp Image 2026-11-23 at " + time + ".jpeg";
+/** A video sent on WhatsApp on 23/11/2026. */
+const waVideo = (time) => "wa:WhatsApp Video 2026-11-23 at " + time + ".mp4";
 
 /*
  * Each key (a piece, "boxes/<box>", "house"): its photos, [name on the site, file, how]. The file: a path in 00 Contexte
@@ -108,6 +113,34 @@ const PIECES = {
   ],
   // The top of the page of the trunks: the Dragon Ball trunk closed, lit from above (23/11/2026), whole.
   "boxes/hero": [["dragon-ball-closed", join("Ecrins v3 (lumiere du dessus)", "dragonball-closed.jpg")]],
+  // The evening of 23/11/2026 (WhatsApp, 16 h 25 to 17 h 22), looked at one by one, every photo whole:
+  // the Butterfly trunk open, its chain and its pendant inside; the best first (open, from the front).
+  "boxes/butterfly-trunk": [
+    ["open-front", wa("16.36.49")],
+    ["open-tray", wa("16.36.50 (1)")],
+    ["tray-front", wa("16.36.50")],
+    ["chain", wa("16.36.50 (2)")],
+    ["lid", wa("16.36.49 (1)")],
+  ],
+  // The trunk of Keita (« celle de Keita »): its face with his photograph and his belts, then its face BRT.
+  "boxes/keita-trunk": [
+    ["face", wa("16.25.47")],
+    ["brt", wa("16.26.17")],
+    ["brt-above", wa("16.26.17 (1)")],
+  ],
+  // The trunk of Malik Tillman (« Malik tilman »): its face with his photograph « USA », its face in grey python with the
+  // BRT mark, then open (black suede, the BRT mark in its lid, a round place held by straps), beside its tray.
+  "boxes/tillman-trunk": [
+    ["face", wa("16.33.43 (2)")],
+    ["brt", wa("16.33.43 (3)")],
+    ["open", wa("16.33.43")],
+    ["open-tray", wa("16.33.43 (1)")],
+  ],
+  // Keita at the boutique of the house, with his trunk: his photos, and "Worn by" of the panther.
+  "players/keita-losene": [["boutique", wa("16.50.18")]],
+  // The setting of the wings of the Butterfly pendant (« Sertissage papillon »), the film of its step "setting": whole,
+  // silent, its first frame as its poster.
+  "michy-batshuayi-butterfly-pendant": [["setting", waVideo("16.32.56"), "video"]],
 };
 
 const sourceOf = (file) => (file.startsWith("wa:") ? join(WA, file.slice(3)) : join(YONI, file));
@@ -147,6 +180,23 @@ async function cropped(file, [x, y, w, h]) {
   return sharp(await img.clone().extract({ left, top, width: Math.min(width - left, Math.round(w * width)), height: Math.min(height - top, Math.round(h * height)) }).toBuffer());
 }
 
+/**
+ * A film, whole: its picture as it was sent when it is already H.264 (copied, nothing lost), else H.264 at its own size in
+ * high quality; its sound removed (a step of the making-of plays silent), ready to start before it is all loaded; its
+ * poster: an early frame, in WebP.
+ */
+async function video(src, dir, name) {
+  const probe = JSON.parse(execFileSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name,pix_fmt,width,height:stream_side_data=rotation:format=duration", "-of", "json", src], { encoding: "utf8" }));
+  const out = join(dir, name + ".mp4");
+  const h264 = probe.streams[0].codec_name === "h264" && probe.streams[0].pix_fmt === "yuv420p";
+  const encode = h264 ? ["-c:v", "copy"] : ["-c:v", "libx264", "-preset", "slow", "-crf", "18", "-pix_fmt", "yuv420p", "-profile:v", "high"];
+  execFileSync("ffmpeg", ["-v", "error", "-y", "-i", src, "-an", ...encode, "-movflags", "+faststart", "-map_metadata", "-1", out]);
+  execFileSync("ffmpeg", ["-v", "error", "-y", "-ss", "0.3", "-i", out, "-frames:v", "1", "-c:v", "libwebp", "-quality", "88", join(dir, name + "-poster.webp")]);
+  const { width, height } = probe.streams[0];
+  const rotated = Math.abs(Number(probe.streams[0].side_data_list?.[0]?.rotation ?? 0)) === 90;
+  return { name, video: true, width: rotated ? height : width, height: rotated ? width : height, duration: Math.round(Number(probe.format.duration) * 10) / 10 };
+}
+
 const keys = Object.keys(PIECES).filter((k) => !ONLY || ONLY.has(k));
 for (const key of keys) {
   for (const [, file] of PIECES[key]) {
@@ -172,6 +222,10 @@ for (const key of keys) {
   const made = [];
   for (const [name, file, how] of photos) {
     const src = sourceOf(file);
+    if (how === "video") {
+      made.push(await video(src, tmp, name));
+      continue;
+    }
     const img = how === "frame" ? await framed(src) : Array.isArray(how) ? await cropped(src, how) : sharp(src).rotate();
     const out = join(tmp, name + ".webp");
     const { width, height } = await img.clone().resize(LONG, LONG, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: 84, effort: 6 }).toFile(out);
@@ -190,7 +244,15 @@ for (const key of keys) {
   await rm(dir, { recursive: true, force: true });
   await mkdir(dirname(dir), { recursive: true });
   await rename(tmp, dir);
-  data[key] = Object.fromEntries(made.map((m) => [m.name, { src: "/media/extra/" + key + "/" + m.name + "." + v + ".webp", width: m.width, height: m.height }]));
+  const base = "/media/extra/" + key + "/";
+  data[key] = Object.fromEntries(
+    made.map((m) => [
+      m.name,
+      m.video
+        ? { type: "video", src: base + m.name + "." + v + ".mp4", poster: base + m.name + "-poster." + v + ".webp", width: m.width, height: m.height, duration: m.duration, audio: false }
+        : { src: base + m.name + "." + v + ".webp", width: m.width, height: m.height },
+    ]),
+  );
   console.log("  + " + key + " (" + v + ", " + made.length + " photo" + (made.length > 1 ? "s" : "") + ")");
 }
 // A key no longer listed loses its files and its entry.

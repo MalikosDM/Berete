@@ -22,6 +22,9 @@ const SINGLE = { x: 0, y: 0, s: 0.94, d: 12 };
 // A piece shown large (PieceShowcase.size): its main view takes the whole box (the views around stay at their places, behind).
 const MAIN_LARGE = { ...MAIN, s: 1 };
 const SINGLE_LARGE = { ...SINGLE, s: 1 };
+// "xl" (Dragon Ball with its chain, Yoni 23/11/2026): a fifth larger again, a little higher; its chain leaves the top of the
+// box under the menu, faded (.sv-xl), the jewel itself whole above the bottom of the screen.
+const SINGLE_XL = { x: 0, y: -0.035, s: 1.2, d: 12 };
 // Each one stays inside the box: |x| and |y| at most (1 - s) / 2.
 const AROUND = [
   { x: -0.37, y: 0.33, s: 0.26, d: 7 },
@@ -37,7 +40,7 @@ const AROUND = [
 /** A film of the piece turning, played while the piece is hovered (a touch on a phone): Dragon Ball (Yoni, 23/11/2026). */
 export type ShowcaseSpin = { video: string; poster: string; width: number; height: number };
 
-export default function Showcase({ slug, title, views, jewel = null, large = false, spin = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; spin?: ShowcaseSpin | null }) {
+export default function Showcase({ slug, title, views, jewel = null, large = false, xl = false, spin = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; xl?: boolean; spin?: ShowcaseSpin | null }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
   // The film of the piece turning: it plays while the piece is hovered, stops when the pointer leaves (a touch on a phone).
@@ -173,6 +176,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       ref={rootRef}
       data-showcase={multi ? "multi" : "single"}
       data-showcase-large={large ? "" : undefined}
+      data-showcase-xl={xl && !multi ? "" : undefined}
       data-spinning={spinning ? "" : undefined}
       onPointerEnter={spin ? (e) => e.pointerType === "mouse" && setSpinning(true) : undefined}
       onPointerLeave={spin ? (e) => e.pointerType === "mouse" && setSpinning(false) : undefined}
@@ -184,7 +188,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
         {places.map((viewIndex, place) => {
           const v = views[viewIndex]!;
-          const spot = !multi ? (large ? SINGLE_LARGE : SINGLE) : place === 0 ? (large ? MAIN_LARGE : MAIN) : AROUND[(place - 1) % AROUND.length]!;
+          const spot = !multi ? (xl ? SINGLE_XL : large ? SINGLE_LARGE : SINGLE) : place === 0 ? (large ? MAIN_LARGE : MAIN) : AROUND[(place - 1) % AROUND.length]!;
           const main = place === 0;
           const style = {
             transform: "translate(" + spot.x * 100 + "%, " + spot.y * 100 + "%) scale(" + spot.s + ")",
@@ -202,7 +206,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
               aria-label={main ? t.piece.viewAlt(title, kindName(v)) : t.piece.showView(kindName(v))}
               onClick={() => bring(place)}
               style={style}
-              className={"sv-view absolute inset-0 " + (main ? "pointer-events-none" : "cursor-pointer")}
+              className={"sv-view absolute inset-0 " + (main ? "pointer-events-none" : "cursor-pointer") + (main && xl && !multi ? " sv-xl" : "")}
             >
               <span className="sv-par block h-full w-full">
                 {framed(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw")}

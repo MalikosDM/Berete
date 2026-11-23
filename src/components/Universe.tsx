@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useBrandWatermark } from "@/lib/brandmark";
 import { createPortal } from "react-dom";
 import { BACKDROPS, THEME_FONTS, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
 import brand from "@/data/brand.generated.json" with { type: "json" };
@@ -169,6 +170,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fxRef = useRef<Fx | null>(null);
+  // The name BERETE in its background (src/lib/site.ts, BRAND_WATERMARK).
+  const watermark = useBrandWatermark();
   const [impact, setImpact] = useState<{ x: number; y: number; key: number } | null>(null);
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
@@ -389,7 +392,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {/* The name of the house, very discreet, in the depth of every capsule (Yoni, 23/11/2026): behind the decor, under
             the light and the effects, never over a jewel (the whole universe is behind the page). */}
-        {preview || fixed ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
+        {preview || fixed || !watermark ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
         <div className="u-light" />
         <div className="u-texture" />
         {theme.mark ? (

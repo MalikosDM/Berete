@@ -259,6 +259,7 @@ export const ar: Messages = {
     sheet: "الخامات والحِرفية",
     customBox: "علبة تقديم حسب الطلب",
     deliveredIn: (box: string) => "تُسلَّم في علبتها المصنوعة خصيصاً لها: " + box + ".",
+    seeTrunk: "افتحه في صناديق Signature",
     press: "تحت الأضواء",
     pressAlt: (outlet: string) => "مقال " + outlet,
     similar: "ما وراء هذا العالم",
@@ -285,6 +286,7 @@ export const ar: Messages = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "صناديقه" : "صندوقه"),
     eyebrow: "دائرة Berete",
     title: "يرتديها النجوم",
     lead: "شخصيات استثنائية. إبداعات لا مثيل لها.",

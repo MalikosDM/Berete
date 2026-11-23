@@ -766,6 +766,33 @@ html.lenis body {
     width: 92vw;
   }
 }
+/* The name BERETE in the background of the home page and of the circle (src/components/BrandMark.tsx): the same mark, fixed
+   while the page scrolls, under everything (the wrapper of the pages is isolated: drawn over its black, under its content). */
+/* A view shown very large (Showcase "xl"): its chain fades out at the top of the box, under the menu (the jewel stays whole). */
+.sv-xl {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
+  mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
+}
+.brand-mark {
+  position: fixed;
+  left: 50%;
+  bottom: 7svh;
+  z-index: -1;
+  width: min(94vw, 150svh);
+  aspect-ratio: 4.345;
+  transform: translateX(-50%);
+  background: var(--color-white);
+  -webkit-mask: var(--brand-mark) center / contain no-repeat;
+  mask: var(--brand-mark) center / contain no-repeat;
+  opacity: 0.045;
+  pointer-events: none;
+}
+@media (max-width: 1023px) {
+  .brand-mark {
+    bottom: calc(76px + 3svh + env(safe-area-inset-bottom));
+    width: 92vw;
+  }
+}
 .u-mark {
   inset: auto;
   left: var(--u-at-x);

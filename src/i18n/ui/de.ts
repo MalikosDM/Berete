@@ -276,6 +276,7 @@ export const de: Messages = {
     sheet: "Komposition & Handwerkskunst",
     customBox: "Präsentation nach Maß",
     deliveredIn: (box: string) => "Geliefert in seinem eigens dafür gefertigten Etui: " + box + ".",
+    seeTrunk: "Unter Signature-Etuis öffnen",
     press: "Im Rampenlicht",
     pressAlt: (outlet: string) => "Presseartikel: " + outlet,
     similar: "Weitere Welten",
@@ -302,6 +303,7 @@ export const de: Messages = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "Seine Etuis" : "Sein Etui"),
     eyebrow: "Der Berete-Kreis",
     title: "Getragen von Ikonen",
     lead: "Herausragende Persönlichkeiten. Außergewöhnliche Kreationen.",

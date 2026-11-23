@@ -258,7 +258,7 @@ test("the page of the trunks without the NZ Travel Case; kept for the admin; its
   expect(publicCatalogue(defaultCatalogue).boxes.map((b) => b.slug)).not.toContain("nz-travel-case");
   await skipIntro(page);
   await page.goto("/boxes", { waitUntil: "load" });
-  await expect(page.locator("[data-box]")).toHaveCount(BOXES.length - 1);
+  await expect(page.locator("[data-box]")).toHaveCount(BOXES.filter((b) => b.published && trunkOf(b.slug)).length);
   await expect(page.locator("[data-box='nz-travel-case']")).toHaveCount(0);
   expect(await page.locator("main").innerText()).not.toMatch(/NZ Travel Case/i);
   await shot(page, info.project.name + "-ecrins-sans-nz", true);
@@ -303,5 +303,6 @@ test("admin: the NZ Travel Case kept, unpublished; the size of the piece in the 
   await page.screenshot({ path: DIR + "/admin-ecrin-nz.jpg", type: "jpeg", quality: 70 });
   await page.getByRole("tab", { name: "Pièces" }).click();
   await page.locator("[data-admin-row='" + DRAGON + "'] button[aria-label='Modifier']").click();
-  await expect(page.locator("[data-showcase-size='large']")).toBeChecked();
+  // Larger still since the evening of 23/11/2026 (its chain leaving the top, on a computer).
+  await expect(page.locator("[data-showcase-size='xl']")).toBeChecked();
 });

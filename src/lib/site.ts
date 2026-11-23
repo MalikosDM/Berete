@@ -8,6 +8,12 @@ export const INSTAGRAM_HANDLE = "beretejewellers";
 export const INSTAGRAM_URL = "https://www.instagram.com/" + INSTAGRAM_HANDLE + "/";
 
 /**
+ * The name BERETE as a watermark, very discreet, in the background of the home page, of the pages of the pieces (in their
+ * universe) and of the circle: true shows it, false removes it everywhere. Always under the pieces, never over a jewel.
+ */
+export const BRAND_WATERMARK = true;
+
+/**
  * Whether this version of the site has its server (the API: forms, 3D models, client space, admin). The version put
  * online before the real server (Vercel) has none: it asks nothing of the API, its forms open WhatsApp with the request
  * already written, the client space and the admin say they open soon.

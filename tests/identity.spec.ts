@@ -330,7 +330,9 @@ test("the opening: every jewel whole on screen (cut out, one view or a showcase)
         const w = img.naturalWidth * k;
         const h = img.naturalHeight * k;
         const r = { left: b.left + (b.width - w) / 2, top: b.top + (b.height - h) / 2, right: b.left + (b.width + w) / 2, bottom: b.top + (b.height + h) / 2 };
-        const bad = [r.top < header + 6 && "top", r.bottom > floor - 6 && "bottom", r.left < 6 && "left", r.right > innerWidth - 6 && "right"].filter(Boolean);
+        // A view shown very large ("xl", Dragon Ball on a computer): its chain leaves the top under the menu, faded, by design.
+        const chainOut = img.closest("[data-showcase-xl] .sv-xl") !== null;
+        const bad = [r.top < header + 6 && !chainOut && "top", r.bottom > floor - 6 && "bottom", r.left < 6 && "left", r.right > innerWidth - 6 && "right"].filter(Boolean);
         return bad.length ? [img.closest("[data-showcase-view]")?.getAttribute("data-showcase-view") ?? "photo", ...bad] : [];
       });
     });

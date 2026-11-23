@@ -1,6 +1,6 @@
 /* The links between stories, people and pieces, computed from the catalogue. */
-import { media } from "./sources.js";
-import type { Catalogue, MediaItem, Person, Piece, PieceType, Story } from "./types.js";
+import { extrasOf, media } from "./sources.js";
+import type { Box, Catalogue, MediaItem, Person, Piece, PieceType, Story } from "./types.js";
 
 export const TYPE_LABELS: Record<PieceType, string> = {
   chain: "Chain",
@@ -58,6 +58,16 @@ export function piecesOf(cat: Catalogue, personSlug: string): Piece[] {
 }
 
 /**
+ * The trunks of a person (Yoni, 23/11/2026): those of their pieces, and a trunk tied to them before its piece is known
+ * (BOX_PEOPLE of src/data/pieces.ts: the trunk of Malik Tillman).
+ */
+export function boxesOf(cat: Catalogue, personSlug: string, boxPeople: Record<string, string[]> = {}): Box[] {
+  const pieces = piecesOf(cat, personSlug);
+  const slugs = new Set(pieces.map((p) => p.boxSlug).filter((b): b is string => Boolean(b)));
+  return cat.boxes.filter((b) => slugs.has(b.slug) || (b.pieceSlug !== null && pieces.some((p) => p.slug === b.pieceSlug)) || (boxPeople[b.slug] ?? []).includes(personSlug));
+}
+
+/**
  * Where a click on a person leads (Yoni, 23/11/2026): always to their own page, /players/<slug>: their portrait, who they
  * are, all their pieces, their photos and moments; from there the visitor enters the world of a piece.
  */
@@ -97,7 +107,8 @@ export function portraitOf(_cat: Catalogue, person: Person): string {
 /** The other photos of a person in their jersey ("In Pictures" on their page): all of them but the portrait shown. */
 export function photosOf(cat: Catalogue, person: Person): MediaItem[] {
   const shown = portraitOf(cat, person);
-  return (media.players?.[person.slug] ?? []).filter((m) => m.src !== shown);
+  // Then the photos sent apart (Keita at the boutique of the house, 23/11/2026: scripts/extra-media.mjs, "players/<slug>").
+  return [...(media.players?.[person.slug] ?? []), ...extrasOf("players/" + person.slug)].filter((m) => m.src !== shown);
 }
 
 /** The Instagram profile of a person, or null. */

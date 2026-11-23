@@ -266,6 +266,7 @@ export const es: Messages = {
     sheet: "Composición y artesanía",
     customBox: "Presentación a medida",
     deliveredIn: (box: string) => "Se entrega en su estuche, creado para ella: " + box + ".",
+    seeTrunk: "Abrirlo en Estuches Signature",
     press: "Bajo los focos",
     pressAlt: (outlet: string) => "Artículo de " + outlet,
     similar: "Más allá de este universo",
@@ -292,6 +293,7 @@ export const es: Messages = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "Sus estuches" : "Su estuche"),
     eyebrow: "El Círculo Berete",
     title: "Lucidas por iconos",
     lead: "Personalidades excepcionales. Creaciones extraordinarias.",

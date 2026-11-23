@@ -6,6 +6,7 @@ import Lightbox from "@/components/Lightbox";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
+import { onTrunksPage } from "@/components/BoxSection";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
 import Mechanisms from "@/components/Mechanisms";
 import PageIntro from "@/components/PageIntro";
@@ -288,7 +289,9 @@ export function Boxes() {
   }, [hash]);
   // The trunk of the house first, then in the order of the catalogue (src/data/pieces.ts, BOXES); a box added in the admin after them.
   const rank = (b: Box) => (b.slug === FEATURED_BOX ? -1 : BOX_ORDER.has(b.slug) ? BOX_ORDER.get(b.slug)! : BOX_ORDER.size + all.indexOf(b));
-  const boxes = [...all].sort((a, b) => rank(a) - rank(b));
+  // Only the trunks that open in their film (Malik, 23/11/2026: every trunk of the page the same way); one still waiting for
+  // its film (the trunks of Keita and of Malik Tillman) is shown on the page of its piece and on the profile of its person.
+  const boxes = all.filter(onTrunksPage).sort((a, b) => rank(a) - rank(b));
   const heroTrunk = extra("boxes/hero", "dragon-ball-closed", { alt: t.boxes.heroAlt, onBlack: false });
 
   return (

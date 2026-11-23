@@ -249,5 +249,89 @@
    "width": 1600,
    "height": 1600
   }
+ },
+ "boxes/butterfly-trunk": {
+  "open-front": {
+   "src": "/media/extra/boxes/butterfly-trunk/open-front.5be42922ea.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "open-tray": {
+   "src": "/media/extra/boxes/butterfly-trunk/open-tray.5be42922ea.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "tray-front": {
+   "src": "/media/extra/boxes/butterfly-trunk/tray-front.5be42922ea.webp",
+   "width": 1600,
+   "height": 1200
+  },
+  "chain": {
+   "src": "/media/extra/boxes/butterfly-trunk/chain.5be42922ea.webp",
+   "width": 1600,
+   "height": 1066
+  },
+  "lid": {
+   "src": "/media/extra/boxes/butterfly-trunk/lid.5be42922ea.webp",
+   "width": 1066,
+   "height": 1600
+  }
+ },
+ "boxes/keita-trunk": {
+  "face": {
+   "src": "/media/extra/boxes/keita-trunk/face.ec30c4a502.webp",
+   "width": 1200,
+   "height": 1600
+  },
+  "brt": {
+   "src": "/media/extra/boxes/keita-trunk/brt.ec30c4a502.webp",
+   "width": 900,
+   "height": 1600
+  },
+  "brt-above": {
+   "src": "/media/extra/boxes/keita-trunk/brt-above.ec30c4a502.webp",
+   "width": 900,
+   "height": 1600
+  }
+ },
+ "boxes/tillman-trunk": {
+  "face": {
+   "src": "/media/extra/boxes/tillman-trunk/face.e7b26a9b4d.webp",
+   "width": 1200,
+   "height": 1600
+  },
+  "brt": {
+   "src": "/media/extra/boxes/tillman-trunk/brt.e7b26a9b4d.webp",
+   "width": 1200,
+   "height": 1600
+  },
+  "open": {
+   "src": "/media/extra/boxes/tillman-trunk/open.e7b26a9b4d.webp",
+   "width": 1200,
+   "height": 1600
+  },
+  "open-tray": {
+   "src": "/media/extra/boxes/tillman-trunk/open-tray.e7b26a9b4d.webp",
+   "width": 1200,
+   "height": 1600
+  }
+ },
+ "players/keita-losene": {
+  "boutique": {
+   "src": "/media/extra/players/keita-losene/boutique.a662557da6.webp",
+   "width": 1200,
+   "height": 1600
+  }
+ },
+ "michy-batshuayi-butterfly-pendant": {
+  "setting": {
+   "type": "video",
+   "src": "/media/extra/michy-batshuayi-butterfly-pendant/setting.6ed26350d6.mp4",
+   "poster": "/media/extra/michy-batshuayi-butterfly-pendant/setting-poster.6ed26350d6.webp",
+   "width": 720,
+   "height": 1280,
+   "duration": 7.1,
+   "audio": false
+  }
  }
 }

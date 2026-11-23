@@ -264,6 +264,7 @@ export const nl: Messages = {
     sheet: "Samenstelling & vakmanschap",
     customBox: "Presentatie op maat",
     deliveredIn: (box: string) => "Geleverd in het etui dat ervoor werd gemaakt: " + box + ".",
+    seeTrunk: "Open hem bij Signature-koffers",
     press: "In de schijnwerpers",
     pressAlt: (outlet: string) => "Artikel van " + outlet,
     similar: "Voorbij dit universum",
@@ -290,6 +291,7 @@ export const nl: Messages = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "Zijn koffers" : "Zijn koffer"),
     eyebrow: "De Kring van Berete",
     title: "Gedragen door iconen",
     lead: "Uitzonderlijke persoonlijkheden. Buitengewone creaties.",

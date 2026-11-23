@@ -282,6 +282,7 @@ export const en = {
     sheet: "Composition & Craftsmanship",
     customBox: "Bespoke Presentation",
     deliveredIn: (box: string) => "Delivered in the " + box + ", made for it.",
+    seeTrunk: "Open it on Signature Trunks",
     press: "In the Spotlight",
     pressAlt: (outlet: string) => outlet + " article",
     similar: "Beyond This Universe",
@@ -308,6 +309,7 @@ export const en = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "Their Trunks" : "Their Trunk"),
     eyebrow: "The Berete Circle",
     title: "Worn by Icons",
     lead: "Exceptional individuals. Extraordinary creations.",

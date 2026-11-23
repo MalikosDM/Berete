@@ -277,6 +277,7 @@ export const fr: Messages = {
     sheet: "Composition & Savoir-faire",
     customBox: "Présentation sur mesure",
     deliveredIn: (box: string) => "Livrée dans l’écrin conçu pour elle : " + box + ".",
+    seeTrunk: "L’ouvrir dans les Écrins Signature",
     press: "Sous les projecteurs",
     pressAlt: (outlet: string) => "Article de " + outlet,
     similar: "Au-delà de cet univers",
@@ -303,6 +304,7 @@ export const fr: Messages = {
   },
 
   players: {
+    trunks: (count: number) => (count > 1 ? "Ses écrins" : "Son écrin"),
     eyebrow: "Le Cercle Berete",
     title: "Portées par des icônes",
     lead: "Des personnalités singulières. Des créations extraordinaires.",

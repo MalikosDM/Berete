@@ -41,6 +41,12 @@ export function extra(slug: string, name: string, texts: Partial<MediaItem> = {}
   return m ? { type: "image", onBlack: true, ...m, ...texts } : null;
 }
 
+/** Every photo made for one key of scripts/extra-media.mjs ("players/keita-losene"), in its order; [] when none. */
+export function extrasOf(key: string, texts: Partial<MediaItem> = {}): MediaItem[] {
+  const all = (extras as Record<string, Record<string, { src: string; width: number; height: number }>>)[key] ?? {};
+  return Object.values(all).map((m) => ({ type: "image", onBlack: false, ...m, ...texts }) as MediaItem);
+}
+
 export function yoni(dir: string, file: string, texts: Partial<MediaItem> = {}): MediaItem | null {
   // "p6" and "p06" name the same file.
   const key = file.replace(/^(\d\d-)?([pv])(\d+)$/, (_all, pre: string | undefined, kind: string, n: string) => (pre ?? "") + kind + n.padStart(2, "0"));

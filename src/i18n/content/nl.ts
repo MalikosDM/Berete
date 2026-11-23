@@ -857,6 +857,24 @@ const content: Record<string, string> = {
   "Under the ring: sculpted gold edged with green enamel": "Onder de ring: gebeeldhouwd goud, omrand met groen email",
   "The side of the ring, a name and a number over baguettes, above a band of green enamel": "De zijkant van de ring, een naam en een nummer op baguettes, boven een band van groen email",
   "The ring in profile: First World Cup Game around the top, a name and a number on the side": "De ring in profiel: First World Cup Game rond het bovenstuk, een naam en een nummer op de zijkant",
+  // The evening of 23/11/2026: the trunks of Keita and Malik Tillman, the Butterfly trunk, the setting of its wings.
+  "Film: the wings of the butterfly set by hand": "Film: de vleugels van de vlinder met de hand gezet",
+  "Keita at the Berete boutique, with his trunk": "Keita in de Berete-boetiek, met zijn koffer",
+  "The Butterfly trunk open, the chain and its pendant inside": "De Butterfly-koffer open, met de ketting en zijn hanger erin",
+  "The trunk open, its tray with the chain beside it": "De koffer open, met zijn plateau en de ketting ernaast",
+  "The tray with the chain, in front of the open trunk": "Het plateau met de ketting, voor de open koffer",
+  "The Butterfly chain and its pendant on the black suede, up close": "De Butterfly-ketting en zijn hanger op het zwarte suède, van dichtbij",
+  "The emblem in rose gold in its lid, above the chain": "Het embleem in roségoud in het deksel, boven de ketting",
+  "Keita Trunk": "Keita’s koffer",
+  "A black trunk with rose gold corners: on one face, his photograph with his champion's belts; on the other, the BRT mark and Berete Jewellers.": "Een zwarte koffer met hoeken in roségoud: aan de ene kant zijn foto met zijn kampioensgordels, aan de andere het merk BRT en Berete Jewellers.",
+  "The trunk and its photograph: the champion with his belts": "De koffer en zijn foto: de kampioen met zijn gordels",
+  "Its other face, the BRT mark and Berete Jewellers": "Zijn andere kant, het merk BRT en Berete Jewellers",
+  "The BRT face of the trunk, from above": "De BRT-kant van de koffer, van bovenaf",
+  "Tillman Trunk": "Tillmans koffer",
+  "A trunk in grey python leather: on one face, his photograph and the letters USA; on the other, the BRT mark. Inside, black suede, the BRT mark in its lid and a round place held by straps.": "Een koffer van grijs pythonleer: aan de ene kant zijn foto en de letters USA, aan de andere het merk BRT. Binnenin zwart suède, het merk BRT in het deksel en een ronde plaats die met riemen wordt vastgehouden.",
+  "The trunk and its photograph: USA": "De koffer en zijn foto: USA",
+  "Its other face in grey python leather, with the BRT mark": "Zijn andere kant van grijs pythonleer, met het merk BRT",
+  "The trunk open: black suede, the BRT mark in its lid, a round place held by straps": "De koffer open: zwart suède, het merk BRT in het deksel, een ronde plaats die met riemen wordt vastgehouden",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

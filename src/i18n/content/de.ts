@@ -857,6 +857,24 @@ const content: Record<string, string> = {
   "Under the ring: sculpted gold edged with green enamel": "Unter dem Ring: modelliertes Gold, gesäumt von grüner Emaille",
   "The side of the ring, a name and a number over baguettes, above a band of green enamel": "Die Seite des Rings, ein Name und eine Nummer auf Baguettes, über einem Band aus grüner Emaille",
   "The ring in profile: First World Cup Game around the top, a name and a number on the side": "Der Ring im Profil: First World Cup Game rund um den Ringkopf, ein Name und eine Nummer an der Seite",
+  // The evening of 23/11/2026: the trunks of Keita and Malik Tillman, the Butterfly trunk, the setting of its wings.
+  "Film: the wings of the butterfly set by hand": "Film: die Flügel des Schmetterlings, von Hand gefasst",
+  "Keita at the Berete boutique, with his trunk": "Keita in der Berete-Boutique, mit seinem Koffer",
+  "The Butterfly trunk open, the chain and its pendant inside": "Der Butterfly-Koffer geöffnet, die Kette und ihr Anhänger darin",
+  "The trunk open, its tray with the chain beside it": "Der Koffer geöffnet, daneben sein Tablett mit der Kette",
+  "The tray with the chain, in front of the open trunk": "Das Tablett mit der Kette, vor dem geöffneten Koffer",
+  "The Butterfly chain and its pendant on the black suede, up close": "Die Butterfly-Kette und ihr Anhänger auf schwarzem Wildleder, aus der Nähe",
+  "The emblem in rose gold in its lid, above the chain": "Das Emblem in Roségold im Deckel, über der Kette",
+  "Keita Trunk": "Keitas Koffer",
+  "A black trunk with rose gold corners: on one face, his photograph with his champion's belts; on the other, the BRT mark and Berete Jewellers.": "Ein schwarzer Koffer mit Ecken in Roségold: auf einer Seite sein Foto mit seinen Meistergürteln, auf der anderen die Marke BRT und Berete Jewellers.",
+  "The trunk and its photograph: the champion with his belts": "Der Koffer und sein Foto: der Champion mit seinen Gürteln",
+  "Its other face, the BRT mark and Berete Jewellers": "Seine andere Seite, die Marke BRT und Berete Jewellers",
+  "The BRT face of the trunk, from above": "Die BRT-Seite des Koffers, von oben",
+  "Tillman Trunk": "Tillmans Koffer",
+  "A trunk in grey python leather: on one face, his photograph and the letters USA; on the other, the BRT mark. Inside, black suede, the BRT mark in its lid and a round place held by straps.": "Ein Koffer aus grauem Pythonleder: auf einer Seite sein Foto und die Buchstaben USA, auf der anderen die Marke BRT. Innen schwarzes Wildleder, die Marke BRT im Deckel und ein runder Platz, von Riemen gehalten.",
+  "The trunk and its photograph: USA": "Der Koffer und sein Foto: USA",
+  "Its other face in grey python leather, with the BRT mark": "Seine andere Seite aus grauem Pythonleder, mit der Marke BRT",
+  "The trunk open: black suede, the BRT mark in its lid, a round place held by straps": "Der Koffer geöffnet: schwarzes Wildleder, die Marke BRT im Deckel, ein runder Platz, von Riemen gehalten",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

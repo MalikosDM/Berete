@@ -11,7 +11,9 @@ import SplitHeading from "@/components/SplitHeading";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
 import { defaultCatalogue } from "@/data/catalogue";
-import { findPerson, instagramOf, leftTheCircle, membersOf, personHref, photosOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
+import { boxesOf, findPerson, instagramOf, leftTheCircle, membersOf, personHref, photosOf, pieceVisualFor, piecesOf, storiesOf } from "@/data/relations";
+import { BOX_PEOPLE } from "@/data/pieces";
+import BoxSection from "@/components/BoxSection";
 import type { PersonKind } from "@/data/types";
 import { Link, Navigate, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -55,6 +57,7 @@ export function PlayerPage() {
   const pieces = piecesOf(cat, person.slug);
   const members = membersOf(cat, person);
   const photos = photosOf(cat, person);
+  const boxes = boxesOf(cat, person.slug, BOX_PEOPLE);
   const kindLabel = person.kind === "club" ? t.players.club : person.kind === "personality" ? t.players.personality : person.club;
   const instagram = instagramOf(person);
 
@@ -129,6 +132,9 @@ export function PlayerPage() {
           </ul>
         </section>
       ) : null}
+
+      {/* Their trunks (Yoni, 23/11/2026): those of their pieces, and the one made for them before its piece is known. */}
+      <BoxSection boxes={boxes} title={t.players.trunks(boxes.length)} id="player-trunks" />
 
       {photos.length > 0 || stories.length > 0 ? (
         <section aria-labelledby="player-photos" data-player-moments className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">

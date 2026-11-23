@@ -121,7 +121,9 @@ async function playsIts(card: Locator, which: "opening" | "closing", src: string
 }
 
 test("the data: 13 boxes, each its two images and its two films, every name with its version; their photos", async () => {
-  const shown = BOXES.filter((b) => b.published).map((b) => b.slug);
+  // On the page: the published trunks that open in their film (Keita and Malik Tillman wait for theirs, 23/11/2026).
+  const shown = BOXES.filter((b) => b.published && trunkOf(b.slug)).map((b) => b.slug);
+  expect(BOXES.filter((b) => b.published && !trunkOf(b.slug)).map((b) => b.slug)).toEqual(["keita-trunk", "tillman-trunk"]);
   expect(shown).toEqual(ORDER.map(([s]) => s));
   // Nothing else in the folder of the trunks (no old box, no old opening).
   expect(readdirSync("public/media/trunks").sort()).toEqual(ORDER.map(([s]) => s).sort());
@@ -422,11 +424,13 @@ for (const [piece, box] of PIECE_BOXES) {
     test.skip(phoneOf(info) && box !== "dragon-ball-trunk", "on a phone: one of them");
     await skipIntro(page);
     await page.goto("/fr/pieces/" + piece, { waitUntil: "load" });
-    const link = page.locator("[data-custom-box]");
-    await expect(link).toHaveAttribute("data-custom-box", box);
+    // Its trunk section (23/11/2026): all its photos, the first its professional photo; the way to it on the page of the trunks.
+    const block = page.locator("[data-custom-box]");
+    await expect(block).toHaveAttribute("data-custom-box", box);
+    const link = block.locator("[data-box-section-link]");
     await expect(link).toHaveAttribute("href", "/fr/boxes#box-" + box);
-    await link.scrollIntoViewIfNeeded();
-    const img = link.locator("img");
+    await block.scrollIntoViewIfNeeded();
+    const img = block.locator("[data-box-section-photo='0'] img");
     await expect
       .poll(() => img.evaluate((e) => new URL((e as HTMLImageElement).currentSrc || (e as HTMLImageElement).src).pathname), { timeout: 15_000 })
       .toMatch(new RegExp("^/media/trunks/" + box + "/photo-01\\." + trunkOf(box)!.version + "\\."));

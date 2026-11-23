@@ -863,6 +863,24 @@ const content: Record<string, string> = {
   "Under the ring: sculpted gold edged with green enamel": "أسفل الخاتم: ذهب منحوت تحدّه المينا الخضراء",
   "The side of the ring, a name and a number over baguettes, above a band of green enamel": "جانب الخاتم، اسم ورقم على الباغيت، فوق شريط من المينا الخضراء",
   "The ring in profile: First World Cup Game around the top, a name and a number on the side": "الخاتم من الجانب: عبارة First World Cup Game حول الجزء العلوي، واسم ورقم على الجانب",
+  // The evening of 23/11/2026: the trunks of Keita and Malik Tillman, the Butterfly trunk, the setting of its wings.
+  "Film: the wings of the butterfly set by hand": "فيلم: جناحا الفراشة يُرصَّعان يدويًا",
+  "Keita at the Berete boutique, with his trunk": "كيتا في بوتيك Berete، مع حقيبته",
+  "The Butterfly trunk open, the chain and its pendant inside": "حقيبة Butterfly مفتوحة، وفي داخلها السلسلة وقلادتها",
+  "The trunk open, its tray with the chain beside it": "الحقيبة مفتوحة، وبجانبها صينيتها مع السلسلة",
+  "The tray with the chain, in front of the open trunk": "الصينية مع السلسلة، أمام الحقيبة المفتوحة",
+  "The Butterfly chain and its pendant on the black suede, up close": "سلسلة Butterfly وقلادتها على الشامواه الأسود، عن قرب",
+  "The emblem in rose gold in its lid, above the chain": "الشعار بالذهب الوردي في غطائها، فوق السلسلة",
+  "Keita Trunk": "حقيبة كيتا",
+  "A black trunk with rose gold corners: on one face, his photograph with his champion's belts; on the other, the BRT mark and Berete Jewellers.": "حقيبة سوداء بزوايا من الذهب الوردي: على أحد وجهيها صورته مع أحزمة البطولة، وعلى الآخر علامة BRT وBerete Jewellers.",
+  "The trunk and its photograph: the champion with his belts": "الحقيبة وصورتها: البطل مع أحزمته",
+  "Its other face, the BRT mark and Berete Jewellers": "وجهها الآخر، علامة BRT وBerete Jewellers",
+  "The BRT face of the trunk, from above": "وجه BRT من الحقيبة، من الأعلى",
+  "Tillman Trunk": "حقيبة تيلمان",
+  "A trunk in grey python leather: on one face, his photograph and the letters USA; on the other, the BRT mark. Inside, black suede, the BRT mark in its lid and a round place held by straps.": "حقيبة من جلد الثعبان الرمادي: على أحد وجهيها صورته والأحرف USA، وعلى الآخر علامة BRT. في الداخل شامواه أسود، وعلامة BRT في الغطاء، ومكان دائري تثبّته أحزمة.",
+  "The trunk and its photograph: USA": "الحقيبة وصورتها: USA",
+  "Its other face in grey python leather, with the BRT mark": "وجهها الآخر من جلد الثعبان الرمادي، مع علامة BRT",
+  "The trunk open: black suede, the BRT mark in its lid, a round place held by straps": "الحقيبة مفتوحة: شامواه أسود، علامة BRT في الغطاء، مكان دائري تثبّته أحزمة",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

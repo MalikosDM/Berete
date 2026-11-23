@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
 import { ArrowRight } from "lucide-react";
+import BrandMark from "@/components/BrandMark";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -23,7 +24,8 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="relative min-h-svh bg-ink pb-[calc(76px+env(safe-area-inset-bottom))] text-white md:pb-0">
+    // Isolated: the watermark BERETE (z-index -1) is drawn over its black and under all its content.
+    <div className="relative isolate min-h-svh bg-ink pb-[calc(76px+env(safe-area-inset-bottom))] text-white md:pb-0">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-5 focus:py-3 focus:text-ink"
@@ -33,6 +35,7 @@ export default function Layout() {
       <LocaleSync />
       <Preloader />
       <SmoothScroll />
+      <BrandMark />
       <Navbar />
       <main id="main" className="relative">
         <Outlet />

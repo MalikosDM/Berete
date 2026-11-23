@@ -67,7 +67,7 @@ function Hero() {
   const [dir, file] = HERO_PHOTOS[HERO_PHOTO];
   const photo = yoni(dir, file, { alt: piece?.title ?? "" });
   return (
-    <section aria-labelledby="home-title" data-home-hero className="relative isolate overflow-hidden bg-[#050505]">
+    <section aria-labelledby="home-title" data-home-hero className="relative isolate overflow-hidden">
       {/* The light: a soft warm glow behind the piece, a touch of rose gold, the edges in deep black. */}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(60%_55%_at_70%_48%,rgba(232,180,160,0.13),rgba(156,91,79,0.05)_45%,transparent_72%)] max-lg:bg-[radial-gradient(80%_45%_at_50%_30%,rgba(232,180,160,0.13),rgba(156,91,79,0.05)_45%,transparent_75%)]" />
       <div className="mx-auto grid min-h-svh max-w-[1600px] items-center gap-6 px-5 pt-24 pb-14 sm:px-8 desk:pt-32 lg:grid-cols-12 lg:gap-10 lg:px-12 lg:pb-16">
@@ -136,7 +136,7 @@ function Innovation() {
     } else setStarted(true);
   };
   return (
-    <section aria-labelledby="innovation-title" data-home-innovation className="border-t border-white/10 bg-ink">
+    <section aria-labelledby="innovation-title" data-home-innovation className="border-t border-white/10">
       <div className="mx-auto grid max-w-[1600px] items-center gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-28">
         <div className="relative lg:col-span-6">
           <div className="relative mx-auto aspect-[4/5] w-full max-w-xl">
@@ -199,7 +199,7 @@ function Commissions() {
   }).filter((r) => r !== null);
   if (rings.length === 0) return null;
   return (
-    <section aria-labelledby="special-title" data-special-project className="border-t border-white/10 bg-ink">
+    <section aria-labelledby="special-title" data-special-project className="border-t border-white/10">
       <div className="mx-auto max-w-[1600px] px-5 pt-20 pb-10 sm:px-8 lg:px-12 lg:pt-28 lg:pb-12">
         <p className="eyebrow">{t.home.special.eyebrow}</p>
         <h2 id="special-title" className="title-caps mt-4 text-[clamp(1.75rem,4vw,3.25rem)] tracking-[0.14em] [text-wrap:balance]">
@@ -240,7 +240,7 @@ function Selection() {
   const pieces = SELECTION.map((s) => cat.pieces.find((p) => p.slug === s)).filter((p): p is Piece => p !== undefined);
   if (pieces.length === 0) return null;
   return (
-    <section aria-labelledby="selection-title" data-home-selection className="border-t border-white/10 bg-ink">
+    <section aria-labelledby="selection-title" data-home-selection className="border-t border-white/10">
       <div className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
         <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div>
@@ -271,7 +271,7 @@ function PressBand() {
   const articles = publishedPress();
   if (articles.length === 0) return null;
   return (
-    <section aria-labelledby="press-band-title" data-home-press className="border-y border-white/10 bg-ink">
+    <section aria-labelledby="press-band-title" data-home-press className="border-y border-white/10">
       <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-14 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:py-16">
         <div className="shrink-0">
           <p className="eyebrow">{t.press.eyebrow}</p>

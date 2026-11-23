@@ -432,7 +432,9 @@ const SITE_PIECES: Piece[] = [
     // Its main view much larger at the opening (feedback of Yoni, 21/11/2026), whole, on a computer and on a phone.
     // 23/11/2026 (Yoni): the view with its chain alone and larger at the opening; its back no longer first (at the end of
     // its photos).
-    showcase: { size: "large", mode: "single", views: ["p19"] },
+    // 23/11/2026 evening (Yoni: « la photo avec la chaîne est trop petite ») : on a computer larger still ("xl"), its chain
+    // leaving the top of the screen, faded; on a phone it already fills the frame.
+    showcase: { size: "xl", mode: "single", views: ["p19"] },
     ...sorted("kevin-schade-dragon-ball-pendant", [
       yoni("kevin-schade-dragon-ball-pendant", "p19", at("The Dragon Ball pendant on black, with its Cuban chain")),
       yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
@@ -1150,7 +1152,9 @@ const SITE_PIECES: Piece[] = [
     boxSlug: "butterfly-trunk",
     making: {
       raw: raw(BUTTERFLY, "p77"),
-      setting: still("pieces/michy-batshuayi-butterfly-chain/setting", SET()),
+      // The setting of its wings, filmed at the bench (Yoni, 23/11/2026: « Sertissage papillon »), then its moment of the story.
+      setting: extra("michy-batshuayi-butterfly-pendant", "setting", { ...at("Film: the wings of the butterfly set by hand", "In the setting"), onBlack: false }) ?? undefined,
+      setting2: still("pieces/michy-batshuayi-butterfly-chain/setting", SET()),
       delivery: yoni(BUTTERFLY, "v01-4_8s", IN_TRUNK()),
     },
   }),
@@ -1474,6 +1478,9 @@ const COLLECTED: Piece[] = [
       ["Signature", "BRT mark on the back"],
     ],
     seen: "White gold tone panther, yellow gold tone belt · round diamonds in pavé",
+    // His trunk (Yoni, 23/11/2026: « celle de Keita »); him at the boutique of the house with it, in "Worn by".
+    boxSlug: "keita-trunk",
+    handover: list(extra("players/keita-losene", "boutique", { ...at("Keita at the Berete boutique, with his trunk"), onBlack: false })),
     making: {
       raw: raw("panther-champion-pendant", "v01-5s"),
       setting: yoni("panther-champion-pendant", "v08", { ...SETTING_FILM(), onBlack: false }),
@@ -1741,6 +1748,12 @@ const T = (file: string, texts: Partial<MediaItem>) => yoni("boxes/signature-tru
 export const REMOVED_BOXES = ["nz-travel-case"];
 
 /**
+ * A trunk tied to a person of the circle without a piece on the site yet (Malik, 23/11/2026): shown on their profile. A
+ * trunk whose piece is known is shown on the profile of the people of that piece.
+ */
+export const BOX_PEOPLE: Record<string, string[]> = { "tillman-trunk": ["malik-tillman"] };
+
+/**
  * The Signature Trunks, in the order of their page (Yoni, 22/11/2026): each opens (src/data/trunks.ts), then its piece
  * rises from it. `pieceSlug`: the address of its piece; null while it is not known (only "Create your trunk" then, and no
  * piece rising): fill it here or in the admin ("Pièce liée") once Yoni says which piece it holds.
@@ -1902,8 +1915,43 @@ export const BOXES: Box[] = ([
     slug: "butterfly-trunk",
     name: "Butterfly Trunk",
     description: "A black trunk with rose gold corners, opened by Michy Batshuayi on his Butterfly chain.",
-    images: list(still("boxes/butterfly-trunk/01", at("Michy Batshuayi opening the black trunk of his chain"))),
+    images: list(
+      // Its real photos, open on the chain and its pendant (Yoni, 23/11/2026), the best first.
+      extra("boxes/butterfly-trunk", "open-front", { ...at("The Butterfly trunk open, the chain and its pendant inside", "Opened"), onBlack: false }),
+      extra("boxes/butterfly-trunk", "open-tray", { ...at("The trunk open, its tray with the chain beside it"), onBlack: false }),
+      extra("boxes/butterfly-trunk", "tray-front", { ...at("The tray with the chain, in front of the open trunk"), onBlack: false }),
+      extra("boxes/butterfly-trunk", "chain", { ...at("The Butterfly chain and its pendant on the black suede, up close"), onBlack: false }),
+      extra("boxes/butterfly-trunk", "lid", { ...at("The emblem in rose gold in its lid, above the chain"), onBlack: false }),
+      still("boxes/butterfly-trunk/01", at("Michy Batshuayi opening the black trunk of his chain")),
+    ),
     pieceSlug: "michy-batshuayi-butterfly-pendant",
+  },
+  {
+    // Its real photos (Yoni, 23/11/2026: « celle de Keita »). Not on the page of the trunks while it has no film of its
+    // opening (every trunk of that page opens the same way); on the page of the panther and on the profile of Keita.
+    slug: "keita-trunk",
+    name: "Keita Trunk",
+    description: "A black trunk with rose gold corners: on one face, his photograph with his champion's belts; on the other, the BRT mark and Berete Jewellers.",
+    images: list(
+      extra("boxes/keita-trunk", "face", { ...at("The trunk and its photograph: the champion with his belts"), onBlack: false }),
+      extra("boxes/keita-trunk", "brt", { ...at("Its other face, the BRT mark and Berete Jewellers"), onBlack: false }),
+      extra("boxes/keita-trunk", "brt-above", { ...at("The BRT face of the trunk, from above"), onBlack: false }),
+    ),
+    pieceSlug: "panther-champion-pendant",
+  },
+  {
+    // Its real photos (Yoni, 23/11/2026: « Malik tilman »); its piece is not known yet (Malik says which). Shown on the
+    // profile of Malik Tillman (BOX_PEOPLE), not on the page of the trunks while it has no film of its opening.
+    slug: "tillman-trunk",
+    name: "Tillman Trunk",
+    description: "A trunk in grey python leather: on one face, his photograph and the letters USA; on the other, the BRT mark. Inside, black suede, the BRT mark in its lid and a round place held by straps.",
+    images: list(
+      extra("boxes/tillman-trunk", "face", { ...at("The trunk and its photograph: USA"), onBlack: false }),
+      extra("boxes/tillman-trunk", "brt", { ...at("Its other face in grey python leather, with the BRT mark"), onBlack: false }),
+      extra("boxes/tillman-trunk", "open", { ...at("The trunk open: black suede, the BRT mark in its lid, a round place held by straps", "Opened"), onBlack: false }),
+      extra("boxes/tillman-trunk", "open-tray", { ...at("The trunk open, beside its tray"), onBlack: false }),
+    ),
+    pieceSlug: null,
   },
   {
     slug: "okafor-trunk",
