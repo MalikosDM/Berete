@@ -134,12 +134,20 @@ test("the name BERETE in the background: home, pieces, circle; under everything;
     await page.evaluate(() => window.scrollTo(0, innerHeight * 1.5));
     await page.waitForTimeout(1200);
     await expect(page.locator(mark)).toBeInViewport();
+    // The pictures, where it shows (the text of the home page, the opening of the piece, the circle): with, then without.
+    const place = async () => {
+      await page.evaluate((home) => {
+        const hero = home ? document.querySelector("[data-home-hero]") : null;
+        window.scrollTo(0, hero ? hero.getBoundingClientRect().top + window.scrollY : 0);
+      }, path === "/");
+      await page.waitForTimeout(1500);
+    };
+    await place();
     await page.screenshot({ path: shotPath(info, "yoni2311c-filigrane-avec-" + name), type: "jpeg", quality: 70 });
     // Removed for the visit.
     await page.goto(path + "?filigrane=0", { waitUntil: "load" });
     await expect(page.locator(mark)).toHaveCount(0);
-    await page.evaluate(() => window.scrollTo(0, innerHeight * 1.5));
-    await page.waitForTimeout(1200);
+    await place();
     await page.screenshot({ path: shotPath(info, "yoni2311c-filigrane-sans-" + name), type: "jpeg", quality: 70 });
     await page.goto(path + "?filigrane=1", { waitUntil: "load" });
   }

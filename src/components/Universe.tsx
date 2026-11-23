@@ -390,9 +390,6 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
             </div>
           </div>
         ) : null}
-        {/* The name of the house, very discreet, in the depth of every capsule (Yoni, 23/11/2026): behind the decor, under
-            the light and the effects, never over a jewel (the whole universe is behind the page). */}
-        {preview || fixed || !watermark ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
         <div className="u-light" />
         <div className="u-texture" />
         {theme.mark ? (
@@ -427,6 +424,10 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {canvasEffects.length > 0 && !preview ? <canvas ref={canvasRef} className="u-fx" /> : null}
         <div className="u-veil" />
+        {/* The name of the house, very discreet, in every capsule (Yoni, 23/11/2026): over the decor and its veil (else the
+            veil of a phone hides it), under the whole page, never over a jewel (the universe is behind the page). Its
+            setting: BRAND_WATERMARK (src/lib/site.ts). */}
+        {preview || fixed || !watermark ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
         {/* The entrance only: hidden once it has played (src/index.css). */}
         <div className="u-entrance">
           <span className="u-flash" />
