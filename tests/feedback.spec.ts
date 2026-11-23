@@ -71,7 +71,8 @@ test("Sirius, BRT Flower and the L pendant: every photo of their folders, their 
   // Its polishing: a frame of its making-of (21/11/2026: v05 was a bur on a raw link, not the polishing).
   expect(brt.making.polishing?.src).toBe("/media/hd/brt-flower-chain/v02-24_8s.webp");
   const deniz = pieceOf("deniz-undav-l-pendant");
-  expect(deniz.gallery.length + 1).toBe(10);
+  // Its 10 photos and, first since 23/11/2026, its studio image (also its cover).
+  expect(new Set([deniz.cover, ...deniz.gallery].map((m) => m.src)).size).toBe(11);
   expect(FILMS["deniz-undav-l-pendant"]?.making?.source).toContain("38/v01");
   expect(deniz.making.polishing?.src).toBe("/media/hd/deniz-undav-l-pendant/v02.mp4");
 });

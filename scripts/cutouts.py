@@ -20,13 +20,24 @@ subject lifting (scripts/cutout-mask.swift), a transparent image whose edges fol
   height of the photo) goes.
 - neutral: a white-metal jewel on skin (a watch on a wrist): kept where the photo is neutral and light (its diamonds and
   steel), not where it is coloured (the skin) or dark (a sleeve, the background).
+- holes: a fraction: the holes of the outline smaller than that fraction of the jewel's box filled (dark stones of a pavé
+  as dark as the background), not the larger ones (the space between a chain and its pendant).
+- clear: a light level: the black seen through the gaps of a chain on black, filled by macOS, cleared (every part of the
+  jewel darker than that and larger than a speck): only for a jewel without black parts of its own.
+- largest: only the largest part of the jewel stays (what is left of a jewel whose black mirror sides were cleared).
 - seed: [x, y] (fractions of the photo): only the part of the jewel at that point (or the nearest one) is kept (a watch
   beside a chain and a bangle on the same cushion).
 - A jewel that leaves the photo (a chain going up) fades out on that side instead of a sharp cut; keep_edge: the cut kept
   sharp instead (a pendant whose corner only touches the edge: a fade would dissolve half of it). fade: {side: fraction}:
   a fade asked on a side, over that fraction of the jewel from its own edge (a chain whose ends go behind the neck of the
-  bust, blurred: they fade out instead of ending in ragged pieces).
+  bust, blurred: they fade out instead of ending in ragged pieces). fade_at: [[x, y, r]]: a fade around a point (the end
+  of a bracelet that goes into the shadow).
+- near: (mode "luma") the colour of a half-transparent edge taken from the jewel next to it, at its own light, instead of
+  unpremultiplied against black: the light decides the alpha there, so a dim pixel of metal is dark metal, not half
+  background, and dividing it by its alpha drew a pale rim around a chain on a bust.
 - Cropped on the jewel with a transparent margin of 5 % (none on a faded side).
+- mode "png": an image already cut out (a transparent PNG made by hand): kept as it is, only its loose specks removed and
+  cropped with the same margin.
 Prints one JSON line per job: size, faded sides, checks (touches the edge, haze).
 """
 import json
@@ -73,7 +84,35 @@ def fill_stones(alpha, img, s):
     return alpha
 
 
-def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None, neutral=False, seed=None, keep_edge=False, fade=None):
+def as_is(work):
+    """An image already cut out by hand: its alpha kept, loose specks removed, cropped with the margin."""
+    rgba = np.asarray(Image.open(work).convert("RGBA")).astype(np.float32) / 255
+    h, w = rgba.shape[:2]
+    s = max(h, w) / 3600
+    alpha = rgba[..., 3].copy()
+    solid = (alpha > 0.15).astype(np.uint8)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(solid, connectivity=8)
+    if n > 1:
+        areas = stats[1:, cv2.CC_STAT_AREA]
+        keep = np.zeros(n, bool)
+        keep[1:] = areas >= max(40 * s * s, areas.max() * 0.0015)
+        alpha = alpha * (cv2.dilate(keep[labels].astype(np.uint8), disk(3 * s)) > 0)
+    alpha[alpha < 0.02] = 0
+    ys, xs = np.nonzero(alpha > 0.02)
+    if len(ys) == 0:
+        return None, {"error": "empty"}
+    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    mg = int(round(MARGIN * max(y1 - y0, x1 - x0)))
+    out = np.zeros((y1 - y0 + 2 * mg, x1 - x0 + 2 * mg, 4), np.float32)
+    out[mg : mg + y1 - y0, mg : mg + x1 - x0, :3] = rgba[y0:y1, x0:x1, :3]
+    out[mg : mg + y1 - y0, mg : mg + x1 - x0, 3] = alpha[y0:y1, x0:x1]
+    a = out[..., 3]
+    obj = (a > 0.02).sum()
+    haze = float(((a > 0.05) & (a < 0.5)).sum() / max(obj, 1))
+    return out, {"width": int(out.shape[1]), "height": int(out.shape[0]), "fade": [], "onEdge": [], "haze": round(haze, 3), "dark": True, "bg": 0}
+
+
+def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None, neutral=False, seed=None, keep_edge=False, fade=None, near_colour=False, fade_at=None, clear=None, holes=None, largest=False):
     img = cv2.cvtColor(cv2.imread(work, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
     h, w = img.shape[:2]
     m = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
@@ -126,7 +165,7 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         core = cv2.erode((m > 0.5).astype(np.uint8), disk(7 * s)).astype(np.float32)
         core = cv2.GaussianBlur(core, (0, 0), 1.2 * s + 0.3)
         near = cv2.dilate((m > 0.12).astype(np.uint8), disk(16 * s)) > 0
-        t0 = bg_level + 0.035
+        t0 = max(bg_level + 0.035, level or 0)
         light = smoothstep(t0, t0 + 0.16, lum) * near
         alpha = np.maximum(core, light)
     else:
@@ -141,6 +180,15 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         den = cv2.GaussianBlur(bgmask, (0, 0), k)[..., None]
         bg_color = num / np.maximum(den, 1e-4)
 
+    if clear:
+        # The black seen through the gaps between the links of a chain (macOS fills them): a pure dark part of the
+        # jewel larger than a speck goes, its edge drawn by the light around it.
+        gap = ((lum < clear) & (alpha > 0.3)).astype(np.uint8)
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(gap, connectivity=8)
+        big = np.zeros(n, bool)
+        big[1:] = stats[1:, cv2.CC_STAT_AREA] >= 150 * s * s
+        gaps = cv2.GaussianBlur(big[labels].astype(np.float32), (0, 0), 0.8 * s + 0.3)
+        alpha = alpha * (1 - gaps) + np.minimum(alpha, smoothstep(clear, clear + 0.12, lum)) * gaps
     if seed is not None:
         # Only the part at the seed (or the nearest part): the jewel, not what lies beside it in the photo.
         solid = cv2.morphologyEx((alpha > 0.35).astype(np.uint8), cv2.MORPH_CLOSE, disk(5 * s))
@@ -155,6 +203,19 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
             alpha = alpha * (cv2.dilate((labels == k).astype(np.uint8), disk(3 * s)) > 0)
     if stones:
         alpha = fill_stones(alpha, img, s)
+    if holes:
+        # The small holes of its outline filled (dark stones of a pavé, as dark as the background), not the large ones (the
+        # space between a chain and its pendant): a hole smaller than that fraction of the jewel's box.
+        solid = cv2.morphologyEx((alpha > 0.3).astype(np.uint8), cv2.MORPH_CLOSE, disk(3 * s))
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(1 - solid, connectivity=4)
+        ys, xs = np.nonzero(solid)
+        box = (ys.max() - ys.min() + 1) * (xs.max() - xs.min() + 1)
+        small = np.zeros(n, bool)
+        for i in range(1, n):
+            x, y, bw, bh, area = stats[i]
+            small[i] = area < holes * box and not (x == 0 or y == 0 or x + bw >= w or y + bh >= h)
+        filled = cv2.erode((solid | small[labels]).astype(np.uint8), disk(1 * s)).astype(np.float32)
+        alpha = np.maximum(alpha, cv2.GaussianBlur(filled, (0, 0), 0.8 * s + 0.3))
     if fill:
         # A ring seen from the side, where no background shows through it: the inside of its band, a mirror of the black
         # background (dark between its reflections), is part of it: every hole of its outline is filled.
@@ -213,12 +274,29 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
                 cx, cy = cents[i]
                 keep[i] = x - pad <= cx <= x + bw0 + pad and y - pad <= cy <= y + bh0 + pad
             alpha = alpha * (cv2.dilate(keep[labels].astype(np.uint8), disk(3 * s)) > 0)
+    if largest:
+        # Only its largest part (the front of a cross whose black mirror sides were cleared: the pieces of rim left
+        # floating beside it go).
+        solid = (alpha > 0.15).astype(np.uint8)
+        n, labels, stats, _ = cv2.connectedComponentsWithStats(solid, connectivity=8)
+        if n > 2:
+            big = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+            alpha = alpha * (cv2.dilate((labels == big).astype(np.uint8), disk(3 * s)) > 0)
     alpha[alpha < 0.02] = 0
 
     # Colours without the background (unpremultiplied against it).
     a3 = alpha[..., None]
     fg = np.where(a3 > 0.004, (img - (1 - a3) * bg_color) / np.maximum(a3, 0.004), img)
     fg = np.clip(fg, 0, 1)
+    if near_colour and mode == "luma" and not neutral:
+        # The colour of the jewel nearby (its opaque part), blended back to the photo as the alpha rises.
+        op = (alpha > 0.9).astype(np.float32)
+        k = 3 * s + 0.5
+        num = cv2.GaussianBlur(img * op[..., None], (0, 0), k)
+        den = cv2.GaussianBlur(op, (0, 0), k)[..., None]
+        t = np.clip((a3 - 0.15) / 0.75, 0, 1)
+        fg = np.where(den > 0.02, num / np.maximum(den, 1e-4) * (1 - t) + img * t, img)
+        fg = np.clip(np.where(a3 > 0.9, img, fg), 0, 1)
 
     # A jewel that leaves the photo fades out on that side.
     band = max(2, int(round(3 * s)))
@@ -252,6 +330,16 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
             alpha = alpha * smoothstep(0, f * bw, xx - x0)
         elif side == "right":
             alpha = alpha * smoothstep(0, f * bw, x1 - xx)
+    # A fade around a point ([x, y, r], fractions of the photo; r of its larger side): the end of a bracelet that goes
+    # into the shadow dissolves there instead of ending in a ragged piece.
+    for fx, fy, fr in fade_at or []:
+        r = fr * max(h, w)
+        d = np.sqrt((xx - fx * (w - 1)) ** 2 + (yy - fy * (h - 1)) ** 2)
+        alpha = alpha * smoothstep(0.25 * r, r, d)
+    if fade_at:
+        ys, xs = np.nonzero(alpha > 0.02)
+        y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+        bh, bw = y1 - y0, x1 - x0
 
     # Cropped on the jewel, with its margin (none on a faded side).
     mg = int(round(MARGIN * max(bh, bw)))
@@ -279,7 +367,10 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
 def main():
     jobs = json.load(open(sys.argv[1]))
     for job in jobs:
-        out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"), job.get("neutral", False), job.get("seed"), job.get("keepEdge", False), job.get("fade"))
+        if job.get("mode") == "png":
+            out, report = as_is(job["work"])
+        else:
+            out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"), job.get("neutral", False), job.get("seed"), job.get("keepEdge", False), job.get("fade"), job.get("near", False), job.get("fadeAt"), job.get("clear"), job.get("holes"), job.get("largest", False))
         if out is not None:
             Image.fromarray((out * 255 + 0.5).astype(np.uint8), "RGBA").save(job["out"], compress_level=3)
         print(json.dumps({"out": job["out"], **report}), flush=True)

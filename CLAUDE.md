@@ -162,6 +162,45 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « tout ce qui reste des 3 appels (22-23/11) » — état au 23/11/2026
+- [x] **La loupe** (`src/components/Loupe.tsx`, remplace PieceLens) : photos seulement, jamais de vidéo ; elle grossit le fichier le
+      plus grand de la photo à l'endroit du curseur, jamais au-delà de ses pixels ; molette (à son plus près ou son plus loin, la page
+      défile : elle ne bloque jamais la page) et + / − au coin de la photo. Ouverture des pièces, « Sous tous les angles », « Porté
+      par », cartes des Créations (+ / − ne suivent pas le lien), photos des écrins (page Écrins et section écrin). Une photo est
+      marquée `data-loupe="<fichier>"`. iPhone : pas de loupe ; un toucher ouvre la photo en plein écran (pincement).
+- [x] **Plus de sphère qui tourne au survol** (vidéo `dragon-ball-spin` supprimée, `ShowcaseSpin` retiré). La sphère tourne dans le
+      **film héros** (`dragon-ball-hero`) : grande section juste après l'ouverture de l'accueil et de la page Dragon Ball
+      (`src/components/FeatureFilm.tsx` : muette en boucle à l'écran, son, plein écran ; texte tiré de son histoire). Source :
+      `DRAGON_BALL_HERO_SOURCE` de `scripts/mechanism-media.mjs` (720 × 1280, 25 s, image copiée sans réencodage pour l'ordinateur,
+      copie légère pour le téléphone) : **la seule ligne à changer quand arrive l'original 1080p ProRes**, puis
+      `npm run mechanisms -- --only=dragon-ball-hero`. Le making-of reste dans sa section et dans l'Atelier.
+- [x] **Nouveau texte Dragon Ball** (Yoni, mot pour mot, retours à la ligne gardés : `whitespace-pre-line` des paragraphes) ; fiche
+      « Settings » : Classic, bezel, channel, reverse ; 5 langues (FR : « le Genki Dama (le Genkidama) », « sertissage inversé »).
+- [x] **La croix de Malik Tillman qui tourne** (`tillman-cross-spin`, story Collectors 14 entière, `TILLMAN_CROSS_SOURCE`) : section
+      « Le mécanisme » juste après l'ouverture de sa page, et 3e mécanisme de l'Atelier (« La croix qui tourne »).
+- [x] **Univers** : `ciel` (L de Deniz Undav : nuages, rayons dorés, effet `feathers`), Inter (`inter-victoire`, variante
+      `inter-victoire-echarpes` : **un seul réglage `INTER_VICTORY` de `src/data/themes.ts`**), VfB (`vfb-victoire`), confettis légers
+      bleus-noirs-or (Inter) et or-rouges (VfB) derrière la bague (`fx.ts`), collier T de Thuram `gothique` (**un seul réglage
+      `RUBY_T_UNIVERSE` de `src/data/pieces.ts`**, "noir" pour revenir au noir complet). Anciens fichiers jamais utilisés.
+- [x] **Photos studio en premier** (`withStudio` de `src/data/pieces.ts`) : chaîne torsadée de Kevin Schade, montres de Radja, Tajon
+      et Thuram, médaillon FAM, L de Deniz Undav ; les photos portées restent dans « Porté par ».
+- [x] **Ordre des galeries** revu sur les 44 pièces (planches regardées une par une) : `firsts()` pour VfB, Inter (p08 de Yoni en
+      tête), maillot d'Okafor (p20), L, The Hand, Tulips, Sirius, Jesus Piece Red Flowers, Cross Infinity ; film amateur de la
+      panthère en fin de galerie (`AMATEUR_FILMS`).
+- [x] **Détourages contrôlés un par un** (planches `verification/cutouts/cutouts-grey-0N.jpg` sur gris #76808c et `cutouts-light-0N.jpg`
+      sur fond clair) : 88 vues regardées, 44 refusées, 26 refaites, 18 retirées, 70 publiées. Refusé : fond noir collé, partie
+      manquante, partie délavée ou à moitié transparente, trous dans le pavé, contour dentelé ou halo. Une vue impossible à rendre
+      propre est **retirée de la liste** de `scripts/cutouts.mjs` (jamais publiée). Nouvelles options : source `png:` (un PNG déjà
+      détouré, pris tel quel : le L de Deniz Undav), `near`, `clear`, `holes`, `largest`, `fadeAt`. Sans détourage propre (ouverture
+      sur leur photo) : bague Oval Eternity, médaillon trèfle d'Eljero Elia. Retirées aussi : L p10/p08/p02, croix Tillman p03/p06,
+      OKA p05, AS p03, Samuel Ballet s06.
+- [ ] Yoni : les rendus IA des montres montrent CARTIER (Tajon, Thuram) et ROLEX (Radja) sur le cadran : d'accord pour les publier ?
+- [x] **Marcus Thuram avec Kanye West** (story Thuram SS23 06 recadrée, `players/marcus-thuram`), sur son profil seulement ; textes
+      des photos nommées : `players.photoNamed` des textes du site.
+- `tests/yoni2311d.spec.ts` (ordinateur et iPhone, anglais et français), captures `verification/<appareil>/yoni2311d-*.jpg`.
+- [ ] Yoni : l'original 1080p du film Dragon Ball ; la croix de Tillman en HD ; choisir Inter « trophée » ou « écharpes » ; collier T
+      gothique ou tout noir.
+
 ## Passe « écrins v3 » (validés par Yoni, 23/11/2026) — état au 23/11/2026
 - [x] **9 écrins dans la même mise en scène** (socle en marbre noir, lumière dorée du dessus, caméra fixe, 6 s, la vraie pièce
       dedans) : `00 Contexte Yoni/Ecrins IA (ouverture) v3/<dossier>/` (closed.jpg et open.jpg en 4096, ouverture.mp4 et

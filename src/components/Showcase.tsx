@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import PieceLens from "@/components/PieceLens";
+import { createPortal } from "react-dom";
+import Lightbox from "@/components/Lightbox";
+import Loupe from "@/components/Loupe";
 import JewelFx, { jewelSource } from "@/components/universe/JewelFx";
 import { cutoutLargest, cutoutSrcSet, type CutoutView } from "@/data/showcase";
 import type { JewelEffect } from "@/data/themes";
@@ -37,25 +39,19 @@ const AROUND = [
  * jewel: the effect of its universe on the piece itself (src/components/universe/JewelFx.tsx), on its main view. large: its
  * main view much larger (the whole box).
  */
-/** A film of the piece turning, played while the piece is hovered (a touch on a phone): Dragon Ball (Yoni, 23/11/2026). */
-export type ShowcaseSpin = { video: string; poster: string; width: number; height: number };
 
-export default function Showcase({ slug, title, views, jewel = null, large = false, xl = false, spin = null }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; xl?: boolean; spin?: ShowcaseSpin | null }) {
+export default function Showcase({ slug, title, views, jewel = null, large = false, xl = false }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; xl?: boolean }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
-  // The film of the piece turning: it plays while the piece is hovered, stops when the pointer leaves (a touch on a phone).
-  const spinDesk = useRef<HTMLVideoElement>(null);
-  const spinPhone = useRef<HTMLVideoElement>(null);
-  const [spinning, setSpinning] = useState(false);
-  useEffect(() => {
-    for (const v of [spinDesk.current, spinPhone.current]) {
-      if (!v) continue;
-      if (spinning && v.offsetParent !== null) void v.play().catch(() => undefined);
-      else v.pause();
-    }
-  }, [spinning]);
   const mainImage = useCallback(() => rootRef.current?.querySelector<HTMLImageElement>("[data-place='0'] img") ?? null, []);
-  const spinVideo = useCallback(() => spinDesk.current, []);
+  // The magnifying glass over the main view (photos only: never a film, Yoni 23/11/2026).
+  const lensTarget = useCallback(() => {
+    const img = mainImage();
+    const v = img ? views.find((x) => img.currentSrc.includes("/" + x.id + "-") || img.src.includes("/" + x.id + "-")) : undefined;
+    return img && v && rootRef.current ? { img, full: cutoutLargest(slug, v), frame: rootRef.current } : null;
+  }, [mainImage, views, slug]);
+  // Phone: a touch opens the views full screen, where two fingers zoom.
+  const [opened, setOpened] = useState<number | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   // order[k]: the view in place k (place 0 is the middle).
   const [order, setOrder] = useState(() => views.map((_, i) => i));
@@ -149,24 +145,9 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
     />
   );
   // The jewel and the effect of its world on it, in one frame (isolated: the halo stays behind it).
-  const framed = (v: CutoutView, main: boolean, sizes: string, phone = false) => (
-    <span className={"sv-float block h-full w-full" + (jewel || (main && spin) ? " relative isolate" : "")}>
+  const framed = (v: CutoutView, main: boolean, sizes: string) => (
+    <span className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
       {img(v, main, sizes)}
-      {main && spin ? (
-        <video
-          ref={phone ? spinPhone : spinDesk}
-          data-showcase-spin
-          src={spin.video}
-          poster={spin.poster}
-          muted
-          loop
-          playsInline
-          preload="none"
-          aria-hidden="true"
-          tabIndex={-1}
-          className="sv-spin"
-        />
-      ) : null}
       {jewel ? <JewelFx kind={jewel} /> : null}
     </span>
   );
@@ -177,13 +158,10 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       data-showcase={multi ? "multi" : "single"}
       data-showcase-large={large ? "" : undefined}
       data-showcase-xl={xl && !multi ? "" : undefined}
-      data-spinning={spinning ? "" : undefined}
-      onPointerEnter={spin ? (e) => e.pointerType === "mouse" && setSpinning(true) : undefined}
-      onPointerLeave={spin ? (e) => e.pointerType === "mouse" && setSpinning(false) : undefined}
       className="relative h-full w-full"
     >
       {/* The magnifying glass that follows the pointer over the jewel (computers). */}
-      <PieceLens root={rootRef} image={mainImage} full={cutoutLargest(slug, views[places[0] ?? 0]!)} video={spin ? spinVideo : undefined} />
+      <Loupe zone={rootRef} pick={lensTarget} />
       {/* Computer: the views in depth */}
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
         {places.map((viewIndex, place) => {
@@ -227,14 +205,10 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
         >
           {views.map((v, i) => (
             <div key={v.id} data-showcase-slide={i} className={"h-full w-full shrink-0 snap-center " + (multi ? "pb-12" : "")} style={{ "--i": i } as CSSProperties}>
-              {spin && i === 0 ? (
-                // A touch makes it turn, another one stops it.
-                <button type="button" onClick={() => setSpinning((s) => !s)} aria-pressed={spinning} aria-label={t.piece.spin} className="block h-full w-full">
-                  {framed(v, true, "92vw", true)}
-                </button>
-              ) : (
-                framed(v, i === 0, "92vw")
-              )}
+              {/* A touch: full screen, two fingers to zoom. */}
+              <button type="button" onClick={() => setOpened(i)} data-showcase-open={i} aria-label={t.gallery.open(t.piece.viewAlt(title, kindName(v)))} className="block h-full w-full cursor-zoom-in">
+                {framed(v, i === 0, "92vw")}
+              </button>
             </div>
           ))}
         </div>
@@ -255,6 +229,17 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
           </div>
         ) : null}
       </div>
+      {opened !== null
+        ? createPortal(
+            <Lightbox
+              items={views.map((v) => ({ type: "image" as const, src: cutoutLargest(slug, v), width: v.width, height: v.height, alt: t.piece.viewAlt(title, kindName(v)), onBlack: true }))}
+              index={opened}
+              onIndex={setOpened}
+              onClose={() => setOpened(null)}
+            />,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

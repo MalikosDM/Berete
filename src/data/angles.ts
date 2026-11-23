@@ -65,6 +65,8 @@ export function anglePhotos(piece: Pick<Piece, "cover" | "gallery">, openingIsPh
  * studio films. A film added in the admin keeps its place.
  */
 export const AMATEUR_FILMS = new Set([
+  // The panther in a gloved hand, a phone film (23/11/2026: it came second).
+  "/media/hd/panther-champion-pendant/v03.mp4",
   "/media/stories/kevin-schade/22.mp4",
   "/media/stories/noah-okafor-ii/03.mp4",
   "/media/stories/thuram-ss23/05.mp4",

@@ -1203,6 +1203,91 @@
     }
    ]
   },
+  "ciel": {
+   "name": "Ciel au-dessus des nuages, rayons de lumière dorée (Deniz Undav, le L à l'ange)",
+   "ratio": 1.778,
+   "focusX": 0.6,
+   "focusY": 0.36,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "a376cd672d"
+  },
+  "inter-victoire": {
+   "name": "Victoire : l'équipe de l'Inter soulève le trophée, projecteurs bleus, confettis, feux d'artifice (Inter Milan)",
+   "ratio": 1.792,
+   "focusX": 0.5,
+   "focusY": 0.42,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "b8133c78cd"
+  },
+  "inter-victoire-echarpes": {
+   "name": "Victoire : l'équipe de l'Inter, écharpes levées (Inter Milan, variante)",
+   "ratio": 1.792,
+   "focusX": 0.5,
+   "focusY": 0.42,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "72dcacad8a"
+  },
+  "vfb-victoire": {
+   "name": "Victoire : l'équipe du VfB soulève la coupe, fumigènes rouges, confettis or et rouges, feux d'artifice (VfB Stuttgart)",
+   "ratio": 1.792,
+   "focusX": 0.55,
+   "focusY": 0.42,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "e8c7b4b5f9"
+  },
+  "gothique": {
+   "name": "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)",
+   "ratio": 1.792,
+   "focusX": 0.6,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "c58598fd94"
+  },
   "keita-ko": {
    "name": "Le KO : la panthère de fumée qui bondit (Lasana Keita)",
    "ratio": 1.792,

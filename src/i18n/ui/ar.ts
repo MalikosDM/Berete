@@ -286,6 +286,7 @@ export const ar: Messages = {
   },
 
   players: {
+    photoNamed: { kanye: "ماركوس تورام مع كانييه ويست", boutique: "كيتا في بوتيك Berete، مع حقيبته" } as Record<string, string>,
     trunks: (count: number) => (count > 1 ? "صناديقه" : "صندوقه"),
     eyebrow: "دائرة Berete",
     title: "يرتديها النجوم",
@@ -712,6 +713,20 @@ export const ar: Messages = {
     soonMessage: "مرحبًا Berete Jewellers، أودّ رؤية قطعي بالأبعاد الثلاثية.",
   },
 
+  feature: {
+    film: "الفيلم",
+    dragonTitle: "Dragon Ball في حركة",
+    dragonLabel: "فيلم قلادة Dragon Ball: القطعة، وحقيبتها وهي تنفتح، وكرة Spirit Bomb وهي تدور",
+    mechanism: "الآلية",
+    crossTitle: "الصليب الذي يدور",
+    crossText: "في نهاية الفيلم، يُدار مركزه باليد.",
+    crossLabel: "صليب مالك تيلمان، ملبوساً، ثم يُدار مركزه باليد",
+    play: "تشغيل الفيلم",
+    pause: "إيقاف الفيلم مؤقتاً",
+    soundOn: "تشغيل الصوت",
+    soundOff: "كتم الصوت",
+    fullscreen: "المشاهدة بملء الشاشة",
+  },
   films: {
     pieceSection: "القطعة المكتملة",
     pieceSectionLead: (title: string) => "فيلم القطعة المكتملة: " + title + ". على كامل الشاشة، مع الصوت.",

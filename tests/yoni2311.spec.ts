@@ -3,6 +3,7 @@
 // without descriptive texts, the new worlds, the Bosnia ring, the trunks, the atelier, the journey, the house, the press.
 // Computer (Chrome 1440), iPhone (WebKit 390) and Safari on a laptop (WebKit 1280). Silent (tests/fixtures.ts).
 import { expect, test, type Page } from "./fixtures";
+import { RUBY_T_UNIVERSE } from "../src/data/pieces";
 import { shotPath, skipIntro, watch } from "./helpers";
 
 const V = "\\.[0-9a-f]{10}\\.";
@@ -39,15 +40,11 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   // In this order: the innovation, the commissions, the selection, the press.
   const order = await page.evaluate(() => ["[data-scroll-video]", "[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
   expect(order.every((y, i) => y >= 0 && (i === 0 || y > order[i - 1]!))).toBe(true);
-  // The Dragon Ball: its sphere turns at a click (never by itself), its capsule.
+  // The Dragon Ball: its film, large (23/11/2026), and its capsule (tests/yoni2311d.spec.ts plays it).
   const inno = page.locator("[data-home-innovation]");
   await inno.scrollIntoViewIfNeeded();
   await expect(inno.locator('a[href="/pieces/kevin-schade-dragon-ball-pendant"]')).toBeVisible();
-  const film = inno.locator("[data-sphere-film]");
-  expect(await film.getAttribute("src")).toBeNull();
-  await inno.locator("[data-sphere-play]").click();
-  await expect(film).toHaveAttribute("src", new RegExp("^/media/mechanisms/dragon-ball-sphere" + V + "mp4$"));
-  await expect.poll(() => film.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.2);
+  await expect(inno.locator("[data-feature-video]")).toHaveAttribute("src", new RegExp("^/media/mechanisms/dragon-ball-hero(-mobile)?" + V + "mp4$"), { timeout: 15_000 });
   // The two great commissions.
   await expect(page.locator("[data-special-ring]")).toHaveCount(2);
   // Pendants, chains and rings, not only football.
@@ -185,10 +182,9 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   await expect(page.locator('[data-worn-with="noah-okafor-jersey-pendant"]')).toBeVisible();
   await open(page, "/pieces/noah-okafor-oka-pendant");
   await expect.poll(backdrop).toContain("/media/universes/okafor-oka-");
-  // The T necklace of Marcus Thuram: no universe, all black, its details large.
+  // The T necklace of Marcus Thuram: a very dark gothic since 23/11/2026 (RUBY_T_UNIVERSE: "noir" for all black), its details large.
   await open(page, "/pieces/marcus-thuram-ruby-t-necklace");
-  await expect(page.locator(".universe")).toHaveAttribute("data-universe", "noir");
-  await expect(page.locator(".u-backdrop")).toHaveCount(0);
+  await expect(page.locator(".universe")).toHaveAttribute("data-universe", RUBY_T_UNIVERSE);
   await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase", "single");
   await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p01");
   await page.screenshot({ path: shotPath(info, "yoni2311-ruby-t") });
@@ -262,7 +258,8 @@ test("atelier, journey, house, press", async ({ page }, info) => {
   await expect(page.locator("[data-philosophy]")).toContainText("No vision too bold, no detail without purpose.");
   const eng = page.locator("[data-engineering]");
   await eng.scrollIntoViewIfNeeded();
-  await expect(eng.locator("[data-mechanism]")).toHaveCount(2);
+  // The sphere, the top that lifts off, the cross that turns (23/11/2026).
+  await expect(eng.locator("[data-mechanism]")).toHaveCount(3);
   await expect(eng.locator("[data-mechanism='sphere'] video")).toHaveAttribute("src", new RegExp("/media/mechanisms/dragon-ball-sphere" + V + "mp4$"));
   await eng.locator("[data-lifting-ring] button").first().click();
   await expect(eng.locator("[data-lifting-ring] button").first()).toHaveAttribute("aria-pressed", "true");

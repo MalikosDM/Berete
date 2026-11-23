@@ -276,23 +276,37 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       kind: 0,
     };
   };
-  const confettiColors = opts.preset === "bianconero" ? WHITE : [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
+  // Inter: blue, black and gold; VfB: gold and red (23/11/2026); else from the light of the world.
+  const confettiColors =
+    opts.preset === "bianconero"
+      ? WHITE
+      : opts.preset === "victoire-nuit"
+        ? ["rgba(30,84,214,1)", "rgba(74,128,240,1)", "rgba(10,12,18,1)", "rgba(226,184,79,1)", "rgba(246,214,130,1)"]
+        : opts.preset === "victoire-rouge"
+          ? ["rgba(226,184,79,1)", "rgba(246,214,130,1)", "rgba(206,24,32,1)", "rgba(240,60,52,1)"]
+          : [rgba(glow, 1), rgba(mix(glow, white, 0.4), 1), "rgba(12,12,14,1)", rgba(mix(glow, [0, 0, 0], 0.35), 1)];
+  /** The two victories: a light rain (their images already hold confetti). */
+  const lightRain = opts.preset === "victoire-nuit" || opts.preset === "victoire-rouge";
+  const FEATHER = ["rgba(255,251,242,0.85)", "rgba(246,234,212,0.8)", "rgba(255,244,222,0.7)"];
   const petalColors =
     opts.preset === "tulipes" ? TULIPS.map((c) => rgba(c, 0.9)) : opts.preset === "roses" ? ROSES.map((c) => rgba(c, 0.9)) : [rgba(glow, 0.85), rgba(mix(glow, hexToRgb(opts.tint), 0.35), 0.85), rgba(mix(glow, white, 0.3), 0.8)];
   const mapleColors = MAPLE.map((c) => rgba(c, 0.92));
   const leaf = mapleLeaf();
-  /** kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light), 3: a red maple leaf. */
+  /**
+   * kind 0: confetti, 1: a petal, 2: golden confetti (falling slower, turning in the light), 3: a red maple leaf, 4: a white
+   * feather drifting down, very slowly.
+   */
   const newFalling = (anywhere: boolean, kind: number): P => {
     const petal = kind === 1 || kind === 3;
-    const colors = kind === 3 ? mapleColors : petal ? petalColors : kind === 2 ? GOLD : confettiColors;
+    const colors = kind === 4 ? FEATHER : kind === 3 ? mapleColors : petal ? petalColors : kind === 2 ? GOLD : confettiColors;
     return {
       x: rand(-0.05, 1.05) * w,
       y: anywhere ? rand(-0.1, 1) * h : rand(-60, -10),
-      vx: rand(-0.4, 0.4),
-      vy: petal ? rand(0.35, 0.9) : kind === 2 ? rand(0.35, 0.85) : rand(0.5, 1.3),
+      vx: kind === 4 ? rand(-0.25, 0.25) : rand(-0.4, 0.4),
+      vy: kind === 4 ? rand(0.18, 0.38) : petal ? rand(0.35, 0.9) : kind === 2 ? rand(0.35, 0.85) : rand(0.5, 1.3),
       life: 0,
       max: 99999,
-      size: kind === 3 ? rand(7, 14) * (phone ? 0.85 : 1) : petal ? rand(6, 12) : rand(4, 8),
+      size: kind === 4 ? rand(12, 20) * (phone ? 0.8 : 1) : kind === 3 ? rand(7, 14) * (phone ? 0.85 : 1) : petal ? rand(6, 12) : rand(4, 8),
       spin: rand(0, Math.PI * 2),
       angle: rand(-0.04, 0.04),
       hue: rand(0, Math.PI * 2),
@@ -334,7 +348,8 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
     if (has("genkidama")) while (genki.length < (phone ? 60 : count(84))) genki.push(newGenki(true));
     if (has("dust")) while (dust.length < count(46)) dust.push(newDust(true));
     if (has("embers")) while (embers.length < count(64)) embers.push(newEmber(true));
-    if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(26)) falling.push(newFalling(true, 0));
+    if (has("confetti")) while (falling.filter((p) => p.kind === 0).length < count(lightRain ? 16 : 26)) falling.push(newFalling(true, 0));
+    if (has("feathers")) while (falling.filter((p) => p.kind === 4).length < count(7)) falling.push(newFalling(true, 4));
     if (has("petals")) while (falling.filter((p) => p.kind === 1).length < count(22)) falling.push(newFalling(true, 1));
     if (has("gold-confetti")) while (falling.filter((p) => p.kind === 2).length < count(24)) falling.push(newFalling(true, 2));
     if (has("maple")) while (falling.filter((p) => p.kind === 3).length < count(16)) falling.push(newFalling(true, 3));
@@ -872,7 +887,7 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
 
     // Confetti and petals fall in their own colours, not in light.
     ctx.globalCompositeOperation = "source-over";
-    if (has("confetti") || has("petals") || has("gold-confetti") || has("maple")) {
+    if (has("confetti") || has("petals") || has("gold-confetti") || has("maple") || has("feathers")) {
       for (let i = falling.length - 1; i >= 0; i--) {
         const p = falling[i]!;
         p.hue += 0.05;
@@ -885,7 +900,23 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         ctx.rotate(p.spin);
         ctx.globalAlpha = 0.75;
         ctx.fillStyle = p.color;
-        if (p.kind === 3) {
+        if (p.kind === 4) {
+          // A feather: a long soft vane on its shaft, rocking gently as it drifts down.
+          ctx.rotate(Math.sin(p.hue * 0.6) * 0.5 - p.spin);
+          ctx.scale(Math.abs(turn) * 0.35 + 0.65, 1);
+          ctx.globalAlpha = 0.55;
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size);
+          ctx.bezierCurveTo(p.size * 0.32, -p.size * 0.6, p.size * 0.3, p.size * 0.45, 0, p.size * 0.8);
+          ctx.bezierCurveTo(-p.size * 0.26, p.size * 0.4, -p.size * 0.3, -p.size * 0.55, 0, -p.size);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,246,228,0.6)";
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(0, -p.size);
+          ctx.lineTo(0, p.size * 1.05);
+          ctx.stroke();
+        } else if (p.kind === 3) {
           // A maple leaf turning over as it falls (it narrows, then shows its other side, a little darker).
           ctx.scale(Math.abs(turn) * 0.75 + 0.25, 1);
           ctx.scale(p.size, p.size);

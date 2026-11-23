@@ -143,7 +143,7 @@ export function PlayerPage() {
             <ul data-player-photos className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
               {photos.map((m, i) => (
                 <li key={m.src} className="relative aspect-[4/5] overflow-hidden border border-white/10 bg-ink-soft">
-                  <MediaView item={m} alt={t.players.photo(person.name, i + 1)} fit="cover" fade sizes="(max-width: 1023px) 50vw, 33vw" />
+                  <MediaView item={m} alt={t.players.photoNamed[m.src.match(/\/media\/extra\/players\/[^/]+\/([a-z-]+)\./)?.[1] ?? ""] ?? t.players.photo(person.name, i + 1)} fit="cover" fade sizes="(max-width: 1023px) 50vw, 33vw" />
                 </li>
               ))}
             </ul>

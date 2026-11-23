@@ -7,10 +7,14 @@
  *   public/media/mechanisms/<key>.<v>.webp        a still of a film (a step of The Bespoke Journey)
  * and src/data/mechanisms.generated.json. <v>: a fingerprint of the files (no cache keeps an old one). Originals never go
  * in Git.
- * Also the Dragon Ball pendant that turns, played while the pointer is on the piece (its page): "dragon-ball-spin", at the
- * resolution of its source (never enlarged nor reduced), silent, a loop without a jump. Its source is DRAGON_BALL_SPIN_SOURCE
- * below: when the professional HD film of Yoni arrives, change only that path and run npm run mechanisms -- --only=
- * dragon-ball-spin (the film is then taken whole, at its own size; give it a window in SPIN_WINDOWS if only a part turns).
+ * Also two films taken whole, at the size of their source (never enlarged), each from ONE line to change when a better file
+ * arrives (then npm run mechanisms -- --only=<key>):
+ *   - "dragon-ball-hero": the professional film of the finished Dragon Ball pendant (the piece, its trunk that opens, the
+ *     sphere that turns), shown large on the home page and at the top of its page, with its sound: DRAGON_BALL_HERO_SOURCE;
+ *     a version for computers (its full quality) and a lighter one for phones;
+ *   - "tillman-cross-spin": the cross of Malik Tillman whose centre is turned by hand ("The mechanism" of its page, and
+ *     The Atelier): TILLMAN_CROSS_SOURCE, silent.
+ * The Dragon Ball pendant no longer turns under the pointer (Yoni, 23/11/2026: the lens shows photos only).
  *
  *   npm run mechanisms
  *   npm run mechanisms -- --only=<key>,<key>      (the other keys keep their files and their entry)
@@ -38,26 +42,23 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 
 /**
  * ============================================================================================================
- * THE SOURCE OF THE DRAGON BALL PENDANT THAT TURNS (key "dragon-ball-spin"): the one line to change when the
- * professional HD film of Yoni arrives (then: npm run mechanisms -- --only=dragon-ball-spin).
- * Today (23/11/2026, every film of the piece looked at frame by frame): the story of Kevin Schade 03/12 (720 x 1280, the
- * best there is): the finished pendant held by its bail, on the black tray of the house, turns from the front to its
- * side and on to its other side. Folder 13 has no film of it turning (video 01: the making-of, the sphere filmed close
- * but not turning; video 02: the raw piece turned by a finger at the bench); stories 07 and 22: the camera moves along
- * it, or it is handled on its chain.
+ * THE TWO LINES TO CHANGE when Yoni sends the originals (then npm run mechanisms -- --only=<key>):
+ * - the film of the finished Dragon Ball pendant (key "dragon-ball-hero"): today its copy of the iCloud album, 720 x 1280,
+ *   25 s (23/11/2026); Yoni sends the original in 1080p ProRes;
+ * - the cross of Malik Tillman whose centre turns (key "tillman-cross-spin"): today the story Collectors 14, 720 x 1280,
+ *   17 s (worn, then a hand turns its centre); Yoni sends it in HD.
  * ============================================================================================================
  */
-const DRAGON_BALL_SPIN_SOURCE = join(STORIES, "03 Kevin Schade", "03 Kevin Schade - 12.mp4");
+const DRAGON_BALL_HERO_SOURCE = join(ICLOUD, "13 Pendentif sculpte or jaune et rose", "Videos", "HD hero", "13 Dragon Ball - video hero pro (Yoni 23-11).mp4");
+const TILLMAN_CROSS_SOURCE = join(STORIES, "09 Collectors", "09 Collectors - 14.mp4");
 
-/**
- * The part of a source that turns, by source: from/to (seconds), the part of the image kept (ffmpeg crop, w:h:x:y), and
- * pingpong (played forward then backward: a loop without a jump). A source not listed is taken whole.
- * Story 03/12: from the front (2.3 s) through its side (5 s) to its other side (8.3 s), then back: the caption of the story
- * ("Final choice. No doubt.", from 1170 px down) left out by the crop, the pendant whole in every image (down to 1070 px).
- */
-const SPIN_WINDOWS = {
-  [join(STORIES, "03 Kevin Schade", "03 Kevin Schade - 12.mp4")]: { from: 2.3, to: 8.3, crop: "720:1120:0:0", pingpong: true },
-};
+/** The films taken whole: their source, whether their sound is kept, the moment of their image before they play. */
+const WHOLE = [
+  // Its image: the pendant almost whole, from its sphere to the dragons, on black (3.5 s).
+  { key: "dragon-ball-hero", src: DRAGON_BALL_HERO_SOURCE, audio: true, poster: 3.5 },
+  // Its image: the cross whole, worn (1 s).
+  { key: "tillman-cross-spin", src: TILLMAN_CROSS_SOURCE, audio: false, poster: 1 },
+];
 
 /**
  * Each film: its source, the square kept (after the rotation of the phone), the part kept (seconds) and the moment of its
@@ -98,36 +99,43 @@ function sizeOf(file) {
   return { width, height };
 }
 
-/** The Dragon Ball pendant that turns: at the size of its source, silent, H.264, its index at the start, a loop. */
-async function spin(key, src) {
+/**
+ * A film whole, at the size of its source (never enlarged): for computers its picture as it is (copied, nothing lost, when
+ * it is already H.264), for phones a lighter copy (the same size, a lower rate); ready to start before it is all loaded; its
+ * sound kept if asked; its image, sharp.
+ */
+async function whole({ key, src, audio, poster: at }) {
   if (!existsSync(src)) {
     console.error("Not found (plug the disk in): " + src);
     process.exit(1);
   }
-  const w = SPIN_WINDOWS[src] ?? {};
   const tmp = join(OUT, "." + key + ".tmp");
   await rm(tmp, { recursive: true, force: true });
   await mkdir(tmp, { recursive: true });
   const film = join(tmp, key + ".mp4");
+  const mobile = join(tmp, key + "-mobile.mp4");
   const poster = join(tmp, key + "-poster.webp");
-  const window = w.from !== undefined ? ["-ss", String(w.from), "-to", String(w.to)] : [];
-  const crop = w.crop ? "crop=" + w.crop + "," : "";
-  // Forward, then backward without its two ends (each already shown): the last image leads back to the first.
-  const graph = w.pingpong
-    ? "[0:v]" + crop + "format=yuv420p,split[a][b];[b]trim=start_frame=1,setpts=PTS-STARTPTS,reverse,trim=start_frame=1,setpts=PTS-STARTPTS[r];[a][r]concat=n=2:v=1:a=0[v]"
-    : "[0:v]" + crop + "format=yuv420p[v]";
-  run([...window, "-i", src, "-an", "-filter_complex", graph, "-map", "[v]", "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-maxrate", "3000k", "-bufsize", "6000k", "-profile:v", "high", "-movflags", "+faststart", "-map_metadata", "-1", film]);
-  run(["-ss", String(w.from ?? 0), "-i", src, "-frames:v", "1", "-vf", crop ? crop.slice(0, -1) : "null", "-quality", "85", poster]);
+  const sound = audio ? ["-c:a", "aac", "-b:a", "160k"] : ["-an"];
+  const common = ["-vf", "format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-movflags", "+faststart", "-map_metadata", "-1"];
+  const probe = spawnSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=codec_name,pix_fmt", "-of", "csv=p=0", src], { encoding: "utf8" }).stdout.trim();
+  const copy = probe === "h264,yuv420p";
+  if (copy) run(["-i", src, "-c:v", "copy", ...(audio ? ["-c:a", "copy"] : ["-an"]), "-movflags", "+faststart", "-map_metadata", "-1", film]);
+  else run(["-i", src, ...common, "-crf", "17", "-maxrate", "8000k", "-bufsize", "16000k", ...sound, film]);
+  run(["-i", src, ...common, "-crf", "23", "-maxrate", "1800k", "-bufsize", "3600k", ...(audio ? ["-c:a", "aac", "-b:a", "128k"] : ["-an"]), mobile]);
+  run(["-ss", String(at), "-i", src, "-frames:v", "1", "-quality", "90", poster]);
   const hash = createHash("sha256");
-  for (const file of [film, poster]) hash.update(readFileSync(file));
+  for (const file of [film, mobile, poster]) hash.update(readFileSync(file));
   const v = hash.digest("hex").slice(0, 10);
-  for (const old of await readdir(OUT)) if (old.startsWith(key + ".") || old.startsWith(key + "-poster.")) await rm(join(OUT, old));
+  for (const old of await readdir(OUT)) if (old.startsWith(key + ".") || old.startsWith(key + "-poster.") || old.startsWith(key + "-mobile.")) await rm(join(OUT, old));
   await rename(film, join(OUT, key + "." + v + ".mp4"));
+  await rename(mobile, join(OUT, key + "-mobile." + v + ".mp4"));
   await rename(poster, join(OUT, key + "-poster." + v + ".webp"));
   await rm(tmp, { recursive: true, force: true });
   const { width, height } = sizeOf(join(OUT, key + "." + v + ".mp4"));
-  console.log("  + " + key + " (" + v + ", " + width + " x " + height + ")");
-  return { video: "/media/mechanisms/" + key + "." + v + ".mp4", poster: "/media/mechanisms/" + key + "-poster." + v + ".webp", width, height };
+  const duration = Number(spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", join(OUT, key + "." + v + ".mp4")], { encoding: "utf8" }).stdout.trim());
+  console.log("  + " + key + " (" + v + ", " + width + " x " + height + ", " + duration.toFixed(1) + " s)");
+  const base = "/media/mechanisms/" + key;
+  return { video: base + "." + v + ".mp4", mobile: base + "-mobile." + v + ".mp4", poster: base + "-poster." + v + ".webp", width, height, duration: Math.round(duration * 10) / 10, audio };
 }
 
 await mkdir(OUT, { recursive: true });
@@ -179,6 +187,11 @@ for (const f of STILLS) {
   data[f.key] = { image: "/media/mechanisms/" + f.key + "." + v + ".webp", width: 1080, height: 1350 };
   console.log("  + " + f.key + " (" + v + ")");
 }
-if (runs("dragon-ball-spin")) data["dragon-ball-spin"] = await spin("dragon-ball-spin", DRAGON_BALL_SPIN_SOURCE);
+for (const f of WHOLE) if (runs(f.key)) data[f.key] = await whole(f);
+// The Dragon Ball pendant that turned under the pointer: gone (23/11/2026).
+if (data["dragon-ball-spin"]) {
+  delete data["dragon-ball-spin"];
+  for (const old of await readdir(OUT)) if (old.startsWith("dragon-ball-spin")) await rm(join(OUT, old));
+}
 await writeFile(DATA, JSON.stringify(data, null, 1) + "\n");
 console.log("  = src/data/mechanisms.generated.json");

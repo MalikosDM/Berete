@@ -333,5 +333,54 @@
    "duration": 7.1,
    "audio": false
   }
+ },
+ "kevin-schade-twisted-chain": {
+  "studio": {
+   "src": "/media/extra/kevin-schade-twisted-chain/studio.715785d303.webp",
+   "width": 1195,
+   "height": 1600
+  }
+ },
+ "radja-nainggolan-iced-watch": {
+  "studio": {
+   "src": "/media/extra/radja-nainggolan-iced-watch/studio.28f637d026.webp",
+   "width": 1195,
+   "height": 1600
+  }
+ },
+ "tajon-buchanan-iced-watch": {
+  "studio": {
+   "src": "/media/extra/tajon-buchanan-iced-watch/studio.e904936b57.webp",
+   "width": 1195,
+   "height": 1600
+  }
+ },
+ "marcus-thuram-skeleton-watch": {
+  "studio": {
+   "src": "/media/extra/marcus-thuram-skeleton-watch/studio.68adb49903.webp",
+   "width": 1195,
+   "height": 1600
+  }
+ },
+ "tanguy-nianzou-fam-medallion": {
+  "studio": {
+   "src": "/media/extra/tanguy-nianzou-fam-medallion/studio.947c7a497c.webp",
+   "width": 1200,
+   "height": 1600
+  }
+ },
+ "deniz-undav-l-pendant": {
+  "studio": {
+   "src": "/media/extra/deniz-undav-l-pendant/studio.7d9436dc29.webp",
+   "width": 971,
+   "height": 1600
+  }
+ },
+ "players/marcus-thuram": {
+  "kanye": {
+   "src": "/media/extra/players/marcus-thuram/kanye.4092eb7e59.webp",
+   "width": 1042,
+   "height": 1419
+  }
  }
 }

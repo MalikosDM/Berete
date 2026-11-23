@@ -304,6 +304,7 @@ export const fr: Messages = {
   },
 
   players: {
+    photoNamed: { kanye: "Marcus Thuram avec Kanye West", boutique: "Keita à la boutique Berete, avec sa malle" } as Record<string, string>,
     trunks: (count: number) => (count > 1 ? "Ses écrins" : "Son écrin"),
     eyebrow: "Le Cercle Berete",
     title: "Portées par des icônes",
@@ -731,6 +732,20 @@ export const fr: Messages = {
     soonMessage: "Bonjour Berete Jewellers, j’aimerais voir mes pièces en 3D.",
   },
 
+  feature: {
+    film: "Le film",
+    dragonTitle: "Dragon Ball, en mouvement",
+    dragonLabel: "Le film du pendentif Dragon Ball : la pièce, sa malle qui s’ouvre, son Genkidama qui tourne",
+    mechanism: "Le mécanisme",
+    crossTitle: "La croix qui tourne",
+    crossText: "À la fin du film, son centre tourne sous la main.",
+    crossLabel: "La croix de Malik Tillman, portée, puis son centre tourné à la main",
+    play: "Lire le film",
+    pause: "Mettre le film en pause",
+    soundOn: "Activer le son",
+    soundOff: "Couper le son",
+    fullscreen: "Voir en plein écran",
+  },
   films: {
     pieceSection: "La pièce achevée",
     pieceSectionLead: (title: string) => "Le film de la pièce achevée : " + title + ". En plein écran, avec le son.",

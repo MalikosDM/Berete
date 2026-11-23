@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import ContactBlock from "@/components/ContactBlock";
+import FeatureFilm from "@/components/FeatureFilm";
 import { MediaView } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
 import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
-import { media } from "@/data/catalogue";
-import mechanisms from "@/data/mechanisms.generated.json" with { type: "json" };
+import { defaultCatalogue, media } from "@/data/catalogue";
+import { DRAGON_BALL_MOTION, featureFilmOf, storyLines } from "@/data/featureFilms";
 import { yoni } from "@/data/sources";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import { publishedPress } from "@/data/press";
-import { CUTOUTS, cutoutSrc, cutoutSrcSet, type CutoutView } from "@/data/showcase";
 import type { Piece } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
@@ -34,30 +33,6 @@ const HERO_PHOTO: keyof typeof HERO_PHOTOS = "chain";
 const INNOVATION = "kevin-schade-dragon-ball-pendant";
 /** A balanced selection (not only football): two pendants, two chains, two rings, in turn. */
 const SELECTION = ["the-hand", "butterfly-chain", "oval-eternity-band", "tulips-on-tour-medallion", "sirius", "bosnia-and-herzegovina-world-cup-2026-ring"];
-
-/** The main cutout of a piece (its face view), if it has a clean one. */
-function faceOf(slug: string): CutoutView | null {
-  const views = (CUTOUTS[slug] ?? []).filter((v) => v.clean);
-  return views.find((v) => v.kind === "face") ?? views[0] ?? null;
-}
-
-function Cutout({ slug, view, alt, sizes, priority = false, className = "" }: { slug: string; view: CutoutView; alt: string; sizes: string; priority?: boolean; className?: string }) {
-  return (
-    <img
-      src={cutoutSrc(slug, view, view.widths[1] ?? view.widths[0]!)}
-      srcSet={cutoutSrcSet(slug, view)}
-      sizes={sizes}
-      alt={alt}
-      width={view.width}
-      height={view.height}
-      decoding="async"
-      loading={priority ? "eager" : "lazy"}
-      fetchPriority={priority ? "high" : undefined}
-      draggable={false}
-      className={"h-full w-full object-contain " + className}
-    />
-  );
-}
 
 /** The opening: who Berete is, in one sentence, beside one piece, large, on black, in a luxurious light. */
 function Hero() {
@@ -113,78 +88,33 @@ function Hero() {
   );
 }
 
-/** The innovation: the Spirit Bomb of the Dragon Ball pendant, engineered to rotate; its film plays at a click (never by itself). */
+/**
+ * The Dragon Ball pendant, in its film (Yoni, 23/11/2026: « la vidéo héros », the one to show first): large, right after the
+ * opening, silent in a loop when it comes on screen, its sound and full screen at a button; the words of its story on its
+ * sphere that turns; the way to its world.
+ */
 function Innovation() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const piece = cat.pieces.find((p) => p.slug === INNOVATION);
-  const view = faceOf(INNOVATION);
-  const film = mechanisms["dragon-ball-sphere"];
-  // Its file is asked for at the first click only; the film plays then (muted, it may play outside of the click itself).
-  const [started, setStarted] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  useEffect(() => {
-    if (started) void videoRef.current?.play().catch(() => undefined);
-  }, [started]);
-  if (!piece) return null;
-  const play = () => {
-    const v = videoRef.current;
-    if (started && v) {
-      v.currentTime = 0;
-      void v.play().catch(() => undefined);
-    } else setStarted(true);
-  };
+  const film = featureFilmOf(INNOVATION);
+  if (!piece || !film) return null;
   return (
-    <section aria-labelledby="innovation-title" data-home-innovation className="border-t border-white/10">
-      <div className="mx-auto grid max-w-[1600px] items-center gap-12 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-28">
-        <div className="relative lg:col-span-6">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-xl">
-            {view ? <Cutout slug={piece.slug} view={view} alt={piece.title} sizes="(max-width: 1023px) 90vw, 45vw" /> : <MediaView item={piece.cover} alt={piece.title} fit="contain" sizes="(max-width: 1023px) 90vw, 45vw" />}
-            {/* The film of its sphere turning, before the setting: in a circle, at a click. */}
-            {film ? (
-              <div className="absolute end-0 bottom-0 w-[42%] max-w-56 sm:w-[38%]">
-                <div className="relative aspect-square overflow-hidden rounded-full border border-rose-light/50 bg-ink-soft shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
-                  <video
-                    ref={videoRef}
-                    src={started ? film.video : undefined}
-                    poster={film.poster}
-                    muted
-                    playsInline
-                    preload="none"
-                    onPlaying={() => setPlaying(true)}
-                    onEnded={() => setPlaying(false)}
-                    data-sphere-film
-                    aria-label={t.home.innovation.film}
-                    className="h-full w-full object-cover"
-                  />
-                  {!playing ? (
-                    <button type="button" onClick={play} data-sphere-play className="absolute inset-0 flex items-center justify-center bg-ink/35 text-white transition-colors hover:bg-ink/20" aria-label={t.home.innovation.play}>
-                      <span className="flex size-12 items-center justify-center rounded-full border border-white/70 bg-ink/50">
-                        <Play className="size-5 translate-x-0.5 fill-current" aria-hidden="true" />
-                      </span>
-                    </button>
-                  ) : null}
-                </div>
-                <p className="mt-2 text-center text-base text-mist">{t.home.innovation.caption}</p>
-              </div>
-            ) : null}
-          </div>
-        </div>
-        <div className="lg:col-span-5 lg:col-start-8">
-          <p className="eyebrow">{t.home.innovation.eyebrow}</p>
-          <h2 id="innovation-title" className="title-caps mt-5 text-[clamp(1.75rem,3.6vw,3rem)] leading-[1.1] tracking-[0.08em] [text-wrap:balance]">
-            {t.home.innovation.title}
-          </h2>
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-bone md:text-lg">{t.home.innovation.text}</p>
-          <p className="mt-3 text-base text-mist">{piece.title}</p>
-          <Link to={"/pieces/" + piece.slug} data-innovation-link className="mt-8 inline-flex min-h-12 items-center gap-3 border border-rose-light/80 px-7 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink">
-            {t.common.enterWorld}
-            <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
+    <div data-home-innovation>
+      <FeatureFilm film={film.film} id="innovation-title" data="home" label={t.feature.dragonLabel} eyebrow={t.feature.film} title={t.feature.dragonTitle}>
+        {storyLines(piece, defaultCatalogue.pieces.find((p) => p.slug === INNOVATION), DRAGON_BALL_MOTION).map((line) => (
+          <p key={line} className="mt-6 max-w-lg text-base leading-relaxed text-bone md:text-lg">
+            {line}
+          </p>
+        ))}
+        {piece.line ? <p className="mt-8 font-display text-[clamp(1.5rem,2.4vw,2rem)] font-light italic leading-snug text-white">{t.about.quoted(piece.line)}</p> : null}
+        <p className="mt-6 text-base text-mist">{piece.title}</p>
+        <Link to={"/pieces/" + piece.slug} data-innovation-link className="mt-8 inline-flex min-h-12 items-center gap-3 border border-rose-light/80 px-7 text-base font-semibold uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink">
+          {t.common.enterWorld}
+          <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+        </Link>
+      </FeatureFilm>
+    </div>
   );
 }
 

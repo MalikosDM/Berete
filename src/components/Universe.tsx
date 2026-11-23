@@ -183,7 +183,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   // The other images of a sequence load once the page is there (the first one alone before).
   const [allFrames, setAllFrames] = useState(false);
   const canvasEffects = effects.filter((e) =>
-    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "maple", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops", "void"].includes(e),
+    ["dust", "embers", "glints", "lightning", "speedlines", "butterflies", "confetti", "gold-confetti", "petals", "maple", "feathers", "stars", "genkidama", "flashes", "serpent", "fireflies", "sparks", "light-lines", "prism", "dew", "beam-dust", "drops", "void"].includes(e),
   );
   // The lights of the image that come alive, and the places where some effects of the canvas happen.
   const frameSpots = frames.map((f) => (effects.includes("scene") ? (f.b.spots ?? []) : []));

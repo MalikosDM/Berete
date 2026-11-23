@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, Gift, ZoomIn } from "lucide-react";
+import { ArrowRight, Gift } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
+import Loupe, { pickMarked } from "@/components/Loupe";
 import { MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
 import { onTrunksPage as onPage } from "@/data/trunks";
@@ -22,11 +23,12 @@ export const onTrunksPage = (box: Box): boolean => onPage(box.slug);
 export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: string; id: string }) {
   const { t } = useI18n();
   const [open, setOpen] = useState<{ box: number; photo: number } | null>(null);
+  const zone = useRef<HTMLElement>(null);
   const shown = boxes.filter((b) => b.images.length > 0);
   if (shown.length === 0) return null;
   const current = open ? shown[open.box] : undefined;
   return (
-    <section aria-labelledby={id} data-box-section className="mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+    <section ref={zone} aria-labelledby={id} data-box-section className="relative mx-auto max-w-[1600px] px-5 pb-20 sm:px-8 lg:px-12 lg:pb-28">
       <p className="eyebrow inline-flex items-center gap-2">
         <Gift className="size-5 text-rose-light" aria-hidden="true" /> {t.piece.customBox}
       </p>
@@ -45,14 +47,12 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
                     type="button"
                     onClick={() => setOpen({ box: b, photo: i })}
                     data-box-section-photo={i}
+                    data-loupe={m.type === "image" ? m.src : undefined}
                     className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden"
                     aria-label={t.gallery.open(m.alt ?? box.name)}
                   >
                     {/* Whole: a trunk is never cut (its artwork, its photograph). */}
                     <MediaView item={m} fit="contain" sizes="(max-width: 1023px) 46vw, 30vw" />
-                    <span aria-hidden="true" className="absolute end-2 bottom-2 hidden size-9 items-center justify-center rounded-full bg-ink/70 text-white group-hover:inline-flex">
-                      <ZoomIn className="size-4" />
-                    </span>
                   </button>
                 </Reveal>
               </li>
@@ -66,6 +66,7 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
           ) : null}
         </div>
       ))}
+      <Loupe zone={zone} pick={pickMarked} />
       {open && current ? createPortal(<Lightbox items={current.images} index={open.photo} onIndex={(photo) => setOpen({ box: open.box, photo })} onClose={() => setOpen(null)} />, document.body) : null}
     </section>
   );

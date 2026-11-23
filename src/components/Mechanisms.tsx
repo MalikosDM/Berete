@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { LoopVideo, MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
 import films from "@/data/mechanisms.generated.json" with { type: "json" };
+import { featureFilm } from "@/data/featureFilms";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import type { MediaItem, Piece } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
@@ -53,14 +54,17 @@ function LiftingRing({ piece, trophy, closed, open }: { piece: Piece; trophy: st
 /**
  * "Engineering the Extraordinary" (Yoni, 23/11/2026), on the page The Atelier: the mechanisms of the house, each with the
  * films and photos that exist. Today the Spirit Bomb of the Dragon Ball pendant that rotates, and the top of the
- * championship rings that lifts off (it was on the home page). The cross of Malik Tillman that turns and the ring that
- * opens will come with their films: a mechanism without its media is not shown (never an empty block).
+ * championship rings that lifts off (it was on the home page), the cross of Malik Tillman whose centre turns. The ring
+ * that opens will come with its film: a mechanism without its media is not shown (never an empty block).
  */
 export default function Mechanisms() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const sphere = films["dragon-ball-sphere"];
   const dragon = cat.pieces.find((p) => p.slug === "kevin-schade-dragon-ball-pendant");
+  // The cross of Malik Tillman whose centre turns (Yoni, 23/11/2026: « un détail très important »).
+  const crossFilm = featureFilm("tillman-cross-spin");
+  const cross = cat.pieces.find((p) => p.slug === "malik-tillman-cross-pendant");
   const rings = SPECIAL_PROJECT.map((r) => {
     const piece = cat.pieces.find((p) => p.slug === r.slug);
     const closed = piece ? (photoOf(piece, r.closed) ?? piece.cover) : null;
@@ -115,6 +119,25 @@ export default function Mechanisms() {
                 <LiftingRing key={r.slug} piece={r.piece} trophy={r.trophy} closed={r.closed} open={r.open} />
               ))}
             </ul>
+          </article>
+        ) : null}
+
+        {crossFilm && cross ? (
+          <article data-mechanism="cross" className="mt-16 grid items-center gap-10 border-t border-white/10 pt-14 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5 lg:order-2 lg:col-start-8">
+              <span aria-hidden="true" className="text-rose-gold font-display text-3xl">{String(1 + (sphere && dragon ? 1 : 0) + (rings.length > 0 ? 1 : 0)).padStart(2, "0")}</span>
+              <h3 className="title-caps mt-3 text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.15] tracking-[0.08em] text-white">{t.feature.crossTitle}</h3>
+              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone md:text-lg">{t.feature.crossText}</p>
+              <p className="mt-3 text-base text-mist">{cross.title}</p>
+              <Link to={"/pieces/" + cross.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.14em] text-white hover:text-rose-light">
+                {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="flex justify-center lg:col-span-6 lg:order-1">
+              <div className="relative aspect-[9/16] h-[min(80svh,calc((100vw-2.5rem)*16/9))] max-w-full overflow-hidden border border-white/10 bg-black">
+                <LoopVideo item={{ type: "video", src: crossFilm.mobile ?? crossFilm.video, poster: crossFilm.poster, width: crossFilm.width, height: crossFilm.height }} label={t.feature.crossLabel} className="h-full w-full object-contain" />
+              </div>
+            </div>
           </article>
         ) : null}
       </div>

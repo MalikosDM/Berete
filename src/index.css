@@ -3212,12 +3212,12 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
 }
 
-/* The magnifying glass of the opening of a capsule (src/components/PieceLens.tsx): a round lens that follows the pointer. */
+/* The magnifying glass (src/components/Loupe.tsx): a round lens that follows the pointer over a photo. */
 .piece-lens {
   position: absolute;
   left: 0;
   top: 0;
-  z-index: 20;
+  z-index: 40;
   border-radius: 9999px;
   border: 1px solid color-mix(in oklab, var(--color-rose-light) 60%, transparent);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
@@ -3227,30 +3227,4 @@ html[lang="ar"] [data-piece] [data-u-title] {
 }
 .piece-lens[data-on] {
   opacity: 1;
-}
-/* The piece that turns while it is hovered (Dragon Ball): its film in the frame of its cutout, its black melting into the
-   world around it; the still cutout comes back when the pointer leaves. */
-.sv-spin {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  mix-blend-mode: lighten;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-[data-spinning] .sv-spin {
-  opacity: 1;
-}
-[data-spinning] .sv-float:has(.sv-spin) > img {
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-@media (prefers-reduced-motion: reduce) {
-  .sv-spin,
-  [data-spinning] .sv-float:has(.sv-spin) > img {
-    transition: none;
-  }
 }

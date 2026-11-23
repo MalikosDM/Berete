@@ -1,5 +1,5 @@
-// The official text of Yoni for the Dragon Ball pendant (22/11/2026): word for word, in two parts with their titles, its last
-// words set apart as a closing quote and as the line under the title; its technical sheet only what the text says;
+// The official text of Yoni for the Dragon Ball pendant (23/11/2026): word for word, under its title, its last words set apart
+// as a closing quote and as the line under the title; its technical sheet only what the text says;
 // translated (French checked here, the other languages by scripts/i18n-check.ts). Computer and iPhone, English and French,
 // silent. Screenshots go to verification/dragonball/.
 import { mkdirSync } from "node:fs";
@@ -12,40 +12,44 @@ const DIR = "verification/dragonball";
 mkdirSync(DIR, { recursive: true });
 const SLUG = "kevin-schade-dragon-ball-pendant";
 
-/** The text of Yoni, as he sent it. */
+/**
+ * The text (23/11/2026): the challenge of Kevin Schade, then the text of Yoni word for word (only the spaces before ";"
+ * and "," removed, a full stop at its end; its line breaks kept), with the two sentences of the sphere that turns after
+ * the cuts of the diamonds.
+ */
 const VISION = [
   "A lifelong admirer of Dragon Ball Z, Kevin Schade challenged Berete to create an extraordinary, never-before-seen piece inspired by Goku and his iconic Genki Dama — a technique Kevin himself had celebrated on the football pitch.",
-  "In the Dragon Ball universe, the Spirit Bomb gathers energy from the world around Goku — humans, animals, plants, and even the atmosphere — uniting these different sources into one immense sphere.",
-  "We translated this principle into diamonds.",
-  "Different cuts, settings and orientations represent the diversity of energy sources contributing to a single collective force.",
+  "In the Dragon Ball universe, the Genki Dama (Spirit Bomb) is not born from force, but from unity.\nIt is an energy sphere formed by gathering life force from every living being; humans, animals, nature, and worlds beyond.",
+  "This philosophy guided the creation of this piece.",
+  "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings.",
   "But to us, energy was never meant to remain still.",
   "We therefore engineered the diamond-set Spirit Bomb to rotate, bringing movement to the very heart of the creation.",
-  "Every detail has a purpose. Nothing is accidental.",
-];
-const CRAFT = [
-  "The rotating Spirit Bomb combines round, emerald and princess-cut diamonds through multiple setting techniques, including prong, bezel, channel and reverse settings.",
-  "Even the inverted diamonds carry meaning, symbolising the unseen contributions that form a greater whole.",
-  "Beneath the sphere, Goku channels the gathered energy, surrounded by the seven iconic Dragon Balls, each distinguished by its number of stars.",
-  "A creation where symbolism, engineering and high jewellery become one.",
+  "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible.",
+  "Beneath the sphere stands Goku, the conduit rather than the source.\nSurrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope.",
+  "Crafted in precious metals and diamonds, this piece translates a universal story into high jewellery:\nnot power taken, but power entrusted.",
+  "A tribute to imagination, craftsmanship, and the legacy of Akira Toriyama, whose universe taught generations that true strength is never singular.",
 ];
 const LAST = "Not power taken, but power entrusted.";
 const SHEET: [string, string][] = [
   ["Motif", "Goku and the Spirit Bomb, surrounded by the seven Dragon Balls"],
   ["Spirit Bomb", "Rotating, diamond-set"],
   ["Diamond cuts", "Round, emerald, princess"],
-  ["Settings", "Prong, bezel, channel, reverse"],
+  ["Settings", "Classic, bezel, channel, reverse"],
 ];
 
 /** The same in French. */
 const FR = {
-  titles: ["La vision derrière la création", "L’art du savoir-faire"],
+  titles: ["La vision derrière la création"],
   first: "Admirateur de toujours de Dragon Ball Z, Kevin Schade a lancé un défi à Berete : créer une pièce extraordinaire, jamais vue, inspirée de Goku et de son emblématique Genki Dama — une technique que Kevin avait lui-même célébrée sur le terrain de football.",
+  second: "Dans l’univers de Dragon Ball, le Genki Dama (le Genkidama) ne naît pas de la force, mais de l’unité.\nC’est une sphère d’énergie formée en rassemblant la force vitale de chaque être vivant ; les humains, les animaux, la nature et les mondes au-delà.",
+  reverse: "sertissage inversé",
+  tribute: "Un hommage à l’imagination, au savoir-faire et à l’héritage d’Akira Toriyama, dont l’univers a appris à des générations que la vraie force n’est jamais solitaire.",
   last: "Non pas un pouvoir pris, mais un pouvoir confié.",
   sheet: [
     ["Motif", "Goku et la Spirit Bomb, entourés des sept boules de cristal"],
     ["Spirit Bomb", "Rotative, sertie de diamants"],
     ["Tailles des diamants", "Ronde, émeraude, princesse"],
-    ["Sertis", "Griffes, clos, rail, inversé"],
+    ["Sertis", "Classique, clos, rail, inversé"],
   ],
 };
 
@@ -54,8 +58,6 @@ test("the data: the text of Yoni word for word, its line, its sheet, nothing els
   expect(storyBlocks(piece.story)).toEqual([
     { kind: "title", text: "The Vision Behind the Creation" },
     ...VISION.map((text) => ({ kind: "paragraph", text })),
-    { kind: "title", text: "The Art of Craftsmanship" },
-    ...CRAFT.map((text) => ({ kind: "paragraph", text })),
     { kind: "quote", text: LAST },
   ]);
   expect(piece.line).toBe(LAST);
@@ -86,13 +88,17 @@ for (const lang of ["en", "fr"] as const) {
     await expect(page.locator("[data-piece-intro]")).toContainText(lang === "fr" ? FR.last : LAST);
     const s = await story(page);
     if (lang === "en") {
-      expect(s.titles.map((t) => t.toLowerCase())).toEqual(["the vision behind the creation", "the art of craftsmanship"]);
-      expect(s.paragraphs).toEqual([...VISION, ...CRAFT]);
+      expect(s.titles.map((t) => t.toLowerCase())).toEqual(["the vision behind the creation"]);
+      // Whole, its line breaks kept.
+      expect(s.paragraphs).toEqual(VISION);
       expect(s.quote).toBe("“" + LAST + "”");
     } else {
       expect(s.titles.map((t) => t.toLowerCase())).toEqual(FR.titles.map((t) => t.toLowerCase()));
       expect(s.paragraphs[0]).toBe(FR.first);
-      expect(s.paragraphs).toHaveLength(11);
+      expect(s.paragraphs[1]).toBe(FR.second);
+      expect(s.paragraphs.join(" ")).toContain(FR.reverse);
+      expect(s.paragraphs[s.paragraphs.length - 1]).toBe(FR.tribute);
+      expect(s.paragraphs).toHaveLength(VISION.length);
       expect(s.quote).toBe("« " + FR.last + " »");
     }
     // The line is not written again at the top of the text (its titles stand there).

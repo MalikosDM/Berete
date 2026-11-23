@@ -172,6 +172,15 @@ const SCENES = [
       ...[[0.384, 0.316], [0.383, 0.14], [0.496, 0.229], [0.605, 0.315], [0.606, 0.142]].map(([x, y], i) => ({ k: "star", tone: "rose", seq: true, m: [x, y, 0.045], i })),
     ],
   }),
+  // 23/11/2026 (Yoni, the calls of 22-23/11): the sky for the angel of the L of Deniz Undav (no more cathedral); the
+  // victory of Inter Milan and of VfB Stuttgart, the squad lifting its trophy behind the ring, blurred (made again on the
+  // evening of 23/11; the first versions in _originaux/_anciens, never used); the variant of Inter with its scarves held
+  // up; a very dark gothic for the T necklace of Marcus Thuram (black arches, wrought iron, a few red candles).
+  scene("ciel", "Ciel au-dessus des nuages, rayons de lumière dorée (Deniz Undav, le L à l'ange)", [0.6, 0.36]),
+  scene("inter-victoire", "Victoire : l'équipe de l'Inter soulève le trophée, projecteurs bleus, confettis, feux d'artifice (Inter Milan)", [0.5, 0.42]),
+  scene("inter-victoire-echarpes", "Victoire : l'équipe de l'Inter, écharpes levées (Inter Milan, variante)", [0.5, 0.42]),
+  scene("vfb-victoire", "Victoire : l'équipe du VfB soulève la coupe, fumigènes rouges, confettis or et rouges, feux d'artifice (VfB Stuttgart)", [0.55, 0.42]),
+  scene("gothique", "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)", [0.6, 0.5]),
 ];
 BACKDROPS.push(...SCENES);
 

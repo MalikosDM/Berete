@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Newspaper, Play, Rotate3d, ZoomIn } from "lucide-react";
@@ -14,8 +14,10 @@ import PieceCard from "@/components/PieceCard";
 import PieceFilm from "@/components/PieceFilm";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
-import Showcase, { type ShowcaseSpin } from "@/components/Showcase";
-import mechanisms from "@/data/mechanisms.generated.json" with { type: "json" };
+import Showcase from "@/components/Showcase";
+import FeatureFilm from "@/components/FeatureFilm";
+import Loupe, { pickMarked } from "@/components/Loupe";
+import { DRAGON_BALL_MOTION, featureFilmOf, storyLines } from "@/data/featureFilms";
 import JewelFx from "@/components/universe/JewelFx";
 import { primeStoryVideo } from "@/components/stories/player";
 import StoryViewer from "@/components/stories/StoryViewer";
@@ -46,16 +48,6 @@ import { pressDate } from "@/pages/Press";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
-/**
- * The film of a piece that turns while it is hovered (Yoni, 23/11/2026: the Spirit Bomb of the Dragon Ball pendant), from
- * scripts/mechanism-media.mjs: one key per piece, its file replaced the day a better film arrives.
- */
-const SPINS: Record<string, string> = { "kevin-schade-dragon-ball-pendant": "dragon-ball-spin" };
-function spinOf(slug: string): ShowcaseSpin | null {
-  const m = (mechanisms as Record<string, Partial<ShowcaseSpin>>)[SPINS[slug] ?? ""];
-  return m?.video && m.poster && m.width && m.height ? { video: m.video, poster: m.poster, width: m.width, height: m.height } : null;
-}
-
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
   const { slug = "" } = useParams();
@@ -72,6 +64,7 @@ export default function PiecePage() {
   const reveal = piece ? resolveReveal(piece.slug, piece.atelier) : null;
   const [filmOpen, setFilmOpen] = useState(false);
   const [wornOpen, setWornOpen] = useState<number | null>(null);
+  const wornZone = useRef<HTMLDivElement>(null);
   if (!piece) {
     // A renamed piece leads to its new address; an unpublished one to its player, else to the creations.
     const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug);
@@ -94,6 +87,7 @@ export default function PiecePage() {
   const historic = SPECIAL_PROJECT.some((r) => r.slug === piece.slug);
   // Its photos worn or held (judged on the English catalogue): out of "Every Angle", into "Worn by" with its handover.
   const wornSrcs = wornSet(raw.pieces.find((p) => p.slug === piece.slug));
+  const feature = featureFilmOf(piece.slug);
   const worn = [...piece.handover, ...[piece.cover, ...piece.gallery].filter((m) => wornSrcs.has(m.src))].filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i);
   // Its press (Yoni, 23/11/2026): the articles of the page In the Spotlight that tell it, then those the admin gave it with
   // their link; an article without its link is not shown.
@@ -155,7 +149,7 @@ export default function PiecePage() {
               ) : null}
             </>
           ) : (
-            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} xl={opening.xl} spin={spinOf(piece.slug)} />
+            <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} xl={opening.xl} />
           )}
         </div>
         {/* The text of the opening: discreet (asked by Yoni, 20/11/2026), so that the jewel shines; the title stays first, the
@@ -200,6 +194,26 @@ export default function PiecePage() {
           </Link>
         </div>
       </section>
+
+      {/* Its film, large, right after its opening (Yoni, 23/11/2026: not a film that blocks the page at its entrance): the
+          finished Dragon Ball pendant; the cross of Malik Tillman whose centre turns ("The mechanism"). */}
+      {feature ? (
+        <FeatureFilm
+          film={feature.film}
+          id="piece-feature-film"
+          data={piece.slug}
+          label={feature.kind === "film" ? t.feature.dragonLabel : t.feature.crossLabel}
+          eyebrow={feature.kind === "film" ? t.feature.film : t.feature.mechanism}
+          title={feature.kind === "film" ? t.feature.dragonTitle : t.feature.crossTitle}
+        >
+          {(feature.kind === "film" ? storyLines(piece, raw.pieces.find((p) => p.slug === piece.slug), DRAGON_BALL_MOTION) : [t.feature.crossText]).map((line) => (
+            <p key={line} className="mt-6 max-w-lg text-base leading-relaxed text-bone md:text-lg">
+              {line}
+            </p>
+          ))}
+          {feature.kind === "film" && piece.line ? <p className="mt-8 font-display text-[clamp(1.5rem,2.4vw,2rem)] font-light italic leading-snug text-white">{t.about.quoted(piece.line)}</p> : null}
+        </FeatureFilm>
+      ) : null}
 
       {model ? <Piece3D piece={piece} model={model} /> : null}
 
@@ -299,11 +313,12 @@ export default function PiecePage() {
           <h2 id="handover-title" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
             {t.piece.wornBy(wornName)}
           </h2>
+          <div ref={wornZone} className="relative">
           <ul className={"mt-12 grid gap-6 sm:gap-8 " + (worn.length > 1 ? "grid-cols-2 xl:grid-cols-3" : "max-w-xl")}>
             {worn.map((m, i) => (
               <li key={m.src}>
                 <Reveal>
-                  <button type="button" onClick={() => setWornOpen(i)} className="group block w-full cursor-zoom-in text-start" aria-label={t.gallery.open(m.alt ?? piece.title)}>
+                  <button type="button" onClick={() => setWornOpen(i)} data-loupe={m.type === "image" ? m.src : undefined} className="group block w-full cursor-zoom-in text-start" aria-label={t.gallery.open(m.alt ?? piece.title)}>
                     <span className="block aspect-[4/5] overflow-hidden bg-ink-soft">
                       <MediaView item={m} fit="cover" sizes="(max-width: 1279px) 46vw, 30vw" className="transition-transform duration-[1.2s] group-hover:scale-[1.03]" />
                     </span>
@@ -312,6 +327,8 @@ export default function PiecePage() {
               </li>
             ))}
           </ul>
+          <Loupe zone={wornZone} pick={pickMarked} />
+          </div>
           {wornOpen !== null ? createPortal(<Lightbox items={worn.map((m) => ({ ...m, caption: undefined }))} index={wornOpen} onIndex={setWornOpen} onClose={() => setWornOpen(null)} />, document.body) : null}
         </section>
       ) : null}
@@ -517,7 +534,7 @@ function StoryText({ story }: { story: string }) {
             </figure>
           );
         return (
-          <p key={i} data-story-paragraph={numbers[i]} className="mt-8 max-w-2xl text-lg leading-relaxed text-bone">
+          <p key={i} data-story-paragraph={numbers[i]} className="mt-8 max-w-2xl text-lg leading-relaxed whitespace-pre-line text-bone">
             {b.text}
           </p>
         );

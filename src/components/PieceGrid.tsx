@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import { ArrowRight } from "lucide-react";
+import Loupe, { pickMarked } from "@/components/Loupe";
 import { MediaView } from "@/components/Media";
 import type { Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
@@ -14,13 +16,16 @@ export default function PieceGrid({ pieces, showType }: { pieces: Piece[]; showT
   const { t } = useI18n();
   const cat = useCatalogue();
   const madeFor = useMadeFor();
+  const zone = useRef<HTMLDivElement>(null);
   return (
+    // The magnifying glass over each piece (computers): its + and − never follow the link of the card.
+    <div ref={zone} className="relative">
     <ul data-creations-grid className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-16">
       {pieces.map((p, i) => (
         <li key={p.slug} className="flex">
           <Link to={"/pieces/" + p.slug} data-piece-card={p.slug} className="group flex w-full flex-col">
             <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
-              <span className="absolute inset-0 p-5 transition-transform duration-[1.8s] ease-out group-hover:scale-[1.05] sm:p-6">
+              <span data-loupe={p.cover.type === "image" ? p.cover.src : undefined} className="absolute inset-0 p-5 transition-transform duration-[1.8s] ease-out group-hover:scale-[1.05] sm:p-6">
                 <MediaView item={p.cover} alt={p.cover.alt ?? p.title} fit="contain" eager={i < 3} priority={i === 0} sizes="(max-width: 639px) 92vw, (max-width: 1023px) 46vw, 30vw" />
               </span>
               <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
@@ -40,5 +45,7 @@ export default function PieceGrid({ pieces, showType }: { pieces: Piece[]; showT
         </li>
       ))}
     </ul>
+    <Loupe zone={zone} pick={pickMarked} />
+    </div>
   );
 }

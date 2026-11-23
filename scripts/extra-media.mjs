@@ -42,6 +42,7 @@ const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
 const YONI = join(DISK, "Berete - Dossiers icloud", "00 Contexte Yoni");
 const WA = process.env.BERETE_WA_DIR ?? join(homedir(), "Desktop", "Yoni envoie whatsapp");
+const STORIES = join(DISK, "Berete - Stories");
 const OUT = join(ROOT, "public", "media", "extra");
 const DATA = join(ROOT, "src", "data", "extra.generated.json");
 const LONG = 1600;
@@ -55,13 +56,16 @@ const BOSNIA = "Bague Bosnie (retouche fond noir)";
 const BOSNIA_ORDER = ["04497", "04499", "04512", "04509", "04487", "04504", "04506", "04507", "04508", "04513", "04514", "04462", "04467", "04469", "04470", "04478", "04489"];
 /** A photo sent on WhatsApp on 23/11/2026, by the time in its name ("09.50.36 (2)"). */
 const wa = (time) => "wa:WhatsApp Image 2026-11-23 at " + time + ".jpeg";
+/** A story of "Berete - Stories" ("<folder>/<file>"). */
+const story = (file) => "story:" + file;
 /** A video sent on WhatsApp on 23/11/2026. */
 const waVideo = (time) => "wa:WhatsApp Video 2026-11-23 at " + time + ".mp4";
 
 /*
- * Each key (a piece, "boxes/<box>", "house"): its photos, [name on the site, file, how]. The file: a path in 00 Contexte
- * Yoni, or "wa:<file>" (the WhatsApp folder). How: "frame" (a whole jewel on black, framed on it in 4:5), [x, y, w, h]
- * (the part kept, fractions of the photo), else the photo whole.
+ * Each key (a piece, "boxes/<box>", "house", "players/<person>"): its photos, [name on the site, file, how]. The file: a
+ * path in 00 Contexte Yoni, "wa:<file>" (the WhatsApp folder) or "story:<folder>/<file>" (Berete - Stories). How: "frame"
+ * (a whole jewel on black, framed on it in 4:5), [x, y, w, h] (the part kept, fractions of the photo), else the photo
+ * whole (a transparent PNG keeps its transparency).
  */
 const PIECES = {
   "malik-tillman-tm-pendant": [["studio", join(STUDIO, "malik-tillman-tm-pendant-studio-ia.jpg")]],
@@ -141,9 +145,21 @@ const PIECES = {
   // The setting of the wings of the Butterfly pendant (« Sertissage papillon »), the film of its step "setting": whole,
   // silent, its first frame as its poster.
   "michy-batshuayi-butterfly-pendant": [["setting", waVideo("16.32.56"), "video"]],
+  // The studio images sent the evening of 23/11/2026 (Pieces sans photo pro (IA)), whole: the first photo of their gallery
+  // (their cutout, scripts/cutouts.mjs, opens their page).
+  "kevin-schade-twisted-chain": [["studio", join(STUDIO, "kevin-schade-twisted-chain-studio-ia.jpg")]],
+  "radja-nainggolan-iced-watch": [["studio", join(STUDIO, "radja-nainggolan-iced-watch-studio-ia.jpg")]],
+  "tajon-buchanan-iced-watch": [["studio", join(STUDIO, "tajon-buchanan-iced-watch-studio-ia.jpg")]],
+  "marcus-thuram-skeleton-watch": [["studio", join(STUDIO, "marcus-thuram-skeleton-watch-studio-ia.jpg")]],
+  "tanguy-nianzou-fam-medallion": [["studio", join(STUDIO, "tanguy-nianzou-fam-medallion-studio-ia.jpg")]],
+  // The L of Deniz Undav cut out by hand (transparent PNG): whole, its transparency kept (WebP with alpha).
+  "deniz-undav-l-pendant": [["studio", join(STUDIO, "deniz-undav-l-pendant-detoure.png")]],
+  // Marcus Thuram with Kanye West and a third person, wearing his T (story 20/06): the photo only, without the frame of the
+  // Instagram post around it; its right edge trimmed so that the "several photos" icon of Instagram in its corner goes.
+  "players/marcus-thuram": [["kanye", story("20 Thuram SS23/20 Thuram SS23 - 06.jpg"), [0.0589, 0.1901, 0.8078, 0.6188]]],
 };
 
-const sourceOf = (file) => (file.startsWith("wa:") ? join(WA, file.slice(3)) : join(YONI, file));
+const sourceOf = (file) => (file.startsWith("wa:") ? join(WA, file.slice(3)) : file.startsWith("story:") ? join(STORIES, file.slice(6)) : join(YONI, file));
 
 /** The photo framed on the jewel: the black around it trimmed, then an even margin, in a 4:5 frame (black). */
 async function framed(file) {

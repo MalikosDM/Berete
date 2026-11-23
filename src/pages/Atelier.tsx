@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import { createPortal } from "react-dom";
-import { ArrowRight, Images, Play, ZoomIn } from "lucide-react";
+import { ArrowRight, Images, Play } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
+import Loupe, { pickMarked } from "@/components/Loupe";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
@@ -207,10 +208,12 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
   const { t } = useI18n();
   const [shown, setShown] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
+  const zone = useRef<HTMLDivElement>(null);
   if (box.images.length === 0) return null;
   const id = "box-photos-" + box.slug;
   return (
-    <div data-box-gallery={box.slug}>
+    // The magnifying glass of the pieces over its photos too (computers); looking at them never closes the trunk.
+    <div ref={zone} data-box-gallery={box.slug} className="relative">
       <p className="mt-2 flex flex-wrap gap-x-6">
         <button type="button" onClick={() => setShown((v) => !v)} aria-expanded={shown} aria-controls={id} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
           <Images className="size-4" aria-hidden="true" /> {shown ? t.boxes.hidePhotos : t.boxes.photos(box.images.length)}
@@ -221,11 +224,8 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
           <ul className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
             {box.images.map((m, i) => (
               <li key={m.src}>
-                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
-                  <MediaView item={m} fit="cover" sizes="(max-width: 639px) 30vw, 10vw" className="transition-transform duration-700 group-hover:scale-105" />
-                  <span aria-hidden="true" className="absolute end-1.5 bottom-1.5 hidden size-8 items-center justify-center rounded-full bg-ink/70 text-white group-hover:inline-flex">
-                    <ZoomIn className="size-4" />
-                  </span>
+                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} data-loupe={m.type === "image" ? m.src : undefined} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
+                  <MediaView item={m} fit="cover" sizes="(max-width: 639px) 30vw, 10vw" />
                 </button>
               </li>
             ))}
@@ -238,6 +238,7 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
           ) : null}
         </div>
       ) : null}
+      <Loupe zone={zone} pick={pickMarked} />
       {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </div>
   );

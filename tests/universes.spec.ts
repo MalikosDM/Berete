@@ -49,7 +49,8 @@ async function groundContrast(page: Page, el: Locator): Promise<number> {
 }
 
 const WORLDS: [string, string, string[], string][] = [
-  ["vfb-stuttgart-dfb-pokal-2025", "vfb", ["smoke-rise", "gold-confetti"], "VfB"],
+  // Since 23/11/2026: its victory (the squad behind the ring), a light rain of gold and red confetti.
+  ["vfb-stuttgart-dfb-pokal-2025", "vfb-victoire", ["confetti"], "VfB"],
   ["michy-batshuayi-butterfly-pendant", "butterfly", ["butterflies", "glints", "moon"], "Butterfly"],
 ];
 

@@ -55,6 +55,8 @@ export const THEME_EFFECTS = [
   "void",
   // The Japanese night of Sirius: red maple leaves falling.
   "maple",
+  // The sky of the angel (Deniz Undav, 23/11/2026): a few white feathers drifting down.
+  "feathers",
   // An effect on the piece itself, that ties it to its world (src/components/universe/JewelFx.tsx).
   "jewel-sheen",
   "jewel-sparkle",
@@ -150,6 +152,12 @@ export type Backdrop = {
 export type BackdropSpot = { k: string; tone?: string; seq?: boolean; i?: number; d?: number[]; m?: number[] };
 export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
 
+/**
+ * The victory of Inter Milan (23/11/2026): its squad lifting the trophy ("inter-victoire"), or the variant with its scarves
+ * held up ("inter-victoire-echarpes"). The one setting to change if Yoni prefers the other.
+ */
+export const INTER_VICTORY: "inter-victoire" | "inter-victoire-echarpes" = "inter-victoire";
+
 /** What a piece (or the admin) writes: a preset, and the parts it changes. */
 export type PieceTheme = {
   preset?: string;
@@ -202,13 +210,28 @@ export const THEME_PRESETS: Record<string, Preset> = {
     name: "Forêt violette au clair de lune : Butterfly",
     theme: { base: "#07050b", tint: "#2a1838", glow: "#d9b8f0", texture: "grain", light: "halo", font: "aerien", backdrop: "butterfly", entrance: "flutter", effects: ["butterflies", "glints", "dust", "moon"], mark: "" },
   },
+  // 23/11/2026 (Yoni: « plus du feeling de victoire »): the squad of Inter lifting its trophy behind the ring, blurred, under
+  // the blue lights of the stadium; a light rain of confetti, blue, black and gold, behind the ring (src/components/universe/fx.ts).
   "victoire-nuit": {
-    name: "Victoire, stade de nuit (Inter Milan)",
-    theme: { base: "#03050b", tint: "#0b1733", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "inter", entrance: "stars", effects: ["twenty-stars", "confetti", "glints"], mark: "" },
+    name: "Victoire : l'équipe soulève le trophée, projecteurs bleus, confettis (Inter Milan)",
+    theme: { base: "#03050b", tint: "#0b1733", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: INTER_VICTORY, entrance: "stars", effects: ["twenty-stars", "confetti", "glints"], mark: "" },
   },
+  // 23/11/2026 (Yoni: more triumph, the red he loves): the squad of VfB lifting its cup behind the ring, red flares; a light
+  // rain of confetti, gold and red.
   "victoire-rouge": {
-    name: "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)",
-    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: "vfb", entrance: "smoke", effects: ["smoke-rise", "gold-confetti", "glints"], mark: "" },
+    name: "Victoire : l'équipe soulève la coupe, fumigènes rouges, confettis or et rouges (VfB Stuttgart)",
+    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: "vfb-victoire", entrance: "smoke", effects: ["confetti", "glints"], mark: "" },
+  },
+  // 23/11/2026 (Yoni: the sky, for the meaning of the angel; no more cathedral): above the clouds, rays of golden light, a
+  // few feathers. The L and its angel large in front.
+  ciel: {
+    name: "Ciel au-dessus des nuages : rayons dorés, quelques plumes (le L à l'ange)",
+    theme: { base: "#0a0908", tint: "#2a2318", glow: "#f6dcae", texture: "grain", light: "beam", font: "sacre", backdrop: "ciel", entrance: "spotlight", effects: ["dust", "feathers", "jewel-beam"], mark: "" },
+  },
+  // 23/11/2026: a very dark gothic, almost black (black arches, wrought iron, a few red candles), the necklace the hero.
+  gothique: {
+    name: "Gothique très sombre : arches noires, fer forgé, bougies rouges",
+    theme: { base: "#050405", tint: "#160b0d", glow: "#e8b4a0", texture: "none", light: "halo", font: "maison", backdrop: "gothique", entrance: "ignite", effects: ["dust"], mark: "" },
   },
   tunnel: {
     name: "Tunnel du vestiaire, avant-match (Noah Okafor)",
@@ -394,6 +417,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   drops: "Gouttes qui brillent sous le réverbère",
   void: "Espace infini : traits de lumière vers la sphère, anneaux, respiration de la sphère",
   maple: "Feuilles d'érable rouges qui tombent",
+  feathers: "Quelques plumes blanches qui descendent lentement",
   "jewel-sheen": "Sur la pièce : un reflet passe (couleur de la lumière)",
   "jewel-sparkle": "Sur la pièce : des éclats scintillent",
   "jewel-halo": "Sur la pièce : un halo pulse autour",

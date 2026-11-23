@@ -309,6 +309,8 @@ export const en = {
   },
 
   players: {
+    /** The text of a photo of a profile sent apart, by its name (scripts/extra-media.mjs, "players/<slug>"). */
+    photoNamed: { kanye: "Marcus Thuram with Kanye West", boutique: "Keita at the Berete boutique, with his trunk" } as Record<string, string>,
     trunks: (count: number) => (count > 1 ? "Their Trunks" : "Their Trunk"),
     eyebrow: "The Berete Circle",
     title: "Worn by Icons",
@@ -682,6 +684,21 @@ export const en = {
   },
 
   /** "Enter the Atelier": the films of a piece, its making-of then the finished piece (src/components/AtelierRoom.tsx). */
+  /** The films shown large in their own section (src/components/FeatureFilm.tsx). */
+  feature: {
+    film: "The Film",
+    dragonTitle: "Dragon Ball, in Motion",
+    dragonLabel: "The film of the Dragon Ball pendant: the piece, its trunk that opens, its Spirit Bomb that turns",
+    mechanism: "The Mechanism",
+    crossTitle: "The Cross That Turns",
+    crossText: "At the end of the film, its centre is turned by hand.",
+    crossLabel: "The cross of Malik Tillman, worn, then its centre turned by hand",
+    play: "Play the film",
+    pause: "Pause the film",
+    soundOn: "Turn the sound on",
+    soundOff: "Turn the sound off",
+    fullscreen: "Watch full screen",
+  },
   films: {
     pieceSection: "The Finished Piece",
     pieceSectionLead: (title: string) => "The film of " + title + ", finished. Full screen, with its sound.",

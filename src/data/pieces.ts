@@ -15,6 +15,13 @@ import type { PieceTheme } from "./themes.js";
 import { trunkPhotos } from "./trunks.js";
 import type { Box, Making, MakingKey, MediaItem, Piece, PieceType, Press } from "./types.js";
 
+/**
+ * The world of the T necklace of Marcus Thuram (23/11/2026): a very dark gothic ("gothique"), or all black, no world at all
+ * ("noir", as Yoni asked on 22-23/11). The one setting to change if Yoni prefers all black.
+ */
+export const RUBY_T_UNIVERSE: "gothique" | "noir" = "gothique";
+
+
 export const VFB = "vfb-stuttgart-dfb-pokal-2025";
 export const INTER = "campione-d-italia-2023-2024";
 export const DAILY_MAIL_ARTICLE =
@@ -229,6 +236,23 @@ function lead(dir: string, file: string): string[] {
   return [file, ...hdGallery(dir).map((g) => g.file).filter((f) => f !== file)];
 }
 
+/**
+ * Some files first, in this order, then the others of the folder in theirs (23/11/2026: "Every Angle" opens on the most
+ * striking photos, the whole piece from the front on black, then the details).
+ */
+function firsts(dir: string, files: string[]): string[] {
+  return [...files, ...hdGallery(dir).map((g) => g.file).filter((f) => !files.includes(f))];
+}
+
+/**
+ * Its studio photo first (Yoni, 23/11/2026, 00 Contexte Yoni/Pieces sans photo pro (IA)/, scripts/extra-media.mjs): the
+ * cover and the first photo of "Every Angle", the photos it had after it (its worn ones go to "Worn by").
+ */
+function withStudio(slug: string, alt: string, s: { cover: Maybe; gallery: Maybe[] }): { cover: Maybe; gallery: Maybe[] } {
+  const studio = extra(slug, "studio", at(alt));
+  return studio ? { cover: studio, gallery: [studio, s.cover, ...s.gallery] } : s;
+}
+
 function sorted(dir: string, own: Maybe[], files?: string[]): { cover: Maybe; gallery: Maybe[] } {
   const known = new Map(list(...own).map((m) => [m.src, m]));
   const all = hdGallery(dir);
@@ -305,7 +329,8 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "victoire-rouge" },
     // The crest ring face on as the hero (Yoni, 23/11/2026).
     showcase: { size: "large", views: ["p13", "p12", "p18"] },
-    ...sorted(VFB, [vfb.front, vfb.open, vfb.cup, vfb.engraving, vfb.profile, vfb.crest, vfb.undav, vfb.stiller, vfb.mittelstaedt, vfb.karazor, vfb.squad]),
+    // Its photos, the most striking first (23/11/2026): the ring whole, then its crest.
+    ...sorted(VFB, [vfb.front, vfb.open, vfb.cup, vfb.engraving, vfb.profile, vfb.crest, vfb.undav, vfb.stiller, vfb.mittelstaedt, vfb.karazor, vfb.squad], firsts(VFB, ["p13", "p17", "p20", "p18", "p06", "p11", "p12", "p22", "p01", "p14", "p15", "p16", "p21", "p19", "p08", "p04", "p05"])),
     handover: [vfb.presentation, vfb.showcase, vfb.shown, st("collectors", 41, at("VfB Stuttgart players with the ring", "The squad and its ring"))],
     press: [{ outlet: "Bild", title: "The VfB champions receive their rings", url: null, image: vfbPhotos[10]?.src ?? null }],
     specs: [
@@ -340,7 +365,8 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "victoire-nuit" },
     // Its face view as the hero (Yoni, 23/11/2026).
     showcase: { size: "large", views: ["p08", "p13", "p54", "p04", "p44"] },
-    ...sorted(INTER, [inter.ring, inter.emblem, inter.stars, inter.flag, inter.side, inter.serieA, inter.cup, inter.pendant, inter.brt, inter.squad, inter.glove]),
+    // Its photos, the most striking first (23/11/2026): its face (p08, Yoni), the ring whole on black, then the details.
+    ...sorted(INTER, [inter.ring, inter.emblem, inter.stars, inter.flag, inter.side, inter.serieA, inter.cup, inter.pendant, inter.brt, inter.squad, inter.glove], firsts(INTER, ["p08", "p55", "p13", "p54", "p56", "p57", "p49", "p01", "p41", "p02", "v10", "p14", "p52", "p53", "p48", "p06", "p12", "p15", "p46", "p47", "p50", "p51", "p43", "p45", "p03", "p04", "p05", "p44", "p42", "p40"])),
     handover: [st("inter-squad", 2, at("Inter players with their rings", "The Moment of Victory")), ...inter.received, st("inter-squad", 5, at("An Inter player receives his ring"))],
     press: [
       { outlet: "Daily Mail", title: "Arnautovic, Thuram and Calhanoglu commission diamond rings for their Inter teammates", url: DAILY_MAIL_ARTICLE, image: null },
@@ -407,23 +433,22 @@ const SITE_PIECES: Piece[] = [
     slug: "kevin-schade-dragon-ball-pendant",
     title: "Kevin Schade — Dragon Ball Pendant",
     type: "pendant",
-    // The official text of Yoni (22/11/2026), word for word, in two parts with their titles ("## "); its last words set apart
-    // as a closing quote ("> "), and its line (src/data/story.ts).
+    // The official text of Yoni (23/11/2026), word for word (only the spaces before ";" and "," removed, a full stop added at
+    // its end), after the challenge of Kevin Schade, under its title ("## "); the two sentences of the sphere that turns kept
+    // after the cuts of its diamonds; its last words set apart as a closing quote ("> "), and its line (src/data/story.ts).
     line: "Not power taken, but power entrusted.",
     story:
       "## The Vision Behind the Creation\n\n" +
       "A lifelong admirer of Dragon Ball Z, Kevin Schade challenged Berete to create an extraordinary, never-before-seen piece inspired by Goku and his iconic Genki Dama — a technique Kevin himself had celebrated on the football pitch.\n\n" +
-      "In the Dragon Ball universe, the Spirit Bomb gathers energy from the world around Goku — humans, animals, plants, and even the atmosphere — uniting these different sources into one immense sphere.\n\n" +
-      "We translated this principle into diamonds.\n\n" +
-      "Different cuts, settings and orientations represent the diversity of energy sources contributing to a single collective force.\n\n" +
+      "In the Dragon Ball universe, the Genki Dama (Spirit Bomb) is not born from force, but from unity.\nIt is an energy sphere formed by gathering life force from every living being; humans, animals, nature, and worlds beyond.\n\n" +
+      "This philosophy guided the creation of this piece.\n\n" +
+      "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings.\n\n" +
       "But to us, energy was never meant to remain still.\n\n" +
       "We therefore engineered the diamond-set Spirit Bomb to rotate, bringing movement to the very heart of the creation.\n\n" +
-      "Every detail has a purpose. Nothing is accidental.\n\n" +
-      "## The Art of Craftsmanship\n\n" +
-      "The rotating Spirit Bomb combines round, emerald and princess-cut diamonds through multiple setting techniques, including prong, bezel, channel and reverse settings.\n\n" +
-      "Even the inverted diamonds carry meaning, symbolising the unseen contributions that form a greater whole.\n\n" +
-      "Beneath the sphere, Goku channels the gathered energy, surrounded by the seven iconic Dragon Balls, each distinguished by its number of stars.\n\n" +
-      "A creation where symbolism, engineering and high jewellery become one.\n\n" +
+      "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible.\n\n" +
+      "Beneath the sphere stands Goku, the conduit rather than the source.\nSurrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope.\n\n" +
+      "Crafted in precious metals and diamonds, this piece translates a universal story into high jewellery:\nnot power taken, but power entrusted.\n\n" +
+      "A tribute to imagination, craftsmanship, and the legacy of Akira Toriyama, whose universe taught generations that true strength is never singular.\n\n" +
       "> Not power taken, but power entrusted.",
     people: ["kevin-schade"],
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
@@ -451,7 +476,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "Goku and the Spirit Bomb, surrounded by the seven Dragon Balls"],
       ["Spirit Bomb", "Rotating, diamond-set"],
       ["Diamond cuts", "Round, emerald, princess"],
-      ["Settings", "Prong, bezel, channel, reverse"],
+      ["Settings", "Classic, bezel, channel, reverse"],
     ],
     boxSlug: "dragon-ball-trunk",
     making: {
@@ -523,7 +548,7 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-jersey-pendant", "p16", at("The pendant, arms crossed, from another angle")),
       yoni("noah-okafor-jersey-pendant", "p01", { ...at("Noah Okafor wearing the pendant", "Worn by Noah Okafor"), onBlack: false }),
       // Not the story 11 (the same edit as its film v01, a duplicate).
-    ]),
+    ], firsts("noah-okafor-jersey-pendant", ["p20", "p16", "p02", "p17", "v01", "p10", "p18", "p15", "p11", "p13", "p12", "p03", "p06", "p09", "p07", "p05", "p04", "p01"])),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "His goal celebration: a jersey, arms crossed"],
@@ -789,9 +814,11 @@ const SITE_PIECES: Piece[] = [
     story:
       "A tall letter L paved with white diamonds, with a cherub in rose gold resting in its corner. Its bail is set with diamonds too, and the back is engraved with a pattern of interlaced circles and the BRT mark in rose gold.",
     people: ["deniz-undav"],
-    theme: { preset: "sacre", tint: "#331013", mark: "L" },
+    // 23/11/2026 (Yoni): the sky, for the meaning of its angel (no more cathedral).
+    theme: { preset: "ciel", mark: "L" },
     // Its photos in HD (folder 38, 20/11/2026).
-    ...sorted("deniz-undav-l-pendant", []),
+    // Its studio image first (23/11/2026, the L cut out by Malik), then its photos, the whole piece first, the backs last.
+    ...withStudio("deniz-undav-l-pendant", "The L pendant of Deniz Undav, its cherub in rose gold", sorted("deniz-undav-l-pendant", [], firsts("deniz-undav-l-pendant", ["p10", "p08", "p04", "p07", "p09", "p03", "p06", "p05", "p01", "p02"]))),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "The letter L and a cherub"],
@@ -898,12 +925,15 @@ const SITE_PIECES: Piece[] = [
       "A round medallion paved with diamonds, its edge ribbed like a coin. The word FAM stands out in polished letters among rose gold roses, and marquise-cut diamonds are set in the flowers, one for each member of the family. It hangs from a diamond-set Cuban chain.",
     people: ["tanguy-nianzou"],
     theme: { preset: "roses", mark: "FAM" },
-    cover: still("pieces/tanguy-nianzou-fam-medallion/cover", at("Tanguy Nianzou's FAM medallion on its Cuban chain")),
-    gallery: [
+    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
+    ...withStudio("tanguy-nianzou-fam-medallion", "Tanguy Nianzou's FAM medallion", {
+      cover: still("pieces/tanguy-nianzou-fam-medallion/cover", at("Tanguy Nianzou's FAM medallion on its Cuban chain")),
+      gallery: [
       st("nz", 6, at("Close-up of the rose gold roses and a marquise diamond", "The roses")),
       st("nz", 2, at("The FAM medallion and its story: one marquise diamond for each family member")),
       st("nz", 5, at("Film of the medallion on a bust")),
     ],
+    }),
     specs: [
       ["Type", "Medallion pendant on a Cuban chain"],
       ["Motif", "The word FAM among roses"],
@@ -1033,7 +1063,7 @@ const SITE_PIECES: Piece[] = [
       yoni("the-hand", "p05", at("The BRT mark engraved on The Hand", "The BRT mark")),
       yoni("the-hand", "p03", at("The Hand pendant seen from above", "From above")),
       yoni("the-hand", "v01", at("Film of The Hand pendant")),
-    ]),
+    ], firsts("the-hand", ["p07", "p02", "p03", "p01", "p06", "p05", "p04"])),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A hand"],
@@ -1097,7 +1127,7 @@ const SITE_PIECES: Piece[] = [
       yoni("tulips-on-tour-medallion", "p20", BAIL()),
       yoni("tulips-on-tour-medallion", "p05", at("The edge of the medallion, set with red stones", "The edge")),
       st("collectors", 54, at("Film of the medallion being worn for the first time")),
-    ]),
+    ], firsts("tulips-on-tour-medallion", ["p22", "p21", "p16", "p19", "p18", "p13", "p08", "p07", "p12", "v02", "p23", "p20", "p10", "p15", "p11", "p05", "p09", "p06", "p04", "p02", "p03", "p01"])),
     specs: [
       ["Type", "Medallion pendant"],
       ["Motif", "Tulips, a cart and a figure"],
@@ -1192,7 +1222,7 @@ const SITE_PIECES: Piece[] = [
     people: ["marcus-thuram"],
     // 23/11/2026 (Yoni): no universe any more, all black; the full piece as the hero and the first photo, as large as
     // possible (second call: « première photo hero full piece, agrandir au max »).
-    theme: { preset: "noir" },
+    theme: { preset: RUBY_T_UNIVERSE },
     showcase: { size: "large", mode: "single", views: ["p01"] },
     ...sorted("marcus-thuram-ruby-t-necklace", [
       yoni("marcus-thuram-ruby-t-necklace", "p02", at("Marcus Thuram's T necklace: a gothic T with rose gold scrolls")),
@@ -1244,11 +1274,14 @@ const SITE_PIECES: Piece[] = [
     story: "Twisted links in a single tone of rose gold, with diamond flowers set along the whole chain.",
     people: ["kevin-schade"],
     theme: { preset: "forge" },
-    cover: st("kevin-schade", 3, at("Kevin Schade's twisted link chain laid in its box")),
-    gallery: [
+    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
+    ...withStudio("kevin-schade-twisted-chain", "Kevin Schade's twisted link chain", {
+      cover: st("kevin-schade", 3, at("Kevin Schade's twisted link chain laid in its box")),
+      gallery: [
       st("kevin-schade", 14, at("Film of the twisted chain and its diamond flowers")),
       st("kevin-schade", 1, at("Kevin Schade wearing his chain", "Worn by Kevin Schade")),
     ],
+    }),
     specs: [
       ["Type", "Chain"],
       ["Links", "Twisted, with diamond flowers"],
@@ -1292,7 +1325,8 @@ const SITE_PIECES: Piece[] = [
     // Its Japanese night since 21/11/2026 (the starry sky before).
     theme: { preset: "japon" },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
-    ...sorted("sirius", []),
+    // The most striking first (23/11/2026): the chain whole, on the bust, then its details; the trunk at the end.
+    ...sorted("sirius", [], firsts("sirius", ["p27", "p28", "p29", "p25", "p18", "p20", "p23", "p17", "p16", "p22", "p24", "p21", "p14", "p15", "p08", "p12", "p19", "p11", "p13", "p10", "p09", "v03", "p26", "p05", "p02", "p01", "p03", "p04"])),
     specs: [
       ["Type", "Chain and nameplate"],
       ["Box", "Sirius trunk"],
@@ -1315,8 +1349,11 @@ const SITE_PIECES: Piece[] = [
     story: "A square watch with a skeleton dial, its case and bracelet entirely set with diamonds, shown with a Cuban chain.",
     people: ["marcus-thuram"],
     theme: { preset: "mecanique" },
-    cover: still("pieces/marcus-thuram-skeleton-watch/cover", at("A square watch with a skeleton dial, fully set with diamonds")),
-    gallery: [],
+    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
+    ...withStudio("marcus-thuram-skeleton-watch", "A square watch with a skeleton dial, fully set with diamonds", {
+      cover: still("pieces/marcus-thuram-skeleton-watch/cover", at("A square watch with a skeleton dial, fully set with diamonds")),
+      gallery: [],
+    }),
     specs: [
       ["Type", "Watch"],
       ["Dial", "Skeleton"],
@@ -1331,10 +1368,13 @@ const SITE_PIECES: Piece[] = [
     story: "A square watch with Roman numerals, its case, dial and bracelet set with diamonds.",
     people: ["tajon-buchanan"],
     theme: { preset: "mecanique" },
-    cover: still("pieces/tajon-buchanan-iced-watch/cover", at("Tajon Buchanan's square watch set with diamonds, on the wrist")),
-    gallery: [
+    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
+    ...withStudio("tajon-buchanan-iced-watch", "Tajon Buchanan's square watch set with diamonds", {
+      cover: still("pieces/tajon-buchanan-iced-watch/cover", at("Tajon Buchanan's square watch set with diamonds, on the wrist")),
+      gallery: [
       st("tajon-buchanan", 3, at("Tajon Buchanan at the house")),
     ],
+    }),
     specs: [
       ["Type", "Watch"],
     ],
@@ -1349,8 +1389,11 @@ const SITE_PIECES: Piece[] = [
     story: "A watch with a dial paved with diamonds and a bracelet set link by link.",
     people: ["radja-nainggolan"],
     theme: { preset: "mecanique" },
-    cover: still("pieces/radja-nainggolan-iced-watch/cover", at("Radja Nainggolan's iced watch on his wrist")),
-    gallery: [],
+    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
+    ...withStudio("radja-nainggolan-iced-watch", "Radja Nainggolan's iced watch", {
+      cover: still("pieces/radja-nainggolan-iced-watch/cover", at("Radja Nainggolan's iced watch on his wrist")),
+      gallery: [],
+    }),
     specs: [
       ["Type", "Watch"],
     ],
@@ -1367,8 +1410,8 @@ const SITE_PIECES: Piece[] = [
  * say what the photos show, no figure but the sizes given by Yoni, the coloured stones by their colour. Yoni can rename
  * it, hide it or write its story from the admin.
  */
-function collected(p: Omit<PieceInput, "cover" | "gallery">): Piece {
-  return piece({ ...p, ...sorted(p.slug, []) });
+function collected({ order, ...p }: Omit<PieceInput, "cover" | "gallery"> & { order?: string[] }): Piece {
+  return piece({ ...p, ...sorted(p.slug, [], order ? firsts(p.slug, order) : undefined) });
 }
 
 /** The pieces published on 20/11/2026 (tests/galleries.spec.ts). */
@@ -1509,6 +1552,8 @@ const COLLECTED: Piece[] = [
 
   collected({
     slug: "jesus-piece-red-flowers",
+    // Its photos in a new order (23/11/2026): the sharp crown first, the softer close-ups later.
+    order: ["p06", "p04", "p07", "p01", "p02", "p03", "p05"],
     title: "Jesus Piece — Red Flowers",
     type: "pendant",
     line: "A crown of red flowers in rose gold.",
@@ -1533,6 +1578,8 @@ const COLLECTED: Piece[] = [
   /* Chains */
   collected({
     slug: "cross-infinity-chain",
+    // Its photos in a new order (23/11/2026): the longest stretch of chain first.
+    order: ["p09", "p07", "p01", "14-p05", "p02", "p04", "14-p10", "14-p06", "p12", "p05", "p10", "p11", "p06"],
     title: "Cross Infinity Chain",
     type: "chain",
     line: "Round links paved with diamonds, joined by crosses.",

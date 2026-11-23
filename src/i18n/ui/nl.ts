@@ -291,6 +291,7 @@ export const nl: Messages = {
   },
 
   players: {
+    photoNamed: { kanye: "Marcus Thuram met Kanye West", boutique: "Keita in de Berete-boetiek, met zijn koffer" } as Record<string, string>,
     trunks: (count: number) => (count > 1 ? "Zijn koffers" : "Zijn koffer"),
     eyebrow: "De Kring van Berete",
     title: "Gedragen door iconen",
@@ -717,6 +718,20 @@ export const nl: Messages = {
     soonMessage: "Hallo Berete Jewellers, ik wil graag mijn stukken in 3D zien.",
   },
 
+  feature: {
+    film: "De film",
+    dragonTitle: "Dragon Ball in beweging",
+    dragonLabel: "De film van de Dragon Ball-hanger: het stuk, zijn koffer die opengaat, zijn Spirit Bomb die draait",
+    mechanism: "Het mechanisme",
+    crossTitle: "Het kruis dat draait",
+    crossText: "Aan het einde van de film wordt het midden met de hand gedraaid.",
+    crossLabel: "Het kruis van Malik Tillman, gedragen, daarna het midden met de hand gedraaid",
+    play: "Film afspelen",
+    pause: "Film pauzeren",
+    soundOn: "Geluid aanzetten",
+    soundOff: "Geluid uitzetten",
+    fullscreen: "Bekijk op volledig scherm",
+  },
   films: {
     pieceSection: "Het voltooide stuk",
     pieceSectionLead: (title: string) => "De film van het voltooide stuk: " + title + ". Op volledig scherm, met geluid.",

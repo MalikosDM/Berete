@@ -101,43 +101,34 @@ test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
   await page.screenshot({ path: shotPath(info, "yoni2311b-t-serpent") });
 });
 
-test("Dragon Ball: the magnifying glass follows the pointer; the sphere turns while hovered", async ({ page }, info) => {
+test("Dragon Ball: the magnifying glass follows the pointer, photos only (no film under the pointer)", async ({ page }, info) => {
   await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
   const showcase = page.locator("[data-piece-cover] [data-showcase]");
   await expect(showcase).toBeVisible();
+  // Never a film in the opening (the sphere turns in its own film, under the opening: tests/yoni2311d.spec.ts).
+  await expect(page.locator("[data-piece-cover] video")).toHaveCount(0);
   if (desktop(info.project.name)) {
     const img = page.locator("[data-piece-cover] [data-place='0'] img");
     await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     const b = (await img.boundingBox())!;
-    await page.mouse.move(b.x + b.width / 2, b.y + b.height * 0.35, { steps: 4 });
-    await expect(showcase).toHaveAttribute("data-spinning", "");
-    const video = page.locator("[data-piece-cover] [data-place='0'] [data-showcase-spin]");
-    await expect(video).toHaveAttribute("src", new RegExp("/media/mechanisms/dragon-ball-spin" + V + "mp4$"));
-    await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
-    const lens = page.locator("[data-piece-lens]");
-    await page.mouse.move(b.x + b.width / 2 + 10, b.y + b.height * 0.4, { steps: 3 });
+    const lens = page.locator("[data-piece-cover] [data-piece-lens]");
+    await page.mouse.move(b.x + b.width / 2 + 10, b.y + b.height * 0.55, { steps: 4 });
     await expect(lens).toHaveAttribute("data-on", "");
     // Never beyond the pixels of the file.
     expect(Number(await lens.getAttribute("data-zoom"))).toBeGreaterThan(1);
     await page.waitForTimeout(500);
     await page.screenshot({ path: shotPath(info, "yoni2311b-dragonball-loupe") });
-    await page.mouse.move(5, 300, { steps: 3 });
-    await expect(showcase).not.toHaveAttribute("data-spinning", "");
-    await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).paused)).toBe(true);
     // The same glass on another piece.
     await open(page, "/pieces/campione-d-italia-2023-2024");
     const ring = page.locator("[data-piece-cover] [data-place='0'] img");
     await expect.poll(() => ring.evaluate((i) => (i as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     const r = (await ring.boundingBox())!;
     await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2, { steps: 4 });
-    await expect(page.locator("[data-piece-lens]")).toHaveAttribute("data-on", "");
+    await expect(page.locator("[data-piece-cover] [data-piece-lens]")).toHaveAttribute("data-on", "");
   } else {
-    // A touch makes it turn, another one stops it.
-    const button = page.locator("[data-piece-cover] [data-showcase-slide='0'] button");
-    await button.tap();
-    await expect(showcase).toHaveAttribute("data-spinning", "");
-    await button.tap();
-    await expect(showcase).not.toHaveAttribute("data-spinning", "");
+    // A touch: the view full screen, where two fingers zoom.
+    await page.locator("[data-piece-cover] [data-showcase-slide='0'] button").tap();
+    await expect(page.locator("[data-lightbox]")).toBeVisible();
   }
 });
 
