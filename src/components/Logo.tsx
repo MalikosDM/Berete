@@ -1,20 +1,26 @@
 /*
- * The owner's logo (scripts/import-media.mjs writes /media/brand/), used as a mask
- * over the metallic rose gold, with its slow sheen: sharp at every size.
- * "full": diamond, BRT and the name. "mark": the diamond and BRT only.
- * "wordmark": BERETE JEWELLERS on one line, "berete": BERETE alone, in the letters of the logo (scripts/brand-media.mjs).
+ * The owner's logo (scripts/import-media.mjs writes /media/brand/, scripts/brand-media.mjs its sharp copy and the name).
+ * "full": diamond, BRT and the name; "wordmark": BERETE JEWELLERS on one line, in the letters of the logo — both drawn as
+ * vector images, sharp at every size and on every screen (Yoni, 24/11/2026: the logo of the menu was blurred on black; a
+ * mask is drawn at a low resolution by Safari). "mark": the diamond and BRT only, and "berete": BERETE alone (the watermark),
+ * as masks over the rose gold.
  */
 import brand from "@/data/brand.generated.json" with { type: "json" };
 import { useI18n } from "@/i18n";
 
-const FILES = { full: "/media/brand/logo.svg", mark: "/media/brand/logo-mark.svg", wordmark: brand.wordmark.src, berete: brand.berete.src } as const;
+const IMAGES = { full: brand.sharp.src, wordmark: brand.wordmark.src } as const;
+const MASKS = { mark: "/media/brand/logo-mark.svg", berete: brand.berete.src } as const;
 
 /** "start": against the start of the line (the left, the right in Arabic). */
-type LogoProps = { variant?: keyof typeof FILES; className?: string; position?: "start" | "center" };
+type LogoProps = { variant?: keyof typeof IMAGES | keyof typeof MASKS; className?: string; position?: "start" | "center" };
 
 export default function Logo({ variant = "full", className = "", position = "start" }: LogoProps) {
   const { dir } = useI18n();
-  const url = "url(" + FILES[variant] + ")";
+  if (variant === "full" || variant === "wordmark") {
+    const place = position === "center" ? "object-center" : dir === "rtl" ? "object-right" : "object-left";
+    return <img src={IMAGES[variant]} alt="" aria-hidden="true" decoding="async" draggable={false} className={"block object-contain " + place + " " + className} />;
+  }
+  const url = "url(" + MASKS[variant] + ")";
   const place = position === "center" ? "center" : dir === "rtl" ? "right center" : "left center";
   return (
     <span

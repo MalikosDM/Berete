@@ -133,6 +133,14 @@ export const en = {
       bracelets: { name: "Bracelets", intro: "Bracelets made to measure, link by link." },
       watches: { name: "Watches", intro: "Watches set with diamonds from the case to the bracelet." },
       "jesus-pieces": { name: "Jesus Pieces", intro: "From the streets of New York to Biggie making it legendary, the Jesus piece became one of the most recognizable symbols in the culture. We're not changing that story just adding our part to it." },
+      "celebration": { name: "Celebration Pendants", intro: "The goal celebrations of the players, sculpted in diamonds: a gesture on the pitch, kept for good." },
+      "cross": { name: "Cross Pendants", intro: "Crosses drawn by the house, framed in baguettes or set stone by stone." },
+      "name": { name: "Name Pendants", intro: "A name, or the initials of a name, drawn in gold and set with diamonds." },
+      "letter": { name: "Letter Pendants", intro: "One letter, and the whole story of the one who wears it." },
+      "signature": { name: "Signature Chains", intro: "The chains of the house, drawn by Berete: the Safi Link and BRT Flowers." },
+      "cuban": { name: "Cuban Chains", intro: "The Cuban link, iced with diamonds, from one width to another." },
+      "tennis": { name: "Tennis Chains", intro: "A line of diamonds, stone after stone." },
+      "infinity": { name: "Infinity Chains", intro: "Links drawn in the shape of infinity." },
     },
     eyebrow: "The Portfolio",
     title: "Explore the Creations",
@@ -142,6 +150,8 @@ export const en = {
     /* The page of one collection */
     collection: "The Portfolio",
     listLabel: (collection: string) => "The creations: " + collection,
+    /** The heading of the categories of a collection (24/11/2026). */
+    categories: "Categories",
     subLabel: (collection: string) => collection + ": its sub-categories",
     subAll: (collection: string) => "All " + collection.toLowerCase(),
     others: "More of the Portfolio",
@@ -151,6 +161,9 @@ export const en = {
   },
 
   home: {
+    /** The opening photo of the home page (24/11/2026) and the small link under it. */
+    heroAlt: "The Sirius trunk open: the chain and its nameplate in their display, the BRT logo on the black trunk",
+    discoverMore: "Discover More",
     sketchLabel: "From the first sketch to the jewel, played by scrolling",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "We don't begin with what has been done. We begin with what could be.",
@@ -279,6 +292,8 @@ export const en = {
     delivered: "Delivered",
     handedOverTo: (_client: string) => "The Official Presentation",
     handover: "The handover",
+    /** The lines of the composition sent by Yoni piece by piece (the admin prepares them; 24/11/2026). */
+    composition: { "Gold": "Gold", "Gold weight": "Gold weight", "Diamonds": "Diamonds", "Total diamond weight": "Total diamond weight", "Coloured stones": "Coloured stones", "Hours of work": "Hours of work" } as Record<string, string>,
     sheet: "Composition & Craftsmanship",
     customBox: "Bespoke Presentation",
     deliveredIn: (box: string) => "Delivered in the " + box + ", made for it.",
@@ -410,6 +425,9 @@ export const en = {
 
   process: {
     /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
+    liveWithSpace: "Live progress photos and videos on WhatsApp and in your private client space.",
+    spaceAfterDeposit: "After the design deposit, you enter your private client space: your piece in 3D and its progress, live.",
     quick: {
       lead: "From a first sketch to the reveal in its case: four steps, followed with you on WhatsApp.",
       steps: [
@@ -428,7 +446,7 @@ export const en = {
       { title: "The Private Consultation", text: "Ideas and budget. Tell us the moment you want to mark, your references, your story.", meter: "0%", payNote: "No payment at this stage." },
       { title: "The Design Commission", text: "Deducted from the final price if confirmed, covers design costs if cancelled.", meter: "Deposit", payNote: "Design deposit paid." },
       { title: "Design Approval", text: "50% of production paid before crafting starts.", meter: "50%", payNote: "50% of production paid." },
-      { title: "The Art of Creation", text: "Progress photos and videos on WhatsApp, timing depends on complexity.", meter: "50%", payNote: "Nothing more to pay while we craft." },
+      { title: "The Art of Creation", text: "Live progress photos and videos on WhatsApp.", meter: "50%", payNote: "Nothing more to pay while we craft." },
       { title: "The Editorial Reveal", text: "Dedicated shoot, then delivery preparation.", meter: "50%", payNote: "Your piece is photographed before it leaves the atelier." },
       { title: "Final Payment & Presentation", text: "Remaining 50% about one week before handover.", meter: "100%", payNote: "Fully paid, ready for handover." },
     ],
@@ -664,7 +682,7 @@ export const en = {
   vip: {
     eyebrow: "Berete VIP",
     title: "Your private space",
-    intro: "Your pieces in 3D, prepared for you by Berete Jewellers.",
+    intro: "The progress of your piece and your creations in 3D, prepared for you by Berete Jewellers.",
     code: "Access code",
     codeHint: "The code we sent you, for example 7KQ2-9MXA.",
     enter: "Enter",
@@ -673,7 +691,6 @@ export const en = {
     linkMissing: "This link no longer works. Enter your code, or ask us for a new link on WhatsApp.",
     hello: (name: string) => "Hello " + name,
     yourPieces: "Your pieces",
-    none: "Your pieces will appear here as soon as they are ready.",
     logout: "Log out",
     footerLink: "Client space",
     askCode: "Ask for my code on WhatsApp",
@@ -681,6 +698,21 @@ export const en = {
     /** The client space on the site without its server. */
     soon: "Your private space opens very soon. Until then, write to us on WhatsApp and we will send you your pieces in 3D directly.",
     soonMessage: "Hello Berete Jewellers, I would like to see my pieces in 3D.",
+    /** The follow-up of the commission (Yoni, 24/11/2026): the step of the piece, its estimated date, the news of the atelier. */
+    journey: "The Journey of Your Piece",
+    stepOf: (step: number, total: number) => "Step " + step + " of " + total,
+    stepDone: "Completed",
+    stepCurrent: "In progress",
+    stepNext: "To come",
+    delivered: "Every step is complete: your piece has been handed over to you.",
+    estimated: "Estimated completion",
+    /** The estimated date changed: when, and the date it replaced (dates written by Intl). */
+    estimateChanged: (on: string, before: string) => "Updated on " + on + ", previously " + before,
+    news: "News from the Atelier",
+    noNews: "The first photos and videos from the atelier will appear here.",
+    openPhoto: "Open the photo full screen",
+    photoAlt: (date: string) => "Photo from the atelier, " + date,
+    videoAlt: (date: string) => "Video from the atelier, " + date,
   },
 
   /** "Enter the Atelier": the films of a piece, its making-of then the finished piece (src/components/AtelierRoom.tsx). */

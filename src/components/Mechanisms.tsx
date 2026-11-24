@@ -78,10 +78,10 @@ export default function Mechanisms() {
       <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
         <Reveal>
           <p className="eyebrow">{t.atelier.engineering.eyebrow}</p>
-          <h2 id="engineering-title" className="title-caps mt-5 max-w-4xl text-[clamp(2rem,5vw,4.25rem)] leading-[1.08] tracking-[0.1em] text-white [text-wrap:balance]">
+          <h2 id="engineering-title" className="title-caps mt-5 max-w-4xl t-title leading-[1.08] tracking-[0.1em] text-white [text-wrap:balance]">
             {t.atelier.engineering.title}
           </h2>
-          <p className="mt-6 max-w-2xl text-lg text-bone">{t.atelier.engineering.lead}</p>
+          <p className="mt-6 max-w-2xl text-base text-bone">{t.atelier.engineering.lead}</p>
         </Reveal>
 
         {sphere && dragon ? (
@@ -98,9 +98,9 @@ export default function Mechanisms() {
             </div>
             <div className="lg:col-span-5">
               <span aria-hidden="true" className="text-rose-gold font-display text-3xl">01</span>
-              <h3 className="title-caps mt-3 text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.15] tracking-[0.08em] text-white">{t.atelier.engineering.sphereTitle}</h3>
-              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone md:text-lg">{t.atelier.engineering.sphereText}</p>
-              <Link to={"/pieces/" + dragon.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.14em] text-white hover:text-rose-light">
+              <h3 className="title-caps mt-3 t-lead leading-[1.15] tracking-[0.08em] text-white">{t.atelier.engineering.sphereTitle}</h3>
+              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone">{t.atelier.engineering.sphereText}</p>
+              <Link to={"/pieces/" + dragon.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.14em] text-white hover:text-rose-light">
                 {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             </div>
@@ -111,8 +111,8 @@ export default function Mechanisms() {
           <article data-mechanism="lift" className="mt-16 grid gap-10 border-t border-white/10 pt-14 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5">
               <span aria-hidden="true" className="text-rose-gold font-display text-3xl">{sphere && dragon ? "02" : "01"}</span>
-              <h3 className="title-caps mt-3 text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.15] tracking-[0.08em] text-white">{t.atelier.engineering.liftTitle}</h3>
-              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone md:text-lg">{t.atelier.engineering.liftText}</p>
+              <h3 className="title-caps mt-3 t-lead leading-[1.15] tracking-[0.08em] text-white">{t.atelier.engineering.liftTitle}</h3>
+              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone">{t.atelier.engineering.liftText}</p>
             </div>
             <ul className="grid gap-8 sm:grid-cols-2 lg:col-span-7">
               {rings.map((r) => (
@@ -126,10 +126,10 @@ export default function Mechanisms() {
           <article data-mechanism="cross" className="mt-16 grid items-center gap-10 border-t border-white/10 pt-14 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5 lg:order-2 lg:col-start-8">
               <span aria-hidden="true" className="text-rose-gold font-display text-3xl">{String(1 + (sphere && dragon ? 1 : 0) + (rings.length > 0 ? 1 : 0)).padStart(2, "0")}</span>
-              <h3 className="title-caps mt-3 text-[clamp(1.5rem,2.6vw,2.25rem)] leading-[1.15] tracking-[0.08em] text-white">{t.feature.crossTitle}</h3>
-              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone md:text-lg">{t.feature.crossText}</p>
+              <h3 className="title-caps mt-3 t-lead leading-[1.15] tracking-[0.08em] text-white">{t.feature.crossTitle}</h3>
+              <p className="mt-4 max-w-lg text-base leading-relaxed text-bone">{t.feature.crossText}</p>
               <p className="mt-3 text-base text-mist">{cross.title}</p>
-              <Link to={"/pieces/" + cross.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.14em] text-white hover:text-rose-light">
+              <Link to={"/pieces/" + cross.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.14em] text-white hover:text-rose-light">
                 {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             </div>

@@ -133,6 +133,14 @@ export const de: Messages = {
       bracelets: { name: "Armbänder", intro: "Armbänder nach Maß, Glied für Glied gefertigt." },
       watches: { name: "Uhren", intro: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband." },
       "jesus-pieces": { name: "Jesus Pieces", intro: "Von den Straßen New Yorks bis zu Biggie, der es legendär machte, wurde das Jesus Piece zu einem der bekanntesten Symbole der Kultur. Wir ändern diese Geschichte nicht, wir fügen ihr nur unseren Teil hinzu." },
+      "celebration": { name: "Jubel-Anhänger", intro: "Die Torjubel der Spieler, in Diamanten modelliert: eine Geste auf dem Platz, für immer bewahrt." },
+      "cross": { name: "Kreuz-Anhänger", intro: "Vom Haus entworfene Kreuze, mit Baguettes gerahmt oder Stein für Stein gefasst." },
+      "name": { name: "Namens-Anhänger", intro: "Ein Name oder die Initialen eines Namens, in Gold gezeichnet und mit Diamanten besetzt." },
+      "letter": { name: "Buchstaben-Anhänger", intro: "Ein einziger Buchstabe und die ganze Geschichte dessen, der ihn trägt." },
+      "signature": { name: "Signature-Ketten", intro: "Die Ketten des Hauses, von Berete entworfen: der Safi Link und BRT Flowers." },
+      "cuban": { name: "Kubanische Ketten", intro: "Das kubanische Glied, mit Diamanten besetzt, in verschiedenen Breiten." },
+      "tennis": { name: "Tennisketten", intro: "Eine Linie aus Diamanten, Stein für Stein." },
+      "infinity": { name: "Infinity-Ketten", intro: "Glieder in Form der Unendlichkeit." },
     },
     eyebrow: "Das Portfolio",
     title: "Die Kreationen entdecken",
@@ -141,6 +149,8 @@ export const de: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "Das Portfolio",
     listLabel: (collection: string) => "Die Kreationen: " + collection,
+    /** The heading of the categories of a collection (24/11/2026). */
+    categories: "Kategorien",
     subLabel: (collection: string) => collection + ": Unterkategorien",
     subAll: (collection: string) => "Alle " + collection,
     others: "Mehr aus dem Portfolio",
@@ -150,6 +160,9 @@ export const de: Messages = {
   },
 
   home: {
+    /** The opening photo of the home page (24/11/2026) and the small link under it. */
+    heroAlt: "Der geöffnete Sirius-Koffer: die Kette und ihr Anhänger in ihrer Präsentation, das BRT-Logo auf dem schwarzen Koffer",
+    discoverMore: "Mehr entdecken",
     sketchLabel: "Von der ersten Skizze zum Schmuckstück, beim Scrollen",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "Wir beginnen nicht mit dem, was schon gemacht wurde. Wir beginnen mit dem, was sein könnte.",
@@ -273,6 +286,8 @@ export const de: Messages = {
     delivered: "Übergeben",
     handedOverTo: (_client: string) => "Die feierliche Übergabe",
     handover: "Die Übergabe",
+    /** The lines of the composition sent by Yoni piece by piece (the admin prepares them; 24/11/2026). */
+    composition: { "Gold": "Gold", "Gold weight": "Goldgewicht", "Diamonds": "Diamanten", "Total diamond weight": "Gesamtgewicht der Diamanten", "Coloured stones": "Farbsteine", "Hours of work": "Arbeitsstunden" } as Record<string, string>,
     sheet: "Komposition & Handwerkskunst",
     customBox: "Präsentation nach Maß",
     deliveredIn: (box: string) => "Geliefert in seinem eigens dafür gefertigten Etui: " + box + ".",
@@ -400,6 +415,9 @@ export const de: Messages = {
 
   process: {
     /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
+    liveWithSpace: "Fotos und Videos vom Fortschritt live auf WhatsApp und in Ihrem privaten Kundenbereich.",
+    spaceAfterDeposit: "Nach der Design-Anzahlung erhalten Sie Zugang zu Ihrem privaten Kundenbereich: Ihr Stück in 3D und sein Fortschritt, live.",
     quick: {
       lead: "Von der ersten Skizze bis zur Enthüllung im Etui: vier Schritte, gemeinsam mit Ihnen auf WhatsApp begleitet.",
       steps: [
@@ -418,7 +436,7 @@ export const de: Messages = {
       { title: "Die private Beratung", text: "Ideen und Budget. Erzählen Sie uns von dem Moment, den Sie festhalten möchten, von Ihren Referenzen, Ihrer Geschichte.", meter: "0 %", payNote: "In dieser Phase fällt keine Zahlung an." },
       { title: "Der Designauftrag", text: "Wird bei Bestätigung vom Endpreis abgezogen und deckt bei einer Absage die Designkosten.", meter: "Anzahlung", payNote: "Design-Anzahlung geleistet." },
       { title: "Die Designfreigabe", text: "50 % der Produktion werden vor Beginn der Fertigung bezahlt.", meter: "50 %", payNote: "50 % der Produktion bezahlt." },
-      { title: "Die Kunst der Entstehung", text: "Fotos und Videos vom Fortschritt auf WhatsApp; die Dauer hängt von der Komplexität ab.", meter: "50 %", payNote: "Während der Fertigung ist nichts weiter zu zahlen." },
+      { title: "Die Kunst der Entstehung", text: "Fotos und Videos vom Fortschritt live auf WhatsApp.", meter: "50 %", payNote: "Während der Fertigung ist nichts weiter zu zahlen." },
       { title: "Die Enthüllung in Bildern", text: "Ein eigenes Shooting, dann die Vorbereitung der Lieferung.", meter: "50 %", payNote: "Ihr Stück wird fotografiert, bevor es das Atelier verlässt." },
       { title: "Restzahlung & feierliche Übergabe", text: "Die restlichen 50 % etwa eine Woche vor der Übergabe.", meter: "100 %", payNote: "Vollständig bezahlt, bereit zur Übergabe." },
     ],
@@ -598,6 +616,38 @@ export const de: Messages = {
       title: "Diamantbesetzte Uhren",
       description: "Uhren, mit Diamanten besetzt vom Gehäuse bis zum Armband, getragen von Fußballern: die Uhren von Berete Jewellers, Dubai.",
     },
+    "/creations/pendants/celebration": {
+      title: "Jubel-Anhänger: Torjubel in Diamanten",
+      description: "Die Jubel-Anhänger von Berete Jewellers: der Torjubel von Fußballern, in Gold und Diamanten modelliert, gefertigt in Dubai.",
+    },
+    "/creations/pendants/cross": {
+      title: "Kreuz-Anhänger mit Diamanten",
+      description: "Die Kreuz-Anhänger von Berete Jewellers: Kreuze mit Baguettes gerahmt oder Stein für Stein gefasst, gefertigt in Dubai.",
+    },
+    "/creations/pendants/name": {
+      title: "Namens- und Initialen-Anhänger",
+      description: "Die Namens-Anhänger von Berete Jewellers: Namen und Initialen in Gold gezeichnet und mit Diamanten besetzt, gefertigt in Dubai.",
+    },
+    "/creations/pendants/letter": {
+      title: "Buchstaben-Anhänger mit Diamanten",
+      description: "Die Buchstaben-Anhänger von Berete Jewellers: ein Buchstabe, modelliert und mit Diamanten besetzt, gefertigt in Dubai.",
+    },
+    "/creations/chains/signature": {
+      title: "Signature-Ketten: Safi Link und BRT Flowers",
+      description: "Die Signature-Ketten von Berete Jewellers, der Safi Link und BRT Flowers, vom Haus entworfen und in Dubai gefertigt.",
+    },
+    "/creations/chains/cuban": {
+      title: "Kubanische Ketten mit Diamanten",
+      description: "Die kubanischen Ketten von Berete Jewellers, mit Diamanten besetzt, in verschiedenen Breiten, gefertigt in Dubai.",
+    },
+    "/creations/chains/tennis": {
+      title: "Tennisketten",
+      description: "Die Tennisketten von Berete Jewellers: eine Linie aus Diamanten, Stein für Stein, gefertigt in Dubai.",
+    },
+    "/creations/chains/infinity": {
+      title: "Infinity-Ketten",
+      description: "Die Infinity-Ketten von Berete Jewellers: Glieder in Form der Unendlichkeit, gefertigt in Dubai.",
+    },
     "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces: Christus-Anhänger mit Diamanten nach Maß",
       description: "Die Jesus Pieces von Berete Jewellers: das Antlitz Christi mit Dornen- oder Blumenkrone und Christus am Kreuz, modelliert und mit Diamanten besetzt in Dubai.",
@@ -714,7 +764,7 @@ export const de: Messages = {
   vip: {
     eyebrow: "Berete VIP",
     title: "Ihr privater Bereich",
-    intro: "Ihre Stücke in 3D, für Sie vorbereitet von Berete Jewellers.",
+    intro: "Der Fortschritt Ihres Stücks und Ihre Kreationen in 3D, für Sie vorbereitet von Berete Jewellers.",
     code: "Zugangscode",
     codeHint: "Der Code, den wir Ihnen gesendet haben, zum Beispiel 7KQ2-9MXA.",
     enter: "Eintreten",
@@ -723,13 +773,25 @@ export const de: Messages = {
     linkMissing: "Dieser Link funktioniert nicht mehr. Geben Sie Ihren Code ein oder bitten Sie uns per WhatsApp um einen neuen Link.",
     hello: (name: string) => "Hallo " + name,
     yourPieces: "Ihre Stücke",
-    none: "Ihre Stücke erscheinen hier, sobald sie fertig sind.",
     logout: "Abmelden",
     footerLink: "Kundenbereich",
     askCode: "Meinen Code per WhatsApp anfragen",
     askMessage: "Hallo Berete Jewellers, könnten Sie mir meinen Zugangscode für meinen privaten Bereich senden?",
     soon: "Ihr privater Bereich öffnet sehr bald. Schreiben Sie uns bis dahin auf WhatsApp, und wir senden Ihnen Ihre Stücke direkt in 3D.",
     soonMessage: "Hallo Berete Jewellers, ich würde gern meine Stücke in 3D sehen.",
+    journey: "Der Weg Ihres Stücks",
+    stepOf: (step: number, total: number) => "Schritt " + step + " von " + total,
+    stepDone: "Abgeschlossen",
+    stepCurrent: "In Arbeit",
+    stepNext: "Folgt",
+    delivered: "Alle Schritte sind abgeschlossen: Ihr Stück wurde Ihnen übergeben.",
+    estimated: "Voraussichtliche Fertigstellung",
+    estimateChanged: (on: string, before: string) => "Aktualisiert am " + on + ", zuvor geplant für den " + before,
+    news: "Neuigkeiten aus dem Atelier",
+    noNews: "Die ersten Fotos und Videos aus dem Atelier erscheinen hier.",
+    openPhoto: "Foto im Vollbild öffnen",
+    photoAlt: (date: string) => "Foto aus dem Atelier, " + date,
+    videoAlt: (date: string) => "Video aus dem Atelier, " + date,
   },
 
   feature: {

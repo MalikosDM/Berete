@@ -1,5 +1,6 @@
 import { expect, test, type Page } from "./fixtures";
-import { anglePhotos, wornSet, anglesShownFirst } from "../src/data/angles";
+import { anglePhotos, wornSet } from "../src/data/angles";
+import { resolveAtelier } from "../src/data/atelier";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
 import { PIECES } from "../src/data/pieces";
 import { resolveShowcase } from "../src/data/showcase";
@@ -16,6 +17,9 @@ import { checkPage, getCatalogue, scrollTo, skipIntro, watch } from "./helpers";
  * home page to every piece; the links between players, pieces and stories in
  * both directions; sharp, well framed main photos. Screenshots: verification/.
  */
+
+/** "Every Angle" shows four photos, then "See N more" (24/11/2026, src/components/EveryAngle.tsx). */
+const anglesShownFirst = (n: number) => Math.min(n, 4);
 
 const MAIN_PAGES = ["/", "/creations", "/players", "/atelier", "/boxes", "/process", "/about", "/press", "/contact", "/legal", "/privacy", "/admin"];
 
@@ -90,13 +94,14 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   for (const v of await page.locator("[data-angle] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }
-  // "The Making of a Masterpiece": only its real steps (src/data/making.ts), its complete making-of first; none: no section.
+  // "The Making of a Masterpiece" lives in The Atelier since 24/11/2026 (Yoni): on the page, a way there when the piece has
+  // its making-of film or real steps (src/data/making.ts); none: no way.
   const box = piece.boxSlug ? cat.boxes.find((b) => b.slug === piece.boxSlug)?.images[0] : undefined;
   const steps = makingSteps(piece, box);
-  const film = completeMakingOf(piece.slug, piece.atelier);
-  await expect(page.locator("[data-making-step]"), id + " making").toHaveCount(steps.length);
-  await expect(page.locator("[data-making-film]"), id + " making-of film").toHaveCount(film ? 1 : 0);
-  await expect(page.locator("[data-making]"), id + " making section").toHaveCount(steps.length > 0 || film ? 1 : 0);
+  const film = resolveAtelier(piece.slug, piece.atelier) || completeMakingOf(piece.slug, piece.atelier);
+  await expect(page.locator("[data-making]"), id + " no making-of on the page").toHaveCount(0);
+  await expect(page.locator("[data-enter-atelier-link]"), id + " the way to its making-of").toHaveCount(steps.length > 0 || film ? 1 : 0);
+  if (steps.length > 0 || film) await expect(page.locator("[data-enter-atelier-link]")).toHaveAttribute("href", "/atelier?piece=" + piece.slug);
   for (const slug of piece.people.slice(0, 3)) await expect(page.locator('[data-made-for-person="' + slug + '"]'), id + " made for " + slug).toHaveAttribute("href", "/players/" + slug);
   const sameType = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
   const similar = await page.locator("[data-similar] [data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));
@@ -327,53 +332,42 @@ test("story viewer: buttons, pause, close", async ({ page }) => {
 
 /* ---------- Scroll-driven films ---------- */
 
-// The home page has no film since 23/11/2026 (Yoni).
-for (const path of ["/process"]) {
-  test("the film of " + path + " is moved by the scroll only", async ({ page }) => {
-    const problems = watch(page);
-    await page.goto(path);
-    const section = page.locator("[data-scroll-video]");
-    await expect(section).toHaveCount(1);
-    const canvas = section.locator("canvas");
-    await expect(canvas).toHaveCount(1);
-    const frame = () => canvas.evaluate((c) => (c as HTMLCanvasElement).toDataURL("image/jpeg", 0.5).length);
-    // Wait for the whole frame sequence.
-    await expect(canvas).toHaveAttribute("data-frames", /^\d+$/);
-    const count = Number(await canvas.getAttribute("data-frames"));
-    await expect
-      .poll(() => page.evaluate(() => new Set(performance.getEntriesByType("resource").map((e) => e.name).filter((n) => /frames-(desktop|mobile)\/\d+\.webp/.test(n))).size), { timeout: 60_000 })
-      .toBeGreaterThanOrEqual(count);
-    const box = await section.evaluate((el) => ({ top: el.getBoundingClientRect().top + window.scrollY, height: el.offsetHeight }));
-    const vh = await page.evaluate(() => window.innerHeight);
-    const at = async (p: number) => {
-      await scrollTo(page, box.top + p * (box.height - vh));
-      await page.waitForTimeout(1200);
-      return frame();
-    };
-    const f0 = await at(0);
-    await page.waitForTimeout(1500);
-    expect(await frame(), "frozen while the scroll does not move").toBe(f0);
-    const f1 = await at(0.3);
-    const f2 = await at(0.7);
-    const back = await at(0.3);
-    expect(f1).not.toBe(f0);
-    expect(f2).not.toBe(f1);
-    expect(Math.abs(back - f1) / f1, "scrolling back shows the same frame again").toBeLessThan(0.02);
-    // No <video> plays by itself in the film.
-    expect(await section.locator("video").count()).toBe(0);
-    expect(problems.errors).toEqual([]);
-  });
-}
+// 24/11/2026 (Yoni): no film moved by the scroll on the site any more (the home page lost it on 23/11, /process on 24/11; the
+// films are kept, SketchToJewel and ScrollVideo stay in the code): The Bespoke Journey is a compact page and a timeline of
+// six steps, each with its image.
+test("/process: no film moved by the scroll, the journey then a timeline of six steps with their images", async ({ page }) => {
+  const problems = watch(page);
+  await page.goto("/process", { waitUntil: "load" });
+  await expect(page.locator("[data-scroll-video]")).toHaveCount(0);
+  await expect(page.locator("[data-journey]")).toBeVisible();
+  const steps = page.locator("[data-timeline] [data-timeline-step]");
+  await expect(steps).toHaveCount(6);
+  for (const step of await steps.all()) {
+    await step.scrollIntoViewIfNeeded();
+    const img = step.locator("img").first();
+    await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).complete && (i as HTMLImageElement).naturalWidth > 0), { timeout: 15_000 }).toBe(true);
+  }
+  await expect(steps.nth(3)).toContainText("Live progress photos and videos on WhatsApp");
+  expect(problems.errors).toEqual([]);
+});
 
 /* ---------- Logo, admin, forms ---------- */
 
-test("logo in the navigation: the logo as it was, and the name of the house again, large, in the bar (23/11/2026)", async ({ page }, info) => {
+// 24/11/2026 (Yoni): the logo a sharp vector image (src/components/Logo.tsx), the name smaller and exactly in the middle of the page.
+test("logo in the navigation: the logo as it was, and the name of the house again, in the middle of the bar (23-24/11/2026)", async ({ page }, info) => {
+  const phone = info.project.name === "iphone";
   await page.goto("/creations");
-  const logo = page.locator('header a[aria-label="Berete Jewellers, home"] span:visible');
-  expect(Math.round((await logo.boundingBox())!.height)).toBe(info.project.name === "iphone" ? 44 : 56);
-  const name = page.locator("header [data-wordmark] span");
+  const logo = page.locator('header a[aria-label="Berete Jewellers, home"] img:visible');
+  await expect(logo).toHaveAttribute("src", /\/media\/brand\/logo-sharp\.[0-9a-f]+\.svg$/);
+  // 40 px on a phone, 44 px at the 15 px scale of a computer.
+  expect(Math.round((await logo.boundingBox())!.height)).toBe(phone ? 40 : 41);
+  const name = page.locator("header [data-wordmark] img");
   await expect(name).toBeVisible();
-  expect((await name.boundingBox())!.width).toBeGreaterThan(info.project.name === "iphone" ? 160 : 300);
+  const box = (await name.boundingBox())!;
+  expect(box.width).toBeGreaterThan(phone ? 140 : 180);
+  // In the middle of the page.
+  const width = await page.evaluate(() => document.documentElement.clientWidth);
+  expect(Math.abs(box.x + box.width / 2 - width / 2)).toBeLessThanOrEqual(2);
   // Still there once the page has scrolled.
   await page.evaluate(() => window.scrollTo(0, 2400));
   await page.waitForTimeout(600);

@@ -43,8 +43,8 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="eyebrow">3D</p>
-          <h2 id="piece-3d-title" className="title-caps mt-4 text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">{t.viewer.title}</h2>
-          <p className="mt-4 max-w-2xl text-lg text-bone">{t.viewer.intro}</p>
+          <h2 id="piece-3d-title" className="title-caps mt-4 t-title tracking-[0.12em]">{t.viewer.title}</h2>
+          <p className="mt-4 max-w-2xl text-base text-bone">{t.viewer.intro}</p>
         </div>
       </div>
       {/* "See it in 3D", at the top of the page, comes here: the viewer whole on the screen, its choices and the WhatsApp button beside it. */}
@@ -54,7 +54,7 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
           words={t.viewer}
           onSelection={setSelection}
           actions={
-            <a href={waLink(t.viewer.wantMessage(piece.title, metals))} target="_blank" rel="noreferrer" data-want-3d className="inline-flex min-h-14 w-full items-center justify-center gap-3 bg-white px-5 py-3 text-center text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+            <a href={waLink(t.viewer.wantMessage(piece.title, metals))} target="_blank" rel="noreferrer" data-want-3d className="inline-flex min-h-12 w-full items-center justify-center gap-3 bg-white px-5 py-3 text-center text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
               <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {t.viewer.want}
             </a>
           }

@@ -8,7 +8,7 @@ import { useCatalogue } from "@/lib/catalogue";
 import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
-const linkCls = "inline-flex min-h-12 items-center text-base text-bone transition-colors hover:text-rose-light";
+const linkCls = "inline-flex min-h-11 items-center text-base text-bone transition-colors hover:text-rose-light lg:min-h-9 lg:text-[0.875rem]";
 
 export default function Footer() {
   const { t } = useI18n();
@@ -34,14 +34,17 @@ export default function Footer() {
   return (
     <footer className="relative bg-ink pb-28 md:pb-0">
       <div className="rule-rose" />
-      <div className="mx-auto max-w-[1600px] px-5 pt-20 sm:px-8 lg:px-12 lg:pt-28">
-        <p className="eyebrow">{t.site.tagline}</p>
-        <Link to="/" className="mt-6 block" aria-label={t.site.homeLabel}>
-          <Logo className="h-[clamp(7rem,18vw,13rem)] w-full max-w-3xl" />
-        </Link>
-        <p className="mt-8 text-lg text-mist">{t.site.baseLine}</p>
+      <div className="mx-auto max-w-[1600px] px-5 pt-16 sm:px-8 lg:px-12 lg:pt-20">
+        {/* The logo, smaller, sharp and centred; the signature of the house under it, never above (Yoni, 24/11/2026). */}
+        <div className="flex flex-col items-center text-center" data-footer-brand>
+          <Link to="/" className="block" aria-label={t.site.homeLabel}>
+            <Logo position="center" className="h-[5.5rem] w-[7.625rem] sm:h-24 sm:w-[8.25rem]" />
+          </Link>
+          <p className="eyebrow mt-6" data-footer-tagline>{t.site.tagline}</p>
+          <p className="mt-3 text-base text-mist">{t.site.baseLine}</p>
+        </div>
 
-        <div className="mt-16 grid gap-12 sm:grid-cols-2 lg:mt-24 lg:grid-cols-12">
+        <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:mt-16 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <h2 className="eyebrow mb-4">{t.footer.creations}</h2>
             <ul>
@@ -109,7 +112,7 @@ export default function Footer() {
             <p className="text-base text-bone">{t.footer.pitch}</p>
             <Link
               to="/contact"
-              className="mt-6 inline-flex min-h-12 items-center gap-2 border border-rose-light/70 px-6 text-sm font-semibold uppercase tracking-[0.18em] text-white transition-colors hover:bg-rose-light hover:text-ink"
+              className="mt-6 inline-flex min-h-12 items-center gap-2 border border-rose-light/70 px-5 text-base font-normal uppercase tracking-[0.18em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-10 lg:text-[0.75rem]"
             >
               {t.common.startPiece}
               <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />

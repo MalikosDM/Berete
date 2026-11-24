@@ -1,19 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useSearchParams } from "react-router";
 import { createPortal } from "react-dom";
 import { ArrowRight, Images, Play } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
-import Loupe, { pickMarked } from "@/components/Loupe";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
 import { onTrunksPage } from "@/components/BoxSection";
 import { Img, LoopVideo, MediaView } from "@/components/Media";
+import MakingSteps from "@/components/MakingSteps";
 import Mechanisms from "@/components/Mechanisms";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import TrunkReveal, { type TrunkPiece } from "@/components/TrunkReveal";
 import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
+import { completeMakingOf, makingSteps } from "@/data/making";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
 import { resolveShowcase } from "@/data/showcase";
@@ -65,23 +66,23 @@ export default function Atelier() {
         <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/40 to-ink/30" />
         <div className={"relative mx-auto w-full max-w-[1600px] px-5 pb-28 sm:px-8 md:pb-20 lg:px-12 " + shadow}>
           <p className="eyebrow">{t.atelier.eyebrow}</p>
-          <h1 id="atelier-title" className="title-caps mt-5 text-[clamp(2.75rem,9vw,8rem)] tracking-[0.14em] text-white">{t.atelier.title}</h1>
-          <p className="mt-6 max-w-lg text-lg text-bone">{t.atelier.lead}</p>
+          <h1 id="atelier-title" className="title-caps mt-4 t-hero tracking-[0.16em] text-white">{t.atelier.title}</h1>
+          <p className="mt-4 max-w-lg text-base text-bone">{t.atelier.lead}</p>
         </div>
       </section>
 
       {/* The philosophy of the house (Yoni, 23/11/2026). */}
       <section aria-labelledby="philosophy-title" data-philosophy className="relative z-20 bg-ink">
-        <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-24 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-32">
+        <div className="mx-auto grid max-w-[1240px] gap-8 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:px-12 lg:py-20">
           <Reveal className="lg:col-span-6">
             <p className="eyebrow">{t.atelier.philosophy.eyebrow}</p>
-            <h2 id="philosophy-title" className="mt-5 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-light leading-[1.12] text-white [text-wrap:balance]">
+            <h2 id="philosophy-title" className="mt-5 font-display t-title font-light leading-[1.12] text-white [text-wrap:balance]">
               {t.atelier.philosophy.title}
             </h2>
           </Reveal>
           <Reveal className="lg:col-span-5 lg:col-start-8 lg:self-end" delay={0.1}>
             {t.atelier.philosophy.text.map((p) => (
-              <p key={p} className="mt-5 text-base leading-relaxed text-bone first:mt-0 md:text-lg">{p}</p>
+              <p key={p} className="mt-5 text-base leading-relaxed text-bone first:mt-0">{p}</p>
             ))}
           </Reveal>
         </div>
@@ -100,9 +101,9 @@ export default function Atelier() {
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
               </div>
               <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-5 pb-28 sm:px-8 md:pb-20 lg:px-12">
-                <span aria-hidden="true" className="text-rose-gold block font-display text-5xl font-light md:text-7xl">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className={"title-caps mt-4 text-[clamp(2rem,6vw,5rem)] text-white " + shadow}>{step.title}</h3>
-                <div className="rule-rose my-6 max-w-xs" aria-hidden="true" />
+                <span aria-hidden="true" className="text-rose-gold block font-display text-3xl font-light md:text-4xl">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className={"title-caps mt-3 t-lead text-white " + shadow}>{step.title}</h3>
+                <div className="rule-rose my-4 max-w-[12rem]" aria-hidden="true" />
                 <p className={"max-w-xl text-lg text-bone " + shadow}>{step.text}</p>
               </div>
             </article>
@@ -114,13 +115,13 @@ export default function Atelier() {
 
       <AtelierFilms />
 
-      <section className="relative z-20 bg-ink px-5 py-24 text-center sm:px-8 md:py-32">
+      <section className="relative z-20 bg-ink px-5 py-16 text-center sm:px-8 md:py-20">
         <Reveal>
           <p className="eyebrow">{t.common.yourPiece}</p>
-          <h2 className="title-caps mx-auto mt-6 max-w-4xl text-[clamp(2rem,5vw,4.5rem)] text-white">{t.atelier.ctaTitle}</h2>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-bone">{t.atelier.ctaText}</p>
+          <h2 className="title-caps mx-auto mt-6 max-w-4xl t-title text-white">{t.atelier.ctaTitle}</h2>
+          <p className="mx-auto mt-6 max-w-xl text-base text-bone">{t.atelier.ctaText}</p>
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link to="/contact" className="inline-flex min-h-12 items-center gap-3 bg-white px-8 text-base font-semibold text-ink transition hover:bg-rose-light">
+            <Link to="/contact" className="inline-flex min-h-12 items-center gap-3 bg-white px-8 text-base font-medium text-ink transition hover:bg-rose-light">
               {t.common.startPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
             <Link to="/process" className="border-rose-gold inline-flex min-h-12 items-center gap-3 px-8 text-base text-white transition hover:text-rose-light">
@@ -144,33 +145,72 @@ function AtelierFilms() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const madeFor = useMadeFor();
-  const [open, setOpen] = useState<{ piece: Piece; atelier: ResolvedAtelier } | null>(null);
+  const [params] = useSearchParams();
+  const asked = params.get("piece") ?? "";
+  // The piece whose atelier is open (its films taken from the catalogue as it is now: the choices of the admin arrive with it).
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+  // Every published piece with its making-of film: its atelier, else its complete making-of (a film of its stories).
   const films = cat.pieces.flatMap((piece) => {
-    const atelier = piece.published === false ? null : resolveAtelier(piece.slug, piece.atelier);
-    return atelier ? [{ piece, atelier }] : [];
+    if (piece.published === false) return [];
+    const atelier = resolveAtelier(piece.slug, piece.atelier);
+    if (atelier) return [{ piece, atelier }];
+    const complete = completeMakingOf(piece.slug, piece.atelier);
+    return complete ? [{ piece, atelier: { making: complete, reveal: null, poster: complete.posters[complete.poster] || complete.posters[0] || "" } }] : [];
   });
-  if (films.length === 0) return null;
+  // Coming from the page of a piece (/atelier?piece=<slug>, Yoni 24/11/2026): its making-of starts at once, and the photos of
+  // its steps wait here, at the top of the section, when the window is closed.
+  const askedPiece = asked ? cat.pieces.find((p) => p.slug === asked && p.published !== false) : undefined;
+  const askedFilm = askedPiece ? films.find((f) => f.piece.slug === askedPiece.slug) : undefined;
+  const askedBox = askedPiece?.boxSlug ? cat.boxes.find((b) => b.slug === askedPiece.boxSlug) : undefined;
+  const askedSteps = askedPiece ? makingSteps(askedPiece, askedBox?.images[0]).length > 0 : false;
+  const [opened, setOpened] = useState("");
+  if (askedFilm && opened !== asked) {
+    setOpened(asked);
+    setOpenSlug(asked);
+  }
+  const open = openSlug ? (films.find((f) => f.piece.slug === openSlug) ?? null) : null;
+  useEffect(() => {
+    if (!askedPiece) return;
+    const el = document.getElementById("atelier-making-of");
+    if (!el) return;
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(el, { immediate: true, offset: -80 });
+    else el.scrollIntoView({ block: "start" });
+  }, [askedPiece]);
+  if (films.length === 0 && !askedSteps) return null;
   return (
-    <section aria-labelledby="atelier-films-title" data-atelier-films className="atelier-passage relative z-20 border-t border-white/10 bg-ink">
-      <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+    <section id="atelier-making-of" aria-labelledby="atelier-films-title" data-atelier-films className="atelier-passage relative z-20 scroll-mt-24 border-t border-white/10 bg-ink">
+      {askedPiece && askedSteps ? (
+        <div data-atelier-piece={askedPiece.slug}>
+          <MakingSteps piece={askedPiece} boxImage={askedBox?.images[0]} title={askedPiece.title} id="atelier-piece-title" />
+          {askedFilm ? (
+            <div className="mx-auto max-w-[1600px] px-5 pt-8 sm:px-8 lg:px-12">
+              <button type="button" onClick={() => setOpenSlug(askedFilm.piece.slug)} className="inline-flex min-h-12 items-center gap-3 border border-rose-light/70 px-6 text-base font-normal uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-11 lg:text-[0.8125rem]">
+                <Play className="size-4 fill-current" aria-hidden="true" /> {t.films.open(askedPiece.title)}
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      <div className="mx-auto max-w-[1600px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
         <Reveal>
           <p className="eyebrow">{t.films.sectionEyebrow}</p>
-          <h2 id="atelier-films-title" className="title-caps mt-5 max-w-4xl text-[clamp(2rem,5vw,4.25rem)] leading-[1.08] tracking-[0.1em] text-white [text-wrap:balance]">
+          <h2 id="atelier-films-title" className="title-caps mt-4 max-w-4xl t-title leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">
             {t.films.sectionTitle}
           </h2>
-          <p className="mt-6 max-w-xl text-lg text-bone">{t.films.sectionLead}</p>
+          <p className="mt-4 max-w-xl text-base text-bone">{t.films.sectionLead}</p>
         </Reveal>
-        <ul className="mt-14 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+        <ul className="mt-10 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-6">
           {films.map(({ piece, atelier }) => (
             <li key={piece.slug} data-atelier-film={piece.slug}>
               {/* A button: never hidden by an animation (a keyboard reaches each one). */}
-              <button type="button" onClick={() => setOpen({ piece, atelier })} aria-label={t.films.open(piece.title)} className="group block w-full text-start">
+              <button type="button" onClick={() => setOpenSlug(piece.slug)} aria-label={t.films.open(piece.title)} className="group block w-full text-start">
                 <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-black">
                   {atelier.poster ? (
                     <Img
                       src={atelier.poster}
                       srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
-                      sizes="(max-width: 767px) 46vw, (max-width: 1279px) 30vw, 22vw"
+                      sizes="(max-width: 767px) 46vw, (max-width: 1279px) 24vw, 18vw"
                       alt=""
                       loading="lazy"
                       decoding="async"
@@ -178,21 +218,21 @@ function AtelierFilms() {
                     />
                   ) : null}
                   <span aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-transparent" />
-                  <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-12 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
-                    <Play className="size-5 translate-x-px fill-current" />
+                  <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-10 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
+                    <Play className="size-4 translate-x-px fill-current" />
                   </span>
-                  <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-1 text-base text-bone tabular-nums">
+                  <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-0.5 text-base text-bone tabular-nums lg:text-[0.8125rem]">
                     {filmTime(atelier.making.duration)}
                   </span>
                 </span>
-                <span className="title-caps mt-4 block text-base leading-snug tracking-[0.1em] text-white group-hover:text-rose-light sm:text-lg">{piece.title}</span>
-                <span className="mt-1 block text-base text-mist">{t.common.madeFor(madeFor(cat, piece))}</span>
+                <span className="title-caps mt-3 block text-base leading-snug tracking-[0.08em] text-white group-hover:text-rose-light lg:text-[0.9375rem]">{piece.title}</span>
+                <span className="mt-1 block text-base text-mist lg:text-[0.875rem]">{t.common.madeFor(madeFor(cat, piece))}</span>
               </button>
             </li>
           ))}
         </ul>
       </div>
-      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpen(null)} /> : null}
+      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpenSlug(null)} /> : null}
     </section>
   );
 }
@@ -215,7 +255,7 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
     // The magnifying glass of the pieces over its photos too (computers); looking at them never closes the trunk.
     <div ref={zone} data-box-gallery={box.slug} className="relative">
       <p className="mt-2 flex flex-wrap gap-x-6">
-        <button type="button" onClick={() => setShown((v) => !v)} aria-expanded={shown} aria-controls={id} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-semibold text-white hover:text-rose-light">
+        <button type="button" onClick={() => setShown((v) => !v)} aria-expanded={shown} aria-controls={id} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-medium text-white hover:text-rose-light">
           <Images className="size-4" aria-hidden="true" /> {shown ? t.boxes.hidePhotos : t.boxes.photos(box.images.length)}
         </button>
       </p>
@@ -224,7 +264,7 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
           <ul className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
             {box.images.map((m, i) => (
               <li key={m.src}>
-                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} data-loupe={m.type === "image" ? m.src : undefined} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
+                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
                   <MediaView item={m} fit="cover" sizes="(max-width: 639px) 30vw, 10vw" />
                 </button>
               </li>
@@ -238,7 +278,6 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
           ) : null}
         </div>
       ) : null}
-      <Loupe zone={zone} pick={pickMarked} />
       {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </div>
   );
@@ -253,7 +292,7 @@ function CreateBox() {
       target="_blank"
       rel="noreferrer"
       data-create-box
-      className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light"
+      className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
     >
       <BrandIcon name="whatsapp" className="size-5" /> {t.boxes.create}
     </a>
@@ -304,9 +343,9 @@ export function Boxes() {
 
       {/* An example, large, first (Yoni, 23/11/2026): the Dragon Ball trunk as it is, its artwork and the BRT mark on its face. */}
       {heroTrunk ? (
-        <section aria-label={heroTrunk.alt} data-boxes-hero className="mx-auto mb-20 max-w-[1600px] px-5 sm:px-8 lg:mb-28 lg:px-12">
+        <section aria-label={heroTrunk.alt} data-boxes-hero className="mx-auto mb-14 max-w-[1240px] px-5 sm:px-8 lg:mb-16 lg:px-12">
           <div className="relative overflow-hidden border border-white/10 bg-ink-soft">
-            <MediaView item={heroTrunk} fit="contain" priority sizes="(max-width: 1599px) 100vw, 1600px" className="max-h-[82svh] w-full" />
+            <MediaView item={heroTrunk} fit="contain" priority sizes="(max-width: 1599px) 100vw, 1600px" className="max-h-[min(62svh,40rem)] w-full" />
           </div>
           <a href="#box-dragon-ball-trunk" className="mt-4 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
             {t.boxes.heroLink} <ArrowRight className="size-4 rotate-90" aria-hidden="true" />
@@ -314,10 +353,10 @@ export function Boxes() {
         </section>
       ) : null}
 
-      <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
+      <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-12">
         <h2 id="boxes-list-title" className="eyebrow">{t.boxes.listLabel}</h2>
-        <p className="title-caps mt-5 mb-12 text-[clamp(1.75rem,3.6vw,3rem)] leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">{t.boxes.closing}</p>
-        <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 xl:grid-cols-3 xl:gap-x-10">
+        <p className="title-caps mt-4 mb-10 t-lead leading-[1.15] tracking-[0.1em] text-white [text-wrap:balance]">{t.boxes.closing}</p>
+        <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
           {boxes.map((box) => {
             const trunk = trunkOf(box.slug);
             return (
@@ -329,19 +368,19 @@ export function Boxes() {
                 ) : (
                   <div className="relative aspect-square w-full overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</div>
                 )}
-                <h3 className="title-caps mt-5 text-2xl text-white md:text-3xl">{box.name}</h3>
-                {box.description ? <p className="mt-3 max-w-md text-base text-bone md:text-lg">{box.description}</p> : null}
+                <h3 className="title-caps mt-4 t-sub tracking-[0.1em] text-white">{box.name}</h3>
+                {box.description ? <p className="mt-3 max-w-md text-base text-bone">{box.description}</p> : null}
                 <BoxPhotos box={box} piece={pieceOf(box)} />
                 </Reveal>
               </li>
             );
           })}
         </ul>
-        <div className="rule-rose my-20" aria-hidden="true" />
-        <p className="mx-auto max-w-2xl text-center font-display text-2xl text-white md:text-3xl">{t.common.yourStory}</p>
+        <div className="rule-rose my-14" aria-hidden="true" />
+        <p className="mx-auto max-w-2xl text-center font-display t-lead text-white">{t.common.yourStory}</p>
         <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
           <CreateBox />
-          <Link to="/contact" className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+          <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/40 px-6 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
             {t.common.startPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>

@@ -232,11 +232,21 @@ const VIEWS = {
   // smudge inside the bail and a ragged edge on its side: it opens on its photo until a studio photo.
   // Its HD photos (folder 37, 20/11/2026): the plate alone first (asked by Yoni, 23/11/2026: the piece alone in hero; p28
   // is its only photo of the whole plate face on), the chain and its plate on the bust (by its light), its back.
+  // 24/11/2026 (Yoni): the plate straightened (it leaned to the left by 1.1°), its back no more (the page stays on Sirius).
   sirius: [
-    { id: "p28", kind: "face", from: "hd:37/p28", clear: 0.06 },
+    { id: "p28", kind: "face", from: "hd:37/p28", clear: 0.06, rotate: 1.12 },
     { id: "p27", kind: "worn", from: "hd:37/p27", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
-    { id: "p26", kind: "back", from: "hd:37/p26" },
   ],
+  // BRT Flowers, one sheet (24/11/2026): its chain alone, whole, from the front on the bust (folder 37, the chain of Sirius).
+  "brt-flower-chain": [{ id: "s29", kind: "face", from: "hd:37/p29", mode: "luma", solo: true, near: true, fade: { top: 0.15 } }],
+  // The Infinity Link (24/11/2026) is not cut out: its only photo (a phone, 720 px) has a grey wall and marble around the bust,
+  // which stay as a pale wash; it opens on its photo until a studio photo on black.
+  // The chains published on 24/11/2026, whole from the front on the bust.
+  "two-row-tennis-chain": [
+    { id: "p04", kind: "face", from: "hd:03/p4", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
+    { id: "p01", kind: "face", from: "hd:03/p1", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
+  ],
+  "white-iced-cuban-chain": [{ id: "p02", kind: "face", from: "hd:33/p2", mode: "luma", solo: true, near: true, crop: [0, 0.215, 1, 0.74], fade: { top: 0.12 } }],
   // The Inter Milan pendant (the top of the Inter ring on a chain, WhatsApp 23/11/2026): on black, by its light; its chain
   // leaves the photo at the top (faded).
   "campione-d-italia-pendant": [{ id: "black", kind: "face", from: "wa:WhatsApp Image 2026-11-23 at 09.43.30.jpeg", mode: "luma", near: true, holes: 0.003 }],
@@ -333,7 +343,17 @@ async function prepare(slug, view) {
   if (view.from.startsWith("hd:")) {
     const f = await hdFile(view.from.slice(3));
     source = "Dossiers icloud/" + f.label;
-    if (FORCE || !existsSync(work)) await workPhoto(f.path, work, view.crop);
+    if (FORCE || !existsSync(work)) {
+      await workPhoto(f.path, work, view.crop);
+      // A photo that leans (Sirius, 24/11/2026): straightened first (degrees, clockwise; its size kept, black corners).
+      if (view.rotate) {
+        const { width, height } = await sharp(work).metadata();
+        const turned = await sharp(work).rotate(view.rotate, { background: "#000000" }).toBuffer();
+        const t = await sharp(turned).metadata();
+        await sharp(turned).extract({ left: Math.round((t.width - width) / 2), top: Math.round((t.height - height) / 2), width, height }).jpeg({ quality: 97 }).toFile(work + ".tmp.jpg");
+        await rename(work + ".tmp.jpg", work);
+      }
+    }
   } else if (view.from.startsWith("yoni:")) {
     const file = join(YONI_DIR, view.from.slice(5));
     if (!existsSync(file)) throw new Error("File of 00 Contexte Yoni not found: " + view.from);

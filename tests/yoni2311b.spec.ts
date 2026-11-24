@@ -54,25 +54,30 @@ test("profiles: one model, the known data everywhere, nothing generic, nothing e
   await expect(page.locator('[data-player-piece="panther-champion-pendant"]')).toBeVisible();
 });
 
-test("the header: the logo as it was and the name of the house, large, always in view", async ({ page }, info) => {
+// (24/11/2026: the logo and the name as sharp vector images, src/components/Logo.tsx; the name smaller, in the middle.)
+test("the header: the logo as it was and the name of the house, always in view", async ({ page }, info) => {
   await open(page, "/fr/creations");
-  const logo = page.locator('header a[data-brand] span');
-  await expect(logo).toHaveCSS("mask-image", /logo\.svg/);
-  const name = page.locator("header [data-wordmark] span");
-  expect((await name.boundingBox())!.width).toBeGreaterThan(desktop(info.project.name) ? 300 : 160);
+  const logo = page.locator("header a[data-brand] img");
+  await expect(logo).toHaveAttribute("src", new RegExp("/media/brand/logo-sharp" + V + "svg$"));
+  const name = page.locator("header [data-wordmark] img");
+  // (Once the page is settled: it may draw its header again when its language has loaded.)
+  await expect(name).toBeVisible();
+  await expect.poll(async () => (await name.boundingBox())?.width ?? 0).toBeGreaterThan(desktop(info.project.name) ? 180 : 140);
   await page.evaluate(() => window.scrollTo(0, 3000));
   await page.waitForTimeout(700);
   await expect(name).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "yoni2311b-entete") });
 });
 
-test("home: the sketch becomes the jewel first, then the Butterfly on its chain", async ({ page }, info) => {
+// 24/11/2026 (Yoni): the film of the sketch that becomes the jewel left the home page; one photo, full screen, first.
+test("home: one photo full screen first, then the Butterfly on its chain", async ({ page }, info) => {
   const problems = watch(page);
   await open(page, "/");
-  const film = page.locator("[data-scroll-video]");
-  await expect(film).toHaveCount(1);
-  const [filmTop, heroTop] = await page.evaluate(() => [document.querySelector("[data-scroll-video]")!.getBoundingClientRect().top, document.querySelector("[data-home-hero]")!.getBoundingClientRect().top]);
-  expect(filmTop).toBeLessThan(heroTop);
+  await expect(page.locator("[data-scroll-video]")).toHaveCount(0);
+  const photo = page.locator("[data-home-photo]");
+  await expect(photo).toHaveCount(1);
+  const [photoTop, heroTop] = await page.evaluate(() => [document.querySelector("[data-home-photo]")!.getBoundingClientRect().top, document.querySelector("[data-home-hero]")!.getBoundingClientRect().top]);
+  expect(photoTop).toBeLessThan(heroTop);
   await expect(page.locator("[data-hero-piece]")).toHaveAttribute("data-hero-photo", "chain");
   await expect(page.locator("[data-hero-piece] img")).toHaveAttribute("src", /\/media\/hd\/michy-batshuayi-butterfly-chain\/p54/);
   await page.screenshot({ path: shotPath(info, "yoni2311b-accueil") });
@@ -83,17 +88,19 @@ test("home: the sketch becomes the jewel first, then the Butterfly on its chain"
 });
 
 test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
-  const hero = async (slug: string, id: string) => {
+  const hero = async (slug: string, id: string, large = true) => {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", id);
-    await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-large", "");
+    if (large) await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-large", "");
+    else await expect(page.locator("[data-showcase]")).not.toHaveAttribute("data-showcase-large", "");
   };
   await hero("michy-batshuayi-butterfly-pendant", "p54");
   await expect(page.locator("[data-angle='1'] img").first()).toHaveAttribute("src", /michy-batshuayi-butterfly-chain\/p54/);
   await hero("marcus-thuram-ruby-t-necklace", "p01");
   await hero("noah-okafor-jersey-pendant", "p20");
-  await hero("campione-d-italia-2023-2024", "p08");
-  await hero("vfb-stuttgart-dfb-pokal-2025", "p13");
+  // (The rings of Inter and VfB no longer large since 24/11/2026: their universes v2, the squad on each side.)
+  await hero("campione-d-italia-2023-2024", "p08", false);
+  await hero("vfb-stuttgart-dfb-pokal-2025", "p13", false);
   await open(page, "/pieces/sirius");
   await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p28");
   await open(page, "/pieces/marcus-thuram-t-serpent-pendant");
@@ -101,34 +108,39 @@ test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
   await page.screenshot({ path: shotPath(info, "yoni2311b-t-serpent") });
 });
 
-test("Dragon Ball: the magnifying glass follows the pointer, photos only (no film under the pointer)", async ({ page }, info) => {
+// 24/11/2026 (Yoni): no magnifying glass over the page any more (src/components/Loupe.tsx deleted); a click on the piece of
+// the opening opens it full screen, where the magnifying glass lives (src/components/Lightbox.tsx).
+test("Dragon Ball: a click on the piece opens it full screen with the magnifying glass, photos only", async ({ page }, info) => {
   await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
   const showcase = page.locator("[data-piece-cover] [data-showcase]");
   await expect(showcase).toBeVisible();
   // Never a film in the opening (the sphere turns in its own film, under the opening: tests/yoni2311d.spec.ts).
   await expect(page.locator("[data-piece-cover] video")).toHaveCount(0);
+  await expect(page.locator("[data-piece-lens], canvas[data-piece-lens], [data-loupe], [data-loupe-control]")).toHaveCount(0);
+  const lb = page.locator("[data-lightbox]");
   if (desktop(info.project.name)) {
     const img = page.locator("[data-piece-cover] [data-place='0'] img");
     await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
-    const b = (await img.boundingBox())!;
-    const lens = page.locator("[data-piece-cover] [data-piece-lens]");
-    await page.mouse.move(b.x + b.width / 2 + 10, b.y + b.height * 0.55, { steps: 4 });
-    await expect(lens).toHaveAttribute("data-on", "");
-    // Never beyond the pixels of the file.
-    expect(Number(await lens.getAttribute("data-zoom"))).toBeGreaterThan(1);
+    await page.locator("[data-piece-cover] [data-place='0']").click();
+    await expect(lb).toBeVisible();
+    await lb.locator("[data-zoom-in]").click();
+    await expect.poll(async () => Number(await lb.locator("[data-lightbox-stage]").getAttribute("data-zoom"))).toBeGreaterThan(1);
     await page.waitForTimeout(500);
     await page.screenshot({ path: shotPath(info, "yoni2311b-dragonball-loupe") });
-    // The same glass on another piece.
+    await page.keyboard.press("Escape");
+    await expect(lb).toHaveCount(0);
+    // The same on a showcase of several views: the middle of the main view opens it.
     await open(page, "/pieces/campione-d-italia-2023-2024");
     const ring = page.locator("[data-piece-cover] [data-place='0'] img");
     await expect.poll(() => ring.evaluate((i) => (i as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     const r = (await ring.boundingBox())!;
-    await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2, { steps: 4 });
-    await expect(page.locator("[data-piece-cover] [data-piece-lens]")).toHaveAttribute("data-on", "");
+    await page.mouse.click(r.x + r.width / 2, r.y + r.height / 2);
+    await expect(lb).toBeVisible();
+    await expect(lb.locator("[data-zoom-in]")).toBeVisible();
   } else {
     // A touch: the view full screen, where two fingers zoom.
     await page.locator("[data-piece-cover] [data-showcase-slide='0'] button").tap();
-    await expect(page.locator("[data-lightbox]")).toBeVisible();
+    await expect(lb).toBeVisible();
   }
 });
 
@@ -179,9 +191,9 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   // The Campione case waits for its v3 files (off the page of the trunks): its real photos on the page of the ring.
   await open(page, "/pieces/campione-d-italia-2023-2024");
   await expect(page.locator("[data-custom-box='campione-d-italia-case'] [data-box-section-photo]")).toHaveCount(10);
-  // The house: the photos of Yoni in his chapters.
+  // The house: the photos of Yoni in his chapters (24/11/2026: five of his WhatsApp photos, none of a jewel).
   await open(page, "/about");
-  await expect(page.locator("[data-house-chapter] img[src*='/media/extra/house/']")).toHaveCount(9);
+  await expect(page.locator("[data-house-chapter] img[src*='/media/extra/house/']")).toHaveCount(5);
   await page.locator("[data-house-chapter='9']").scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "yoni2311b-maison") });

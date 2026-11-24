@@ -162,6 +162,73 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « appel du 23-24/11 : le luxe ne crie pas » — état au 24/11/2026
+- [x] **Une seule échelle de tailles** (`src/index.css`) : sur ordinateur tout le site est dessiné à 15 px (`html` 93,75 % dès
+      1 024 px ; le téléphone garde 16 px) ; titres `t-hero` (titre de page), `t-title` (section), `t-lead` (citation), `t-sub`
+      (petit titre), `eyebrow` plus petit ; plus aucun `text-[clamp(...)]` isolé ; boutons plus petits et plus fins (`font-medium`
+      au lieu de `font-semibold`). Plus aucune animation de mots ou de lettres (`SplitHeading` immobile). Captures avant / après
+      de chaque page : `verification/tailles/avant/` (site en ligne avant le passage) et `verification/tailles/apres/`
+      (1280 × 800, 1440 × 900, 1470 × 956, 1512 × 982, 1920 × 1080, iPhone 393 × 852 ; `tests/tailles.spec.ts`, `SHOTS=avant|apres`).
+- [x] **En-tête** : le nom exactement au centre de la page (positionné au milieu, plus entre le logo et les boutons), plus petit ;
+      le logo en image vectorielle nette (`logo-sharp.<v>.svg`, traits un peu épaissis : `npm run brand`) ; menu, menu déroulant,
+      langue, WhatsApp et « Begin your creation » plus petits et plus fins. **Pied de page** : logo plus petit, net, centré, la
+      phrase « Made by us. Inspired by you. » dessous.
+- [x] **Accueil** : la photo de l'écrin Sirius en plein écran (`00 Contexte Yoni/Accueil (photo ecrin)/`, version verticale sur
+      téléphone, `npm run page-media` → `public/media/pages/`), la phrase dans le noir (une bande noire sous la photo sur un écran
+      large, le sol sombre sur téléphone), « Discover More ». Le film croquis → écrin n'est plus sur l'accueil (`SketchToJewel`
+      gardé). Dragon Ball : sa photo et un rond où seule la sphère tourne (boucle 1,5 s du dossier 13, muette, lancée à l'écran),
+      le titre, une phrase, « Enter the World » ; le film héros reste en haut de sa page. La Safi Link en tête de la sélection.
+- [x] **Loupe** : plus aucune au survol (`Loupe.tsx` supprimé) ; seulement sur une photo ouverte en grand (`Lightbox.tsx` : molette
+      à l'endroit du curseur, + / −, pincement ; jamais sur un film). Un clic sur la pièce d'ouverture l'ouvre en grand.
+- [x] **Pages pièces, une seule structure** (`src/pages/PiecePage.tsx`) : 1. la pièce dans son univers, entière dans le premier écran
+      (1280 × 800), plus petite ; 2. le film de la pièce finie (`FeatureFilm` : muet, en boucle, lancé à l'écran, toujours entier ;
+      le film fait pour la page s'il existe — Dragon Ball, croix de Tillman —, sinon son film de la pièce finie ; « Watch the film »
+      y descend) ; 3. Every Angle : 4 photos (les plus fortes d'abord : sur fond noir), puis « See more » ; 4. l'histoire ; 5.
+      Composition & Craftsmanship (petit, une ligne par info, seulement les lignes remplies ; l'admin prépare les lignes « Gold,
+      Gold weight, Diamonds, Total diamond weight, Coloured stones, Hours of work », traduites par `piece.composition`) ; 6. Créée
+      pour, Porté par, l'écrin, « Enter the Atelier », presse, autres créations, commande. **Plus de making-of ni de fenêtre de
+      cinéma sur les pages pièces** : « Enter the Atelier » mène à `/atelier?piece=<slug>`, où le making-of s'ouvre tout de suite et
+      où attendent les étapes de la pièce (`src/components/MakingSteps.tsx`).
+- [x] **Aucune 3D présentée comme pièce finie** (44 films regardés image par image) : le film de la bague Inter (25/v01) est
+      entièrement en 3D et celui de Dragon Ball (13/v01) s'ouvre sur 4,5 s de modélisation : `atelier: { reveal: null }` pour les
+      deux (plus de « Final Reveal » non plus dans l'Atelier). Les autres sont de vraies images.
+- [x] **Créations** : 4 par ligne sur ordinateur (2 sur iPhone). **Catégories** (`SUBCATEGORIES` de `src/data/collections.ts`, menu,
+      pied de page, `/creations/<collection>/<catégorie>`) ; sur la page d'une collection, les catégories d'abord, puis les pièces.
+      Pendentifs : Celebration (Kenan, maillot d'Okafor, Dragon Ball, panthère), Cross (croix Tillman, Baguette Cross, Jesus Cross),
+      Name (OKA, octogone d'Okafor, AS, JL, TM, Loïs Openda, D&E, FAM), Letter (T-Serpent, Thorned T, L, N14), Jesus Pieces (4) ; dans
+      « Tous » seulement : pendentif Inter, trèfle d'Eljero Elia, Butterfly, The Hand, Tulips. Chaînes : Signature (Safi Link, BRT
+      Flowers, Sirius), Cuban (14 mm, 20 mm, Baguette, White), Tennis, Infinity (Infinity Link, Cross Infinity). **À faire valider par
+      Yoni.** La Safi Link d'abord parmi les chaînes (`FIRST_IN_COLLECTION`).
+- [x] **Chaînes** : **BRT Flowers** = une fiche (`brt-flower-chain`, deux largeurs 12 et 16 mm, chiffres de Yoni) qui reprend la chaîne
+      torsadée de Kevin Schade (adresse redirigée) et la chaîne seule de Sirius (37/p29 en couverture) ; **Safi Link** : toutes ses
+      photos au même noir (niveaux, `npm run extra-media`), couverture de face ; **Sirius** : sans le dos ni les photos de la chaîne
+      seule ou de l'écrin, sa plaque redressée de 1,1° (photo et détourage) ; couvertures des chaînes = la chaîne entière de face
+      (14 mm p02, Baguette p05). Remises en ligne : **chaîne tennis 2 rangs** (or rose puis or blanc), **White Iced Cuban**,
+      **Infinity Link** (`infinity-link-chain`, sans le nom de Marcus Thuram ; photos de téléphone, détourage impossible).
+      Détourages refaits et contrôlés : `verification/cutouts/cutouts-2411-grey.jpg` et `-light.jpg`.
+- [x] **The Bespoke Journey** : compacte (le haut tient dans un écran 1440 × 900), plus de film au défilement (fichiers gardés), une
+      frise des 6 étapes sur une fine ligne (image, numéro, titre, une ligne, paiement) : consultation (`01-consultation-privee.jpg`),
+      croquis de Yoni, rendu 3D, atelier, shooting (`05-shooting-editorial.jpg`), écrin ; étape 04 « Live progress photos and videos
+      on WhatsApp » ; avec le serveur seulement, l'espace client aux étapes 02 et 04.
+- [x] **Espace client VIP** (serveur seulement ; Vercel inchangé) : l'admin règle l'étape (les 6 du Bespoke Journey), la date de fin
+      estimée (historique des changements) et publie des nouvelles (photos, vidéos depuis le téléphone, note, date) ; `/vip` montre la
+      3D, la frise avec l'étape en cours, les nouvelles (photo en grand avec loupe, vidéo sur place) et la date (« modifiée »).
+      Migration `20261124100000_vip_tracking`, fichiers dans `storage/vip/` (jamais dans Git), `tests/vip.spec.ts`.
+- [x] **La Maison** : textes plus petits ; plus aucune image de bijou ; un chapitre sans photo de Yoni n'affiche rien ; chapitre 4 =
+      Anvers à la loupe en noir et blanc, chapitre 11 = son ancien bureau en Belgique (`npm run import-media -- --only=house`) ;
+      chapitres 6 et 7 retirés (presque pareils que le 5) ; 9 et 10 gardés.
+- [x] **Atelier** : plus petit ; la seule page avec la fenêtre de cinéma. **Cercle** : « Worn by Icons » sur une petite ligne, 4 par
+      ligne, profils plus petits. **Inter** : les photos de Yoni avec les joueurs et les bagues dans « Porté par » (stories 21/03, 04 ;
+      originaux 25/p38, p36 des stories 21/01, 06) ; pendentif Inter porté (story 06/17).
+- [x] **Univers Inter et VfB v2** (`inter-victoire-v2`, `vfb-victoire-v2`) : larges, l'équipe de chaque côté, bague plus petite ;
+      **un réglage chacun pour revenir aux anciens** : `INTER_VICTORY` et `VFB_VICTORY` de `src/data/themes.ts`.
+- `tests/yoni2411.spec.ts` (ordinateur, iPhone, Safari ; anglais et français), captures `verification/<appareil>/yoni2411-*.jpg`.
+- [ ] Yoni : valider le classement des pendentifs et des chaînes ; « le R » des pendentifs lettre : aucune pièce R sur le site ;
+      la chaîne « en or rose et en blanc dont la version seule manque » : candidates dans le rapport (Infinity Link remise en ligne,
+      Cross Infinity blanche du collier de Tillman, tennis 2 rangs, cubaine glacée) ; photos studio sur fond noir de l'Infinity Link ;
+      les fichiers de « Yoni 24-11 (a telecharger depuis WhatsApp) » (3 vidéos atelier, remise à Keita, photos tennis, grand-père,
+      premier bijou, malles sur la table, sertissages) : **aucun n'était là le 24/11** ; les poids d'or et carats pièce par pièce.
+
 ## Passe « tout ce qui reste des 3 appels (22-23/11) » — état au 23/11/2026
 - [x] **La loupe** (`src/components/Loupe.tsx`, remplace PieceLens) : photos seulement, jamais de vidéo ; elle grossit le fichier le
       plus grand de la photo à l'endroit du curseur, jamais au-delà de ses pixels ; molette (à son plus près ou son plus loin, la page

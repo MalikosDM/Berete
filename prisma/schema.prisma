@@ -223,18 +223,74 @@ model LayerMemory {
 }
 
 /// A client of the jeweller with a private space on the site (/vip): the 3D
-/// models he was given. He enters with his personal link (/vip/<token>) or
-/// with his access code; the code is kept only as a keyed fingerprint (codeKey).
+/// models he was given, and the follow-up of his commission (Yoni, 24/11/2026:
+/// like a parcel tracking): the step of his piece, its estimated date, the news
+/// of the atelier. He enters with his personal link (/vip/<token>) or with his
+/// access code; the code is kept only as a keyed fingerprint (codeKey).
 model Client {
-  id         String        @id @default(cuid())
-  name       String
-  email      String?
-  phone      String?
-  token      String        @unique
-  codeKey    String        @unique
-  lastSeenAt DateTime?
-  models     ClientModel[]
-  createdAt  DateTime      @default(now())
+  id          String             @id @default(cuid())
+  name        String
+  email       String?
+  phone       String?
+  token       String             @unique
+  codeKey     String             @unique
+  lastSeenAt  DateTime?
+  /// The step of his piece among the six of "The Bespoke Journey" (0 The Private Consultation … 5 Final Payment &
+  /// Presentation); 6: every step done, the piece handed over.
+  stage       Int                @default(0)
+  /// The day his piece should be finished (a day, no time), null while not said.
+  estimatedAt DateTime?          @db.Date
+  models      ClientModel[]
+  dateChanges ClientDateChange[]
+  updates     ClientUpdate[]
+  createdAt   DateTime           @default(now())
+}
+
+/// Each change of the estimated date of a client (the old date, the new one, when): the client sees the last one.
+model ClientDateChange {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  previous  DateTime? @db.Date
+  next      DateTime? @db.Date
+  createdAt DateTime  @default(now())
+
+  @@index([clientId])
+}
+
+/// A news of the atelier for one client: a short note and its photos or videos, on a day.
+model ClientUpdate {
+  id        String             @id @default(cuid())
+  clientId  String
+  client    Client             @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  note      String             @default("")
+  /// The day of the news (today when sent, or the day chosen in the admin).
+  date      DateTime           @db.Date
+  files     ClientUpdateFile[]
+  createdAt DateTime           @default(now())
+
+  @@index([clientId])
+}
+
+/// A photo or a video of a news. The file lives in the storage (server/models/storage.ts, clientFiles):
+/// storage/vip/<client id>/<file id>.<ext>, served only to that client (his session) or to the admin.
+model ClientUpdateFile {
+  id        String       @id @default(cuid())
+  updateId  String
+  update    ClientUpdate @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  /// Its place among the files of the news (0 = the first).
+  position  Int
+  /// "image" or "video".
+  kind      String
+  mime      String
+  ext       String
+  name      String
+  size      Int
+  width     Int?
+  height    Int?
+  createdAt DateTime     @default(now())
+
+  @@index([updateId])
 }
 
 /// Which models a client sees in his space.

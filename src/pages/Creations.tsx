@@ -45,8 +45,8 @@ export default function Creations() {
     <>
       <PageIntro eyebrow={t.creations.eyebrow} title={t.creations.title} lead={t.creations.lead} compact />
 
-      <section aria-label={t.creations.listLabel} className="mx-auto max-w-[1600px] px-4 pb-28 sm:px-8 lg:px-12 lg:pb-36">
-        <div role="group" aria-label={t.creations.filterLabel} className="no-scrollbar -mx-4 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
+      <section aria-label={t.creations.listLabel} className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div role="group" aria-label={t.creations.filterLabel} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
           {FILTERS.map((f) => {
             const on = f.key === active;
             return (
@@ -56,10 +56,10 @@ export default function Creations() {
                 onClick={() => select(f.param)}
                 aria-pressed={on}
                 data-filter={f.key}
-                className={"inline-flex min-h-12 shrink-0 items-center border px-6 text-base font-semibold uppercase tracking-[0.16em] transition-colors " + (on ? "border-rose-light text-rose-light" : "border-white/25 text-white hover:border-rose-light hover:text-rose-light")}
+                className={"inline-flex min-h-12 shrink-0 items-center border px-4 text-base font-normal uppercase tracking-[0.14em] transition-colors lg:min-h-10 lg:text-[0.75rem] " + (on ? "border-rose-light text-rose-light" : "border-white/20 text-white hover:border-rose-light hover:text-rose-light")}
               >
                 {f.label}
-                <span data-filter-count className="ms-3 text-mist">{f.key === "all" ? pieces.length : pieces.filter((p) => p.type === f.key).length}</span>
+                <span data-filter-count className="ms-2.5 text-mist">{f.key === "all" ? pieces.length : pieces.filter((p) => p.type === f.key).length}</span>
               </button>
             );
           })}
@@ -77,7 +77,7 @@ export default function Creations() {
                   onClick={() => select(collection.slug, s?.slug ?? "")}
                   aria-pressed={on}
                   data-subfilter={s?.slug ?? "all"}
-                  className={"inline-flex min-h-12 shrink-0 items-center gap-2.5 px-5 text-base font-semibold uppercase tracking-[0.14em] transition-colors " + (on ? "bg-rose-light/10 text-rose-light" : "text-bone hover:text-rose-light")}
+                  className={"inline-flex min-h-12 shrink-0 items-center gap-2.5 px-4 text-base font-normal uppercase tracking-[0.12em] transition-colors lg:min-h-10 lg:text-[0.75rem] " + (on ? "bg-rose-light/10 text-rose-light" : "text-bone hover:text-rose-light")}
                 >
                   <span aria-hidden="true" className={"h-px w-3 " + (on ? "bg-rose-light" : "bg-white/40")} />
                   {s ? collectionWords(t, s.slug, s).name : t.collections.subAll(collectionName)}
@@ -89,7 +89,7 @@ export default function Creations() {
         ) : null}
 
         {collection && list.length > 0 ? (
-          <Link to={collectionPath(sub ?? collection)} className="mt-4 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white hover:text-rose-light">
+          <Link to={collectionPath(sub ?? collection)} className="mt-3 inline-flex min-h-12 items-center gap-2 text-base font-normal uppercase tracking-[0.14em] text-white hover:text-rose-light lg:min-h-10 lg:text-[0.75rem]">
             {t.creations.enterCollection(sub ? collectionWords(t, sub.slug, sub).name : collectionName)} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         ) : null}
@@ -98,8 +98,8 @@ export default function Creations() {
           {list.length === 0 ? (
             <div className="border border-white/15 p-10 text-center">
               <p className="title-caps text-2xl tracking-[0.14em]">{t.common.newPiecesTitle}</p>
-              <p className="mt-4 text-lg text-bone">{t.common.newPiecesText}</p>
-              <Link to="/contact" className="mt-8 inline-flex min-h-12 items-center bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink hover:bg-rose-light">
+              <p className="mt-4 text-base text-bone">{t.common.newPiecesText}</p>
+              <Link to="/contact" className="mt-8 inline-flex min-h-12 items-center bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
                 {t.common.startPiece}
               </Link>
             </div>

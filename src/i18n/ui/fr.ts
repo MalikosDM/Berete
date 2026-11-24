@@ -136,6 +136,14 @@ export const fr: Messages = {
       bracelets: { name: "Bracelets", intro: "Des bracelets réalisés sur mesure, maillon par maillon." },
       watches: { name: "Montres", intro: "Des montres serties de diamants, du boîtier au bracelet." },
       "jesus-pieces": { name: "Jesus Pieces", intro: "Des rues de New York à Biggie qui l’a rendue légendaire, la Jesus piece est devenue l’un des symboles les plus reconnaissables de la culture. Nous ne changeons pas cette histoire, nous y ajoutons simplement notre part." },
+      "celebration": { name: "Pendentifs de célébration", intro: "Les célébrations de but des joueurs, sculptées en diamants : un geste sur le terrain, gardé pour toujours." },
+      "cross": { name: "Pendentifs croix", intro: "Des croix dessinées par la maison, encadrées de baguettes ou serties pierre par pierre." },
+      "name": { name: "Pendentifs nom", intro: "Un nom, ou les initiales d’un nom, dessiné en or et serti de diamants." },
+      "letter": { name: "Pendentifs lettre", intro: "Une seule lettre, et toute l’histoire de celui qui la porte." },
+      "signature": { name: "Chaînes signature", intro: "Les chaînes de la maison, dessinées par Berete : la Safi Link et BRT Flowers." },
+      "cuban": { name: "Chaînes cubaines", intro: "La maille cubaine, glacée de diamants, d’une largeur à l’autre." },
+      "tennis": { name: "Chaînes tennis", intro: "Une ligne de diamants, pierre après pierre." },
+      "infinity": { name: "Chaînes infini", intro: "Des maillons dessinés en forme d’infini." },
     },
     eyebrow: "Le Portfolio",
     title: "Explorer les créations",
@@ -144,8 +152,10 @@ export const fr: Messages = {
     tileAlt: (collection: string, piece: string) => collection + " : " + piece,
     collection: "Le Portfolio",
     listLabel: (collection: string) => "Les créations de la collection " + collection,
+    /** The heading of the categories of a collection (24/11/2026). */
+    categories: "Catégories",
     subLabel: (collection: string) => collection + " : sous-catégories",
-    subAll: (collection: string) => "Tous les " + collection.toLowerCase(),
+    subAll: (collection: string) => (/^(cha[iî]nes|bagues|montres)/i.test(collection) ? "Toutes les " : "Tous les ") + collection.toLowerCase(),
     others: "Plus loin dans le Portfolio",
     ctaTitle: "La vôtre, dès la première esquisse.",
     ctaText: "Chaque pièce commence par une conversation. Racontez-nous votre histoire, nous la dessinons.",
@@ -153,6 +163,9 @@ export const fr: Messages = {
   },
 
   home: {
+    /** The opening photo of the home page (24/11/2026) and the small link under it. */
+    heroAlt: "L’écrin Sirius ouvert : la chaîne et son pendentif dans leur présentoir, le logo BRT sur la malle noire",
+    discoverMore: "Découvrir",
     sketchLabel: "Du premier croquis au bijou, au fil du défilement",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "Nous ne partons pas de ce qui a déjà été fait. Nous partons de ce qui pourrait être.",
@@ -274,6 +287,8 @@ export const fr: Messages = {
     delivered: "Livrée",
     handedOverTo: (_client: string) => "La Présentation officielle",
     handover: "La remise",
+    /** The lines of the composition sent by Yoni piece by piece (the admin prepares them; 24/11/2026). */
+    composition: { "Gold": "Or", "Gold weight": "Poids de l’or", "Diamonds": "Diamants", "Total diamond weight": "Poids total des diamants", "Coloured stones": "Pierres de couleur", "Hours of work": "Heures de travail" } as Record<string, string>,
     sheet: "Composition & Savoir-faire",
     customBox: "Présentation sur mesure",
     deliveredIn: (box: string) => "Livrée dans l’écrin conçu pour elle : " + box + ".",
@@ -400,6 +415,9 @@ export const fr: Messages = {
 
   process: {
     /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
+    liveWithSpace: "Photos et vidéos de l’avancement en direct sur WhatsApp et dans votre espace client privé.",
+    spaceAfterDeposit: "Après l’acompte du design, vous accédez à votre espace client privé : votre pièce en 3D et son avancement en direct.",
     quick: {
       lead: "Du premier croquis à la révélation dans son écrin : quatre étapes, suivies avec vous sur WhatsApp.",
       steps: [
@@ -418,7 +436,7 @@ export const fr: Messages = {
       { title: "La Consultation privée", text: "Idées et budget. Racontez-nous le moment que vous souhaitez marquer, vos références, votre histoire.", meter: "0 %", payNote: "Aucun paiement à ce stade." },
       { title: "La Conception sur mesure", text: "Déduit du prix final en cas de confirmation, il couvre les frais de création en cas d’annulation.", meter: "Acompte", payNote: "Acompte de création versé." },
       { title: "Validation du design", text: "50 % de la production réglée avant le début de la fabrication.", meter: "50 %", payNote: "50 % de la production réglée." },
-      { title: "L’Art de la création", text: "Photos et vidéos de l’avancement sur WhatsApp ; le délai dépend de la complexité de la pièce.", meter: "50 %", payNote: "Plus rien à régler pendant la fabrication." },
+      { title: "L’Art de la création", text: "Photos et vidéos de l’avancement en direct sur WhatsApp.", meter: "50 %", payNote: "Plus rien à régler pendant la fabrication." },
       { title: "La Révélation en images", text: "Une séance photo dédiée, puis la préparation de la livraison.", meter: "50 %", payNote: "Votre pièce est photographiée avant de quitter l’atelier." },
       { title: "Solde & Présentation finale", text: "Les 50 % restants, environ une semaine avant la remise.", meter: "100 %", payNote: "Entièrement réglée, prête à être remise." },
     ],
@@ -598,6 +616,38 @@ export const fr: Messages = {
       title: "Montres serties de diamants",
       description: "Des montres serties de diamants du boîtier au bracelet, portées par des footballeurs : les montres Berete Jewellers, Dubaï.",
     },
+    "/creations/pendants/celebration": {
+      title: "Pendentifs de célébration : les célébrations de but en diamants",
+      description: "Les pendentifs de célébration de Berete Jewellers : les célébrations de but des footballeurs sculptées en or et en diamants, créées à Dubaï.",
+    },
+    "/creations/pendants/cross": {
+      title: "Pendentifs croix en diamants",
+      description: "Les pendentifs croix de Berete Jewellers : des croix encadrées de baguettes ou serties pierre par pierre, créées à Dubaï.",
+    },
+    "/creations/pendants/name": {
+      title: "Pendentifs nom et initiales",
+      description: "Les pendentifs nom de Berete Jewellers : des noms et des initiales dessinés en or et sertis de diamants, créés à Dubaï.",
+    },
+    "/creations/pendants/letter": {
+      title: "Pendentifs lettre en diamants",
+      description: "Les pendentifs lettre de Berete Jewellers : une lettre sculptée et sertie de diamants, créée à Dubaï.",
+    },
+    "/creations/chains/signature": {
+      title: "Chaînes signature : Safi Link et BRT Flowers",
+      description: "Les chaînes signature de Berete Jewellers, la Safi Link et BRT Flowers, dessinées par la maison et créées à Dubaï.",
+    },
+    "/creations/chains/cuban": {
+      title: "Chaînes cubaines glacées",
+      description: "Les chaînes cubaines de Berete Jewellers, glacées de diamants, en plusieurs largeurs, créées à Dubaï.",
+    },
+    "/creations/chains/tennis": {
+      title: "Chaînes tennis",
+      description: "Les chaînes tennis de Berete Jewellers : une ligne de diamants, pierre après pierre, créées à Dubaï.",
+    },
+    "/creations/chains/infinity": {
+      title: "Chaînes infini",
+      description: "Les chaînes infini de Berete Jewellers : des maillons dessinés en forme d’infini, créées à Dubaï.",
+    },
     "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces : pendentifs du Christ en diamants sur mesure",
       description: "Les Jesus pieces de Berete Jewellers : le visage du Christ couronné d’épines ou de fleurs, et le Christ en croix, sculptés et sertis de diamants à Dubaï.",
@@ -714,7 +764,7 @@ export const fr: Messages = {
   vip: {
     eyebrow: "Berete VIP",
     title: "Votre espace privé",
-    intro: "Vos pièces en 3D, préparées pour vous par Berete Jewellers.",
+    intro: "L’avancement de votre pièce et vos créations en 3D, préparés pour vous par Berete Jewellers.",
     code: "Code d’accès",
     codeHint: "Le code que nous vous avons envoyé, par exemple 7KQ2-9MXA.",
     enter: "Entrer",
@@ -723,13 +773,25 @@ export const fr: Messages = {
     linkMissing: "Ce lien ne fonctionne plus. Saisissez votre code, ou demandez-nous un nouveau lien sur WhatsApp.",
     hello: (name: string) => "Bonjour " + name,
     yourPieces: "Vos pièces",
-    none: "Vos pièces apparaîtront ici dès qu’elles seront prêtes.",
     logout: "Se déconnecter",
     footerLink: "Espace client",
     askCode: "Demander mon code sur WhatsApp",
     askMessage: "Bonjour Berete Jewellers, pourriez-vous m’envoyer mon code d’accès à mon espace privé ?",
     soon: "Votre espace privé ouvre très bientôt. En attendant, écrivez-nous sur WhatsApp : nous vous envoyons vos pièces en 3D directement.",
     soonMessage: "Bonjour Berete Jewellers, j’aimerais voir mes pièces en 3D.",
+    journey: "Le parcours de votre pièce",
+    stepOf: (step: number, total: number) => "Étape " + step + " sur " + total,
+    stepDone: "Terminée",
+    stepCurrent: "En cours",
+    stepNext: "À venir",
+    delivered: "Toutes les étapes sont achevées : votre pièce vous a été remise.",
+    estimated: "Date d’achèvement estimée",
+    estimateChanged: (on: string, before: string) => "Mise à jour le " + on + " ; prévue auparavant le " + before,
+    news: "Nouvelles de l’atelier",
+    noNews: "Les premières photos et vidéos de l’atelier apparaîtront ici.",
+    openPhoto: "Ouvrir la photo en plein écran",
+    photoAlt: (date: string) => "Photo de l’atelier, " + date,
+    videoAlt: (date: string) => "Vidéo de l’atelier, " + date,
   },
 
   feature: {

@@ -123,6 +123,14 @@ export const nl: Messages = {
       bracelets: { name: "Armbanden", intro: "Armbanden op maat, schakel voor schakel." },
       watches: { name: "Horloges", intro: "Horloges bezet met diamanten, van de kast tot de band." },
       "jesus-pieces": { name: "Jesus Pieces", intro: "Van de straten van New York tot Biggie die het legendarisch maakte: het Jesus piece werd een van de herkenbaarste symbolen van de cultuur. We veranderen dat verhaal niet, we voegen er alleen ons deel aan toe." },
+      "celebration": { name: "Vieringshangers", intro: "De doelpuntvieringen van de spelers, in diamanten gebeeldhouwd: een gebaar op het veld, voorgoed bewaard." },
+      "cross": { name: "Kruishangers", intro: "Kruisen getekend door het huis, omlijst met baguettes of steen voor steen gezet." },
+      "name": { name: "Naamhangers", intro: "Een naam, of de initialen van een naam, in goud getekend en met diamanten gezet." },
+      "letter": { name: "Letterhangers", intro: "Eén letter, en het hele verhaal van wie hem draagt." },
+      "signature": { name: "Signature-kettingen", intro: "De kettingen van het huis, getekend door Berete: de Safi Link en BRT Flowers." },
+      "cuban": { name: "Cubaanse kettingen", intro: "De Cubaanse schakel, bezet met diamanten, in verschillende breedtes." },
+      "tennis": { name: "Tenniskettingen", intro: "Een lijn van diamanten, steen na steen." },
+      "infinity": { name: "Infinity-kettingen", intro: "Schakels getekend in de vorm van oneindigheid." },
     },
     eyebrow: "Het portfolio",
     title: "Verken de creaties",
@@ -131,6 +139,8 @@ export const nl: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "Het portfolio",
     listLabel: (collection: string) => "De creaties: " + collection,
+    /** The heading of the categories of a collection (24/11/2026). */
+    categories: "Categorieën",
     subLabel: (collection: string) => collection + ": subcategorieën",
     subAll: (collection: string) => "Alle " + collection.toLowerCase(),
     others: "Meer uit het portfolio",
@@ -140,6 +150,9 @@ export const nl: Messages = {
   },
 
   home: {
+    /** The opening photo of the home page (24/11/2026) and the small link under it. */
+    heroAlt: "De geopende Sirius-koffer: de ketting en zijn hanger in hun presentatie, het BRT-logo op de zwarte koffer",
+    discoverMore: "Ontdek meer",
     sketchLabel: "Van de eerste schets tot het juweel, al scrollend",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "We beginnen niet bij wat al gedaan is. We beginnen bij wat zou kunnen zijn.",
@@ -261,6 +274,8 @@ export const nl: Messages = {
     delivered: "Geleverd",
     handedOverTo: (_client: string) => "De officiële overhandiging",
     handover: "De overhandiging",
+    /** The lines of the composition sent by Yoni piece by piece (the admin prepares them; 24/11/2026). */
+    composition: { "Gold": "Goud", "Gold weight": "Gewicht van het goud", "Diamonds": "Diamanten", "Total diamond weight": "Totaalgewicht van de diamanten", "Coloured stones": "Gekleurde stenen", "Hours of work": "Werkuren" } as Record<string, string>,
     sheet: "Samenstelling & vakmanschap",
     customBox: "Presentatie op maat",
     deliveredIn: (box: string) => "Geleverd in het etui dat ervoor werd gemaakt: " + box + ".",
@@ -387,6 +402,9 @@ export const nl: Messages = {
 
   process: {
     /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
+    liveWithSpace: "Live foto’s en video’s van de voortgang via WhatsApp en in uw privé-klantenruimte.",
+    spaceAfterDeposit: "Na de aanbetaling voor het ontwerp krijgt u toegang tot uw privé-klantenruimte: uw stuk in 3D en de voortgang ervan, live.",
     quick: {
       lead: "Van de eerste schets tot de onthulling in zijn etui: vier stappen, samen met u gevolgd op WhatsApp.",
       steps: [
@@ -405,7 +423,7 @@ export const nl: Messages = {
       { title: "Het privéconsult", text: "Ideeën en budget. Vertel ons welk moment u wilt vastleggen, uw referenties, uw verhaal.", meter: "0%", payNote: "Geen betaling in deze fase." },
       { title: "De ontwerpopdracht", text: "Wordt bij bevestiging van de eindprijs afgetrokken en dekt bij annulering de ontwerpkosten.", meter: "Voorschot", payNote: "Ontwerpvoorschot betaald." },
       { title: "Goedkeuring van het ontwerp", text: "50% van de productie wordt betaald voordat het maken begint.", meter: "50%", payNote: "50% van de productie betaald." },
-      { title: "De kunst van de creatie", text: "Foto’s en video’s van de vorderingen via WhatsApp; de doorlooptijd hangt af van de complexiteit.", meter: "50%", payNote: "Tijdens het maken hoeft u niets meer te betalen." },
+      { title: "De kunst van de creatie", text: "Live foto’s en video’s van de voortgang via WhatsApp.", meter: "50%", payNote: "Tijdens het maken hoeft u niets meer te betalen." },
       { title: "De onthulling in beeld", text: "Een eigen fotoshoot, daarna de voorbereiding van de levering.", meter: "50%", payNote: "Uw juweel wordt gefotografeerd voordat het het atelier verlaat." },
       { title: "Saldo & overhandiging", text: "De resterende 50% ongeveer een week vóór de overhandiging.", meter: "100%", payNote: "Volledig betaald, klaar voor de overhandiging." },
     ],
@@ -585,6 +603,38 @@ export const nl: Messages = {
       title: "Horloges bezet met diamanten",
       description: "Horloges bezet met diamanten, van de kast tot de band, gedragen door voetballers: de horloges van Berete Jewellers, Dubai.",
     },
+    "/creations/pendants/celebration": {
+      title: "Vieringshangers: doelpuntvieringen in diamanten",
+      description: "De vieringshangers van Berete Jewellers: de doelpuntvieringen van voetballers, in goud en diamanten gebeeldhouwd, gemaakt in Dubai.",
+    },
+    "/creations/pendants/cross": {
+      title: "Kruishangers met diamanten",
+      description: "De kruishangers van Berete Jewellers: kruisen omlijst met baguettes of steen voor steen gezet, gemaakt in Dubai.",
+    },
+    "/creations/pendants/name": {
+      title: "Naam- en initialenhangers",
+      description: "De naamhangers van Berete Jewellers: namen en initialen in goud getekend en met diamanten gezet, gemaakt in Dubai.",
+    },
+    "/creations/pendants/letter": {
+      title: "Letterhangers met diamanten",
+      description: "De letterhangers van Berete Jewellers: één letter, gebeeldhouwd en met diamanten gezet, gemaakt in Dubai.",
+    },
+    "/creations/chains/signature": {
+      title: "Signature-kettingen: Safi Link en BRT Flowers",
+      description: "De signature-kettingen van Berete Jewellers, de Safi Link en BRT Flowers, getekend door het huis en gemaakt in Dubai.",
+    },
+    "/creations/chains/cuban": {
+      title: "Cubaanse kettingen met diamanten",
+      description: "De Cubaanse kettingen van Berete Jewellers, bezet met diamanten in verschillende breedtes, gemaakt in Dubai.",
+    },
+    "/creations/chains/tennis": {
+      title: "Tenniskettingen",
+      description: "De tenniskettingen van Berete Jewellers: een lijn van diamanten, steen na steen, gemaakt in Dubai.",
+    },
+    "/creations/chains/infinity": {
+      title: "Infinity-kettingen",
+      description: "De infinity-kettingen van Berete Jewellers: schakels in de vorm van oneindigheid, gemaakt in Dubai.",
+    },
     "/creations/pendants/jesus-pieces": {
       title: "Jesus Pieces: Christushangers met diamanten op maat",
       description: "De Jesus pieces van Berete Jewellers: het gezicht van Christus met een kroon van doornen of bloemen, en Christus aan het kruis, gebeeldhouwd en met diamanten gezet in Dubai.",
@@ -700,7 +750,7 @@ export const nl: Messages = {
   vip: {
     eyebrow: "Berete VIP",
     title: "Uw privéruimte",
-    intro: "Uw stukken in 3D, voor u voorbereid door Berete Jewellers.",
+    intro: "De voortgang van uw stuk en uw creaties in 3D, voor u voorbereid door Berete Jewellers.",
     code: "Toegangscode",
     codeHint: "De code die we u stuurden, bijvoorbeeld 7KQ2-9MXA.",
     enter: "Binnengaan",
@@ -709,13 +759,25 @@ export const nl: Messages = {
     linkMissing: "Deze link werkt niet meer. Voer uw code in, of vraag ons via WhatsApp om een nieuwe link.",
     hello: (name: string) => "Hallo " + name,
     yourPieces: "Uw stukken",
-    none: "Uw stukken verschijnen hier zodra ze klaar zijn.",
     logout: "Afmelden",
     footerLink: "Klantenruimte",
     askCode: "Mijn code vragen via WhatsApp",
     askMessage: "Hallo Berete Jewellers, kunt u mij mijn toegangscode voor mijn privéruimte sturen?",
     soon: "Uw privéruimte opent binnenkort. Schrijf ons in de tussentijd op WhatsApp, dan sturen we u uw stukken rechtstreeks in 3D.",
     soonMessage: "Hallo Berete Jewellers, ik wil graag mijn stukken in 3D zien.",
+    journey: "De weg van uw stuk",
+    stepOf: (step: number, total: number) => "Stap " + step + " van " + total,
+    stepDone: "Voltooid",
+    stepCurrent: "Bezig",
+    stepNext: "Volgt nog",
+    delivered: "Alle stappen zijn voltooid: uw stuk is aan u overhandigd.",
+    estimated: "Verwachte voltooiing",
+    estimateChanged: (on: string, before: string) => "Bijgewerkt op " + on + ", eerder gepland op " + before,
+    news: "Nieuws uit het atelier",
+    noNews: "De eerste foto’s en video’s uit het atelier verschijnen hier.",
+    openPhoto: "Foto op volledig scherm openen",
+    photoAlt: (date: string) => "Foto uit het atelier, " + date,
+    videoAlt: (date: string) => "Video uit het atelier, " + date,
   },
 
   feature: {

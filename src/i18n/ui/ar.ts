@@ -118,6 +118,14 @@ export const ar: Messages = {
       bracelets: { name: "الأساور", intro: "أساور تُصنع حسب المقاس، حلقة بعد حلقة." },
       watches: { name: "الساعات", intro: "ساعات مرصعة بالألماس من الهيكل إلى السوار." },
       "jesus-pieces": { name: "مجوهرات المسيح", intro: "من شوارع نيويورك إلى بيغي الذي جعلها أسطورية، أصبحت قطعة «جيزس بيس» واحدة من أكثر الرموز شهرةً في الثقافة. نحن لا نغيّر هذه القصة، بل نضيف إليها فصلنا فقط." },
+      "celebration": { name: "قلادات الاحتفال", intro: "احتفالات اللاعبين بأهدافهم، منحوتة بالألماس: حركة على أرض الملعب، محفوظة إلى الأبد." },
+      "cross": { name: "قلادات الصليب", intro: "صلبان صمّمتها الدار، محاطة بأحجار الباغيت أو مرصّعة حجراً بعد حجر." },
+      "name": { name: "قلادات الأسماء", intro: "اسم، أو الأحرف الأولى من اسم، مرسوم بالذهب ومرصّع بالألماس." },
+      "letter": { name: "قلادات الحروف", intro: "حرف واحد، وكل قصة من يرتديه." },
+      "signature": { name: "سلاسل الدار المميزة", intro: "سلاسل الدار التي صمّمتها بيريتي: سافي لينك وBRT Flowers." },
+      "cuban": { name: "السلاسل الكوبية", intro: "الحلقة الكوبية مرصّعة بالألماس، بعروض مختلفة." },
+      "tennis": { name: "سلاسل التنس", intro: "خط من الألماس، حجر بعد حجر." },
+      "infinity": { name: "سلاسل اللانهاية", intro: "حلقات مرسومة على شكل اللانهاية." },
     },
     eyebrow: "معرض الأعمال",
     title: "استكشفوا الإبداعات",
@@ -126,6 +134,8 @@ export const ar: Messages = {
     tileAlt: (collection: string, piece: string) => collection + ": " + piece,
     collection: "معرض الأعمال",
     listLabel: (collection: string) => "إبداعات " + collection,
+    /** The heading of the categories of a collection (24/11/2026). */
+    categories: "الفئات",
     subLabel: (collection: string) => collection + ": الفئات الفرعية",
     subAll: (collection: string) => "كل " + collection,
     others: "المزيد من معرض الأعمال",
@@ -135,6 +145,9 @@ export const ar: Messages = {
   },
 
   home: {
+    /** The opening photo of the home page (24/11/2026) and the small link under it. */
+    heroAlt: "صندوق سيريوس مفتوحاً: السلسلة وقلادتها في حاملهما، وشعار BRT على الصندوق الأسود",
+    discoverMore: "اكتشف المزيد",
     sketchLabel: "من الرسم الأول إلى القطعة، مع التمرير",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "لا نبدأ مما صُنع من قبل. نبدأ مما يمكن أن يكون.",
@@ -256,6 +269,8 @@ export const ar: Messages = {
     delivered: "تم التسليم",
     handedOverTo: (_client: string) => "مراسم التسليم",
     handover: "التسليم",
+    /** The lines of the composition sent by Yoni piece by piece (the admin prepares them; 24/11/2026). */
+    composition: { "Gold": "الذهب", "Gold weight": "وزن الذهب", "Diamonds": "الألماس", "Total diamond weight": "الوزن الإجمالي للألماس", "Coloured stones": "الأحجار الملوّنة", "Hours of work": "ساعات العمل" } as Record<string, string>,
     sheet: "الخامات والحِرفية",
     customBox: "علبة تقديم حسب الطلب",
     deliveredIn: (box: string) => "تُسلَّم في علبتها المصنوعة خصيصاً لها: " + box + ".",
@@ -382,6 +397,9 @@ export const ar: Messages = {
 
   process: {
     /** The journey in five seconds (23/11/2026): four steps, how to order, how long. */
+    /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
+    liveWithSpace: "صور ومقاطع فيديو مباشرة لتقدّم العمل عبر WhatsApp وفي مساحتك الخاصة للعملاء.",
+    spaceAfterDeposit: "بعد دفعة التصميم، تدخل إلى مساحتك الخاصة للعملاء: قطعتك بتقنية ثلاثية الأبعاد وتقدّمها مباشرةً.",
     quick: {
       lead: "من الرسم الأول إلى الكشف في علبتها: أربع مراحل نتابعها معكم عبر واتساب.",
       steps: [
@@ -400,7 +418,7 @@ export const ar: Messages = {
       { title: "الاستشارة الخاصة", text: "الأفكار والميزانية. أخبرونا باللحظة التي تودون تخليدها، وبمراجعكم، وبقصتكم.", meter: "0%", payNote: "لا يُطلب أي دفع في هذه المرحلة." },
       { title: "طلب التصميم", text: "يُخصم من السعر النهائي عند التأكيد، ويغطي تكاليف التصميم في حال الإلغاء.", meter: "العربون", payNote: "تم دفع عربون التصميم." },
       { title: "اعتماد التصميم", text: "يُدفع 50% من تكلفة الإنتاج قبل بدء الصياغة.", meter: "50%", payNote: "تم دفع 50% من تكلفة الإنتاج." },
-      { title: "فنّ الإبداع", text: "صور ومقاطع فيديو لمراحل العمل عبر WhatsApp، وتتوقف المدة على درجة التعقيد.", meter: "50%", payNote: "لا شيء آخر للدفع خلال الصياغة." },
+      { title: "فنّ الإبداع", text: "صور ومقاطع فيديو مباشرة لتقدّم العمل عبر WhatsApp.", meter: "50%", payNote: "لا شيء آخر للدفع خلال الصياغة." },
       { title: "الكشف بالصور", text: "جلسة تصوير مخصصة، ثم التحضير للتسليم.", meter: "50%", payNote: "تُصوَّر قطعتكم قبل أن تغادر المشغل." },
       { title: "الدفعة الأخيرة ومراسم التسليم", text: "تُدفع نسبة الـ50% المتبقية قبل التسليم بنحو أسبوع.", meter: "100%", payNote: "مدفوعة بالكامل، وجاهزة للتسليم." },
     ],
@@ -580,6 +598,38 @@ export const ar: Messages = {
       title: "ساعات مرصعة بالألماس",
       description: "ساعات مرصعة بالألماس من الهيكل إلى السوار، يرتديها لاعبو كرة القدم: ساعات Berete Jewellers، دبي.",
     },
+    "/creations/pendants/celebration": {
+      title: "قلادات الاحتفال: احتفالات الأهداف بالألماس",
+      description: "قلادات الاحتفال من بيريتي للمجوهرات: احتفالات لاعبي كرة القدم بأهدافهم منحوتة بالذهب والألماس، صُنعت في دبي.",
+    },
+    "/creations/pendants/cross": {
+      title: "قلادات الصليب بالألماس",
+      description: "قلادات الصليب من بيريتي للمجوهرات: صلبان محاطة بأحجار الباغيت أو مرصّعة حجراً بعد حجر، صُنعت في دبي.",
+    },
+    "/creations/pendants/name": {
+      title: "قلادات الأسماء والأحرف الأولى",
+      description: "قلادات الأسماء من بيريتي للمجوهرات: أسماء وأحرف أولى مرسومة بالذهب ومرصّعة بالألماس، صُنعت في دبي.",
+    },
+    "/creations/pendants/letter": {
+      title: "قلادات الحروف بالألماس",
+      description: "قلادات الحروف من بيريتي للمجوهرات: حرف واحد منحوت ومرصّع بالألماس، صُنع في دبي.",
+    },
+    "/creations/chains/signature": {
+      title: "سلاسل الدار المميزة: سافي لينك وBRT Flowers",
+      description: "سلاسل بيريتي للمجوهرات المميزة، سافي لينك وBRT Flowers، من تصميم الدار وصُنعت في دبي.",
+    },
+    "/creations/chains/cuban": {
+      title: "سلاسل كوبية بالألماس",
+      description: "السلاسل الكوبية من بيريتي للمجوهرات، مرصّعة بالألماس بعروض مختلفة، صُنعت في دبي.",
+    },
+    "/creations/chains/tennis": {
+      title: "سلاسل التنس",
+      description: "سلاسل التنس من بيريتي للمجوهرات: خط من الألماس، حجر بعد حجر، صُنعت في دبي.",
+    },
+    "/creations/chains/infinity": {
+      title: "سلاسل اللانهاية",
+      description: "سلاسل اللانهاية من بيريتي للمجوهرات: حلقات على شكل اللانهاية، صُنعت في دبي.",
+    },
     "/creations/pendants/jesus-pieces": {
       title: "مجوهرات المسيح: قلائد المسيح بالألماس حسب الطلب",
       description: "مجوهرات المسيح من Berete Jewellers: وجه المسيح متوَّجًا بالأشواك أو بالزهور، والمسيح على الصليب، منحوتة ومرصّعة بالألماس في دبي.",
@@ -695,7 +745,7 @@ export const ar: Messages = {
   vip: {
     eyebrow: "Berete VIP",
     title: "مساحتك الخاصة",
-    intro: "قطعك بالأبعاد الثلاثية، أعدّتها لك Berete Jewellers.",
+    intro: "تقدّم العمل على قطعتك وإبداعاتك بالأبعاد الثلاثية، أعدّتها لك Berete Jewellers.",
     code: "رمز الدخول",
     codeHint: "الرمز الذي أرسلناه إليك، مثل 7KQ2-9MXA.",
     enter: "دخول",
@@ -704,13 +754,25 @@ export const ar: Messages = {
     linkMissing: "هذا الرابط لم يعد يعمل. أدخل رمزك، أو اطلب منا رابطًا جديدًا عبر واتساب.",
     hello: (name: string) => "مرحبًا " + name,
     yourPieces: "قطعك",
-    none: "ستظهر قطعك هنا فور جاهزيتها.",
     logout: "تسجيل الخروج",
     footerLink: "مساحة العملاء",
     askCode: "اطلب رمزي عبر واتساب",
     askMessage: "مرحبًا Berete Jewellers، هل يمكنكم إرسال رمز الدخول إلى مساحتي الخاصة؟",
     soon: "مساحتك الخاصة تفتح قريبًا جدًا. في الأثناء، راسلنا عبر واتساب وسنرسل إليك قطعك بالأبعاد الثلاثية مباشرة.",
     soonMessage: "مرحبًا Berete Jewellers، أودّ رؤية قطعي بالأبعاد الثلاثية.",
+    journey: "مسار قطعتك",
+    stepOf: (step: number, total: number) => "المرحلة " + step + " من " + total,
+    stepDone: "مكتملة",
+    stepCurrent: "قيد التنفيذ",
+    stepNext: "لاحقًا",
+    delivered: "اكتملت جميع المراحل: سُلِّمت إليك قطعتك.",
+    estimated: "موعد الإنجاز المتوقع",
+    estimateChanged: (on: string, before: string) => "حُدِّث في " + on + "، وكان مقررًا سابقًا في " + before,
+    news: "أخبار المشغل",
+    noNews: "ستظهر هنا أولى الصور ومقاطع الفيديو من المشغل.",
+    openPhoto: "افتح الصورة بملء الشاشة",
+    photoAlt: (date: string) => "صورة من المشغل، " + date,
+    videoAlt: (date: string) => "فيديو من المشغل، " + date,
   },
 
   feature: {

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router";
 import { LoaderCircle, LogOut } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
+import { VipJourney, VipNews } from "@/components/VipTracking";
 import { useI18n } from "@/i18n";
 import { localizePath } from "@/i18n/locales";
 import { metalsInWords, vipEnter, vipLeave, vipMe, type VipAnswer } from "@/lib/models";
@@ -10,9 +11,11 @@ import type { PublicModel } from "@/data/models";
 import { Jewel3D, type Selection } from "@/viewer";
 
 /**
- * The private space of a client (/vip): his pieces in 3D, given by the
- * jeweller from the admin. He enters with his personal link (/vip/<token>,
- * which opens the space and comes back here) or with his access code.
+ * The private space of a client (/vip): the follow-up of his commission (the
+ * step of his piece, its estimated date, the news of the atelier:
+ * src/components/VipTracking.tsx) and his pieces in 3D, given by the jeweller
+ * from the admin. He enters with his personal link (/vip/<token>, which opens
+ * the space and comes back here) or with his access code.
  */
 export default function Vip() {
   const { token } = useParams();
@@ -61,15 +64,15 @@ export default function Vip() {
   };
 
   const w = t.vip;
-  const button = "inline-flex min-h-14 items-center justify-center gap-3 px-7 text-base font-semibold uppercase tracking-[0.12em] transition-colors";
+  const button = "inline-flex min-h-14 items-center justify-center gap-3 px-7 text-base font-medium uppercase tracking-[0.12em] transition-colors";
 
   // The version online without its server: the space opens soon, the pieces come by WhatsApp meanwhile.
   if (!HAS_SERVER) {
     return (
       <section className="mx-auto max-w-xl px-5 pt-40 pb-24 sm:px-8" data-vip-soon>
         <p className="eyebrow">{w.eyebrow}</p>
-        <h1 className="title-caps mt-4 text-[clamp(2.25rem,5vw,3.75rem)] tracking-[0.1em]">{w.title}</h1>
-        <p className="mt-5 text-lg text-bone">{w.soon}</p>
+        <h1 className="title-caps mt-4 t-hero tracking-[0.1em]">{w.title}</h1>
+        <p className="mt-5 text-base text-bone">{w.soon}</p>
         <a href={waLink(w.soonMessage)} target="_blank" rel="noreferrer" className={button + " mt-10 w-full bg-white text-ink hover:bg-rose-light sm:w-auto"}>
           <BrandIcon name="whatsapp" className="size-5" /> {t.contact.openWhatsapp}
         </a>
@@ -93,23 +96,30 @@ export default function Vip() {
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow">{w.eyebrow}</p>
-            <h1 className="title-caps mt-4 text-[clamp(2.25rem,5vw,4rem)] tracking-[0.1em] break-words">{w.hello(state.name)}</h1>
-            <p className="mt-4 text-lg text-bone">{w.intro}</p>
+            <h1 className="title-caps mt-4 t-hero tracking-[0.1em] break-words">{w.hello(state.name)}</h1>
+            <p className="mt-4 text-base text-bone">{w.intro}</p>
           </div>
           <button type="button" onClick={() => void leave()} className={button + " border border-white/40 text-white hover:border-rose-light hover:text-rose-light"}>
             <LogOut className="size-4" aria-hidden="true" /> {w.logout}
           </button>
         </div>
-        <h2 className="eyebrow mt-16">{w.yourPieces}</h2>
-        {state.pieces.length === 0 ? (
-          <p className="mt-6 border border-white/15 p-8 text-center text-lg text-bone">{w.none}</p>
-        ) : (
-          <ul className="mt-6 grid gap-20">
-            {state.pieces.map((model) => (
-              <VipPiece key={model.id} model={model} />
-            ))}
-          </ul>
-        )}
+        {/* The follow-up of the commission: the steps and the estimated date beside the news (one under the other on a phone). */}
+        <div className="mt-16 grid gap-16 lg:mt-24 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-24">
+          <div className="lg:sticky lg:top-36 lg:self-start">
+            <VipJourney space={state} />
+          </div>
+          <VipNews updates={state.updates} />
+        </div>
+        {state.pieces.length > 0 ? (
+          <>
+            <h2 className="eyebrow mt-24">{w.yourPieces}</h2>
+            <ul className="mt-6 grid gap-20">
+              {state.pieces.map((model) => (
+                <VipPiece key={model.id} model={model} />
+              ))}
+            </ul>
+          </>
+        ) : null}
       </section>
     );
   }
@@ -118,8 +128,8 @@ export default function Vip() {
   return (
     <section className="mx-auto max-w-xl px-5 pt-40 pb-24 sm:px-8" data-vip-login>
       <p className="eyebrow">{w.eyebrow}</p>
-      <h1 className="title-caps mt-4 text-[clamp(2.25rem,5vw,3.75rem)] tracking-[0.1em]">{w.title}</h1>
-      <p className="mt-5 text-lg text-bone">{state.state === "lost" ? w.linkMissing : w.intro}</p>
+      <h1 className="title-caps mt-4 t-hero tracking-[0.1em]">{w.title}</h1>
+      <p className="mt-5 text-base text-bone">{state.state === "lost" ? w.linkMissing : w.intro}</p>
       <form onSubmit={submit} className="mt-10 grid gap-5">
         <label className="block text-base text-bone">
           {w.code}
@@ -130,7 +140,7 @@ export default function Vip() {
             autoCapitalize="characters"
             spellCheck={false}
             placeholder="XXXX-XXXX"
-            className="mt-2 block min-h-14 w-full border border-white/30 bg-ink px-4 text-lg tracking-[0.2em] text-white placeholder:text-mist/50 focus:border-rose-light focus:outline-none"
+            className="mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base tracking-[0.2em] text-white placeholder:text-mist/50 focus:border-rose-light focus:outline-none"
           />
           <span className="mt-2 block text-base text-mist">{w.codeHint}</span>
         </label>
@@ -152,10 +162,10 @@ function VipPiece({ model }: { model: PublicModel }) {
   const metals = metalsInWords(selection, t.viewer, intl);
   // The messages end on the address of a link elsewhere; here there is none.
   const clean = (text: string) => text.replace(/[\s:]+$/, "");
-  const button = "inline-flex min-h-14 items-center justify-center gap-3 px-7 text-base font-semibold uppercase tracking-[0.12em] transition-colors";
+  const button = "inline-flex min-h-14 items-center justify-center gap-3 px-7 text-base font-medium uppercase tracking-[0.12em] transition-colors";
   return (
     <li data-vip-piece={model.id}>
-      <h3 className="title-caps text-[clamp(1.75rem,3.5vw,2.75rem)] tracking-[0.08em] break-words">{model.name}</h3>
+      <h3 className="title-caps t-lead tracking-[0.08em] break-words">{model.name}</h3>
       <Jewel3D
         model={model}
         words={t.viewer}

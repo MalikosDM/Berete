@@ -1,4 +1,8 @@
 {
+ "sharp": {
+  "src": "/media/brand/logo-sharp.dfcd073ed2.svg",
+  "ratio": 1.384
+ },
  "wordmark": {
   "src": "/media/brand/wordmark.6bbb4634fd.svg",
   "ratio": 10.152

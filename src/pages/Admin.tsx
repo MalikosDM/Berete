@@ -129,7 +129,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
       { key: "gallery", label: "Photos de « Sous tous les angles », dans l'ordre", type: "medialist" },
       { key: "angles", label: "« Sous tous les angles » : une courte légende, seulement sur les photos où elle apprend quelque chose (en anglais, puis ses traductions si vous le voulez). Le site n'affiche que le titre, jamais le texte (Yoni, 23/11/2026)", type: "angles" },
       { key: "handover", label: "Remise au client", type: "medialist" },
-      { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Or : 18 carats ; « Precious Materials » : d'après les photos, à faire valider par Yoni)", type: "specs" },
+      { key: "specs", label: "Composition & Savoir-faire (une ligne par info, ex. Gold : 18 carats ; une ligne vide n'apparaît pas sur le site ; « Precious Materials » : d'après les photos, à faire valider par Yoni ; jamais un chiffre inventé)", type: "specs" },
       { key: "details", label: "Les détails, un symbole par ligne : Titre | Texte | n° de la photo qui le montre (1 = photo d'ouverture, 2 = 1re photo des détails…)", type: "details" },
       { key: "detailPoints", label: "Les détails sur le modèle 3D (« The Art of Detail » : un point de la pièce pour chaque détail, relié à son étiquette)", type: "detailPoints" },
       { key: "press", label: "Presse (une ligne : Média | Titre | Lien)", type: "press" },
@@ -172,6 +172,10 @@ const TABS: { key: Tab; label: string }[] = [
 
 /* The open tab, kept for the visit (a reload stays on it). */
 const TAB_KEY = "bj-admin-tab";
+
+
+/** The lines of the composition of a piece, in English (the site translates them: piece.composition in src/i18n/ui). */
+const COMPOSITION_LINES = ["Gold", "Gold weight", "Diamonds", "Total diamond weight", "Coloured stones", "Hours of work"];
 
 function readTab(): Tab {
   try {
@@ -601,10 +605,22 @@ function Editor({ kind, token, initial, models, titles, onDone, onExpired }: { k
         </label>
       );
     const area = d.type === "textarea" || d.type === "specs" || d.type === "press" || d.type === "details";
+    // Composition (Yoni, 24/11/2026): the lines he will send piece by piece, ready to fill; an empty line never shows on the site.
+    const prepare = () => {
+      const text = asText(v);
+      const have = new Set(text.split("\n").map((l) => l.split(":")[0]!.trim()).filter(Boolean));
+      const missing = COMPOSITION_LINES.filter((l) => !have.has(l)).map((l) => l + " : ");
+      set(d.key, [text.trim(), ...missing].filter(Boolean).join("\n"));
+    };
     return (
       <label key={d.key} className="block text-base text-bone">
         {d.label}
-        {area ? <textarea rows={5} value={asText(v)} onChange={(e) => set(d.key, e.target.value)} className={inputCls + " py-3"} /> : <input type={d.type === "number" ? "number" : "text"} value={asText(v)} onChange={(e) => set(d.key, e.target.value)} className={inputCls} />}
+        {area ? <textarea rows={d.type === "specs" ? 8 : 5} value={asText(v)} onChange={(e) => set(d.key, e.target.value)} className={inputCls + " py-3"} /> : <input type={d.type === "number" ? "number" : "text"} value={asText(v)} onChange={(e) => set(d.key, e.target.value)} className={inputCls} />}
+        {d.type === "specs" ? (
+          <button type="button" onClick={prepare} data-composition-lines className={btn + " mt-3"}>
+            Préparer les lignes de composition (poids de l'or, carats…)
+          </button>
+        ) : null}
       </label>
     );
   };
@@ -740,7 +756,7 @@ function Section({ kind, token, onExpired }: { kind: Kind; token: string; onExpi
             <li key={String(item.id)} className="grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b border-white/15 py-4 sm:flex" data-admin-row={asText(item.slug)}>
               <span className="size-14 shrink-0 overflow-hidden bg-ink-soft">{thumbOf(item) ? <img src={thumbOf(item)} alt="" className="h-full w-full object-cover" /> : null}</span>
               <span className="min-w-0 flex-1">
-                <span className="block break-words text-lg text-white">{asText(item[name])}</span>
+                <span className="block break-words text-base text-white">{asText(item[name])}</span>
                 <span className="mt-1 flex flex-wrap items-center gap-2 text-base text-mist">
                   {has3d.has(asText(item.slug)) ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-3d>3D</span> : null}
                   {item.published === false ? <span className="border border-rose-light/60 px-2 text-rose-light" data-row-unpublished>{kind === "boxes" ? "Non publié" : "Non publiée"}</span> : null}
@@ -1495,7 +1511,7 @@ export default function Admin() {
                   role="tab"
                   aria-selected={tab === t.key}
                   onClick={() => open(t.key)}
-                  className={"min-h-12 shrink-0 border-b-2 px-3 text-base font-semibold whitespace-nowrap transition-colors " + (tab === t.key ? "border-rose-light text-rose-light" : "border-transparent text-bone hover:text-white")}
+                  className={"min-h-12 shrink-0 border-b-2 px-3 text-base font-medium whitespace-nowrap transition-colors " + (tab === t.key ? "border-rose-light text-rose-light" : "border-transparent text-bone hover:text-white")}
                 >
                   {t.label}
                 </button>

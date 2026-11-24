@@ -31,14 +31,14 @@ export function PressCard({ article, withPiece = true }: { article: PublishedArt
           </span>
         ) : null}
         <span className="flex flex-1 flex-col p-6 sm:p-7">
-          <span className="text-base font-semibold uppercase tracking-[0.18em] text-rose-light">{article.outlet}</span>
+          <span className="text-base font-medium uppercase tracking-[0.18em] text-rose-light">{article.outlet}</span>
           <span className="mt-1 text-base text-mist">
             <time dateTime={article.date}>{pressDate(article.date, intl)}</time>
           </span>
-          <span lang={article.lang} className="mt-4 font-display text-[clamp(1.375rem,2vw,1.75rem)] leading-snug text-white [text-wrap:pretty] group-hover:text-rose-light">
+          <span lang={article.lang} className="mt-4 font-display t-sub leading-snug text-white [text-wrap:pretty] group-hover:text-rose-light">
             {article.title}
           </span>
-          <span className="mt-auto inline-flex min-h-12 items-center gap-2 pt-6 text-base font-semibold text-white">
+          <span className="mt-auto inline-flex min-h-12 items-center gap-2 pt-6 text-base font-medium text-white">
             {t.common.readArticle} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </span>
         </span>

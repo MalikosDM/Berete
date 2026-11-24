@@ -43,6 +43,7 @@ const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
 const YONI = join(DISK, "Berete - Dossiers icloud", "00 Contexte Yoni");
 const WA = process.env.BERETE_WA_DIR ?? join(homedir(), "Desktop", "Yoni envoie whatsapp");
 const STORIES = join(DISK, "Berete - Stories");
+const ICLOUD = join(DISK, "Berete - Dossiers icloud");
 const OUT = join(ROOT, "public", "media", "extra");
 const DATA = join(ROOT, "src", "data", "extra.generated.json");
 const LONG = 1600;
@@ -102,6 +103,24 @@ const PIECES = {
     ["p5", wa("09.36.59 (4)")],
     ["p6", wa("09.36.59 (5)")],
   ],
+  // The Safi Link (Yoni, 24/11/2026): all its photos on the same deep black as its cover, the chain whole from the front first
+  // (folder 16; the flower and the clasp were shot on a lighter grey, the back a little lifted).
+  "the-safi-link": [
+    ["front", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 07.jpg"],
+    ["three-quarter", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 06.jpg"],
+    ["flower", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 03.jpg", { black: 26 }],
+    ["clasp", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 02.jpg", { black: 40 }],
+    ["links", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 04.jpg", { black: 10 }],
+    ["side", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 05.jpg"],
+  ],
+  // Sirius (Yoni, 24/11/2026): its plate from the front leaned to the left (its left tip 26 px lower over 1,333 px): straightened.
+  sirius: [["plate-front", "icloud:37 Chaine Sirius/Photos/37 Chaine Sirius - 28.jpg", { rotate: 1.12 }]],
+  // The Inter ring (Yoni, 24/11/2026: his photos with the players and their rings, in "Worn by"): the originals of the
+  // stories 21/01 (Denzel Dumfries) and 21/06 (a player opening his box), without the mention of the story.
+  "campione-d-italia-2023-2024": [
+    ["dumfries", "icloud:25 Pendentif Inter Milan/Photos/25 Pendentif Inter Milan - 38.jpg"],
+    ["box-opened", "icloud:25 Pendentif Inter Milan/Photos/25 Pendentif Inter Milan - 36.jpg"],
+  ],
   // Yoni for The House (23/11/2026), whole. Not "09.34.58" (an evening, a person not identified).
   house: [
     ["desk-smile", wa("00.50.54")],
@@ -159,7 +178,28 @@ const PIECES = {
   "players/marcus-thuram": [["kanye", story("20 Thuram SS23/20 Thuram SS23 - 06.jpg"), [0.0589, 0.1901, 0.8078, 0.6188]]],
 };
 
-const sourceOf = (file) => (file.startsWith("wa:") ? join(WA, file.slice(3)) : file.startsWith("story:") ? join(STORIES, file.slice(6)) : join(YONI, file));
+const sourceOf = (file) =>
+  file.startsWith("wa:") ? join(WA, file.slice(3)) : file.startsWith("story:") ? join(STORIES, file.slice(6)) : file.startsWith("icloud:") ? join(ICLOUD, file.slice(7)) : join(YONI, file);
+
+/**
+ * A photo adjusted (24/11/2026): { rotate } straightens it (degrees, clockwise; the corners filled with black, the photo kept
+ * at its size), { black } brings its background to the deep black of the other photos of the piece (the levels: the given
+ * grey becomes black, white stays white), { frame } then frames it on the jewel.
+ */
+async function adjusted(file, how) {
+  let buf = await sharp(file).rotate().toBuffer();
+  const { width, height } = await sharp(buf).metadata();
+  if (how.rotate) {
+    const turned = await sharp(buf).rotate(how.rotate, { background: "#000000" }).toBuffer();
+    const t = await sharp(turned).metadata();
+    buf = await sharp(turned).extract({ left: Math.round((t.width - width) / 2), top: Math.round((t.height - height) / 2), width, height }).toBuffer();
+  }
+  if (how.black) {
+    const a = 255 / (255 - how.black);
+    buf = await sharp(buf).linear(a, -how.black * a).toBuffer();
+  }
+  return how.frame ? framed(buf) : sharp(buf);
+}
 
 /** The photo framed on the jewel: the black around it trimmed, then an even margin, in a 4:5 frame (black). */
 async function framed(file) {
@@ -242,7 +282,7 @@ for (const key of keys) {
       made.push(await video(src, tmp, name));
       continue;
     }
-    const img = how === "frame" ? await framed(src) : Array.isArray(how) ? await cropped(src, how) : sharp(src).rotate();
+    const img = how === "frame" ? await framed(src) : Array.isArray(how) ? await cropped(src, how) : how && typeof how === "object" ? await adjusted(src, how) : sharp(src).rotate();
     const out = join(tmp, name + ".webp");
     const { width, height } = await img.clone().resize(LONG, LONG, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: 84, effort: 6 }).toFile(out);
     for (const size of SIZES) {

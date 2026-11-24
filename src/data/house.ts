@@ -1,7 +1,7 @@
 /*
  * The page The House (/about): the story of Yoni Berete in chapters (texts: src/i18n/house/<language>.ts) and the places
- * of his personal photos. Every chapter, the three quotes and the portrait have a place for a photo; a quote without its
- * photo has none (never an empty frame), a chapter without his own photo shows an image of the house (23/11/2026). A photo is added either from the admin (tab "La Maison") or by dropping a file
+ * of his personal photos. Every chapter, the three quotes and the portrait have a place for a photo; a place without its
+ * photo shows nothing (never an empty frame, never an image put in its place: 24/11/2026). A photo is added either from the admin (tab "La Maison") or by dropping a file
  * named after its place ("portrait.jpg", "citation-1.jpg", "chapitre-03.jpg"...) in the folder "Berete - La Maison" of
  * the external disk, then npm run import-media.
  */
@@ -43,24 +43,25 @@ export function housePhoto(cat: Catalogue, key: string): MediaItem | null {
 const plain = (m: MediaItem | null | undefined): MediaItem | null => (m?.src ? { ...m, alt: "", caption: undefined } : null);
 
 /**
- * One image per chapter (Yoni, 23/11/2026): his own photos where they fit the chapter (sent on WhatsApp,
- * scripts/extra-media.mjs), and for his early years an image of the house (his hand drawing, the atelier).
+ * His own photos where they fit a chapter (Yoni, 23/11/2026, sent on WhatsApp, scripts/extra-media.mjs). Since 24/11/2026 no
+ * image of a jewel anywhere on the page (no sketch, no pendant, no chain, no piece), and no image put in place of a missing
+ * photo: a chapter without a personal photo of Yoni shows none. Chapters 6 and 7 lost theirs (almost the same as chapter 5);
+ * chapter 6 will get the photo of his first jewel, chapter 1 his grandfather at his desk (chapitre-06.jpg, chapitre-01.jpg in
+ * the folder). Chapter 4 (Antwerp, at the loupe, in black and white) and 11 (his former office in Belgium) come from the folder.
  */
 const own = (name: string): MediaItem | null => plain(extra("house", name, { onBlack: false }));
 const CHAPTER_IMAGES: (() => MediaItem | null)[] = [
-  () => plain(media.sketches?.["campione-d-italia-2023-2024"]),
-  () => plain(media.groups["atelier"]?.[0]),
-  () => plain(media.groups["atelier"]?.[1]),
-  // His own photos (Yoni, 23/11/2026): the loupe on a stone, the tray of diamonds at his desk, at Inter with the Campione
-  // case, his head in his hands among four Inter rings. Not the photo of an evening with a person not known.
-  () => own("loupe"),
+  () => null,
+  () => null,
+  () => null,
+  () => null,
   () => own("desk-tray"),
-  () => own("desk-pointing"),
-  () => own("desk-scale"),
+  () => null,
+  () => null,
   () => own("desk-smile"),
   () => own("inter-rings"),
   () => own("inter-case-open"),
-  () => own("desk-smile-wide"),
+  () => null,
   () => own("inter-ring"),
 ];
 

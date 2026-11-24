@@ -1,9 +1,11 @@
 // The answers of Yoni to the 20 doubts of the making-of (21/11/2026, the sheet _verif/making-of-doutes.jpg): the confirmed
-// steps are on the pages of their 8 pieces, under the names asked; the rejected ones nowhere. Computer and iPhone, silent.
-// Screenshots go to verification/doutes/.
+// steps are with their pieces, under the names asked; the rejected ones nowhere. Since 24/11/2026 (Yoni: no making-of on the
+// pages of the pieces) the steps of a piece wait in The Atelier, /atelier?piece=<slug>, under its making-of that opens at
+// once. Computer and iPhone, silent. Screenshots go to verification/doutes/.
 import { mkdirSync } from "node:fs";
 import { expect, test } from "./fixtures";
 import { defaultCatalogue } from "../src/data/catalogue";
+import { resolveAtelier } from "../src/data/atelier";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import { publicCatalogue } from "../src/data/relations";
 import type { MakingStep } from "../src/data/types";
@@ -26,7 +28,8 @@ const CONFIRMED: { n: number; slug: string; step: MakingStep; title: string; src
   { n: 5, slug: "panther-champion-pendant", step: "parts", title: "Les pièces avant assemblage", src: "/media/hd/panther-champion-pendant/08-p01.webp" },
   { n: 9, slug: "marcus-thuram-t-serpent-pendant", step: "setting", title: "L’Art du sertissage", src: "/media/hd/marcus-thuram-t-serpent-pendant/08-v19-2s.webp", second: true },
   { n: 10, slug: "campione-d-italia-2023-2024", step: "setting", title: "L’Art du sertissage", src: "/media/hd/campione-d-italia-2023-2024/08-v25-3s.webp", second: true },
-  { n: 16, slug: "kevin-schade-twisted-chain", step: "delivery", title: "La Révélation finale", src: "/media/stories/kevin-schade/02.webp" },
+  // (16, the handover of the twisted chain of Kevin Schade: since 24/11/2026 that chain is BRT Flowers, the story in its
+  // "Worn by": checked in the data below.)
   { n: 18, slug: "samuel-ballet-jesus-piece", step: "worn", title: "La pièce portée", src: "/media/pieces/samuel-ballet-jesus-piece/worn.webp" },
   { n: 19, slug: "tulips-on-tour-medallion", step: "finishing", title: "Finition", src: "/media/hd/tulips-on-tour-medallion/v13-0_5s.webp" },
 ];
@@ -43,8 +46,12 @@ test("the data: each confirmed step on its piece; the rejected ones nowhere", ()
   // links of the film of the jersey of Okafor.
   for (const rejected of ["/media/stories/nz/03", "08-v18", "08-v03", "08-v10", "08-v02", "08-p05", "08-p06", "08-p07"]) expect(all.some((s) => s.includes(rejected)), rejected).toBe(false);
   expect(all.some((s) => /noah-okafor-jersey-pendant\/v02-1[45]/.test(s)), "15").toBe(false);
+  // 16: the twisted chain of Kevin Schade is BRT Flowers since 24/11/2026 (unpublished, its address leads there); its handover
+  // is in the "Worn by" of BRT Flowers.
+  expect(defaultCatalogue.pieces.find((p) => p.slug === "kevin-schade-twisted-chain")?.published).toBe(false);
+  expect(pieceOf("brt-flower-chain").handover.map((m) => m.src)).toContain("/media/stories/kevin-schade/02.webp");
   // 17: the making-of 36/v02 stays on the BRT Flower only.
-  expect(completeMakingOf("kevin-schade-twisted-chain", pieceOf("kevin-schade-twisted-chain").atelier)).toBeNull();
+  expect(completeMakingOf("kevin-schade-twisted-chain", null)).toBeNull();
   expect(completeMakingOf("brt-flower-chain", pieceOf("brt-flower-chain").atelier)).not.toBeNull();
   // 18: worn for the Jesus piece of Samuel Ballet only, never for the BRT Flower.
   expect(makingSteps(pieceOf("brt-flower-chain")).some((s) => s.step === "worn")).toBe(false);
@@ -54,12 +61,21 @@ test("the data: each confirmed step on its piece; the rejected ones nowhere", ()
 
 const SLUGS = [...new Set(CONFIRMED.map((c) => c.slug))];
 for (const slug of SLUGS) {
-  test(slug + ": its confirmed steps in its Making of, under their names", async ({ page }, info) => {
+  test(slug + ": its confirmed steps in its Making of in The Atelier, under their names", async ({ page }, info) => {
     const problems = watch(page);
     await skipIntro(page);
-    await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
-    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
-    const section = page.locator("[data-making]");
+    await page.goto("/fr/atelier?piece=" + slug, { waitUntil: "load" });
+    // Its making-of opens at once; closed, its steps are there.
+    if (resolveAtelier(slug, pieceOf(slug).atelier) || completeMakingOf(slug, pieceOf(slug).atelier)) {
+      const room = page.locator("[data-atelier-room]");
+      await expect(room).toBeVisible();
+      // (Again until it is gone: the page may still be settling when it opens.)
+      await expect(async () => {
+        if (await room.count()) await page.keyboard.press("Escape");
+        await expect(room).toHaveCount(0, { timeout: 2_000 });
+      }).toPass({ timeout: 20_000 });
+    }
+    const section = page.locator("[data-atelier-piece='" + slug + "'] [data-making]");
     await section.evaluate((el) => el.scrollIntoView({ block: "start" }));
     await page.waitForTimeout(1000);
     const steps = makingSteps(pieceOf(slug), boxOf(slug));

@@ -203,13 +203,13 @@ export default function AtelierRoom({ title, madeFor, slug, atelier, world = fal
               <span className="hidden lg:inline">{t.atelier.title} · </span>
               <span data-film-name>{filmName}</span>
             </p>
-            <h2 id="atelier-room-title" className="title-caps mt-2 text-[clamp(1.375rem,2.6vw,2.75rem)] leading-[1.1] tracking-[0.08em] break-words text-white lg:mt-4">
+            <h2 id="atelier-room-title" className="title-caps mt-2 t-title leading-[1.1] tracking-[0.08em] break-words text-white lg:mt-4">
               {title}
             </h2>
             <p className="mt-1 text-base text-bone lg:mt-3">{t.common.madeFor(madeFor)}</p>
             {world ? (
               // "Enter the World" on phones, under the name of the piece (computers: under the button to leave).
-              <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.1em] text-rose-light lg:hidden">
+              <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-rose-light lg:hidden">
                 {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
               </Link>
             ) : null}
@@ -268,21 +268,21 @@ export default function AtelierRoom({ title, madeFor, slug, atelier, world = fal
             {interlude ? (
               <div data-interlude className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 px-6 text-center">
                 <span className="text-rose-gold font-display text-3xl">02</span>
-                <p className={"title-caps mt-3 text-[clamp(1.75rem,4vw,3rem)] tracking-[0.14em] text-white " + (reduced ? "" : "ar-rise")}>{t.films.reveal}</p>
+                <p className={"title-caps mt-3 t-lead tracking-[0.14em] text-white " + (reduced ? "" : "ar-rise")}>{t.films.reveal}</p>
               </div>
             ) : null}
             {ended ? (
               <div data-atelier-end className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 px-6">
-                <p className="title-caps mb-4 text-center text-[clamp(1.5rem,3vw,2.25rem)] tracking-[0.12em] text-white">{title}</p>
-                <button type="button" onClick={replay} className="inline-flex min-h-14 w-full max-w-xs items-center justify-center gap-3 border border-white/40 px-7 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+                <p className="title-caps mb-4 text-center t-lead tracking-[0.12em] text-white">{title}</p>
+                <button type="button" onClick={replay} className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 border border-white/40 px-7 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
                   <RotateCcw className="size-5" aria-hidden="true" /> {t.films.replay}
                 </button>
                 {world ? (
-                  <Link to={"/pieces/" + slug} replace className="inline-flex min-h-14 w-full max-w-xs items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+                  <Link to={"/pieces/" + slug} replace className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 bg-white px-7 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
                     {t.common.enterWorld} <ArrowRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
                   </Link>
                 ) : (
-                  <button type="button" onClick={close} className="inline-flex min-h-14 w-full max-w-xs items-center justify-center gap-3 bg-white px-7 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light">
+                  <button type="button" onClick={close} className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 bg-white px-7 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
                     {t.films.leave}
                   </button>
                 )}
@@ -301,7 +301,7 @@ export default function AtelierRoom({ title, madeFor, slug, atelier, world = fal
                       data-chapter={c.kind}
                       aria-current={kind === c.kind ? "true" : undefined}
                       onClick={onChapter}
-                      className={"inline-flex min-h-12 flex-1 items-center justify-center px-3 text-center text-base leading-tight font-semibold transition-colors " + (kind === c.kind ? "bg-white text-ink" : "border border-white/35 bg-black/40 text-white")}
+                      className={"inline-flex min-h-12 flex-1 items-center justify-center px-3 text-center text-base leading-tight font-medium transition-colors " + (kind === c.kind ? "bg-white text-ink" : "border border-white/35 bg-black/40 text-white")}
                     >
                       {c.name}
                     </button>
@@ -348,11 +348,11 @@ export default function AtelierRoom({ title, madeFor, slug, atelier, world = fal
 
         {/* Leave (computers) */}
         <div className="hidden self-start justify-self-end pt-8 lg:block">
-          <button type="button" onClick={close} data-atelier-close className="inline-flex min-h-12 items-center gap-3 border border-white/35 bg-black/40 px-5 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light">
+          <button type="button" onClick={close} data-atelier-close className="inline-flex min-h-12 items-center gap-3 border border-white/35 bg-black/40 px-5 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
             <X className="size-5" aria-hidden="true" /> {t.films.leave}
           </button>
           {world ? (
-            <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-3 flex min-h-12 items-center justify-end gap-2 text-base font-semibold uppercase tracking-[0.12em] text-white hover:text-rose-light">
+            <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-3 flex min-h-12 items-center justify-end gap-2 text-base font-medium uppercase tracking-[0.12em] text-white hover:text-rose-light">
               {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
           ) : null}

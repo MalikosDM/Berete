@@ -4,13 +4,15 @@
 //   image on (rising smoke and falling golden confetti; butterflies of light, sparkles, the moon shining barely), the
 //   piece and the texts readable; the same world around their story;
 // - "Loïs Openda — Script Pendant" and "Bouzou — Pendant" are one piece, at the address of Loïs Openda;
-// - the making-of of "Enter the Atelier" in HD on a sharp computer screen (a Retina Mac).
+// - the making-of of "Enter the Atelier" in HD on a sharp computer screen (a Retina Mac); since 24/11/2026 the making-of
+//   plays in the room of The Atelier only, in HD on every computer.
 // Screenshots go to verification/universes/.
 import { mkdirSync } from "node:fs";
 import { devices, expect, silence, test, type Locator, type Page } from "./fixtures";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { RENAMED_PIECES } from "../src/data/pieces";
 import media from "../src/data/media.generated.json" with { type: "json" };
+import { VFB_VICTORY } from "../src/data/themes";
 import { skipIntro, watch } from "./helpers";
 
 const DIR = "verification/universes";
@@ -49,8 +51,9 @@ async function groundContrast(page: Page, el: Locator): Promise<number> {
 }
 
 const WORLDS: [string, string, string[], string][] = [
-  // Since 23/11/2026: its victory (the squad behind the ring), a light rain of gold and red confetti.
-  ["vfb-stuttgart-dfb-pokal-2025", "vfb-victoire", ["confetti"], "VfB"],
+  // Since 23/11/2026: its victory (the squad behind the ring), a light rain of gold and red confetti; since 24/11/2026 its
+  // version v2 (VFB_VICTORY of src/data/themes.ts).
+  ["vfb-stuttgart-dfb-pokal-2025", VFB_VICTORY, ["confetti"], "VfB"],
   ["michy-batshuayi-butterfly-pendant", "butterfly", ["butterflies", "glints", "moon"], "Butterfly"],
 ];
 
@@ -177,26 +180,26 @@ test("Loïs Openda — Script Pendant: one piece with everything of Bouzou, no d
 
 /* ---------- The making-of in HD on a sharp computer screen ---------- */
 
-test("Enter the Atelier: on a Retina Mac its making-of plays in HD, on a plain screen and a phone its light copy", async ({ browser }, info) => {
+// 24/11/2026: the preview of the making-of that played on the page of the piece (AtelierPassage, the light copy on a plain
+// screen) left the pages of the pieces; the making-of plays in the room of The Atelier, in HD on every computer.
+test("Enter the Atelier: on a computer, a Retina Mac or a plain screen, its making-of plays in HD", async ({ browser }, info) => {
   test.skip(info.project.name !== "desktop", "a computer with a sharp screen, opened once");
   const films = (media as unknown as { films: Record<string, { making?: { src: string; mobile: string } }> }).films;
   const making = films["campione-d-italia-2023-2024"]!.making!;
-  for (const [name, options, want] of [
-    ["retina", { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 }, making.src],
-    ["plain", { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }, making.mobile],
+  for (const [name, options] of [
+    ["retina", { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 }],
+    ["plain", { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }],
   ] as const) {
     const context = await browser.newContext({ ...options, baseURL: process.env.BASE_URL ?? "http://localhost:3001" });
     await silence(context);
     const page = await context.newPage();
     await skipIntro(page);
-    await page.goto("/pieces/campione-d-italia-2023-2024", { waitUntil: "load" });
-    await ready(page);
-    const preview = page.locator("[data-atelier-preview]");
-    await preview.scrollIntoViewIfNeeded();
-    await expect(preview, name).toHaveAttribute("src", want);
-    await expect.poll(() => preview.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 30_000 }).toBeGreaterThan(0.3);
-    const short = await preview.evaluate((v) => Math.min((v as HTMLVideoElement).videoWidth, (v as HTMLVideoElement).videoHeight));
-    expect(short, name).toBe(name === "retina" ? 1080 : 720);
+    await page.goto("/atelier?piece=campione-d-italia-2023-2024", { waitUntil: "load" });
+    const video = page.locator("[data-atelier-room] [data-atelier-video]");
+    await expect(video, name).toHaveAttribute("src", making.src);
+    await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 30_000 }).toBeGreaterThan(0.3);
+    const short = await video.evaluate((v) => Math.min((v as HTMLVideoElement).videoWidth, (v as HTMLVideoElement).videoHeight));
+    expect(short, name).toBe(1080);
     await context.close();
   }
 });

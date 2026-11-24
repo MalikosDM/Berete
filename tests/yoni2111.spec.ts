@@ -18,6 +18,8 @@ import { personHref, piecesOf, publicCatalogue } from "../src/data/relations";
 import { BACKDROPS, resolveTheme } from "../src/data/themes";
 import { onTrunksPage, trunkOf } from "../src/data/trunks";
 import media from "../src/data/media.generated.json" with { type: "json" };
+import { resolveReveal } from "../src/data/atelier";
+import { featureFilmOf } from "../src/data/featureFilms";
 import { skipIntro, watch } from "./helpers";
 
 const DIR = "verification/yoni2111";
@@ -64,28 +66,30 @@ const drawn = (img: Locator) =>
 
 /* ---------- 1. Dragon Ball ---------- */
 
-test("Dragon Ball: its main view much larger and whole; its edit 13/v01 opens the capsule, once in its atelier", async ({ page }, info) => {
+// 24/11/2026 (Yoni): its edit 13/v01 opens on 4.5 s of 3D modelling: never shown as the finished piece any more (its reveal
+// is none); the film section of its page is its film made for the page (dragon-ball-hero); the edit stays its making-of, in
+// The Atelier, played once.
+test("Dragon Ball: its main view much larger and whole; its film after the opening; its edit 13/v01 once in its atelier", async ({ page }, info) => {
   const problems = watch(page);
   const phone = info.project.name !== "desktop";
   const film = FILMS[DRAGON]!;
   expect(film.reveal?.source, "the professional edit in HD").toBe("13/v01 · HD 1080p");
   expect(film.making?.source).toBe(film.reveal?.source);
-  await skipIntro(page, { films: false });
+  expect(resolveReveal(DRAGON, defaultCatalogue.pieces.find((p) => p.slug === DRAGON)!.atelier), "no 3D shown as the finished piece").toBeNull();
+  const hero = featureFilmOf(DRAGON)!.film;
+  await skipIntro(page);
   await page.goto("/pieces/" + DRAGON);
-  // The piece first (23/11/2026); its film in its own section: its own copy for the screen, playing.
+  // The piece first; its film in its own section right after the opening, its own copy for the screen, playing.
   await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
   await page.waitForTimeout(1000);
   await expect(page.locator("[data-piece-film]")).toHaveCount(0);
-  await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
-  await page.locator("[data-watch-film-section]").click();
-  const video = page.locator("[data-piece-film-video]");
-  await expect(page.locator("[data-piece-film]")).toBeVisible({ timeout: 15_000 });
+  const section = page.locator("[data-feature-film='" + DRAGON + "']");
+  await section.locator("[data-feature-frame]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  const video = section.locator("[data-feature-video]");
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 30_000 }).toBeGreaterThan(0.6);
-  expect(await video.evaluate((v) => new URL((v as HTMLVideoElement).currentSrc, location.href).pathname)).toBe(phone ? film.reveal!.mobile : film.reveal!.src);
+  expect(await video.evaluate((v) => new URL((v as HTMLVideoElement).currentSrc, location.href).pathname)).toBe(phone ? (hero.mobile ?? hero.video) : hero.video);
   await page.waitForTimeout(1500);
   await shot(page, info.project.name + "-dragon-1-film");
-  await page.locator("[data-piece-film-skip]").click();
-  await expect(page.locator("[data-piece-film]")).toHaveCount(0);
   await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(1200);
@@ -104,10 +108,12 @@ test("Dragon Ball: its main view much larger and whole; its edit 13/v01 opens th
   expect(box.left).toBeGreaterThanOrEqual(0);
   expect(box.left + box.width).toBeLessThanOrEqual(vp.width + 1);
   await shot(page, info.project.name + "-dragon-2-piece");
-  // Its atelier: the same edit, played once.
-  const atelier = page.locator("[data-atelier-passage]");
-  await atelier.scrollIntoViewIfNeeded();
-  await expect(atelier).toBeVisible();
+  // Its atelier, in The Atelier: the same edit, played once (no Final Reveal).
+  await expect(page.locator("[data-enter-atelier-link]")).toHaveAttribute("href", "/atelier?piece=" + DRAGON);
+  await page.goto("/atelier?piece=" + DRAGON);
+  const room = page.locator("[data-atelier-room]");
+  await expect(room.locator("[data-atelier-video]")).toHaveAttribute("src", phone ? film.making!.mobile : film.making!.src);
+  await expect(room.locator("[data-chapter='reveal']")).toHaveCount(0);
   expect(problems.errors).toEqual([]);
 });
 

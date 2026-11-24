@@ -215,17 +215,39 @@ input[type="radio"] {
   font-family: var(--font-display);
   font-weight: 300;
   text-transform: uppercase;
-  letter-spacing: 0.18em;
-  line-height: 1.05;
+  letter-spacing: 0.16em;
+  line-height: 1.1;
+}
+
+/*
+ * One scale of sizes for the whole site (Yoni, call of 23-24/11/2026: "luxury does not shout" — small, thin titles, a lot of
+ * air, as Rolex, Patek Philippe or Audemars Piguet): the title of a page (t-hero), of a section (t-title), a quote or a
+ * large line (t-lead), a small title (t-sub). On a computer the whole site is drawn a little smaller (html, below).
+ */
+@utility t-hero {
+  font-size: clamp(1.625rem, 2.3vw, 2.5rem);
+}
+@utility t-title {
+  font-size: clamp(1.375rem, 1.8vw, 2rem);
+}
+@utility t-lead {
+  font-size: clamp(1.1875rem, 1.4vw, 1.5rem);
+}
+@utility t-sub {
+  font-size: clamp(1.0625rem, 1.1vw, 1.25rem);
 }
 
 @utility eyebrow {
   font-family: var(--font-sans);
-  font-size: var(--text-sm);
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.26em;
   color: var(--color-rose-light);
+  @media (max-width: 767px) {
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+  }
 }
 
 @utility no-scrollbar {
@@ -253,9 +275,10 @@ input[type="radio"] {
     overflow-x: clip;
   }
 
-  @media (min-width: 768px) {
-    body {
-      font-size: 1.0625rem;
+  /* A computer: the whole site a little smaller (every size in rem follows), its text 15 px. Phones keep 16 px. */
+  @media (min-width: 1024px) {
+    html {
+      font-size: 93.75%;
     }
   }
 
@@ -2627,8 +2650,8 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   font-style: var(--u-font-style, normal);
   text-transform: var(--u-font-case, uppercase);
   letter-spacing: var(--u-font-tracking, 0.06em);
-  /* Discreet beside the jewel (20/11/2026), still the first thing read. */
-  font-size: calc(clamp(1.75rem, 2.7vw, 2.75rem) * var(--u-font-scale, 1));
+  /* Discreet beside the jewel (20/11/2026; smaller still, 24/11/2026), still the first thing read. */
+  font-size: calc(clamp(1.5rem, 2vw, 2.125rem) * var(--u-font-scale, 1));
   line-height: 1.1;
 }
 html[lang="ar"] [data-piece] [data-u-title] {
@@ -2636,7 +2659,7 @@ html[lang="ar"] [data-piece] [data-u-title] {
   font-weight: 400;
   font-style: normal;
   letter-spacing: 0;
-  font-size: clamp(1.75rem, 2.7vw, 2.75rem);
+  font-size: clamp(1.5rem, 2vw, 2.125rem);
 }
 /* Engraved in gold, like a trophy. */
 [data-font="trophee"] [data-u-title] {

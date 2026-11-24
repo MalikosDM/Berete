@@ -62,7 +62,7 @@ export default function Layout() {
           </a>
           <Link
             to="/contact"
-            className="flex min-h-[52px] items-center justify-center gap-2 bg-white px-3 py-1 text-center text-base leading-tight font-semibold text-ink transition-colors active:bg-bone"
+            className="flex min-h-[52px] items-center justify-center gap-2 bg-white px-3 py-1 text-center text-base leading-tight font-medium text-ink transition-colors active:bg-bone"
           >
             {t.common.startPiece}
             <ArrowRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />

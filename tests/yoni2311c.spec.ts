@@ -23,12 +23,15 @@ test("Dragon Ball: the view with its chain larger on a computer, its chain fadin
   await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p19");
   await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-xl", "");
   if (desktop(info.project.name)) {
-    // A fifth larger than the frame, the jewel itself above the bottom of the screen.
+    // Larger than its frame (a fifth until 24/11/2026; since then 1.04, the whole piece in the first screen of a laptop), the
+    // jewel itself above the bottom of the screen.
     const view = page.locator(".sv-xl");
     await expect(view).toHaveCount(1);
-    const frame = (await page.locator("[data-piece-cover]").boundingBox())!;
+    const cover = page.locator("[data-piece-cover]");
+    const frame = (await cover.boundingBox())!;
+    const pad = await cover.evaluate((e) => parseFloat(getComputedStyle(e).paddingTop) + parseFloat(getComputedStyle(e).paddingBottom));
     const box = (await view.boundingBox())!;
-    expect(box.height).toBeGreaterThan((frame.height - 184) * 1.15);
+    expect(box.height).toBeGreaterThan((frame.height - pad) * 1.02);
     expect(box.y + box.height).toBeLessThanOrEqual(900);
   }
   await page.waitForTimeout(800);
@@ -43,11 +46,20 @@ test("Dragon Ball: the view with its chain larger on a computer, its chain fadin
 test("Butterfly: the film of the setting of its wings in its making-of; its trunk open on the chain, the best photo first", async ({ page }, info) => {
   const problems = watch(page);
   for (const lang of ["", "/fr"]) {
-    await open(page, lang + "/pieces/michy-batshuayi-butterfly-pendant");
-    const step = page.locator("[data-making-step='setting']");
+    // Its making-of in The Atelier since 24/11/2026: its film opens at once; closed, its steps are there.
+    await open(page, lang + "/atelier?piece=michy-batshuayi-butterfly-pendant");
+    const room = page.locator("[data-atelier-room]");
+    await expect(room).toBeVisible();
+    // (Again until it is gone: the page may still be settling when it opens.)
+    await expect(async () => {
+      if (await room.count()) await page.keyboard.press("Escape");
+      await expect(room).toHaveCount(0, { timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
+    const step = page.locator("[data-atelier-piece='michy-batshuayi-butterfly-pendant'] [data-making-step='setting']");
     await step.scrollIntoViewIfNeeded();
     await expect(step.locator("[data-making-open] video")).toHaveAttribute("src", EXTRA["michy-batshuayi-butterfly-pendant"]!.setting!.src);
     await expect(step.locator("[data-making-more]")).toHaveCount(1);
+    await open(page, lang + "/pieces/michy-batshuayi-butterfly-pendant");
     // Its trunk section: all its photos, whole, the trunk open from the front first; the way to it on the page of the trunks.
     const trunk = page.locator("[data-custom-box='butterfly-trunk']");
     await trunk.scrollIntoViewIfNeeded();

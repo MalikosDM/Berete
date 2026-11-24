@@ -4902,6 +4902,20 @@
     ]
   },
   "house": {
+    "chapitre-04": {
+      "type": "image",
+      "src": "/media/house/chapitre-04.webp",
+      "width": 1440,
+      "height": 1929,
+      "onBlack": true
+    },
+    "chapitre-11": {
+      "type": "image",
+      "src": "/media/house/chapitre-11.webp",
+      "width": 1440,
+      "height": 1920,
+      "onBlack": false
+    },
     "portrait": {
       "type": "image",
       "src": "/media/house/portrait.webp",

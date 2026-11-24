@@ -5,12 +5,13 @@ import { useI18n } from "@/i18n";
 
 
 /**
- * A film shown large in its own section (Yoni, 22-23/11/2026: the film of the Dragon Ball pendant on the home page and at the
- * top of its page; the cross of Malik Tillman that turns): it plays silently, in a loop, when it comes on screen and rests
- * when it leaves; a button gives its sound (when it has one), another shows it full screen. Never before it is near (its file
- * is asked for then), never on its own with "reduce motion" (a button plays it). On a phone, its lighter copy.
+ * A film in its own section (Yoni, 22-23/11/2026; 24/11/2026: the film of the finished piece on every page of a piece, right
+ * after its opening): it plays silently, in a loop, when it comes on screen and rests when it leaves — no button to press; a
+ * small button gives its sound (when it has one), another shows it full screen. Always whole in the screen, never cut nor
+ * wider than it. Never before it is near (its file is asked for then), never on its own with "reduce motion" (a button plays
+ * it). On a phone, its lighter copy.
  */
-export default function FeatureFilm({ film, id, label, eyebrow, title, children, data, flip = false }: { film: FeatureFilmData; id: string; label: string; eyebrow: string; title: string; children?: ReactNode; data: string; flip?: boolean }) {
+export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, children, data, flip = false, compact = false }: { film: FeatureFilmData; id: string; anchor?: string; label: string; eyebrow: string; title: string; children?: ReactNode; data: string; flip?: boolean; compact?: boolean }) {
   const { t } = useI18n();
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -88,16 +89,18 @@ export default function FeatureFilm({ film, id, label, eyebrow, title, children,
     else video.webkitEnterFullscreen?.();
   };
 
-  const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/40 bg-ink/65 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light";
+  const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/35 bg-ink/60 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:size-10";
+  // Whole in the screen: as high as the screen allows (under the menu), as wide as the page allows.
+  const tall = compact ? "min(74svh, 40rem" : "min(86svh, 52rem";
   return (
-    <section aria-labelledby={id} data-feature-film={data} className="border-t border-white/10">
-      <div className="mx-auto grid max-w-[1600px] items-center gap-10 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-28">
+    <section id={anchor} aria-labelledby={id} data-feature-film={data} className="scroll-mt-24 border-t border-white/10">
+      <div className={"mx-auto grid items-center gap-8 px-5 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:px-12 " + (compact ? "max-w-[1240px] py-14 lg:py-16" : "max-w-[1400px] py-16 lg:py-24")}>
         <div className={"flex justify-center lg:col-span-7 " + (flip ? "lg:order-2" : "")}>
           <div
             ref={frameRef}
             data-feature-frame
-            className="feature-film relative aspect-[9/16] h-[min(90svh,calc((100vw-2.5rem)*16/9))] max-w-full overflow-hidden border border-white/10 bg-black"
-            style={{ aspectRatio: film.width + " / " + film.height }}
+            className="feature-film relative max-w-full overflow-hidden border border-white/10 bg-black"
+            style={{ aspectRatio: film.width + " / " + film.height, height: tall + ", calc((100vw - 2.5rem) * " + film.height + " / " + film.width + "))" }}
           >
             <video
               ref={videoRef}
@@ -114,24 +117,24 @@ export default function FeatureFilm({ film, id, label, eyebrow, title, children,
               onClick={togglePlay}
               className="h-full w-full cursor-pointer object-contain"
             />
-            <div className="absolute end-3 bottom-3 flex gap-2">
+            <div className="absolute end-2.5 bottom-2.5 flex gap-1.5">
               <button type="button" onClick={togglePlay} data-feature-play aria-label={playing ? t.feature.pause : t.feature.play} className={btn}>
-                {playing ? <Pause className="size-5" aria-hidden="true" /> : <Play className="size-5 translate-x-0.5" aria-hidden="true" />}
+                {playing ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4 translate-x-0.5" aria-hidden="true" />}
               </button>
               {film.audio ? (
                 <button type="button" onClick={toggleSound} data-feature-sound aria-pressed={!muted} aria-label={muted ? t.feature.soundOn : t.feature.soundOff} className={btn}>
-                  {muted ? <VolumeX className="size-5" aria-hidden="true" /> : <Volume2 className="size-5" aria-hidden="true" />}
+                  {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4" aria-hidden="true" />}
                 </button>
               ) : null}
               <button type="button" onClick={fullScreen} data-feature-fullscreen aria-label={t.feature.fullscreen} className={btn}>
-                <Maximize className="size-5" aria-hidden="true" />
+                <Maximize className="size-4" aria-hidden="true" />
               </button>
             </div>
           </div>
         </div>
         <div className={"lg:col-span-5 " + (flip ? "lg:order-1" : "")}>
           <p className="eyebrow">{eyebrow}</p>
-          <h2 id={id} className="title-caps mt-5 text-[clamp(1.875rem,4vw,3.5rem)] leading-[1.1] tracking-[0.08em] text-white [text-wrap:balance]">
+          <h2 id={id} className="title-caps mt-4 t-title leading-[1.15] tracking-[0.1em] text-white [text-wrap:balance]">
             {title}
           </h2>
           {children}

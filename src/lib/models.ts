@@ -84,7 +84,26 @@ export function metalsInWords(selection: Selection, words: Messages["viewer"], i
 
 /* ---------- The client space (/vip) ---------- */
 
-export type VipAnswer = { state: "ok"; name: string; pieces: PublicModel[] } | { state: "out" };
+/** A photo or a video of a news of the atelier (served only to the client: server/routes/vip.ts). */
+export type VipFile = { id: string; kind: "image" | "video"; url: string; width: number | null; height: number | null };
+/** A news of the atelier: its day ("2027-03-12"), a short note, its photos and videos. */
+export type VipUpdate = { id: string; date: string; note: string; createdAt: string; files: VipFile[] };
+
+/**
+ * The client entered: his pieces in 3D and the follow-up of his commission: the step of his piece among the six of The
+ * Bespoke Journey (0 to 5; 6: every step done), its estimated day and, when it changed, the day it replaced and when; the
+ * news of the atelier, newest first.
+ */
+export type VipSpace = {
+  state: "ok";
+  name: string;
+  pieces: PublicModel[];
+  stage: number;
+  estimatedAt: string | null;
+  dateChange: { previous: string; at: string } | null;
+  updates: VipUpdate[];
+};
+export type VipAnswer = VipSpace | { state: "out" };
 
 async function vipCall(path: string, body?: object): Promise<Record<string, unknown>> {
   if (!HAS_SERVER) return { state: "out" };
@@ -109,7 +128,9 @@ export async function vipEnter(by: { code: string } | { token: string }): Promis
 /** The client entered and his pieces, or { state: "out" }. */
 export async function vipMe(): Promise<VipAnswer> {
   const answer = await vipCall("me");
-  return answer.state === "ok" ? (answer as unknown as VipAnswer) : { state: "out" };
+  if (answer.state !== "ok") return { state: "out" };
+  const space = answer as Partial<VipSpace>;
+  return { state: "ok", name: space.name ?? "", pieces: space.pieces ?? [], stage: space.stage ?? 0, estimatedAt: space.estimatedAt ?? null, dateChange: space.dateChange ?? null, updates: space.updates ?? [] };
 }
 
 export async function vipLeave(): Promise<void> {

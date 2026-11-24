@@ -811,13 +811,13 @@
     "id": "p28",
     "kind": "face",
     "width": 1600,
-    "height": 1205,
+    "height": 1199,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "a1f28a13a3",
+    "version": "3f6c97c364",
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 28.jpg",
@@ -837,22 +837,6 @@
     "fade": null,
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 27.jpg",
-    "note": ""
-   },
-   {
-    "id": "p26",
-    "kind": "back",
-    "width": 1600,
-    "height": 1321,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "version": "6f14971063",
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 26.jpg",
     "note": ""
    }
   ],
@@ -1227,6 +1211,78 @@
     ],
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/kevin-schade-twisted-chain-studio-ia.jpg",
+    "note": ""
+   }
+  ],
+  "brt-flower-chain": [
+   {
+    "id": "s29",
+    "kind": "face",
+    "width": 1600,
+    "height": 1172,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "f93f7cf6ef",
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 29.jpg",
+    "note": ""
+   }
+  ],
+  "two-row-tennis-chain": [
+   {
+    "id": "p04",
+    "kind": "face",
+    "width": 1600,
+    "height": 1619,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "cc0ab7aff5",
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/03 Chaine tennis 2 rangs/03 Chaine tennis 2 rangs - 04.jpg",
+    "note": ""
+   },
+   {
+    "id": "p01",
+    "kind": "face",
+    "width": 1600,
+    "height": 1382,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "dc7bb4727b",
+    "fade": null,
+    "clean": true,
+    "source": "Dossiers icloud/03 Chaine tennis 2 rangs/03 Chaine tennis 2 rangs - 01.jpg",
+    "note": ""
+   }
+  ],
+  "white-iced-cuban-chain": [
+   {
+    "id": "p02",
+    "kind": "face",
+    "width": 1600,
+    "height": 1205,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "c3aa85e2c0",
+    "fade": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/33 Chaine cubaine glacee/33 Chaine cubaine glacee - 02.jpg",
     "note": ""
    }
   ]

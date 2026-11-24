@@ -24,24 +24,24 @@ export default function NotFound() {
           404
         </h1>
         <div className="rule-rose mx-auto mt-10 max-w-md" aria-hidden="true" />
-        <p className="title-caps mx-auto mt-10 max-w-3xl text-[clamp(1.5rem,4vw,3rem)] tracking-[0.14em] text-white">
+        <p className="title-caps mx-auto mt-10 max-w-3xl t-lead tracking-[0.14em] text-white">
           {t.notFound.title}
         </p>
-        <p className="mx-auto mt-6 max-w-xl text-lg text-mist">
+        <p className="mx-auto mt-6 max-w-xl text-base text-mist">
           {t.notFound.text}
         </p>
 
         <div className="mt-12 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
           <Link
             to="/"
-            className="inline-flex min-h-14 items-center justify-center gap-3 border border-white/40 px-8 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
+            className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/40 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
           >
             <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             {t.notFound.home}
           </Link>
           <Link
             to="/contact"
-            className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light"
+            className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
           >
             {t.common.startPiece}
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />

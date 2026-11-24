@@ -312,9 +312,11 @@ for (const [slug, piece] of ORDER) {
     // (Its name as the page writes it, in French.)
     await expect(closeButton).toHaveAttribute("aria-label", "Refermer : " + (await card.locator("h3").evaluate((e) => e.textContent!.trim())));
     await expect(card.locator("[data-trunk-replay]")).toHaveText("Revoir l’ouverture");
+    // (A computer draws the site at 15 px since 24/11/2026, its buttons smaller and thinner: 41 to 45 px high, 12 to 15 px
+    // text; a phone keeps 48 and 16.)
     for (const b of [create, closeButton, card.locator("[data-trunk-replay]"), ...(piece ? [discover] : [])]) {
-      expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(48);
-      expect(await b.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+      expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(phone ? 48 : 40);
+      expect(await b.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(phone ? 16 : 12);
     }
     await card.evaluate((el) => el.scrollIntoView({ block: "center" }));
     await page.waitForTimeout(300);

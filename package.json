@@ -29,7 +29,8 @@
     "vps": "bash deploy/vps.sh",
     "brand": "node scripts/brand-media.mjs",
     "mechanisms": "node scripts/mechanism-media.mjs",
-    "extra-media": "node scripts/extra-media.mjs"
+    "extra-media": "node scripts/extra-media.mjs",
+    "page-media": "node scripts/page-media.mjs"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",

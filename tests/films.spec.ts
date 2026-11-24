@@ -1,11 +1,13 @@
 // The films of the site from the originals in HD (21/11/2026, "Videos HD/" of the folders of Yoni, scripts/film-media.mjs):
 // on a computer true 1080p, on a phone a light 720p copy, never heavier than before; their images taken from the
-// originals; every film loaded only once it is seen (the finished piece when the page opens, the making-of when its
-// passage comes on screen, the room after the click). Six capsules, on a computer and an iPhone, silent (fixtures).
-// Screenshots go to verification/films/.
+// originals; every film loaded only once it is near (since 24/11/2026: the finished piece in its section right after the
+// opening, src/components/FeatureFilm.tsx; the making-of in The Atelier only, /atelier?piece=<slug>, its room opening at
+// once). Six capsules, on a computer and an iPhone, silent (fixtures). Screenshots go to verification/films/.
 import { mkdirSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Locator, type Page } from "./fixtures";
+import { resolveReveal } from "../src/data/atelier";
+import { defaultCatalogue } from "../src/data/catalogue";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { skipIntro, watch } from "./helpers";
 
@@ -58,62 +60,50 @@ const play = (video: Locator) =>
   });
 
 for (const slug of CAPSULES) {
-  test(slug + ": its films in HD on a computer, light on a phone, each loaded once seen", async ({ page }, info) => {
+  test(slug + ": its films in HD on a computer, light on a phone, each loaded once near", async ({ page }, info) => {
     const problems = watch(page);
     const phone = info.project.name !== "desktop";
     const name = info.project.name + "-" + slug;
-    const { making, reveal } = FILMS[slug]!;
+    const { making } = FILMS[slug]!;
+    // The film of the finished piece shown on its page (none for the Inter ring since 24/11/2026: its film was a 3D render).
+    const reveal = resolveReveal(slug, defaultCatalogue.pieces.find((p) => p.slug === slug)!.atelier)?.film as Film | undefined;
     const asked = new Set<string>();
     page.on("request", (r) => {
       const path = new URL(r.url()).pathname;
-      if (path.endsWith(".mp4")) asked.add(path);
+      if (path.startsWith("/media/films/") && path.endsWith(".mp4")) asked.add(path);
     });
-    await skipIntro(page, { films: false });
+    await skipIntro(page);
     await page.goto("/fr/pieces/" + slug);
+    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
 
-    // 1. The finished piece (since 23/11/2026 in its own section, at a click): nothing loaded before the click, then the copy
-    //    made for the screen, sharp, playing.
+    // 1. The finished piece, in its section right after the opening: the copy made for the screen, sharp, playing by itself.
+    const section = page.locator("[data-feature-film='" + slug + "']");
     if (reveal) {
-      await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
-      await page.waitForTimeout(1000);
-      expect([...asked]).toEqual([]);
-      await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
-      await page.locator("[data-watch-film-section]").click();
-      const video = page.locator("[data-piece-film-video]");
-      await expect(page.locator("[data-piece-film]")).toBeVisible();
+      await section.locator("[data-feature-frame]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+      const video = section.locator("[data-feature-video]");
       await expect.poll(async () => (await play(video)).time, { timeout: 30_000 }).toBeGreaterThan(0.6);
       const state = await play(video);
       expect(state.paused).toBe(false);
       expect(state.src).toBe(phone ? reveal.mobile : reveal.src);
       if (isHd(slug, "reveal")) expect(state.short).toBe(phone ? 720 : 1080);
-      expect([...asked]).toEqual([state.src]);
       await page.waitForTimeout(500);
       await shot(page, name + "-1-film");
-      await page.locator("[data-piece-film-skip]").click();
-      await expect(page.locator("[data-piece-film]")).toHaveCount(0);
-    }
-    await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
+    } else await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+    // Down the whole page: no other film of the piece is asked for (its making-of lives in The Atelier).
+    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    for (let y = 0; y < height; y += 700) await page.evaluate((top) => window.scrollTo(0, top), y).then(() => page.waitForTimeout(150));
+    await page.waitForTimeout(600);
+    expect([...asked]).toEqual(reveal ? [phone ? reveal.mobile : reveal.src] : []);
 
-    // 2. The making-of: nothing before its passage is on screen, then its light copy, playing by itself, silent.
+    // 2. The making-of, in The Atelier: its room opens at once, the film for the screen, true 1080p on a computer.
     if (making) {
-      // (The film section stands just before the atelier: once it was scrolled to, the atelier may have come near already.)
-      if (!reveal) expect([...asked].filter((p) => p.includes("/making"))).toEqual([]);
-      const passage = page.locator("[data-atelier-passage]");
-      await passage.scrollIntoViewIfNeeded();
-      const preview = passage.locator("[data-atelier-preview]");
-      await expect.poll(async () => (await play(preview)).time, { timeout: 30_000 }).toBeGreaterThan(0.3);
-      expect(asked).toContain(making.mobile);
-      if (isHd(slug, "making")) expect((await play(preview)).short).toBe(720);
-      await page.waitForTimeout(500);
-      await shot(page, name + "-2-atelier");
-
-      // 3. In the room, after the click: the film for the screen, true 1080p on a computer.
-      await passage.locator("[data-enter-atelier]").click();
+      await page.goto("/fr/atelier?piece=" + slug);
       const room = page.locator("[data-atelier-room]");
       const video = room.locator("[data-atelier-video]");
       await expect(video).toHaveAttribute("src", phone ? making.mobile : making.src);
       await expect.poll(async () => (await play(video)).time, { timeout: 30_000 }).toBeGreaterThan(1);
       if (isHd(slug, "making")) expect((await play(video)).short).toBe(phone ? 720 : 1080);
+      expect(asked).toContain(phone ? making.mobile : making.src);
       await page.waitForTimeout(500);
       await shot(page, name + "-3-room");
       await room.locator("[data-atelier-close]:visible").click();

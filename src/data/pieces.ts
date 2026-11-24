@@ -38,7 +38,6 @@ export const OLD_SEEN_LABEL = "Metal and stones";
  */
 export const REMOVED_PIECES = [
   "jack-nameplate-pendant",
-  "marcus-thuram-infinity-chain",
   "marcus-thuram-snowflake-pendant",
   "marcus-thuram-jesus-piece",
   "marcus-thuram-signet-ring",
@@ -47,13 +46,14 @@ export const REMOVED_PIECES = [
   "tanguy-nianzou-nz-pendant",
   "tanguy-nianzou-nz-ring",
   "sidney-eweka-999-pendant",
-  // The tennis chain of two rows (folder 03), crossed out by Yoni on his albums (20/11/2026).
-  "two-row-tennis-chain",
   // Too few photos (feedback of Yoni, 21/11/2026): back on the site the day they have more.
   "flaneur-medallion",
   "two-tone-iced-cuban-chain",
-  "white-iced-cuban-chain",
   "pear-link-chain",
+  // One sheet with BRT Flowers since 24/11/2026 (Yoni: the same chain); its address leads there (RENAMED_PIECES).
+  "kevin-schade-twisted-chain",
+  // Back on the site on 24/11/2026 (Yoni could not find them): the tennis chain of two rows (folder 03), the white Cuban
+  // chain (folder 33), the Infinity Link (without the name of Marcus Thuram, under which Yoni had it removed on 19/11).
 ];
 
 /** Pieces worn together (22/11/2026): a pendant and the chain it is worn on. The page of each leads to the other. */
@@ -93,6 +93,10 @@ export const RENAMED_PIECES: Record<string, string> = {
   butterfly: "michy-batshuayi-butterfly-pendant",
   // The Butterfly of Michy Batshuayi is two pieces since 22/11/2026 (Yoni): its old address is the pendant's.
   "michy-batshuayi-butterfly-chain": "michy-batshuayi-butterfly-pendant",
+  // BRT Flowers is one chain in two widths (Yoni, 24/11/2026): the twisted chain of Kevin Schade is this sheet.
+  "kevin-schade-twisted-chain": "brt-flower-chain",
+  // The Infinity Link, back on the site without the name under which it was removed (24/11/2026).
+  "marcus-thuram-infinity-chain": "infinity-link-chain",
   // "Bouzou — Pendant" (folder 14) is the pendant of Loïs Openda (Yoni, 21/11/2026): one piece, at his address.
   "script-nameplate-pendant": "lois-openda-script-pendant",
 };
@@ -328,7 +332,8 @@ const SITE_PIECES: Piece[] = [
     client: "VfB Stuttgart",
     theme: { preset: "victoire-rouge" },
     // The crest ring face on as the hero (Yoni, 23/11/2026).
-    showcase: { size: "large", views: ["p13", "p12", "p18"] },
+    // Smaller since 24/11/2026: the squad seen on each side of the ring.
+    showcase: { views: ["p13", "p12", "p18"] },
     // Its photos, the most striking first (23/11/2026): the ring whole, then its crest.
     ...sorted(VFB, [vfb.front, vfb.open, vfb.cup, vfb.engraving, vfb.profile, vfb.crest, vfb.undav, vfb.stiller, vfb.mittelstaedt, vfb.karazor, vfb.squad], firsts(VFB, ["p13", "p17", "p20", "p18", "p06", "p11", "p12", "p22", "p01", "p14", "p15", "p16", "p21", "p19", "p08", "p04", "p05"])),
     handover: [vfb.presentation, vfb.showcase, vfb.shown, st("collectors", 41, at("VfB Stuttgart players with the ring", "The squad and its ring"))],
@@ -364,10 +369,23 @@ const SITE_PIECES: Piece[] = [
     client: "Inter Milan",
     theme: { preset: "victoire-nuit" },
     // Its face view as the hero (Yoni, 23/11/2026).
-    showcase: { size: "large", views: ["p08", "p13", "p54", "p04", "p44"] },
+    // Smaller since 24/11/2026: the squad seen on each side of the ring.
+    showcase: { views: ["p08", "p13", "p54", "p04", "p44"] },
+    // Its film of the finished piece (25/v01) is a 3D animation, never shown as the finished piece (Yoni, 24/11/2026).
+    atelier: { reveal: null },
     // Its photos, the most striking first (23/11/2026): its face (p08, Yoni), the ring whole on black, then the details.
     ...sorted(INTER, [inter.ring, inter.emblem, inter.stars, inter.flag, inter.side, inter.serieA, inter.cup, inter.pendant, inter.brt, inter.squad, inter.glove], firsts(INTER, ["p08", "p55", "p13", "p54", "p56", "p57", "p49", "p01", "p41", "p02", "v10", "p14", "p52", "p53", "p48", "p06", "p12", "p15", "p46", "p47", "p50", "p51", "p43", "p45", "p03", "p04", "p05", "p44", "p42", "p40"])),
-    handover: [st("inter-squad", 2, at("Inter players with their rings", "The Moment of Victory")), ...inter.received, st("inter-squad", 5, at("An Inter player receives his ring"))],
+    // Yoni with the players and their rings (24/11/2026: the stories 21 Inter Squad all in "Worn by"; 01 and 06 from their
+    // originals, without the mention of the story).
+    handover: [
+      st("inter-squad", 2, at("Inter players with their rings", "The Moment of Victory")),
+      ...inter.received,
+      st("inter-squad", 5, at("An Inter player receives his ring")),
+      extra(INTER, "dumfries", { ...at("Denzel Dumfries with his ring and its box"), onBlack: false }),
+      st("inter-squad", 3, { ...at("Yoni Berete with Hakan Çalhanoğlu and his ring"), onBlack: false }),
+      st("inter-squad", 4, { ...at("Yoni Berete with an Inter player and his ring"), onBlack: false }),
+      extra(INTER, "box-opened", { ...at("An Inter player opens the box of his ring"), onBlack: false }),
+    ],
     press: [
       { outlet: "Daily Mail", title: "Arnautovic, Thuram and Calhanoglu commission diamond rings for their Inter teammates", url: DAILY_MAIL_ARTICLE, image: null },
       { outlet: "Het Nieuwsblad", title: "Inter celebrates its twentieth title with championship rings", url: null, image: null },
@@ -460,6 +478,9 @@ const SITE_PIECES: Piece[] = [
     // 23/11/2026 evening (Yoni: « la photo avec la chaîne est trop petite ») : on a computer larger still ("xl"), its chain
     // leaving the top of the screen, faded; on a phone it already fills the frame.
     showcase: { size: "xl", mode: "single", views: ["p19"] },
+    // Its edit 13/v01 opens on its 3D model: a making-of (in The Atelier), never its finished piece (Yoni, 24/11/2026); the
+    // film of its finished piece is its hero film (src/data/featureFilms.ts).
+    atelier: { reveal: null },
     ...sorted("kevin-schade-dragon-ball-pendant", [
       yoni("kevin-schade-dragon-ball-pendant", "p19", at("The Dragon Ball pendant on black, with its Cuban chain")),
       yoni("kevin-schade-dragon-ball-pendant", "p18", at("Kevin Schade's Dragon Ball pendant, seen from the front")),
@@ -1248,18 +1269,15 @@ const SITE_PIECES: Piece[] = [
     },
   }),
   piece({
-    slug: "marcus-thuram-infinity-chain",
-    title: "Marcus Thuram — Infinity Link Chain",
+    // Back on the site on 24/11/2026 (Yoni could not find it), without the name of a person: the same chain in rose gold and in
+    // white gold, alone on the bust. Its photos are those of a phone (a studio photo on black is asked of Yoni).
+    slug: "infinity-link-chain",
+    title: "Infinity Link Chain",
     type: "chain",
-    line: "Infinity links, set with diamonds.",
-    story: "Chains of infinity links set with diamonds, worn by Marcus Thuram with his Jesus piece.",
-    people: ["marcus-thuram"],
-    cover: still("pieces/marcus-thuram-infinity-chain/cover", at("Marcus Thuram's infinity link chains on a bust")),
-    gallery: [
-      st("thuram-ss23", 4, at("Film of the infinity link chains")),
-      st("thuram-ss23", 3, at("Film of the chain with the Jesus piece")),
-      st("thuram-ss23", 1, at("Marcus Thuram wearing his infinity link chain", "Worn by Marcus Thuram")),
-    ],
+    line: "Infinity links, set with diamonds, in rose and in white.",
+    story: "Links in the shape of infinity, each one paved with diamonds, joined by polished bars. The same chain is made in rose gold tones and in white gold tones, worn alone or together.",
+    cover: still("pieces/marcus-thuram-infinity-chain/cover", at("The Infinity Link chain in rose gold and in white gold, on a bust")),
+    gallery: [st("thuram-ss23", 4, at("Film of the two Infinity Link chains"))],
     specs: [
       ["Type", "Chain"],
       ["Links", "Infinity links"],
@@ -1301,14 +1319,17 @@ const SITE_PIECES: Piece[] = [
       "Its links are flowers of marquise-cut diamonds in rose gold, and the clasp is a flower too, around the BRT mark.",
     people: ["noah-okafor"],
     theme: { preset: "roses", glow: "#f6e2da" },
-    ...sorted("the-safi-link", [
-      yoni("the-safi-link", "p07", at("The Safi Link chain on a black bust")),
-      yoni("the-safi-link", "p03", at("A flower of marquise and pear-shaped diamonds", "The flower")),
-      yoni("the-safi-link", "p02", at("The clasp, a flower with the BRT mark", "The clasp")),
-      yoni("the-safi-link", "p04", at("The twisted rose gold links between the flowers")),
-      yoni("the-safi-link", "p05", at("The Safi Link on a black bust, from the side")),
+    // Its photos on the same deep black as its cover (Yoni, 24/11/2026: the flower and the clasp were lighter), the chain whole
+    // from the front first (scripts/extra-media.mjs); worn, in "Worn by".
+    cover: extra("the-safi-link", "front", at("The Safi Link chain on a black bust, from the front")),
+    gallery: [
+      extra("the-safi-link", "three-quarter", at("The Safi Link on a black bust, at three quarters")),
+      extra("the-safi-link", "flower", at("A flower of marquise and pear-shaped diamonds", "The flower")),
+      extra("the-safi-link", "clasp", at("The clasp, a flower with the BRT mark", "The clasp")),
+      extra("the-safi-link", "links", at("The twisted rose gold links between the flowers")),
+      extra("the-safi-link", "side", at("The Safi Link on a black bust, from the side")),
       yoni("the-safi-link", "p01", { ...at("A chain of diamond flowers seen from behind, worn"), onBlack: false }),
-    ]),
+    ],
     specs: [
       ["Type", "Chain"],
       ["Links", "Flowers of marquise-cut diamonds"],
@@ -1326,7 +1347,12 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "japon" },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
     // The most striking first (23/11/2026): the chain whole, on the bust, then its details; the trunk at the end.
-    ...sorted("sirius", [], firsts("sirius", ["p27", "p28", "p29", "p25", "p18", "p20", "p23", "p17", "p16", "p22", "p24", "p21", "p14", "p15", "p08", "p12", "p19", "p11", "p13", "p10", "p09", "v03", "p26", "p05", "p02", "p01", "p03", "p04"])),
+    // 24/11/2026 (Yoni): on Sirius only — no back, no photo of the chain alone (it is BRT Flowers), no trunk without it; its
+    // plate from the front straightened (it leaned to the left: scripts/extra-media.mjs).
+    ...(() => {
+      const s = sorted("sirius", [], ["p27", "p25", "p18", "p20", "p23", "p21", "p14", "p15", "p08", "p12", "p19", "p11", "p13", "p10", "p09", "v03", "p04"]);
+      return { cover: s.cover, gallery: [extra("sirius", "plate-front", at("The Sirius nameplate from the front")), ...s.gallery] };
+    })(),
     specs: [
       ["Type", "Chain and nameplate"],
       ["Box", "Sirius trunk"],
@@ -1592,16 +1618,42 @@ const COLLECTED: Piece[] = [
     ],
     seen: "Rose gold tone · round diamonds in pavé, baguettes",
   }),
-  collected({
+  piece({
+    // One sheet since 24/11/2026 (Yoni): the BRT Flower chain, the twisted chain of Kevin Schade and the chain of Sirius are
+    // one chain, the signature of the house, in two widths. Its cover: the whole chain from the front (folder 37, p29).
     slug: "brt-flower-chain",
-    title: "BRT Flower Chain",
+    title: "BRT Flowers",
     type: "chain",
-    line: "Twisted links, flowers of diamonds, a clasp signed BRT.",
+    line: "The signature chain of the house, in two widths.",
     story:
-      "Along twisted links in rose gold tones, paved with diamonds, run flowers of round diamonds with leaves of marquise-cut diamonds. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.",
+      "BRT Flowers is the signature chain of Berete Jewellers. Along twisted links in rose gold tones, paved with diamonds, run flowers of round diamonds with leaves of marquise-cut diamonds. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.\n\n" +
+      "It is made in two widths, 12 mm and 16 mm. It is the chain of the Sirius piece, and the one Kevin Schade wears.",
+    people: ["kevin-schade"],
     theme: { preset: "roses" },
+    ...(() => {
+      const own = sorted("brt-flower-chain", []);
+      const studio = extra("kevin-schade-twisted-chain", "studio", at("BRT Flowers laid flat, in the studio"));
+      return {
+        cover: yoni("sirius", "p29", at("BRT Flowers, the whole chain on a black bust")),
+        gallery: [
+          own.cover,
+          ...own.gallery,
+          yoni("sirius", "p24", at("BRT Flowers on the bust, from the side")),
+          yoni("sirius", "p16", at("Its twisted links and its diamond flowers")),
+          yoni("sirius", "p17", at("Its twisted links and its diamond flowers")),
+          yoni("sirius", "p22", at("Its clasp, signed BRT", "The clasp")),
+          studio,
+          st("kevin-schade", 3, at("The chain of Kevin Schade laid in its box")),
+          st("kevin-schade", 14, at("Film of the chain and its diamond flowers")),
+          st("kevin-schade", 1, at("Kevin Schade wearing his chain", "Worn by Kevin Schade")),
+        ],
+      };
+    })(),
+    // He wears the chain only, not the Dragon Ball pendant (story 03/02, confirmed by Yoni, 21/11/2026).
+    handover: [st("kevin-schade", 2, { ...at("Kevin Schade, wearing his chain, at its handover", "Handed over"), onBlack: false })],
     specs: [
       ["Type", "Chain"],
+      ["Widths", "12 mm and 16 mm"],
       ["Signature", "BRT mark on the clasp"],
     ],
     seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
@@ -1613,6 +1665,8 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "baguette-cuban-chain",
+    // Its cover: the whole chain from the front (24/11/2026; p01 is at three quarters, cut on its right).
+    order: ["p05"],
     title: "Baguette Cuban Chain",
     type: "chain",
     line: "Baguettes in every link, white and rose in turn.",
@@ -1627,6 +1681,8 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "rose-iced-cuban-chain",
+    // Its cover: the whole chain from the front (24/11/2026; p01 was seen at an angle).
+    order: ["p02"],
     title: "14 mm Cuban Chain",
     type: "chain",
     line: "A 14 mm Cuban chain, paved link by link, its clasp signed BRT.",
@@ -1664,6 +1720,8 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "white-iced-cuban-chain",
+    // Its cover: the whole chain from the front on black (24/11/2026).
+    order: ["p02", "p03", "p01"],
     title: "White Iced Cuban Chain",
     type: "chain",
     line: "White links, paved, under a domed clasp.",
@@ -1681,6 +1739,8 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "two-row-tennis-chain",
+    // Its cover: the rose gold chain whole from the front, then its white gold version (24/11/2026).
+    order: ["p04", "p05", "p06", "p01", "p02", "p03"],
     title: "Two-Row Tennis Chain",
     type: "chain",
     line: "Two rows of diamonds, side by side.",
@@ -1733,6 +1793,8 @@ const COLLECTED: Piece[] = [
       extra(INTER_PENDANT, "black", at("The top of the Inter ring worn as a pendant, on black")),
       extra(INTER_PENDANT, "worn", { ...at("The Inter pendant worn on a chain"), onBlack: false }),
     ],
+    // Worn (story 06/17, 24/11/2026).
+    handover: [st("inter-milan", 17, { ...at("The Inter pendant worn"), onBlack: false })],
     specs: [
       ["Type", "Pendant"],
       ["Motif", "The top of the Campione d'Italia ring"],

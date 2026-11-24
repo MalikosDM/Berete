@@ -9,6 +9,7 @@
  *   storage/models/<model id>/light.glb        phones
  *   storage/models/<model id>/poster.webp      still image of the saved view
  *   storage/uploads/<upload id>.part           a file being received, piece by piece
+ *   storage/vip/<client id>/<file id>.<ext>    a photo or a video of the news of a client (/vip): clientFiles below
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -16,6 +17,7 @@ import path from "node:path";
 const ROOT = path.resolve(process.env.MODELS_DIR ?? "storage");
 const MODELS = path.join(ROOT, "models");
 const UPLOADS = path.join(ROOT, "uploads");
+const CLIENTS = path.join(ROOT, "vip");
 
 export const MODEL_FILES = ["full.glb", "light.glb", "poster.webp"] as const;
 export type ModelFile = (typeof MODEL_FILES)[number];
@@ -96,5 +98,27 @@ export const storage = {
       const file = path.join(UPLOADS, f);
       if (fs.statSync(file).mtimeMs < old) fs.rmSync(file, { force: true });
     }
+  },
+};
+
+/** The photos and videos of the news of the clients (/vip): never public, served by server/routes/vip.ts. */
+export const clientFiles = {
+  /** Path of one file, for reading (null when missing). */
+  file(clientId: string, fileId: string, ext: string): string | null {
+    const file = path.join(CLIENTS, check(clientId), check(fileId) + "." + check(ext));
+    return fs.existsSync(file) ? file : null;
+  },
+  /** Moves a received upload (storage.uploadPath) into the folder of a client. */
+  adopt(uploadId: string, clientId: string, fileId: string, ext: string): void {
+    const dir = path.join(CLIENTS, check(clientId));
+    fs.mkdirSync(dir, { recursive: true });
+    fs.renameSync(storage.uploadPath(uploadId), path.join(dir, check(fileId) + "." + check(ext)));
+  },
+  remove(clientId: string, fileId: string, ext: string): void {
+    fs.rmSync(path.join(CLIENTS, check(clientId), check(fileId) + "." + check(ext)), { force: true });
+  },
+  /** Every file of a client (the client deleted). */
+  removeClient(clientId: string): void {
+    fs.rmSync(path.join(CLIENTS, check(clientId)), { recursive: true, force: true });
   },
 };

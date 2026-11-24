@@ -9,6 +9,7 @@ import { defaultCatalogue } from "../src/data/catalogue";
 import { anglePhotos, wornSet } from "../src/data/angles";
 import { publicCatalogue } from "../src/data/relations";
 import { resolveShowcase } from "../src/data/showcase";
+import { INTER_VICTORY, VFB_VICTORY } from "../src/data/themes";
 
 const V = "\\.[0-9a-f]{10}\\.";
 const desktop = (name: string) => name === "desktop" || name === "safari";
@@ -20,94 +21,104 @@ async function open(page: Page, path: string) {
   await page.waitForLoadState("load").catch(() => undefined);
 }
 
-/** The pointer over the photo of an element, then the lens shown over it (computers). */
-async function hover(page: Page, img: ReturnType<Page["locator"]>, at = 0.5) {
-  await img.scrollIntoViewIfNeeded();
-  await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).naturalWidth), { timeout: 15_000 }).toBeGreaterThan(0);
-  const b = (await img.boundingBox())!;
-  await page.mouse.move(b.x + b.width / 2, b.y + b.height * at, { steps: 5 });
-}
-
-test("the magnifying glass: photos only, never a film, on Dragon Ball and five other pieces, in their galleries, the creations, the trunks", async ({ page }, info) => {
+// 24/11/2026 (Yoni): no magnifying glass over the pages any more (src/components/Loupe.tsx deleted: no lens that follows the
+// pointer, no + / − on the photos of the pages). It lives in the full screen only (src/components/Lightbox.tsx): the wheel
+// zooms where the pointer is, + and −, two fingers; never on a film. A click on the piece of the opening opens it there.
+test("the magnifying glass: in the full screen only, photos only, never a film; the opening, the galleries, the trunks", async ({ page }, info) => {
   const problems = watch(page);
+  const lb = page.locator("[data-lightbox]");
+  const zoom = async () => Number(await lb.locator("[data-lightbox-stage]").getAttribute("data-zoom"));
   const pieces = ["kevin-schade-dragon-ball-pendant", "campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "the-hand", "deniz-undav-l-pendant"];
   for (const slug of pieces) {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
-    // No film under the pointer, anywhere in the opening.
+    // No film in the opening, no lens over the page.
     await expect(page.locator("[data-piece-cover] video")).toHaveCount(0);
+    await expect(page.locator("[data-piece-lens], [data-loupe], [data-loupe-control]")).toHaveCount(0);
     if (!desktop(info.project.name)) continue;
-    const lens = page.locator("[data-piece-cover] [data-piece-lens]");
-    await hover(page, page.locator("[data-piece-cover] [data-place='0'] img"), 0.55);
-    await expect(lens, slug).toHaveAttribute("data-on", "");
-    await expect(page.locator("[data-piece-cover] video")).toHaveCount(0);
+    // A click on the piece of the opening: full screen, where the glass lives.
+    const main = page.locator("[data-piece-cover] [data-place='0'] img");
+    await expect.poll(() => main.evaluate((i) => (i as HTMLImageElement).naturalWidth), { timeout: 15_000 }).toBeGreaterThan(0);
+    const b = (await main.boundingBox())!;
+    await page.mouse.click(b.x + b.width / 2, b.y + b.height / 2);
+    await expect(lb, slug).toBeVisible();
+    await expect(lb.locator("[data-zoom-in]")).toBeVisible();
     if (slug === "kevin-schade-dragon-ball-pendant") {
-      // The wheel brings it closer, + and − too, never beyond the pixels of the file.
-      const before = Number(await lens.getAttribute("data-zoom"));
+      // The wheel brings it closer where the pointer is (no key needed), + and − too.
+      const s = (await lb.locator("[data-lightbox-stage]").boundingBox())!;
+      await page.mouse.move(s.x + s.width * 0.55, s.y + s.height * 0.5);
       await page.mouse.wheel(0, -300);
-      await expect.poll(async () => Number(await lens.getAttribute("data-zoom"))).not.toBe(before);
-      await expect(page.locator("[data-piece-cover] [data-loupe-control]")).toBeVisible();
+      await expect.poll(zoom).toBeGreaterThan(1);
       await page.waitForTimeout(400);
       await page.screenshot({ path: shotPath(info, "yoni2311d-loupe-dragonball") });
-      // Its gallery: the same glass over a photo.
-      const first = page.locator("[data-every-angle] [data-angle='1'] [data-loupe] img");
-      await hover(page, first, 0.5);
-      await expect(page.locator("[data-every-angle] [data-piece-lens]")).toHaveAttribute("data-on", "");
-      const zoomIn = page.locator("[data-every-angle] [data-loupe-in]");
-      await expect(zoomIn).toBeVisible();
+    }
+    await page.keyboard.press("Escape");
+    await expect(lb).toHaveCount(0);
+    if (slug === "kevin-schade-dragon-ball-pendant") {
+      // Its gallery: a photo opens full screen, with the glass.
+      await page.locator("[data-every-angle] [data-angle='1'] button").click();
+      await expect(lb).toBeVisible();
+      await lb.locator("[data-zoom-in]").click();
+      await expect.poll(zoom).toBeGreaterThan(1);
       await page.screenshot({ path: shotPath(info, "yoni2311d-loupe-galerie") });
+      await page.keyboard.press("Escape");
+    }
+    if (slug === "campione-d-italia-2023-2024") {
+      // A film of the gallery (the films come last, after "See more") full screen: no glass, no zoom.
+      await page.locator("[data-every-angle] [data-angle-more]").click();
+      await page.locator("[data-every-angle] [data-angle-type='video'] button").first().click();
+      await expect(lb).toBeVisible();
+      await expect(lb.locator("video")).toHaveCount(1);
+      await expect(lb.locator("[data-zoom-in], [data-zoom-out]")).toHaveCount(0);
+      await page.keyboard.press("Escape");
     }
   }
   if (desktop(info.project.name)) {
-    // The creations: over the piece itself; + and − never follow the link of the card.
+    // The creations: no glass over the cards (a card is a way into the piece).
     await open(page, "/creations");
-    const card = page.locator("[data-piece-card='kevin-schade-dragon-ball-pendant'] [data-loupe] img");
-    await hover(page, card, 0.5);
-    await expect(page.locator("[data-creations-grid] ~ [data-piece-lens], [data-piece-lens]").first()).toHaveAttribute("data-on", "");
+    await expect(page.locator("[data-piece-lens], [data-loupe], [data-loupe-in]")).toHaveCount(0);
     await expect(page.locator("main video")).toHaveCount(0);
     await page.screenshot({ path: shotPath(info, "yoni2311d-loupe-creations") });
-    await page.locator("[data-loupe-in]").first().click();
-    await expect(page).toHaveURL(/\/creations$/);
-    // The photos of a trunk.
+    // The photos of a trunk: full screen, with the glass.
     await open(page, "/boxes");
     await page.locator("[data-box-photos='sirius']").click();
-    await hover(page, page.locator("[data-box-gallery='sirius'] [data-box-photo='0'] img"), 0.5);
-    await expect(page.locator("[data-box-gallery='sirius'] [data-piece-lens]")).toHaveAttribute("data-on", "");
+    await page.locator("[data-box-gallery='sirius'] [data-box-photo='0']").click();
+    await expect(lb).toBeVisible();
+    await lb.locator("[data-zoom-in]").click();
+    await expect.poll(zoom).toBeGreaterThan(1);
   } else {
     // A phone: a touch on the jewel opens it full screen, two fingers to zoom.
     await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
     await page.locator("[data-piece-cover] [data-showcase-slide='0'] button").tap();
-    await expect(page.locator("[data-lightbox]")).toBeVisible();
+    await expect(lb).toBeVisible();
     await expect(page.locator("[data-lightbox] img").first()).toHaveAttribute("src", /\/media\/cutouts\/kevin-schade-dragon-ball-pendant\//);
   }
   expect(problems.errors).toEqual([]);
 });
 
-test("the film of the Dragon Ball pendant: on the home page after its opening, at the top of its page; silent in a loop, its sound and full screen", async ({ page }, info) => {
+// 24/11/2026 (Yoni: "the immersive part is not for the home page"): on the home page, its photo and a circle where only its
+// sphere turns (silent, in a loop, while on screen), one sentence, "Enter the World"; its film stays at the top of its page.
+test("the Dragon Ball pendant: its sphere turning in a circle on the home page; its film at the top of its page, silent in a loop", async ({ page }, info) => {
   const problems = watch(page);
   for (const lang of ["", "/fr"]) {
     await open(page, lang + "/");
     // The page settles first (its language loaded, it may come back to its top once).
     await page.waitForTimeout(2500);
-    const section = page.locator("[data-feature-film='home']");
-    // Right after the opening of the home page.
-    const order = await page.evaluate(() => ["[data-home-hero]", "[data-feature-film='home']", "[data-special-project]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
+    await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+    const section = page.locator("[data-home-innovation]");
+    // Right after the piece of the opening, before the great commissions.
+    const order = await page.evaluate(() => ["[data-home-hero]", "[data-home-innovation]", "[data-special-project]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
     expect(order[0]!).toBeLessThan(order[1]!);
     expect(order[1]!).toBeLessThan(order[2]!);
+    const video = section.locator("[data-sphere-film]");
     // (Scrolled again until it is on screen: the page may come back to its top while it settles.)
     await expect(async () => {
-      await section.scrollIntoViewIfNeeded();
-      await expect(section.locator("[data-feature-frame]")).toBeInViewport({ ratio: 0.4, timeout: 1_500 });
+      await video.scrollIntoViewIfNeeded();
+      await expect(video).toBeInViewport({ ratio: 0.5, timeout: 1_500 });
     }).toPass({ timeout: 20_000 });
-    const video = section.locator("[data-feature-video]");
-    await expect(video).toHaveAttribute("src", new RegExp("^/media/mechanisms/dragon-ball-hero" + (desktop(info.project.name) ? "" : "-mobile") + V + "mp4$"), { timeout: 15_000 });
+    await expect(video).toHaveAttribute("src", new RegExp("^/media/pages/dragon-ball-sphere" + V + "mp4$"), { timeout: 15_000 });
     await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
     expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop }))).toEqual({ muted: true, loop: true });
-    await expect(section.locator("[data-feature-fullscreen]")).toBeVisible();
-    // Its sound at a button.
-    await section.locator("[data-feature-sound]").click();
-    await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).muted)).toBe(false);
-    await section.locator("[data-feature-sound]").click();
     await expect(section).toContainText(lang ? "Mais pour nous, l’énergie n’a jamais été faite pour rester immobile." : "But to us, energy was never meant to remain still.");
     await expect(section.locator("a[data-innovation-link]")).toHaveAttribute("href", lang + "/pieces/kevin-schade-dragon-ball-pendant");
     await page.waitForTimeout(500);
@@ -122,8 +133,17 @@ test("the film of the Dragon Ball pendant: on the home page after its opening, a
   await expect(top.locator("[data-feature-video]")).toHaveAttribute("src", /dragon-ball-hero/, { timeout: 15_000 });
   await page.waitForTimeout(600);
   await page.screenshot({ path: shotPath(info, "yoni2311d-dragonball-film") });
-  // The making-of keeps its place.
-  await expect(page.locator("[data-making]")).toBeAttached();
+  // Its film silent, in a loop, its sound and full screen at buttons.
+  const video = top.locator("[data-feature-video]");
+  await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
+  expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop }))).toEqual({ muted: true, loop: true });
+  await expect(top.locator("[data-feature-fullscreen]")).toBeVisible();
+  await top.locator("[data-feature-sound]").click();
+  await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).muted)).toBe(false);
+  await top.locator("[data-feature-sound]").click();
+  // The making-of lives in The Atelier since 24/11/2026: a way there.
+  await expect(page.locator("[data-making]")).toHaveCount(0);
+  await expect(page.locator("[data-enter-atelier-link]")).toHaveAttribute("href", "/atelier?piece=kevin-schade-dragon-ball-pendant");
   expect(problems.errors).toEqual([]);
 });
 
@@ -156,9 +176,10 @@ test("the worlds: the sky of the L, the victory of Inter and of VfB (the squad b
   const backdrop = () => page.locator(".u-backdrop img").first().evaluate((el) => (el as HTMLImageElement).currentSrc);
   const worlds: [string, string, string][] = [
     ["deniz-undav-l-pendant", "ciel", "ciel"],
-    ["campione-d-italia-2023-2024", "victoire-nuit", "inter-victoire"],
-    ["campione-d-italia-pendant", "victoire-nuit", "inter-victoire"],
-    ["vfb-stuttgart-dfb-pokal-2025", "victoire-rouge", "vfb-victoire"],
+    // (The versions v2 since 24/11/2026: INTER_VICTORY and VFB_VICTORY of src/data/themes.ts.)
+    ["campione-d-italia-2023-2024", "victoire-nuit", INTER_VICTORY],
+    ["campione-d-italia-pendant", "victoire-nuit", INTER_VICTORY],
+    ["vfb-stuttgart-dfb-pokal-2025", "victoire-rouge", VFB_VICTORY],
     ["marcus-thuram-ruby-t-necklace", "gothique", "gothique"],
   ];
   for (const [slug, preset, file] of worlds) {
@@ -181,7 +202,8 @@ test("the worlds: the sky of the L, the victory of Inter and of VfB (the squad b
 test("the studio photos first, the L cut out cleanly; Marcus Thuram with Kanye West on his profile; the galleries open on their best photos", async ({ page }, info) => {
   const problems = watch(page);
   // Data: their studio photo first in "Every Angle", their worn ones in "Worn by".
-  for (const slug of ["kevin-schade-twisted-chain", "radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion", "deniz-undav-l-pendant"]) {
+  // (The twisted chain of Kevin Schade is BRT Flowers since 24/11/2026: its own photos of the chain on black first.)
+  for (const slug of ["radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion", "deniz-undav-l-pendant"]) {
     const piece = cat.pieces.find((p) => p.slug === slug)!;
     expect(piece.cover.src, slug).toMatch(new RegExp("^/media/extra/" + slug + "/studio" + V + "webp$"));
     const shown = resolveShowcase(slug, piece.showcase);

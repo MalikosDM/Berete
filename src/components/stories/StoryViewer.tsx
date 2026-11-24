@@ -360,12 +360,12 @@ export default function StoryViewer({ stories, start, startStep = 0, onClose, on
         <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black via-black/70 to-transparent px-4 pt-20 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="pointer-events-auto flex flex-col gap-3">
             {story.articleUrl ? (
-              <a href={story.articleUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-5 text-base font-semibold text-ink">
+              <a href={story.articleUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-5 text-base font-medium text-ink">
                 {t.common.readArticle} <ArrowUpRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
               </a>
             ) : null}
             <div className="flex gap-3">
-              <a href={waLink(storyMessage)} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-semibold " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
+              <a href={waLink(storyMessage)} target="_blank" rel="noreferrer" className={"inline-flex min-h-12 flex-1 items-center justify-center gap-2 px-5 text-base font-medium " + (story.articleUrl ? "border border-white/60 text-white" : "bg-white text-ink")}>
                 <BrandIcon name="whatsapp" className="size-5" /> {t.stories.want}
               </a>
               {piece ? (

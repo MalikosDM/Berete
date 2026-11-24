@@ -191,6 +191,57 @@
    "height": 1600
   }
  },
+ "the-safi-link": {
+  "front": {
+   "src": "/media/extra/the-safi-link/front.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "three-quarter": {
+   "src": "/media/extra/the-safi-link/three-quarter.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "flower": {
+   "src": "/media/extra/the-safi-link/flower.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "clasp": {
+   "src": "/media/extra/the-safi-link/clasp.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "links": {
+   "src": "/media/extra/the-safi-link/links.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  },
+  "side": {
+   "src": "/media/extra/the-safi-link/side.14460900df.webp",
+   "width": 1067,
+   "height": 1600
+  }
+ },
+ "sirius": {
+  "plate-front": {
+   "src": "/media/extra/sirius/plate-front.266a8f86bb.webp",
+   "width": 1066,
+   "height": 1600
+  }
+ },
+ "campione-d-italia-2023-2024": {
+  "dumfries": {
+   "src": "/media/extra/campione-d-italia-2023-2024/dumfries.5ab23fbe26.webp",
+   "width": 1066,
+   "height": 1600
+  },
+  "box-opened": {
+   "src": "/media/extra/campione-d-italia-2023-2024/box-opened.5ab23fbe26.webp",
+   "width": 1067,
+   "height": 1600
+  }
+ },
  "house": {
   "desk-smile": {
    "src": "/media/extra/house/desk-smile.268a69dba8.webp",

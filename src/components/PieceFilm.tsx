@@ -133,7 +133,7 @@ export default function PieceFilm({ title, film, poster, theme, onClose }: { tit
               aria-label={muted ? t.films.soundOn : t.films.soundOff}
               className={
                 "absolute end-3 top-3 inline-flex min-h-12 items-center gap-2 rounded-full border px-4 text-base backdrop-blur-sm transition-colors " +
-                (muted ? "pf-sound-call border-white/70 bg-ink/70 font-semibold text-white" : "border-white/30 bg-ink/50 text-white hover:border-rose-light hover:text-rose-light")
+                (muted ? "pf-sound-call border-white/70 bg-ink/70 font-medium text-white" : "border-white/30 bg-ink/50 text-white hover:border-rose-light hover:text-rose-light")
               }
             >
               {muted ? <VolumeX className="size-5" aria-hidden="true" /> : <Volume2 className="size-5" aria-hidden="true" />}
@@ -144,7 +144,7 @@ export default function PieceFilm({ title, film, poster, theme, onClose }: { tit
         <div className="flex w-full max-w-md flex-col items-center gap-4 text-center lg:w-auto lg:max-w-sm lg:items-start lg:text-start">
           <div className="hidden sm:block">
             <p className="eyebrow">{t.films.reveal}</p>
-            <p data-u-title className="title-caps mt-3 text-[clamp(1.5rem,3vw,2.5rem)] leading-tight tracking-[0.06em] [text-wrap:balance]">
+            <p data-u-title className="title-caps mt-3 t-lead leading-tight tracking-[0.06em] [text-wrap:balance]">
               {title}
             </p>
           </div>
@@ -153,7 +153,7 @@ export default function PieceFilm({ title, film, poster, theme, onClose }: { tit
             type="button"
             onClick={leave}
             data-piece-film-skip
-            className="inline-flex min-h-14 w-full items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light sm:w-auto lg:mt-4"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light sm:w-auto lg:mt-4 lg:min-h-11 lg:text-[0.8125rem]"
           >
             {t.films.skip} <ArrowRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
           </button>

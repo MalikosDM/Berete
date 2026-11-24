@@ -1271,6 +1271,40 @@
    "portrait": true,
    "version": "e8c7b4b5f9"
   },
+  "inter-victoire-v2": {
+   "name": "Victoire, la nuit : toute l'équipe de l'Inter écharpes levées, confettis, feux d'artifice (Inter Milan, v2)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "fc9eb9b671"
+  },
+  "vfb-victoire-v2": {
+   "name": "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)",
+   "ratio": 1.792,
+   "focusX": 0.66,
+   "focusY": 0.5,
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "version": "91ac804abc"
+  },
   "gothique": {
    "name": "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)",
    "ratio": 1.792,

@@ -31,7 +31,7 @@ export default function PieceCard({ piece, eager = false, priority = false, show
           <span aria-hidden="true" className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-rose-light/15 to-transparent transition-transform duration-[1.6s] ease-out group-hover:translate-x-full" />
           <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
           {in3d ? (
-            <span data-card-3d className="absolute end-2 top-2 border border-rose-light/60 bg-ink/70 px-2 py-0.5 text-base font-semibold tracking-[0.16em] text-white backdrop-blur-sm">
+            <span data-card-3d className="absolute end-2 top-2 border border-rose-light/60 bg-ink/70 px-2 py-0.5 text-base font-medium tracking-[0.16em] text-white backdrop-blur-sm">
               <span aria-hidden="true">3D</span>
               <span className="sr-only">{t.viewer.available}</span>
             </span>
@@ -46,7 +46,7 @@ export default function PieceCard({ piece, eager = false, priority = false, show
           </span>
           {/* The signature button of every piece. */}
           {/* Its arrow follows its last word, on two lines too (a narrow card of a phone). */}
-          <span data-enter-world className="mt-2 block py-2 text-base leading-snug font-semibold text-rose-light transition-colors group-hover:text-white">
+          <span data-enter-world className="mt-2 block py-2 text-base leading-snug font-medium text-rose-light transition-colors group-hover:text-white">
             {t.common.enterWorld}
             <ArrowRight className="ms-1.5 inline size-4 align-[-0.15em] transition-transform duration-500 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
           </span>
@@ -64,26 +64,26 @@ export default function PieceCard({ piece, eager = false, priority = false, show
         <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
         {/* The pieces the jeweller attached a 3D model to. */}
         {in3d ? (
-          <span data-card-3d className="absolute end-3 top-3 border border-rose-light/60 bg-ink/70 px-3 py-1 text-base font-semibold tracking-[0.16em] text-white backdrop-blur-sm">
+          <span data-card-3d className="absolute end-3 top-3 border border-rose-light/60 bg-ink/70 px-3 py-1 text-base font-medium tracking-[0.16em] text-white backdrop-blur-sm">
             <span aria-hidden="true">3D</span>
             <span className="sr-only">{t.viewer.available}</span>
           </span>
         ) : null}
       </span>
-      <span className="mt-5 flex items-start justify-between gap-4">
+      <span className="mt-4 flex items-start justify-between gap-4">
         <span className="min-w-0">
-          <span className="title-caps block text-[clamp(1.375rem,2vw,1.875rem)] tracking-[0.06em] break-words text-white [text-wrap:balance] transition-colors group-hover:text-rose-light">{piece.title}</span>
-          <span className="mt-2 block text-base text-mist">
+          <span className="title-caps block text-base tracking-[0.06em] break-words text-white [text-wrap:balance] transition-colors group-hover:text-rose-light lg:text-[1.0625rem]">{piece.title}</span>
+          <span className="mt-1.5 block text-base text-mist lg:text-[0.875rem]">
             {showType ? t.types[piece.type] + " · " : ""}
             {t.common.madeFor(madeFor(cat, piece))}
           </span>
           {/* The signature button of every piece. */}
-          <span data-enter-world className="mt-4 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors group-hover:text-rose-light">
+          <span data-enter-world className="mt-2 inline-flex min-h-11 items-center gap-2 text-[0.8125rem] font-normal uppercase tracking-[0.14em] text-white transition-colors group-hover:text-rose-light max-sm:text-base max-sm:tracking-[0.06em] lg:min-h-10 lg:text-[0.75rem]">
             {t.common.enterWorld}
             <ArrowRight className="size-4 transition-transform duration-500 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
           </span>
         </span>
-        <ArrowUpRight className="mt-1 size-6 shrink-0 text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
+        <ArrowUpRight className="mt-1 hidden size-5 shrink-0 sm:block text-white transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-rose-light rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
       </span>
     </Link>
   );

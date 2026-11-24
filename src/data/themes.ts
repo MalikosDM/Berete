@@ -153,10 +153,13 @@ export type BackdropSpot = { k: string; tone?: string; seq?: boolean; i?: number
 export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
 
 /**
- * The victory of Inter Milan (23/11/2026): its squad lifting the trophy ("inter-victoire"), or the variant with its scarves
- * held up ("inter-victoire-echarpes"). The one setting to change if Yoni prefers the other.
+ * The victory of Inter Milan and of VfB Stuttgart. Since 24/11/2026 (Yoni: the first two were too alike and too close, the
+ * squad not seen) the v2: Inter at night, in blue, the whole squad scarves held up, confetti and fireworks; VfB at a red
+ * sunset, the whole squad lifting the cup, flares, gold and red confetti — seen wide. One setting each to go back to the
+ * former ones ("inter-victoire": the squad lifting the trophy; "inter-victoire-echarpes"; "vfb-victoire").
  */
-export const INTER_VICTORY: "inter-victoire" | "inter-victoire-echarpes" = "inter-victoire";
+export const INTER_VICTORY: "inter-victoire-v2" | "inter-victoire" | "inter-victoire-echarpes" = "inter-victoire-v2";
+export const VFB_VICTORY: "vfb-victoire-v2" | "vfb-victoire" = "vfb-victoire-v2";
 
 /** What a piece (or the admin) writes: a preset, and the parts it changes. */
 export type PieceTheme = {
@@ -220,7 +223,7 @@ export const THEME_PRESETS: Record<string, Preset> = {
   // rain of confetti, gold and red.
   "victoire-rouge": {
     name: "Victoire : l'équipe soulève la coupe, fumigènes rouges, confettis or et rouges (VfB Stuttgart)",
-    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: "vfb-victoire", entrance: "smoke", effects: ["confetti", "glints"], mark: "" },
+    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: VFB_VICTORY, entrance: "smoke", effects: ["confetti", "glints"], mark: "" },
   },
   // 23/11/2026 (Yoni: the sky, for the meaning of the angel; no more cathedral): above the clouds, rays of golden light, a
   // few feathers. The L and its angel large in front.

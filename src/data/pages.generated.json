@@ -1,0 +1,173 @@
+{
+ "hero-desktop": {
+  "width": 5504,
+  "height": 3072,
+  "avif": [
+   {
+    "w": 1280,
+    "src": "/media/pages/hero-desktop-1280.0a5b02735b.avif"
+   },
+   {
+    "w": 1920,
+    "src": "/media/pages/hero-desktop-1920.0a5b02735b.avif"
+   },
+   {
+    "w": 2560,
+    "src": "/media/pages/hero-desktop-2560.0a5b02735b.avif"
+   },
+   {
+    "w": 3200,
+    "src": "/media/pages/hero-desktop-3200.0a5b02735b.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 1280,
+    "src": "/media/pages/hero-desktop-1280.0a5b02735b.webp"
+   },
+   {
+    "w": 1920,
+    "src": "/media/pages/hero-desktop-1920.0a5b02735b.webp"
+   },
+   {
+    "w": 2560,
+    "src": "/media/pages/hero-desktop-2560.0a5b02735b.webp"
+   },
+   {
+    "w": 3200,
+    "src": "/media/pages/hero-desktop-3200.0a5b02735b.webp"
+   }
+  ],
+  "src": "/media/pages/hero-desktop-3200.0a5b02735b.webp"
+ },
+ "hero-mobile": {
+  "width": 3072,
+  "height": 5504,
+  "avif": [
+   {
+    "w": 720,
+    "src": "/media/pages/hero-mobile-720.8e6d48e2b0.avif"
+   },
+   {
+    "w": 1080,
+    "src": "/media/pages/hero-mobile-1080.8e6d48e2b0.avif"
+   },
+   {
+    "w": 1440,
+    "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 720,
+    "src": "/media/pages/hero-mobile-720.8e6d48e2b0.webp"
+   },
+   {
+    "w": 1080,
+    "src": "/media/pages/hero-mobile-1080.8e6d48e2b0.webp"
+   },
+   {
+    "w": 1440,
+    "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.webp"
+   }
+  ],
+  "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.webp"
+ },
+ "journey-consultation": {
+  "width": 4176,
+  "height": 3119,
+  "avif": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-consultation-480.b65ec10fb9.avif"
+   },
+   {
+    "w": 800,
+    "src": "/media/pages/journey-consultation-800.b65ec10fb9.avif"
+   },
+   {
+    "w": 1200,
+    "src": "/media/pages/journey-consultation-1200.b65ec10fb9.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-consultation-480.b65ec10fb9.webp"
+   },
+   {
+    "w": 800,
+    "src": "/media/pages/journey-consultation-800.b65ec10fb9.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/media/pages/journey-consultation-1200.b65ec10fb9.webp"
+   }
+  ],
+  "src": "/media/pages/journey-consultation-1200.b65ec10fb9.webp"
+ },
+ "journey-shoot": {
+  "width": 4800,
+  "height": 3584,
+  "avif": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-shoot-480.463bc5ff4a.avif"
+   },
+   {
+    "w": 800,
+    "src": "/media/pages/journey-shoot-800.463bc5ff4a.avif"
+   },
+   {
+    "w": 1200,
+    "src": "/media/pages/journey-shoot-1200.463bc5ff4a.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-shoot-480.463bc5ff4a.webp"
+   },
+   {
+    "w": 800,
+    "src": "/media/pages/journey-shoot-800.463bc5ff4a.webp"
+   },
+   {
+    "w": 1200,
+    "src": "/media/pages/journey-shoot-1200.463bc5ff4a.webp"
+   }
+  ],
+  "src": "/media/pages/journey-shoot-1200.463bc5ff4a.webp"
+ },
+ "sphere": {
+  "video": "/media/pages/dragon-ball-sphere.0f4049c0f4.mp4",
+  "poster": "/media/pages/dragon-ball-sphere.0f4049c0f4.webp",
+  "width": 600,
+  "height": 600
+ },
+ "journey-cad": {
+  "width": 776,
+  "height": 870,
+  "avif": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-cad-480.efa054a27a.avif"
+   },
+   {
+    "w": 776,
+    "src": "/media/pages/journey-cad-776.efa054a27a.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 480,
+    "src": "/media/pages/journey-cad-480.efa054a27a.webp"
+   },
+   {
+    "w": 776,
+    "src": "/media/pages/journey-cad-776.efa054a27a.webp"
+   }
+  ],
+  "src": "/media/pages/journey-cad-776.efa054a27a.webp"
+ }
+}

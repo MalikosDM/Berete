@@ -75,10 +75,10 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
         {/* The way in is never hidden by an animation (a keyboard reaches it at once). */}
         <div className="lg:col-span-5">
           <p className="eyebrow">{t.films.eyebrow}</p>
-          <h2 id="atelier-passage-title" className="title-caps mt-5 text-[clamp(2rem,5vw,4rem)] leading-[1.08] tracking-[0.12em] text-white [text-wrap:balance]">
+          <h2 id="atelier-passage-title" className="title-caps mt-5 t-title leading-[1.08] tracking-[0.12em] text-white [text-wrap:balance]">
             {t.films.enter}
           </h2>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-bone">{t.films.lead(piece.title, reveal !== null)}</p>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-bone">{t.films.lead(piece.title, reveal !== null)}</p>
           <ol className="mt-8 max-w-md border-t border-white/15">
             {chapters.map((c) => (
               <li key={c.n} className="flex items-baseline gap-4 border-b border-white/15 py-4">
@@ -92,7 +92,7 @@ export default function AtelierPassage({ piece, madeFor, atelier }: { piece: Pie
             type="button"
             onClick={enter}
             data-enter-atelier
-            className="mt-10 inline-flex min-h-14 items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light"
+            className="mt-10 inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
           >
             <Play className="size-5 fill-current" aria-hidden="true" /> {t.films.enter}
           </button>

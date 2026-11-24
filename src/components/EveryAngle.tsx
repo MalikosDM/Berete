@@ -1,40 +1,52 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import { Play, ZoomIn } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
-import Loupe, { pickMarked } from "@/components/Loupe";
 import { MediaView } from "@/components/Media";
-import { angleOf, anglesShownFirst } from "@/data/angles";
+import { angleOf } from "@/data/angles";
 import type { MediaItem, Piece } from "@/data/types";
 import { useI18n } from "@/i18n";
 
+/** The photos shown before "See more": one row on a computer, two by two on a phone (Yoni, 24/11/2026). */
+const FIRST = 4;
+
+/**
+ * The strongest photos first (Yoni, 24/11/2026): the whole piece seen from the front, on black — the photos on black in the
+ * order of the gallery (its best first), then the other photos, the films last; the rest after them, in its order.
+ */
+export function strongestFirst(given: MediaItem[]): MediaItem[] {
+  // Never the same photo twice.
+  const items = given.filter((m, i) => m.src && given.findIndex((x) => x.src === m.src) === i);
+  const rank = (m: MediaItem) => (m.type === "video" ? 2 : m.onBlack === false ? 1 : 0);
+  const first = [...items].map((m, i) => ({ m, i })).sort((a, b) => rank(a.m) - rank(b.m) || a.i - b.i).slice(0, FIRST).map((x) => x.m);
+  return [...first, ...items.filter((m) => !first.includes(m))];
+}
+
 /**
  * "Every Angle": every photo and film of the piece in a gallery (Yoni, 23/11/2026: no more texts that describe what is
- * already seen). Three on a row on a computer, two on a phone, all in the same frame; under a photo, at most a short caption,
- * only when it teaches something (src/data/angles.ts: its title; the admin "Sous tous les angles"). A piece with many photos
- * shows its first ones, then "See N more". Each photo loads as the visitor comes near it; a film plays silently only while
- * it is on screen. A click opens it full screen with the magnifying glass (src/components/Lightbox.tsx).
+ * already seen; 24/11/2026: one row of four on a computer, two by two on a phone, smaller, the four strongest first, then
+ * "See more" for the others). Under a photo, at most a short caption, only when it teaches something (src/data/angles.ts: its
+ * title; the admin "Sous tous les angles"). Each photo loads as the visitor comes near it; a film plays silently only while
+ * it is on screen. A click opens it full screen, where the magnifying glass lives (src/components/Lightbox.tsx).
  */
-export default function EveryAngle({ piece, items }: { piece: Piece; items: MediaItem[] }) {
+export default function EveryAngle({ piece, items: given }: { piece: Piece; items: MediaItem[] }) {
   const { t } = useI18n();
   const [open, setOpen] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
-  const zone = useRef<HTMLDivElement>(null);
-  if (items.length === 0) return null;
-  const shown = expanded ? items : items.slice(0, anglesShownFirst(items.length));
+  if (given.length === 0) return null;
+  const items = strongestFirst(given);
+  const shown = expanded ? items : items.slice(0, FIRST);
   const hidden = items.length - shown.length;
   const captionOf = (item: MediaItem) => angleOf(piece, item.src)?.title.trim() ?? "";
   // Full screen: the same short caption, or none (never the old descriptive one).
   const viewed = items.map((item) => ({ ...item, caption: captionOf(item) || undefined }));
 
   return (
-    <section aria-labelledby="every-angle" data-every-angle className="mx-auto max-w-[1600px] px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
-      <h2 id="every-angle" className="title-caps text-[clamp(2rem,5vw,4rem)] tracking-[0.12em]">
+    <section aria-labelledby="every-angle" data-every-angle className="mx-auto max-w-[1240px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
+      <h2 id="every-angle" className="title-caps t-title tracking-[0.12em]">
         {t.gallery.everyAngle}
       </h2>
-      {/* The magnifying glass over its photos (computers; never over a film). */}
-      <div ref={zone} className="relative">
-      <ol className="mt-10 grid grid-cols-2 gap-x-3 gap-y-6 border-t border-white/15 pt-10 sm:gap-x-5 lg:mt-12 lg:grid-cols-3 lg:gap-x-6 lg:gap-y-10 lg:pt-12">
+      <ol className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:mt-10 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-8">
         {shown.map((item, k) => {
           const caption = captionOf(item);
           const name = item.alt ?? (caption ? piece.title + " · " + caption : piece.title);
@@ -49,10 +61,9 @@ export default function EveryAngle({ piece, items }: { piece: Piece; items: Medi
                 }}
                 className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
                 aria-label={t.gallery.open(name)}
-                data-loupe={item.type === "image" ? item.src : undefined}
               >
                 <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]">
-                  <MediaView item={item} sizes="(max-width: 1023px) 46vw, 30vw" />
+                  <MediaView item={item} sizes="(max-width: 1023px) 46vw, 18rem" />
                 </span>
                 {item.type === "video" ? (
                   <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-ink/60 px-3 py-1 text-sm text-white">
@@ -75,15 +86,13 @@ export default function EveryAngle({ piece, items }: { piece: Piece; items: Medi
           );
         })}
       </ol>
-      <Loupe zone={zone} pick={pickMarked} />
-      </div>
       {hidden > 0 ? (
-        <div className="mt-14 flex justify-center lg:mt-20">
+        <div className="mt-8 flex justify-center lg:mt-10">
           <button
             type="button"
             onClick={() => setExpanded(true)}
             data-angle-more
-            className="inline-flex min-h-14 items-center justify-center border border-rose-light/70 px-8 text-base font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
+            className="inline-flex min-h-12 items-center justify-center border border-white/35 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
           >
             {t.gallery.more(hidden)}
           </button>

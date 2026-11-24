@@ -3,7 +3,10 @@
 // without descriptive texts, the new worlds, the Bosnia ring, the trunks, the atelier, the journey, the house, the press.
 // Computer (Chrome 1440), iPhone (WebKit 390) and Safari on a laptop (WebKit 1280). Silent (tests/fixtures.ts).
 import { expect, test, type Page } from "./fixtures";
+import { collectionPath, subcategoriesOf, visibleCollections } from "../src/data/collections";
+import { defaultCatalogue } from "../src/data/catalogue";
 import { RUBY_T_UNIVERSE } from "../src/data/pieces";
+import { publicCatalogue } from "../src/data/relations";
 import { shotPath, skipIntro, watch } from "./helpers";
 
 const V = "\\.[0-9a-f]{10}\\.";
@@ -21,9 +24,11 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   // No bubbles of stories, no film in the background, no universe of a capsule.
   await expect(page.locator("[data-stories-bar], [data-story-bubble]")).toHaveCount(0);
   await expect(page.locator(".universe")).toHaveCount(0);
-  // (Since the second call of 23/11/2026: the pencil sketch that becomes the jewel comes first, moved by the scroll only.)
+  // (Since the second call of 23/11/2026: the pencil sketch that becomes the jewel came first; since 24/11/2026 one photo,
+  // full screen, still: no film moved by the scroll any more.)
   await expect(page.locator("[data-home-hero] video")).toHaveCount(0);
-  await expect(page.locator("[data-scroll-video]")).toHaveCount(1);
+  await expect(page.locator("[data-scroll-video]")).toHaveCount(0);
+  await expect(page.locator("[data-home-photo] [data-home-photo-img]")).toBeVisible();
   // One sentence of who Berete is, the hook, two buttons.
   const hero = page.locator("[data-home-hero]");
   await expect(hero.locator("h1")).toHaveText("We don't begin with what has been done. We begin with what could be.");
@@ -37,19 +42,24 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   const box = (await jewel.boundingBox())!;
   expect(box.height).toBeGreaterThan(desktop(info.project.name) ? 450 : 300);
   await page.screenshot({ path: shotPath(info, "yoni2311-home") });
-  // In this order: the innovation, the commissions, the selection, the press.
-  const order = await page.evaluate(() => ["[data-scroll-video]", "[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
+  // In this order: the photo, the piece, the innovation, the commissions, the selection, the press.
+  const order = await page.evaluate(() => ["[data-home-photo]", "[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
   expect(order.every((y, i) => y >= 0 && (i === 0 || y > order[i - 1]!))).toBe(true);
-  // The Dragon Ball: its film, large (23/11/2026), and its capsule (tests/yoni2311d.spec.ts plays it).
+  // The Dragon Ball: since 24/11/2026 its photo and a circle where only its sphere turns (its film stays on its page), one
+  // sentence, its capsule.
   const inno = page.locator("[data-home-innovation]");
   await inno.scrollIntoViewIfNeeded();
-  await expect(inno.locator('a[href="/pieces/kevin-schade-dragon-ball-pendant"]')).toBeVisible();
-  await expect(inno.locator("[data-feature-video]")).toHaveAttribute("src", new RegExp("^/media/mechanisms/dragon-ball-hero(-mobile)?" + V + "mp4$"), { timeout: 15_000 });
+  await expect(inno.locator("[data-innovation-link]")).toHaveAttribute("href", "/pieces/kevin-schade-dragon-ball-pendant");
+  await expect(inno.locator("[data-feature-film]")).toHaveCount(0);
+  await inno.locator("[data-sphere-film]").scrollIntoViewIfNeeded();
+  await expect(inno.locator("[data-sphere-film]")).toHaveAttribute("src", new RegExp("^/media/pages/dragon-ball-sphere" + V + "mp4$"), { timeout: 15_000 });
   // The two great commissions.
   await expect(page.locator("[data-special-ring]")).toHaveCount(2);
   // Pendants, chains and rings, not only football.
   const types = await page.locator("[data-home-selection] [data-piece-card]").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-piece-card")));
   expect(types).toEqual(expect.arrayContaining(["the-hand", "butterfly-chain", "oval-eternity-band", "tulips-on-tour-medallion"]));
+  // The Safi Link first (24/11/2026).
+  expect(types[0]).toBe("the-safi-link");
   // The press: the articles with their link, BILD not yet.
   const outlets = await page.locator("[data-home-press] [data-press-outlet]").evaluateAll((a) => a.map((x) => x.getAttribute("data-press-outlet")));
   expect(outlets).toEqual(["Goal.com Deutschland", "Stuttgarter Nachrichten", "Daily Mail"]);
@@ -61,11 +71,14 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
 test("menu: the name of the house, the whole menu on a computer, the creations, the press", async ({ page }, info) => {
   await open(page, "/atelier");
   // BERETE JEWELLERS in the letters of the logo, beside the mark.
-  // (Since the second call of 23/11/2026: the logo as it was, the name again, large, in the middle of the bar.)
-  const wordmark = page.locator("[data-wordmark] span");
+  // (Since the second call of 23/11/2026: the logo as it was, the name again in the bar; since 24/11/2026 a sharp vector
+  // image, smaller, exactly in the middle of the page.)
+  const wordmark = page.locator("[data-wordmark] img");
   await expect(wordmark).toBeVisible();
-  expect((await wordmark.boundingBox())!.width).toBeGreaterThan(150);
-  expect(await wordmark.evaluate((el) => getComputedStyle(el).maskImage || getComputedStyle(el).webkitMaskImage)).toMatch(new RegExp("wordmark" + V + "svg"));
+  const mark = (await wordmark.boundingBox())!;
+  expect(mark.width).toBeGreaterThan(140);
+  expect(Math.abs(mark.x + mark.width / 2 - (await page.evaluate(() => document.documentElement.clientWidth)) / 2)).toBeLessThanOrEqual(2);
+  await expect(wordmark).toHaveAttribute("src", new RegExp("wordmark" + V + "svg"));
   const nav = page.locator("[data-desktop-nav]");
   const burger = page.locator('button[aria-controls="mobile-menu"]');
   if (desktop(info.project.name)) {
@@ -75,18 +88,15 @@ test("menu: the name of the house, the whole menu on a computer, the creations, 
     await expect(nav.locator('a[href="/press"]')).toBeVisible();
     const rows = await nav.locator(":scope > div > a, :scope > a").evaluateAll((links) => new Set(links.map((a) => Math.round(a.getBoundingClientRect().top))).size);
     expect(rows).toBe(1);
-    // Under « Creations »: All, Pendants (and Jesus Pieces), Chains, Rings, Watches.
+    // Under « Creations »: All, Pendants and their categories (Jesus Pieces among them), Chains and theirs, Rings, Watches
+    // (the categories since 24/11/2026).
     await nav.locator('a[href="/creations"]').first().hover();
     const menu = page.locator("[data-creations-menu]");
     await expect(menu).toBeVisible();
-    expect(await menu.locator("a").evaluateAll((a) => a.map((x) => x.getAttribute("href")))).toEqual([
-      "/creations",
-      "/creations/pendants",
-      "/creations/pendants/jesus-pieces",
-      "/creations/chains",
-      "/creations/rings",
-      "/creations/watches",
-    ]);
+    const cat = publicCatalogue(defaultCatalogue);
+    const hrefs = ["/creations", ...visibleCollections(cat).flatMap(({ collection }) => [collectionPath(collection), ...subcategoriesOf(cat, collection.type).map(collectionPath)])];
+    expect(hrefs).toEqual(expect.arrayContaining(["/creations/pendants", "/creations/pendants/jesus-pieces", "/creations/chains", "/creations/rings", "/creations/watches"]));
+    expect(await menu.locator("a").evaluateAll((a) => a.map((x) => x.getAttribute("href")))).toEqual(hrefs);
     await page.screenshot({ path: shotPath(info, "yoni2311-menu") });
   } else {
     await expect(nav).toBeHidden();
@@ -96,16 +106,18 @@ test("menu: the name of the house, the whole menu on a computer, the creations, 
   }
 });
 
-test("creations: the grid, 3 by 3, the filters and Jesus Pieces", async ({ page }, info) => {
+// (Four by four on a computer since 24/11/2026.)
+test("creations: the grid, 4 by 4, the filters and Jesus Pieces", async ({ page }, info) => {
   await open(page, "/creations");
   await expect(page.locator("[data-pieces-view]")).toHaveCount(0);
   const cards = page.locator("[data-creations-grid] > li");
   await expect(cards.first()).toBeVisible();
-  const tops = await cards.evaluateAll((li) => li.slice(0, 4).map((x) => Math.round(x.getBoundingClientRect().top)));
+  const tops = await cards.evaluateAll((li) => li.slice(0, 5).map((x) => Math.round(x.getBoundingClientRect().top)));
   if (desktop(info.project.name)) {
     expect(tops[0]).toBe(tops[1]);
     expect(tops[1]).toBe(tops[2]);
-    expect(tops[3]).toBeGreaterThan(tops[0]!);
+    expect(tops[2]).toBe(tops[3]);
+    expect(tops[4]).toBeGreaterThan(tops[0]!);
   }
   await page.locator('[data-filter="pendant"]').click();
   await page.locator('[data-subfilter="jesus-pieces"]').click();
@@ -113,7 +125,8 @@ test("creations: the grid, 3 by 3, the filters and Jesus Pieces", async ({ page 
   await page.screenshot({ path: shotPath(info, "yoni2311-creations") });
 });
 
-test("capsule: the piece at once, its film lower, the magnifying glass, the gallery without texts, the press", async ({ page }, info) => {
+// (24/11/2026: the film of the Inter ring was a 3D render, set to none: no film section on its page.)
+test("capsule: the piece at once, no film of a 3D render, the magnifying glass, the gallery without texts, the press", async ({ page }, info) => {
   const problems = watch(page);
   await open(page, "/pieces/campione-d-italia-2023-2024");
   // No film at the entrance.
@@ -150,12 +163,9 @@ test("capsule: the piece at once, its film lower, the magnifying glass, the gall
   await expect(lb.locator("[data-zoom-out]")).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(lb).toHaveCount(0);
-  // Its film, in its own section, full screen at a click.
-  const section = page.locator("[data-piece-film-section]");
-  await section.scrollIntoViewIfNeeded();
-  await section.locator("[data-watch-film-section]").click();
-  await expect(page.locator("[data-piece-film]")).toBeVisible();
-  await page.keyboard.press("Escape");
+  // No film section (its film was a 3D render), no "Watch the film".
+  await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+  await expect(page.locator("[data-watch-film]")).toHaveCount(0);
   // Its press: the Daily Mail.
   await expect(page.locator('[data-piece-press] a[href*="dailymail.co.uk"]')).toHaveCount(1);
   expect(problems.errors).toEqual([]);
@@ -278,7 +288,8 @@ test("atelier, journey, house, press", async ({ page }, info) => {
   await open(page, "/about");
   const chapters = page.locator("[data-house-chapter]");
   await expect(chapters).toHaveCount(12);
-  await expect(page.locator("[data-house-chapter] [data-house-photo]")).toHaveCount(12);
+  // (24/11/2026: only the photos of Yoni himself, seven chapters.)
+  await expect(page.locator("[data-house-chapter] [data-house-photo]")).toHaveCount(7);
 
   await open(page, "/press");
   const cards = page.locator("[data-press-card]");

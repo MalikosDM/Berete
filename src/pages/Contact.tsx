@@ -203,7 +203,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
           {open ? (
             <div id="email-form" ref={box} tabIndex={-1} className="mt-8 focus:outline-none">
               {status === "sent" ? (
-                <p role="status" data-email-sent className="flex items-start gap-3 text-lg text-bone">
+                <p role="status" data-email-sent className="flex items-start gap-3 text-base text-bone">
                   <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />
                   {sentPhotos > 0 ? t.contact.emailSentPhotos(sentPhotos) : t.contact.emailSent}
                 </p>
@@ -307,7 +307,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
                       </ul>
                     ) : null}
                     {photos.length < MAX_PHOTOS ? (
-                      <label className="inline-flex min-h-14 w-full cursor-pointer items-center justify-center gap-3 border border-white/40 px-5 text-base font-semibold uppercase tracking-[0.1em] text-white transition-colors focus-within:border-rose-light focus-within:text-rose-light hover:border-rose-light hover:text-rose-light sm:w-fit sm:px-6">
+                      <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 border border-white/40 px-5 text-base font-medium uppercase tracking-[0.1em] text-white transition-colors focus-within:border-rose-light focus-within:text-rose-light hover:border-rose-light hover:text-rose-light sm:w-fit sm:px-6 lg:min-h-11 lg:text-[0.8125rem]">
                         <ImagePlus className="size-5 shrink-0" aria-hidden="true" />
                         <span>{t.contact.addPhotos}</span>
                         <span className="whitespace-nowrap text-mist">{photos.length + " / " + MAX_PHOTOS}</span>
@@ -343,7 +343,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
                     <button
                       type="submit"
                       disabled={status === "sending" || preparing}
-                      className="inline-flex min-h-14 w-full items-center justify-center gap-2 bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light disabled:opacity-70 sm:w-auto"
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.8125rem]"
                     >
                       {status === "sending" ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : null}
                       {status === "sending" ? t.contact.sending : t.contact.emailButton}

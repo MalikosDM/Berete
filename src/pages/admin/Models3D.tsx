@@ -681,7 +681,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
       )}
 
       <details className="group border border-white/15 p-4 sm:p-5">
-        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-lg text-white">
+        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-white">
           <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden="true" /> Détails techniques
         </summary>
         <div className="mt-3 grid gap-4">

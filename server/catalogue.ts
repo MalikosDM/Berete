@@ -275,11 +275,15 @@ async function once(key: string, seeded: Set<string>, create: () => Promise<unkn
   await prisma.seededEntry.create({ data: { key } });
 }
 
-/** A piece renamed in the catalogue keeps its row and the links to it. */
-async function applyRenames(): Promise<void> {
+/**
+ * A piece renamed in the catalogue keeps its row and the links to it. A piece merged into another one that stays in the
+ * catalogue, unpublished (the twisted chain of Kevin Schade in BRT Flowers, 24/11/2026), keeps its own row: a removed piece
+ * is never deleted.
+ */
+async function applyRenames(cat: Catalogue): Promise<void> {
   for (const [from, to] of Object.entries(RENAMED_PIECES)) {
     const old = await prisma.piece.findUnique({ where: { slug: from }, select: { id: true } });
-    if (old !== null) {
+    if (old !== null && !cat.pieces.some((p) => p.slug === from)) {
       const taken = await prisma.piece.findUnique({ where: { slug: to }, select: { id: true } });
       if (taken === null) await prisma.piece.update({ where: { id: old.id }, data: { slug: to } });
       else await prisma.piece.delete({ where: { id: old.id } });
@@ -291,7 +295,7 @@ async function applyRenames(): Promise<void> {
 
 export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<void> {
   const seeded = new Set((await prisma.seededEntry.findMany({ select: { key: true } })).map((e) => e.key));
-  await applyRenames();
+  await applyRenames(cat);
 
   for (const [i, s] of cat.stories.entries()) {
     const row = await prisma.story.findUnique({ where: { slug: s.slug } });
@@ -348,7 +352,8 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
       await prisma.piece.update({
         where: { id: row.id },
         // A piece that follows the catalogue also follows its order.
-        data: { gallery, handover, cover: nextCover, ...theme, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
+        // Published again in the catalogue (24/11/2026: its "published" left out of its texts means published): published here too.
+        data: { gallery, handover, cover: nextCover, ...theme, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
       });
     }
   }
@@ -363,7 +368,7 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     const current = mediaList(row.images);
     const images = mergeImported(current, b.images);
     const texts = textUpdate(boxTexts(toBox(row)), boxTexts(b), row.seedHash);
-    if (images !== current || texts) await prisma.box.update({ where: { id: row.id }, data: { images, ...(texts ? { ...texts.texts, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) } });
+    if (images !== current || texts) await prisma.box.update({ where: { id: row.id }, data: { images, ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) } });
   }
 }
 

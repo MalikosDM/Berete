@@ -1,14 +1,29 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { Check, Copy, KeyRound, LoaderCircle, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, ChevronDown, Copy, KeyRound, LoaderCircle, Pencil, Plus, Route, Trash2, X } from "lucide-react";
+import ClientTracking, { dayFr, stageLabel } from "./ClientTracking";
 import { BrandIconLink, adminCall, btn, btnMain, iconBtn, inputCls, type ModelSummary } from "./ui";
 
 /*
  * Admin "Clients VIP": each client gets a private space on the site (/vip)
- * with the 3D pieces chosen for him. Share his personal link (one click, no
- * code) or his access code (to enter from any device).
+ * with the 3D pieces chosen for him and the follow-up of his commission (the
+ * step of his piece, its estimated date, the news of the atelier:
+ * ClientTracking.tsx). Share his personal link (one click, no code) or his
+ * access code (to enter from any device).
  */
 
-type ClientRow = { id: string; name: string; email: string | null; phone: string | null; token: string; lastSeenAt: string | null; createdAt: string; modelIds: string[] };
+type ClientRow = {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  token: string;
+  lastSeenAt: string | null;
+  createdAt: string;
+  modelIds: string[];
+  stage: number;
+  estimatedAt: string | null;
+  updates: number;
+};
 type Draft = { id?: string; name: string; email: string; phone: string; modelIds: string[] };
 
 const EMPTY: Draft = { name: "", email: "", phone: "", modelIds: [] };
@@ -19,8 +34,8 @@ function linkOf(token: string): string {
 
 function messageOf(name: string, token: string, code: string | null, lang: "fr" | "en"): string {
   const link = linkOf(token);
-  if (lang === "en") return "Hello " + name + ", your pieces in 3D are ready in your private Berete space: " + link + (code ? " (access code: " + code + ")" : "");
-  return "Bonjour " + name + ", vos pièces en 3D sont prêtes dans votre espace privé Berete : " + link + (code ? " (code d'accès : " + code + ")" : "");
+  if (lang === "en") return "Hello " + name + ", follow the progress of your piece in your private Berete space: " + link + (code ? " (access code: " + code + ")" : "");
+  return "Bonjour " + name + ", suivez l'avancement de votre pièce dans votre espace privé Berete : " + link + (code ? " (code d'accès : " + code + ")" : "");
 }
 
 async function copy(text: string): Promise<void> {
@@ -36,6 +51,7 @@ export default function Clients({ token, onExpired }: { token: string; onExpired
   const [models, setModels] = useState<ModelSummary[]>([]);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [shown, setShown] = useState<{ id: string; code: string } | null>(null);
+  const [tracked, setTracked] = useState<string | null>(null);
   const [copied, setCopied] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -187,9 +203,13 @@ export default function Clients({ token, onExpired }: { token: string; onExpired
               <li key={c.id} className="grid gap-4 border-b border-white/15 py-5" data-client={c.name}>
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="break-words text-lg text-white">{c.name}</p>
+                    <p className="break-words text-base text-white">{c.name}</p>
                     <p className="text-base text-mist">
                       {[c.email, c.phone].filter(Boolean).join(" · ") || "Pas de contact"} · {pieces.length} {pieces.length > 1 ? "pièces" : "pièce"} · {c.lastSeenAt ? "vu le " + new Date(c.lastSeenAt).toLocaleDateString("fr-FR") : "jamais connecté"}
+                    </p>
+                    <p className="text-base text-mist" data-client-stage>
+                      Étape : <span className="text-bone">{stageLabel(c.stage)}</span>
+                      {c.estimatedAt ? " · fin estimée le " + dayFr(c.estimatedAt) : ""} · {c.updates} {c.updates > 1 ? "nouvelles" : "nouvelle"}
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -204,7 +224,7 @@ export default function Clients({ token, onExpired }: { token: string; onExpired
                 {code ? (
                   <div className="flex flex-wrap items-center gap-3 border border-rose-light/50 p-4" data-client-code>
                     <p className="text-base text-bone">
-                      Code d'accès : <span className="font-semibold tracking-[0.2em] text-white">{code}</span> <span className="text-mist">(visible une seule fois : copiez-le maintenant)</span>
+                      Code d'accès : <span className="font-medium tracking-[0.2em] text-white">{code}</span> <span className="text-mist">(visible une seule fois : copiez-le maintenant)</span>
                     </p>
                     <button type="button" aria-label="Masquer le code" className={iconBtn} onClick={() => setShown(null)}>
                       <X className="size-4" aria-hidden="true" />
@@ -225,7 +245,11 @@ export default function Clients({ token, onExpired }: { token: string; onExpired
                   <button type="button" className={btn} onClick={() => void newCode(c)} data-new-code>
                     <KeyRound className="size-4" aria-hidden="true" /> Créer un nouveau code
                   </button>
+                  <button type="button" className={btn} aria-expanded={tracked === c.id} onClick={() => setTracked(tracked === c.id ? null : c.id)} data-open-tracking>
+                    <Route className="size-4" aria-hidden="true" /> Suivi de la commande <ChevronDown className={"size-4 transition-transform " + (tracked === c.id ? "rotate-180" : "")} aria-hidden="true" />
+                  </button>
                 </div>
+                {tracked === c.id ? <ClientTracking token={token} clientId={c.id} onExpired={onExpired} onChanged={() => void load()} /> : null}
               </li>
             );
           })}

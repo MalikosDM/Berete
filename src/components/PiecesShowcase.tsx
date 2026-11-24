@@ -67,14 +67,14 @@ export default function PiecesShowcase({
             <p className="eyebrow">{t.showcase.eyebrow}</p>
             <h2
               id="capsules-title"
-              className="title-caps mt-4 text-[clamp(1.75rem,4vw,3.25rem)] tracking-[0.14em]"
+              className="title-caps mt-4 t-title tracking-[0.14em]"
             >
               {t.showcase.title}
             </h2>
           </div>
           <Link
             to="/creations"
-            className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light"
+            className="inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.2em] text-white hover:text-rose-light"
           >
             {t.common.allCreations} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
@@ -107,13 +107,13 @@ export default function PiecesShowcase({
                 <span className="text-rose-gold font-display text-xl">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="title-caps mt-2 block text-[clamp(1.25rem,1.7vw,1.75rem)] tracking-[0.06em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">
+                <span className="title-caps mt-2 block t-sub tracking-[0.06em] break-words text-white [text-wrap:balance] group-hover:text-rose-light">
                   {p.title}
                 </span>
                 <span className="mt-2 block text-base text-mist">
                   {t.types[p.type]}
                 </span>
-                <span data-enter-world className="mt-auto inline-flex min-h-12 items-center gap-2 pt-4 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
+                <span data-enter-world className="mt-auto inline-flex min-h-12 items-center gap-2 pt-4 text-base font-medium uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
                   {t.common.enterWorld}
                   <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                 </span>

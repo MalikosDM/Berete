@@ -4,10 +4,10 @@ import { expect, test, type Locator, type Page } from "./fixtures";
 import { catalogueRedirects } from "../scripts/vercel-redirects";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { HOUSE_PHOTO_PLACES } from "../src/data/house";
-import { NEW_PIECES, REMOVED_PIECES } from "../src/data/pieces";
+import { NEW_PIECES, REMOVED_PIECES, RENAMED_PIECES } from "../src/data/pieces";
 import { removedPieceTarget } from "../src/data/relations";
 import { CUTOUTS, resolveShowcase } from "../src/data/showcase";
-import { resolveTheme } from "../src/data/themes";
+import { INTER_VICTORY, resolveTheme, VFB_VICTORY } from "../src/data/themes";
 import { fr as houseFr } from "../src/i18n/house/fr";
 import { getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
@@ -30,7 +30,8 @@ test("the removed pieces appear nowhere; their addresses lead to their player, e
   const cat = await getCatalogue(page);
   for (const slug of REMOVED_PIECES) expect(cat.pieces.some((p) => p.slug === slug), slug + " in the catalogue").toBe(false);
   for (const slug of REMOVED_PIECES) {
-    const target = removedPieceTarget(defaultCatalogue, slug)!;
+    // (A piece that became another one leads to it: the twisted chain of Kevin Schade to BRT Flowers, 24/11/2026.)
+    const target = RENAMED_PIECES[slug] ? "/pieces/" + RENAMED_PIECES[slug] : removedPieceTarget(defaultCatalogue, slug)!;
     for (const prefix of ["", "/fr", "/ar"]) {
       const res = await page.request.get(prefix + "/pieces/" + slug, { maxRedirects: 0 });
       expect(res.status(), prefix + "/pieces/" + slug).toBe(301);
@@ -62,15 +63,19 @@ test("the removed pieces appear nowhere; their addresses lead to their player, e
 test("the drafts made from Yoni's photos are published (20/11/2026): each with its page, made for a private collector", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
-  // Unpublished: the 10 removed pieces, the tennis chain he crossed out and the 4 pieces with too few photos (21/11), only.
-  expect(REMOVED_PIECES).toContain("two-row-tennis-chain");
+  // Unpublished: the removed pieces only (24/11/2026: the tennis chain of two rows and the White Iced Cuban chain are back;
+  // the twisted chain of Kevin Schade is BRT Flowers).
+  expect(REMOVED_PIECES).not.toContain("two-row-tennis-chain");
+  expect(REMOVED_PIECES).not.toContain("white-iced-cuban-chain");
   expect(defaultCatalogue.pieces.filter((p) => !p.published).map((p) => p.slug).sort()).toEqual([...REMOVED_PIECES].sort());
   for (const slug of NEW_PIECES.filter((s) => !REMOVED_PIECES.includes(s))) {
     const piece = cat.pieces.find((p) => p.slug === slug);
     expect(piece, slug).toBeTruthy();
     expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
-    // (The panther is the piece of the fighter of the circle, Keita Losene: linked on 23/11/2026.)
-    expect(piece!.people, slug + " linked to no page of a person").toEqual(slug === "panther-champion-pendant" ? ["keita-losene"] : []);
+    // (The panther is the piece of the fighter of the circle, Keita Losene: linked on 23/11/2026; BRT Flowers, since 24/11/2026
+    // the sheet of the twisted chain of Kevin Schade, is linked to him.)
+    const linked: Record<string, string[]> = { "panther-champion-pendant": ["keita-losene"], "brt-flower-chain": ["kevin-schade"] };
+    expect(piece!.people, slug + " linked to no page of a person").toEqual(linked[slug] ?? []);
     // Made for a private collector, but the panther: made for Lasana Keita (the album of Yoni, 20/11/2026).
     if (slug === "panther-champion-pendant") expect(piece!.client).toBe("Lasana Keita");
     else expect(piece!.clientPublic, slug).toBe(false);
@@ -167,9 +172,9 @@ test("The House: Yoni Berete's story in chapters, his three quotes, the signatur
     await expect(quotes.nth(i)).toContainText(label);
     await expect(quotes.nth(i)).toContainText("Yoni Berete");
   }
-  // His portrait only (22/11/2026): no photo, so no frame, in the chapters and the quotes.
-  // The portrait, and one image of the house per chapter (23/11/2026); no empty frame, none on the quotes.
-  await expect(page.locator("[data-house-photo]")).toHaveCount(13);
+  // His portrait (22/11/2026), and since 24/11/2026 only his own photos in the chapters (seven of them: 4, 5, 8 to 12); no
+  // empty frame, none on the quotes.
+  await expect(page.locator("[data-house-photo]")).toHaveCount(8);
   await expect(page.locator("[data-house-quote] [data-house-photo]")).toHaveCount(0);
   await quotes.nth(0).scrollIntoViewIfNeeded();
   await page.waitForTimeout(1000);
@@ -266,8 +271,9 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
     // Since 20/11/2026: its own world, the Genkidama (tests/capsules.spec.ts).
     ["kevin-schade-dragon-ball-pendant", "genkidama", "Shojumaru"],
     ["michy-batshuayi-butterfly-pendant", "butterfly", "Italiana"],
-    ["campione-d-italia-2023-2024", "inter-victoire", "Cinzel"],
-    ["vfb-stuttgart-dfb-pokal-2025", "vfb-victoire", "Grenze Gotisch"],
+    // (24/11/2026: the versions v2 of the victories of Inter and VfB, INTER_VICTORY and VFB_VICTORY of src/data/themes.ts.)
+    ["campione-d-italia-2023-2024", INTER_VICTORY, "Cinzel"],
+    ["vfb-stuttgart-dfb-pokal-2025", VFB_VICTORY, "Grenze Gotisch"],
     ["noah-okafor-jersey-pendant", "okafor-jersey", "Big Shoulders Display"],
   ];
   for (const [slug, backdrop, font] of cases) {
@@ -391,9 +397,11 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await page.getByLabel("Mot de passe").fill(password!);
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page.getByRole("tab", { name: "Pièces" })).toBeVisible();
-  // The removed pieces, unpublished; the pieces published on 20/11/2026 in the list.
-  await expect(page.locator("[data-row-unpublished]")).toHaveCount(REMOVED_PIECES.length);
-  for (const slug of REMOVED_PIECES) await expect(page.locator("[data-admin-row='" + slug + "'] [data-row-unpublished]"), slug).toHaveCount(1);
+  // The removed pieces, unpublished, kept in the admin; the pieces published on 20/11/2026 in the list. A removed piece merged
+  // into another (the twisted chain of Kevin Schade, BRT Flowers since 24/11/2026) keeps its row too (server/catalogue.ts).
+  const kept = REMOVED_PIECES;
+  await expect(page.locator("[data-row-unpublished]")).toHaveCount(kept.length);
+  for (const slug of kept) await expect(page.locator("[data-admin-row='" + slug + "'] [data-row-unpublished]"), slug).toHaveCount(1);
   for (const slug of NEW_PIECES) await expect(page.locator("[data-admin-row='" + slug + "']"), slug).toHaveCount(1);
   await page.locator("[data-admin-row='pear-link-chain']").scrollIntoViewIfNeeded();
   await page.screenshot({ path: shotPath(info, "admin-1-pieces-non-publiees"), type: "jpeg", quality: 70, fullPage: true });
@@ -418,7 +426,7 @@ test("admin: the removed pieces and the drafts unpublished, the universe of a pi
   await expect(portrait.getByText("Enregistré.")).toBeVisible();
   const about = await page.context().newPage();
   await about.goto("/about", { waitUntil: "load" });
-  await expect(about.locator("[data-house-photo]")).toHaveCount(13, { timeout: 20_000 });
+  await expect(about.locator("[data-house-photo]")).toHaveCount(8, { timeout: 20_000 });
   await about.waitForTimeout(1500);
   await about.screenshot({ path: shotPath(info, "admin-4-photo-dans-la-maison"), type: "jpeg", quality: 70 });
   await about.close();

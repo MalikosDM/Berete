@@ -18,7 +18,7 @@ function linkClass({ isActive }: { isActive: boolean }): string {
   return [
     // Never on two lines: the row of the menu has the whole width under the name of the house (from 900 px on a computer).
     // From 900 to 1280 px (a narrow window of a laptop) the letters are a little smaller and tighter, so every language fits.
-    "relative inline-flex min-h-11 items-center whitespace-nowrap text-[0.6875rem] font-medium uppercase tracking-[0.04em] transition-colors xl:text-[0.75rem] xl:tracking-[0.1em] roomy:text-[0.8125rem] roomy:tracking-[0.16em]",
+    "relative inline-flex min-h-10 items-center whitespace-nowrap text-[0.6875rem] font-normal uppercase tracking-[0.06em] transition-colors xl:tracking-[0.12em] roomy:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-1.5 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -97,28 +97,30 @@ export default function Navbar() {
       {/* The logo as it was, the BRT diamond with BERETE JEWELLERS under it, and the name of the house again, much larger, in
           the middle of the bar, always in view while the page scrolls (Yoni, 23/11/2026: computer and iPhone); then the
           language, WhatsApp and, on a phone or a tablet, the menu button. */}
-      <div className="mx-auto grid h-18 max-w-[1600px] grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 sm:gap-4 sm:px-8 desk:h-16 desk:px-8 roomy:px-12">
-        <Link to="/" data-brand className="group flex min-h-12 items-center" aria-label={t.site.homeLabel}>
-          <Logo className="h-11 w-[3.8rem] shrink-0 desk:h-14 desk:w-[4.875rem]" />
+      {/* The name of the house sits exactly in the middle of the width of the page (Yoni, 24/11/2026: it was off centre, set
+          between the logo and the buttons, which are not as wide), smaller; the logo at the start, the buttons at the end. */}
+      <div className="relative mx-auto flex h-16 max-w-[1600px] items-center justify-between gap-3 px-4 sm:gap-4 sm:px-8 desk:h-15 desk:px-8 roomy:px-12">
+        <Link to="/" data-brand className="group relative z-10 flex min-h-12 items-center" aria-label={t.site.homeLabel}>
+          <Logo className="h-10 w-[3.5rem] shrink-0 desk:h-11 desk:w-[3.875rem]" />
         </Link>
-        <Link to="/" data-wordmark tabIndex={-1} aria-hidden="true" className="flex min-h-12 items-center justify-center">
-          <Logo variant="wordmark" position="center" className="aspect-[10.152] w-full max-w-[12.5rem] sm:max-w-[16rem] desk:max-w-[22rem]" />
+        <Link to="/" data-wordmark tabIndex={-1} aria-hidden="true" className="absolute top-1/2 left-1/2 flex min-h-10 w-[min(9.5rem,42vw)] -translate-x-1/2 -translate-y-1/2 items-center justify-center desk:w-[12.5rem]">
+          <Logo variant="wordmark" position="center" className="aspect-[10.152] w-full" />
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="relative z-10 flex items-center gap-2 sm:gap-3">
           <LanguageMenu className="hidden md:block" />
           <a
             href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
             aria-label={t.common.chatWhatsapp}
-            className="hidden size-12 items-center justify-center rounded-full border border-white/30 text-white transition-colors hover:border-rose-light hover:text-rose-light md:inline-flex"
+            className="hidden size-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-rose-light hover:text-rose-light md:inline-flex"
           >
-            <BrandIcon name="whatsapp" className="size-5" />
+            <BrandIcon name="whatsapp" className="size-4" />
           </a>
           <Link
             to="/contact"
-            className="hidden min-h-12 items-center gap-2 whitespace-nowrap bg-white px-5 text-[0.8125rem] font-semibold uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light roomy:inline-flex"
+            className="hidden min-h-10 items-center gap-2 whitespace-nowrap border border-white/70 px-4 text-[0.6875rem] font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light roomy:inline-flex"
           >
             {t.common.startPiece}
           </Link>
@@ -137,7 +139,7 @@ export default function Navbar() {
 
       {/* The whole menu on every computer (Yoni, 23/11/2026: a laptop under Safari at a middle width showed the menu button):
           its own row under the name of the house, so the long names (The Berete Circle, The Bespoke Journey…) always fit. */}
-      <nav aria-label={t.nav.main} data-desktop-nav className="mx-auto hidden h-11 max-w-[1600px] items-center justify-center gap-x-3 px-4 desk:flex xl:gap-x-5 xl:px-8 roomy:gap-x-8 wide:gap-x-10">
+      <nav aria-label={t.nav.main} data-desktop-nav className="mx-auto hidden h-10 max-w-[1600px] items-center justify-center gap-x-3 px-4 desk:flex xl:gap-x-5 xl:px-8 roomy:gap-x-8 wide:gap-x-10">
         <div className="group relative">
           <NavLink
             to="/creations"
@@ -147,20 +149,20 @@ export default function Navbar() {
             {t.nav.creations}
             <ChevronDown className="size-3.5 transition-transform duration-300 group-hover:rotate-180 group-focus-within:rotate-180" aria-hidden="true" />
           </NavLink>
-          <div data-creations-menu className="invisible absolute start-1/2 top-full w-72 -translate-x-1/2 translate-y-2 pt-2 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 rtl:translate-x-1/2">
-            <ul className="border border-white/15 bg-ink/95 p-3 backdrop-blur-xl">
+          <div data-creations-menu className="invisible absolute start-1/2 top-full w-64 -translate-x-1/2 translate-y-2 pt-2 opacity-0 transition-all duration-300 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 rtl:translate-x-1/2">
+            <ul className="border border-white/12 bg-ink/95 px-2 py-3 backdrop-blur-xl">
               {CREATION_LINKS.map((item) => (
                 <li key={item.to}>
                   <Link
                     to={item.to}
                     data-nav-sub={item.sub ? "" : undefined}
-                    className={"flex min-h-12 items-center justify-between font-display uppercase text-white transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "ps-9 pe-4 text-lg tracking-[0.12em] text-bone" : "px-4 text-xl tracking-[0.14em]")}
+                    className={"flex items-center justify-between uppercase transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "min-h-8 ps-8 pe-3 text-[0.6875rem] tracking-[0.14em] text-mist" : "mt-1 min-h-10 px-3 text-[0.75rem] tracking-[0.18em] text-white first:mt-0")}
                   >
                     <span className="flex items-center gap-2.5">
                       {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}
                       {item.label}
                     </span>
-                    <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+                    {item.sub ? null : <ArrowRight className="size-3.5 opacity-60 rtl:-scale-x-100" aria-hidden="true" />}
                   </Link>
                 </li>
               ))}
@@ -178,7 +180,7 @@ export default function Navbar() {
         id="mobile-menu"
         data-lenis-prevent
         className={[
-          "fixed inset-x-0 bottom-0 top-18 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 desk:hidden",
+          "fixed inset-x-0 bottom-0 top-16 overflow-y-auto bg-ink transition-[opacity,visibility] duration-500 desk:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         ].join(" ")}
       >
@@ -200,7 +202,7 @@ export default function Navbar() {
                 <NavLink
                   to={item.to}
                   className={({ isActive }) =>
-                    "flex min-h-14 items-baseline gap-4 font-display text-4xl font-light uppercase tracking-[0.12em] sm:text-5xl " +
+                    "flex min-h-12 items-baseline gap-4 font-display text-2xl font-light uppercase tracking-[0.12em] sm:text-3xl " +
                     (isActive ? "text-rose-light" : "text-white hover:text-rose-light")
                   }
                 >

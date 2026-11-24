@@ -1,10 +1,13 @@
-// The step "The Original Vision" of every piece (src/pages/PiecePage.tsx, MakingSection): the hand of Yoni drawing the
-// piece (scripts/import-media.mjs, folder "Croquis main de Yoni (site)"), sharp on a computer and on a phone, never
-// stretched, light, loaded only when the visitor comes near it; Dragon Ball keeps its first hand drawing.
-// Screenshots go to verification/sketches/.
+// The step "The Original Vision" of every piece (src/components/MakingSteps.tsx; since 24/11/2026 in The Atelier,
+// /atelier?piece=<slug>, under the making-of of the piece that opens at once): the hand of Yoni drawing the piece
+// (scripts/import-media.mjs, folder "Croquis main de Yoni (site)"), sharp on a computer and on a phone, never stretched,
+// light, loaded lazily; Dragon Ball keeps its first hand drawing. Screenshots go to verification/sketches/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
+import { resolveAtelier } from "../src/data/atelier";
+import { defaultCatalogue } from "../src/data/catalogue";
+import { completeMakingOf } from "../src/data/making";
 import { skipIntro } from "./helpers";
 
 const SKETCHES = (media as unknown as { sketches: Record<string, { src: string; width: number; height: number }> }).sketches;
@@ -13,10 +16,20 @@ const PIECES = ["the-hand", "marcus-thuram-skeleton-watch", "campione-d-italia-2
 const DIR = "verification/sketches";
 mkdirSync(DIR, { recursive: true });
 
-async function openPiece(page: Page, path: string) {
-  await page.goto(path);
-  // The page ready (its entrance over).
-  await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
+/** The steps of a piece in The Atelier: its making-of opens at once (when it has one), closed, its steps are there. */
+async function openSteps(page: Page, slug: string, prefix = "") {
+  await page.goto(prefix + "/atelier?piece=" + slug);
+  const piece = defaultCatalogue.pieces.find((p) => p.slug === slug)!;
+  if (resolveAtelier(slug, piece.atelier) || completeMakingOf(slug, piece.atelier)) {
+    const room = page.locator("[data-atelier-room]");
+    await expect(room).toBeVisible();
+    // (Again until it is gone: the page may still be settling when it opens.)
+    await expect(async () => {
+      if (await room.count()) await page.keyboard.press("Escape");
+      await expect(room).toHaveCount(0, { timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
+  }
+  return page.locator("[data-atelier-piece='" + slug + "'] [data-making-step='sketch']");
 }
 
 test.beforeEach(async ({ page }) => {
@@ -31,19 +44,9 @@ for (const slug of PIECES) {
     expect(sketch.height).toBe(1920);
     expect(Math.abs(sketch.width / sketch.height - 3 / 4)).toBeLessThan(0.01);
 
-    await openPiece(page, "/fr/pieces/" + slug);
-    // Never with the first screen: loaded when the visitor comes near (the browser may start a little before, on a short
-    // page, but only once the page itself is loaded).
-    const early = await page.evaluate(() => {
-      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
-      return performance
-        .getEntriesByType("resource")
-        .filter((e) => e.name.includes("/media/sketches/"))
-        .map((e) => ({ start: e.startTime, load: nav.loadEventStart }));
-    });
-    for (const e of early) expect(e.start, "sketch asked for before the page was loaded").toBeGreaterThanOrEqual(e.load);
-
-    const step = page.locator("[data-making-step='sketch']");
+    // (24/11/2026: The Atelier opened for a piece goes straight to its steps, so the sketch is near at once: no check of the
+    // time it is asked for any more; it stays a lazy image.)
+    const step = await openSteps(page, slug, "/fr");
     await step.scrollIntoViewIfNeeded();
     const button = step.locator("[data-making-open='sketch']");
     await expect(button).toBeVisible();
@@ -90,8 +93,7 @@ for (const slug of PIECES) {
 }
 
 test("Dragon Ball keeps its first hand drawing", async ({ page }) => {
-  await openPiece(page, "/pieces/kevin-schade-dragon-ball-pendant");
-  const step = page.locator("[data-making-step='sketch']");
+  const step = await openSteps(page, "kevin-schade-dragon-ball-pendant");
   await step.scrollIntoViewIfNeeded();
   await expect(step.locator("img")).toHaveAttribute("src", "/media/stories/kevin-schade/08.webp");
   await expect(step).toContainText("The Original Vision");
@@ -110,6 +112,7 @@ test("every published piece with a file of the hand of Yoni shows it", async ({ 
     if (!drawn.includes(fileOf(p.slug))) continue;
     expect(p.making.sketch?.src, p.slug).toBe("/media/sketches/" + fileOf(p.slug) + ".webp");
   }
-  // 28 drawings; the Flâneur, drawn too, is off the site since 21/11/2026 (too few photos).
-  expect(pieces!.filter((p) => drawn.includes(fileOf(p.slug))).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(27);
+  // 28 drawings; the Flâneur, drawn too, is off the site since 21/11/2026 (too few photos), the twisted chain of Kevin Schade
+  // since 24/11/2026 (one sheet with BRT Flowers).
+  expect(pieces!.filter((p) => drawn.includes(fileOf(p.slug))).length, "pieces drawn by the hand of Yoni").toBeGreaterThanOrEqual(26);
 });

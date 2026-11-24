@@ -23,11 +23,11 @@ export default function CollectionTiles() {
       <div className="mx-auto flex max-w-[1600px] flex-col justify-between gap-5 px-5 pt-20 pb-10 sm:flex-row sm:items-end sm:px-8 lg:px-12 lg:pt-24 lg:pb-12">
         <div>
           <p className="eyebrow">{t.collections.eyebrow}</p>
-          <h2 id="collections-title" className="title-caps mt-4 text-[clamp(1.75rem,4vw,3.25rem)] tracking-[0.14em]">
+          <h2 id="collections-title" className="title-caps mt-4 t-title tracking-[0.14em]">
             {t.collections.title}
           </h2>
         </div>
-        <Link to="/creations" className="inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.2em] text-white hover:text-rose-light">
+        <Link to="/creations" className="inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.2em] text-white hover:text-rose-light">
           {t.common.allCreations} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
         </Link>
       </div>
@@ -47,7 +47,7 @@ export default function CollectionTiles() {
                   </span>
                   {/* Its name, then the number of its pieces below it: every card the same, whatever the length of the words. */}
                   <span className="mt-4 flex flex-col gap-1">
-                    <span className="title-caps block text-[clamp(1.25rem,2vw,1.875rem)] tracking-[0.1em] text-white transition-colors duration-500 group-hover:text-rose-light">{name}</span>
+                    <span className="title-caps block t-sub tracking-[0.1em] text-white transition-colors duration-500 group-hover:text-rose-light">{name}</span>
                     <span className="font-display text-lg" data-count>
                       <Count text={t.collections.count(pieces.length)} numberClassName="text-rose-gold" wordClassName="text-rose-light text-base uppercase tracking-[0.16em]" />
                     </span>
@@ -55,7 +55,7 @@ export default function CollectionTiles() {
                   <span aria-hidden="true" className="relative mt-3 block h-px w-full bg-white/15">
                     <span className="bg-rose-gold absolute inset-y-0 start-0 w-0 transition-[width] duration-[1.2s] ease-out group-hover:w-full" />
                   </span>
-                  <span className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-semibold uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
+                  <span className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.16em] text-white group-hover:text-rose-light">
                     {t.collections.explore} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                   </span>
                 </Link>

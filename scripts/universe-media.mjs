@@ -180,6 +180,11 @@ const SCENES = [
   scene("inter-victoire", "Victoire : l'équipe de l'Inter soulève le trophée, projecteurs bleus, confettis, feux d'artifice (Inter Milan)", [0.5, 0.42]),
   scene("inter-victoire-echarpes", "Victoire : l'équipe de l'Inter, écharpes levées (Inter Milan, variante)", [0.5, 0.42]),
   scene("vfb-victoire", "Victoire : l'équipe du VfB soulève la coupe, fumigènes rouges, confettis or et rouges, feux d'artifice (VfB Stuttgart)", [0.55, 0.42]),
+  // 24/11/2026 (Yoni: the first two were too alike and too close, the squad not seen): the night, the blue, the whole squad
+  // scarves held up, confetti and fireworks (Inter); a red sunset, the whole squad lifting the cup, flares, gold and red
+  // confetti (VfB). Seen wide, the squad on each side of the ring.
+  scene("inter-victoire-v2", "Victoire, la nuit : toute l'équipe de l'Inter écharpes levées, confettis, feux d'artifice (Inter Milan, v2)", [0.66, 0.5]),
+  scene("vfb-victoire-v2", "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)", [0.66, 0.5]),
   scene("gothique", "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)", [0.6, 0.5]),
 ];
 BACKDROPS.push(...SCENES);

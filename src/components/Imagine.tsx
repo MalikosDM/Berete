@@ -149,7 +149,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
         <div className="border border-white/15 p-6 sm:p-10">
           <p className="eyebrow">{s.eyebrow}</p>
           <h2 id="imagine-title" className="title-caps mt-4 text-xl tracking-[0.14em] text-balance break-words sm:text-2xl">{s.title}</h2>
-          <p className="mt-4 text-base text-mist sm:text-lg">{s.lead}</p>
+          <p className="mt-4 text-base text-mist sm:text-base">{s.lead}</p>
 
           <form onSubmit={generate} noValidate className="mt-8 grid gap-4" data-imagine-form>
             <label htmlFor={fieldId} className="text-base text-bone">{s.label}</label>
@@ -175,7 +175,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                 type="submit"
                 disabled={loading}
                 data-imagine-generate
-                className="inline-flex min-h-14 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 py-3 text-center text-base leading-snug font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto sm:px-8"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto sm:px-8 lg:min-h-11 lg:text-[0.8125rem]"
               >
                 {loading ? <LoaderCircle className="size-5 shrink-0 animate-spin" aria-hidden="true" /> : <Sparkles className="size-5 shrink-0" aria-hidden="true" />}
                 {s.generate}
@@ -199,7 +199,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                 className="mx-auto mt-8 flex aspect-square w-full max-w-xl flex-col items-center justify-center gap-4 border border-white/15 bg-ink-soft bg-[radial-gradient(circle_at_center,rgba(232,180,160,0.16),transparent_62%)] p-6 text-center"
               >
                 <LoaderCircle className="size-8 animate-spin text-rose-light" aria-hidden="true" />
-                <p className="text-lg text-bone">{s.loading}</p>
+                <p className="text-base text-bone">{s.loading}</p>
                 <p className="text-base text-mist">{s.loadingHint}</p>
               </div>
             ) : proposal ? (
@@ -219,7 +219,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                     type="button"
                     onClick={finalise}
                     data-imagine-finalise
-                    className="inline-flex min-h-14 flex-1 items-center justify-center gap-2 bg-white px-6 py-3 text-center text-base leading-snug font-semibold uppercase tracking-[0.1em] text-ink transition-colors hover:bg-rose-light"
+                    className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-white px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.1em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
                   >
                     <ArrowDown className="size-5 shrink-0" aria-hidden="true" />
                     {s.finalise}
@@ -228,7 +228,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                     type="button"
                     onClick={restart}
                     data-imagine-restart
-                    className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/40 px-6 py-3 text-center text-base leading-snug font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.1em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
                   >
                     <RotateCcw className="size-5 shrink-0" aria-hidden="true" />
                     {s.restart}

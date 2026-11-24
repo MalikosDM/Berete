@@ -1,12 +1,13 @@
-// The pages of the pieces (the "capsules"), 20/11/2026: the film of the finished piece first (src/components/PieceFilm.tsx),
-// the official logo of Inter Milan (src/lib/clubs.ts), the Genkidama of Dragon Ball (its page and its story), and "The
-// Art of Detail" in 3D with the details pointed at on the jewel (src/viewer/DetailViewer.tsx: on this computer only, the
-// test model is never put on a real piece online). Screenshots go to verification/capsules/.
+// The pages of the pieces (the "capsules"), 20/11/2026: the film of the finished piece (since 24/11/2026 its own section right
+// after the opening, src/components/FeatureFilm.tsx: silent, in a loop, playing while on screen), the official logo of Inter
+// Milan (src/lib/clubs.ts), the Genkidama of Dragon Ball (its page and its story), and "The Art of Detail" in 3D with the
+// details pointed at on the jewel (src/viewer/DetailViewer.tsx: on this computer only, the test model is never put on a
+// real piece online). Screenshots go to verification/capsules/.
 import { createHash } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { chromium, devices, expect, test, type Page } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
-import { FILM_PIECES, skipIntro, watch } from "./helpers";
+import { skipIntro, watch } from "./helpers";
 
 type Film = { src: string; mobile: string; width: number; height: number; audio: boolean };
 const FILMS = (media as unknown as { films: Record<string, { reveal?: Film }> }).films;
@@ -16,90 +17,92 @@ mkdirSync(DIR, { recursive: true });
 const shot = (page: Page, name: string) => page.screenshot({ path: DIR + "/" + name + ".jpg", type: "jpeg", quality: 70, timeout: 45_000 });
 const ready = (page: Page) => expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
 
-const filmLayer = (page: Page) => page.locator("[data-piece-film]");
 const filmState = (page: Page) =>
-  page.locator("[data-piece-film-video]").evaluate((el) => {
+  page.locator("[data-feature-video]").evaluate((el) => {
     const v = el as HTMLVideoElement;
-    return { time: v.currentTime, paused: v.paused, muted: v.muted, src: v.currentSrc, width: v.videoWidth };
+    return { time: v.currentTime, paused: v.paused, muted: v.muted, loop: v.loop, src: v.currentSrc, width: v.videoWidth };
   });
 
-/* ---------- The film of the finished piece: in its own section since 23/11/2026 (Yoni: the piece first) ---------- */
+/* ---------- The film of the finished piece: its own section right after the opening (Yoni, 24/11/2026) ---------- */
 
-const ENTERED = [INTER, "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "noah-okafor-oka-pendant", "tulips-on-tour-medallion", "the-hand"];
+// (The Inter ring left this list on 24/11/2026: its film was a 3D render, set to none; no film section on its page.)
+const ENTERED = ["vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "noah-okafor-oka-pendant", "tulips-on-tour-medallion", "the-hand"];
 
 for (const slug of ENTERED) {
-  test("entering " + slug + " by a click: the piece first, its film in its section, playing with its sound, in its frame, easy to leave", async ({ page }, info) => {
+  test("entering " + slug + " by a click: the piece first, then its film in its section, silent, in a loop, whole on screen", async ({ page }, info) => {
     const problems = watch(page);
     const phone = info.project.name !== "desktop";
     const film = FILMS[slug]!.reveal!;
     await skipIntro(page, { films: false });
-    await page.goto("/fr/creations?view=grid");
+    await page.goto("/fr/creations");
     const card = page.locator("a[data-piece-card='" + slug + "']").first();
     await card.scrollIntoViewIfNeeded();
     await card.click();
     await expect(page).toHaveURL(new RegExp("/fr/pieces/" + slug + "$"));
-    // The first thing seen: the piece, no film.
+    // The first thing seen: the piece; no film over it (the cinema window lives in The Atelier only).
     await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
     await page.waitForTimeout(1200);
-    await expect(filmLayer(page)).toHaveCount(0);
-    // Its film, in its own section lower on the page: a click plays it full screen.
-    const section = page.locator("[data-piece-film-section]");
-    await section.scrollIntoViewIfNeeded();
-    await section.locator("[data-watch-film-section]").click();
-    await expect(filmLayer(page)).toBeVisible();
+    await expect(page.locator("[data-piece-film]")).toHaveCount(0);
+    const section = page.locator("section#piece-film[data-feature-film='" + slug + "']");
+    await expect(section).toHaveCount(1);
+    // Right after the opening.
+    expect(await section.evaluate((el) => el.previousElementSibling?.hasAttribute("data-piece-opening"))).toBe(true);
+    // "Watch the film" leads down to it; on screen it plays by itself, silent, in a loop, its copy made for the screen.
+    await ready(page);
+    const watchFilm = page.locator("[data-watch-film]");
+    await expect(watchFilm).toHaveAttribute("href", "#piece-film");
+    await watchFilm.click();
+    await expect(section).toBeInViewport({ timeout: 10_000 });
+    const frame = section.locator("[data-feature-frame]");
+    await frame.evaluate((el) => el.scrollIntoView({ block: "center" }));
     await expect.poll(async () => (await filmState(page)).time, { timeout: 30_000 }).toBeGreaterThan(0.6);
     const state = await filmState(page);
     expect(state.paused).toBe(false);
+    expect(state.muted).toBe(true);
+    expect(state.loop).toBe(true);
     expect(new URL(state.src).pathname).toBe(phone ? film.mobile : film.src);
     // Sharp on a phone too: its own film at 720 pixels wide at least.
     expect(state.width).toBeGreaterThanOrEqual(720);
-    // The sound: on after the click; a browser that refuses it plays silent, and the button asks for it, in view.
-    const sound = page.locator("[data-piece-film-sound]");
-    if (state.muted) {
-      await expect(sound).toHaveAttribute("data-piece-film-sound", "off");
-      await expect(sound).toBeVisible();
+    // Its frame: the shape of the film, whole on the screen.
+    await page.waitForTimeout(800);
+    const box = (await frame.boundingBox())!;
+    const viewport = page.viewportSize()!;
+    expect(Math.abs(box.width / box.height - film.width / film.height)).toBeLessThan(0.02);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+    // Its sound at a small button (when it has one), its full screen at another.
+    const sound = section.locator("[data-feature-sound]");
+    if (film.audio) {
+      await expect(sound).toHaveAttribute("aria-pressed", "false");
       await sound.click();
       expect((await filmState(page)).muted).toBe(false);
-    } else await expect(sound).toHaveAttribute("data-piece-film-sound", "on");
-    // In its frame, the shape of the film, whole on the screen.
-    const frame = (await page.locator(".pf-frame video").boundingBox())!;
-    const viewport = page.viewportSize()!;
-    expect(Math.abs(frame.width / frame.height - film.width / film.height)).toBeLessThan(0.02);
-    expect(frame.y).toBeGreaterThanOrEqual(0);
-    expect(frame.y + frame.height).toBeLessThanOrEqual(viewport.height);
-    await expect(page.locator("[data-piece-film-skip]")).toBeInViewport();
-    await page.waitForTimeout(600);
+      await expect(sound).toHaveAttribute("aria-pressed", "true");
+    } else await expect(sound).toHaveCount(0);
+    await expect(section.locator("[data-feature-fullscreen]")).toBeVisible();
     await shot(page, info.project.name + "-film-" + slug);
-    // "See the piece": the piece.
-    await page.locator("[data-piece-film-skip]").click();
-    await expect(filmLayer(page)).toHaveCount(0);
-    await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
-    // Back on the piece, straight to it; "Watch the film" leads to its section, which plays it again; Escape leaves it.
-    await page.goto("/fr/pieces/" + slug);
-    await ready(page);
-    await expect(filmLayer(page)).toHaveCount(0);
-    await page.locator("[data-watch-film]").click();
-    await page.locator("[data-watch-film-section]").click();
-    await expect(filmLayer(page)).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(filmLayer(page)).toHaveCount(0);
+    // Off screen, it rests.
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect.poll(async () => (await filmState(page)).paused, { timeout: 10_000 }).toBe(true);
     expect(problems.errors).toEqual([]);
   });
 }
 
-test("a piece without a film of its finished piece opens on the piece; asked for less motion, no film by itself", async ({ page }) => {
+test("a piece without a film (the Safi Link; the Inter ring, whose film was a 3D render) has no film section; asked for less motion, no film by itself", async ({ page }) => {
   await skipIntro(page, { films: false });
-  const without = "the-safi-link";
-  expect(FILM_PIECES).not.toContain(without);
-  await page.goto("/fr/pieces/" + without);
-  await ready(page);
-  await expect(filmLayer(page)).toHaveCount(0);
-  await expect(page.locator("[data-watch-film]")).toHaveCount(0);
+  for (const without of ["the-safi-link", INTER]) {
+    await page.goto("/fr/pieces/" + without);
+    await ready(page);
+    await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+    await expect(page.locator("[data-watch-film]")).toHaveCount(0);
+  }
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/fr/pieces/" + INTER);
+  await page.goto("/fr/pieces/vfb-stuttgart-dfb-pokal-2025");
   await expect(page.locator("[data-watch-film]")).toBeVisible();
-  await page.waitForTimeout(1200);
-  await expect(filmLayer(page)).toHaveCount(0);
+  const section = page.locator("[data-feature-film]");
+  await section.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1500);
+  expect(await page.locator("[data-feature-video]").evaluate((v) => (v as HTMLVideoElement).paused)).toBe(true);
 });
 
 /* ---------- The logo of Inter Milan ---------- */
@@ -117,7 +120,8 @@ test("Inter Milan: its official logo in Created exclusively for, as the club mad
   // The file of the club itself, byte for byte (never redrawn nor changed).
   const file = await (await page.request.get((await img.getAttribute("src"))!)).body();
   expect(createHash("sha1").update(file).digest("hex")).toBe("c6b22cd28b44aab549f2ef96dd6e285d4e5f2e72");
-  expect((await emblem.boundingBox())!.width).toBeGreaterThanOrEqual(96);
+  // (Smaller since 24/11/2026: 64 px on a phone, 80 at the scale of 15 px of a computer.)
+  expect((await emblem.boundingBox())!.width).toBeGreaterThanOrEqual(64);
   await page.waitForTimeout(500);
   await page.locator("[data-made-for]").screenshot({ path: DIR + "/" + info.project.name + "-logo-inter.jpg", type: "jpeg", quality: 75 });
   // Only Inter for now: VfB Stuttgart, a club too, keeps its portrait.
@@ -172,9 +176,11 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   await page.waitForTimeout(1500);
   await shot(page, info.project.name + "-genkidama-story");
   await page.keyboard.press("Escape");
-  // The chain of Kevin Schade is not in the Genkidama: its own world, the forge (21/11/2026, tests/universes15.spec.ts).
+  // The chain of Kevin Schade is not in the Genkidama: since 24/11/2026 it is BRT Flowers (its address leads there), in the
+  // roses of its own world.
   await page.goto("/pieces/kevin-schade-twisted-chain", { waitUntil: "load" });
-  await expect(page.locator("article[data-piece] .universe")).toHaveAttribute("data-universe", "forge");
+  await expect(page).toHaveURL(/\/pieces\/brt-flower-chain$/);
+  await expect(page.locator("article[data-piece] .universe")).toHaveAttribute("data-universe", "roses");
   await expect(page.locator(".u-genki")).toHaveCount(0);
   expect(problems.errors).toEqual([]);
 });

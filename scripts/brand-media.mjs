@@ -25,7 +25,18 @@ const FRAMES = {
   berete: "271 405 126 29",
 };
 const out = {};
-for (const old of await readdir(DIR)) if (/^(wordmark|berete)\.[0-9a-f]{10}\.svg$/.test(old)) await rm(join(DIR, old));
+for (const old of await readdir(DIR)) if (/^(wordmark|berete|logo-sharp)\.[0-9a-f]{10}\.svg$/.test(old)) await rm(join(DIR, old));
+{
+  // The logo drawn sharp at small sizes (Yoni, 24/11/2026: blurred on black in the menu): an <img> of the vector file (never a
+  // mask, which Safari draws at a low resolution), its fine lines a little thicker (an outline in the same rose gold), so the
+  // diamond never fades away on black at 60 to 160 px.
+  const svg = logo.replace(".st0{fill:url(#bj-rose-gold);}", ".st0{fill:url(#bj-rose-gold);stroke:url(#bj-rose-gold);stroke-width:1.5;stroke-linejoin:round}");
+  if (svg === logo) throw new Error("logo.svg: its style .st0 was not found");
+  const v = createHash("sha256").update(svg).digest("hex").slice(0, 10);
+  await writeFile(join(DIR, "logo-sharp." + v + ".svg"), svg);
+  out.sharp = { src: "/media/brand/logo-sharp." + v + ".svg", ratio: Math.round((335.5 / 242.5) * 1000) / 1000 };
+  console.log("  + public/media/brand/logo-sharp." + v + ".svg");
+}
 for (const [name, box] of Object.entries(FRAMES)) {
   // Only the letters of the name: the diamond and BRT are drawn above y 360 (outside the frame), cut by the viewBox.
   const svg = logo.replace(/viewBox="[^"]*"/, 'viewBox="' + box + '"').replace(/<svg /, '<svg preserveAspectRatio="xMinYMid meet" ');

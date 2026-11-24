@@ -39,6 +39,8 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
   const item = items[index];
   const count = items.length;
   const zoomed = view.s > 1.001;
+  // The magnifying glass is for photos only, never a film (Yoni, 23-24/11/2026).
+  const photo = item?.type !== "video";
 
   /** The size of the photo as drawn whole in the stage (contained), and the stage. */
   const boxes = useCallback(() => {
@@ -68,6 +70,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
   /** Zooms to the scale s around a point of the screen (the middle of the stage by default). */
   const zoomTo = useCallback(
     (s: number, at?: { x: number; y: number }, smooth = true) => {
+      if (!photo) return;
       setAnimate(smooth);
       setView((v) => {
         const b = boxes();
@@ -78,7 +81,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
         return clamp({ s, x: px - (px - v.x) * k, y: py - (py - v.y) * k });
       });
     },
-    [boxes, clamp],
+    [boxes, clamp, photo],
   );
 
   const go = useCallback(
@@ -118,18 +121,19 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
     return () => window.removeEventListener("keydown", onKey);
   }, [go, onClose, count, dir, zoomTo, view.s]);
 
-  // The wheel: a pinch of the trackpad (the wheel with Ctrl) zooms, the wheel moves the zoomed photo. Safari pinches with its
-  // own gesture events. Not passive: the page under it must not move.
+  // The wheel zooms on the point under the pointer (24/11/2026), and so does a pinch of the trackpad (the wheel with Ctrl);
+  // a sideways move of the trackpad moves the zoomed photo. Safari pinches with its own gesture events. Not passive: the page
+  // under it must not move.
   useEffect(() => {
     const stage = stageRef.current;
     if (!stage) return undefined;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-      if (e.ctrlKey) {
-        zoomTo(view.s * Math.exp(-e.deltaY * 0.01), { x: e.clientX, y: e.clientY }, false);
-      } else if (zoomed) {
+      if (zoomed && !e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         setAnimate(false);
         setView((v) => clamp({ s: v.s, x: v.x - e.deltaX, y: v.y - e.deltaY }));
+      } else {
+        zoomTo(view.s * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0025)), { x: e.clientX, y: e.clientY }, false);
       }
     };
     let start = 1;
@@ -241,12 +245,16 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
           {String(count).padStart(2, "0")}
         </p>
         <div className="flex gap-2 sm:gap-3">
-          <button type="button" className={btn} onClick={() => zoomTo(view.s / STEP)} disabled={!zoomed} data-zoom-out aria-label={t.gallery.zoomOut}>
-            <Minus className="size-5" aria-hidden="true" />
-          </button>
-          <button type="button" className={btn} onClick={() => zoomTo(view.s * STEP)} disabled={view.s >= MAX - 0.01} data-zoom-in aria-label={t.gallery.zoomIn}>
-            <Plus className="size-5" aria-hidden="true" />
-          </button>
+          {photo ? (
+            <>
+              <button type="button" className={btn} onClick={() => zoomTo(view.s / STEP)} disabled={!zoomed} data-zoom-out aria-label={t.gallery.zoomOut}>
+                <Minus className="size-5" aria-hidden="true" />
+              </button>
+              <button type="button" className={btn} onClick={() => zoomTo(view.s * STEP)} disabled={view.s >= MAX - 0.01} data-zoom-in aria-label={t.gallery.zoomIn}>
+                <Plus className="size-5" aria-hidden="true" />
+              </button>
+            </>
+          ) : null}
           <button ref={closeRef} type="button" className={btn} onClick={onClose} aria-label={t.common.close}>
             <X className="size-5" aria-hidden="true" />
           </button>
@@ -262,7 +270,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         onDoubleClick={onDoubleClick}
-        className={"relative flex-1 touch-none overflow-hidden select-none " + (zoomed ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in")}
+        className={"relative flex-1 touch-none overflow-hidden select-none " + (!photo ? "" : zoomed ? "cursor-grab active:cursor-grabbing" : "cursor-zoom-in")}
       >
         {item.type === "video" ? (
           <video

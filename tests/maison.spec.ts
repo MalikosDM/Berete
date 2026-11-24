@@ -1,17 +1,28 @@
-// The House (/about), 22/11/2026: the black and white portrait of Yoni as the main photo of the page, and no other photo
-// (the quotes and the chapters keep theirs: none). His face whole, on a computer and on an iPhone. Silent.
-// Screenshots go to verification/maison/.
+// The House (/about), 22/11/2026: the black and white portrait of Yoni as the main photo of the page. Since 24/11/2026 the
+// chapters show only his own photos (chapters 4 and 11 from the folder, 5, 8, 9, 10 and 12 his WhatsApp photos; 1, 2, 3, 6
+// and 7 none), the quotes none. His face whole, on a computer and on an iPhone. Silent. Screenshots go to verification/maison/.
 import { mkdirSync } from "node:fs";
 import { expect, test } from "./fixtures";
+import { defaultCatalogue } from "../src/data/catalogue";
+import { HOUSE_CHAPTERS, houseChapterPhoto } from "../src/data/house";
 import { media } from "../src/data/sources";
 import { skipIntro, watch } from "./helpers";
 
 const DIR = "verification/maison";
 mkdirSync(DIR, { recursive: true });
 
-test("the data: the portrait only", () => {
-  expect(Object.keys(media.house ?? {})).toEqual(["portrait"]);
+/** The chapters (1 to 12) with a photo of Yoni (24/11/2026). */
+const WITH_PHOTO = [4, 5, 8, 9, 10, 11, 12];
+
+test("the data: the portrait and the photos of chapters 4 and 11 from the folder; his own photos only", () => {
+  expect(Object.keys(media.house ?? {}).sort()).toEqual(["chapitre-04", "chapitre-11", "portrait"]);
   expect(media.house!.portrait!.src).toBe("/media/house/portrait.webp");
+  expect(media.house!["chapitre-04"]!.src).toBe("/media/house/chapitre-04.webp");
+  expect(media.house!["chapitre-11"]!.src).toBe("/media/house/chapitre-11.webp");
+  const photos = Array.from({ length: HOUSE_CHAPTERS }, (_, i) => houseChapterPhoto(defaultCatalogue, i));
+  expect(photos.flatMap((m, i) => (m ? [i + 1] : []))).toEqual(WITH_PHOTO);
+  // Never an image of a jewel (a sketch, a piece) in place of a missing photo.
+  for (const m of photos) if (m) expect(m.src).toMatch(/^\/media\/(house|extra\/house)\//);
 });
 
 for (const lang of ["", "/fr"]) {
@@ -20,9 +31,10 @@ for (const lang of ["", "/fr"]) {
     await skipIntro(page);
     await page.goto(lang + "/about", { waitUntil: "load" });
     const photos = page.locator("[data-house-photo]");
-    // The portrait at the top, then one image of the house per chapter (23/11/2026, until Yoni sends his own), none on the quotes.
-    await expect(photos).toHaveCount(13);
-    await expect(page.locator("[data-house-chapter] [data-house-photo]")).toHaveCount(12);
+    // The portrait at the top, then the photos of Yoni of seven chapters (24/11/2026), none on the quotes, no empty frame.
+    await expect(photos).toHaveCount(1 + WITH_PHOTO.length);
+    await expect(page.locator("[data-house-chapter] [data-house-photo]")).toHaveCount(WITH_PHOTO.length);
+    for (const n of WITH_PHOTO) await expect(page.locator("[data-house-chapter='" + n + "'] [data-house-photo]")).toHaveCount(1);
     await expect(page.locator("[data-house-quote] [data-house-photo]")).toHaveCount(0);
     const img = photos.first().locator("img");
     await img.scrollIntoViewIfNeeded();
@@ -44,7 +56,8 @@ for (const lang of ["", "/fr"]) {
     // Whole on the screen, at a good size.
     expect(fit.left).toBeGreaterThanOrEqual(0);
     expect(fit.right).toBeLessThanOrEqual(fit.vw);
-    expect(fit.w).toBeGreaterThan(info.project.name === "desktop" ? 380 : 300);
+    // (A third of the page on a computer, smaller since 24/11/2026.)
+    expect(fit.w).toBeGreaterThan(info.project.name === "desktop" ? 330 : 300);
     await img.evaluate((e) => e.scrollIntoView({ block: "center" }));
     await page.waitForTimeout(800);
     await page.screenshot({ path: DIR + "/" + info.project.name + (lang ? "-fr" : "") + "-portrait.jpg", type: "jpeg", quality: 72 });

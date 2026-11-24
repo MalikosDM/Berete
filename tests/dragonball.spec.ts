@@ -103,10 +103,11 @@ for (const lang of ["en", "fr"] as const) {
     }
     // The line is not written again at the top of the text (its titles stand there).
     expect(s.lines).toBe(0);
-    // The closing quote, larger than the text, in the italic of the quotes of the site.
+    // The closing quote, larger than the text, in the italic of the quotes of the site (24/11/2026: the smaller scale, t-lead).
     const look = await page.locator("[data-story-quote] p").evaluate((e) => ({ size: parseFloat(getComputedStyle(e).fontSize), style: getComputedStyle(e).fontStyle }));
+    const textSize = parseFloat(await page.locator("[data-story-paragraph]").first().evaluate((e) => getComputedStyle(e).fontSize));
     expect(look.style).toBe("italic");
-    expect(look.size).toBeGreaterThan(26);
+    expect(look.size).toBeGreaterThan(textSize * 1.15);
     await page.locator("[data-story-title]").first().scrollIntoViewIfNeeded();
     await page.waitForTimeout(500);
     await page.screenshot({ path: DIR + "/" + info.project.name + "-" + lang + "-texte.jpg", type: "jpeg", quality: 68 });
@@ -120,8 +121,9 @@ for (const lang of ["en", "fr"] as const) {
     await page.locator("#sheet-title").scrollIntoViewIfNeeded();
     await page.waitForTimeout(400);
     await page.screenshot({ path: DIR + "/" + info.project.name + "-" + lang + "-fiche.jpg", type: "jpeg", quality: 68 });
-    // Every text readable: 16 px at least.
-    for (const el of await page.locator("[data-story-paragraph], [data-story-title]").all()) expect(parseFloat(await el.evaluate((e) => getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(16);
+    // Every text readable: 16 px at least on a phone (a computer draws the site smaller since 24/11/2026: 14 px at least).
+    const least = info.project.name === "desktop" ? 14 : 16;
+    for (const el of await page.locator("[data-story-paragraph], [data-story-title]").all()) expect(parseFloat(await el.evaluate((e) => getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(least);
     expect(problems.errors).toEqual([]);
   });
 }

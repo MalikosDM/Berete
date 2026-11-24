@@ -35,24 +35,24 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
   const proof = [...people.filter((p) => p.kind === "club"), ...people.filter((p) => p.kind === "player" && p.number !== null)].map((p) => p.name);
 
   return (
-    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-32 bg-ink " + (compact ? "py-20 lg:py-28" : "py-24 lg:py-36")}>
-      <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
-        <div className="rule-rose mb-16 lg:mb-24" aria-hidden="true" />
+    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-32 bg-ink " + (compact ? "py-16 lg:py-20" : "py-16 lg:py-24")}>
+      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
+        <div className="rule-rose mb-10 lg:mb-12" aria-hidden="true" />
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">
           {/* Left: the main call to action */}
           <div className="lg:col-span-5">
             <p className="eyebrow">{pieceName ? t.contact.inspired : t.common.startPiece}</p>
-            <h2 id={(id ?? "contact-block") + "-title"} className={"title-caps mt-5 max-w-full text-balance break-words tracking-[0.14em] " + (compact ? "text-[clamp(2rem,5vw,3.75rem)] lg:text-[clamp(2rem,3.2vw,3.25rem)]" : "text-[clamp(2.25rem,6vw,5rem)] lg:text-[clamp(2.25rem,3.6vw,3.75rem)]")}>
+            <h2 id={(id ?? "contact-block") + "-title"} className={"title-caps mt-5 max-w-full text-balance break-words tracking-[0.14em] " + (compact ? "t-title lg:t-title" : "t-title lg:t-title")}>
               {pieceName ? t.piece.want : t.common.yourStory}
             </h2>
-            <p className="mt-6 max-w-md text-lg text-mist">
+            <p className="mt-6 max-w-md text-base text-mist">
               {t.contact.oneConversation}
             </p>
             <a
               href={waLink(mainMessage)}
               target="_blank"
               rel="noreferrer"
-              className="mt-10 flex min-h-16 w-full items-center justify-center gap-3 bg-white px-8 text-base font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light sm:w-auto sm:inline-flex"
+              className="mt-10 flex min-h-16 w-full items-center justify-center gap-3 bg-white px-8 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light sm:w-auto sm:inline-flex"
             >
               <BrandIcon name="whatsapp" className="size-6" />
               {t.common.chatWhatsapp}
@@ -146,7 +146,7 @@ function Configurator({ pieceName }: { pieceName?: string }) {
                 key={o.value}
                 type="button"
                 onClick={() => choose(o)}
-                className="group flex min-h-14 items-center justify-between gap-3 border border-white/25 px-5 text-start text-base text-white transition-colors hover:border-rose-light hover:text-rose-light"
+                className="group flex min-h-12 items-center justify-between gap-3 border border-white/25 px-5 text-start text-base text-white transition-colors hover:border-rose-light hover:text-rose-light"
               >
                 {o.label}
                 <ArrowRight className="size-4 shrink-0 transition-transform group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" aria-hidden="true" />
@@ -178,7 +178,7 @@ function Configurator({ pieceName }: { pieceName?: string }) {
               href={waLink(message)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-14 items-center justify-center gap-3 bg-white px-6 text-base font-semibold text-ink transition-colors hover:bg-rose-light"
+              className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium text-ink transition-colors hover:bg-rose-light"
             >
               <BrandIcon name="whatsapp" className="size-5" />
               {t.contact.openWhatsapp}
@@ -186,7 +186,7 @@ function Configurator({ pieceName }: { pieceName?: string }) {
             <button
               type="button"
               onClick={() => setAnswers([])}
-              className="inline-flex min-h-14 items-center justify-center gap-2 border border-white/30 px-6 text-base text-white transition-colors hover:border-rose-light hover:text-rose-light"
+              className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-6 text-base text-white transition-colors hover:border-rose-light hover:text-rose-light"
             >
               <RotateCcw className="size-4" aria-hidden="true" />
               {t.contact.startOver}
@@ -250,7 +250,7 @@ function CallBack({ pieceName }: { pieceName?: string }) {
       {open ? (
         <div id="callback-form" className="mt-6">
           {status === "sent" ? (
-            <p role="status" className="flex items-start gap-3 text-lg text-bone">
+            <p role="status" className="flex items-start gap-3 text-base text-bone">
               <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />
               {t.contact.callSent}
             </p>
@@ -291,7 +291,7 @@ function CallBack({ pieceName }: { pieceName?: string }) {
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="inline-flex min-h-14 w-full items-center justify-center gap-2 border border-rose-light/80 px-8 text-base font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.8125rem]"
                 >
                   {status === "sending" ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : null}
                   {t.contact.callButton}

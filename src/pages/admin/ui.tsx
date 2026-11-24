@@ -3,8 +3,8 @@ import BrandIcon from "@/components/BrandIcon";
 import type { PublicModel } from "@/data/models";
 
 export const inputCls = "mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
-export const btn = "inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-5 text-base font-semibold text-white hover:border-rose-light hover:text-rose-light disabled:opacity-50";
-export const btnMain = "inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 text-base font-semibold text-ink hover:bg-rose-light disabled:opacity-60";
+export const btn = "inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-5 text-base font-medium text-white hover:border-rose-light hover:text-rose-light disabled:opacity-50";
+export const btnMain = "inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 text-base font-medium text-ink hover:bg-rose-light disabled:opacity-60";
 export const iconBtn = "inline-flex size-12 shrink-0 items-center justify-center border border-white/30 text-white hover:border-rose-light hover:text-rose-light";
 
 /** A model as the admin lists it (server/routes/models.ts, adminView). */

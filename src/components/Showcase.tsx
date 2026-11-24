@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import Lightbox from "@/components/Lightbox";
-import Loupe from "@/components/Loupe";
 import JewelFx, { jewelSource } from "@/components/universe/JewelFx";
 import { cutoutLargest, cutoutSrcSet, type CutoutView } from "@/data/showcase";
 import type { JewelEffect } from "@/data/themes";
@@ -19,14 +18,15 @@ import { useI18n } from "@/i18n";
  */
 
 /** The places around the main view: [x, y] as a share of the box, the size, the depth of the relief. */
-const MAIN = { x: 0, y: 0, s: 0.74, d: 16 };
-const SINGLE = { x: 0, y: 0, s: 0.94, d: 12 };
+const MAIN = { x: 0, y: 0, s: 0.68, d: 16 };
+const SINGLE = { x: 0, y: 0, s: 0.86, d: 12 };
 // A piece shown large (PieceShowcase.size): its main view takes the whole box (the views around stay at their places, behind).
-const MAIN_LARGE = { ...MAIN, s: 1 };
-const SINGLE_LARGE = { ...SINGLE, s: 1 };
+const MAIN_LARGE = { ...MAIN, s: 0.9 };
+const SINGLE_LARGE = { ...SINGLE, s: 0.94 };
 // "xl" (Dragon Ball with its chain, Yoni 23/11/2026): a fifth larger again, a little higher; its chain leaves the top of the
 // box under the menu, faded (.sv-xl), the jewel itself whole above the bottom of the screen.
-const SINGLE_XL = { x: 0, y: -0.035, s: 1.2, d: 12 };
+// Smaller since 24/11/2026 (the whole piece in the first screen of a laptop).
+const SINGLE_XL = { x: 0, y: -0.02, s: 1.04, d: 12 };
 // Each one stays inside the box: |x| and |y| at most (1 - s) / 2.
 const AROUND = [
   { x: -0.37, y: 0.33, s: 0.26, d: 7 },
@@ -43,14 +43,8 @@ const AROUND = [
 export default function Showcase({ slug, title, views, jewel = null, large = false, xl = false }: { slug: string; title: string; views: CutoutView[]; jewel?: JewelEffect | null; large?: boolean; xl?: boolean }) {
   const { t } = useI18n();
   const rootRef = useRef<HTMLDivElement>(null);
-  const mainImage = useCallback(() => rootRef.current?.querySelector<HTMLImageElement>("[data-place='0'] img") ?? null, []);
-  // The magnifying glass over the main view (photos only: never a film, Yoni 23/11/2026).
-  const lensTarget = useCallback(() => {
-    const img = mainImage();
-    const v = img ? views.find((x) => img.currentSrc.includes("/" + x.id + "-") || img.src.includes("/" + x.id + "-")) : undefined;
-    return img && v && rootRef.current ? { img, full: cutoutLargest(slug, v), frame: rootRef.current } : null;
-  }, [mainImage, views, slug]);
-  // Phone: a touch opens the views full screen, where two fingers zoom.
+  // A click on the main view (a touch on a phone) opens the views full screen, where the magnifying glass lives (Yoni,
+  // 24/11/2026: no lens that follows the pointer over the page any more).
   const [opened, setOpened] = useState<number | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   // order[k]: the view in place k (place 0 is the middle).
@@ -160,8 +154,6 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       data-showcase-xl={xl && !multi ? "" : undefined}
       className="relative h-full w-full"
     >
-      {/* The magnifying glass that follows the pointer over the jewel (computers). */}
-      <Loupe zone={rootRef} pick={lensTarget} />
       {/* Computer: the views in depth */}
       <div className="absolute inset-0 hidden lg:block" role={multi ? "group" : undefined} aria-label={multi ? t.piece.viewsLabel : undefined}>
         {places.map((viewIndex, place) => {
@@ -180,12 +172,13 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
               type="button"
               data-showcase-view={v.id}
               data-place={place}
-              disabled={main}
-              aria-label={main ? t.piece.viewAlt(title, kindName(v)) : t.piece.showView(kindName(v))}
-              onClick={() => bring(place)}
+              aria-label={main ? t.gallery.open(t.piece.viewAlt(title, kindName(v))) : t.piece.showView(kindName(v))}
+              onClick={() => (main ? setOpened(viewIndex) : bring(place))}
               style={style}
-              className={"sv-view absolute inset-0 " + (main ? "pointer-events-none" : "cursor-pointer") + (main && xl && !multi ? " sv-xl" : "")}
+              // Among several views, only the middle of the main one opens it (the small views around it stay within reach).
+              className={"sv-view absolute inset-0 " + (main ? (multi ? "pointer-events-none" : "cursor-zoom-in") : "cursor-pointer") + (main && xl && !multi ? " sv-xl" : "")}
             >
+              {main && multi ? <span aria-hidden="true" className="pointer-events-auto absolute inset-[16%] z-10 cursor-zoom-in" /> : null}
               <span className="sv-par block h-full w-full">
                 {framed(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw")}
               </span>

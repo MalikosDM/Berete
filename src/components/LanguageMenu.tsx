@@ -42,9 +42,9 @@ export function LanguageMenu({ className = "" }: { className?: string }) {
         aria-expanded={open}
         aria-controls={id}
         aria-label={t.language.choose + " — " + LOCALE_INFO[locale].name}
-        className="inline-flex min-h-12 items-center gap-1.5 px-2 text-[0.8125rem] font-medium uppercase tracking-[0.18em] text-white transition-colors hover:text-rose-light"
+        className="inline-flex min-h-10 items-center gap-1.5 px-2 text-[0.6875rem] font-normal uppercase tracking-[0.18em] text-white transition-colors hover:text-rose-light"
       >
-        <Globe className="size-4" aria-hidden="true" />
+        <Globe className="size-3.5" aria-hidden="true" />
         {LOCALE_INFO[locale].short}
         <ChevronDown className={"size-3.5 transition-transform duration-300 " + (open ? "rotate-180" : "")} aria-hidden="true" />
       </button>

@@ -15,7 +15,9 @@ const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
 
 /**
  * Each universe, the pieces it holds (from the feedback of Yoni), and the one opened here. Flâneur and the two iced Cuban
- * chains of "facettes" were taken off the site on 21/11/2026 (too few photos): their universes wait for them.
+ * chains of "facettes" were taken off the site on 21/11/2026 (too few photos): their universes wait for them. (24/11/2026:
+ * the White Iced Cuban chain is back, in "facettes"; the forge waits too: the twisted chain of Kevin Schade is BRT Flowers,
+ * in the roses.)
  */
 const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   // The panther: since 21/11/2026 the night of his celebration (a sequence of three images, tests/making.spec.ts).
@@ -28,7 +30,6 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   { backdrop: "trefle", preset: "emeraude", pieces: ["eljero-elia-clover-medallion"] },
   // The Hand: since 21/11/2026 the endless space (tests/infini.spec.ts).
   { backdrop: "infini", preset: "infini", pieces: ["the-hand"] },
-  { backdrop: "forge", preset: "forge", pieces: ["kevin-schade-twisted-chain"] },
   {
     backdrop: "sacre",
     preset: "sacre",
@@ -40,7 +41,7 @@ const UNIVERSES: { backdrop: string; preset: string; pieces: string[] }[] = [
   {
     backdrop: "facettes",
     preset: "facettes",
-    pieces: ["ampersand-initials-pendant", "malik-tillman-tm-pendant", "baguette-cuban-chain", "oval-eternity-band"],
+    pieces: ["ampersand-initials-pendant", "malik-tillman-tm-pendant", "baguette-cuban-chain", "white-iced-cuban-chain", "oval-eternity-band"],
   },
   { backdrop: "mecanique", preset: "mecanique", pieces: ["marcus-thuram-skeleton-watch", "tajon-buchanan-iced-watch", "radja-nainggolan-iced-watch"] },
   { backdrop: "n14", preset: "n14", pieces: ["celestial-initial-medallion"] },
@@ -130,7 +131,7 @@ for (const u of UNIVERSES) {
 test("asked for less motion: the worlds stay still (no canvas, no animation), the piece and its texts there", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await skipIntro(page);
-  for (const slug of ["kevin-schade-twisted-chain", "celestial-initial-medallion", "kenan-yildiz-celebration-pendant"]) {
+  for (const slug of ["brt-flower-chain", "celestial-initial-medallion", "kenan-yildiz-celebration-pendant"]) {
     await page.goto("/pieces/" + slug, { waitUntil: "load" });
     await expect(page.locator("h1#piece-title")).toBeVisible();
     await expect(page.locator(".universe canvas.u-fx")).toHaveCount(1);

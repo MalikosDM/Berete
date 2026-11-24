@@ -1,4 +1,4 @@
-/* The collections: one per type of jewel, at /creations/<slug>; and their sub-categories (Jesus Pieces, inside the pendants). */
+/* The collections: one per type of jewel, at /creations/<slug>; and their categories (inside the pendants and the chains). */
 import type { Catalogue, Piece, PieceType } from "./types.js";
 
 export type Collection = {
@@ -59,6 +59,40 @@ export const COLLECTIONS: Collection[] = [
 export type SubCategory = Omit<Collection, "type"> & { parent: PieceType; pieces: string[] };
 
 export const SUBCATEGORIES: SubCategory[] = [
+  // The categories of the pendants (Yoni, 24/11/2026): one presses Pendants and sees the categories first, then the pieces.
+  // A pendant that fits none stays in "All pendants" only. The list is Yoni's to confirm (CLAUDE.md).
+  {
+    parent: "pendant",
+    slug: "celebration",
+    name: "Celebration Pendants",
+    intro: "The goal celebrations of the players, sculpted in diamonds: a gesture on the pitch, kept for good.",
+    hero: "kenan-yildiz-celebration-pendant",
+    pieces: ["kenan-yildiz-celebration-pendant", "noah-okafor-jersey-pendant", "kevin-schade-dragon-ball-pendant", "panther-champion-pendant"],
+  },
+  {
+    parent: "pendant",
+    slug: "cross",
+    name: "Cross Pendants",
+    intro: "Crosses drawn by the house, framed in baguettes or set stone by stone.",
+    hero: "malik-tillman-cross-pendant",
+    pieces: ["malik-tillman-cross-pendant", "baguette-cross-pendant", "thorns-and-roses-crucifix"],
+  },
+  {
+    parent: "pendant",
+    slug: "name",
+    name: "Name Pendants",
+    intro: "A name, or the initials of a name, drawn in gold and set with diamonds.",
+    hero: "noah-okafor-oka-pendant",
+    pieces: ["noah-okafor-oka-pendant", "noah-okafor-octagon-pendant", "angelo-stiller-as-pendant", "jamie-leweling-jl-pendant", "malik-tillman-tm-pendant", "lois-openda-script-pendant", "ampersand-initials-pendant", "tanguy-nianzou-fam-medallion"],
+  },
+  {
+    parent: "pendant",
+    slug: "letter",
+    name: "Letter Pendants",
+    intro: "One letter, and the whole story of the one who wears it.",
+    hero: "marcus-thuram-t-serpent-pendant",
+    pieces: ["marcus-thuram-t-serpent-pendant", "marcus-thuram-thorned-t-pendant", "deniz-undav-l-pendant", "celestial-initial-medallion"],
+  },
   {
     parent: "pendant",
     slug: "jesus-pieces",
@@ -68,7 +102,43 @@ export const SUBCATEGORIES: SubCategory[] = [
     hero: "crown-of-thorns-jesus-piece",
     pieces: ["crown-of-thorns-jesus-piece", "samuel-ballet-jesus-piece", "jesus-piece-red-flowers", "thorns-and-roses-crucifix"],
   },
+  // The categories of the chains (proposed to Yoni, 24/11/2026).
+  {
+    parent: "chain",
+    slug: "signature",
+    name: "Signature Chains",
+    intro: "The chains of the house, drawn by Berete: the Safi Link and BRT Flowers.",
+    hero: "the-safi-link",
+    pieces: ["the-safi-link", "brt-flower-chain", "sirius"],
+  },
+  {
+    parent: "chain",
+    slug: "cuban",
+    name: "Cuban Chains",
+    intro: "The Cuban link, iced with diamonds, from one width to another.",
+    hero: "rose-iced-cuban-chain",
+    pieces: ["rose-iced-cuban-chain", "wide-rose-iced-cuban-chain", "baguette-cuban-chain", "white-iced-cuban-chain", "two-tone-iced-cuban-chain"],
+  },
+  {
+    parent: "chain",
+    slug: "tennis",
+    name: "Tennis Chains",
+    intro: "A line of diamonds, stone after stone.",
+    hero: "two-row-tennis-chain",
+    pieces: ["two-row-tennis-chain"],
+  },
+  {
+    parent: "chain",
+    slug: "infinity",
+    name: "Infinity Chains",
+    intro: "Links drawn in the shape of infinity.",
+    hero: "infinity-link-chain",
+    pieces: ["infinity-link-chain", "cross-infinity-chain", "pear-link-chain"],
+  },
 ];
+
+/** The pieces shown first in their collection (Yoni, 24/11/2026: the Safi Link, the second signature of the house, first among the chains). */
+export const FIRST_IN_COLLECTION = ["the-safi-link", "brt-flower-chain"];
 
 export type AnyCollection = Collection | SubCategory;
 export const isSub = (c: AnyCollection): c is SubCategory => "parent" in c;
@@ -112,7 +182,11 @@ export function collectionOf(type: PieceType): Collection {
 }
 
 export function piecesOfType(cat: Catalogue, type: PieceType): Piece[] {
-  return cat.pieces.filter((p) => p.type === type);
+  const rank = (p: Piece) => {
+    const i = FIRST_IN_COLLECTION.indexOf(p.slug);
+    return i < 0 ? FIRST_IN_COLLECTION.length : i;
+  };
+  return cat.pieces.filter((p) => p.type === type).sort((a, b) => rank(a) - rank(b));
 }
 
 /** The collections with at least `min` pieces, in their order. */

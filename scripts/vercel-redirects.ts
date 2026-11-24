@@ -28,6 +28,8 @@ export function catalogueRedirects(): Redirect[] {
     out.push({ source: "/:lang(fr|es|de|nl|ar)" + from, destination: "/:lang" + to, statusCode: 301 });
   };
   for (const p of defaultCatalogue.pieces) {
+    // A piece merged into another (RENAMED_PIECES) leads to it, not to its player.
+    if (RENAMED_PIECES[p.slug]) continue;
     const target = removedPieceTarget(defaultCatalogue, p.slug);
     if (target) both("/pieces/" + p.slug, target);
   }

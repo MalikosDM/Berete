@@ -18,7 +18,7 @@ export function PlayerPortrait({ person, className = "", sizes = "96px", big = f
   if (!src) {
     return (
       <span aria-hidden="true" data-initials className={"flex items-center justify-center bg-ink-soft " + className}>
-        <span className={"text-rose-gold font-display font-light " + (big ? "text-[clamp(5rem,14vw,10rem)]" : "text-[clamp(2.25rem,6vw,3.5rem)]")}>{initials(person.name)}</span>
+        <span className={"text-rose-gold font-display font-light " + (big ? "text-[clamp(5rem,14vw,10rem)]" : "t-title")}>{initials(person.name)}</span>
       </span>
     );
   }
@@ -50,8 +50,9 @@ export function facesFirst(people: Person[], cat: Catalogue): Person[] {
 export default function PlayerWall({ people, compact = false }: { people: Person[]; compact?: boolean }) {
   const { t } = useI18n();
   const cat = useCatalogue();
-  const columns = compact ? "grid-cols-3 gap-x-3 gap-y-8 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-7 lg:gap-x-6" : "grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4 xl:grid-cols-5";
-  const sizes = compact ? "(max-width: 639px) 31vw, (max-width: 1023px) 23vw, 13vw" : "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, (max-width: 1279px) 23vw, 18vw";
+  // Four on a row on a computer, smaller (Yoni, 24/11/2026).
+  const columns = compact ? "grid-cols-3 gap-x-3 gap-y-8 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-7 lg:gap-x-6" : "grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6";
+  const sizes = compact ? "(max-width: 639px) 31vw, (max-width: 1023px) 23vw, 13vw" : "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, 18rem";
   return (
     <ul data-player-wall className={"grid " + columns}>
       {people.map((p) => {
@@ -67,14 +68,14 @@ export default function PlayerWall({ people, compact = false }: { people: Person
               {/* Three narrow columns on phones: the names in plain letters, so that long names keep whole words. */}
               <span
                 className={
-                  "mt-4 flex items-baseline gap-2 leading-[1.15] text-white transition-colors group-hover:text-rose-light " +
-                  (compact ? "text-base font-medium max-sm:mt-3 sm:font-display sm:text-lg sm:font-normal sm:uppercase sm:tracking-[0.05em]" : "font-display text-xl uppercase tracking-[0.05em] sm:text-2xl")
+                  "mt-3 flex items-baseline gap-2 leading-[1.15] text-white transition-colors group-hover:text-rose-light " +
+                  (compact ? "text-base font-medium max-sm:mt-3 sm:font-display sm:text-lg sm:font-normal sm:uppercase sm:tracking-[0.05em]" : "font-display text-base uppercase tracking-[0.06em] sm:text-lg")
                 }
               >
                 {p.number !== null ? <span className="text-rose-gold shrink-0">{p.number}</span> : null}
                 <span className="min-w-0 break-words">{p.name}</span>
               </span>
-              {role ? <span className="mt-1 block text-base text-mist">{role}</span> : null}
+              {role ? <span className="mt-1 block text-base text-mist lg:text-[0.875rem]">{role}</span> : null}
             </Link>
             {instagram ? (
               <a

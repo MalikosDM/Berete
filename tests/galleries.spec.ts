@@ -5,7 +5,7 @@
 // Screenshots go to verification/galleries/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
-import { anglePhotos, wornSet, anglesShownFirst } from "../src/data/angles";
+import { anglePhotos, wornSet } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import { NEW_PIECES } from "../src/data/pieces";
@@ -16,11 +16,13 @@ const DIR = "verification/galleries";
 mkdirSync(DIR, { recursive: true });
 const shot = (page: Page, name: string) => page.screenshot({ path: DIR + "/" + name + ".jpg", type: "jpeg", quality: 65, timeout: 45_000 });
 const PUBLISHED = defaultCatalogue.pieces.filter((p) => p.published);
+/** "Every Angle" shows four photos, then "See N more" (24/11/2026, src/components/EveryAngle.tsx). */
+const anglesShownFirst = (n: number) => Math.min(n, 4);
 
 test("Créations: every published piece is there, each card with its photo", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  await page.goto("/fr/creations?view=grid");
+  await page.goto("/fr/creations");
   const cards = page.locator("a[data-piece-card]");
   await expect(cards).toHaveCount(PUBLISHED.length);
   const shown = await cards.evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));
@@ -50,29 +52,28 @@ test("the pages chosen: eight new pieces and four of the site", () => {
   for (const slug of NEW_PAGES) expect(NEW_PIECES).toContain(slug);
 });
 
-/** The new pieces with a film of the finished piece: since 23/11/2026 in its own section, played at a click (src/components/PieceFilm.tsx). */
+/** The new pieces with a film of the finished piece: since 24/11/2026 in its own section right after the opening, silent, in a loop (src/components/FeatureFilm.tsx). */
 const NEW_FILMS = ["ampersand-initials-pendant", "thorns-and-roses-crucifix", "lois-openda-script-pendant", "panther-champion-pendant", "jesus-piece-red-flowers", "brt-flower-chain", "baguette-cuban-chain"];
 for (const slug of NEW_FILMS) {
   test(slug + ": the piece first, its film in its section", async ({ page }, info) => {
     const problems = watch(page);
-    await skipIntro(page, { films: false });
-    await page.goto("/fr/creations?view=grid");
+    await skipIntro(page);
+    await page.goto("/fr/creations");
     const card = page.locator("a[data-piece-card='" + slug + "']").first();
     await card.scrollIntoViewIfNeeded();
     await card.click();
     await expect(page.locator("[data-piece-opening] h1")).toBeVisible();
     await page.waitForTimeout(1000);
+    // No film over the piece (the cinema window lives in The Atelier only).
     await expect(page.locator("[data-piece-film]")).toHaveCount(0);
-    await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
-    await page.locator("[data-watch-film-section]").click();
-    await expect(page.locator("[data-piece-film]")).toBeVisible({ timeout: 20_000 });
-    const src = await page.locator("[data-piece-film-video]").evaluate((el) => (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src);
-    expect(src).toContain("/media/films/" + slug + "/reveal");
-    await expect.poll(() => page.locator("[data-piece-film-video]").evaluate((el) => (el as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
+    const section = page.locator("[data-feature-film='" + slug + "']");
+    await section.locator("[data-feature-frame]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+    const video = section.locator("[data-feature-video]");
+    await expect.poll(() => video.evaluate((el) => (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src), { timeout: 20_000 }).toContain("/media/films/" + slug + "/reveal");
+    await expect.poll(() => video.evaluate((el) => (el as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
+    expect(await video.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop)).toBe(true);
     await page.waitForTimeout(600);
     await shot(page, info.project.name + "-" + slug + "-film");
-    await page.locator("[data-piece-film-skip]").click();
-    await expect(page.locator("[data-piece-film]")).toHaveCount(0, { timeout: 5_000 });
     expect(problems.errors).toEqual([]);
   });
 }

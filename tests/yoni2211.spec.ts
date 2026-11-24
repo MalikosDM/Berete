@@ -1,7 +1,9 @@
 // Feedback of Yoni (22/11/2026), checked on a computer, a tablet and an iPhone, silent:
-// 1. Créations: three pieces on a row on a computer, larger than before; two on a tablet; one on a phone.
+// 1. Créations: three pieces on a row on a computer, larger than before; two on a tablet; one on a phone (24/11/2026: four on
+//    a row on a computer, three on a tablet, two on a phone).
 // 2. Jesus Pieces: a sub-category of the pendants (a tab inside Pendants, its own address /creations/pendants/jesus-pieces,
-//    under Pendants in the menu); its old address leads there.
+//    under Pendants in the menu); its old address leads there. (24/11/2026: the pendants have categories, shown first on
+//    their page as tiles; inside a category, the tabs of the others.)
 // 3. The world of the T-Serpent pendant in rose gold: its new backdrop, its glow, embers, halo and serpent of light.
 // 4. The Butterfly: the pendant (its old address leads to it) and the chain, two pieces linked to each other; the world
 //    darker, the piece first.
@@ -35,24 +37,23 @@ async function firstRow(page: Page, grid: string): Promise<number> {
   });
 }
 
-test("Créations: three on a row on a computer, two on a tablet, one on a phone, larger cards", async ({ page }, info) => {
+test("Créations: four on a row on a computer, three on a tablet, two on a phone", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  // (Since 22/11/2026 (2), the carousel first: this grid with "See all creations", tests/carousel.spec.ts.)
-  await page.goto("/creations?view=grid", { waitUntil: "load" });
+  await page.goto("/creations", { waitUntil: "load" });
   const grid = page.locator("[data-creations-grid]");
   await expect(grid.locator("> li").first()).toBeVisible();
   const phone = info.project.name !== "desktop";
-  expect(await firstRow(page, "[data-creations-grid]")).toBe(phone ? 1 : 3);
+  expect(await firstRow(page, "[data-creations-grid]")).toBe(phone ? 2 : 4);
   const width = await grid.locator("> li").first().evaluate((e) => e.getBoundingClientRect().width);
-  // Before: six on a row (about 200 px on 1440). Now about 420 px.
-  expect(width).toBeGreaterThan(phone ? 320 : 380);
+  // Before: six on a row (about 200 px on 1440); then three (about 420 px); since 24/11/2026 four, about 300 px.
+  expect(width).toBeGreaterThan(phone ? 150 : 250);
   await shot(page, info.project.name + "-creations");
   if (!phone) {
-    // A tablet: two on a row.
+    // A tablet: three on a row.
     await page.setViewportSize({ width: 820, height: 1180 });
     await page.waitForTimeout(500);
-    expect(await firstRow(page, "[data-creations-grid]")).toBe(2);
+    expect(await firstRow(page, "[data-creations-grid]")).toBe(3);
     await shot(page, "tablette-creations");
   }
   expect(problems.errors).toEqual([]);
@@ -65,15 +66,17 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   const count = piecesOfCollection(CAT, jesus).length;
   expect(count).toBeGreaterThanOrEqual(4);
   for (const slug of jesus.pieces) expect(CAT.pieces.find((p) => p.slug === slug)?.type, slug).toBe("pendant");
-  // The page of the pendants: its tabs.
+  // The page of the pendants: its categories first (24/11/2026), Jesus Pieces among them.
   await page.goto("/fr/creations/pendants", { waitUntil: "load" });
-  const tabs = page.locator("[data-subcategories]");
-  await expect(tabs.locator("[data-subcategory='pendants']")).toContainText("Tous les pendentifs");
-  await expect(tabs.locator("[data-subcategory='pendants']")).toHaveAttribute("aria-current", "page");
-  await tabs.locator("[data-subcategory='jesus-pieces']").click();
+  const tiles = page.locator("[data-categories] [data-category]");
+  await expect(tiles).toHaveCount(SUBCATEGORIES.filter((s) => s.parent === "pendant" && piecesOfCollection(CAT, s).length > 0).length);
+  await page.locator("[data-categories] [data-category='jesus-pieces']").click();
   await expect(page).toHaveURL(/\/fr\/creations\/pendants\/jesus-pieces$/);
   await expect(page.locator("h1")).toContainText("Jesus Pieces");
-  await expect(page.locator("[data-subcategory='jesus-pieces']")).toHaveAttribute("aria-current", "page");
+  // Inside it, the tabs of the pendants: all of them, then each category.
+  const tabs = page.locator("[data-subcategories]");
+  await expect(tabs.locator("[data-subcategory='pendants']")).toContainText("Tous les pendentifs");
+  await expect(tabs.locator("[data-subcategory='jesus-pieces']")).toHaveAttribute("aria-current", "page");
   await expect(page.locator("[data-creations-grid] [data-piece-card]")).toHaveCount(count);
   await shot(page, info.project.name + "-pendentifs-jesus-pieces");
   // Its old address.
@@ -82,14 +85,15 @@ test("Jesus Pieces: inside Pendants (tab, filter, menu), its own address, the ol
   // The menu: under Pendants.
   if (info.project.name === "desktop") {
     await page.locator("[data-desktop-nav] a[aria-haspopup]").hover();
-    const sub = page.locator("[data-desktop-nav] a[data-nav-sub]");
+    // (Among the categories of the pendants and of the chains, 24/11/2026.)
+    const sub = page.locator("[data-desktop-nav] a[data-nav-sub][href='/creations/pendants/jesus-pieces']");
     await expect(sub).toHaveText("Jesus Pieces");
     await expect(sub).toHaveAttribute("href", "/creations/pendants/jesus-pieces");
     await page.waitForTimeout(400);
     await shot(page, "desktop-menu-jesus-pieces");
   } else {
     await page.getByRole("button", { name: /menu/i }).first().click();
-    const sub = page.locator("nav a[data-nav-sub]").first();
+    const sub = page.locator("#mobile-menu a[data-nav-sub][href='/creations/pendants/jesus-pieces']");
     await expect(sub).toHaveText("Jesus Pieces");
     await expect(sub).toHaveAttribute("href", "/creations/pendants/jesus-pieces");
     await page.waitForTimeout(600);

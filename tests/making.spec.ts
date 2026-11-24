@@ -1,6 +1,7 @@
 // Feedback of Yoni, 21/11/2026 (2).
 // 1. "The Making of a Masterpiece": only the real steps of each piece (src/data/making.ts), its complete making-of first;
-//    no image of the atelier repeated from piece to piece; a piece without a real step has no section.
+//    no image of the atelier repeated from piece to piece; a piece without a real step has no section. Since 24/11/2026
+//    (Yoni) it lives in The Atelier: /atelier?piece=<slug> opens its making-of at once, its steps wait under it.
 // 2. From the opening of a capsule, one scroll leads to the next section (no pinned sequence any more).
 // 3. The amateur films at the end of "Every Angle" (src/data/angles.ts, AMATEUR_FILMS).
 // 4. N14: every useful photo of folder 22, its professional film at the opening and in its atelier.
@@ -12,6 +13,7 @@ import { expect, test, type Page } from "./fixtures";
 import { AMATEUR_FILMS, anglePhotos, wornSet } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { piecesOfCollection, SUBCATEGORIES } from "../src/data/collections";
+import { resolveAtelier } from "../src/data/atelier";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import { publicCatalogue } from "../src/data/relations";
 import { resolveShowcase } from "../src/data/showcase";
@@ -68,27 +70,41 @@ for (const slug of PAGES) {
     const types = await page.locator("[data-every-angle] [data-angle]").evaluateAll((els) => els.map((e) => e.querySelector("video")?.getAttribute("src") ?? e.querySelector("video source")?.getAttribute("src") ?? ""));
     expect(types.length).toBe(photos.length);
 
-    // "The Making of a Masterpiece": its real steps only, its complete making-of first.
+    // "The Making of a Masterpiece": not on the page of the piece any more (24/11/2026), a way to The Atelier.
     const steps = makingSteps(piece, boxOf(slug));
-    const film = completeMakingOf(slug, piece.atelier);
-    const section = page.locator("[data-making]");
+    const atelier = resolveAtelier(slug, piece.atelier);
+    const film = atelier?.making ?? completeMakingOf(slug, piece.atelier);
+    await expect(page.locator("[data-making]")).toHaveCount(0);
     if (steps.length === 0 && !film) {
-      await expect(section).toHaveCount(0);
+      await expect(page.locator("[data-enter-atelier]")).toHaveCount(0);
     } else {
-      await section.scrollIntoViewIfNeeded();
-      await expect(section.locator("[data-making-step]")).toHaveCount(steps.length);
-      await expect(section.locator("[data-making-film]")).toHaveCount(film ? 1 : 0);
-      const order = await section.locator("ol > li[data-making-film], ol > li[data-making-step]").evaluateAll((els) => els.map((e) => e.getAttribute("data-making-step") ?? "film"));
-      expect(order).toEqual([...(film ? ["film"] : []), ...steps.map((s) => s.step)]);
-      const srcs = await section.locator("img, video").evaluateAll((els) => els.map((e) => (e as HTMLImageElement).currentSrc || e.getAttribute("src") || ""));
-      for (const s of srcs) expect(s, "no image of the atelier").not.toMatch(/\/media\/atelier\//);
-      await section.evaluate((el) => el.scrollIntoView({ block: "start" }));
-      await page.waitForTimeout(900);
-      await shot(page, info.project.name + "-" + slug + "-2-making-of");
+      await expect(page.locator("[data-enter-atelier-link]")).toHaveAttribute("href", "/fr/atelier?piece=" + slug);
+      await page.goto("/fr/atelier?piece=" + slug, { waitUntil: "load" });
+      // Its making-of first: its film opens at once.
       if (film) {
-        await section.locator("[data-making-open='film']").click();
-        await expect(page.getByRole("dialog")).toBeVisible();
-        await page.keyboard.press("Escape");
+        const room = page.locator("[data-atelier-room]");
+        await expect(room.locator("[data-atelier-video]")).toHaveAttribute("src", info.project.name === "desktop" ? film.src : film.mobile);
+        await page.waitForTimeout(600);
+        await shot(page, info.project.name + "-" + slug + "-2-making-of-film");
+        // (Again until it is gone: the page may still be settling when it opens.)
+        await expect(async () => {
+          if (await room.count()) await page.keyboard.press("Escape");
+          await expect(room).toHaveCount(0, { timeout: 2_000 });
+        }).toPass({ timeout: 20_000 });
+      }
+      // Then its real steps only, in their order, never an image of the atelier.
+      const section = page.locator("[data-atelier-piece='" + slug + "'] [data-making]");
+      if (steps.length === 0) await expect(page.locator("[data-atelier-piece]")).toHaveCount(0);
+      else {
+        await section.scrollIntoViewIfNeeded();
+        await expect(section.locator("[data-making-step]")).toHaveCount(steps.length);
+        const order = await section.locator("ol > li[data-making-step]").evaluateAll((els) => els.map((e) => e.getAttribute("data-making-step")));
+        expect(order).toEqual(steps.map((s) => s.step));
+        const srcs = await section.locator("img, video").evaluateAll((els) => els.map((e) => (e as HTMLImageElement).currentSrc || e.getAttribute("src") || ""));
+        for (const s of srcs) expect(s, "no image of the atelier").not.toMatch(/\/media\/atelier\//);
+        await section.evaluate((el) => el.scrollIntoView({ block: "start" }));
+        await page.waitForTimeout(900);
+        await shot(page, info.project.name + "-" + slug + "-2-making-of");
       }
     }
     expect(problems.errors).toEqual([]);
@@ -100,18 +116,16 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   const slug = "celestial-initial-medallion";
   const piece = pieceOf(slug);
   for (const f of ["p05", "p15", "p17", "p10"]) expect(piece.gallery.some((m) => m.src === "/media/hd/" + slug + "/" + f + ".webp"), f).toBe(true);
-  await skipIntro(page, { films: false });
+  await skipIntro(page);
   await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
-  // Its film, in its own section since 23/11/2026 (the piece first).
+  // Its film, in its own section right after the opening (24/11/2026: silent, in a loop, on screen).
   await expect(page.locator("[data-piece-film]")).toHaveCount(0);
-  await page.locator("[data-watch-film-section]").scrollIntoViewIfNeeded();
-  await page.locator("[data-watch-film-section]").click();
-  await expect(page.locator("[data-piece-film]")).toBeVisible({ timeout: 20_000 });
-  const src = await page.locator("[data-piece-film-video]").evaluate((el) => (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src);
-  expect(src).toContain("/media/films/" + slug + "/reveal");
+  const film = page.locator("[data-feature-film='" + slug + "']");
+  await film.locator("[data-feature-frame]").evaluate((el) => el.scrollIntoView({ block: "center" }));
+  const video = film.locator("[data-feature-video]");
+  await expect.poll(() => video.evaluate((el) => (el as HTMLVideoElement).currentSrc || (el as HTMLVideoElement).src), { timeout: 20_000 }).toContain("/media/films/" + slug + "/reveal");
   await page.waitForTimeout(1200);
   await shot(page, info.project.name + "-n14-1-film");
-  await page.locator("[data-piece-film-skip]").click();
   // Every Angle: its photos (since 23/11/2026, no text).
   const section = page.locator("[data-every-angle]");
   await section.scrollIntoViewIfNeeded();
@@ -120,10 +134,13 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   await expect(section.locator("[data-angle]")).toHaveCount(anglePhotos(piece, resolveShowcase(slug, piece.showcase).mode === "photo", wornSet(piece)).length);
   await expect(section.locator("[data-angle-text]")).toHaveCount(0);
   await shot(page, info.project.name + "-n14-2-angles");
-  // Its atelier: the same film, once.
-  const passage = page.locator("[data-atelier-passage]");
-  await passage.scrollIntoViewIfNeeded();
-  await expect(passage.locator("ol > li")).toHaveCount(1);
+  // Its atelier (in The Atelier since 24/11/2026): the same film, once (one chapter).
+  await page.goto("/fr/atelier?piece=" + slug, { waitUntil: "load" });
+  const room = page.locator("[data-atelier-room]");
+  await expect(room).toBeVisible();
+  await expect(room.locator("[data-chapter='making']")).toHaveCount(1);
+  await expect(room.locator("[data-chapter='reveal']")).toHaveCount(0);
+  await page.waitForTimeout(800);
   await shot(page, info.project.name + "-n14-3-atelier");
   expect(problems.errors).toEqual([]);
 });
