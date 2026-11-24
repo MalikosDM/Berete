@@ -187,6 +187,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       noir. Menu : Manrope 500, ivoire franc (contraste ≥ 7:1).
 - `tests/retours2411.spec.ts` (ordinateur Chromium, Safari WebKit, iPhone), captures `verification/<appareil>/retours2411-*.jpg`
   et avant / après dans `/Volumes/Disque externe/_verif/appel-24-11/apres-retours/`.
+  Vérifié sur le site en ligne le 24/11 : tests ordinateur, Safari, iPhone ; `npm run audit:coherence` 534 pages, 0 problème.
 
 ## Passe « zéro incohérence » (après l'appel du 23-24/11) — état au 24/11/2026
 - [x] **Deux polices** seulement : Cormorant Garamond (titres) et Manrope (textes). Les polices des univers ne sont plus chargées
