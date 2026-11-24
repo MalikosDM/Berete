@@ -81,7 +81,7 @@ function HeroPhoto() {
         </div>
         {/* On the floor of the photo, small, at the foot of its box (never over the trunk). */}
         <div className="home-photo-caption absolute inset-x-0 flex flex-col items-center px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center">
-          <p data-home-tagline className="font-display text-base font-light uppercase tracking-[0.16em] whitespace-nowrap text-bone sm:text-[0.9375rem] sm:tracking-[0.32em]">
+          <p data-home-tagline className="font-display text-base font-light uppercase tracking-[0.16em] text-balance text-bone sm:whitespace-nowrap sm:text-[0.9375rem] sm:tracking-[0.32em]">
             {t.site.tagline}
           </p>
           <button type="button" onClick={() => scrollToId("home-next")} data-home-discover data-cta className="btn-secondary mt-1 text-mist">
