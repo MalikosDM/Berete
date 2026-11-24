@@ -222,7 +222,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       originaux 25/p38, p36 des stories 21/01, 06) ; pendentif Inter porté (story 06/17).
 - [x] **Univers Inter et VfB v2** (`inter-victoire-v2`, `vfb-victoire-v2`) : larges, l'équipe de chaque côté, bague plus petite ;
       **un réglage chacun pour revenir aux anciens** : `INTER_VICTORY` et `VFB_VICTORY` de `src/data/themes.ts`.
-- `tests/yoni2411.spec.ts` (ordinateur, iPhone, Safari ; anglais et français), captures `verification/<appareil>/yoni2411-*.jpg`.
+- `tests/yoni2411.spec.ts` (ordinateur, iPhone, Safari ; anglais et français), vérifié sur le site en ligne le 24/11 (33 réussis),
+  captures `verification/<appareil>/yoni2411-*.jpg` ; captures « après » du site en ligne : `verification/tailles/apres/`.
 - [ ] Yoni : valider le classement des pendentifs et des chaînes ; « le R » des pendentifs lettre : aucune pièce R sur le site ;
       la chaîne « en or rose et en blanc dont la version seule manque » : candidates dans le rapport (Infinity Link remise en ligne,
       Cross Infinity blanche du collier de Tillman, tennis 2 rangs, cubaine glacée) ; photos studio sur fond noir de l'Infinity Link ;
