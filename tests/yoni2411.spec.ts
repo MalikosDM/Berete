@@ -89,6 +89,8 @@ test("home: the Dragon Ball pendant beside a circle where its sphere turns by it
     await section.scrollIntoViewIfNeeded();
     await expect(section.locator("[data-feature-film], [data-feature-video]")).toHaveCount(0);
     const sphere = section.locator("[data-sphere-film]");
+    // (The section is the whole subject since 24/11/2026: the sphere itself brought on screen.)
+    await sphere.scrollIntoViewIfNeeded();
     await expect(sphere).toHaveAttribute("src", /\/media\/pages\/dragon-ball-sphere\.[0-9a-f]{10}\.mp4$/);
     await expect.poll(() => sphere.evaluate((v) => !(v as HTMLVideoElement).paused && (v as HTMLVideoElement).currentTime > 0), { timeout: 15_000 }).toBe(true);
     expect(await sphere.evaluate((v) => (v as HTMLVideoElement).muted && (v as HTMLVideoElement).loop)).toBe(true);

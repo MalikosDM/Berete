@@ -203,7 +203,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Contrôle automatique** : `npm run audit:coherence` (`scripts/audit-coherence.ts` ; `BASE_URL`, `SIZES`, `LANGS`, `ONLY`)
       sur toutes les pages du plan du site, 6 langues, 1280 × 800, 1440 × 900, iPhone (WebKit) : polices, tailles, doublons de
       photos et de phrases, boutons, photos sans description, « gold tone », anglais oublié, noms coupés, débordements, ordre des
-      sections. Rapport : `verification/coherence/rapport.md`. `tests/coherence2411.spec.ts`.
+      sections. Rapport : `verification/coherence/rapport.md`. `tests/coherence2411.spec.ts`. **Passé sur le site en ligne le
+      24/11 : 534 pages × 1280, 1440, iPhone, 0 problème.** Toute la batterie passe en local (ordinateur, iPhone, Safari) ; en
+      ligne : `coherence2411` et `yoni2411` (ordinateur, iPhone, Safari). Captures avant : `verification/tailles/apres/` (le site
+      avant ce passage) ; après : `verification/tailles/coherence/` (1280 × 800, 1440 × 900, 1920 × 1080, iPhone).
+      Une story s'ouvre depuis le profil : `/players/<personne>?story=<story>&piece=<pièce>` (au moment qui montre la pièce).
 - [ ] Yoni : valider les noms, les fusions, les photos IA encore en ligne (liste dans le rapport du 24/11), la Two-Tone (31 :
       2 photos, une floue, gardée hors ligne), les chaînes probables d'autres pièces (Baguette Cuban = chaîne de l'OKA, reliée ; White
       Iced Cuban = chaîne de Dragon Ball ? 14 et 20 mm = un modèle en deux largeurs ?).
