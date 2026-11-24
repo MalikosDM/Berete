@@ -53,6 +53,7 @@ const ONLY = (process.argv.find((a) => a.startsWith("--only=")) ?? "").slice(7).
  * the 9 boxes made again on 23/11/2026, v2 for the 4 waiting for their v3 files: signature-trunk, photo-case, trophy-trunk,
  * campione-d-italia-case), the folder of its films, of its photos. A box gets "v3" the day its v3 folder arrives.
  */
+// (Only the folders of this list are read: "_anciens" (the old files kept by Yoni) and "A LIRE.txt" are no boxes.)
 const BOXES = [
   { slug: "signature-trunk", set: "v2", film: "signature-trunk", pro: "signature-trunk" },
   { slug: "sirius", set: "v3", film: "sirius", pro: "sirius" },
@@ -79,20 +80,111 @@ const duration = (file) => Number(spawnSync("ffprobe", ["-v", "error", "-show_en
 /** The professional photos of a box, in their order ("01-fermee.jpg", ...). */
 const proPhotos = (folder) => (folder && existsSync(join(PRO, folder)) ? readdirSync(join(PRO, folder)).filter((f) => /^\d\d.*\.jpe?g$/i.test(f)).sort() : []);
 
+/*
+ * One staging for every trunk (Yoni, 24/11/2026: "la même taille et posés de la même manière, sur exactement le même fond"):
+ * the marble base of each box is measured on its closed.jpg, then the square is cropped (a zoom and a shift) so that, on
+ * every trunk, the base has the width of the base of the Butterfly Trunk (the reference), the top of its plateau stands at
+ * the same height, and the base is centred. The camera of the four files of a box is fixed: the same frame for its two
+ * images and its two films.
+ *
+ * The measure: the zone of the base (left, right, the axis of its top, its bottom), read on a fine grid of closed.jpg (2 %),
+ * is refined by sharp — the strongest horizontal edge of the silhouette in a window of ±2.5 % around each side, row by row,
+ * and the first row where both sides reach the widest (the top of the plateau) — and the refined value is kept when it falls
+ * within 1.2 % of the zone (a sharp edge), else the zone (a reflection or a vein took the edge). `top` (optional): the top of
+ * the box itself, read on the grid, so that a tall box is never cut by the square (the zoom is then lowered, said in the log).
+ * A new image arriving with the same name (the four boxes to bring onto the black marble) is measured again at the next run.
+ */
+const BASES = {
+  "butterfly-trunk": { zone: [0.13, 0.855, 0.745, 0.83], top: 0.47 },
+  "okafor-trunk": { zone: [0.13, 0.855, 0.745, 0.83], top: 0.15 },
+  sirius: { zone: [0.1, 0.905, 0.77, 0.89], top: 0.33 },
+  "tulips-on-tour": { zone: [0.13, 0.865, 0.735, 0.81], top: 0.45 },
+  "dragon-ball-trunk": { zone: [0.195, 0.805, 0.84, 0.9], top: 0.215 },
+  "the-hand-cube": { zone: [0.225, 0.775, 0.765, 0.83], top: 0.27 },
+  "dfb-pokal-2025-display": { zone: [0.195, 0.8, 0.81, 0.87], top: 0.32 },
+  "world-cup-display": { zone: [0.165, 0.83, 0.78, 0.85], top: 0.29 },
+  "brt-coral-case": { zone: [0.095, 0.9, 0.74, 0.86], top: 0.33 },
+};
+/** The reference (the Butterfly Trunk): the share of the square its base takes, the height of its plateau, the centre. */
+const REFERENCE = "butterfly-trunk";
+/** The least room above a box (a share of the square). */
+const HEADROOM = 0.05;
+
+/** The marble base of a box, measured on its closed image (shares of the image). */
+async function measureBase(file, zone) {
+  const N = 1024;
+  const { data } = await sharp(file).resize(N, N).greyscale().gamma(2.2, 1).linear(2.2, 0).blur(1.5).raw().toBuffer({ resolveWithObject: true });
+  const L = (x, y) => data[Math.max(0, Math.min(N - 1, y)) * N + Math.max(0, Math.min(N - 1, x))];
+  const [zl, zr, za, zb] = zone;
+  const win = Math.round(0.025 * N);
+  const edges = [];
+  for (let y = Math.round((za - 0.03) * N); y <= Math.round(zb * N); y++) {
+    let l = 0, r = 0, gl = 0, gr = 0;
+    for (let x = Math.round(zl * N) - win; x <= Math.round(zl * N) + win; x++) {
+      const g = Math.abs(L(x + 3, y) - L(x - 3, y));
+      if (g > gl) [gl, l] = [g, x];
+    }
+    for (let x = Math.round(zr * N) - win; x <= Math.round(zr * N) + win; x++) {
+      const g = Math.abs(L(x - 3, y) - L(x + 3, y));
+      if (g > gr) [gr, r] = [g, x];
+    }
+    edges.push({ y, l, r, gl, gr });
+  }
+  const high = (k) => edges.map((e) => e[k]).sort((a, b) => a - b)[Math.floor(edges.length * 0.9)];
+  const strong = edges.filter((e) => e.gl > high("gl") * 0.4 && e.gr > high("gr") * 0.4);
+  const ls = strong.map((e) => e.l).sort((a, b) => a - b);
+  const rs = strong.map((e) => e.r).sort((a, b) => a - b);
+  const left = ls[Math.floor(ls.length * 0.15)] / N;
+  const right = rs[Math.floor(rs.length * 0.85)] / N;
+  const tol = 0.012;
+  const topRow = strong.find((e) => e.l / N <= left + tol && e.r / N >= right - tol);
+  const keep = (measured, read) => (measured !== undefined && Math.abs(measured - read) <= tol ? measured : read);
+  const base = { left: keep(left, zl), right: keep(right, zr), top: keep(topRow ? topRow.y / N : undefined, za) };
+  return { ...base, width: base.right - base.left, center: (base.left + base.right) / 2 };
+}
+
+/** The square kept of a box (shares of its image: its corner and its side; outside the image, the ground is extended). */
+function frameOf(base, ref, top) {
+  let size = base.width / ref.width;
+  const fit = top === undefined ? size : Math.max(size, (base.top - top) / (ref.top - HEADROOM));
+  const lowered = fit > size + 1e-6;
+  size = fit;
+  return { x: base.center - 0.5 * size, y: base.top - ref.top * size, size, lowered };
+}
+
+/** An image cropped to the frame; what lies outside the image is its ground mirrored (no empty band). */
+async function framed(file, frame, width) {
+  const px = (v) => Math.round(v * width);
+  const x = px(frame.x), y = px(frame.y), size = px(frame.size);
+  const pad = Math.max(0, -x, -y, x + size - width, y + size - width);
+  // (sharp extracts before it extends: the extended image is made first.)
+  const img = pad > 0 ? sharp(await sharp(file).extend({ top: pad, bottom: pad, left: pad, right: pad, extendWith: "mirror" }).toBuffer()) : sharp(file);
+  return { img, region: { left: x + pad, top: y + pad, width: size, height: size }, pad };
+}
+
 /** "closed-720.webp" -> "closed-720.<v>.webp", "photo-01.w640.webp" -> "photo-01.<v>.w640.webp". */
 const versioned = (file, v) => file.replace(/^([^.]+)\./, "$1." + v + ".");
 
-async function writeSquare(file, dir, state) {
+async function writeSquare(file, dir, state, frame) {
+  const { width } = await sharp(file).metadata();
+  const { img: source, region } = await framed(file, frame, width);
+  const cropped = await source.extract(region).toBuffer();
   for (const w of WIDTHS) {
-    const img = sharp(file).resize(w, w, { fit: "cover", kernel: "lanczos3" });
+    const img = sharp(cropped).resize(w, w, { fit: "cover", kernel: "lanczos3" });
     await img.clone().avif({ quality: 55, effort: 6 }).toFile(join(dir, state + "-" + w + ".avif"));
     await img.clone().webp({ quality: 78, effort: 6 }).toFile(join(dir, state + "-" + w + ".webp"));
   }
 }
 
 /** A film of the box: silent, square, every frame kept (it starts and ends on its images), light enough for a phone. */
-function writeFilm(src, out) {
-  run("ffmpeg", ["-loglevel", "error", "-y", "-i", src, "-an", "-vf", "scale=" + VIDEO + ":" + VIDEO + ":flags=lanczos,format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-maxrate", "2200k", "-bufsize", "4400k", "-profile:v", "high", "-movflags", "+faststart", "-map_metadata", "-1", out]);
+function writeFilm(src, out, frame) {
+  const width = Number(spawnSync("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width", "-of", "csv=p=0", src]).stdout.toString().trim());
+  const px = (v) => Math.round(v * width / 2) * 2;
+  const x = px(frame.x), y = px(frame.y), size = px(frame.size);
+  const pad = Math.max(0, -x, -y, x + size - width, y + size - width);
+  // The same frame as its images: its ground mirrored beyond the film when the frame goes past it.
+  const crop = (pad > 0 ? "pad=" + (width + 2 * pad) + ":" + (width + 2 * pad) + ":" + pad + ":" + pad + ",fillborders=left=" + pad + ":right=" + pad + ":top=" + pad + ":bottom=" + pad + ":mode=mirror," : "") + "crop=" + size + ":" + size + ":" + (x + pad) + ":" + (y + pad) + ",";
+  run("ffmpeg", ["-loglevel", "error", "-y", "-i", src, "-an", "-vf", crop + "scale=" + VIDEO + ":" + VIDEO + ":flags=lanczos,format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-maxrate", "2200k", "-bufsize", "4400k", "-profile:v", "high", "-movflags", "+faststart", "-map_metadata", "-1", out]);
   return Math.round(duration(out) * 100) / 100;
 }
 
@@ -109,6 +201,11 @@ for (const box of BOXES) {
     }
   }
 }
+const round = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, typeof v === "number" ? Math.round(v * 10000) / 10000 : v]));
+// The reference of the staging: the base of the Butterfly Trunk, measured on its closed image.
+const refBox = BOXES.find((b) => b.slug === REFERENCE);
+const reference = await measureBase(join(SETS[refBox.set], refBox.film, "closed.jpg"), BASES[REFERENCE].zone);
+console.log("  reference " + REFERENCE + ": base " + Math.round(reference.width * 1000) / 10 + " % wide, plateau at " + Math.round(reference.top * 1000) / 10 + " %");
 // Some boxes alone: the others keep what was made for them.
 const made = ONLY.length > 0 && existsSync(DATA) ? JSON.parse(readFileSync(DATA, "utf8")).trunks : {};
 for (const box of BOXES) {
@@ -118,9 +215,17 @@ for (const box of BOXES) {
   await rm(tmp, { recursive: true, force: true });
   await mkdir(tmp, { recursive: true });
   const src = join(SETS[box.set], box.film);
-  for (const state of ["closed", "open"]) await writeSquare(join(src, state + ".jpg"), tmp, state);
-  const openingDuration = writeFilm(join(src, "ouverture.mp4"), join(tmp, "opening.mp4"));
-  const closingDuration = writeFilm(join(src, "fermeture.mp4"), join(tmp, "closing.mp4"));
+  // Its frame: its base measured, set against the base of the reference (the v2 boxes keep their whole square).
+  let frame = { x: 0, y: 0, size: 1 };
+  let marble = null;
+  if (BASES[box.slug]) {
+    marble = await measureBase(join(src, "closed.jpg"), BASES[box.slug].zone);
+    frame = frameOf(marble, reference, BASES[box.slug].top);
+    if (frame.lowered) console.log("  ! " + box.slug + ": zoom lowered so that the whole box stays in the square (its base " + Math.round((marble.width / frame.size) * 100) + " % of the square instead of " + Math.round(reference.width * 100) + " %)");
+  }
+  for (const state of ["closed", "open"]) await writeSquare(join(src, state + ".jpg"), tmp, state, frame);
+  const openingDuration = writeFilm(join(src, "ouverture.mp4"), join(tmp, "opening.mp4"), frame);
+  const closingDuration = writeFilm(join(src, "fermeture.mp4"), join(tmp, "closing.mp4"), frame);
   // Its professional photos, for its gallery.
   const photos = [];
   for (const file of proPhotos(box.pro)) {
@@ -154,6 +259,9 @@ for (const box of BOXES) {
     closing: base + "/" + versioned("closing.mp4", v),
     duration: openingDuration,
     closingDuration,
+    // The base measured on its closed image, and the square kept of its images and films (shares of the original square):
+    // the places of its light and of its piece (src/data/trunks.ts) follow the same frame.
+    ...(marble ? { marble: round(marble), frame: round({ x: frame.x, y: frame.y, size: frame.size }) } : {}),
   };
   if (photos.length > 0) entry.photos = photos.map(({ name, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
   made[box.slug] = entry;

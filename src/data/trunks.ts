@@ -24,6 +24,12 @@ export type TrunkOpening = {
   closingDuration: number;
   /** Its professional photos (its gallery, the page of its piece). */
   photos?: TrunkPhoto[];
+  /**
+   * One staging for every trunk (24/11/2026): its marble base measured on its closed image, and the square kept of its
+   * images and films (shares of the original square: its corner x, y and its side), scripts/trunk-media.mjs.
+   */
+  marble?: { left: number; right: number; top: number; width: number; center: number };
+  frame?: { x: number; y: number; size: number };
 };
 
 const OPENINGS = generated.trunks as Record<string, TrunkOpening>;
@@ -45,7 +51,9 @@ const PLACES: Record<string, { light: [number, number]; float?: [number, number,
   "dfb-pokal-2025-display": { light: [0.49, 0.42], float: [0.5, 0.28, 0.27] },
   "world-cup-display": { light: [0.5, 0.36], float: [0.5, 0.27, 0.26] },
   "brt-coral-case": { light: [0.5, 0.57] },
-  "okafor-trunk": { light: [0.5, 0.55], float: [0.5, 0.33, 0.38] },
+  // Its new images (24/11/2026, the same trunk as the Butterfly, the photo in its lid): the octagon pendant lies in the middle
+  // of its compartments, among the tennis chains; it rises from there.
+  "okafor-trunk": { light: [0.5, 0.57], float: [0.5, 0.33, 0.36] },
   "butterfly-trunk": { light: [0.46, 0.58], float: [0.5, 0.33, 0.38] },
   // Still in their v2 images (off the page of the trunks until their v3 files arrive).
   "signature-trunk": { light: [0.5, 0.52] },
@@ -68,7 +76,15 @@ export function trunkOf(slug: string): Trunk | null {
   if (!opening) return null;
   const place = PLACES[slug];
   const light = place?.light ?? [0.5, 0.55];
-  return { ...opening, light, float: place?.float ?? [light[0], Math.max(0.3, light[1] - 0.28), 0.42] };
+  const float = place?.float ?? [light[0], Math.max(0.3, light[1] - 0.28), 0.42];
+  // The places are measured on the original images: they follow the frame of the staging (the piece rises from the same
+  // place in the box as before).
+  const f = opening.frame ?? { x: 0, y: 0, size: 1 };
+  const at = (x: number, y: number): [number, number] => [(x - f.x) / f.size, (y - f.y) / f.size];
+  const [fx, fy] = at(float[0], float[1]);
+  const size = float[2] / f.size;
+  // A box shown larger by the staging (the two displays, the cube): its piece still floats whole inside the square.
+  return { ...opening, light: at(light[0], light[1]), float: [fx, Math.max(fy, size / 2 + 0.04), size] };
 }
 
 /** Whether a box is on the page of the trunks: it opens in its film, in the staging of the page. */

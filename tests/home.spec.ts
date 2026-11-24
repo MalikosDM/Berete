@@ -76,7 +76,7 @@ test("Signature Trunks: every trunk closed in a grid of squares, Begin Your Crea
   await page.goto("/boxes", { waitUntil: "load" });
   await page.waitForTimeout(1500);
   await expect(page.locator("h1")).toContainText("Signature Trunks");
-  await expect(page.getByText("Every exceptional creation deserves an extraordinary presentation.")).toBeVisible();
+  // (24/11/2026: the page starts with the trunks themselves, no sentence under its name.)
   // One way to one's own trunk, at the end (24/11/2026: the buttons of the house, never twice on the page).
   const buttons = page.locator("[data-create-box]");
   await expect(buttons).toHaveCount(1);
@@ -89,7 +89,6 @@ test("Signature Trunks: every trunk closed in a grid of squares, Begin Your Crea
   // the same size, closed (tests/trunks.spec.ts opens them).
   const cards = page.locator("[data-box]");
   await expect(cards.first()).toHaveAttribute("data-box", "sirius");
-  await expect(page.getByText("An Extension of Your Creation")).toBeVisible();
   const squares = await page.locator("[data-box] .aspect-square").evaluateAll((els) => els.map((e) => [Math.round(e.getBoundingClientRect().width), Math.round(e.getBoundingClientRect().height)]));
   expect(squares.length).toBe(await cards.count());
   for (const [w, h] of squares) {
@@ -97,8 +96,8 @@ test("Signature Trunks: every trunk closed in a grid of squares, Begin Your Crea
     expect(Math.abs(w! - squares[0]![0]!)).toBeLessThanOrEqual(1);
   }
   // Its photos, under it (23/11/2026), each full screen with the magnifying glass.
+  // "Discover the photos" opens them all, large (24/11/2026).
   await page.locator("[data-box-photos='sirius']").click();
-  await page.locator("[data-box='sirius'] [data-box-photo]").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.waitForTimeout(700);
   await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });

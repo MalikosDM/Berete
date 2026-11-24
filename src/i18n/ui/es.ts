@@ -405,11 +405,12 @@ export const es: Messages = {
     openTrunk: (name: string) => "Abrir: " + name,
     openHint: "Abrir",
     createOwn: "Comience su creación",
-    discoverPiece: "Entrar en el universo",
+    discoverPiece: "Descubrir la pieza",
     replay: "Ver de nuevo la apertura",
     closeHint: "Cerrar",
     closeTrunk: (name: string) => "Cerrar: " + name,
     openAlt: (name: string) => name + ", al abrirse",
+    discoverPhotos: "Descubrir las fotos",
   },
 
   process: {

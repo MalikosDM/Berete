@@ -40,22 +40,6 @@ const WAITING: [string, string | null][] = [
 ];
 /** Without professional photos: their gallery keeps their real photos. */
 const NO_PRO = new Set(["campione-d-italia-case", "butterfly-trunk", "okafor-trunk"]);
-/** The French name of each box, as its WhatsApp message names it. */
-const FR: Record<string, string> = {
-  "signature-trunk": "l’écrin Signature",
-  sirius: "l’écrin Sirius",
-  "tulips-on-tour": "l’écrin Tulips on Tour",
-  "dragon-ball-trunk": "la malle Dragon Ball",
-  "the-hand-cube": "le cube The Hand",
-  "dfb-pokal-2025-display": "la vitrine DFB-Pokal 2025",
-  "world-cup-display": "la vitrine Coupe du monde",
-  "photo-case": "la malle photo",
-  "brt-coral-case": "la malle BRT corail",
-  "trophy-trunk": "la malle au trophée",
-  "campione-d-italia-case": "l’écrin Campione d'Italia",
-  "butterfly-trunk": "la malle Butterfly",
-  "okafor-trunk": "la malle Okafor",
-};
 const VERSIONED = /\.[0-9a-f]{10}\.(webp|avif|mp4)$/;
 
 /** The mean difference of two images (0 to 255), at 200 px. */
@@ -251,7 +235,9 @@ for (const [slug, piece] of ORDER) {
     await page.waitForTimeout(700);
     await expect(card.locator("[data-trunk-open]")).toBeVisible();
     await expect(card.locator("[data-trunk-image='open']")).not.toHaveAttribute("data-shown", "");
-    await expect(card.locator("[data-trunk-actions]")).toHaveCount(0);
+    // Closed: its photos first (24/11/2026), never a way to its piece yet.
+    await expect(card.locator("[data-box-photos]")).toHaveText("Découvrir les photos");
+    await expect(card.locator("[data-box-enter]")).toHaveCount(0);
     await shot(page, name + "-1-ferme");
 
     /* ---- It opens ---- */
@@ -277,12 +263,11 @@ for (const [slug, piece] of ORDER) {
     // The film of the closing loads now that the box is open.
     await expect(card.locator("[data-trunk-video='closing']")).toHaveAttribute("src", trunk.closing);
 
-    /* ---- Open: its piece, its buttons ---- */
+    /* ---- Open: its piece; under the card, its photos then, small, the way to its piece ---- */
     const jewel = card.locator("[data-trunk-jewel]");
-    const create = card.locator("[data-trunk-create]");
-    const discover = card.locator("[data-trunk-piece]");
+    const discover = card.locator("[data-box-enter]");
     const closeButton = card.locator("[data-trunk-close]");
-    await expect(create).toBeVisible();
+    await expect(closeButton).toBeVisible();
     await page.waitForTimeout(1500);
     if (piece) {
       // Its piece, cut out, floating above the box, whole inside the square.
@@ -296,16 +281,14 @@ for (const [slug, piece] of ORDER) {
       expect(j.x + j.width).toBeLessThanOrEqual(area.x + area.width + 1);
       expect(j.y).toBeGreaterThanOrEqual(area.y - 1);
       expect(j.y + j.height / 2, "above the light of the box").toBeLessThan(area.y + area.height * trunk.light[1]);
-      await expect(discover).toHaveText("Entrer dans l’univers");
+      await expect(discover).toContainText("Découvrir la pièce");
       await expect(discover).toHaveAttribute("href", "/fr/pieces/" + piece);
     } else {
       await expect(jewel).toHaveCount(0);
       await expect(discover).toHaveCount(0);
     }
-    await expect(create).toHaveText("Commencer votre création");
-    const href = (await create.getAttribute("href"))!;
-    expect(href).toMatch(/^https:\/\/wa\.me\/[^?]+\?text=/);
-    expect(new URL(href).searchParams.get("text")).toBe("Bonjour Berete, j’ai découvert " + FR[slug] + " sur votre site et j’aimerais créer mon propre écrin.");
+    // No button to create one's own trunk on the card any more (Begin Your Creation once, at the end of the page).
+    await expect(card.locator("[data-trunk-create]")).toHaveCount(0);
     // "Close" where "Open" was, "Watch the opening again" in its corner; all readable and large enough for a finger.
     await expect(closeButton).toBeVisible();
     await expect(closeButton).toHaveText("Refermer");
@@ -314,7 +297,7 @@ for (const [slug, piece] of ORDER) {
     await expect(card.locator("[data-trunk-replay]")).toHaveText("Revoir l’ouverture");
     // (A computer draws the site at 15 px since 24/11/2026, its buttons smaller and thinner: 41 to 45 px high, 12 to 15 px
     // text; a phone keeps 48 and 16.)
-    for (const b of [create, closeButton, card.locator("[data-trunk-replay]"), ...(piece ? [discover] : [])]) {
+    for (const b of [closeButton, card.locator("[data-trunk-replay]"), ...(piece ? [discover] : [])]) {
       expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(phone ? 48 : 40);
       expect(await b.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(phone ? 16 : 11);
     }
@@ -326,14 +309,13 @@ for (const [slug, piece] of ORDER) {
     await press(info, closeButton);
     // Its buttons go, its piece goes back into the box...
     await expect(stateOf(card)).toHaveAttribute("data-trunk-state", "lowering");
-    await expect(card.locator("[data-trunk-actions]")).toHaveAttribute("data-leaving", "");
     if (piece) await expect(jewel).toHaveAttribute("data-leaving", "");
     await page.waitForTimeout(phone ? 150 : 300);
     await shot(page, name + "-4-la-piece-rentre");
     // ... then the film of its closing.
     const closing = await playsIts(card, "closing", trunk.closing);
     await expect(jewel).toHaveCount(0);
-    await expect(card.locator("[data-trunk-actions]")).toHaveCount(0);
+    await expect(discover).toHaveCount(0);
     await press(info, sq, { force: true, position: { x: box.width / 2, y: box.height / 2 } });
     await expect(stateOf(card)).toHaveAttribute("data-trunk-state", "closing");
     await expect.poll(() => closing.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 15_000 }).toBeGreaterThan(2);
@@ -427,7 +409,7 @@ test("asked for less motion: open and closed at once, its piece in place, its bu
   const card = page.locator("[data-box='sirius']");
   await square(card);
   await openIt(info, card);
-  await expect(card.locator("[data-trunk-create]")).toBeVisible({ timeout: 2_000 });
+  await expect(card.locator("[data-box-enter]")).toBeVisible({ timeout: 2_000 });
   await expect(card.locator("[data-trunk-jewel] img")).toBeVisible();
   await expect(card.locator("[data-trunk-image='open']")).toHaveAttribute("data-shown", "");
   await expect(card.locator("[data-trunk-replay]")).toHaveCount(0);
@@ -446,7 +428,7 @@ for (const [slug, piece] of ORDER.filter(([, p]) => p)) {
     const card = page.locator("[data-box='" + slug + "']");
     await square(card);
     await openIt(info, card);
-    await press(info, card.locator("[data-trunk-piece]"));
+    await press(info, card.locator("[data-box-enter]"));
     await expect(page).toHaveURL(new RegExp("/fr/pieces/" + piece + "$"));
     await expect(page.locator("article[data-piece]")).toBeVisible();
   });

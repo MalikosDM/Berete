@@ -18,9 +18,10 @@ function linkClass({ isActive }: { isActive: boolean }): string {
   return [
     // Never on two lines: the row of the menu has the whole width under the name of the house (from 900 px on a computer).
     // From 900 to 1280 px (a narrow window of a laptop) the letters are a little smaller and tighter, so every language fits.
-    "relative inline-flex min-h-10 items-center whitespace-nowrap text-[0.75rem] font-normal uppercase tracking-[0.06em] transition-colors xl:tracking-[0.12em] roomy:tracking-[0.18em]",
+    // (24/11/2026: a notch heavier and a franker ivory, read at once on a laptop; the same sizes and spaces.)
+    "relative inline-flex min-h-10 items-center whitespace-nowrap text-[0.75rem] font-medium uppercase tracking-[0.06em] transition-colors xl:tracking-[0.12em] roomy:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-1.5 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
-    isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
+    isActive ? "text-rose-light after:scale-x-100" : "text-bone hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
 }
 
@@ -92,7 +93,8 @@ export default function Navbar() {
     >
       {/* The frosted background sits in its own layer: a blur on the header itself would make it the frame of the
           mobile menu (position: fixed), which would then open with no height. */}
-      <div aria-hidden="true" className={"absolute inset-0 -z-10 transition-[background-color,backdrop-filter] duration-500 " + (scrolled || open ? "bg-ink/80 backdrop-blur-xl" : "bg-transparent")} />
+      {/* Opaque black from the top of every page (Yoni, 24/11/2026): the header never lies over a photo. */}
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-ink" />
       {/* The logo as it was, the BRT diamond with BERETE JEWELLERS under it, and the name of the house again, much larger, in
           the middle of the bar, always in view while the page scrolls (Yoni, 23/11/2026: computer and iPhone); then the
           language, WhatsApp and, on a phone or a tablet, the menu button. */}
@@ -120,7 +122,7 @@ export default function Navbar() {
           <Link
             to="/contact"
             data-cta
-            className="hidden min-h-10 items-center gap-2 whitespace-nowrap border border-rose-light/55 px-4 text-[0.75rem] font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light roomy:inline-flex"
+            className="hidden min-h-10 items-center gap-2 whitespace-nowrap border border-rose-light/55 px-4 text-[0.75rem] font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-rose-light hover:text-rose-light roomy:inline-flex"
           >
             {t.common.startPiece}
           </Link>
@@ -156,7 +158,7 @@ export default function Navbar() {
                   <Link
                     to={item.to}
                     data-nav-sub={item.sub ? "" : undefined}
-                    className={"flex items-center justify-between uppercase transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "min-h-8 ps-8 pe-3 text-[0.75rem] tracking-[0.14em] text-mist" : "mt-1 min-h-10 px-3 text-[0.75rem] tracking-[0.18em] text-white first:mt-0")}
+                    className={"flex items-center justify-between font-medium uppercase transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "min-h-8 ps-8 pe-3 text-[0.75rem] tracking-[0.14em] text-mist" : "mt-1 min-h-10 px-3 text-[0.75rem] tracking-[0.18em] text-bone first:mt-0")}
                   >
                     <span className="flex items-center gap-2.5">
                       {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}

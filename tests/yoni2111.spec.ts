@@ -241,13 +241,13 @@ test("the trunk of Sirius: the black trunk with the horned mask, its opening, it
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 15_000 }).toBeGreaterThan(2.5);
   expect(await video.evaluate((v) => new URL((v as HTMLVideoElement).currentSrc).pathname)).toBe(trunk.opening);
   await shot(page, info.project.name + "-sirius-ecrin-2-ouverture");
-  await expect(card.locator("[data-trunk-create]")).toBeVisible({ timeout: 15_000 });
+  await expect(card.locator("[data-box-enter]")).toBeVisible({ timeout: 15_000 });
   await page.waitForTimeout(1200);
   await shot(page, info.project.name + "-sirius-ecrin-3-ouvert");
   // Its photos: the professional ones.
   // (Under the box since 23/11/2026, which stays open.)
   await card.locator("[data-box-photos='sirius']").click();
-  const dialog = card.locator("[data-box-gallery]");
+  const dialog = page.locator("[data-lightbox]");
   await expect(dialog.locator("img").first()).toBeVisible();
   const srcs = await dialog.locator("img").evaluateAll((els) => els.map((e) => new URL((e as HTMLImageElement).currentSrc || (e as HTMLImageElement).src).pathname));
   expect(srcs.some((s) => s.startsWith("/media/trunks/sirius/photo-01"))).toBe(true);

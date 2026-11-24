@@ -76,7 +76,7 @@ test("Butterfly: the film of the setting of its wings in its making-of; its trun
   // On the page of the trunks: its gallery starts with the same photo; its film of opening untouched.
   await open(page, "/boxes");
   await page.locator("[data-box-photos='butterfly-trunk']").click();
-  await expect(page.locator("[data-box-gallery='butterfly-trunk'] [data-box-photo='0'] img")).toHaveAttribute("src", new RegExp("/media/extra/boxes/butterfly-trunk/open-front\\."));
+  await expect(page.locator("[data-lightbox] img").first()).toHaveAttribute("src", new RegExp("/media/extra/boxes/butterfly-trunk/open-front\\."));
   expect(problems.errors).toEqual([]);
 });
 

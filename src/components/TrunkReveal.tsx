@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowRight, RotateCcw, X } from "lucide-react";
-import BrandIcon from "@/components/BrandIcon";
+import { RotateCcw, X } from "lucide-react";
 import { forceMuted } from "@/components/Media";
 import { cutoutSrc, cutoutSrcSet, type CutoutView } from "@/data/showcase";
 import { trunkImage, type Trunk } from "@/data/trunks";
-import { Link, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { useReducedMotion } from "@/lib/gsap";
-import { waLink } from "@/lib/site";
 
 /**
  * Where a box is: closed; opening (its film); open (its piece above it, its buttons); lowering (its piece goes back into it,
@@ -42,10 +40,12 @@ export type TrunkPiece = { slug: string; title: string; view: CutoutView | null 
  * box comes near the screen or under the pointer, the film of the closing once the box is open. A film that cannot play:
  * the box simply fades to where it was going. Asked for less motion: no film, the box is open or closed at once.
  */
-export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string; name: string; trunk: Trunk; piece: TrunkPiece | null }) {
+export default function TrunkReveal({ name, trunk, piece, onOpen }: { slug: string; name: string; trunk: Trunk; piece: TrunkPiece | null; onOpen?: (open: boolean) => void }) {
   const { t } = useI18n();
   const reduced = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("closed");
+  // The card under it says when it is open (24/11/2026: its photos first, the way to its piece then, small, under them).
+  useEffect(() => onOpen?.(phase === "open"), [phase, onOpen]);
   // Which film really plays (its first frame on the screen): only then it is shown.
   const [playing, setPlaying] = useState<"opening" | "closing" | null>(null);
   // The open image comes and goes in a fade (watching the opening again, a film that cannot play), else at once, under a film.
@@ -277,35 +277,8 @@ export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string
           </>
         ) : null}
       </div>
-      {/* Its two ways on, once it is open. */}
-      <div className={"trunk-actions grid transition-[grid-template-rows] duration-500 ease-out " + (phase === "open" ? "grid-rows-[1fr]" : "grid-rows-[0fr]")}>
-        <div className="overflow-hidden">
-          {phase === "open" || leaving ? (
-            <div key={"actions" + round} data-trunk-actions={slug} data-leaving={leaving ? "" : undefined} className="trunk-actions-in flex flex-wrap gap-3 pt-5">
-              <a
-                href={waLink(t.whatsapp.trunk(name))}
-                target="_blank"
-                rel="noreferrer"
-                data-trunk-create
-                tabIndex={leaving ? -1 : undefined}
-                className="inline-flex min-h-12 flex-1 basis-48 items-center justify-center gap-2.5 border border-rose-light/55 px-3 text-center text-base font-normal tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
-              >
-                <BrandIcon name="whatsapp" className="size-4.5" /> {t.boxes.createOwn}
-              </a>
-              {piece ? (
-                <Link
-                  to={"/pieces/" + piece.slug}
-                  data-trunk-piece={piece.slug}
-                  tabIndex={leaving ? -1 : undefined}
-                  className="inline-flex min-h-12 flex-1 basis-48 items-center justify-center gap-2.5 border border-rose-light/70 px-3 text-center text-base font-medium tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
-                >
-                  {t.boxes.discoverPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-                </Link>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      </div>
+      {/* (Since 24/11/2026 no buttons under the open box: the card gives its photos first, then the way to its piece; Begin
+          Your Creation once, at the end of the page.) */}
     </div>
   );
 }

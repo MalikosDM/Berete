@@ -44,38 +44,50 @@
   "sirius": {
    "base": "/media/trunks/sirius",
    "set": "v3",
-   "version": "0964bdfee7",
+   "version": "13535606ae",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/sirius/opening.0964bdfee7.mp4",
-   "closing": "/media/trunks/sirius/closing.0964bdfee7.mp4",
+   "opening": "/media/trunks/sirius/opening.13535606ae.mp4",
+   "closing": "/media/trunks/sirius/closing.13535606ae.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.1,
+    "right": 0.9043,
+    "top": 0.77,
+    "width": 0.8043,
+    "center": 0.5021
+   },
+   "frame": {
+    "x": -0.0485,
+    "y": -0.0504,
+    "size": 1.1012
+   },
    "photos": [
     {
-     "src": "/media/trunks/sirius/photo-01.0964bdfee7.webp",
+     "src": "/media/trunks/sirius/photo-01.13535606ae.webp",
      "width": 1600,
      "height": 1036,
      "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/sirius/photo-02.0964bdfee7.webp",
+     "src": "/media/trunks/sirius/photo-02.13535606ae.webp",
      "width": 1600,
      "height": 1067,
      "file": "02-fermee-masque-et-presentoir"
     },
     {
-     "src": "/media/trunks/sirius/photo-03.0964bdfee7.webp",
+     "src": "/media/trunks/sirius/photo-03.13535606ae.webp",
      "width": 1600,
      "height": 1226,
      "file": "03-ouverte"
     },
     {
-     "src": "/media/trunks/sirius/photo-04.0964bdfee7.webp",
+     "src": "/media/trunks/sirius/photo-04.13535606ae.webp",
      "width": 1600,
      "height": 1067,
      "file": "04-ouverte-et-presentoir"
@@ -85,38 +97,50 @@
   "tulips-on-tour": {
    "base": "/media/trunks/tulips-on-tour",
    "set": "v3",
-   "version": "c183e3cf7b",
+   "version": "5ea8d68de3",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/tulips-on-tour/opening.c183e3cf7b.mp4",
-   "closing": "/media/trunks/tulips-on-tour/closing.c183e3cf7b.mp4",
+   "opening": "/media/trunks/tulips-on-tour/opening.5ea8d68de3.mp4",
+   "closing": "/media/trunks/tulips-on-tour/closing.5ea8d68de3.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.1201,
+    "right": 0.865,
+    "top": 0.735,
+    "width": 0.7449,
+    "center": 0.4926
+   },
+   "frame": {
+    "x": -0.0174,
+    "y": -0.0248,
+    "size": 1.0199
+   },
    "photos": [
     {
-     "src": "/media/trunks/tulips-on-tour/photo-01.c183e3cf7b.webp",
+     "src": "/media/trunks/tulips-on-tour/photo-01.5ea8d68de3.webp",
      "width": 1600,
      "height": 1079,
      "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/tulips-on-tour/photo-02.c183e3cf7b.webp",
+     "src": "/media/trunks/tulips-on-tour/photo-02.5ea8d68de3.webp",
      "width": 1600,
      "height": 1067,
      "file": "02-fermee-dos"
     },
     {
-     "src": "/media/trunks/tulips-on-tour/photo-03.c183e3cf7b.webp",
+     "src": "/media/trunks/tulips-on-tour/photo-03.5ea8d68de3.webp",
      "width": 1600,
      "height": 1067,
      "file": "03-ouverte"
     },
     {
-     "src": "/media/trunks/tulips-on-tour/photo-04.c183e3cf7b.webp",
+     "src": "/media/trunks/tulips-on-tour/photo-04.5ea8d68de3.webp",
      "width": 1600,
      "height": 1067,
      "file": "04-presentoir-et-malle"
@@ -126,38 +150,50 @@
   "dragon-ball-trunk": {
    "base": "/media/trunks/dragon-ball-trunk",
    "set": "v3",
-   "version": "a05612a229",
+   "version": "c25309f783",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/dragon-ball-trunk/opening.a05612a229.mp4",
-   "closing": "/media/trunks/dragon-ball-trunk/closing.a05612a229.mp4",
+   "opening": "/media/trunks/dragon-ball-trunk/opening.c25309f783.mp4",
+   "closing": "/media/trunks/dragon-ball-trunk/closing.c25309f783.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.1973,
+    "right": 0.8027,
+    "top": 0.84,
+    "width": 0.6055,
+    "center": 0.5
+   },
+   "frame": {
+    "x": 0.0504,
+    "y": 0.17,
+    "size": 0.8993
+   },
    "photos": [
     {
-     "src": "/media/trunks/dragon-ball-trunk/photo-01.a05612a229.webp",
+     "src": "/media/trunks/dragon-ball-trunk/photo-01.c25309f783.webp",
      "width": 1126,
      "height": 1600,
      "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/dragon-ball-trunk/photo-02.a05612a229.webp",
+     "src": "/media/trunks/dragon-ball-trunk/photo-02.c25309f783.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-fermee-dos"
     },
     {
-     "src": "/media/trunks/dragon-ball-trunk/photo-03.a05612a229.webp",
+     "src": "/media/trunks/dragon-ball-trunk/photo-03.c25309f783.webp",
      "width": 1600,
      "height": 1067,
      "file": "03-ouverte"
     },
     {
-     "src": "/media/trunks/dragon-ball-trunk/photo-04.a05612a229.webp",
+     "src": "/media/trunks/dragon-ball-trunk/photo-04.c25309f783.webp",
      "width": 1600,
      "height": 1067,
      "file": "04-ouverte-2"
@@ -167,38 +203,50 @@
   "the-hand-cube": {
    "base": "/media/trunks/the-hand-cube",
    "set": "v3",
-   "version": "667a353e86",
+   "version": "acea20d678",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/the-hand-cube/opening.667a353e86.mp4",
-   "closing": "/media/trunks/the-hand-cube/closing.667a353e86.mp4",
+   "opening": "/media/trunks/the-hand-cube/opening.acea20d678.mp4",
+   "closing": "/media/trunks/the-hand-cube/closing.acea20d678.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.225,
+    "right": 0.775,
+    "top": 0.765,
+    "width": 0.55,
+    "center": 0.5
+   },
+   "frame": {
+    "x": 0.1235,
+    "y": 0.204,
+    "size": 0.7531
+   },
    "photos": [
     {
-     "src": "/media/trunks/the-hand-cube/photo-01.667a353e86.webp",
+     "src": "/media/trunks/the-hand-cube/photo-01.acea20d678.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/the-hand-cube/photo-02.667a353e86.webp",
+     "src": "/media/trunks/the-hand-cube/photo-02.acea20d678.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-fermee-3-4"
     },
     {
-     "src": "/media/trunks/the-hand-cube/photo-03.667a353e86.webp",
+     "src": "/media/trunks/the-hand-cube/photo-03.acea20d678.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-ouverte"
     },
     {
-     "src": "/media/trunks/the-hand-cube/photo-04.667a353e86.webp",
+     "src": "/media/trunks/the-hand-cube/photo-04.acea20d678.webp",
      "width": 1067,
      "height": 1600,
      "file": "04-presentoir-replie"
@@ -208,38 +256,50 @@
   "dfb-pokal-2025-display": {
    "base": "/media/trunks/dfb-pokal-2025-display",
    "set": "v3",
-   "version": "9783de2f2a",
+   "version": "d818e59345",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/dfb-pokal-2025-display/opening.9783de2f2a.mp4",
-   "closing": "/media/trunks/dfb-pokal-2025-display/closing.9783de2f2a.mp4",
+   "opening": "/media/trunks/dfb-pokal-2025-display/opening.d818e59345.mp4",
+   "closing": "/media/trunks/dfb-pokal-2025-display/closing.d818e59345.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.195,
+    "right": 0.8,
+    "top": 0.8086,
+    "width": 0.605,
+    "center": 0.4975
+   },
+   "frame": {
+    "x": 0.0833,
+    "y": 0.1915,
+    "size": 0.8284
+   },
    "photos": [
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-01.9783de2f2a.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-01.d818e59345.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-face"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-02.9783de2f2a.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-02.d818e59345.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-3-4"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-03.9783de2f2a.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-03.d818e59345.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-ouverte-dessus"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-04.9783de2f2a.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-04.d818e59345.webp",
      "width": 1067,
      "height": 1600,
      "file": "04-dos-texte"
@@ -249,44 +309,56 @@
   "world-cup-display": {
    "base": "/media/trunks/world-cup-display",
    "set": "v3",
-   "version": "ebc14da53c",
+   "version": "2b30e69d3d",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/world-cup-display/opening.ebc14da53c.mp4",
-   "closing": "/media/trunks/world-cup-display/closing.ebc14da53c.mp4",
+   "opening": "/media/trunks/world-cup-display/opening.2b30e69d3d.mp4",
+   "closing": "/media/trunks/world-cup-display/closing.2b30e69d3d.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.165,
+    "right": 0.83,
+    "top": 0.7832,
+    "width": 0.665,
+    "center": 0.4975
+   },
+   "frame": {
+    "x": 0.0422,
+    "y": 0.1049,
+    "size": 0.9105
+   },
    "photos": [
     {
-     "src": "/media/trunks/world-cup-display/photo-01.ebc14da53c.webp",
+     "src": "/media/trunks/world-cup-display/photo-01.2b30e69d3d.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-face-texte"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-02.ebc14da53c.webp",
+     "src": "/media/trunks/world-cup-display/photo-02.2b30e69d3d.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-3-4"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-03.ebc14da53c.webp",
+     "src": "/media/trunks/world-cup-display/photo-03.2b30e69d3d.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-cote-drapeau"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-04.ebc14da53c.webp",
+     "src": "/media/trunks/world-cup-display/photo-04.2b30e69d3d.webp",
      "width": 1067,
      "height": 1600,
      "file": "04-haute"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-05.ebc14da53c.webp",
+     "src": "/media/trunks/world-cup-display/photo-05.2b30e69d3d.webp",
      "width": 1067,
      "height": 1600,
      "file": "05-les-quatre"
@@ -331,38 +403,50 @@
   "brt-coral-case": {
    "base": "/media/trunks/brt-coral-case",
    "set": "v3",
-   "version": "3d3f304edd",
+   "version": "6b751abdf0",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/brt-coral-case/opening.3d3f304edd.mp4",
-   "closing": "/media/trunks/brt-coral-case/closing.3d3f304edd.mp4",
+   "opening": "/media/trunks/brt-coral-case/opening.6b751abdf0.mp4",
+   "closing": "/media/trunks/brt-coral-case/closing.6b751abdf0.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
+   "marble": {
+    "left": 0.1045,
+    "right": 0.8936,
+    "top": 0.74,
+    "width": 0.7891,
+    "center": 0.499
+   },
+   "frame": {
+    "x": -0.0412,
+    "y": -0.0649,
+    "size": 1.0804
+   },
    "photos": [
     {
-     "src": "/media/trunks/brt-coral-case/photo-01.3d3f304edd.webp",
+     "src": "/media/trunks/brt-coral-case/photo-01.6b751abdf0.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-fermee"
     },
     {
-     "src": "/media/trunks/brt-coral-case/photo-02.3d3f304edd.webp",
+     "src": "/media/trunks/brt-coral-case/photo-02.6b751abdf0.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-fermee-3-4"
     },
     {
-     "src": "/media/trunks/brt-coral-case/photo-03.3d3f304edd.webp",
+     "src": "/media/trunks/brt-coral-case/photo-03.6b751abdf0.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-ouverte"
     },
     {
-     "src": "/media/trunks/brt-coral-case/photo-04.3d3f304edd.webp",
+     "src": "/media/trunks/brt-coral-case/photo-04.6b751abdf0.webp",
      "width": 1600,
      "height": 1067,
      "file": "04-ouverte-et-presentoir"
@@ -428,32 +512,56 @@
   "butterfly-trunk": {
    "base": "/media/trunks/butterfly-trunk",
    "set": "v3",
-   "version": "d9dd6aca20",
+   "version": "a9165e1cbf",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/butterfly-trunk/opening.d9dd6aca20.mp4",
-   "closing": "/media/trunks/butterfly-trunk/closing.d9dd6aca20.mp4",
+   "opening": "/media/trunks/butterfly-trunk/opening.a9165e1cbf.mp4",
+   "closing": "/media/trunks/butterfly-trunk/closing.a9165e1cbf.mp4",
    "duration": 6.04,
-   "closingDuration": 6.04
+   "closingDuration": 6.04,
+   "marble": {
+    "left": 0.13,
+    "right": 0.8604,
+    "top": 0.745,
+    "width": 0.7304,
+    "center": 0.4952
+   },
+   "frame": {
+    "x": -0.0048,
+    "y": 0,
+    "size": 1
+   }
   },
   "okafor-trunk": {
    "base": "/media/trunks/okafor-trunk",
    "set": "v3",
-   "version": "54174c8a12",
+   "version": "dcd3697689",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/okafor-trunk/opening.54174c8a12.mp4",
-   "closing": "/media/trunks/okafor-trunk/closing.54174c8a12.mp4",
+   "opening": "/media/trunks/okafor-trunk/opening.dcd3697689.mp4",
+   "closing": "/media/trunks/okafor-trunk/closing.dcd3697689.mp4",
    "duration": 6.04,
-   "closingDuration": 6.04
+   "closingDuration": 6.04,
+   "marble": {
+    "left": 0.1328,
+    "right": 0.8584,
+    "top": 0.7383,
+    "width": 0.7256,
+    "center": 0.4956
+   },
+   "frame": {
+    "x": -0.0011,
+    "y": -0.0019,
+    "size": 0.9935
+   }
   }
  }
 }

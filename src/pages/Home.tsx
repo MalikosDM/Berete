@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { MediaView } from "@/components/Media";
@@ -64,37 +64,31 @@ function HeroPhoto() {
   const { t } = useI18n();
   const d = pages["hero-desktop"];
   const m = pages["hero-mobile"];
+  // (Yoni, 24/11/2026, on his 13-inch MacBook: the trunk was cut and room was left under it.) The photo starts under the
+  // header (the header on black, never over the photo), whole (its handle, the SIRIUS plate, the chain), centred in the room
+  // left; its box has the shape of the photo (a container query), so its sides and its floor melt into the black of the page
+  // without an edge. Its signature and "Discover More" sit small on its floor, never over the trunk.
   return (
-    <section aria-label="Berete Jewellers" data-home-photo className="relative h-svh min-h-[28rem] overflow-hidden bg-ink">
-      <picture>
-        <source media="(max-aspect-ratio: 1/1)" type="image/avif" srcSet={srcset(m.avif)} sizes="100vw" />
-        <source media="(max-aspect-ratio: 1/1)" type="image/webp" srcSet={srcset(m.webp)} sizes="100vw" />
-        <source type="image/avif" srcSet={srcset(d.avif)} sizes="100vw" />
-        <img
-          src={d.src}
-          srcSet={srcset(d.webp)}
-          sizes="100vw"
-          alt={t.home.heroAlt}
-          width={d.width}
-          height={d.height}
-          fetchPriority="high"
-          decoding="async"
-          data-home-photo-img
-          className="absolute inset-x-0 top-0 bottom-[7.5rem] h-[calc(100%-7.5rem)] w-full object-cover object-[50%_68%] [@media(max-aspect-ratio:1/1)]:bottom-0 [@media(max-aspect-ratio:1/1)]:h-full [@media(max-aspect-ratio:1/1)]:object-[50%_62%]"
-        />
-      </picture>
-      {/* On a screen held wide, the photo stops above a band of black where the words sit (never over the trunk, its logo or
-          the chain); its floor melts into it. Upright, the words sit on the dark floor of the vertical photo. */}
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-[7.5rem] h-24 bg-linear-to-t from-ink to-transparent [@media(max-aspect-ratio:1/1)]:hidden" />
-      <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[22%] bg-linear-to-t from-ink/80 via-ink/35 to-transparent [@media(min-aspect-ratio:1/1)]:hidden" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col items-center px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-center [@media(min-aspect-ratio:1/1)]:h-[7.5rem] [@media(min-aspect-ratio:1/1)]:justify-center [@media(min-aspect-ratio:1/1)]:pb-2">
-        <p data-home-tagline className="font-display text-base font-light uppercase tracking-[0.16em] whitespace-nowrap text-bone sm:text-[0.9375rem] sm:tracking-[0.32em]">
-          {t.site.tagline}
-        </p>
-        <button type="button" onClick={() => scrollToId("home-next")} data-home-discover data-cta className="btn-secondary mt-2 text-mist">
-          {t.home.discoverMore}
-          <ArrowDown className="size-3.5" aria-hidden="true" />
-        </button>
+    <section aria-label="Berete Jewellers" data-home-photo className="relative flex h-svh min-h-[24rem] flex-col bg-ink pt-[calc(4rem+1px)] desk:pt-[calc(6.25rem+1px)]">
+      <div data-home-photo-frame className="home-photo-frame relative min-h-0 flex-1" style={{ "--r": d.width / d.height, "--rm": m.width / m.height } as CSSProperties}>
+        <div data-home-photo-box className="home-photo-box absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <picture>
+            <source media="(max-aspect-ratio: 1/1)" type="image/avif" srcSet={srcset(m.avif)} sizes="100vw" />
+            <source media="(max-aspect-ratio: 1/1)" type="image/webp" srcSet={srcset(m.webp)} sizes="100vw" />
+            <source type="image/avif" srcSet={srcset(d.avif)} sizes="100vw" />
+            <img src={d.src} srcSet={srcset(d.webp)} sizes="100vw" alt={t.home.heroAlt} width={d.width} height={d.height} fetchPriority="high" decoding="async" data-home-photo-img className="h-full w-full object-cover" />
+          </picture>
+        </div>
+        {/* On the floor of the photo, small, at the foot of its box (never over the trunk). */}
+        <div className="home-photo-caption absolute inset-x-0 flex flex-col items-center px-5 pb-[max(0.5rem,env(safe-area-inset-bottom))] text-center">
+          <p data-home-tagline className="font-display text-base font-light uppercase tracking-[0.16em] whitespace-nowrap text-bone sm:text-[0.9375rem] sm:tracking-[0.32em]">
+            {t.site.tagline}
+          </p>
+          <button type="button" onClick={() => scrollToId("home-next")} data-home-discover data-cta className="btn-secondary mt-1 text-mist">
+            {t.home.discoverMore}
+            <ArrowDown className="size-3.5" aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </section>
   );

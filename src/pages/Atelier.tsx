@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router";
 import { createPortal } from "react-dom";
-import { ArrowRight, Images, Play } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
 import AtelierRoom from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
@@ -18,7 +18,6 @@ import { completeMakingOf, makingSteps } from "@/data/making";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
 import { resolveShowcase } from "@/data/showcase";
-import { extra } from "@/data/sources";
 import { trunkOf } from "@/data/trunks";
 import type { Box, MediaItem } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
@@ -228,42 +227,46 @@ function AtelierFilms() {
  * looked at; "x photos" shows them in a row of thumbnails under the box, each opened full screen with the magnifying glass
  * (src/components/Lightbox.tsx); after them, a discreet "Enter the World" when its piece has its page (never a redirection).
  */
-function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
+function BoxPhotos({ box, piece, open: boxOpen }: { box: Box; piece: TrunkPiece | null; open: boolean }) {
   const { t } = useI18n();
-  const [shown, setShown] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
-  const zone = useRef<HTMLDivElement>(null);
-  if (box.images.length === 0) return null;
-  const id = "box-photos-" + box.slug;
   return (
-    // The magnifying glass of the pieces over its photos too (computers); looking at them never closes the trunk.
-    <div ref={zone} data-box-gallery={box.slug} className="relative">
-      <p className="mt-2 flex flex-wrap gap-x-6">
-        <button type="button" onClick={() => setShown((v) => !v)} aria-expanded={shown} aria-controls={id} data-box-photos={box.slug} className="inline-flex min-h-12 items-center gap-2 text-base font-medium text-white hover:text-rose-light">
-          <Images className="size-4" aria-hidden="true" /> {shown ? t.boxes.hidePhotos : t.boxes.photos(box.images.length)}
+    // Its photos first (Yoni, 24/11/2026: his wife did not see there were more photos): one plain button that opens them all,
+    // large (its professional photos, then the real photos and films of its handover); the way to its piece then, small,
+    // once the box is open.
+    <div data-box-gallery={box.slug} className="mt-4 flex flex-col items-start gap-1">
+      {box.images.length > 0 ? (
+        <button type="button" onClick={() => setOpen(0)} data-box-photos={box.slug} data-cta className="btn-primary">
+          {t.boxes.discoverPhotos}
         </button>
-      </p>
-      {shown ? (
-        <div id={id}>
-          <ul className="mt-3 grid grid-cols-3 gap-2 sm:gap-3">
-            {box.images.map((m, i) => (
-              <li key={m.src}>
-                <button type="button" onClick={() => setOpen(i)} data-box-photo={i} className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden bg-ink-soft" aria-label={t.gallery.open(m.alt ?? box.name)}>
-                  <MediaView item={m} fit="cover" sizes="(max-width: 639px) 30vw, 10vw" />
-                </button>
-              </li>
-            ))}
-          </ul>
-          {piece ? (
-            <Link to={"/pieces/" + piece.slug} data-box-enter={piece.slug} className="mt-3 inline-flex min-h-12 items-center gap-2 text-base text-mist underline-offset-4 hover:text-rose-light hover:underline">
-              {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-              <span className="sr-only"> · {piece.title}</span>
-            </Link>
-          ) : null}
-        </div>
+      ) : null}
+      {piece && boxOpen ? (
+        <Link to={"/pieces/" + piece.slug} data-box-enter={piece.slug} data-trunk-piece={piece.slug} data-cta className="btn-secondary text-mist">
+          {t.boxes.discoverPiece} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+          <span className="sr-only"> · {piece.title}</span>
+        </Link>
       ) : null}
       {open !== null ? createPortal(<Lightbox items={box.images} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </div>
+  );
+}
+
+/** One trunk of the page: its square (it opens in its film), its name, its words, its photos, then the way to its piece. */
+function TrunkCard({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
+  const [open, setOpen] = useState(false);
+  const trunk = trunkOf(box.slug);
+  return (
+    // The selection appears as the page scrolls; every card the same: the same square, the same spaces.
+    <Reveal soft className="flex w-full flex-col">
+      {trunk ? (
+        <TrunkReveal slug={box.slug} name={box.name} trunk={trunk} piece={piece} onOpen={setOpen} />
+      ) : (
+        <div className="relative aspect-square w-full overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</div>
+      )}
+      <h3 className="title-caps mt-4 t-sub tracking-[0.1em] text-white">{box.name}</h3>
+      {box.description ? <p className="mt-2 max-w-md text-base text-bone">{box.description}</p> : null}
+      <BoxPhotos box={box} piece={piece} open={open} />
+    </Reveal>
   );
 }
 
@@ -316,39 +319,19 @@ export function Boxes() {
   // one still waiting for its film (Keita, Malik Tillman) or for its v3 files (Signature, Photo Case, Trophy Trunk, Campione)
   // stays on the page of its piece and on the profile of its person.
   const boxes = all.filter(onTrunksPage).sort((a, b) => rank(a) - rank(b));
-  const heroTrunk = extra("boxes/hero", "dragon-ball-closed", { alt: t.boxes.heroAlt, onBlack: false });
 
   return (
     <div className="pb-24">
-      <PageIntro title={t.boxes.title} lead={t.boxes.lead} />
-
-      {/* An example, large, first (Yoni, 23/11/2026): the Dragon Ball trunk as it is, its artwork and the BRT mark on its face. */}
-      {heroTrunk ? (
-        <section aria-label={heroTrunk.alt} data-boxes-hero className="wrap mb-14 lg:mb-16 ">
-          <div className="relative overflow-hidden border border-white/10 bg-ink-soft">
-            <MediaView item={heroTrunk} fit="contain" priority sizes="(max-width: 1599px) 100vw, 1600px" className="max-h-[min(62svh,40rem)] w-full" />
-          </div>
-        </section>
-      ) : null}
+      {/* The page starts with the trunks themselves (Yoni, 24/11/2026): its name on one small line, then the trunks. */}
+      <PageIntro title={t.boxes.title} compact oneLine />
 
       <section aria-labelledby="boxes-list-title" className="wrap">
-        <h2 id="boxes-list-title" className="title-caps tracking-[0.12em] mb-10 t-title text-white [text-wrap:balance]">{t.boxes.closing}</h2>
+        <h2 id="boxes-list-title" className="sr-only">{t.boxes.listLabel}</h2>
         <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
           {boxes.map((box) => {
-            const trunk = trunkOf(box.slug);
             return (
-              <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="scroll-mt-36">
-                {/* The selection appears as the page scrolls. */}
-                <Reveal soft>
-                {trunk ? (
-                  <TrunkReveal slug={box.slug} name={box.name} trunk={trunk} piece={pieceOf(box)} />
-                ) : (
-                  <div className="relative aspect-square w-full overflow-hidden bg-ink-soft">{box.images[0] ? <MediaView item={box.images[0]} fit="cover" /> : null}</div>
-                )}
-                <h3 className="title-caps mt-4 t-sub tracking-[0.1em] text-white">{box.name}</h3>
-                {box.description ? <p className="mt-3 max-w-md text-base text-bone">{box.description}</p> : null}
-                <BoxPhotos box={box} piece={pieceOf(box)} />
-                </Reveal>
+              <li key={box.slug} id={"box-" + box.slug} data-box={box.slug} className="flex scroll-mt-36">
+                <TrunkCard box={box} piece={pieceOf(box)} />
               </li>
             );
           })}

@@ -188,8 +188,9 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   await expect(card.locator("[data-press-piece]")).toContainText("Entrer dans l’univers");
   // The trunks: the Dragon Ball trunk large first, then the selection; the real photos of the Campione case.
   await open(page, "/boxes");
-  const hero = page.locator("[data-boxes-hero] img");
-  await expect(hero).toHaveAttribute("src", new RegExp("/media/extra/boxes/hero/dragon-ball-closed" + V));
+  // (24/11/2026: no large opening any more, the page starts with the trunks themselves.)
+  await expect(page.locator("[data-boxes-hero]")).toHaveCount(0);
+  await expect(page.locator("[data-box]").first()).toBeVisible();
   await page.screenshot({ path: shotPath(info, "yoni2311b-ecrins") });
   // The Campione case waits for its v3 files (off the page of the trunks): its real photos on the page of the ring.
   await open(page, "/pieces/campione-d-italia-2023-2024");

@@ -1,7 +1,6 @@
-import { useState, type FormEvent } from "react";
-import { ArrowRight, Check, LoaderCircle, Mail, MapPin, PhoneCall, RotateCcw } from "lucide-react";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { ArrowRight, Check, ChevronDown, LoaderCircle, Mail, MapPin, PhoneCall, RotateCcw } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
-import Reveal from "@/components/Reveal";
 import { collectionWords, Link, useI18n, type Messages } from "@/i18n";
 import { collectionOf } from "@/data/collections";
 import WhatsAppHandoff from "@/components/WhatsAppHandoff";
@@ -14,6 +13,8 @@ type ContactBlockProps = {
   pieceName?: string;
   compact?: boolean;
   id?: string;
+  /** Under the call back, in the right column (the contact page: its form by email). */
+  extra?: ReactNode;
 };
 
 type Choice = { value: string; label: string };
@@ -29,7 +30,7 @@ function stepsOf(t: Messages): { title: string; options: Choice[] }[] {
   ];
 }
 
-export default function ContactBlock({ pieceName, compact = false, id }: ContactBlockProps) {
+export default function ContactBlock({ pieceName, compact = false, id, extra }: ContactBlockProps) {
   const { t } = useI18n();
   // The message of the page it is on (a person: the creations made for them; a piece: its name; the contact page).
   const mainMessage = useWhatsAppMessage();
@@ -58,21 +59,21 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
   }
 
   return (
-    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className="relative scroll-mt-32 bg-ink py-14 lg:py-20">
+    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} data-contact-block className="relative scroll-mt-32 bg-ink pt-6 pb-12 lg:pt-8 lg:pb-14">
       <div className="wrap">
-        <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">
+        <div data-contact-columns className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Left: the main call to action */}
           <div className="lg:col-span-5">
-            <h2 id={(id ?? "contact-block") + "-title"} className="title-caps tracking-[0.12em] max-w-full text-balance break-words t-title ">
+            <h2 id={(id ?? "contact-block") + "-title"} className="sr-only">
               {t.common.yourStory}
             </h2>
-            <p className="mt-5 max-w-md text-base text-mist">{t.contact.oneConversation}</p>
-            <a href={waLink(mainMessage)} target="_blank" rel="noreferrer" data-cta className="btn-primary mt-8">
+            <p className="max-w-md text-base text-bone">{t.contact.oneConversation}</p>
+            <a href={waLink(mainMessage)} target="_blank" rel="noreferrer" data-cta className="btn-primary mt-5">
               <BrandIcon name="whatsapp" className="size-4" />
               {t.common.whatsapp}
             </a>
 
-            <ul className="mt-10 space-y-1 text-base text-bone">
+            <ul className="mt-5 text-base text-bone">
               <li className="flex min-h-12 items-center gap-3">
                 <MapPin className="size-5 text-rose-light" aria-hidden="true" />
                 {t.site.baseLine}
@@ -94,21 +95,20 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
             </ul>
 
             {proof.length > 0 ? (
-              <div className="mt-10 border-t border-white/15 pt-8">
+              <div className="mt-5 border-t border-white/15 pt-5">
                 <p className="eyebrow">{t.contact.trustedBy}</p>
                 <p className="mt-4 max-w-md font-display t-sub uppercase leading-relaxed tracking-[0.08em] text-white">{proof.join(" · ")}</p>
               </div>
             ) : null}
           </div>
 
-          {/* Right: configurator + call back */}
-          <div className="space-y-8 lg:col-span-6 lg:col-start-7">
-            <Reveal>
-              <Configurator pieceName={pieceName} />
-            </Reveal>
-            <Reveal delay={0.1}>
+          {/* Right: the consultation, then By phone and By email, two fine lines of the same width that open in place. */}
+          <div className="lg:col-span-7 lg:col-start-6">
+            <Configurator pieceName={pieceName} />
+            <div className="mt-4 border-t border-white/12">
               <CallBack pieceName={pieceName} />
-            </Reveal>
+              {extra}
+            </div>
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@ function Configurator({ pieceName }: { pieceName?: string }) {
   };
 
   return (
-    <div className="border-rose-gold bg-ink-soft p-6 sm:p-10">
+    <div data-configurator className="border-rose-gold bg-ink-soft p-5 sm:p-7">
       <div className="flex items-baseline justify-between gap-4">
         <h3 className="title-caps t-sub tracking-[0.12em]">{t.contact.configTitle}</h3>
         <span className="text-rose-gold font-display text-2xl" aria-live="polite">
@@ -144,16 +144,16 @@ function Configurator({ pieceName }: { pieceName?: string }) {
         </span>
       </div>
 
-      <div className="mt-6 flex gap-2" aria-hidden="true">
+      <div className="mt-4 flex gap-2" aria-hidden="true">
         {STEPS.map((s, i) => (
           <span key={s.title} className={"h-px flex-1 " + (i < step ? "bg-rose-gold" : "bg-white/20")} />
         ))}
       </div>
 
       {!done ? (
-        <fieldset className="mt-8">
+        <fieldset className="mt-5">
           <legend className="text-base font-medium uppercase tracking-[0.2em] text-bone">{STEPS[step]!.title}</legend>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
             {STEPS[step]!.options.map((o) => (
               <button
                 key={o.value}
@@ -238,25 +238,23 @@ function CallBack({ pieceName }: { pieceName?: string }) {
     "mt-2 block min-h-14 w-full border border-white/30 bg-ink px-4 text-base text-white placeholder:text-mist/80 focus:border-rose-light focus:outline-none";
 
   return (
-    <div className="border border-white/15 p-6 sm:p-10">
+    <div data-contact-line="phone" className="border-b border-white/12">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="callback-form"
-        className="flex min-h-12 w-full items-center justify-between gap-4 text-start"
+        className="flex min-h-12 w-full items-center justify-between gap-4 py-1 text-start"
       >
         <span className="flex items-center gap-3">
-          <PhoneCall className="size-5 text-rose-light" aria-hidden="true" />
+          <PhoneCall className="size-4 text-rose-light" aria-hidden="true" />
           <span className="title-caps t-sub tracking-[0.12em]">{t.contact.callTitle}</span>
         </span>
-        <span className="text-rose-gold font-display text-3xl leading-none" aria-hidden="true">
-          {open ? "−" : "+"}
-        </span>
+        <ChevronDown className={"size-4 text-rose-light transition-transform duration-500 " + (open ? "rotate-180" : "")} aria-hidden="true" />
       </button>
 
       {open ? (
-        <div id="callback-form" className="mt-6">
+        <div id="callback-form" className="mt-4 pb-6">
           {status === "sent" ? (
             <p role="status" className="flex items-start gap-3 text-base text-bone">
               <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />

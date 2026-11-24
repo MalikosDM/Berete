@@ -35,11 +35,12 @@ export default function Contact() {
 
   return (
     <>
-      <PageIntro title={t.contact.title} lead={t.contact.lead} />
-      <ContactBlock id="configurator" pieceName={fromPiece?.title} />
+      {/* The whole page in one screen (Yoni, 24/11/2026, 1440 × 780 included): its name, then its two columns; By phone and By
+          email two fine lines under the consultation, in its right column. */}
+      <PageIntro title={t.contact.title} lead={t.contact.lead} compact />
+      <ContactBlock id="configurator" pieceName={fromPiece?.title} extra={<EmailForm ref={form} />} />
       {/* « Imaginez votre création »: shown only when the server has its image service (src/components/Imagine.tsx). */}
       <Imagine onFinalise={(message, file) => form.current?.receive(message, file)} />
-      <EmailForm ref={form} />
     </>
   );
 }
@@ -188,25 +189,25 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
     "mt-2 block w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none";
 
   return (
-    <section id="private-correspondence" aria-labelledby="email-title" className="scroll-mt-28 bg-ink pb-24 lg:pb-32">
-      <div className="mx-auto max-w-3xl px-5 sm:px-8">
-        <div className="border border-white/15 p-6 sm:p-10">
+    <section id="private-correspondence" aria-labelledby="email-title" data-contact-line="email" className="scroll-mt-28 border-b border-white/12">
+      <div>
+        <div>
           <button
             type="button"
             onClick={toggle}
             aria-expanded={open}
             aria-controls="email-form"
-            className="flex min-h-12 w-full items-center justify-between gap-4 text-start"
+            className="flex min-h-12 w-full items-center justify-between gap-4 py-1 text-start"
           >
             <span className="flex items-center gap-3">
-              <Mail className="size-5 text-rose-light" aria-hidden="true" />
+              <Mail className="size-4 text-rose-light" aria-hidden="true" />
               <h2 id="email-title" className="title-caps t-sub tracking-[0.12em]">{t.contact.emailTitle}</h2>
             </span>
-            <ChevronDown className={"size-5 text-rose-light transition-transform duration-300 " + (open ? "rotate-180" : "")} aria-hidden="true" />
+            <ChevronDown className={"size-4 text-rose-light transition-transform duration-500 " + (open ? "rotate-180" : "")} aria-hidden="true" />
           </button>
 
           {open ? (
-            <div id="email-form" ref={box} tabIndex={-1} className="mt-8 focus:outline-none">
+            <div id="email-form" ref={box} tabIndex={-1} className="mt-4 pb-6 focus:outline-none">
               {status === "sent" ? (
                 <p role="status" data-email-sent className="flex items-start gap-3 text-base text-bone">
                   <Check className="mt-1 size-5 shrink-0 text-rose-light" aria-hidden="true" />

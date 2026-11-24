@@ -403,11 +403,12 @@ export const nl: Messages = {
     openTrunk: (name: string) => "Openen: " + name,
     openHint: "Openen",
     createOwn: "Begin aan uw creatie",
-    discoverPiece: "Betreed de wereld",
+    discoverPiece: "Ontdek het stuk",
     replay: "Opening opnieuw bekijken",
     closeHint: "Sluiten",
     closeTrunk: (name: string) => "Sluiten: " + name,
     openAlt: (name: string) => name + ", geopend",
+    discoverPhotos: "Ontdek de foto’s",
   },
 
   process: {

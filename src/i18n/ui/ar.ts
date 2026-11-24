@@ -398,11 +398,12 @@ export const ar: Messages = {
     openTrunk: (name: string) => "فتح: " + name,
     openHint: "افتح",
     createOwn: "ابدؤوا إبداعكم",
-    discoverPiece: "ادخلوا العالم",
+    discoverPiece: "اكتشفوا القطعة",
     replay: "إعادة مشاهدة الفتح",
     closeHint: "أغلق",
     closeTrunk: (name: string) => "إغلاق: " + name,
     openAlt: (name: string) => name + " مفتوحاً",
+    discoverPhotos: "اكتشفوا الصور",
   },
 
   process: {

@@ -162,6 +162,32 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours vidéo de Yoni (24/11, 11 h 01 – 11 h 06) » — état au 24/11/2026
+- [x] **Plein écran** qu'on quitte toujours (`src/lib/fullscreen.ts`, `useFullscreen`) : c'est le cadre du film (avec ses boutons)
+      qui passe en plein écran, jamais la vidéo seule ; le même bouton entre et sort, Échap et le geste du système aussi ; Safari
+      (`webkit…`) ; iPhone : lecteur du système (`webkitEnterFullscreen`). À la sortie : même endroit de la page, le film continue,
+      le son comme avant. `FeatureFilm` et le visualiseur 3D.
+- [x] **Signature Trunks** : plus de grande ouverture (photo Dragon Ball, phrase) ; un petit titre, les 9 écrins 3 par ligne, la
+      1re ligne entière avec ses noms à 1280 × 800 et 1440 × 780. Sous chaque écrin : « Discover the photos » / « Découvrir les
+      photos » (visionneuse sur toutes ses photos, compteur) ; ouvert : « Discover the piece → » / « Découvrir la pièce ».
+      « Begin Your Creation » une seule fois, en bas de la page.
+- [x] **Une seule mise en scène des écrins** (`scripts/trunk-media.mjs`) : le socle de marbre est mesuré sur closed.jpg (zone
+      `BASES`, puis bords trouvés par sharp), chaque écrin recadré pour que son socle ait la largeur et la hauteur de celui du
+      Butterfly (`REFERENCE`), centré ; même recadrage pour closed, open et les deux films ; bords prolongés en miroir. Valeurs
+      `marble` et `frame` dans `src/data/trunks.generated.json`, `PLACES` recalculés par `trunkOf`. **Dragon Ball** : zoom
+      abaissé (socle à 67 % au lieu de 73 %) pour garder la malle entière. Planche :
+      `_verif/appel-24-11/apres-retours/ecrins-avant-apres.jpg`. **Okafor** : nouveaux fichiers v3 (le dossier `_anciens` n'est
+      jamais lu), l'octogone sort du milieu des compartiments.
+- [ ] **À repasser sur marbre dès que Yoni envoie les images** (mêmes dossiers v3, aucun code à changer) : Tulips on Tour,
+      malle Dragon Ball, DFB-Pokal 2025 Display, World Cup Display → `npm run trunks -- --only=<écrin>`.
+- [x] **Begin Your Creation** (/contact) tient dans un écran (1280 × 800, 1440 × 780, 1440 × 900) : titre, colonne de gauche,
+      formulaire à droite et dessous deux fines lignes qui s'ouvrent (« By phone », « By email ») ; iPhone : l'un sous l'autre.
+- [x] **Accueil** : la photo de l'écrin Sirius commence sous l'en-tête (noir opaque dès le haut), entière, centrée, bords en
+      fondu (`HeroPhoto`, `.home-photo-*` de `src/index.css`) à toutes les tailles ; phrase et « Discover More » petits sur le
+      noir. Menu : Manrope 500, ivoire franc (contraste ≥ 7:1).
+- `tests/retours2411.spec.ts` (ordinateur Chromium, Safari WebKit, iPhone), captures `verification/<appareil>/retours2411-*.jpg`
+  et avant / après dans `/Volumes/Disque externe/_verif/appel-24-11/apres-retours/`.
+
 ## Passe « zéro incohérence » (après l'appel du 23-24/11) — état au 24/11/2026
 - [x] **Deux polices** seulement : Cormorant Garamond (titres) et Manrope (textes). Les polices des univers ne sont plus chargées
       ni utilisées (`universeProps` de `src/components/Universe.tsx` prend toujours `maison` ; l'admin le dit) ; les grands signes

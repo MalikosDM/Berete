@@ -426,11 +426,12 @@ export const en = {
     openTrunk: (name: string) => "Open " + name,
     openHint: "Open",
     createOwn: "Begin Your Creation",
-    discoverPiece: "Enter the World",
+    discoverPiece: "Discover the piece",
     replay: "Watch the opening again",
     closeHint: "Close",
     closeTrunk: (name: string) => "Close " + name,
     openAlt: (name: string) => name + ", open",
+    discoverPhotos: "Discover the photos",
   },
 
   process: {

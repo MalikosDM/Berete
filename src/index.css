@@ -3307,3 +3307,46 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
 }
 
+
+/* A film full screen (24/11/2026): the frame and its buttons fill the screen, the film whole in it (src/lib/fullscreen.ts). */
+.feature-film:fullscreen,
+.feature-film:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+  border: 0;
+  background: #000;
+}
+
+/*
+ * The photo of the home page, whole in the room left under the header (Yoni, 24/11/2026): its box has the shape of the photo
+ * (as large as the room allows, "contain"), centred; its sides and its floor melt into the black of the page. Upright screens
+ * take its vertical version (the same media query as its <source>).
+ */
+.home-photo-frame {
+  container-type: size;
+}
+.home-photo-box {
+  --ratio: var(--r);
+  width: min(100cqw, 100cqh * var(--ratio));
+  height: min(100cqh, 100cqw / var(--ratio));
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to top, transparent, #000 9%);
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to top, transparent, #000 9%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+@media (max-aspect-ratio: 1/1) {
+  .home-photo-box {
+    --ratio: var(--rm);
+  }
+}
+/* Its signature and "Discover More": at the foot of the box of the photo, on its floor. */
+.home-photo-caption {
+  bottom: calc(50cqh - min(100cqh, 100cqw / var(--r)) / 2);
+}
+@media (max-aspect-ratio: 1/1) {
+  .home-photo-caption {
+    bottom: calc(50cqh - min(100cqh, 100cqw / var(--rm)) / 2);
+  }
+}

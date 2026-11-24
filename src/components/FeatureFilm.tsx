@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Maximize, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import type { FeatureFilmData } from "@/data/featureFilms";
 import { useI18n } from "@/i18n";
+import { useFullscreen } from "@/lib/fullscreen";
 
 
 /**
@@ -78,15 +79,14 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
     if (video.paused) void video.play().catch(() => undefined);
     else video.pause();
   };
+  // Full screen: the frame with its buttons, so that the same button leaves it (24/11/2026, src/lib/fullscreen.ts).
+  const { full, toggle: toggleFull } = useFullscreen(frameRef, videoRef);
   const fullScreen = () => {
-    const frame = frameRef.current as (HTMLDivElement & { webkitRequestFullscreen?: () => void }) | null;
-    const video = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    const video = videoRef.current;
     if (!video) return;
     if (!src) setSrc(film.video);
-    void video.play().catch(() => undefined);
-    if (frame?.requestFullscreen) void frame.requestFullscreen().catch(() => video.webkitEnterFullscreen?.());
-    else if (frame?.webkitRequestFullscreen) frame.webkitRequestFullscreen();
-    else video.webkitEnterFullscreen?.();
+    if (!full) void video.play().catch(() => undefined);
+    toggleFull();
   };
 
   const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/35 bg-ink/60 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:size-10";
@@ -126,8 +126,8 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
                   {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4" aria-hidden="true" />}
                 </button>
               ) : null}
-              <button type="button" onClick={fullScreen} data-feature-fullscreen aria-label={t.feature.fullscreen} className={btn}>
-                <Maximize className="size-4" aria-hidden="true" />
+              <button type="button" onClick={fullScreen} data-feature-fullscreen aria-pressed={full} aria-label={full ? t.viewer.exitFullscreen : t.feature.fullscreen} className={btn}>
+                {full ? <Minimize className="size-4" aria-hidden="true" /> : <Maximize className="size-4" aria-hidden="true" />}
               </button>
             </div>
           </div>

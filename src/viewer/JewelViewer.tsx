@@ -17,6 +17,7 @@ import { METAL_LOOKS, STONE_COLORS } from "./materials";
 import { BACKGROUND_LOOKS, backgroundCss, swatchCss } from "./backgrounds";
 import Stage, { type Choices, type StageApi } from "./Stage";
 import { CANVAS_SIZE, PANEL, VIEWER_GRID } from "./layout";
+import { exitFullscreen, fullscreenElement } from "@/lib/fullscreen";
 
 export type ViewerHandle = {
   getView(): ModelView | null;
@@ -151,23 +152,29 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   const toggleFull = async () => {
     const el = wrap.current;
     if (!el) return;
-    if (document.fullscreenElement) {
-      await document.exitFullscreen().catch(() => undefined);
+    if (fullscreenElement()) {
+      exitFullscreen();
       return;
     }
     if (full) {
       setFull(false);
       return;
     }
+    const webkit = el as HTMLElement & { webkitRequestFullscreen?: () => void };
     if (document.fullscreenEnabled && el.requestFullscreen) {
       await el.requestFullscreen().catch(() => setFull(true));
-    } else setFull(true);
+    } else if (webkit.webkitRequestFullscreen) webkit.webkitRequestFullscreen();
+    else setFull(true);
   };
   const [native, setNative] = useState(false);
   useEffect(() => {
-    const onChange = () => setNative(document.fullscreenElement === wrap.current);
+    const onChange = () => setNative(fullscreenElement() === wrap.current);
     document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+    };
   }, []);
   const isFull = full || native;
   useEffect(() => {

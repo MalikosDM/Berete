@@ -228,9 +228,14 @@ test("the Bosnia ring, its trunk", async ({ page }, info) => {
   await expect(page.locator('[data-custom-box="world-cup-display"]')).toBeVisible();
   // From its trunk: the way to the piece.
   await open(page, "/boxes");
-  await expect(page.locator('[data-box="world-cup-display"] [data-trunk-actions], [data-box="world-cup-display"] [data-box-photos]').first()).toBeAttached();
-  await page.locator('[data-box-photos="world-cup-display"]').click();
+  // (Its photos first, then, once it is open, the way to its piece: 24/11/2026.)
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  const cup = page.locator('[data-box="world-cup-display"]');
+  await cup.scrollIntoViewIfNeeded();
+  await expect(cup.locator("[data-box-photos]")).toBeVisible();
+  await cup.locator("[data-trunk-open]").click();
   await expect(page.locator('[data-box-enter="bosnia-and-herzegovina-world-cup-2026-ring"]')).toBeVisible();
+  await page.emulateMedia({ reducedMotion: null });
   expect(problems.errors).toEqual([]);
 });
 
@@ -244,9 +249,6 @@ test("trunks: the box stays open while its photos are looked at, the magnifying 
     await expect(trunk).toHaveAttribute("data-trunk-state", "open", { timeout: 15_000 });
   }).toPass({ timeout: 45_000 });
   await card.locator("[data-box-photos]").click();
-  await expect(card.locator("[data-box-photo]").first()).toBeVisible();
-  await expect(trunk).toHaveAttribute("data-trunk-state", "open");
-  await card.locator("[data-box-photo]").first().click();
   const lb = page.locator("[data-lightbox]");
   await expect(lb).toBeVisible();
   await lb.locator("[data-zoom-in]").click();
@@ -258,7 +260,7 @@ test("trunks: the box stays open while its photos are looked at, the magnifying 
   await card.screenshot({ path: shotPath(info, "yoni2311-trunk") });
   // A box whose piece is not known: no way to a piece.
   const other = page.locator('[data-box="brt-coral-case"]');
-  await other.locator("[data-box-photos]").click();
+  await expect(other.locator("[data-box-photos]")).toBeVisible();
   await expect(other.locator("[data-box-enter]")).toHaveCount(0);
 });
 

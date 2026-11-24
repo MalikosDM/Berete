@@ -63,12 +63,12 @@ test("home: one photo of the Sirius trunk full screen, its signature in the blac
     const box = (await page.locator("[data-home-photo]").boundingBox())!;
     const view = page.viewportSize()!;
     expect(box.height).toBeGreaterThanOrEqual(view.height - 1);
-    // The signature on one line, under the photo (wide screens) or on its dark floor (upright): never over the trunk.
+    // The signature on one line, small, on the floor of the photo, at its foot (24/11/2026: the photo whole under the header).
     const line = (await page.locator("[data-home-tagline]").boundingBox())!;
     expect(line.height).toBeLessThan(40);
-    const img = (await photo.boundingBox())!;
-    if (view.width > view.height) expect(line.y).toBeGreaterThanOrEqual(img.y + img.height - 2);
-    else expect(line.y).toBeGreaterThan(view.height * 0.7);
+    const img = (await page.locator("[data-home-photo-box]").boundingBox())!;
+    expect(line.y).toBeGreaterThan(img.y + img.height * 0.75);
+    expect(line.y + line.height).toBeLessThanOrEqual(img.y + img.height + 1);
     // No film moved by the scroll, no "Scroll" on the home page any more.
     await expect(page.locator("[data-scroll-video], [data-sketch-intro]")).toHaveCount(0);
     await expect(page.locator("[data-stories-bar], [data-story-bubble]")).toHaveCount(0);

@@ -82,7 +82,6 @@ test("the magnifying glass: in the full screen only, photos only, never a film; 
     // The photos of a trunk: full screen, with the glass.
     await open(page, "/boxes");
     await page.locator("[data-box-photos='sirius']").click();
-    await page.locator("[data-box-gallery='sirius'] [data-box-photo='0']").click();
     await expect(lb).toBeVisible();
     await lb.locator("[data-zoom-in]").click();
     await expect.poll(zoom).toBeGreaterThan(1);
