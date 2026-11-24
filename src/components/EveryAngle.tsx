@@ -42,8 +42,8 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
   const viewed = items.map((item) => ({ ...item, caption: captionOf(item) || undefined }));
 
   return (
-    <section aria-labelledby="every-angle" data-every-angle className="mx-auto max-w-[1240px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
-      <h2 id="every-angle" className="title-caps t-title tracking-[0.12em]">
+    <section aria-labelledby="every-angle" data-every-angle data-piece-section="angles" className="wrap py-16 lg:py-20">
+      <h2 id="every-angle" className="title-caps tracking-[0.12em] t-title ">
         {t.gallery.everyAngle}
       </h2>
       <ol className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:mt-10 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-8">
@@ -62,8 +62,8 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
                 className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink"
                 aria-label={t.gallery.open(name)}
               >
-                <span className="absolute inset-0 transition-transform duration-[1.2s] ease-out group-hover:scale-[1.04]">
-                  <MediaView item={item} sizes="(max-width: 1023px) 46vw, 18rem" />
+                <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
+                  <MediaView item={item} alt={name} sizes="(max-width: 1023px) 46vw, 18rem" />
                 </span>
                 {item.type === "video" ? (
                   <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-ink/60 px-3 py-1 text-sm text-white">
@@ -92,7 +92,8 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
             type="button"
             onClick={() => setExpanded(true)}
             data-angle-more
-            className="inline-flex min-h-12 items-center justify-center border border-white/35 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+            data-cta
+            className="btn-primary"
           >
             {t.gallery.more(hidden)}
           </button>

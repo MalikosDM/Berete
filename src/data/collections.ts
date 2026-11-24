@@ -83,7 +83,7 @@ export const SUBCATEGORIES: SubCategory[] = [
     name: "Name Pendants",
     intro: "A name, or the initials of a name, drawn in gold and set with diamonds.",
     hero: "noah-okafor-oka-pendant",
-    pieces: ["noah-okafor-oka-pendant", "noah-okafor-octagon-pendant", "angelo-stiller-as-pendant", "jamie-leweling-jl-pendant", "malik-tillman-tm-pendant", "lois-openda-script-pendant", "ampersand-initials-pendant", "tanguy-nianzou-fam-medallion"],
+    pieces: ["noah-okafor-oka-pendant", "noah-okafor-octagon-pendant", "angelo-stiller-as-pendant", "jamie-leweling-jl-pendant", "malik-tillman-tm-pendant", "lois-openda-script-pendant", "ampersand-initials-pendant", "tanguy-nianzou-fam-medallion", "sirius"],
   },
   {
     parent: "pendant",
@@ -109,7 +109,7 @@ export const SUBCATEGORIES: SubCategory[] = [
     name: "Signature Chains",
     intro: "The chains of the house, drawn by Berete: the Safi Link and BRT Flowers.",
     hero: "the-safi-link",
-    pieces: ["the-safi-link", "brt-flower-chain", "sirius"],
+    pieces: ["the-safi-link", "brt-flower-chain"],
   },
   {
     parent: "chain",
@@ -119,21 +119,15 @@ export const SUBCATEGORIES: SubCategory[] = [
     hero: "rose-iced-cuban-chain",
     pieces: ["rose-iced-cuban-chain", "wide-rose-iced-cuban-chain", "baguette-cuban-chain", "white-iced-cuban-chain", "two-tone-iced-cuban-chain"],
   },
-  {
-    parent: "chain",
-    slug: "tennis",
-    name: "Tennis Chains",
-    intro: "A line of diamonds, stone after stone.",
-    hero: "two-row-tennis-chain",
-    pieces: ["two-row-tennis-chain"],
-  },
+  // Tennis (24/11/2026): its chain of two rows is the chain of Noah Okafor's octagon, on the page of the pendant; the category
+  // comes back with a tennis chain of its own.
   {
     parent: "chain",
     slug: "infinity",
     name: "Infinity Chains",
     intro: "Links drawn in the shape of infinity.",
-    hero: "infinity-link-chain",
-    pieces: ["infinity-link-chain", "cross-infinity-chain", "pear-link-chain"],
+    hero: "pear-link-chain",
+    pieces: ["pear-link-chain"],
   },
 ];
 

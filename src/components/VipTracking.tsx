@@ -41,7 +41,7 @@ export function VipJourney({ space }: { space: VipSpace }) {
       {space.estimatedAt && !finished ? (
         <div className="mb-12 border-b border-white/10 pb-10" data-vip-estimate>
           <p className="eyebrow">{w.estimated}</p>
-          <p className="title-caps t-title mt-3 text-white">
+          <p className="title-caps tracking-[0.12em] t-title mt-3 text-white">
             <time dateTime={space.estimatedAt}>{dayInWords(intl, space.estimatedAt)}</time>
           </p>
           {change ? (

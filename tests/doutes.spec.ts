@@ -22,7 +22,7 @@ const boxOf = (slug: string) => {
 
 /** Each confirmed doubt: its piece, its step, the title of the step in French, its file, and whether it is the second photo of the step. */
 const CONFIRMED: { n: number; slug: string; step: MakingStep; title: string; src: string; second?: boolean }[] = [
-  { n: 1, slug: "noah-okafor-octagon-pendant", step: "delivery", title: "La Révélation finale", src: "/media/stories/noah-okafor-ii/05.webp" },
+  { n: 1, slug: "noah-okafor-octagon-pendant", step: "delivery", title: "La remise", src: "/media/stories/noah-okafor-ii/05.webp" },
   { n: 3, slug: "angelo-stiller-as-pendant", step: "preparation", title: "Préparation du sertissage", src: "/media/hd/angelo-stiller-as-pendant/v04-2s.webp" },
   { n: 4, slug: "panther-champion-pendant", step: "assembly", title: "Assemblage", src: "/media/hd/panther-champion-pendant/08-v08-1s.webp" },
   { n: 5, slug: "panther-champion-pendant", step: "parts", title: "Les pièces avant assemblage", src: "/media/hd/panther-champion-pendant/08-p01.webp" },

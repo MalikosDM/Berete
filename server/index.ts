@@ -104,7 +104,8 @@ app.get(/^(?!\/api\/).*/, async (req, res, next) => {
     }
   }
   if (!target) return next();
-  const page = path.join(dist, prefix + target + ".html");
+  // A place on a page ("…#worn-as-pendant": the part of a piece on the page of that piece) checks the page itself.
+  const page = path.join(dist, prefix + target.split("#")[0] + ".html");
   if (!page.startsWith(dist + path.sep)) return next();
   fs.stat(page, (error) => (error ? next() : res.redirect(301, prefix + target)));
 });

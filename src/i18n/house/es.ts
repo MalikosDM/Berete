@@ -163,5 +163,5 @@ export const es: HouseTexts = {
     { label: "La trayectoria", text: "Antes era yo quien viajaba para encontrarme con mis clientes. Hoy son ellos quienes vienen a buscarme allí donde he elegido construir mi futuro." },
   ],
   closing: "Un legado transmitido. Una identidad asumida. Una visión singular.",
-  signature: "Made by us. Inspired by you.",
+  signature: "Creado por nosotros. Inspirado por usted.",
 };

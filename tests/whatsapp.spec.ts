@@ -98,5 +98,5 @@ test("the messages: every page and piece in six languages, the special letters k
   }
   // The example of Yoni, word for word.
   expect(en.whatsapp.piece("Butterfly Chain")).toBe("Hello Berete, I discovered the Butterfly Chain on your website and would like to discuss a bespoke creation of my own.");
-  expect(en.whatsapp.piece("The Hand — Pendant")).toBe("Hello Berete, I discovered The Hand — Pendant on your website and would like to discuss a bespoke creation of my own.");
+  expect(en.whatsapp.piece("The Hand")).toBe("Hello Berete, I discovered The Hand on your website and would like to discuss a bespoke creation of my own.");
 });

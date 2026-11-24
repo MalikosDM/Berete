@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
-import { ArrowRight } from "lucide-react";
+
 import BrandMark from "@/components/BrandMark";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -55,17 +55,18 @@ export default function Layout() {
             href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
-            className="flex min-h-[52px] items-center justify-center gap-2 border border-white/40 px-4 text-base font-medium text-white transition-colors active:bg-white/10"
+            data-cta
+            className="flex min-h-[52px] items-center justify-center gap-2 px-3 text-base font-normal text-white transition-colors active:text-rose-light"
           >
             <BrandIcon name="whatsapp" className="size-5 shrink-0" />
             {t.common.whatsapp}
           </a>
           <Link
             to="/contact"
-            className="flex min-h-[52px] items-center justify-center gap-2 bg-white px-3 py-1 text-center text-base leading-tight font-medium text-ink transition-colors active:bg-bone"
+            data-cta
+            className="flex min-h-[52px] items-center justify-center gap-2 border border-rose-light/55 px-3 py-1 text-center text-base leading-tight font-normal uppercase tracking-[0.08em] text-white transition-colors active:border-rose-light"
           >
             {t.common.startPiece}
-            <ArrowRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>
       </div>

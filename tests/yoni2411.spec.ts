@@ -92,7 +92,7 @@ test("home: the Dragon Ball pendant beside a circle where its sphere turns by it
     await expect(sphere).toHaveAttribute("src", /\/media\/pages\/dragon-ball-sphere\.[0-9a-f]{10}\.mp4$/);
     await expect.poll(() => sphere.evaluate((v) => !(v as HTMLVideoElement).paused && (v as HTMLVideoElement).currentTime > 0), { timeout: 15_000 }).toBe(true);
     expect(await sphere.evaluate((v) => (v as HTMLVideoElement).muted && (v as HTMLVideoElement).loop)).toBe(true);
-    await expect(section.locator("h2")).toHaveText(lang ? /Dragon Ball/ : "Dragon Ball, in Motion");
+    await expect(section.locator("h2")).toHaveText(lang ? "Le mécanisme" : "The Mechanism");
     await expect(section.locator("p")).toHaveCount(1);
     await expect(section.locator("p")).toHaveText(lang ? "Mais pour nous, l’énergie n’a jamais été faite pour rester immobile." : "But to us, energy was never meant to remain still.");
     await expect(section.locator("[data-innovation-link]")).toHaveAttribute("href", lang + "/pieces/kevin-schade-dragon-ball-pendant");
@@ -247,7 +247,7 @@ test("the creations: four on a row on a computer, two on a phone; the categories
     await page.waitForTimeout(600);
     await page.screenshot({ path: shotPath(info, "yoni2411-pendentifs" + (lang ? "-fr" : "")), type: "jpeg", quality: 70 });
     await open(page, lang + "/creations/chains");
-    expect(await page.locator("[data-categories] [data-category]").evaluateAll((els) => els.map((e) => e.getAttribute("data-category")))).toEqual(["signature", "cuban", "tennis", "infinity"]);
+    expect(await page.locator("[data-categories] [data-category]").evaluateAll((els) => els.map((e) => e.getAttribute("data-category")))).toEqual(["signature", "cuban", "infinity"]);
     // The Safi Link first among the chains.
     await expect(page.locator("[data-creations-grid] [data-piece-card]").first()).toHaveAttribute("data-piece-card", "the-safi-link");
   }
@@ -271,10 +271,12 @@ test("the chains: BRT Flowers in one sheet, the Safi Link on one deep black, Sir
   await settled(page);
   await expect(page.locator("#piece-title")).toHaveText("BRT Flowers");
   await expect(page.locator("[data-piece-story]")).toContainText("12 mm and 16 mm");
+  // The Infinity Link Yoni was looking for is the chain of folder 09 (24/11/2026); the tennis chain of two rows lives on the
+  // page of Noah Okafor's octagon.
   await open(page, "/pieces/marcus-thuram-infinity-chain");
-  await expect(page).toHaveURL(/\/pieces\/infinity-link-chain$/);
-  await expect(page.locator("#piece-title")).toHaveText("Infinity Link Chain");
-  for (const slug of ["two-row-tennis-chain", "white-iced-cuban-chain"]) {
+  await expect(page).toHaveURL(/\/pieces\/pear-link-chain$/);
+  await expect(page.locator("#piece-title")).toHaveText("Infinity Link");
+  for (const slug of ["pear-link-chain", "white-iced-cuban-chain"]) {
     await open(page, "/pieces/" + slug);
     await settled(page);
     await expect(page.locator("[data-piece-cover] img:visible").first()).toBeVisible();
@@ -307,8 +309,9 @@ test("The Bespoke Journey: compact, no film moved by the scroll, the six steps o
     // The client space: only with the server.
     await expect(page.locator("[data-timeline-space]")).toHaveCount(HAS_SERVER ? 1 : 0);
     if (desktop(info.project.name) && page.viewportSize()!.height >= 900) {
-      const time = (await page.locator("[data-journey-time]").boundingBox())!;
-      expect(time.y + time.height).toBeLessThanOrEqual(900);
+      // Its name, its sentence and its first step in the first screen (the questions come after the six steps, 24/11/2026).
+      const first = (await page.locator("[data-timeline-step='1']").boundingBox())!;
+      expect(first.y + first.height).toBeLessThanOrEqual(900);
     }
     await page.screenshot({ path: shotPath(info, "yoni2411-bespoke" + (lang ? "-fr" : "")), type: "jpeg", quality: 70 });
   }

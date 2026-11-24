@@ -114,7 +114,7 @@
    ]
   },
   "arene": {
-   "name": "Arène de combat, projecteur doré (Lasana Keita)",
+   "name": "Arène de combat, projecteur doré (Losene Keita)",
    "ratio": 1.778,
    "focusX": 0.64,
    "focusY": 0.55,
@@ -1323,7 +1323,7 @@
    "version": "c58598fd94"
   },
   "keita-ko": {
-   "name": "Le KO : la panthère de fumée qui bondit (Lasana Keita)",
+   "name": "Le KO : la panthère de fumée qui bondit (Losene Keita)",
    "ratio": 1.792,
    "focusX": 0.64,
    "focusY": 0.4,
@@ -1373,7 +1373,7 @@
    ]
   },
   "keita-cage": {
-   "name": "La cage ouverte, le chemin de lumière (Lasana Keita)",
+   "name": "La cage ouverte, le chemin de lumière (Losene Keita)",
    "ratio": 1.792,
    "focusX": 0.63,
    "focusY": 0.55,
@@ -1423,7 +1423,7 @@
    ]
   },
   "keita-tribune": {
-   "name": "La célébration : il s'applaudit face à la foule (Lasana Keita)",
+   "name": "La célébration : il s'applaudit face à la foule (Losene Keita)",
    "ratio": 1.792,
    "focusX": 0.67,
    "focusY": 0.5,
@@ -1757,7 +1757,7 @@
    ]
   },
   "keita": {
-   "name": "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)",
+   "name": "La nuit de Losene Keita : KO, cage ouverte, célébration (séquence)",
    "ratio": 1.792,
    "focusX": 0.64,
    "focusY": 0.4,

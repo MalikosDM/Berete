@@ -9,7 +9,7 @@ type RevealProps = {
   mask?: boolean;
   delay?: number;
   as?: RevealTag;
-  /** Only a fade and a rise, never hidden (still reachable by the keyboard and found by a link to it): the trunks. */
+  /** Only a fade, never hidden (still reachable by the keyboard and found by a link to it): the trunks. */
   soft?: boolean;
 };
 
@@ -21,35 +21,20 @@ export default function Reveal({ children, className = "", mask = false, delay =
     const el = ref.current;
     if (!el || reduced) return undefined;
     const ctx = gsap.context(() => {
-      const trigger = { trigger: el, start: "top 88%", once: true };
-      if (mask) {
-        gsap.fromTo(
-          el,
-          { clipPath: "inset(100% 0% 0% 0%)" },
-          {
-            clipPath: "inset(0% 0% 0% 0%)",
-            duration: 1.4,
-            ease: "expo.inOut",
-            delay,
-            clearProps: "clipPath",
-            scrollTrigger: trigger,
-          },
-        );
-      } else {
-        gsap.fromTo(
-          el,
-          soft ? { y: 40, opacity: 0 } : { y: 40, autoAlpha: 0 },
-          {
-            y: 0,
-            ...(soft ? { opacity: 1 } : { autoAlpha: 1 }),
-            duration: 1.1,
-            ease: "power3.out",
-            delay,
-            clearProps: "transform,opacity,visibility",
-            scrollTrigger: trigger,
-          },
-        );
-      }
+      // Only a slow fade (24/11/2026: "des fondus lents uniquement"): nothing rises, slides or wipes in.
+      const trigger = { trigger: el, start: "top 90%", once: true };
+      gsap.fromTo(
+        el,
+        soft || mask ? { opacity: 0 } : { autoAlpha: 0 },
+        {
+          ...(soft || mask ? { opacity: 1 } : { autoAlpha: 1 }),
+          duration: 1.4,
+          ease: "power1.out",
+          delay,
+          clearProps: "opacity,visibility",
+          scrollTrigger: trigger,
+        },
+      );
     }, el);
     return () => ctx.revert();
   }, [mask, delay, reduced, soft]);

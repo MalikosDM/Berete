@@ -49,9 +49,17 @@ export const REMOVED_PIECES = [
   // Too few photos (feedback of Yoni, 21/11/2026): back on the site the day they have more.
   "flaneur-medallion",
   "two-tone-iced-cuban-chain",
-  "pear-link-chain",
   // One sheet with BRT Flowers since 24/11/2026 (Yoni: the same chain); its address leads there (RENAMED_PIECES).
   "kevin-schade-twisted-chain",
+  // The top of the Inter ring: on the page of the ring since 24/11/2026 ("Worn as a Pendant"), never a piece apart.
+  "campione-d-italia-pendant",
+  // The chains of a pendant are on the page of their pendant since 24/11/2026 ("Its Chain"): the tennis chain of two rows of
+  // Noah Okafor's octagon (folder 03, the same shoot), the Cross Infinity chain of Loïs Openda's pendant (folders 07 and 14).
+  "two-row-tennis-chain",
+  "cross-infinity-chain",
+  // The chain of Marcus Thuram removed by Yoni on 19/11/2026: the Infinity Link he was looking for is the chain of folder 09
+  // (pear-link-chain, published on 24/11/2026). Its address of a day leads there.
+  "infinity-link-chain",
   // Back on the site on 24/11/2026 (Yoni could not find them): the tennis chain of two rows (folder 03), the white Cuban
   // chain (folder 33), the Infinity Link (without the name of Marcus Thuram, under which Yoni had it removed on 19/11).
 ];
@@ -59,6 +67,11 @@ export const REMOVED_PIECES = [
 /** Pieces worn together (22/11/2026): a pendant and the chain it is worn on. The page of each leads to the other. */
 export const WORN_TOGETHER: [pendant: string, chain: string][] = [
   ["michy-batshuayi-butterfly-pendant", "butterfly-chain"],
+  // Sirius is a nameplate worn on BRT Flowers (24/11/2026): each page leads to the other.
+  ["sirius", "brt-flower-chain"],
+  // The OKA of Noah Okafor is worn on the Baguette Cuban chain (folder 30: the same links on its photos p05 and p17, the text
+  // of the OKA describes it; 24/11/2026, to be confirmed by Yoni).
+  ["noah-okafor-oka-pendant", "baguette-cuban-chain"],
   // The chain of Noah Okafor's jersey pendant detaches from it and closes into the Safi Link (Yoni, 23/11/2026).
   ["noah-okafor-jersey-pendant", "the-safi-link"],
 ];
@@ -75,8 +88,27 @@ export function wornWith(slug: string): { slug: string; is: "chain" | "pendant" 
 /** A professional photo of the JL pendant of Jamie Leweling (23/11/2026), with what it shows (src/data/views.ts). */
 const JL = (name: string, view: string) => extra("jamie-leweling-jl-pendant", name, { view });
 
-/** The top of the Inter ring, a pendant of its own (Yoni, 23/11/2026). */
+/**
+ * The top of the Inter ring (Yoni, 23/11/2026), worn as a pendant. Since 24/11/2026 it is not a piece apart ("une pièce = une
+ * page"): its photos are on the page of the ring, in "Worn as a Pendant"; its old address leads there.
+ */
 export const INTER_PENDANT = "campione-d-italia-pendant";
+
+/**
+ * The parts of a piece worn on their own, shown on its page (never a piece apart): the piece they belong to, the photos kept
+ * (by their file: "black", "worn") and the place on its page their old address leads to.
+ */
+export const PARTS: Record<string, { slug: string; photos: string[] | "all"; anchor: string; kind: "pendant" | "chain" }> = {
+  "campione-d-italia-2023-2024": { slug: INTER_PENDANT, photos: ["black", "worn"], anchor: "worn-as-pendant", kind: "pendant" },
+  // Its tennis chain of two rows, in white gold and in rose gold (folder 03, shot the same day: agent's check of 24/11/2026).
+  "noah-okafor-octagon-pendant": { slug: "two-row-tennis-chain", photos: "all", anchor: "its-chain", kind: "chain" },
+  // The Cross Infinity chain it is worn on (folder 14 shows the pendant on it; the clasp photos are in both folders).
+  "lois-openda-script-pendant": { slug: "cross-infinity-chain", photos: "all", anchor: "its-chain", kind: "chain" },
+};
+export const partOf = (slug: string) => PARTS[slug] ?? null;
+
+/** The chains of the house (24/11/2026): "A Berete Signature", never "created exclusively for". */
+export const SIGNATURE_PIECES = ["brt-flower-chain", "the-safi-link"];
 
 /** The ring of Bosnia and Herzegovina for the World Cup 2026 (Yoni, 23/11/2026). */
 export const BOSNIA = "bosnia-and-herzegovina-world-cup-2026-ring";
@@ -95,8 +127,13 @@ export const RENAMED_PIECES: Record<string, string> = {
   "michy-batshuayi-butterfly-chain": "michy-batshuayi-butterfly-pendant",
   // BRT Flowers is one chain in two widths (Yoni, 24/11/2026): the twisted chain of Kevin Schade is this sheet.
   "kevin-schade-twisted-chain": "brt-flower-chain",
+  // The top of the Inter ring is on the page of the ring since 24/11/2026: its address leads to "Worn as a Pendant".
+  [INTER_PENDANT]: "campione-d-italia-2023-2024#worn-as-pendant",
   // The Infinity Link, back on the site without the name under which it was removed (24/11/2026).
-  "marcus-thuram-infinity-chain": "infinity-link-chain",
+  "infinity-link-chain": "pear-link-chain",
+  "marcus-thuram-infinity-chain": "pear-link-chain",
+  "two-row-tennis-chain": "noah-okafor-octagon-pendant#its-chain",
+  "cross-infinity-chain": "lois-openda-script-pendant#its-chain",
   // "Bouzou — Pendant" (folder 14) is the pendant of Loïs Openda (Yoni, 21/11/2026): one piece, at his address.
   "script-nameplate-pendant": "lois-openda-script-pendant",
 };
@@ -344,7 +381,7 @@ const SITE_PIECES: Piece[] = [
       ["Personalisation", "Name and number of each player"],
       ["Series", "Created for the squad"],
     ],
-    seen: "Rose and white gold tones · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
+    seen: "Rose and white gold · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
     featured: true,
     boxSlug: "dfb-pokal-2025-display",
     making: { raw: raw(VFB, "08-v05-6s"), setting: yoni(VFB, "08-v05-19s", SET()), polishing: yoni(VFB, "08-v05-4_6s", POLISH()), delivery: vfb.presentation },
@@ -411,7 +448,7 @@ const SITE_PIECES: Piece[] = [
       ["The Secret Within", "The top lifts off and reveals the cup hidden underneath.", inter.cup],
       ["Beyond a Ring", "The top can also be worn on its own, as a pendant.", inter.pendant],
     ],
-    seen: "White gold tone, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
+    seen: "White gold, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
     boxSlug: "campione-d-italia-case",
     // setting2: baguettes set on its side (08/v25, the same session as 08/v24 and 08/v26: confirmed by Yoni, 21/11/2026).
     making: { raw: raw(INTER, "v02-14_6s"), setting: yoni(INTER, "v02-27_4s", SET()), setting2: yoni(INTER, "08-v25-3s", { ...at("Baguettes set on the side of the ring", "In the setting"), onBlack: false }), polishing: yoni(INTER, "v02-34_4s", POLISH()), delivery: inter.case },
@@ -421,7 +458,7 @@ const SITE_PIECES: Piece[] = [
     title: "Tanguy Nianzou — NZ Ring",
     type: "ring",
     line: "His initials, on a ring paved all around.",
-    story: "A wide ring in rose gold tones, paved with diamonds on every face, with the letters NZ raised on its top.",
+    story: "A wide ring in rose gold, paved with diamonds on every face, with the letters NZ raised on its top.",
     people: ["tanguy-nianzou"],
     cover: still("pieces/tanguy-nianzou-nz-ring/cover", at("The NZ ring of Tanguy Nianzou, held between two gloved fingers")),
     gallery: [st("tanguy-nianzou", 2, at("Film of the NZ ring turning in the hand"))],
@@ -443,7 +480,7 @@ const SITE_PIECES: Piece[] = [
     specs: [
       ["Type", "Signet ring"],
     ],
-    seen: "White gold tone · round diamonds in pavé, baguettes along the edge, a pear-shaped stone",
+    seen: "White gold · round diamonds in pavé, baguettes along the edge, a pear-shaped stone",
   }),
 
   /* Pendants */
@@ -533,7 +570,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "Two crossed hands, his celebration"],
     ],
-    seen: "White gold tone · round diamonds in pavé, baguettes at the cuffs, step-cut stones on the bail",
+    seen: "White gold · round diamonds in pavé, baguettes at the cuffs, step-cut stones on the bail",
     // Its first step: the hand of Yoni drawing it (folder of sketches; before 20/11/2026, the 3D model of story 1).
   }),
   piece({
@@ -575,7 +612,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "His goal celebration: a jersey, arms crossed"],
       ["Chain", "Detachable, worn on its own as the Safi Link"],
     ],
-    seen: "White and rose gold tones · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
+    seen: "White and rose gold · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
     making: { raw: raw("noah-okafor-jersey-pendant", "p21"), setting: yoni("noah-okafor-jersey-pendant", "v02-21_2s", SET()), delivery: yoni("noah-okafor-jersey-pendant", "v02-12_2s", IN_TRUNK()) },
   }),
   piece({
@@ -612,7 +649,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Nameplate pendant"],
       ["Motif", "The letters OKA in camouflage, and a football"],
     ],
-    seen: "White and rose gold tones · round diamonds, baguettes",
+    seen: "White and rose gold · round diamonds, baguettes",
     making: { raw: raw("noah-okafor-oka-pendant", "v02-19_8s"), setting: yoni("noah-okafor-oka-pendant", "v02-31_9s", SET()), polishing: yoni("noah-okafor-oka-pendant", "v02-42_4s", POLISH()), delivery: yoni("noah-okafor-oka-pendant", "p18", IN_BOX()) },
   }),
   piece({
@@ -639,7 +676,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant with tennis chains"],
       ["Shape", "Octagon"],
     ],
-    seen: "White and rose gold tones · baguette diamonds in a herringbone, round and pear-shaped diamonds",
+    seen: "White and rose gold · baguette diamonds in a herringbone, round and pear-shaped diamonds",
     boxSlug: "okafor-trunk",
     making: {
       raw: raw("noah-okafor-octagon-pendant", "v02-13s"),
@@ -683,7 +720,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "A gothic T and a serpent that draws a 9"],
       ["Settings", "Pear-shaped scales, in a setting invented by the house"],
     ],
-    seen: "White and rose gold tones · round diamonds in pavé, baguettes, triangle, pear and marquise diamonds, a large red pear-shaped stone",
+    seen: "White and rose gold · round diamonds in pavé, baguettes, triangle, pear and marquise diamonds, a large red pear-shaped stone",
     making: {
       raw: yoni("marcus-thuram-t-serpent-pendant", "08-p02", { ...at("The T-Serpent pendant before the setting", "This piece, before the setting"), onBlack: false }),
       setting: yoni("marcus-thuram-t-serpent-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
@@ -709,7 +746,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A dripping T, a sculpted hand"],
     ],
-    seen: "White gold tone · round diamonds in pavé",
+    seen: "White gold · round diamonds in pavé",
   }),
   piece({
     slug: "marcus-thuram-thorned-t-pendant",
@@ -730,7 +767,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A dripping T and rose gold thorns"],
     ],
-    seen: "White gold tone, rose gold thorns · round diamonds in pavé",
+    seen: "White gold, rose gold thorns · round diamonds in pavé",
   }),
   piece({
     slug: "marcus-thuram-jesus-piece",
@@ -751,7 +788,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A face crowned with red stones"],
     ],
-    seen: "White gold tone, rose gold crown · round diamonds in pavé, red pear-shaped stones",
+    seen: "White gold, rose gold crown · round diamonds in pavé, red pear-shaped stones",
   }),
   piece({
     slug: "marcus-thuram-snowflake-pendant",
@@ -766,7 +803,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "A six-branched snowflake"],
     ],
-    seen: "White gold tone · round diamonds in pavé",
+    seen: "White gold · round diamonds in pavé",
   }),
   piece({
     slug: "angelo-stiller-as-pendant",
@@ -792,7 +829,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "The initials AS in a shield"],
       ["Signature", "BRT mark in rose gold, on the back"],
     ],
-    seen: "White gold tone · baguette diamonds in a herringbone, round diamonds",
+    seen: "White gold · baguette diamonds in a herringbone, round diamonds",
     making: {
       raw: raw("angelo-stiller-as-pendant", "p12"),
       // The seats cut, no stone yet (18/v04): the preparation of the setting (confirmed by Yoni, 21/11/2026).
@@ -825,7 +862,7 @@ const SITE_PIECES: Piece[] = [
     specs: [
       ["Type", "Initials pendant"],
     ],
-    seen: "Rose and white gold tones · step-cut diamonds, round stones on the edge",
+    seen: "Rose and white gold · step-cut diamonds, round stones on the edge",
   }),
   piece({
     slug: "deniz-undav-l-pendant",
@@ -845,7 +882,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "The letter L and a cherub"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "White gold tone, rose gold cherub · round diamonds in pavé",
+    seen: "White gold, rose gold cherub · round diamonds in pavé",
     making: {
       raw: raw("deniz-undav-l-pendant", "v01-2s"),
       setting: yoni("deniz-undav-l-pendant", "v01-15_4s", SET()),
@@ -873,7 +910,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "Rose gold tone, white gold crown · round diamonds in pavé, pear-shaped diamonds in the crown",
+    seen: "Rose gold, white gold crown · round diamonds in pavé, pear-shaped diamonds in the crown",
     making: {
       raw: raw("samuel-ballet-jesus-piece", "v21-25_8s"),
       setting: yoni("samuel-ballet-jesus-piece", "v21-6_9s", SET()),
@@ -908,7 +945,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "A cross"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "White gold tone · round diamonds in halo and bezel settings, a frame of baguettes",
+    seen: "White gold · round diamonds in halo and bezel settings, a frame of baguettes",
     making: {
       raw: raw("malik-tillman-cross-pendant", "v02-13_5s"),
       setting: yoni("malik-tillman-cross-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
@@ -935,7 +972,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant on a Cuban chain"],
       ["Motif", "The initials TM in gothic letters"],
     ],
-    seen: "Rose and white gold tones · round diamonds, claw-set and in pavé",
+    seen: "Rose and white gold · round diamonds, claw-set and in pavé",
   }),
   piece({
     slug: "tanguy-nianzou-fam-medallion",
@@ -959,7 +996,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Medallion pendant on a Cuban chain"],
       ["Motif", "The word FAM among roses"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds in the flowers",
+    seen: "Rose gold · round diamonds in pavé, marquise-cut diamonds in the flowers",
     boxSlug: "nz-travel-case",
   }),
   piece({
@@ -975,7 +1012,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Initials pendant on a Cuban chain"],
       ["Motif", "The letters NZ"],
     ],
-    seen: "Rose and white gold tones · round diamonds in pavé",
+    seen: "Rose and white gold · round diamonds in pavé",
   }),
   piece({
     slug: "eljero-elia-clover-medallion",
@@ -983,7 +1020,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "A clover at the heart of a medallion.",
     story:
-      "A round medallion in yellow gold tones, with a raised border of diamonds and a four-leaf clover paved at its centre. In the film, the centre turns under the finger.",
+      "A round medallion in yellow gold, with a raised border of diamonds and a four-leaf clover paved at its centre. In the film, the centre turns under the finger.",
     people: ["eljero-elia"],
     theme: { preset: "emeraude" },
     cover: st("eljero-elia", 4, at("Eljero Elia's clover medallion on black")),
@@ -998,14 +1035,14 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Medallion pendant"],
       ["Motif", "A four-leaf clover"],
     ],
-    seen: "Yellow gold tone · round diamonds in pavé",
+    seen: "Yellow gold · round diamonds in pavé",
   }),
   piece({
     slug: "sidney-eweka-999-pendant",
     title: "Sidney Eweka — 999 Star Pendant",
     type: "pendant",
     line: "Three nines under a star.",
-    story: "The number 999 set with diamonds in white and yellow gold tones, under a star. It was drawn first as a 3D model, then made to match it.",
+    story: "The number 999 set with diamonds in white and yellow gold, under a star. It was drawn first as a 3D model, then made to match it.",
     people: ["sidney-eweka"],
     cover: still("pieces/sidney-eweka-999-pendant/cover", at("Sidney Eweka's 999 pendant under its star")),
     gallery: [
@@ -1019,7 +1056,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Pendant"],
       ["Motif", "The number 999 under a star"],
     ],
-    seen: "White and gold tones · round diamonds in pavé",
+    seen: "White gold and gold · round diamonds in pavé",
     making: { sketch: st("sidney-eweka", 5, at("The 3D design of the 999 pendant", "The 3D design")) },
   }),
   piece({
@@ -1040,7 +1077,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Initials pendant"],
       ["Motif", "The letters J and C, interlaced"],
     ],
-    seen: "White gold tone · round diamonds in pavé",
+    seen: "White gold · round diamonds in pavé",
   }),
   /*
    * One piece with "Bouzou — Pendant" (an album of Yoni, folder 14) since 21/11/2026 (Yoni: the same pendant): its photos,
@@ -1053,7 +1090,7 @@ const SITE_PIECES: Piece[] = [
     type: "pendant",
     line: "Script letters and a cross of baguettes.",
     story:
-      "A name written in script letters in rose gold tones, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on the Cross Infinity chain: round links paved with diamonds, joined by crosses of baguettes.",
+      "A name written in script letters in rose gold, paved with diamonds and outlined in polished gold, with marquise and pear-shaped diamonds and a cross of baguettes in its first letter; a band of baguettes runs around its edge. The back is engraved with the BRT mark and the word Faith. It hangs on the Cross Infinity chain: round links paved with diamonds, joined by crosses of baguettes.",
     people: ["lois-openda"],
     theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
     ...afterDetails(
@@ -1065,12 +1102,12 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "A name in script letters"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
+    seen: "Rose gold · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
     making: { raw: raw("lois-openda-script-pendant", "p22"), delivery: yoni("lois-openda-script-pendant", "v01-1_2s", IN_TRUNK()) },
   }),
   piece({
     slug: "the-hand",
-    title: "The Hand — Pendant",
+    title: "The Hand",
     type: "pendant",
     line: "A rose gold hand, paved with diamonds, holding a red stone.",
     story: "A hand in rose gold, set stone by stone with diamonds. A red oval stone catches the light at every movement, and the BRT mark is engraved at the wrist.",
@@ -1090,7 +1127,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "A hand"],
       ["Signature", "BRT mark engraved"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone",
+    seen: "Rose gold · round diamonds in pavé, baguette and step-cut diamonds at the wrist, a red oval stone",
     boxSlug: "the-hand-cube",
     making: { delivery: yoni("the-hand", "v01-13_6s", IN_BOX()) },
   }),
@@ -1107,7 +1144,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Medallion pendant"],
       ["Motif", "A walker under an umbrella"],
     ],
-    seen: "Rose gold tone · round white stones in pavé",
+    seen: "Rose gold · round white stones in pavé",
   }),
   piece({
     slug: "jack-nameplate-pendant",
@@ -1124,7 +1161,7 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "tulips-on-tour-medallion",
-    title: "Tulips on Tour — Medallion Pendant",
+    title: "Tulips on Tour Medallion",
     type: "pendant",
     // The piece of a Dutch shoe designer, named after his collection (Yoni, 22–23/11/2026): neither he nor a brand is named.
     line: "Tulips for Amsterdam, and a collection taken across Europe.",
@@ -1199,7 +1236,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "A face with butterfly wings"],
       ["Signature", "BRT mark on the back of the pendant"],
     ],
-    seen: "Rose gold tone, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones",
+    seen: "Rose gold, white gold details · round diamonds in pavé, baguettes, marquises, a large pear-shaped diamond, purple pear-shaped and round stones",
     boxSlug: "butterfly-trunk",
     making: {
       raw: raw(BUTTERFLY, "p77"),
@@ -1261,7 +1298,7 @@ const SITE_PIECES: Piece[] = [
       ["Motif", "Gothic T and infinity links"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "White gold tone, rose gold details · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds, a large red pear-shaped stone",
+    seen: "White gold, rose gold details · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds, a large red pear-shaped stone",
     making: {
       raw: raw("marcus-thuram-ruby-t-necklace", "v02-6_5s"),
       setting: yoni("marcus-thuram-ruby-t-necklace", "v03", { ...SETTING_FILM(), onBlack: false }),
@@ -1275,21 +1312,21 @@ const SITE_PIECES: Piece[] = [
     title: "Infinity Link Chain",
     type: "chain",
     line: "Infinity links, set with diamonds, in rose and in white.",
-    story: "Links in the shape of infinity, each one paved with diamonds, joined by polished bars. The same chain is made in rose gold tones and in white gold tones, worn alone or together.",
+    story: "Links in the shape of infinity, each one paved with diamonds, joined by polished bars. The same chain is made in rose gold and in white gold, worn alone or together.",
     cover: still("pieces/marcus-thuram-infinity-chain/cover", at("The Infinity Link chain in rose gold and in white gold, on a bust")),
     gallery: [st("thuram-ss23", 4, at("Film of the two Infinity Link chains"))],
     specs: [
       ["Type", "Chain"],
       ["Links", "Infinity links"],
     ],
-    seen: "White and rose gold tones · round diamonds in pavé",
+    seen: "White and rose gold · round diamonds in pavé",
   }),
   piece({
     slug: "kevin-schade-twisted-chain",
     title: "Kevin Schade — Twisted Link Chain",
     type: "chain",
     line: "Twisted links, set with diamond flowers.",
-    story: "Twisted links in a single tone of rose gold, with diamond flowers set along the whole chain.",
+    story: "Twisted links all in rose gold, with diamond flowers set along the whole chain.",
     people: ["kevin-schade"],
     theme: { preset: "forge" },
     // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
@@ -1304,16 +1341,16 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Chain"],
       ["Links", "Twisted, with diamond flowers"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé and in flowers, marquise-cut leaves",
+    seen: "Rose gold · round diamonds in pavé and in flowers, marquise-cut leaves",
     // Its handover: he wears the chain only, not the Dragon Ball pendant (story 03/02, confirmed by Yoni, 21/11/2026).
     making: { delivery: st("kevin-schade", 2, { ...at("Kevin Schade, wearing his chain, at its handover", "Handed over"), onBlack: false }) },
   }),
   piece({
     slug: "the-safi-link",
-    title: "The Safi Link — Chain",
+    title: "The Safi Link",
     type: "chain",
     line: "Flowers of marquise diamonds, link after link.",
-    // The chain of the jersey pendant of Noah Okafor, worn on its own (Yoni, 22–23/11/2026); one tone of rose gold.
+    // The chain of the jersey pendant of Noah Okafor, worn on its own (Yoni, 22–23/11/2026); all in rose gold.
     story:
       "This is the chain of Noah Okafor's jersey pendant. Unclipped from the jersey, it is closed by a connecting piece and worn alone, under the name the house gave it: the Safi Link.\n\n" +
       "Its links are flowers of marquise-cut diamonds in rose gold, and the clasp is a flower too, around the BRT mark.",
@@ -1334,15 +1371,16 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Chain"],
       ["Links", "Flowers of marquise-cut diamonds"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
+    seen: "Rose gold · round diamonds in pavé, marquise-cut diamonds",
   }),
   piece({
     slug: "sirius",
-    title: "Sirius — Chain",
-    type: "chain",
-    line: "A chain and its nameplate, delivered in their own trunk.",
+    title: "Sirius Nameplate",
+    // A nameplate pendant worn on BRT Flowers (24/11/2026): a pendant, linked to its chain (WORN_TOGETHER).
+    type: "pendant",
+    line: "A nameplate worn on BRT Flowers, delivered in its own trunk.",
     story:
-      "A chain of twisted links in rose gold tones, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
+      "A chain of twisted links in rose gold, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
     // Its Japanese night since 21/11/2026 (the starry sky before).
     theme: { preset: "japon" },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
@@ -1354,11 +1392,11 @@ const SITE_PIECES: Piece[] = [
       return { cover: s.cover, gallery: [extra("sirius", "plate-front", at("The Sirius nameplate from the front")), ...s.gallery] };
     })(),
     specs: [
-      ["Type", "Chain and nameplate"],
+      ["Type", "Nameplate pendant"],
       ["Box", "Sirius trunk"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "Rose gold tone, white gold lettering · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
+    seen: "Rose gold, white gold lettering · round diamonds in pavé, baguettes, marquise and pear-shaped diamonds",
     boxSlug: "sirius",
     making: {
       raw: yoni("sirius", "p30", { ...at("The parts of the nameplate laid out before they are put together", "Before the assembly"), onBlack: false }),
@@ -1384,7 +1422,7 @@ const SITE_PIECES: Piece[] = [
       ["Type", "Watch"],
       ["Dial", "Skeleton"],
     ],
-    seen: "White gold tone · round diamonds in pavé on the case, the bracelet and the numerals",
+    seen: "White gold · round diamonds in pavé on the case, the bracelet and the numerals",
   }),
   piece({
     slug: "tajon-buchanan-iced-watch",
@@ -1404,7 +1442,7 @@ const SITE_PIECES: Piece[] = [
     specs: [
       ["Type", "Watch"],
     ],
-    seen: "White gold tone · round diamonds in pavé on the case, the dial and the bracelet",
+    seen: "White gold · round diamonds in pavé on the case, the dial and the bracelet",
     making: { delivery: still("pieces/tajon-buchanan-iced-watch/delivery", HANDED()) },
   }),
   piece({
@@ -1423,7 +1461,7 @@ const SITE_PIECES: Piece[] = [
     specs: [
       ["Type", "Watch"],
     ],
-    seen: "White gold tone · round stones in pavé on the dial and the bracelet",
+    seen: "White gold · round stones in pavé on the dial and the bracelet",
   }),
 ];
 
@@ -1436,8 +1474,10 @@ const SITE_PIECES: Piece[] = [
  * say what the photos show, no figure but the sizes given by Yoni, the coloured stones by their colour. Yoni can rename
  * it, hide it or write its story from the admin.
  */
-function collected({ order, ...p }: Omit<PieceInput, "cover" | "gallery"> & { order?: string[] }): Piece {
-  return piece({ ...p, ...sorted(p.slug, [], order ? firsts(p.slug, order) : undefined) });
+function collected({ order, only, lead, ...p }: Omit<PieceInput, "cover" | "gallery"> & { order?: string[]; only?: string[]; lead?: Maybe }): Piece {
+  const s = sorted(p.slug, [], only ?? (order ? firsts(p.slug, order) : undefined));
+  // A photo prepared apart (on deep black) first, the photos of its folder after it.
+  return piece({ ...p, ...(lead ? { cover: lead, gallery: [lead, s.cover, ...s.gallery] } : s) });
 }
 
 /** The pieces published on 20/11/2026 (tests/galleries.spec.ts). */
@@ -1460,7 +1500,7 @@ export const NEW_PIECES = [
   "oval-eternity-band",
 ];
 
-/** The night of the celebration of Lasana Keita, as the press told it (5 September 2026, Paris). */
+/** The night of the celebration of Losene Keita, as the press told it (5 September 2026, Paris). */
 const KEITA_NIGHT =
   "Paris, 5 September 2026: a knockout in the first round. Then the fighter known as the “Black Panther” walked out of the cage, sat down in the front row and applauded himself, a celebration that went viral. Behind his pendant, this page tells that night: the knockout, the open cage, the celebration.";
 
@@ -1468,17 +1508,17 @@ const COLLECTED: Piece[] = [
   /* Pendants */
   collected({
     slug: "ampersand-initials-pendant",
-    title: "D&E — Pendant",
+    title: "D&E Pendant",
     type: "pendant",
     line: "Two initials joined by an ampersand.",
     story:
-      "Two bold initials joined by an ampersand, paved with diamonds and outlined in polished white gold tones, with touches of baguettes. The bail is set with baguettes, and the pendant hangs on a wide Cuban chain paved with diamonds.",
+      "Two bold initials joined by an ampersand, paved with diamonds and outlined in polished white gold, with touches of baguettes. The bail is set with baguettes, and the pendant hangs on a wide Cuban chain paved with diamonds.",
     theme: { preset: "facettes" },
     specs: [
-      ["Type", "Chain and pendant"],
+      ["Type", "Pendant"],
       ["Motif", "Two initials and an ampersand"],
     ],
-    seen: "White gold tone · round diamonds in pavé, baguettes",
+    seen: "White gold · round diamonds in pavé, baguettes",
     making: { delivery: yoni("ampersand-initials-pendant", "v02-19s", IN_BOX()) },
   }),
   collected({
@@ -1494,7 +1534,7 @@ const COLLECTED: Piece[] = [
       ["Motif", "A Christ, thorns and roses"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "White gold tone cross, rose gold Christ and roses · baguettes",
+    seen: "White gold cross, rose gold Christ and roses · baguettes",
     making: { raw: yoni("thorns-and-roses-crucifix", "v02-0_8s", MODEL()), setting: yoni("thorns-and-roses-crucifix", "v02-20_5s", SET()), polishing: yoni("thorns-and-roses-crucifix", "v02-27_5s", POLISH()) },
   }),
   collected({
@@ -1503,50 +1543,50 @@ const COLLECTED: Piece[] = [
     type: "pendant",
     line: "Rows of baguettes, inside a border of diamonds.",
     story:
-      "A cross in rose gold tones filled with rows of baguette diamonds inside a border of round diamonds, under a bail set with baguettes. Turned over, its arms are carved with stars, the BRT mark at their crossing.",
+      "A cross in rose gold filled with rows of baguette diamonds inside a border of round diamonds, under a bail set with baguettes. Turned over, its arms are carved with stars, the BRT mark at their crossing.",
     theme: { preset: "sacre" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A cross"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "Rose gold tone · baguettes, round diamonds",
+    seen: "Rose gold · baguettes, round diamonds",
   }),
   collected({
     slug: "crown-of-thorns-jesus-piece",
-    title: "Jesus Piece — Red Crown",
+    title: "Red Crown Jesus Piece",
     type: "pendant",
     line: "A crown of red stones and spikes.",
     story:
-      "A crown of thorns, set with red pear-shaped stones and sharp polished spikes, rests on a Jesus piece in rose gold tones, entirely paved with diamonds. The lips are polished gold, and the tall bail carries a cross of diamonds over baguettes. On the carved back, the BRT mark stands out in white gold.",
+      "A crown of thorns, set with red pear-shaped stones and sharp polished spikes, rests on a Jesus piece in rose gold, entirely paved with diamonds. The lips are polished gold, and the tall bail carries a cross of diamonds over baguettes. On the carved back, the BRT mark stands out in white gold.",
     theme: { preset: "sacre", tint: "#331013" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A crown of thorns"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, baguettes, red pear-shaped stones",
+    seen: "Rose gold · round diamonds in pavé, baguettes, red pear-shaped stones",
   }),
   collected({
     slug: "panther-champion-pendant",
-    title: "Lasana Keita — Panther Pendant",
+    title: "Losene Keita — Panther Pendant",
     type: "pendant",
-    client: "Lasana Keita",
-    // The fighter on its photos, with his belts, is the person of the circle « Keita Losene » (Malik, 23/11/2026; which name is
+    client: "Losene Keita",
+    // The fighter on its photos, with his belts, is the person of the circle « Losene Keita » (Malik, 23/11/2026; which name is
     // right is to be confirmed: nothing renamed).
     people: ["keita-losene"],
     line: "A panther holding a champion's belt.",
     // Its second paragraph: the celebration that the universe of its page tells (feedback of Yoni, 21/11/2026, from the
     // press: nothing beyond what it said).
     story:
-      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold tones.\n\n" + KEITA_NIGHT,
+      "A panther paved with diamonds, its jaws open and its claws polished black, holds a champion's belt in yellow and rose gold.\n\n" + KEITA_NIGHT,
     theme: { preset: "keita" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A panther and a champion's belt"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "White gold tone panther, yellow gold tone belt · round diamonds in pavé",
+    seen: "White gold panther, yellow gold belt · round diamonds in pavé",
     // His trunk (Yoni, 23/11/2026: « celle de Keita »); him at the boutique of the house with it, in "Worn by".
     boxSlug: "keita-trunk",
     handover: list(extra("players/keita-losene", "boutique", { ...at("Keita at the Berete boutique, with his trunk"), onBlack: false })),
@@ -1562,17 +1602,17 @@ const COLLECTED: Piece[] = [
   }),
   collected({
     slug: "celestial-initial-medallion",
-    title: "N14 — Medallion",
+    title: "N14 Medallion",
     type: "pendant",
     line: "An initial and a number, under a web of stars.",
     story:
-      "A large round medallion in rose gold tones: an initial and a number woven in baguettes, an openwork web of stars set with round diamonds, and a sculpted figure pouring waves of diamonds. A border of marquise-cut diamonds frames it, under a bail crowned with a marquise flower.",
+      "A large round medallion in rose gold: an initial and a number woven in baguettes, an openwork web of stars set with round diamonds, and a sculpted figure pouring waves of diamonds. A border of marquise-cut diamonds frames it, under a bail crowned with a marquise flower.",
     theme: { preset: "n14" },
     specs: [
       ["Type", "Medallion pendant"],
       ["Motif", "An initial, a number and a web of stars"],
     ],
-    seen: "Rose gold tone · baguettes, round diamonds, marquise-cut diamonds",
+    seen: "Rose gold · baguettes, round diamonds, marquise-cut diamonds",
     making: { delivery: yoni("celestial-initial-medallion", "v03-44_8s", CHECKED()) },
   }),
 
@@ -1580,21 +1620,21 @@ const COLLECTED: Piece[] = [
     slug: "jesus-piece-red-flowers",
     // Its photos in a new order (23/11/2026): the sharp crown first, the softer close-ups later.
     order: ["p06", "p04", "p07", "p01", "p02", "p03", "p05"],
-    title: "Jesus Piece — Red Flowers",
+    title: "Red Flowers Jesus Piece",
     type: "pendant",
     line: "A crown of red flowers in rose gold.",
     story:
-      "Flowers of red pear-shaped stones, in rose gold settings, crown a Jesus piece in white gold tones paved with diamonds from edge to edge. At the centre of its back, carved with stars, sits the BRT mark in rose gold.",
+      "Flowers of red pear-shaped stones, in rose gold settings, crown a Jesus piece in white gold paved with diamonds from edge to edge. At the centre of its back, carved with stars, sits the BRT mark in rose gold.",
     theme: { preset: "velours", font: "sacre" },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "A crown of red flowers"],
       ["Signature", "BRT mark on the back"],
     ],
-    seen: "White gold tone, rose gold crown · round diamonds in pavé, baguettes, red pear-shaped stones",
+    seen: "White gold, rose gold crown · round diamonds in pavé, baguettes, red pear-shaped stones",
     making: {
       // Its first sketch: the one drawn for it when it was shown as Marcus Thuram's (the same piece).
-      sketch: sketch("marcus-thuram-jesus-piece", at(sketchAlt("Jesus Piece — Red Flowers"), "The first sketch")) ?? undefined,
+      sketch: sketch("marcus-thuram-jesus-piece", at(sketchAlt("Red Flowers Jesus Piece"), "The first sketch")) ?? undefined,
       raw: raw("jesus-piece-red-flowers", "v01-19s"),
       setting: yoni("jesus-piece-red-flowers", "v01-30s", SET()),
       polishing: yoni("jesus-piece-red-flowers", "v01-40s", POLISH()),
@@ -1610,13 +1650,13 @@ const COLLECTED: Piece[] = [
     type: "chain",
     line: "Round links paved with diamonds, joined by crosses.",
     story:
-      "A chain of round links in rose gold tones, each one paved with diamonds, joined by crosses of baguettes. Its oval clasp is paved too, with baguettes around the BRT mark. In its photos it carries the pendant of Loïs Openda.",
+      "A chain of round links in rose gold, each one paved with diamonds, joined by crosses of baguettes. Its oval clasp is paved too, with baguettes around the BRT mark. In its photos it carries the pendant of Loïs Openda.",
     theme: { preset: "sacre", tint: "#2b1913", font: "bodoni" },
     specs: [
       ["Type", "Chain"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, baguettes",
+    seen: "Rose gold · round diamonds in pavé, baguettes",
   }),
   piece({
     // One sheet since 24/11/2026 (Yoni): the BRT Flower chain, the twisted chain of Kevin Schade and the chain of Sirius are
@@ -1626,13 +1666,12 @@ const COLLECTED: Piece[] = [
     type: "chain",
     line: "The signature chain of the house, in two widths.",
     story:
-      "BRT Flowers is the signature chain of Berete Jewellers. Along twisted links in rose gold tones, paved with diamonds, run flowers of round diamonds with leaves of marquise-cut diamonds. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.\n\n" +
+      "BRT Flowers is the signature chain of Berete Jewellers. Along twisted links in rose gold, paved with diamonds, run flowers of round diamonds with leaves of marquise-cut diamonds. Its rectangular clasp is paved with diamonds around the BRT mark; seen from the back, it is polished smooth.\n\n" +
       "It is made in two widths, 12 mm and 16 mm. It is the chain of the Sirius piece, and the one Kevin Schade wears.",
     people: ["kevin-schade"],
     theme: { preset: "roses" },
     ...(() => {
       const own = sorted("brt-flower-chain", []);
-      const studio = extra("kevin-schade-twisted-chain", "studio", at("BRT Flowers laid flat, in the studio"));
       return {
         cover: yoni("sirius", "p29", at("BRT Flowers, the whole chain on a black bust")),
         gallery: [
@@ -1642,7 +1681,6 @@ const COLLECTED: Piece[] = [
           yoni("sirius", "p16", at("Its twisted links and its diamond flowers")),
           yoni("sirius", "p17", at("Its twisted links and its diamond flowers")),
           yoni("sirius", "p22", at("Its clasp, signed BRT", "The clasp")),
-          studio,
           st("kevin-schade", 3, at("The chain of Kevin Schade laid in its box")),
           st("kevin-schade", 14, at("Film of the chain and its diamond flowers")),
           st("kevin-schade", 1, at("Kevin Schade wearing his chain", "Worn by Kevin Schade")),
@@ -1656,7 +1694,7 @@ const COLLECTED: Piece[] = [
       ["Widths", "12 mm and 16 mm"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé, marquise-cut diamonds",
+    seen: "Rose gold · round diamonds in pavé, marquise-cut diamonds",
     making: {
       raw: raw("brt-flower-chain", "v02-5s"),
       setting: yoni("brt-flower-chain", "v04", { ...SETTING_FILM(), onBlack: false }),
@@ -1671,52 +1709,52 @@ const COLLECTED: Piece[] = [
     type: "chain",
     line: "Baguettes in every link, white and rose in turn.",
     story:
-      "A heavy Cuban chain with angular links, each one a field of baguettes framed by round diamonds, the links alternating white and rose gold tones; the back is polished in both tones. Its domed clasp is paved, with the letters BRT and the diamond of the house in rose gold.",
+      "A heavy Cuban chain with angular links, each one a field of baguettes framed by round diamonds, the links alternating white and rose gold; the back is polished in both tones. Its domed clasp is paved, with the letters BRT and the diamond of the house in rose gold.",
     theme: { preset: "facettes" },
     specs: [
       ["Type", "Chain"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "White and rose gold tones · baguettes, round diamonds in pavé",
+    seen: "White and rose gold · baguettes, round diamonds in pavé",
   }),
   collected({
     slug: "rose-iced-cuban-chain",
     // Its cover: the whole chain from the front (24/11/2026; p01 was seen at an angle).
     order: ["p02"],
-    title: "14 mm Cuban Chain",
+    title: "Rose Cuban Chain 14 mm",
     type: "chain",
     line: "A 14 mm Cuban chain, paved link by link, its clasp signed BRT.",
-    story: "A 14 mm Cuban chain in rose gold tones, every link paved with round diamonds and polished on the back. Its flat clasp is set with diamonds around the BRT mark.",
+    story: "A 14 mm Cuban chain in rose gold, every link paved with round diamonds and polished on the back. Its flat clasp is set with diamonds around the BRT mark.",
     theme: { preset: "velours" },
     specs: [
       ["Type", "Chain"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé",
+    seen: "Rose gold · round diamonds in pavé",
     making: { raw: raw("rose-iced-cuban-chain", "f-2_6s"), setting: yoni("rose-iced-cuban-chain", "f-14_3s", SET()), polishing: yoni("rose-iced-cuban-chain", "f-24s", POLISH()) },
   }),
   collected({
     slug: "wide-rose-iced-cuban-chain",
-    title: "Rose 20 mm Cuban Chain",
+    title: "Rose Cuban Chain 20 mm",
     type: "chain",
     line: "A 20 mm Cuban chain, densely paved, under a domed clasp.",
-    story: "A 20 mm Cuban chain in rose gold tones, each link densely paved with round diamonds, the back polished. The domed clasp is paved too, with the letters BRT raised in polished gold.",
+    story: "A 20 mm Cuban chain in rose gold, each link densely paved with round diamonds, the back polished. The domed clasp is paved too, with the letters BRT raised in polished gold.",
     theme: { preset: "maison", tint: "#33171a", glow: "#f2b0a8", texture: "facets", font: "geometrie" },
     specs: [
       ["Type", "Chain"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "Rose gold tone · round diamonds in pavé",
+    seen: "Rose gold · round diamonds in pavé",
   }),
   collected({
     slug: "two-tone-iced-cuban-chain",
     title: "Two-Tone Iced Cuban Chain",
     type: "chain",
     line: "Rounded links, white and rose in turn.",
-    story: "A heavy Cuban chain whose rounded links alternate white and rose gold tones, each one fully paved with diamonds.",
+    story: "A heavy Cuban chain whose rounded links alternate white and rose gold, each one fully paved with diamonds.",
     theme: { preset: "facettes", tint: "#2a1a16", glow: "#e8b4a0" },
     specs: [["Type", "Chain"]],
-    seen: "White and rose gold tones · round diamonds in pavé",
+    seen: "White and rose gold · round diamonds in pavé",
   }),
   collected({
     slug: "white-iced-cuban-chain",
@@ -1725,13 +1763,13 @@ const COLLECTED: Piece[] = [
     title: "White Iced Cuban Chain",
     type: "chain",
     line: "White links, paved, under a domed clasp.",
-    story: "A Cuban chain in white gold tones, each link paved with round diamonds. The domed clasp is paved too, with the letters BRT and the diamond of the house in rose gold.",
+    story: "A Cuban chain in white gold, each link paved with round diamonds. The domed clasp is paved too, with the letters BRT and the diamond of the house in rose gold.",
     theme: { preset: "facettes" },
     specs: [
       ["Type", "Chain"],
       ["Signature", "BRT mark on the clasp"],
     ],
-    seen: "White gold tone, rose gold lettering · round diamonds in pavé",
+    seen: "White gold, rose gold lettering · round diamonds in pavé",
     making: {
       raw: yoni("white-iced-cuban-chain", "p04", { ...RAW(), onBlack: false }),
       setting: yoni("white-iced-cuban-chain", "v01", { ...SETTING_FILM(), onBlack: false }),
@@ -1744,20 +1782,24 @@ const COLLECTED: Piece[] = [
     title: "Two-Row Tennis Chain",
     type: "chain",
     line: "Two rows of diamonds, side by side.",
-    story: "A tennis chain of two rows of round diamonds, each one held by its own claws. It is shown in two versions: white gold tones and rose gold tones.",
+    story: "A tennis chain of two rows of round diamonds, each one held by its own claws. It is shown in two versions: white gold and rose gold.",
     theme: { preset: "maison", texture: "silk", font: "bodoni", entrance: "glint" },
     specs: [["Type", "Chain"]],
-    seen: "White and rose gold tones · round diamonds in claw settings",
+    seen: "White and rose gold · round diamonds in claw settings",
   }),
   collected({
     slug: "pear-link-chain",
-    title: "Infinity Pear Chain",
+    // The Infinity Link Yoni was looking for (24/11/2026): published, its front on the deep black of the other pieces.
+    // p01 is its front, prepared on black (extra-media): its two close-ups after it.
+    only: ["p02", "p03"],
+    lead: extra("pear-link-chain", "front", at("The Infinity Link, the whole chain on a black bust")),
+    title: "Infinity Link",
     type: "chain",
     line: "Links of diamonds, each holding a pear.",
-    story: "A chain in white gold tones made of figure-of-eight links, each loop outlined with round diamonds and holding a pear-shaped diamond, joined by short paved bars.",
+    story: "A chain in white gold made of figure-of-eight links, each loop outlined with round diamonds and holding a pear-shaped diamond, joined by short paved bars.",
     theme: { preset: "pluie" },
     specs: [["Type", "Chain"]],
-    seen: "White gold tone · round and pear-shaped diamonds",
+    seen: "White gold · round and pear-shaped diamonds",
   }),
 
   /* Rings */
@@ -1766,13 +1808,13 @@ const COLLECTED: Piece[] = [
     title: "Oval Eternity Ring",
     type: "ring",
     line: "Oval diamonds, all the way around.",
-    story: "An eternity band in white gold tones, set all around with oval diamonds in claw settings. Inside, the polished band carries the BRT mark.",
+    story: "An eternity band in white gold, set all around with oval diamonds in claw settings. Inside, the polished band carries the BRT mark.",
     theme: { preset: "facettes", font: "bodoni" },
     specs: [
       ["Type", "Ring"],
       ["Signature", "BRT mark inside"],
     ],
-    seen: "White gold tone · oval diamonds in claw settings",
+    seen: "White gold · oval diamonds in claw settings",
   }),
   /* The top of the Inter ring worn as a pendant (Yoni, 23/11/2026: « le top de l'Inter Milan devient une chaîne »): its photos
      sent on WhatsApp (scripts/extra-media.mjs), the same players and the same world as the ring. Its 3D file (ZP0975-BJ001.3dm)
@@ -1835,7 +1877,7 @@ const COLLECTED: Piece[] = [
       ["Type", "Ring"],
       ["Motif", "The map of Bosnia and Herzegovina, World Cup 2026"],
     ],
-    seen: "Yellow gold tone · round diamonds in pavé, baguettes, blue baguette stones; yellow, blue and green enamel",
+    seen: "Yellow gold · round diamonds in pavé, baguettes, blue baguette stones; yellow, blue and green enamel",
     boxSlug: "world-cup-display",
   }),
 ];

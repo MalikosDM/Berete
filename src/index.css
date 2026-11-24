@@ -250,6 +250,77 @@ input[type="radio"] {
   }
 }
 
+/*
+ * The two buttons of the house (24/11/2026: "one main style, fine and elegant, and a secondary one"): btn-primary, a fine
+ * outline in rose gold, the words in small capitals; btn-secondary, the words and a small arrow. Never a block of white.
+ * On a phone, 48 px high and 16 px letters at least.
+ */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  min-height: 3rem;
+  padding-inline: 1.5rem;
+  border: 1px solid rgb(232 180 160 / 0.55);
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  transition:
+    border-color 0.6s ease,
+    color 0.6s ease;
+  &:hover {
+    border-color: var(--color-rose-light);
+    color: var(--color-rose-light);
+  }
+  @media (min-width: 1024px) {
+    min-height: 2.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+  }
+}
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  color: var(--color-white);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.6s ease;
+  &:hover {
+    color: var(--color-rose-light);
+  }
+  @media (min-width: 1024px) {
+    min-height: 2.75rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+  }
+}
+/* One frame for every page: the same width, the same side margins (24/11/2026). */
+@utility wrap {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1280px;
+  padding-inline: 1.25rem;
+  @media (min-width: 640px) {
+    padding-inline: 2rem;
+  }
+  @media (min-width: 1024px) {
+    padding-inline: 3rem;
+  }
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -337,95 +408,8 @@ html.lenis body {
  * moves is a transform or an opacity, and nothing moves when the visitor asks for reduced motion.
  */
 
-/* The title fonts of the universes (free licence, OFL: public/fonts/universe/LICENSES.txt), loaded only by the page
-   that uses one (and announced early by its <link rel="preload">). */
-@font-face {
-  font-family: "Shojumaru";
-  src: url("/fonts/universe/shojumaru-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Italiana";
-  src: url("/fonts/universe/italiana-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Cinzel";
-  src: url("/fonts/universe/cinzel-latin-600-normal.woff2") format("woff2");
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Grenze Gotisch";
-  src: url("/fonts/universe/grenze-gotisch-latin-600-normal.woff2") format("woff2");
-  font-weight: 600;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Big Shoulders Display";
-  src: url("/fonts/universe/big-shoulders-display-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Pirata One";
-  src: url("/fonts/universe/pirata-one-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Marcellus SC";
-  src: url("/fonts/universe/marcellus-sc-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Bodoni Moda";
-  src: url("/fonts/universe/bodoni-moda-latin-500-italic.woff2") format("woff2");
-  font-weight: 500;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Michroma";
-  src: url("/fonts/universe/michroma-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Poiret One";
-  src: url("/fonts/universe/poiret-one-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Fraunces";
-  src: url("/fonts/universe/fraunces-latin-600-italic.woff2") format("woff2");
-  font-weight: 600;
-  font-style: italic;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Syncopate";
-  src: url("/fonts/universe/syncopate-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Tenor Sans";
-  src: url("/fonts/universe/tenor-sans-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-display: swap;
-}
-/* The watermark 力 ("power") of the energy universe, in a Japanese brush. */
-@font-face {
-  font-family: "Universe Brush";
-  src: url("/fonts/universe/yuji-boku-115-400-normal.woff2") format("woff2");
-  unicode-range: U+529B;
-  font-display: swap;
-}
+/* The title fonts of the universes are no longer loaded (24/11/2026): every title is in the font of the house. Their files stay
+   in public/fonts/universe (THEME_FONTS of src/data/themes.ts), never served by a page. */
 
 .universe {
   /* Where the piece is: the right of a computer screen (the left in Arabic), the top of a phone. */
@@ -538,7 +522,7 @@ html.lenis body {
   object-fit: cover;
   transform: none;
 }
-/* A sequence of images (the night of Lasana Keita): one after the other in a slow fade, each with its own lights. */
+/* A sequence of images (the night of Losene Keita): one after the other in a slow fade, each with its own lights. */
 .u-backdrop[data-frame] img {
   transition: opacity 2.8s ease-in-out;
 }
@@ -780,7 +764,7 @@ html.lenis body {
   background: var(--color-white);
   -webkit-mask: var(--u-brand) center / contain no-repeat;
   mask: var(--u-brand) center / contain no-repeat;
-  opacity: 0.045;
+  opacity: 0.018;
   pointer-events: none;
 }
 @media (max-width: 1023px) {
@@ -807,7 +791,7 @@ html.lenis body {
   background: var(--color-white);
   -webkit-mask: var(--brand-mark) center / contain no-repeat;
   mask: var(--brand-mark) center / contain no-repeat;
-  opacity: 0.045;
+  opacity: 0.018;
   pointer-events: none;
 }
 @media (max-width: 1023px) {
@@ -1019,7 +1003,7 @@ html.lenis body {
   clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 [data-entering] .u-twenty > span {
-  animation: u-star-on 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.4) both;
+  animation: u-star-on 0.9s ease-out both;
   animation-delay: calc(0.45s + var(--i) * 0.07s);
 }
 /* The eyes of the oni masks (Sirius): a dim red glow that flares now and then, both eyes of one mask together, the masks
@@ -3251,3 +3235,75 @@ html[lang="ar"] [data-piece] [data-u-title] {
 .piece-lens[data-on] {
   opacity: 1;
 }
+
+/*
+ * Movement (24/11/2026: "des fondus lents uniquement"): no bounce, no shimmer running over the gold, no sparkle that floats,
+ * no glint sweeping a piece, no floating of the views; the entrances are fades. The effects of a universe stay (discreet).
+ */
+.text-rose-gold,
+.bg-rose-gold {
+  animation: none;
+  background-position: 30% 50%;
+}
+.sparkle,
+.trunk-glow i,
+.u-impact {
+  display: none;
+}
+.sv-float,
+[data-showcase][data-idle] .sv-float,
+.trunk-jewel,
+.trunk-jewel img,
+.trunk-glow::before,
+.club-emblem-halo {
+  animation: none !important;
+}
+[data-piece-cover]::after {
+  display: none;
+}
+@keyframes u-view-in {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes u-piece-in {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes u-piece-flash {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes u-text-in {
+  from {
+    opacity: 0.01;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes logo-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes trunk-actions-in {
+  from {
+    opacity: 0;
+  }
+}
+

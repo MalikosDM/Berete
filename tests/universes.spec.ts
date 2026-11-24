@@ -105,10 +105,8 @@ for (const [slug, backdrop, effects] of WORLDS) {
 test("the Butterfly: its world around its story", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  // (Opened from the piece: no bubbles of stories since 23/11/2026.)
-  await page.goto("/fr/pieces/michy-batshuayi-butterfly-pendant", { waitUntil: "load" });
-  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.locator("[data-seen-in-stories]").click();
+  // (Opened from the profile: no stories on the pages of the pieces since 24/11/2026.)
+  await page.goto("/fr/players/michy-batshuayi?story=michy-batshuayi&piece=michy-batshuayi-butterfly-pendant", { waitUntil: "load" });
   await expect(page.locator('[role="dialog"][data-story]')).toBeVisible();
   const world = page.locator(".universe[data-fixed][data-backdrop='butterfly']");
   await expect(world).toHaveCount(1, { timeout: 15_000 });
@@ -146,7 +144,7 @@ test("Loïs Openda — Script Pendant: one piece with everything of Bouzou, no d
   await page.goto("/pieces/" + OPENDA, { waitUntil: "load" });
   await ready(page);
   await expect(page.locator("h1#piece-title")).toHaveText("Loïs Openda — Script Pendant");
-  await expect(page.locator("[data-piece-intro]")).toContainText("Created exclusively for Loïs Openda");
+  await expect(page.locator("[data-made-for] h2")).toContainText("Created exclusively for Loïs Openda");
   await shot(page, info.project.name + "-openda");
 
   // The old address of Bouzou leads to it, in every language (a permanent redirect of the server, and on the page).

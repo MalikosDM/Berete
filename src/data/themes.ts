@@ -311,14 +311,14 @@ export const THEME_PRESETS: Record<string, Preset> = {
 
 // 21/11/2026: the universes of their own piece, on an AI background of Yoni.
 THEME_PRESETS.arene = {
-  name: "Arène de combat, projecteur doré (Lasana Keita)",
+  name: "Arène de combat, projecteur doré (Losene Keita)",
   theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "arene", entrance: "spotlight", effects: ["embers", "smoke", "scene", "jewel-sheen"], mark: "" },
 };
 // The night of his celebration (feedback of Yoni, 21/11/2026): the knockout, the open cage, the celebration, one after the
 // other (backdrop "keita", a sequence), with the embers, the golden confetti, the smoke and the spotlight of the arena,
 // and the camera flashes of the crowd on the image of the celebration.
 THEME_PRESETS.keita = {
-  name: "La nuit de la célébration : KO, cage ouverte, célébration (Lasana Keita)",
+  name: "La nuit de la célébration : KO, cage ouverte, célébration (Losene Keita)",
   theme: { base: "#050403", tint: "#2a2214", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: "keita", entrance: "spotlight", effects: ["embers", "gold-confetti", "smoke", "scene", "flashes", "jewel-sheen"], mark: "" },
 };
 // Sirius, since 21/11/2026 (feedback of Yoni): the Japanese night, the blood moon, the pagoda and the oni masks (backdrop
@@ -489,7 +489,8 @@ export function cleanTheme(value: unknown): PieceTheme | null {
 }
 
 /** The file of the title font of a universe, to load it early (its <link rel="preload">), or null. */
-export function titleFontFile(theme: ResolvedTheme): string | null {
-  const file = (THEME_FONTS[theme.font] as ThemeFontSpec).file;
+export function titleFontFile(_theme: ResolvedTheme): string | null {
+  // Every title is in the font of the house since 24/11/2026: no other font to load.
+  const file = (THEME_FONTS.maison as ThemeFontSpec).file;
   return file ? "/fonts/universe/" + file + ".woff2" : null;
 }

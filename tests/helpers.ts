@@ -3,6 +3,10 @@ import { mkdirSync } from "node:fs";
 import { expect, type Page, type TestInfo } from "./fixtures";
 import media from "../src/data/media.generated.json" with { type: "json" };
 import type { Catalogue } from "../src/data/types";
+import { defaultCatalogue } from "../src/data/catalogue";
+import { pieceMediaOf } from "../src/data/pageMedia";
+import { partOf } from "../src/data/pieces";
+import { resolveShowcase } from "../src/data/showcase";
 
 
 export type Problems = { errors: string[] };
@@ -150,3 +154,17 @@ export async function checkPage(page: Page, info: TestInfo, path: string, name: 
   return title;
 }
 
+
+/**
+ * The photos and films of "Every Angle" on the page of a piece (24/11/2026: each once on the page, never one its opening, its
+ * trunk, its film or the part worn apart shows): the same list as the page (src/data/pageMedia.ts).
+ */
+export function pageAngles(piece: import("../src/data/types").Piece): import("../src/data/types").MediaItem[] {
+  const part = partOf(piece.slug);
+  const partPiece = part ? defaultCatalogue.pieces.find((p) => p.slug === part.slug) : undefined;
+  return pieceMediaOf(piece, {
+    box: piece.boxSlug ? defaultCatalogue.boxes.find((b) => b.slug === piece.boxSlug) : undefined,
+    part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
+    opening: resolveShowcase(piece.slug, piece.showcase),
+  }).angles;
+}

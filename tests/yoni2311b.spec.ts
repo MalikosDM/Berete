@@ -49,7 +49,7 @@ test("profiles: one model, the known data everywhere, nothing generic, nothing e
   await open(page, "/players/angelo-stiller");
   await expect(page.locator("[data-player-portrait] img")).toHaveAttribute("src", /\/media\/players\/angelo-stiller/);
   await page.screenshot({ path: shotPath(info, "yoni2311b-profil-stiller") });
-  // The panther pendant on the page of Keita Losene.
+  // The panther pendant on the page of Losene Keita.
   await open(page, "/players/keita-losene");
   await expect(page.locator('[data-player-piece="panther-champion-pendant"]')).toBeVisible();
 });
@@ -76,12 +76,12 @@ test("home: one photo full screen first, then the Butterfly on its chain", async
   await expect(page.locator("[data-scroll-video]")).toHaveCount(0);
   const photo = page.locator("[data-home-photo]");
   await expect(photo).toHaveCount(1);
-  const [photoTop, heroTop] = await page.evaluate(() => [document.querySelector("[data-home-photo]")!.getBoundingClientRect().top, document.querySelector("[data-home-hero]")!.getBoundingClientRect().top]);
+  const [photoTop, heroTop] = await page.evaluate(() => [document.querySelector("[data-home-photo]")!.getBoundingClientRect().top, document.querySelector("[data-home-story='house']")!.getBoundingClientRect().top]);
   expect(photoTop).toBeLessThan(heroTop);
   await expect(page.locator("[data-hero-piece]")).toHaveAttribute("data-hero-photo", "chain");
   await expect(page.locator("[data-hero-piece] img")).toHaveAttribute("src", /\/media\/hd\/michy-batshuayi-butterfly-chain\/p54/);
   await page.screenshot({ path: shotPath(info, "yoni2311b-accueil") });
-  await page.locator("[data-home-hero]").scrollIntoViewIfNeeded();
+  await page.locator("[data-home-story='house']").scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "yoni2311b-accueil-hero") });
   expect(problems.errors).toEqual([]);
@@ -95,7 +95,8 @@ test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
     else await expect(page.locator("[data-showcase]")).not.toHaveAttribute("data-showcase-large", "");
   };
   await hero("michy-batshuayi-butterfly-pendant", "p54");
-  await expect(page.locator("[data-angle='1'] img").first()).toHaveAttribute("src", /michy-batshuayi-butterfly-chain\/p54/);
+  // Every Angle never shows again the photo of the opening (24/11/2026: each photo once on the page).
+  await expect(page.locator("[data-every-angle] img[src*='michy-batshuayi-butterfly-chain/p54.']")).toHaveCount(0);
   await hero("marcus-thuram-ruby-t-necklace", "p01");
   await hero("noah-okafor-jersey-pendant", "p20");
   // (The rings of Inter and VfB no longer large since 24/11/2026: their universes v2, the squad on each side.)
@@ -104,7 +105,8 @@ test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
   await open(page, "/pieces/sirius");
   await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p28");
   await open(page, "/pieces/marcus-thuram-t-serpent-pendant");
-  await expect(page.locator("[data-angle='1'] img").first()).toHaveAttribute("src", /t-serpent-pendant\/p08/);
+  // Its cover is p08 (the cards); on its page, each photo once.
+  await expect(page.locator("[data-every-angle] img[src*='t-serpent-pendant/p08.']")).toHaveCount(await page.locator("[data-piece-cover] [data-showcase-view='p08']").count() ? 0 : 1);
   await page.screenshot({ path: shotPath(info, "yoni2311b-t-serpent") });
 });
 
@@ -146,10 +148,11 @@ test("Dragon Ball: a click on the piece opens it full screen with the magnifying
 
 test("the Inter pendant, JL in its real photos, every gallery on black with its worn photos apart", async ({ page }, info) => {
   const problems = watch(page);
+  // The Inter pendant is the top of the ring, on its page since 24/11/2026 ("Portée en pendentif"), its old address leads there.
   await open(page, "/fr/pieces/campione-d-italia-pendant");
-  await expect(page.locator("[data-piece-opening] h1")).toContainText("Pendentif Campione");
-  await expect(page.locator(".universe")).toHaveAttribute("data-universe", "victoire-nuit");
-  await expect(page.locator("[data-worn-by]")).toBeVisible();
+  await expect(page).toHaveURL(/\/fr\/pieces\/campione-d-italia-2023-2024/);
+  await expect(page.locator("#worn-as-pendant")).toBeVisible();
+  await expect(page.locator("#worn-as-pendant h2")).toHaveText(/Portée en pendentif/i);
   await expect(page.locator('[data-made-for] a[href="/fr/players/inter-milan"]').first()).toBeVisible();
   await page.screenshot({ path: shotPath(info, "yoni2311b-pendentif-inter") });
   await open(page, "/pieces/jamie-leweling-jl-pendant");
@@ -182,7 +185,7 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   await open(page, "/fr/press");
   const card = page.locator("[data-press-card]").first();
   await expect(card.locator("a[data-press-link]")).toHaveAttribute("target", "_blank");
-  await expect(card.locator("[data-press-piece]")).toContainText("Découvrir l’univers de la création");
+  await expect(card.locator("[data-press-piece]")).toContainText("Entrer dans l’univers");
   // The trunks: the Dragon Ball trunk large first, then the selection; the real photos of the Campione case.
   await open(page, "/boxes");
   const hero = page.locator("[data-boxes-hero] img");

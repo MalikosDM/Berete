@@ -1,13 +1,14 @@
 import { expect, test, type Page } from "./fixtures";
-import { anglePhotos, wornSet } from "../src/data/angles";
 import { resolveAtelier } from "../src/data/atelier";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
-import { PIECES } from "../src/data/pieces";
+import { partOf, PIECES } from "../src/data/pieces";
+import { defaultCatalogue } from "../src/data/catalogue";
+import { pieceMediaOf } from "../src/data/pageMedia";
 import { resolveShowcase } from "../src/data/showcase";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import type { Catalogue, MediaItem, Piece } from "../src/data/types";
 import { coverSrcSet, srcSetOf } from "../src/lib/responsive";
-import { checkPage, getCatalogue, scrollTo, skipIntro, watch } from "./helpers";
+import { checkPage, getCatalogue, skipIntro, watch } from "./helpers";
 
 /*
  * Checks of the whole site, on a 1440px desktop and a 390px iPhone:
@@ -86,9 +87,17 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   const quality = await sharpness(page, cover);
   expect(Math.min(quality.width, quality.height), id + " cover size").toBeGreaterThanOrEqual(360);
   expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
-  await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  // Begin Your Creation leads to the contact page with the piece; WhatsApp writes its name (24/11/2026).
+  await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", "/contact?piece=" + piece.slug);
+  await expect(page.locator("[data-piece-whatsapp]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   // "Every Angle": every photo and film, each with its text; the first ones when there are many, then "See N more".
-  const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
+  const part = partOf(piece.slug);
+  const partPiece = part ? defaultCatalogue.pieces.find((p) => p.slug === part.slug) : undefined;
+  const angles = pieceMediaOf(piece, {
+    box: piece.boxSlug ? defaultCatalogue.boxes.find((b) => b.slug === piece.boxSlug) : undefined,
+    part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
+    opening: resolveShowcase(piece.slug, piece.showcase),
+  }).angles;
   await expect(page.locator("[data-angle]"), id + " every angle").toHaveCount(anglesShownFirst(angles.length));
   await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > anglesShownFirst(angles.length) ? 1 : 0);
   for (const v of await page.locator("[data-angle] video").all()) {
@@ -263,24 +272,21 @@ test("player pages show all their pieces, and no bubbles of stories", async ({ p
 
 test("piece -> player and stories, story -> piece", async ({ page }) => {
   const problems = watch(page);
-  // Piece -> its stories.
-  await page.goto("/pieces/kevin-schade-dragon-ball-pendant");
-  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.locator("[data-seen-in-stories]").click();
+  // Profile -> its stories (24/11/2026: the stories live on the profiles, never on the pages of the pieces).
+  await page.goto("/players/kevin-schade?story=kevin-schade&piece=kevin-schade-dragon-ball-pendant");
   await expect(page.locator('[role="dialog"][data-story="kevin-schade"]')).toBeVisible();
   // Story -> piece, from the viewer.
   const see = page.locator('[role="dialog"] [data-see-piece]');
   await expect(see).toHaveAttribute("data-see-piece", "kevin-schade-dragon-ball-pendant");
   await page.getByRole("button", { name: "Close the story" }).click();
   // Piece -> player -> stories.
+  await page.goto("/pieces/kevin-schade-dragon-ball-pendant");
   await page.locator('[data-made-for-person="kevin-schade"]').evaluate((el) => el.scrollIntoView({ block: "center" }));
   await page.locator('[data-made-for-person="kevin-schade"]').click();
   await expect(page).toHaveURL(/\/players\/kevin-schade$/);
   await expect(page.locator('a[href="/pieces/kevin-schade-dragon-ball-pendant"]').first()).toBeVisible();
   // Story -> piece (no bubbles any more, 23/11/2026: its stories open from the piece), then the click opens the piece.
-  await page.goto("/pieces/michy-batshuayi-butterfly-chain");
-  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.locator("[data-seen-in-stories]").click();
+  await page.goto("/players/michy-batshuayi?story=michy-batshuayi&piece=michy-batshuayi-butterfly-pendant");
   const link = page.locator('[role="dialog"] [data-see-piece]');
   await expect(link).toHaveAttribute("href", "/pieces/michy-batshuayi-butterfly-pendant");
   await link.click();
@@ -309,9 +315,7 @@ test("piece -> player and stories, story -> piece", async ({ page }) => {
 // piece, or from the page of a person known from the stories only.)
 
 test("story viewer: buttons, pause, close", async ({ page }) => {
-  await page.goto("/pieces/kevin-schade-dragon-ball-pendant");
-  await page.locator("[data-seen-in-stories]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.locator("[data-seen-in-stories]").click();
+  await page.goto("/players/kevin-schade?story=kevin-schade");
   const dialog = page.locator('[role="dialog"][data-story="kevin-schade"]');
   await expect(dialog).toBeVisible();
   // Long press pauses the photo timer.
@@ -382,7 +386,7 @@ test("contact: call back request reaches the admin", async ({ page }) => {
   await page.goto("/contact");
   // The block fades in when it reaches the screen.
   await page.locator("button[aria-controls=callback-form]").evaluate((el) => el.scrollIntoView({ block: "center" }));
-  await page.getByRole("button", { name: /Request a Private Call/i }).click();
+  await page.getByRole("button", { name: /By Phone/i }).click();
   const form = page.locator("#callback-form");
   await form.getByLabel("Name").fill("Test Verification");
   await form.getByLabel("Phone number").fill("+971500000000");

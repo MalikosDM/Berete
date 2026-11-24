@@ -125,7 +125,7 @@ test("the language menu keeps the page, the links stay in the language", async (
   await page.locator("[data-creations-grid] a").first().click();
   await page.waitForURL("**/es/pieces/**");
   const title = (await page.locator("article[data-piece] h1").innerText()).trim();
-  const href = (await page.locator("[data-want-piece]").getAttribute("href")) ?? "";
+  const href = (await page.locator("[data-piece-whatsapp]").getAttribute("href")) ?? "";
   expect(decodeURIComponent(href.split("text=")[1] ?? "").toLowerCase()).toBe(es.whatsapp.piece(title).toLowerCase());
   expect(problems.errors).toEqual([]);
 });
@@ -146,9 +146,7 @@ test("Arabic reads right to left, with its fonts and mirrored gestures", async (
   expect(fonts, "Arabic fonts loaded").toEqual(expect.arrayContaining(["IBM Plex Sans Arabic"]));
 
   // A story moves forward with a tap on the left (opened from a piece: no bubbles of stories any more, 23/11/2026).
-  await page.goto("/ar/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
-  await page.locator("[data-seen-in-stories]").scrollIntoViewIfNeeded();
-  await page.locator("[data-seen-in-stories]").click();
+  await page.goto("/ar/players/kevin-schade?story=kevin-schade&piece=kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
   const viewer = page.locator("[data-story]");
   await expect(viewer).toBeVisible();
   const surface = await page.locator("[data-story-surface]").boundingBox();

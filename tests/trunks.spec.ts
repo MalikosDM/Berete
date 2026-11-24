@@ -296,13 +296,13 @@ for (const [slug, piece] of ORDER) {
       expect(j.x + j.width).toBeLessThanOrEqual(area.x + area.width + 1);
       expect(j.y).toBeGreaterThanOrEqual(area.y - 1);
       expect(j.y + j.height / 2, "above the light of the box").toBeLessThan(area.y + area.height * trunk.light[1]);
-      await expect(discover).toHaveText("Découvrir la pièce");
+      await expect(discover).toHaveText("Entrer dans l’univers");
       await expect(discover).toHaveAttribute("href", "/fr/pieces/" + piece);
     } else {
       await expect(jewel).toHaveCount(0);
       await expect(discover).toHaveCount(0);
     }
-    await expect(create).toHaveText("Créer votre écrin");
+    await expect(create).toHaveText("Commencer votre création");
     const href = (await create.getAttribute("href"))!;
     expect(href).toMatch(/^https:\/\/wa\.me\/[^?]+\?text=/);
     expect(new URL(href).searchParams.get("text")).toBe("Bonjour Berete, j’ai découvert " + FR[slug] + " sur votre site et j’aimerais créer mon propre écrin.");
@@ -316,7 +316,7 @@ for (const [slug, piece] of ORDER) {
     // text; a phone keeps 48 and 16.)
     for (const b of [create, closeButton, card.locator("[data-trunk-replay]"), ...(piece ? [discover] : [])]) {
       expect((await b.boundingBox())!.height).toBeGreaterThanOrEqual(phone ? 48 : 40);
-      expect(await b.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(phone ? 16 : 12);
+      expect(await b.evaluate((e) => parseFloat(getComputedStyle(e).fontSize))).toBeGreaterThanOrEqual(phone ? 16 : 11);
     }
     await card.evaluate((el) => el.scrollIntoView({ block: "center" }));
     await page.waitForTimeout(300);

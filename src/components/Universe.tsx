@@ -103,12 +103,17 @@ function regionStyle(r: { d?: number[]; m?: number[] }): CSSProperties {
   return style as CSSProperties;
 }
 
+/** The signs of the universes on the page: off since 24/11/2026. */
+const SHOW_MARKS = false;
+
 /** A Japanese or Chinese glyph: the watermark takes the brush font. */
 const isBrush = (mark: string) => [...mark].some((c) => (c.codePointAt(0) ?? 0) >= 0x3040 && (c.codePointAt(0) ?? 0) <= 0x9fff);
 
 /** The CSS variables and attributes of a universe, for the page that holds it (its title takes the typography). */
 export function universeProps(theme: ResolvedTheme): { style: CSSProperties; "data-font": string } {
-  const f = THEME_FONTS[theme.font] as ThemeFontSpec;
+  // One typography for every title of the site (24/11/2026: the universe carries the piece, never the font): the font of the
+  // house, whatever the universe asks.
+  const f = THEME_FONTS.maison as ThemeFontSpec;
   const style = {
     "--u-base": theme.base,
     "--u-tint": theme.tint,
@@ -120,7 +125,7 @@ export function universeProps(theme: ResolvedTheme): { style: CSSProperties; "da
     "--u-font-tracking": f.tracking,
     "--u-font-scale": String(f.scale),
   } as CSSProperties;
-  return { style, "data-font": theme.font };
+  return { style, "data-font": "maison" };
 }
 
 /**
@@ -176,7 +181,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
   const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
-  // A sequence (the night of Lasana Keita): its images one after the other, each with its own lights; else the image.
+  // A sequence (the night of Losene Keita): its images one after the other, each with its own lights; else the image.
   const sequence = backdrop?.sequence?.filter((id) => BACKDROPS[id]) ?? null;
   const frames = sequence ? sequence.map((id) => ({ id, b: BACKDROPS[id]! })) : backdrop ? [{ id: theme.backdrop, b: backdrop }] : [];
   const [active, setActive] = useState(0);
@@ -392,7 +397,9 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         <div className="u-light" />
         <div className="u-texture" />
-        {theme.mark ? (
+        {/* The large signs of the universes (力, OKA, T…) are no longer drawn (24/11/2026): they competed with the piece and
+            brought other fonts. Kept in the themes, never shown. */}
+        {SHOW_MARKS && theme.mark ? (
           <span className="u-mark" data-brush={isBrush(theme.mark) ? "" : undefined}>
             {theme.mark}
           </span>

@@ -13,17 +13,17 @@ import Mechanisms from "@/components/Mechanisms";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import TrunkReveal, { type TrunkPiece } from "@/components/TrunkReveal";
-import { filmTime, resolveAtelier, type ResolvedAtelier } from "@/data/atelier";
+import { filmTime, resolveAtelier } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
 import { resolveShowcase } from "@/data/showcase";
 import { extra } from "@/data/sources";
 import { trunkOf } from "@/data/trunks";
-import type { Box, MediaItem, Piece } from "@/data/types";
+import type { Box, MediaItem } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
-import { getLenis, gsap, useReducedMotion } from "@/lib/gsap";
+import { getLenis } from "@/lib/gsap";
 import { srcSetOf } from "@/lib/responsive";
 import { waLink } from "@/lib/site";
 
@@ -36,27 +36,13 @@ export default function Atelier() {
   const { t } = useI18n();
   /* The atelier photos, in the order of their numbers (warm black and white from the import). */
   const STEPS = t.atelier.steps;
-  const reduced = useReducedMotion();
   const root = useRef<HTMLDivElement>(null);
   // The opening film: a horizontal shot of a piece assembled at the bench (Yoni's films, scripts/hd-media.mjs), in the
   // warm black and white of the atelier; the earlier vertical film when it is missing.
   const setting = media.hd?.["atelier"]?.["v12"] ?? media.videos["atelier/setting"];
   const photos: MediaItem[] = media.groups["atelier"] ?? [];
 
-  // Each step opens through a mask, with a light parallax.
-  useEffect(() => {
-    if (reduced || !root.current) return undefined;
-    const ctx = gsap.context(() => {
-      gsap.utils.toArray<HTMLElement>("[data-mask]").forEach((el, i) => {
-        const from = i % 2 === 0 ? "inset(18% 12% 18% 12%)" : "circle(14% at 50% 50%)";
-        const to = i % 2 === 0 ? "inset(0% 0% 0% 0%)" : "circle(80% at 50% 50%)";
-        gsap.fromTo(el, { clipPath: from }, { clipPath: to, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "top top", scrub: true } });
-        const img = el.querySelector("img");
-        if (img) gsap.fromTo(img, { yPercent: -6, scale: 1.12 }, { yPercent: 6, ease: "none", scrollTrigger: { trigger: el.parentElement, start: "top bottom", end: "bottom top", scrub: true } });
-      });
-    }, root);
-    return () => ctx.revert();
-  }, [reduced]);
+  // The steps arrive as the page scrolls, still (24/11/2026: only slow fades, no wipe nor parallax).
 
   return (
     <div ref={root}>
@@ -64,16 +50,15 @@ export default function Atelier() {
       <section aria-labelledby="atelier-title" className="relative flex h-svh items-end overflow-hidden bg-ink">
         {setting ? <LoopVideo item={setting} label={t.atelier.filmLabel} className="absolute inset-0 h-full w-full object-cover" /> : null}
         <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-ink via-ink/40 to-ink/30" />
-        <div className={"relative mx-auto w-full max-w-[1600px] px-5 pb-28 sm:px-8 md:pb-20 lg:px-12 " + shadow}>
-          <p className="eyebrow">{t.atelier.eyebrow}</p>
-          <h1 id="atelier-title" className="title-caps mt-4 t-hero tracking-[0.16em] text-white">{t.atelier.title}</h1>
+        <div className={"wrap relative pb-28 md:pb-20 " + shadow}>
+          <h1 id="atelier-title" className="title-caps tracking-[0.12em] t-hero text-white">{t.atelier.title}</h1>
           <p className="mt-4 max-w-lg text-base text-bone">{t.atelier.lead}</p>
         </div>
       </section>
 
       {/* The philosophy of the house (Yoni, 23/11/2026). */}
       <section aria-labelledby="philosophy-title" data-philosophy className="relative z-20 bg-ink">
-        <div className="mx-auto grid max-w-[1240px] gap-8 px-5 py-16 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:px-12 lg:py-20">
+        <div className="wrap grid gap-8 py-16 lg:grid-cols-12 lg:gap-14  lg:py-20">
           <Reveal className="lg:col-span-6">
             <p className="eyebrow">{t.atelier.philosophy.eyebrow}</p>
             <h2 id="philosophy-title" className="mt-5 font-display t-title font-light leading-[1.12] text-white [text-wrap:balance]">
@@ -100,11 +85,11 @@ export default function Atelier() {
                 <Img src={photo.src} alt={t.atelier.stepAlt(step.title)} width={photo.width} height={photo.height} loading="lazy" decoding="async" className="h-full w-full object-cover" />
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
               </div>
-              <div className="relative z-10 mx-auto flex h-full max-w-[1600px] flex-col justify-end px-5 pb-28 sm:px-8 md:pb-20 lg:px-12">
+              <div className="wrap relative z-10 flex h-full flex-col justify-end pb-28 md:pb-20">
                 <span aria-hidden="true" className="text-rose-gold block font-display text-3xl font-light md:text-4xl">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className={"title-caps mt-3 t-lead text-white " + shadow}>{step.title}</h3>
                 <div className="rule-rose my-4 max-w-[12rem]" aria-hidden="true" />
-                <p className={"max-w-xl text-lg text-bone " + shadow}>{step.text}</p>
+                <p className={"max-w-xl text-base text-bone lg:text-[1rem] " + shadow}>{step.text}</p>
               </div>
             </article>
           );
@@ -115,17 +100,16 @@ export default function Atelier() {
 
       <AtelierFilms />
 
-      <section className="relative z-20 bg-ink px-5 py-16 text-center sm:px-8 md:py-20">
-        <Reveal>
-          <p className="eyebrow">{t.common.yourPiece}</p>
-          <h2 className="title-caps mx-auto mt-6 max-w-4xl t-title text-white">{t.atelier.ctaTitle}</h2>
-          <p className="mx-auto mt-6 max-w-xl text-base text-bone">{t.atelier.ctaText}</p>
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link to="/contact" className="inline-flex min-h-12 items-center gap-3 bg-white px-8 text-base font-medium text-ink transition hover:bg-rose-light">
-              {t.common.startPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+      <section className="relative z-20 border-t border-white/10 bg-ink">
+        <Reveal className="wrap flex flex-col items-center py-20 text-center lg:py-24">
+          <h2 className="title-caps tracking-[0.12em] max-w-4xl t-title text-white [text-wrap:balance]">{t.atelier.ctaTitle}</h2>
+          <p className="mt-5 max-w-xl text-base text-bone">{t.atelier.ctaText}</p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-x-8">
+            <Link to="/contact" data-cta className="btn-primary">
+              {t.common.startPiece}
             </Link>
-            <Link to="/process" className="border-rose-gold inline-flex min-h-12 items-center gap-3 px-8 text-base text-white transition hover:text-rose-light">
-              {t.atelier.seeProcess}
+            <Link to="/process" data-cta className="btn-secondary">
+              {t.atelier.seeProcess} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
           </div>
         </Reveal>
@@ -184,18 +168,18 @@ function AtelierFilms() {
         <div data-atelier-piece={askedPiece.slug}>
           <MakingSteps piece={askedPiece} boxImage={askedBox?.images[0]} title={askedPiece.title} id="atelier-piece-title" />
           {askedFilm ? (
-            <div className="mx-auto max-w-[1600px] px-5 pt-8 sm:px-8 lg:px-12">
-              <button type="button" onClick={() => setOpenSlug(askedFilm.piece.slug)} className="inline-flex min-h-12 items-center gap-3 border border-rose-light/70 px-6 text-base font-normal uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-11 lg:text-[0.8125rem]">
+            <div className="wrap pt-8">
+              <button type="button" onClick={() => setOpenSlug(askedFilm.piece.slug)} className="inline-flex min-h-12 items-center gap-3 border border-rose-light/70 px-6 text-base font-normal uppercase tracking-[0.14em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-11 lg:text-[0.75rem]">
                 <Play className="size-4 fill-current" aria-hidden="true" /> {t.films.open(askedPiece.title)}
               </button>
             </div>
           ) : null}
         </div>
       ) : null}
-      <div className="mx-auto max-w-[1600px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
+      <div className="wrap py-16 lg:py-20">
         <Reveal>
           <p className="eyebrow">{t.films.sectionEyebrow}</p>
-          <h2 id="atelier-films-title" className="title-caps mt-4 max-w-4xl t-title leading-[1.1] tracking-[0.1em] text-white [text-wrap:balance]">
+          <h2 id="atelier-films-title" className="title-caps tracking-[0.12em] mt-4 max-w-4xl t-title leading-[1.1] text-white [text-wrap:balance]">
             {t.films.sectionTitle}
           </h2>
           <p className="mt-4 max-w-xl text-base text-bone">{t.films.sectionLead}</p>
@@ -211,7 +195,7 @@ function AtelierFilms() {
                       src={atelier.poster}
                       srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
                       sizes="(max-width: 767px) 46vw, (max-width: 1279px) 24vw, 18vw"
-                      alt=""
+                      alt={piece.title}
                       loading="lazy"
                       decoding="async"
                       className="h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.05]"
@@ -221,18 +205,18 @@ function AtelierFilms() {
                   <span aria-hidden="true" className="absolute start-3 bottom-3 inline-flex size-10 items-center justify-center rounded-full border border-white/45 bg-black/50 text-white backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light">
                     <Play className="size-4 translate-x-px fill-current" />
                   </span>
-                  <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-0.5 text-base text-bone tabular-nums lg:text-[0.8125rem]">
+                  <span aria-hidden="true" className="absolute end-3 bottom-3 bg-black/60 px-2 py-0.5 text-base text-bone tabular-nums lg:text-[0.75rem]">
                     {filmTime(atelier.making.duration)}
                   </span>
                 </span>
-                <span className="title-caps mt-3 block text-base leading-snug tracking-[0.08em] text-white group-hover:text-rose-light lg:text-[0.9375rem]">{piece.title}</span>
-                <span className="mt-1 block text-base text-mist lg:text-[0.875rem]">{t.common.madeFor(madeFor(cat, piece))}</span>
+                <span className="title-caps mt-3 block text-base leading-snug tracking-[0.08em] text-white group-hover:text-rose-light">{piece.title}</span>
+                {madeFor(cat, piece) !== t.common.privateCollector ? <span className="mt-1 block text-base text-mist">{t.common.madeFor(madeFor(cat, piece), piece.type)}</span> : null}
               </button>
             </li>
           ))}
         </ul>
       </div>
-      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpenSlug(null)} /> : null}
+      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} type={open.piece.type} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpenSlug(null)} /> : null}
     </section>
   );
 }
@@ -283,19 +267,18 @@ function BoxPhotos({ box, piece }: { box: Box; piece: TrunkPiece | null }) {
   );
 }
 
-/** "Create your own box": a WhatsApp conversation, the request already written. */
+/** The way to one's own trunk (24/11/2026): "Begin Your Creation", and WhatsApp with the request already written. */
 function CreateBox() {
   const { t } = useI18n();
   return (
-    <a
-      href={waLink(t.whatsapp.createBox)}
-      target="_blank"
-      rel="noreferrer"
-      data-create-box
-      className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
-    >
-      <BrandIcon name="whatsapp" className="size-5" /> {t.boxes.create}
-    </a>
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:gap-x-8">
+      <Link to="/contact" data-cta className="btn-primary">
+        {t.boxes.create}
+      </Link>
+      <a href={waLink(t.whatsapp.createBox)} target="_blank" rel="noreferrer" data-create-box data-cta className="btn-secondary">
+        <BrandIcon name="whatsapp" className="size-4" /> {t.common.whatsapp}
+      </a>
+    </div>
   );
 }
 
@@ -337,25 +320,19 @@ export function Boxes() {
 
   return (
     <div className="pb-24">
-      <PageIntro eyebrow={t.boxes.eyebrow} title={t.boxes.title} lead={t.boxes.lead}>
-        <CreateBox />
-      </PageIntro>
+      <PageIntro title={t.boxes.title} lead={t.boxes.lead} />
 
       {/* An example, large, first (Yoni, 23/11/2026): the Dragon Ball trunk as it is, its artwork and the BRT mark on its face. */}
       {heroTrunk ? (
-        <section aria-label={heroTrunk.alt} data-boxes-hero className="mx-auto mb-14 max-w-[1240px] px-5 sm:px-8 lg:mb-16 lg:px-12">
+        <section aria-label={heroTrunk.alt} data-boxes-hero className="wrap mb-14 lg:mb-16 ">
           <div className="relative overflow-hidden border border-white/10 bg-ink-soft">
             <MediaView item={heroTrunk} fit="contain" priority sizes="(max-width: 1599px) 100vw, 1600px" className="max-h-[min(62svh,40rem)] w-full" />
           </div>
-          <a href="#box-dragon-ball-trunk" className="mt-4 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-            {t.boxes.heroLink} <ArrowRight className="size-4 rotate-90" aria-hidden="true" />
-          </a>
         </section>
       ) : null}
 
-      <section aria-labelledby="boxes-list-title" className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-12">
-        <h2 id="boxes-list-title" className="eyebrow">{t.boxes.listLabel}</h2>
-        <p className="title-caps mt-4 mb-10 t-lead leading-[1.15] tracking-[0.1em] text-white [text-wrap:balance]">{t.boxes.closing}</p>
+      <section aria-labelledby="boxes-list-title" className="wrap">
+        <h2 id="boxes-list-title" className="title-caps tracking-[0.12em] mb-10 t-title text-white [text-wrap:balance]">{t.boxes.closing}</h2>
         <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
           {boxes.map((box) => {
             const trunk = trunkOf(box.slug);
@@ -377,12 +354,9 @@ export function Boxes() {
           })}
         </ul>
         <div className="rule-rose my-14" aria-hidden="true" />
-        <p className="mx-auto max-w-2xl text-center font-display t-lead text-white">{t.common.yourStory}</p>
-        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+        <h2 className="mx-auto max-w-2xl text-center title-caps tracking-[0.12em] t-title text-white">{t.common.yourStory}</h2>
+        <div className="mt-8 flex justify-center">
           <CreateBox />
-          <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/40 px-6 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
-            {t.common.startPiece} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-          </Link>
         </div>
       </section>
 

@@ -17,6 +17,7 @@
     "db:local": "node scripts/local-db.mjs",
     "lint": "eslint .",
     "verify": "playwright test",
+    "audit:coherence": "tsx scripts/audit-coherence.ts",
     "i18n:check": "tsx scripts/i18n-check.ts",
     "media:sizes": "node scripts/media-sizes.mjs",
     "verify:3d": "node scripts/verify-3d.mjs",

@@ -78,7 +78,7 @@ export default function Mechanisms() {
       <div className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
         <Reveal>
           <p className="eyebrow">{t.atelier.engineering.eyebrow}</p>
-          <h2 id="engineering-title" className="title-caps mt-5 max-w-4xl t-title leading-[1.08] tracking-[0.1em] text-white [text-wrap:balance]">
+          <h2 id="engineering-title" className="title-caps tracking-[0.12em] mt-5 max-w-4xl t-title leading-[1.08] text-white [text-wrap:balance]">
             {t.atelier.engineering.title}
           </h2>
           <p className="mt-6 max-w-2xl text-base text-bone">{t.atelier.engineering.lead}</p>
@@ -126,7 +126,7 @@ export default function Mechanisms() {
           <article data-mechanism="cross" className="mt-16 grid items-center gap-10 border-t border-white/10 pt-14 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5 lg:order-2 lg:col-start-8">
               <span aria-hidden="true" className="text-rose-gold font-display text-3xl">{String(1 + (sphere && dragon ? 1 : 0) + (rings.length > 0 ? 1 : 0)).padStart(2, "0")}</span>
-              <h3 className="title-caps mt-3 t-lead leading-[1.15] tracking-[0.08em] text-white">{t.feature.crossTitle}</h3>
+              <h3 className="title-caps mt-3 t-lead leading-[1.15] tracking-[0.08em] text-white">{t.atelier.engineering.crossTitle}</h3>
               <p className="mt-4 max-w-lg text-base leading-relaxed text-bone">{t.feature.crossText}</p>
               <p className="mt-3 text-base text-mist">{cross.title}</p>
               <Link to={"/pieces/" + cross.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.14em] text-white hover:text-rose-light">

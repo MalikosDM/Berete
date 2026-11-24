@@ -13,14 +13,14 @@ import { stripLocale } from "@/i18n/locales";
 import { useCatalogue } from "@/lib/catalogue";
 
 /** The message for an address of the site ("/fr/pieces/sirius" or "/pieces/sirius"), from the catalogue of its language. */
-export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string): string {
+export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string, search = ""): string {
   const [section = "", slug = "", sub = ""] = stripLocale(pathname).split("/").filter(Boolean);
   const w = t.whatsapp;
   switch (section) {
     case "":
       return w.pages.home;
     case "pieces": {
-      const piece = cat.pieces.find((p) => p.slug === (RENAMED_PIECES[slug] ?? slug));
+      const piece = cat.pieces.find((p) => p.slug === (RENAMED_PIECES[slug] ?? slug).split("#")[0]);
       return piece ? w.piece(piece.title) : w.pages.creations;
     }
     case "creations": {
@@ -40,6 +40,12 @@ export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string): 
       return w.pages.journey;
     case "about":
       return w.pages.house;
+    case "contact": {
+      // "Begin Your Creation" from the page of a piece (/contact?piece=<slug>): the message names that piece.
+      const from = new URLSearchParams(search).get("piece");
+      const piece = from ? cat.pieces.find((p) => p.slug === from) : undefined;
+      return piece ? w.piece(piece.title) : w.hello;
+    }
     default:
       return w.hello;
   }
@@ -49,6 +55,6 @@ export function whatsAppMessage(t: Messages, cat: Catalogue, pathname: string): 
 export function useWhatsAppMessage(): string {
   const { t } = useI18n();
   const cat = useCatalogue();
-  const { pathname } = useLocation();
-  return whatsAppMessage(t, cat, pathname);
+  const { pathname, search } = useLocation();
+  return whatsAppMessage(t, cat, pathname, search);
 }

@@ -107,7 +107,7 @@ test("the Dragon Ball pendant: its sphere turning in a circle on the home page; 
     await expect(page.locator("[data-feature-film]")).toHaveCount(0);
     const section = page.locator("[data-home-innovation]");
     // Right after the piece of the opening, before the great commissions.
-    const order = await page.evaluate(() => ["[data-home-hero]", "[data-home-innovation]", "[data-special-project]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
+    const order = await page.evaluate(() => ["[data-home-story='house']", "[data-home-innovation]", "[data-special-ring]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
     expect(order[0]!).toBeLessThan(order[1]!);
     expect(order[1]!).toBeLessThan(order[2]!);
     const video = section.locator("[data-sphere-film]");
@@ -166,7 +166,7 @@ test("the cross of Malik Tillman that turns: its mechanism after its opening, an
   await open(page, "/fr/atelier");
   const mechanisms = await page.locator("[data-engineering] [data-mechanism]").evaluateAll((els) => els.map((e) => e.getAttribute("data-mechanism")));
   expect(mechanisms).toEqual(["sphere", "lift", "cross"]);
-  await expect(page.locator("[data-mechanism='cross']")).toContainText("La croix qui tourne");
+  await expect(page.locator("[data-mechanism='cross']")).toContainText("La croix tournante");
   expect(problems.errors).toEqual([]);
 });
 
@@ -178,7 +178,6 @@ test("the worlds: the sky of the L, the victory of Inter and of VfB (the squad b
     ["deniz-undav-l-pendant", "ciel", "ciel"],
     // (The versions v2 since 24/11/2026: INTER_VICTORY and VFB_VICTORY of src/data/themes.ts.)
     ["campione-d-italia-2023-2024", "victoire-nuit", INTER_VICTORY],
-    ["campione-d-italia-pendant", "victoire-nuit", INTER_VICTORY],
     ["vfb-stuttgart-dfb-pokal-2025", "victoire-rouge", VFB_VICTORY],
     ["marcus-thuram-ruby-t-necklace", "gothique", "gothique"],
   ];

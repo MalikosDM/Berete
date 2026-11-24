@@ -117,16 +117,6 @@
       "statusCode": 301
     },
     {
-      "source": "/pieces/pear-link-chain",
-      "destination": "/creations",
-      "statusCode": 301
-    },
-    {
-      "source": "/:lang(fr|es|de|nl|ar)/pieces/pear-link-chain",
-      "destination": "/:lang/creations",
-      "statusCode": 301
-    },
-    {
       "source": "/players/jeff-chabot",
       "destination": "/players",
       "statusCode": 301
@@ -217,13 +207,53 @@
       "statusCode": 301
     },
     {
+      "source": "/pieces/campione-d-italia-pendant",
+      "destination": "/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/campione-d-italia-pendant",
+      "destination": "/:lang/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/infinity-link-chain",
+      "destination": "/pieces/pear-link-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/infinity-link-chain",
+      "destination": "/:lang/pieces/pear-link-chain",
+      "statusCode": 301
+    },
+    {
       "source": "/pieces/marcus-thuram-infinity-chain",
-      "destination": "/pieces/infinity-link-chain",
+      "destination": "/pieces/pear-link-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-infinity-chain",
-      "destination": "/:lang/pieces/infinity-link-chain",
+      "destination": "/:lang/pieces/pear-link-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/two-row-tennis-chain",
+      "destination": "/pieces/noah-okafor-octagon-pendant#its-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/two-row-tennis-chain",
+      "destination": "/:lang/pieces/noah-okafor-octagon-pendant#its-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/pieces/cross-infinity-chain",
+      "destination": "/pieces/lois-openda-script-pendant#its-chain",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/pieces/cross-infinity-chain",
+      "destination": "/:lang/pieces/lois-openda-script-pendant#its-chain",
       "statusCode": 301
     },
     {
@@ -314,16 +344,6 @@
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/cuban",
       "destination": "/:lang/creations/chains/cuban",
-      "statusCode": 301
-    },
-    {
-      "source": "/creations/tennis",
-      "destination": "/creations/chains/tennis",
-      "statusCode": 301
-    },
-    {
-      "source": "/:lang(fr|es|de|nl|ar)/creations/tennis",
-      "destination": "/:lang/creations/chains/tennis",
       "statusCode": 301
     },
     {

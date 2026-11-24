@@ -67,7 +67,7 @@ export default function HorizontalGallery({
         className={"relative overflow-hidden py-20 lg:flex lg:min-h-svh lg:flex-col lg:justify-center lg:py-0 " + (bare ? "" : "bg-ink")}
       >
         <div className="mx-auto mb-10 flex w-full max-w-[1600px] items-end justify-between gap-6 px-5 sm:px-8 lg:mb-14 lg:px-12">
-          <h2 className="title-caps t-title tracking-[0.16em]">
+          <h2 className="title-caps tracking-[0.12em] t-title ">
             {title}
           </h2>
           <p className="hidden text-base text-mist sm:block">

@@ -48,7 +48,7 @@ const CAPSULES = [
   "campione-d-italia-2023-2024", // Inter Milan
   "vfb-stuttgart-dfb-pokal-2025",
   "marcus-thuram-ruby-t-necklace",
-  "panther-champion-pendant", // Lasana Keita
+  "panther-champion-pendant", // Losene Keita
   "thorns-and-roses-crucifix", // Jesus Cross
   "sirius",
 ];

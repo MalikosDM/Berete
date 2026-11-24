@@ -16,17 +16,17 @@ export function pressDate(date: string, intl: string): string {
  * One article (Yoni, 23/11/2026): the whole card opens the article in a new tab (the newspaper, its headline in its own
  * language, its day); under the card, a discreet way to the world of the piece it tells.
  */
-export function PressCard({ article, withPiece = true }: { article: PublishedArticle; withPiece?: boolean }) {
+export function PressCard({ article, withPiece = true, image = true }: { article: PublishedArticle; withPiece?: boolean; image?: boolean }) {
   const { t, intl } = useI18n();
   const cat = useCatalogue();
   const piece = withPiece ? cat.pieces.find((p) => article.pieces.includes(p.slug)) : undefined;
   return (
     <article data-press-card={article.outlet} className="flex h-full flex-col">
       <a href={article.url} target="_blank" rel="noreferrer" data-press-link className="group flex flex-1 flex-col border border-white/12 bg-ink-soft/60 transition-colors hover:border-rose-light/60">
-        {piece ? (
+        {piece && image ? (
           <span className="relative block aspect-[16/10] overflow-hidden bg-ink">
-            <span className="absolute inset-0 p-6 transition-transform duration-[1.6s] ease-out group-hover:scale-[1.04]">
-              <MediaView item={piece.cover} alt="" fit="contain" sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 30vw" />
+            <span className="absolute inset-0 p-6 transition-opacity duration-700 group-hover:opacity-90">
+              <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" sizes="(max-width: 767px) 92vw, (max-width: 1279px) 46vw, 30vw" />
             </span>
           </span>
         ) : null}
@@ -44,8 +44,8 @@ export function PressCard({ article, withPiece = true }: { article: PublishedArt
         </span>
       </a>
       {piece ? (
-        <Link to={"/pieces/" + piece.slug} data-press-piece={piece.slug} className="mt-2 inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-          {t.press.discover} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+        <Link to={"/pieces/" + piece.slug} data-press-piece={piece.slug} data-cta className="btn-secondary mt-2 text-mist">
+          {t.common.enterWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
           <span className="sr-only"> · {piece.title}</span>
         </Link>
       ) : null}
@@ -62,13 +62,14 @@ export default function Press() {
   const articles = publishedPress();
   return (
     <>
-      <PageIntro eyebrow={t.press.eyebrow} title={t.press.title} lead={t.press.lead} />
-      <section aria-label={t.press.title} data-press className="mx-auto max-w-[1600px] px-5 pb-24 sm:px-8 lg:px-12 lg:pb-32">
+      <PageIntro title={t.press.title} lead={t.press.lead} />
+      <section aria-label={t.press.title} data-press className="wrap pb-24 lg:pb-32">
         <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-3 lg:gap-8">
           {articles.map((a, i) => (
             <li key={a.url}>
               <Reveal delay={(i % 3) * 0.06} className="h-full">
-                <PressCard article={a} />
+                {/* The photo of its piece once on the page: the first article that tells it (24/11/2026). */}
+                <PressCard article={a} image={!articles.slice(0, i).some((b) => b.pieces[0] === a.pieces[0])} />
               </Reveal>
             </li>
           ))}

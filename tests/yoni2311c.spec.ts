@@ -99,7 +99,9 @@ test("the trunks of Keita and of Malik Tillman: on the panther and on their prof
     await trunk.scrollIntoViewIfNeeded();
     await expect(trunk.locator("[data-box-section-photo]")).toHaveCount(3);
     await expect(trunk.locator("[data-box-section-link]")).toHaveCount(0);
-    await expect(page.locator("#piece-trunk")).toHaveText(lang ? "Malle de Keita" : "Keita Trunk");
+    // The section is "The Trunk" (24/11/2026), the name of the trunk under it.
+    await expect(page.locator("#piece-trunk")).toHaveText(lang ? "L’écrin" : "The Trunk");
+    await expect(trunk.locator("h3")).toHaveText(lang ? "Malle de Keita" : "Keita Trunk");
     await page.waitForTimeout(800);
     await page.screenshot({ path: shotPath(info, "yoni2311c-panthere-ecrin" + (lang ? "-fr" : "")), type: "jpeg", quality: 70 });
 
@@ -149,7 +151,7 @@ test("the name BERETE in the background: home, pieces, circle; under everything;
     // The pictures, where it shows (the text of the home page, the opening of the piece, the circle): with, then without.
     const place = async () => {
       await page.evaluate((home) => {
-        const hero = home ? document.querySelector("[data-home-hero]") : null;
+        const hero = home ? document.querySelector("[data-home-story='house']") : null;
         window.scrollTo(0, hero ? hero.getBoundingClientRect().top + window.scrollY : 0);
       }, path === "/");
       await page.waitForTimeout(1500);

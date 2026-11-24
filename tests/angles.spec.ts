@@ -11,7 +11,8 @@ import { mkdirSync, readFileSync } from "node:fs";
 import { expect, test, type Locator, type Page } from "./fixtures";
 import { anglePhotos, wornSet, DEFAULT_ANGLES } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
-import { REMOVED_PIECES } from "../src/data/pieces";
+import { partOf, REMOVED_PIECES } from "../src/data/pieces";
+import { pieceMediaOf } from "../src/data/pageMedia";
 import { publicCatalogue } from "../src/data/relations";
 import { resolveShowcase } from "../src/data/showcase";
 import { PIECE_TYPES } from "../src/data/types";
@@ -23,15 +24,23 @@ mkdirSync(DIR, { recursive: true });
 const shot = (page: Page, name: string) => page.screenshot({ path: DIR + "/" + name + ".jpg", type: "jpeg", quality: 66, timeout: 45_000 });
 const desktopOnly = () => test.skip(test.info().project.name !== "desktop", "once is enough");
 
-// (24/11/2026: the White Iced Cuban chain is back on the site; the three others stay off.)
-const TAKEN_OFF = ["flaneur-medallion", "two-tone-iced-cuban-chain", "pear-link-chain"];
+// (24/11/2026: the White Iced Cuban chain is back on the site, and the chain of folder 09 as the Infinity Link; the two
+// others stay off.)
+const TAKEN_OFF = ["flaneur-medallion", "two-tone-iced-cuban-chain"];
 /** "Every Angle" shows four photos, then "See N more" (24/11/2026, src/components/EveryAngle.tsx). */
 const anglesShownFirst = (n: number) => Math.min(n, 4);
 const JESUS_PIECES = ["samuel-ballet-jesus-piece", "crown-of-thorns-jesus-piece", "jesus-piece-red-flowers"];
 const PUBLISHED = publicCatalogue(defaultCatalogue).pieces;
+/** The photos of Every Angle on its page: each once on the page (src/data/pageMedia.ts), never one its opening shows. */
 const photosOf = (slug: string) => {
   const piece = PUBLISHED.find((p) => p.slug === slug)!;
-  return anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
+  const part = partOf(slug);
+  const partPiece = part ? defaultCatalogue.pieces.find((p) => p.slug === part.slug) : undefined;
+  return pieceMediaOf(piece, {
+    box: piece.boxSlug ? defaultCatalogue.boxes.find((b) => b.slug === piece.boxSlug) : undefined,
+    part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
+    opening: resolveShowcase(piece.slug, piece.showcase),
+  }).angles;
 };
 
 /** The contrast of two colours (WCAG). */
@@ -133,7 +142,7 @@ for (const slug of PAGES) {
     // Many photos: the first ones, then "See N more" shows all of them.
     const more = section.locator("[data-angle-more]");
     if (photos.length > anglesShownFirst(photos.length)) {
-      await expect(more).toHaveText("Voir les " + (photos.length - anglesShownFirst(photos.length)) + " autres");
+      await expect(more).toHaveText("Voir plus");
       await more.scrollIntoViewIfNeeded();
       await shot(page, info.project.name + "-" + slug + "-2-voir-plus");
       await more.click();
@@ -207,7 +216,7 @@ test("the four pieces taken off: unpublished, kept; their old addresses lead to 
   const sitemap = await (await page.request.get("/sitemap.xml")).text();
   for (const slug of TAKEN_OFF) expect(sitemap, slug).not.toContain("/pieces/" + slug);
   // No link to them: the lists, the universes they shared (facettes, pluie), "Discover More Creations" of their neighbours.
-  for (const path of ["/", "/creations", "/creations/chains", "/creations/pendants", "/players", "/pieces/baguette-cuban-chain", "/pieces/rose-iced-cuban-chain", "/pieces/wide-rose-iced-cuban-chain", "/pieces/cross-infinity-chain", "/pieces/tulips-on-tour-medallion"]) {
+  for (const path of ["/", "/creations", "/creations/chains", "/creations/pendants", "/players", "/pieces/baguette-cuban-chain", "/pieces/rose-iced-cuban-chain", "/pieces/wide-rose-iced-cuban-chain", "/pieces/lois-openda-script-pendant", "/pieces/tulips-on-tour-medallion"]) {
     await page.goto(path, { waitUntil: "load" });
     const links = await page.locator("a[href*='/pieces/']").evaluateAll((els) => els.map((a) => a.getAttribute("href") ?? ""));
     for (const slug of TAKEN_OFF) expect(links.filter((h) => h.endsWith("/pieces/" + slug)), slug + " on " + path).toEqual([]);

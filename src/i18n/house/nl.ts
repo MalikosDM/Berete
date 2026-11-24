@@ -163,5 +163,5 @@ export const nl: HouseTexts = {
     { label: "De weg", text: "Vroeger reisde ik naar mijn klanten toe. Vandaag komen zij mij opzoeken, daar waar ik ervoor gekozen heb mijn toekomst op te bouwen." },
   ],
   closing: "Een erfenis, doorgegeven. Een identiteit, omarmd. Een unieke visie.",
-  signature: "Made by us. Inspired by you.",
+  signature: "Door ons gemaakt. Door u geïnspireerd.",
 };

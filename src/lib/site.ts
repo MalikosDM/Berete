@@ -27,6 +27,7 @@ export function waLink(message: string): string {
 
 /* ---------- Contact configurator: the answers, whose words are in src/i18n (contact.pieceChoices...) ---------- */
 
-export const PIECE_CHOICES = ["chain", "pendant", "ring", "bracelet", "watch", "other"] as const;
+/** The kinds of piece of the configurator: the collections of the creations, in their order (24/11/2026). */
+export const PIECE_CHOICES = ["pendant", "chain", "ring", "watch"] as const;
 export const BUDGETS = ["10k", "25k", "50k", "50k+", "unsure"] as const;
 export const TIMINGS = ["asap", "quarter", "flexible"] as const;

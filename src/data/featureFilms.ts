@@ -24,10 +24,13 @@ export function featureFilm(key: string): FeatureFilmData | null {
 }
 
 /** The film of a piece and its kind, or null. */
-export function featureFilmOf(slug: string): { film: FeatureFilmData; kind: "film" | "mechanism" } | null {
+/** The films of the galleries that are the same film as a feature film (never shown twice on a page): none today. */
+const SAME_AS: Record<string, string[]> = {};
+
+export function featureFilmOf(slug: string): { film: FeatureFilmData; kind: "film" | "mechanism"; same: string[] } | null {
   const entry = FEATURE_FILMS[slug];
   const film = entry ? featureFilm(entry.key) : null;
-  return entry && film ? { film, kind: entry.kind } : null;
+  return entry && film ? { film, kind: entry.kind, same: [film.video, ...(SAME_AS[entry.key] ?? [])] } : null;
 }
 
 /**

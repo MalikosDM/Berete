@@ -18,6 +18,8 @@ import { useI18n } from "@/i18n";
  */
 
 /** The places around the main view: [x, y] as a share of the box, the size, the depth of the relief. */
+/** The relief of the views under the pointer: off since 24/11/2026 (only slow fades on the site). */
+const RELIEF = false;
 const MAIN = { x: 0, y: 0, s: 0.68, d: 16 };
 const SINGLE = { x: 0, y: 0, s: 0.86, d: 12 };
 // A piece shown large (PieceShowcase.size): its main view takes the whole box (the views around stay at their places, behind).
@@ -68,7 +70,8 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
   // The relief: the views follow the mouse a little (computers only, never with reduced motion).
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || !window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches) return undefined;
+    // No relief under the pointer any more (24/11/2026: only slow fades on the site, the piece stays still).
+    if (!root || !RELIEF || !window.matchMedia("(pointer: fine) and (min-width: 1024px)").matches) return undefined;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     let frame = 0;
     let mx = 0;
@@ -127,7 +130,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       src={cutoutLargest(slug, v)}
       srcSet={cutoutSrcSet(slug, v)}
       sizes={sizes}
-      alt={main ? t.piece.viewAlt(title, kindName(v)) : ""}
+      alt={t.piece.viewAlt(title, kindName(v))}
       width={v.width}
       height={v.height}
       loading={main ? "eager" : "lazy"}

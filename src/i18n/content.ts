@@ -136,8 +136,8 @@ export function mapTexts(cat: Catalogue, v: Visitor, locale?: Locale): Catalogue
 
 /** The catalogue in this language, with this dictionary (English text -> translation). */
 export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Record<string, string>, storyAlt: Visitor["storyAlt"], sketchAlt: Visitor["sketchAlt"]): Catalogue {
-  if (locale === "en") return withViews(cat);
-  return mapTexts(
+  if (locale === "en") return withAlts(withViews(cat));
+  return withAlts(mapTexts(
     cat,
     {
       text: (source, _kind, own) => own ?? dictionary[source] ?? source,
@@ -145,7 +145,20 @@ export function localizeCatalogue(cat: Catalogue, locale: Locale, dictionary: Re
       sketchAlt,
     },
     locale,
-  );
+  ));
+}
+
+/**
+ * Every photo of a piece or of a trunk says what it shows (24/11/2026: "chaque photo du site a une description courte"): a
+ * photo without its own words is described by the name of its piece (or of its trunk), in the language of the page.
+ */
+function withAlts(cat: Catalogue): Catalogue {
+  const fill = (name: string) => (m: MediaItem) => (m.src && !m.alt?.trim() ? { ...m, alt: name } : m);
+  return {
+    ...cat,
+    pieces: cat.pieces.map((p) => ({ ...p, cover: fill(p.title)(p.cover), gallery: p.gallery.map(fill(p.title)), handover: p.handover.map(fill(p.title)) })),
+    boxes: cat.boxes.map((b) => ({ ...b, images: b.images.map(fill(b.name)) })),
+  };
 }
 
 /** In English: the photos that say what they show get their caption and their text (the title of the piece with it). */

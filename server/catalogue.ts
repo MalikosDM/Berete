@@ -281,7 +281,9 @@ async function once(key: string, seeded: Set<string>, create: () => Promise<unkn
  * is never deleted.
  */
 async function applyRenames(cat: Catalogue): Promise<void> {
-  for (const [from, to] of Object.entries(RENAMED_PIECES)) {
+  for (const [from, target] of Object.entries(RENAMED_PIECES)) {
+    // A part of another piece leads to a place on its page ("…#worn-as-pendant"): the piece is the address before "#".
+    const to = target.split("#")[0]!;
     const old = await prisma.piece.findUnique({ where: { slug: from }, select: { id: true } });
     if (old !== null && !cat.pieces.some((p) => p.slug === from)) {
       const taken = await prisma.piece.findUnique({ where: { slug: to }, select: { id: true } });

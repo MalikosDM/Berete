@@ -18,7 +18,7 @@ function linkClass({ isActive }: { isActive: boolean }): string {
   return [
     // Never on two lines: the row of the menu has the whole width under the name of the house (from 900 px on a computer).
     // From 900 to 1280 px (a narrow window of a laptop) the letters are a little smaller and tighter, so every language fits.
-    "relative inline-flex min-h-10 items-center whitespace-nowrap text-[0.6875rem] font-normal uppercase tracking-[0.06em] transition-colors xl:tracking-[0.12em] roomy:tracking-[0.18em]",
+    "relative inline-flex min-h-10 items-center whitespace-nowrap text-[0.75rem] font-normal uppercase tracking-[0.06em] transition-colors xl:tracking-[0.12em] roomy:tracking-[0.18em]",
     "after:absolute after:inset-x-0 after:bottom-1.5 after:h-px after:origin-left rtl:after:origin-right after:bg-rose-light after:transition-transform after:duration-500",
     isActive ? "text-rose-light after:scale-x-100" : "text-white hover:text-rose-light after:scale-x-0 hover:after:scale-x-100",
   ].join(" ");
@@ -42,7 +42,6 @@ export default function Navbar() {
     { label: t.nav.process, to: "/process" },
     { label: t.nav.about, to: "/about" },
     { label: t.nav.press, to: "/press" },
-    { label: t.nav.contact, to: "/contact" },
   ];
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -113,14 +112,15 @@ export default function Navbar() {
             href={waLink(waMessage)}
             target="_blank"
             rel="noreferrer"
-            aria-label={t.common.chatWhatsapp}
+            aria-label={t.common.whatsapp}
             className="hidden size-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors hover:border-rose-light hover:text-rose-light md:inline-flex"
           >
             <BrandIcon name="whatsapp" className="size-4" />
           </a>
           <Link
             to="/contact"
-            className="hidden min-h-10 items-center gap-2 whitespace-nowrap border border-white/70 px-4 text-[0.6875rem] font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light roomy:inline-flex"
+            data-cta
+            className="hidden min-h-10 items-center gap-2 whitespace-nowrap border border-rose-light/55 px-4 text-[0.75rem] font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light roomy:inline-flex"
           >
             {t.common.startPiece}
           </Link>
@@ -156,7 +156,7 @@ export default function Navbar() {
                   <Link
                     to={item.to}
                     data-nav-sub={item.sub ? "" : undefined}
-                    className={"flex items-center justify-between uppercase transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "min-h-8 ps-8 pe-3 text-[0.6875rem] tracking-[0.14em] text-mist" : "mt-1 min-h-10 px-3 text-[0.75rem] tracking-[0.18em] text-white first:mt-0")}
+                    className={"flex items-center justify-between uppercase transition-colors hover:text-rose-light focus-visible:text-rose-light " + (item.sub ? "min-h-8 ps-8 pe-3 text-[0.75rem] tracking-[0.14em] text-mist" : "mt-1 min-h-10 px-3 text-[0.75rem] tracking-[0.18em] text-white first:mt-0")}
                   >
                     <span className="flex items-center gap-2.5">
                       {item.sub ? <span aria-hidden="true" className="bg-rose-gold h-px w-3" /> : null}

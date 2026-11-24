@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, Gift } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
 import { MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
@@ -26,17 +26,14 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
   if (shown.length === 0) return null;
   const current = open ? shown[open.box] : undefined;
   return (
-    <section aria-labelledby={id} data-box-section className="relative mx-auto max-w-[1240px] px-5 pb-16 sm:px-8 lg:px-12 lg:pb-20">
-      <p className="eyebrow inline-flex items-center gap-2">
-        <Gift className="size-5 text-rose-light" aria-hidden="true" /> {t.piece.customBox}
-      </p>
-      <h2 id={id} className="title-caps mt-3 t-title tracking-[0.14em]">
+    <section aria-labelledby={id} data-box-section data-piece-section={id === "piece-trunk" ? "trunk" : undefined} className="relative wrap border-t border-white/10 py-14 lg:py-16">
+      <h2 id={id} className="title-caps tracking-[0.12em] t-title ">
         {title}
       </h2>
       {shown.map((box, b) => (
         <div key={box.slug} data-box-block={box.slug} data-custom-box={box.slug} className="mt-8">
-          {shown.length > 1 || title !== box.name ? <h3 className="title-caps text-2xl tracking-[0.08em] text-white md:text-3xl">{box.name}</h3> : null}
-          {box.description ? <p className="mt-3 max-w-3xl text-base text-bone lg:text-[0.9375rem]">{box.description}</p> : null}
+          {shown.length > 1 || title !== box.name ? <h3 className="title-caps t-sub tracking-[0.1em] text-white">{box.name}</h3> : null}
+          {box.description ? <p className="mt-3 max-w-3xl text-base text-bone">{box.description}</p> : null}
           <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
             {box.images.map((m, i) => (
               <li key={m.src}>
@@ -56,8 +53,8 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
             ))}
           </ul>
           {onTrunksPage(box) ? (
-            <Link to={"/boxes#box-" + box.slug} data-box-section-link={box.slug} className="mt-6 inline-flex min-h-12 items-center gap-2 text-base font-medium text-white underline-offset-4 hover:text-rose-light hover:underline">
-              {t.piece.seeTrunk} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+            <Link to={"/boxes#box-" + box.slug} data-box-section-link={box.slug} data-cta className="btn-secondary mt-6">
+              {t.nav.boxes} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
               <span className="sr-only"> · {box.name}</span>
             </Link>
           ) : null}

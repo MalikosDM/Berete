@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { defaultCatalogue } from "@/data/catalogue";
 import { publicCatalogue } from "@/data/relations";
-import type { Catalogue } from "@/data/types";
+import type { Catalogue, Piece } from "@/data/types";
 import { bundleOf, useBundleVersion, useLocale } from "@/i18n";
 import { localizeCatalogue } from "@/i18n/content";
 import { afterLoad } from "@/lib/idle";
@@ -72,3 +72,20 @@ export function useCatalogue(): Catalogue {
 export function useRawCatalogue(): Catalogue {
   return useContext(RawContext);
 }
+
+/**
+ * One piece of the catalogue as written, unpublished ones too, in the language of the page: a part of another piece shown on
+ * its page (the top of the Inter ring, the chain of a pendant), never a piece of its own.
+ */
+export function useLocalizedPiece(slug: string | null | undefined): Piece | undefined {
+  const locale = useLocale();
+  const version = useBundleVersion();
+  return useMemo(() => {
+    const found = slug ? defaultCatalogue.pieces.find((p) => p.slug === slug) : undefined;
+    if (!found) return undefined;
+    const bundle = bundleOf(locale);
+    return localizeCatalogue({ ...defaultCatalogue, pieces: [found], stories: [], boxes: [] }, locale, bundle.content, bundle.ui.stories.alt, bundle.ui.piece.sketchAlt).pieces[0];
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- version: a language has just been loaded
+  }, [slug, locale, version]);
+}
+

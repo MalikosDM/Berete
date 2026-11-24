@@ -1,10 +1,11 @@
 import { useEffect, useImperativeHandle, useRef, useState, type FormEvent, type Ref } from "react";
-import { useLocation } from "react-router";
+import { useLocation, useSearchParams } from "react-router";
 import { Check, ChevronDown, ImageIcon, ImagePlus, LoaderCircle, Mail, X } from "lucide-react";
 import PageIntro from "@/components/PageIntro";
 import ContactBlock from "@/components/ContactBlock";
 import Imagine from "@/components/Imagine";
 import { useI18n } from "@/i18n";
+import { useCatalogue } from "@/lib/catalogue";
 import WhatsAppHandoff from "@/components/WhatsAppHandoff";
 import { sendMessage, type MessagePhoto, type SendError } from "@/lib/api";
 import { base64Of, MAX_PHOTOS, preparePhoto, type PreparedPhoto } from "@/lib/photos";
@@ -15,6 +16,10 @@ export default function Contact() {
   const { t } = useI18n();
   const location = useLocation();
   const form = useRef<EmailFormHandle>(null);
+  // From the page of a piece (/contact?piece=<slug>): the configurator and the messages name it.
+  const [params] = useSearchParams();
+  const cat = useCatalogue();
+  const fromPiece = cat.pieces.find((p) => p.slug === params.get("piece"));
 
   useEffect(() => {
     if (location.hash !== "#configurator") return undefined;
@@ -30,8 +35,8 @@ export default function Contact() {
 
   return (
     <>
-      <PageIntro eyebrow={t.contact.eyebrow} title={t.contact.title} lead={t.contact.lead} />
-      <ContactBlock id="configurator" />
+      <PageIntro title={t.contact.title} lead={t.contact.lead} />
+      <ContactBlock id="configurator" pieceName={fromPiece?.title} />
       {/* « Imaginez votre création »: shown only when the server has its image service (src/components/Imagine.tsx). */}
       <Imagine onFinalise={(message, file) => form.current?.receive(message, file)} />
       <EmailForm ref={form} />
@@ -195,7 +200,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
           >
             <span className="flex items-center gap-3">
               <Mail className="size-5 text-rose-light" aria-hidden="true" />
-              <h2 id="email-title" className="title-caps text-xl tracking-[0.14em] sm:text-2xl">{t.contact.emailTitle}</h2>
+              <h2 id="email-title" className="title-caps t-sub tracking-[0.12em]">{t.contact.emailTitle}</h2>
             </span>
             <ChevronDown className={"size-5 text-rose-light transition-transform duration-300 " + (open ? "rotate-180" : "")} aria-hidden="true" />
           </button>
@@ -307,7 +312,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
                       </ul>
                     ) : null}
                     {photos.length < MAX_PHOTOS ? (
-                      <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 border border-white/40 px-5 text-base font-medium uppercase tracking-[0.1em] text-white transition-colors focus-within:border-rose-light focus-within:text-rose-light hover:border-rose-light hover:text-rose-light sm:w-fit sm:px-6 lg:min-h-11 lg:text-[0.8125rem]">
+                      <label className="inline-flex min-h-12 w-full cursor-pointer items-center justify-center gap-3 border border-white/40 px-5 text-base font-medium uppercase tracking-[0.1em] text-white transition-colors focus-within:border-rose-light focus-within:text-rose-light hover:border-rose-light hover:text-rose-light sm:w-fit sm:px-6 lg:min-h-11 lg:text-[0.75rem]">
                         <ImagePlus className="size-5 shrink-0" aria-hidden="true" />
                         <span>{t.contact.addPhotos}</span>
                         <span className="whitespace-nowrap text-mist">{photos.length + " / " + MAX_PHOTOS}</span>
@@ -343,7 +348,7 @@ function EmailForm({ ref }: { ref?: Ref<EmailFormHandle> }) {
                     <button
                       type="submit"
                       disabled={status === "sending" || preparing}
-                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.8125rem]"
+                      className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/55 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.75rem]"
                     >
                       {status === "sending" ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : null}
                       {status === "sending" ? t.contact.sending : t.contact.emailButton}

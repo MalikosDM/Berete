@@ -75,7 +75,7 @@ export default function PlayerWall({ people, compact = false }: { people: Person
                 {p.number !== null ? <span className="text-rose-gold shrink-0">{p.number}</span> : null}
                 <span className="min-w-0 break-words">{p.name}</span>
               </span>
-              {role ? <span className="mt-1 block text-base text-mist lg:text-[0.875rem]">{role}</span> : null}
+              {role ? <span className="mt-1 block text-base text-mist">{role}</span> : null}
             </Link>
             {instagram ? (
               <a

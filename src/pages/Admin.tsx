@@ -18,7 +18,6 @@ import {
   TEXTURE_NAMES,
   THEME_EFFECTS,
   THEME_ENTRANCES,
-  THEME_FONT_KEYS,
   THEME_FONTS,
   THEME_LIGHTS,
   THEME_PRESETS,
@@ -844,14 +843,10 @@ function ThemeField({ token, label, value, onChange }: { token: string; label: s
             {uploaded ? <option value="__image">Image envoyée</option> : null}
           </select>
         </label>
-        <label className="block text-base text-bone">
-          Typographie du titre
-          <select value={resolved.font} onChange={(e) => set({ font: e.target.value as PieceTheme["font"] })} className={inputCls}>
-            {THEME_FONT_KEYS.map((k) => (
-              <option key={k} value={k}>{(THEME_FONTS[k] as ThemeFontSpec).name}</option>
-            ))}
-          </select>
-        </label>
+        <p data-theme-font className="block text-base text-bone">
+          Typographie du titre : la police de la maison (Cormorant Garamond), la même sur toutes les pièces depuis le 24/11/2026.
+          L'univers (fond, lumière, effets) porte l'identité de la pièce.
+        </p>
       </div>
       <MediaField
         token={token}

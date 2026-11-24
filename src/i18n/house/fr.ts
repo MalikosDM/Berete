@@ -163,5 +163,5 @@ export const fr: HouseTexts = {
     { label: "Le Parcours", text: "Avant, j'allais à la rencontre de mes clients. Aujourd'hui, ils viennent me chercher là où j'ai choisi de construire mon avenir." },
   ],
   closing: "Un héritage transmis. Une identité assumée. Une vision singulière.",
-  signature: "Made by us. Inspired by you.",
+  signature: "Créé par nous. Inspiré par vous.",
 };

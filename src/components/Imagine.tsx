@@ -145,10 +145,11 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
 
   return (
     <section id="imagine" aria-labelledby="imagine-title" data-imagine className="scroll-mt-32 bg-ink pb-12 lg:pb-16">
-      <div className="mx-auto max-w-3xl px-5 sm:px-8">
+      <div className="wrap">
+        <div className="max-w-3xl">
         <div className="border border-white/15 p-6 sm:p-10">
-          <p className="eyebrow">{s.eyebrow}</p>
-          <h2 id="imagine-title" className="title-caps mt-4 text-xl tracking-[0.14em] text-balance break-words sm:text-2xl">{s.title}</h2>
+          {s.eyebrow ? <p className="eyebrow mb-4">{s.eyebrow}</p> : null}
+          <h2 id="imagine-title" className="title-caps t-sub tracking-[0.12em] text-balance break-words">{s.title}</h2>
           <p className="mt-4 text-base text-mist sm:text-base">{s.lead}</p>
 
           <form onSubmit={generate} noValidate className="mt-8 grid gap-4" data-imagine-form>
@@ -175,7 +176,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                 type="submit"
                 disabled={loading}
                 data-imagine-generate
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto sm:px-8 lg:min-h-11 lg:text-[0.8125rem]"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto sm:px-8 lg:min-h-11 lg:text-[0.75rem]"
               >
                 {loading ? <LoaderCircle className="size-5 shrink-0 animate-spin" aria-hidden="true" /> : <Sparkles className="size-5 shrink-0" aria-hidden="true" />}
                 {s.generate}
@@ -219,7 +220,8 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                     type="button"
                     onClick={finalise}
                     data-imagine-finalise
-                    className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 bg-white px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.1em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+                    data-cta
+                    className="btn-primary flex-1"
                   >
                     <ArrowDown className="size-5 shrink-0" aria-hidden="true" />
                     {s.finalise}
@@ -228,7 +230,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
                     type="button"
                     onClick={restart}
                     data-imagine-restart
-                    className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.1em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+                    className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/40 px-6 py-3 text-center text-base leading-snug font-medium uppercase tracking-[0.1em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
                   >
                     <RotateCcw className="size-5 shrink-0" aria-hidden="true" />
                     {s.restart}
@@ -243,6 +245,7 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
               </div>
             ) : null}
           </div>
+        </div>
         </div>
       </div>
     </section>

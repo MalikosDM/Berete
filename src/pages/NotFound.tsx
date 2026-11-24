@@ -34,14 +34,14 @@ export default function NotFound() {
         <div className="mt-12 flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center">
           <Link
             to="/"
-            className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/40 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+            className="inline-flex min-h-12 items-center justify-center gap-3 border border-white/40 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
           >
             <ArrowLeft className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             {t.notFound.home}
           </Link>
           <Link
             to="/contact"
-            className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+            className="inline-flex min-h-12 items-center justify-center gap-3 border border-rose-light/55 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
           >
             {t.common.startPiece}
             <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />

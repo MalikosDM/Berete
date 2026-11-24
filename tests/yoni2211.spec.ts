@@ -178,7 +178,7 @@ test("the Butterfly: the pendant and the chain, two pieces linked to each other,
 
 /** Opens the private correspondence (again until the page is ready to answer the click). */
 async function openForm(page: Page): Promise<void> {
-  const toggle = page.getByRole("button", { name: /Correspondance privée/i });
+  const toggle = page.getByRole("button", { name: /Par e-mail/i });
   await expect(async () => {
     if ((await toggle.getAttribute("aria-expanded")) !== "true") await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true", { timeout: 1500 });

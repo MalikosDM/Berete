@@ -41,13 +41,13 @@ const SHEET: [string, string][] = [
 const FR = {
   titles: ["La vision derrière la création"],
   first: "Admirateur de toujours de Dragon Ball Z, Kevin Schade a lancé un défi à Berete : créer une pièce extraordinaire, jamais vue, inspirée de Goku et de son emblématique Genki Dama — une technique que Kevin avait lui-même célébrée sur le terrain de football.",
-  second: "Dans l’univers de Dragon Ball, le Genki Dama (le Genkidama) ne naît pas de la force, mais de l’unité.\nC’est une sphère d’énergie formée en rassemblant la force vitale de chaque être vivant ; les humains, les animaux, la nature et les mondes au-delà.",
+  second: "Dans l’univers de Dragon Ball, le Genki Dama ne naît pas de la force, mais de l’unité.\nC’est une sphère d’énergie formée en rassemblant la force vitale de chaque être vivant ; les humains, les animaux, la nature et les mondes au-delà.",
   reverse: "sertissage inversé",
   tribute: "Un hommage à l’imagination, au savoir-faire et à l’héritage d’Akira Toriyama, dont l’univers a appris à des générations que la vraie force n’est jamais solitaire.",
   last: "Non pas un pouvoir pris, mais un pouvoir confié.",
   sheet: [
-    ["Motif", "Goku et la Spirit Bomb, entourés des sept boules de cristal"],
-    ["Spirit Bomb", "Rotative, sertie de diamants"],
+    ["Motif", "Goku et le Genkidama, entourés des sept boules de cristal"],
+    ["Genkidama", "Rotatif, serti de diamants"],
     ["Tailles des diamants", "Ronde, émeraude, princesse"],
     ["Sertis", "Classique, clos, rail, inversé"],
   ],
@@ -84,8 +84,9 @@ for (const lang of ["en", "fr"] as const) {
     await skipIntro(page);
     await page.goto((lang === "fr" ? "/fr" : "") + "/pieces/" + SLUG, { waitUntil: "domcontentloaded" });
     await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
-    // The line under the title.
-    await expect(page.locator("[data-piece-intro]")).toContainText(lang === "fr" ? FR.last : LAST);
+    // Its last words once on the page (24/11/2026): the closing quote of its story, not again under the title.
+    await expect(page.locator("[data-piece-intro]")).not.toContainText(lang === "fr" ? FR.last : LAST);
+    await expect(page.locator("[data-story-quote]")).toContainText(lang === "fr" ? FR.last : LAST);
     const s = await story(page);
     if (lang === "en") {
       expect(s.titles.map((t) => t.toLowerCase())).toEqual(["the vision behind the creation"]);

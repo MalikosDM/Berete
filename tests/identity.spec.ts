@@ -63,21 +63,21 @@ test("the removed pieces appear nowhere; their addresses lead to their player, e
 test("the drafts made from Yoni's photos are published (20/11/2026): each with its page, made for a private collector", async ({ page }) => {
   desktopOnly();
   const cat = await getCatalogue(page);
-  // Unpublished: the removed pieces only (24/11/2026: the tennis chain of two rows and the White Iced Cuban chain are back;
-  // the twisted chain of Kevin Schade is BRT Flowers).
-  expect(REMOVED_PIECES).not.toContain("two-row-tennis-chain");
+  // Unpublished: the removed pieces only (24/11/2026: the White Iced Cuban chain is back; the twisted chain of Kevin Schade is
+  // BRT Flowers; the tennis chain of two rows lives on the page of Noah Okafor's octagon, "Its Chain").
+  expect(REMOVED_PIECES).toContain("two-row-tennis-chain");
   expect(REMOVED_PIECES).not.toContain("white-iced-cuban-chain");
   expect(defaultCatalogue.pieces.filter((p) => !p.published).map((p) => p.slug).sort()).toEqual([...REMOVED_PIECES].sort());
   for (const slug of NEW_PIECES.filter((s) => !REMOVED_PIECES.includes(s))) {
     const piece = cat.pieces.find((p) => p.slug === slug);
     expect(piece, slug).toBeTruthy();
     expect(piece!.gallery.length + 1, slug + " has its photos").toBeGreaterThanOrEqual(2);
-    // (The panther is the piece of the fighter of the circle, Keita Losene: linked on 23/11/2026; BRT Flowers, since 24/11/2026
+    // (The panther is the piece of the fighter of the circle, Losene Keita: linked on 23/11/2026; BRT Flowers, since 24/11/2026
     // the sheet of the twisted chain of Kevin Schade, is linked to him.)
     const linked: Record<string, string[]> = { "panther-champion-pendant": ["keita-losene"], "brt-flower-chain": ["kevin-schade"] };
     expect(piece!.people, slug + " linked to no page of a person").toEqual(linked[slug] ?? []);
-    // Made for a private collector, but the panther: made for Lasana Keita (the album of Yoni, 20/11/2026).
-    if (slug === "panther-champion-pendant") expect(piece!.client).toBe("Lasana Keita");
+    // Made for a private collector, but the panther: made for Losene Keita (the album of Yoni, 20/11/2026).
+    if (slug === "panther-champion-pendant") expect(piece!.client).toBe("Losene Keita");
     else expect(piece!.clientPublic, slug).toBe(false);
     // Never the first names engraved on the back of N14.
     expect(piece!.title + " " + piece!.line + " " + piece!.story, slug).not.toMatch(/Nathalie|José|Jose\b|Loan|Elya|Annie/i);
@@ -148,11 +148,11 @@ test("the new names of the founder everywhere, in English and in French: no old 
   }
   // A few of the new ones, where they belong.
   await page.goto("/");
-  for (const name of ["The Creations", "The Berete Circle", "The Atelier", "Signature Trunks", "The Bespoke Journey", "The House", "Private Enquiries"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
+  for (const name of ["The Creations", "The Berete Circle", "The Atelier", "Signature Trunks", "The Bespoke Journey", "The House", "Press"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
   // (The hook of the home page since 23/11/2026, Yoni.)
   await expect(page.locator("h1")).toContainText("We don't begin with what has been done. We begin with what could be.");
   await page.goto("/fr");
-  for (const name of ["Les Créations", "Le Cercle Berete", "L’Atelier", "Écrins Signature", "L’Expérience sur mesure", "La Maison", "Contact privé"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
+  for (const name of ["Les Créations", "Le Cercle Berete", "L’Atelier", "Écrins Signature", "L’Expérience sur mesure", "La Maison", "Presse"]) await expect(page.locator("header nav[data-desktop-nav]")).toContainText(name);
   await expect(page.locator("h1")).toContainText("Nous ne partons pas de ce qui a déjà été fait.");
 });
 
@@ -160,8 +160,10 @@ test("The House: Yoni Berete's story in chapters, his three quotes, the signatur
   const problems = watch(page);
   await page.goto("/about", { waitUntil: "load" });
   await page.waitForTimeout(1200);
-  await expect(page.locator("h1")).toContainText("Yoni Berete");
-  await expect(page.locator("h1")).toContainText("Founder & Creative Director");
+  // The name of the page is the name of the menu (24/11/2026), its founder under it.
+  await expect(page.locator("h1")).toContainText("The House");
+  await expect(page.locator("main")).toContainText("Yoni Berete");
+  await expect(page.locator("main")).toContainText("Founder & Creative Director");
   await expect(page.getByText("Two worlds. One legacy. A singular vision.")).toBeVisible();
   await expect(page.getByText("An independent vision of contemporary high jewellery.")).toBeVisible();
   await page.screenshot({ path: shotPath(info, "house-1-ouverture"), type: "jpeg", quality: 70 });
@@ -239,12 +241,12 @@ test("each piece enters its own world: its universe, readable texts (AA), still 
     const opening = page.locator("[data-piece-opening]");
     // (a title painted with a gradient, gold or pearl, is text too: its gradient goes with it).
     await page.addStyleTag({
-      content: "[data-piece-opening] p, [data-piece-opening] h1, [data-piece-opening] p * { color: transparent !important; text-shadow: none !important; background: none !important; filter: none !important; }",
+      content: "[data-piece-opening] p, [data-piece-opening] h1, [data-piece-opening] p *, [data-piece-opening] [data-piece-eyebrow] { color: transparent !important; text-shadow: none !important; background: none !important; filter: none !important; }",
     });
     await page.waitForTimeout(100);
     // The lightest texts of the opening (mist and rose gold) against the lightest part of their background.
     const textLum = luminance(0xe8, 0xb4, 0xa0);
-    for (const el of [opening.locator("p.eyebrow").first(), opening.locator("h1"), opening.locator("h1 + p")]) {
+    for (const el of [opening.locator("[data-piece-eyebrow]").first(), opening.locator("h1"), opening.locator("h1 + p")]) {
       if ((await el.count()) === 0) continue;
       const ratio = contrast(textLum, await backgroundLuminance(page, el));
       if (ratio < 4.5) low.push(piece.slug + ": " + ratio.toFixed(2));
@@ -267,22 +269,24 @@ test("each piece enters its own world: its universe, readable texts (AA), still 
 test("entering the world: the AI backdrop, the title typography, a cinematic entrance once per visit, the effects", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  const cases: [slug: string, backdrop: string, font: string][] = [
+  // Every title in the font of the house since 24/11/2026 (the universe carries the piece, never the font).
+  const font = "Cormorant Garamond";
+  const cases: [slug: string, backdrop: string][] = [
     // Since 20/11/2026: its own world, the Genkidama (tests/capsules.spec.ts).
-    ["kevin-schade-dragon-ball-pendant", "genkidama", "Shojumaru"],
-    ["michy-batshuayi-butterfly-pendant", "butterfly", "Italiana"],
+    ["kevin-schade-dragon-ball-pendant", "genkidama"],
+    ["michy-batshuayi-butterfly-pendant", "butterfly"],
     // (24/11/2026: the versions v2 of the victories of Inter and VfB, INTER_VICTORY and VFB_VICTORY of src/data/themes.ts.)
-    ["campione-d-italia-2023-2024", INTER_VICTORY, "Cinzel"],
-    ["vfb-stuttgart-dfb-pokal-2025", VFB_VICTORY, "Grenze Gotisch"],
-    ["noah-okafor-jersey-pendant", "okafor-jersey", "Big Shoulders Display"],
+    ["campione-d-italia-2023-2024", INTER_VICTORY],
+    ["vfb-stuttgart-dfb-pokal-2025", VFB_VICTORY],
+    ["noah-okafor-jersey-pendant", "okafor-jersey"],
   ];
-  for (const [slug, backdrop, font] of cases) {
+  for (const [slug, backdrop] of cases) {
     await page.goto("/pieces/" + slug, { waitUntil: "load" });
     const article = page.locator("article[data-piece]");
     await expect(article, slug).toHaveAttribute("data-entering", "");
     await expect(page.locator(".universe"), slug).toHaveAttribute("data-backdrop", backdrop);
-    // The title font, announced in the page and really loaded (never a fallback that would change the title).
-    await expect(page.locator(`link[rel="preload"][as="font"][href^="/fonts/universe/"]`), slug).toHaveCount(1);
+    // No font of a universe announced or loaded any more: the title in the font of the house, really loaded.
+    await expect(page.locator(`link[rel="preload"][as="font"][href^="/fonts/universe/"]`), slug).toHaveCount(0);
     expect(await page.locator("[data-u-title]").evaluate((el) => getComputedStyle(el).fontFamily), slug).toContain(font);
     await expect.poll(() => page.evaluate((f) => [...document.fonts].some((x) => x.family.replace(/"/g, "") === f && x.status === "loaded"), font), { message: slug + " font" }).toBe(true);
     await page.waitForTimeout(700);
@@ -300,13 +304,15 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
   await page.goto("/pieces/campione-d-italia-2023-2024", { waitUntil: "load" });
   await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 1500 });
   await expect(page.locator(".u-twenty > span")).toHaveCount(20);
-  // Dragon Ball: the watermark 力, and opening a photo strikes like an impact.
+  // Dragon Ball: no large sign of its universe (力) any more, no impact over an opened photo (24/11/2026: only slow fades,
+  // nothing that competes with the piece); a photo still opens large.
   await page.goto("/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
-  await expect(page.locator(".u-mark[data-brush]")).toHaveText("力");
+  await expect(page.locator(".u-mark")).toHaveCount(0);
   const first = page.locator("#piece-details button").first();
   await first.scrollIntoViewIfNeeded();
   await first.click();
-  await expect(page.locator("body > .u-impact")).toHaveCount(1);
+  await expect(page.locator("body > .u-impact:visible")).toHaveCount(0);
+  await expect(page.locator("[role=dialog][data-lenis-prevent]")).toBeVisible();
   await page.keyboard.press("Escape");
   expect(problems.errors).toEqual([]);
 });

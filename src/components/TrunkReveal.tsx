@@ -193,7 +193,7 @@ export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string
         src={trunkImage(trunk, which, 1080, "webp")}
         srcSet={set(which, "webp")}
         sizes={sizes}
-        alt={which === "closed" ? name : ""}
+        alt={which === "closed" ? name : t.boxes.openAlt(name)}
         width={trunk.size}
         height={trunk.size}
         loading="lazy"
@@ -240,12 +240,12 @@ export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string
         {(phase === "open" || leaving) && piece && view ? (
           <span key={"jewel" + round} data-trunk-jewel={piece.slug} data-leaving={leaving ? "" : undefined} className="trunk-jewel" aria-hidden="true">
             <span className="trunk-jewel-glow" />
-            <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 639px) 46vw, 18vw" alt="" width={view.width} height={view.height} decoding="async" draggable={false} />
+            <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 639px) 46vw, 18vw" alt={piece.title} width={view.width} height={view.height} decoding="async" draggable={false} />
           </span>
         ) : null}
         {phase === "closed" ? (
           <button ref={openButtonRef} type="button" onClick={open} data-trunk-open aria-label={t.boxes.openTrunk(name)} className="group absolute inset-0 flex cursor-pointer items-end justify-center pb-5 text-white">
-            <span className="trunk-button inline-flex min-h-12 items-center gap-2 border border-rose-light/60 bg-ink/55 px-6 text-base font-medium uppercase tracking-[0.16em] backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
+            <span className="trunk-button inline-flex min-h-12 items-center gap-2 border border-rose-light/60 bg-ink/55 px-6 text-base font-medium uppercase tracking-[0.16em] backdrop-blur-sm transition-colors group-hover:border-rose-light group-hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
               {t.boxes.openHint}
             </span>
           </button>
@@ -269,7 +269,7 @@ export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string
                 disabled={phase !== "open"}
                 data-trunk-close
                 aria-label={t.boxes.closeTrunk(name)}
-                className="trunk-button inline-flex min-h-12 items-center gap-2 border border-rose-light/60 bg-ink/55 px-6 text-base font-medium uppercase tracking-[0.16em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+                className="trunk-button inline-flex min-h-12 items-center gap-2 border border-rose-light/60 bg-ink/55 px-6 text-base font-medium uppercase tracking-[0.16em] text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
               >
                 <X className="size-4" aria-hidden="true" /> {t.boxes.closeHint}
               </button>
@@ -288,7 +288,7 @@ export default function TrunkReveal({ slug, name, trunk, piece }: { slug: string
                 rel="noreferrer"
                 data-trunk-create
                 tabIndex={leaving ? -1 : undefined}
-                className="inline-flex min-h-12 flex-1 basis-48 items-center justify-center gap-2.5 bg-white px-3 text-center text-base font-medium tracking-[0.04em] text-ink transition-colors hover:bg-rose-light"
+                className="inline-flex min-h-12 flex-1 basis-48 items-center justify-center gap-2.5 border border-rose-light/55 px-3 text-center text-base font-normal tracking-[0.04em] text-white transition-colors hover:border-rose-light hover:text-rose-light"
               >
                 <BrandIcon name="whatsapp" className="size-4.5" /> {t.boxes.createOwn}
               </a>

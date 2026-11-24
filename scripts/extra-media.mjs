@@ -113,6 +113,9 @@ const PIECES = {
     ["links", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 04.jpg", { black: 10 }],
     ["side", "icloud:16 Chaine fleurs or rose/Photos/16 Chaine fleurs or rose - 05.jpg"],
   ],
+  // The Infinity Link (folder 09, Yoni 24/11/2026: the chain he was looking for): the whole chain on its bust, its charcoal
+  // background brought to the deep black of the other pieces.
+  "pear-link-chain": [["front", "icloud:09 Chaine diamants/Photos/09 Chaine diamants - 01.jpg", { black: 34 }]],
   // Sirius (Yoni, 24/11/2026): its plate from the front leaned to the left (its left tip 26 px lower over 1,333 px): straightened.
   sirius: [["plate-front", "icloud:37 Chaine Sirius/Photos/37 Chaine Sirius - 28.jpg", { rotate: 1.12 }]],
   // The Inter ring (Yoni, 24/11/2026: his photos with the players and their rings, in "Worn by"): the originals of the

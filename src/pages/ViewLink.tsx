@@ -52,7 +52,7 @@ export default function ViewLink() {
       <>
         <div className="mx-auto max-w-3xl text-center">
           <p className="eyebrow">{w.privateEyebrow}</p>
-          <h1 className="title-caps mt-4 t-hero tracking-[0.1em] break-words" data-link-title>{answer.title}</h1>
+          <h1 className="title-caps tracking-[0.12em] mt-4 t-hero break-words" data-link-title>{answer.title}</h1>
           <p className="mt-4 text-base text-bone">{w.privateText}</p>
         </div>
         <Jewel3D
@@ -63,7 +63,7 @@ export default function ViewLink() {
           className="mt-10"
           actions={
             <>
-              <a href={waLink(w.loveMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-love className={button + " w-full bg-white py-3 text-center text-ink hover:bg-rose-light"}>
+              <a href={waLink(w.loveMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-love className={button + " w-full border border-rose-light/55 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>
                 <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {w.love}
               </a>
               <a href={waLink(w.changeMessage(answer.title, metals, link))} target="_blank" rel="noreferrer" data-change className={button + " w-full border border-white/40 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>
@@ -78,14 +78,14 @@ export default function ViewLink() {
   } else if (answer.kind === "password") {
     body = (
       <form onSubmit={submit} className="mx-auto grid max-w-md gap-5 py-16 text-center" data-link-password>
-        <h1 className="title-caps t-hero tracking-[0.1em]">{w.passwordTitle}</h1>
+        <h1 className="title-caps tracking-[0.12em] t-hero ">{w.passwordTitle}</h1>
         <p className="text-base text-bone">{w.passwordText}</p>
         <label className="block text-start text-base text-bone">
           {w.password}
           <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="mt-2 block min-h-12 w-full border border-white/30 bg-ink px-4 text-base text-white focus:border-rose-light focus:outline-none" />
         </label>
         {answer.wrong ? <p role="alert" className="text-base text-rose-light">{w.wrongPassword}</p> : null}
-        <button type="submit" disabled={busy || !password} className={button + " bg-white text-ink hover:bg-rose-light disabled:opacity-60"}>
+        <button type="submit" disabled={busy || !password} className={button + " border border-rose-light/55 text-white hover:border-rose-light hover:text-rose-light disabled:opacity-60"}>
           {busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null} {w.open}
         </button>
       </form>
@@ -94,9 +94,9 @@ export default function ViewLink() {
     const expired = answer.kind === "expired";
     body = (
       <div className="mx-auto grid max-w-xl gap-5 py-16 text-center" data-link-state={answer.kind}>
-        <h1 className="title-caps t-hero tracking-[0.1em]">{expired ? w.expiredTitle : w.missingTitle}</h1>
+        <h1 className="title-caps tracking-[0.12em] t-hero ">{expired ? w.expiredTitle : w.missingTitle}</h1>
         <p className="text-base text-bone">{expired ? w.expiredText : w.missingText}</p>
-        <a href={waLink(w.askMessage)} target="_blank" rel="noreferrer" className={button + " mx-auto bg-white text-ink hover:bg-rose-light"}>
+        <a href={waLink(w.askMessage)} target="_blank" rel="noreferrer" className={button + " mx-auto border border-rose-light/55 text-white hover:border-rose-light hover:text-rose-light"}>
           <BrandIcon name="whatsapp" className="size-5" /> {w.askLink}
         </a>
       </div>

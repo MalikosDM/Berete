@@ -163,5 +163,5 @@ export const de: HouseTexts = {
     { label: "Der Weg", text: "Früher reiste ich zu meinen Kunden. Heute kommen sie zu mir, dorthin, wo ich mich entschieden habe, meine Zukunft aufzubauen." },
   ],
   closing: "Ein weitergegebenes Erbe. Eine gelebte Identität. Eine unverwechselbare Vision.",
-  signature: "Made by us. Inspired by you.",
+  signature: "Von uns gefertigt. Von Ihnen inspiriert.",
 };

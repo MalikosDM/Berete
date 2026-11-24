@@ -5,10 +5,10 @@
 // Screenshots go to verification/galleries/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
-import { anglePhotos, wornSet } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import media from "../src/data/media.generated.json" with { type: "json" };
-import { NEW_PIECES } from "../src/data/pieces";
+import { NEW_PIECES, partOf } from "../src/data/pieces";
+import { pieceMediaOf } from "../src/data/pageMedia";
 import { resolveShowcase } from "../src/data/showcase";
 import { skipIntro, watch } from "./helpers";
 
@@ -38,7 +38,7 @@ test("Créations: every published piece is there, each card with its photo", asy
 });
 
 /** Eight new pieces (the most photos, films, the albums of Yoni), and the four pieces of the site with the most photos. */
-const NEW_PAGES = ["thorns-and-roses-crucifix", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain", "cross-infinity-chain", "brt-flower-chain", "jesus-piece-red-flowers"];
+const NEW_PAGES = ["thorns-and-roses-crucifix", "crown-of-thorns-jesus-piece", "panther-champion-pendant", "ampersand-initials-pendant", "rose-iced-cuban-chain", "white-iced-cuban-chain", "brt-flower-chain", "jesus-piece-red-flowers"];
 const PAGES = [
   ...NEW_PAGES,
   ...PUBLISHED.filter((p) => !NEW_PIECES.includes(p.slug))
@@ -107,7 +107,14 @@ for (const slug of PAGES) {
     if (!phone) expect(lcp, "largest paint (ms)").toBeLessThan(4000);
 
     // "Every Angle": every photo and film; all of them after "See N more".
-    const angles = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
+    // (Each photo once on the page since 24/11/2026: never one the opening shows, src/data/pageMedia.ts.)
+    const part = partOf(piece.slug);
+    const partPiece = part ? defaultCatalogue.pieces.find((p) => p.slug === part.slug) : undefined;
+    const angles = pieceMediaOf(piece, {
+      box: piece.boxSlug ? defaultCatalogue.boxes.find((b) => b.slug === piece.boxSlug) : undefined,
+      part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
+      opening: resolveShowcase(piece.slug, piece.showcase),
+    }).angles;
     const section = page.locator("[data-every-angle]");
     await section.scrollIntoViewIfNeeded();
     const tiles = page.locator("[data-angle]");

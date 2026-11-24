@@ -23,7 +23,7 @@ export default function CollectionTiles() {
       <div className="mx-auto flex max-w-[1600px] flex-col justify-between gap-5 px-5 pt-20 pb-10 sm:flex-row sm:items-end sm:px-8 lg:px-12 lg:pt-24 lg:pb-12">
         <div>
           <p className="eyebrow">{t.collections.eyebrow}</p>
-          <h2 id="collections-title" className="title-caps mt-4 t-title tracking-[0.14em]">
+          <h2 id="collections-title" className="title-caps tracking-[0.12em] mt-4 t-title ">
             {t.collections.title}
           </h2>
         </div>

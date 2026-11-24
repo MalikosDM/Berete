@@ -30,7 +30,7 @@ export default function MakingSteps({ piece, boxImage, title, id = "making-title
     <section aria-labelledby={id} data-making className="border-y border-white/10 py-16 lg:py-20">
       <div className="mx-auto max-w-[1600px] px-5 sm:px-8 lg:px-12">
         <p className="eyebrow">{t.piece.makingEyebrow}</p>
-        <h2 id={id} className="title-caps mt-4 t-title tracking-[0.12em]">
+        <h2 id={id} className="title-caps tracking-[0.12em] mt-4 t-title ">
           {title ?? t.piece.makingTitle}
         </h2>
       </div>

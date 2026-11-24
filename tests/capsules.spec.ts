@@ -49,9 +49,8 @@ for (const slug of ENTERED) {
     expect(await section.evaluate((el) => el.previousElementSibling?.hasAttribute("data-piece-opening"))).toBe(true);
     // "Watch the film" leads down to it; on screen it plays by itself, silent, in a loop, its copy made for the screen.
     await ready(page);
-    const watchFilm = page.locator("[data-watch-film]");
-    await expect(watchFilm).toHaveAttribute("href", "#piece-film");
-    await watchFilm.click();
+    // (No "Watch the film" in the opening since 24/11/2026: two buttons there, Begin Your Creation and WhatsApp.)
+    await section.scrollIntoViewIfNeeded();
     await expect(section).toBeInViewport({ timeout: 10_000 });
     const frame = section.locator("[data-feature-frame]");
     await frame.evaluate((el) => el.scrollIntoView({ block: "center" }));
@@ -98,7 +97,6 @@ test("a piece without a film (the Safi Link; the Inter ring, whose film was a 3D
   }
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/fr/pieces/vfb-stuttgart-dfb-pokal-2025");
-  await expect(page.locator("[data-watch-film]")).toBeVisible();
   const section = page.locator("[data-feature-film]");
   await section.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1500);
@@ -166,9 +164,8 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   expect(lit).toBeGreaterThan(10);
   await shot(page, info.project.name + "-genkidama-page");
   // Its story: the same world around it.
-  const open = page.locator("[data-seen-in-stories]");
-  await open.scrollIntoViewIfNeeded();
-  await open.click();
+  // (Opened from the profile of Kevin Schade: no stories on the pages of the pieces since 24/11/2026.)
+  await page.goto("/players/kevin-schade?story=kevin-schade&piece=kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
   const story = page.locator("[role='dialog'][data-story-world='kevin-schade-dragon-ball-pendant']");
   await expect(story).toBeVisible();
   await expect(story.locator(".universe[data-fixed]")).toHaveAttribute("data-backdrop", "genkidama");

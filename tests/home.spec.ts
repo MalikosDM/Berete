@@ -20,8 +20,8 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   const problems = watch(page);
   await page.goto("/pieces/" + INTER, { waitUntil: "load" });
   await page.waitForTimeout(1500);
-  await expect(page.locator("#piece-title").locator("xpath=..")).toContainText("Created exclusively for Inter Milan");
-  await expect(page.locator("#piece-title").locator("xpath=..")).toContainText("Historic Commissions");
+  // One small label above its name (24/11/2026); who it was created for in its own section, once.
+  await expect(page.locator("[data-made-for] h2")).toContainText("Created exclusively for Inter Milan");
   await expect(page.locator("[data-made-for-person='marcus-thuram']")).toHaveCount(1);
   await page.screenshot({ path: shotPath(info, "inter-1-ouverture"), type: "jpeg", quality: 70 });
   const details = page.locator("[data-details]");
@@ -29,7 +29,7 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   await page.waitForTimeout(1200);
   await expect(details.locator("[data-detail]")).toHaveCount(9);
   for (const words of ["Six Months of Craftsmanship", "The Secret Within", "Beyond a Ring", "Twenty stars", "Black, blue, black, blue", "Italian flag", "Forza Inter", "Serie A", "Campione d'Italia", "cup", "pendant"]) await expect(details).toContainText(words);
-  await details.screenshot({ path: shotPath(info, "inter-2-details"), type: "jpeg", quality: 70 });
+  await page.screenshot({ path: shotPath(info, "inter-2-details"), type: "jpeg", quality: 70 });
   const photos = details.locator("[data-detail-photo]");
   expect(await photos.count()).toBeGreaterThanOrEqual(8);
   await photos.nth(3).click();
@@ -42,7 +42,7 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   await expect(page.locator("[data-spec='seen']")).toHaveCount(1);
   await expect(page.locator("[data-seen-note]")).toBeVisible();
   await expect(page.locator("#sheet-title").locator("xpath=..")).not.toContainText("Shared on request");
-  await page.locator("#sheet-title").locator("xpath=..").screenshot({ path: shotPath(info, "inter-4-fiche-technique"), type: "jpeg", quality: 70 });
+  await page.screenshot({ path: shotPath(info, "inter-4-fiche-technique"), type: "jpeg", quality: 70 });
   expect(problems.errors).toEqual([]);
 });
 
@@ -71,19 +71,19 @@ test("players: a wall of portraits on /players", async ({ page }, info) => {
   expect(problems.errors).toEqual([]);
 });
 
-test("Signature Trunks: every trunk closed in a grid of squares, Commission Your Signature Trunk at the top and at the bottom", async ({ page }, info) => {
+test("Signature Trunks: every trunk closed in a grid of squares, Begin Your Creation and WhatsApp at the end", async ({ page }, info) => {
   const problems = watch(page);
   await page.goto("/boxes", { waitUntil: "load" });
   await page.waitForTimeout(1500);
   await expect(page.locator("h1")).toContainText("Signature Trunks");
   await expect(page.getByText("Every exceptional creation deserves an extraordinary presentation.")).toBeVisible();
+  // One way to one's own trunk, at the end (24/11/2026: the buttons of the house, never twice on the page).
   const buttons = page.locator("[data-create-box]");
-  await expect(buttons).toHaveCount(2);
-  for (let i = 0; i < 2; i++) {
-    await expect(buttons.nth(i)).toHaveText(/Commission Your Signature Trunk/);
+  await expect(buttons).toHaveCount(1);
+  for (let i = 0; i < 1; i++) {
+    await expect(buttons.nth(i)).toHaveText(/WhatsApp/);
     expect(decodeURIComponent((await buttons.nth(i).getAttribute("href")) ?? "")).toContain("discovered the Signature Trunks on your website and would like to commission a trunk of my own.");
   }
-  await expect(buttons.nth(0)).toBeInViewport();
   await page.screenshot({ path: shotPath(info, "boxes-1-haut"), type: "jpeg", quality: 70 });
   // The trunks of the v3 (23/11/2026; the trunk of the house waits for its v3 files), Sirius first; every trunk a square of
   // the same size, closed (tests/trunks.spec.ts opens them).
@@ -103,7 +103,7 @@ test("Signature Trunks: every trunk closed in a grid of squares, Commission Your
   await page.waitForTimeout(700);
   await page.screenshot({ path: shotPath(info, "boxes-3-photo-en-grand"), type: "jpeg", quality: 70 });
   await page.keyboard.press("Escape");
-  await buttons.nth(1).scrollIntoViewIfNeeded();
+  await buttons.nth(0).scrollIntoViewIfNeeded();
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "boxes-4-bas"), type: "jpeg", quality: 70 });
   expect(problems.errors).toEqual([]);

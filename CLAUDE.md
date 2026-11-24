@@ -162,6 +162,52 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « zéro incohérence » (après l'appel du 23-24/11) — état au 24/11/2026
+- [x] **Deux polices** seulement : Cormorant Garamond (titres) et Manrope (textes). Les polices des univers ne sont plus chargées
+      ni utilisées (`universeProps` de `src/components/Universe.tsx` prend toujours `maison` ; l'admin le dit) ; les grands signes
+      des univers (力, OKA, T…) ne sont plus dessinés (`SHOW_MARKS`). Filigrane BERETE plus discret (opacité 0,018).
+- [x] **Tailles et boutons** : titre de page ≤ 56 px, de section ≤ 36 px, petite étiquette 11–12 px, texte 15 px sur ordinateur
+      (plus de `lg:text-[0.9375rem]` ni `0.875rem`), 16 px sur téléphone. Une seule étiquette au-dessus d'un titre (les intros de
+      page n'en ont plus : `PageIntro`). Deux boutons : `btn-primary` (contour fin or rose) et `btn-secondary` (texte et petite
+      flèche), `src/index.css` ; plus aucun bloc blanc plein. Un seul cadre de page : `wrap` (1280 px, mêmes marges).
+- [x] **Mouvements** : fondus lents seulement (`Reveal` sans montée, plus de balayage ni de parallaxe dans l'Atelier, plus de
+      flottement ni de relief des vues, plus d'étincelles des écrins, plus d'éclat sur l'or rose ; bloc « Movement » en fin de
+      `src/index.css`). Les effets propres aux univers restent.
+- [x] **Un seul mot par chose** (6 langues) : « Begin Your Creation » / « Commencer votre création » (une seule traduction),
+      « WhatsApp », « Enter the World », « Discover Their World », « All Creations », « See More », « Enter the Atelier ». Menu :
+      The Creations, The Berete Circle, The Atelier, Signature Trunks, The Bespoke Journey, The House, Press + Begin Your Creation
+      (« Private Enquiries » retiré). Titres de page = nom du menu (Cercle : « Worn by Icons. » en sous-titre ; Presse ; Contact).
+- [x] **Page pièce** (`src/pages/PiecePage.tsx`, `data-piece-section`) : ouverture (étiquette = la collection, le nom, sa phrase
+      si l'histoire ne la dit pas déjà, Begin Your Creation + WhatsApp) → The Finished Piece (ou The Mechanism : Dragon Ball, croix
+      de Tillman) → Every Angle (jamais une photo de l'ouverture : `src/data/pageMedia.ts`) → Behind the Creation → (The Art of
+      Detail, sans vignettes) → (Worn as a Pendant / Its Chain) → Composition & Craftsmanship → **Created exclusively for …**
+      (une section : la personne, « Discover Their World », les photos portées ; « A Berete Signature » pour BRT Flowers et la
+      Safi Link ; « a private collector » une seule fois) → The Trunk → une ligne vers l'Atelier → presse → un seul bloc de fin.
+      Plus de stories sur les pages pièces. Le français s'accorde : « Créé » (pendentif, bracelet), « Créée » (bague, chaîne,
+      montre) ; espagnol et arabe aussi (`common.madeFor(who, type)`).
+- [x] **Une pièce = une page** (`PARTS` de `src/data/pieces.ts`, anciennes adresses en 301 vers la section) : le pendentif Inter
+      → « Worn as a Pendant » de la bague ; la tennis 2 rangs (dossier 03, même séance) → « Its Chain » de l'octogone d'Okafor ;
+      la Cross Infinity (07) → « Its Chain » du pendentif de Loïs Openda. **Reliées** : Sirius (désormais un pendentif, « Sirius
+      Nameplate », catégorie Name) ↔ BRT Flowers ; OKA ↔ Baguette Cuban (à confirmer) ; Butterfly ↔ sa chaîne ; Safi Link ↔
+      maillot d'Okafor. **Infinity Link** = la
+      chaîne en poire du dossier 09 (`pear-link-chain`, sa face ramenée au noir : `npm run extra-media -- --only=pear-link-chain`) ;
+      la chaîne de Thuram (retirée par Yoni le 19/11) repart en non publiée. Catégorie Tennis retirée (sa chaîne est dans
+      l'octogone). La photo IA retirée de BRT Flowers.
+- [x] **Noms** : The Hand, Tulips on Tour Medallion, D&E Pendant, N14 Medallion, Red Crown / Red Flowers Jesus Piece, The Safi
+      Link, Rose Cuban Chain 14 mm / 20 mm, Sirius Nameplate, Infinity Link ; **Losene Keita** partout (adresse `keita-losene`
+      gardée). « gold tone » → « gold » dans les 6 langues. Français : « Genkidama » partout, « le Genki Dama » dans le texte de Yoni.
+- [x] **Accueil en magazine** (`Story` de `src/pages/Home.tsx`) : la photo de l'écrin, puis une section = un sujet centré (la
+      maison, The Mechanism, la bague Inter, la bague VfB, The Creations, Presse, la fin). **The Bespoke Journey** : six étapes
+      partout, chaque image mène à l'Atelier / aux Créations / aux Écrins, un seul paiement (acompte de design → 50 % à la
+      validation → solde avant la remise), « environ dix semaines ». Contact : Pendants, Chains, Rings, Watches.
+- [x] **Contrôle automatique** : `npm run audit:coherence` (`scripts/audit-coherence.ts` ; `BASE_URL`, `SIZES`, `LANGS`, `ONLY`)
+      sur toutes les pages du plan du site, 6 langues, 1280 × 800, 1440 × 900, iPhone (WebKit) : polices, tailles, doublons de
+      photos et de phrases, boutons, photos sans description, « gold tone », anglais oublié, noms coupés, débordements, ordre des
+      sections. Rapport : `verification/coherence/rapport.md`. `tests/coherence2411.spec.ts`.
+- [ ] Yoni : valider les noms, les fusions, les photos IA encore en ligne (liste dans le rapport du 24/11), la Two-Tone (31 :
+      2 photos, une floue, gardée hors ligne), les chaînes probables d'autres pièces (Baguette Cuban = chaîne de l'OKA, reliée ; White
+      Iced Cuban = chaîne de Dragon Ball ? 14 et 20 mm = un modèle en deux largeurs ?).
+
 ## Passe « appel du 23-24/11 : le luxe ne crie pas » — état au 24/11/2026
 - [x] **Une seule échelle de tailles** (`src/index.css`) : sur ordinateur tout le site est dessiné à 15 px (`html` 93,75 % dès
       1 024 px ; le téléphone garde 16 px) ; titres `t-hero` (titre de page), `t-title` (section), `t-lead` (citation), `t-sub`

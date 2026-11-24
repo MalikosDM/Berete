@@ -5,20 +5,19 @@
 // 2. From the opening of a capsule, one scroll leads to the next section (no pinned sequence any more).
 // 3. The amateur films at the end of "Every Angle" (src/data/angles.ts, AMATEUR_FILMS).
 // 4. N14: every useful photo of folder 22, its professional film at the opening and in its atelier.
-// 5. The panther of Lasana Keita: the night of his celebration, three images one after the other behind it.
+// 5. The panther of Losene Keita: the night of his celebration, three images one after the other behind it.
 // 6. Jesus Pieces: an entry of the menu, under The Creations.
 // Screenshots go to verification/making/.
 import { mkdirSync } from "node:fs";
 import { expect, test, type Page } from "./fixtures";
-import { AMATEUR_FILMS, anglePhotos, wornSet } from "../src/data/angles";
+import { AMATEUR_FILMS } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { piecesOfCollection, SUBCATEGORIES } from "../src/data/collections";
 import { resolveAtelier } from "../src/data/atelier";
 import { completeMakingOf, makingSteps } from "../src/data/making";
 import { publicCatalogue } from "../src/data/relations";
-import { resolveShowcase } from "../src/data/showcase";
 import { BACKDROPS } from "../src/data/themes";
-import { skipIntro, watch } from "./helpers";
+import { pageAngles, skipIntro, watch } from "./helpers";
 
 const DIR = "verification/making";
 mkdirSync(DIR, { recursive: true });
@@ -62,7 +61,7 @@ for (const slug of PAGES) {
     await shot(page, info.project.name + "-" + slug + "-1-apres-ouverture");
 
     // "Every Angle": the amateur films after everything else.
-    const photos = anglePhotos(piece, resolveShowcase(piece.slug, piece.showcase).mode === "photo", wornSet(piece));
+    const photos = pageAngles(piece);
     const firstAmateur = photos.findIndex((m) => AMATEUR_FILMS.has(m.src));
     if (firstAmateur >= 0) expect(photos.slice(firstAmateur).every((m) => AMATEUR_FILMS.has(m.src)), "amateur films last").toBe(true);
     const more = page.locator("[data-angle-more]");
@@ -131,7 +130,7 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   await section.scrollIntoViewIfNeeded();
   const more = section.locator("[data-angle-more]");
   if (await more.count()) await more.click();
-  await expect(section.locator("[data-angle]")).toHaveCount(anglePhotos(piece, resolveShowcase(slug, piece.showcase).mode === "photo", wornSet(piece)).length);
+  await expect(section.locator("[data-angle]")).toHaveCount(pageAngles(piece).length);
   await expect(section.locator("[data-angle-text]")).toHaveCount(0);
   await shot(page, info.project.name + "-n14-2-angles");
   // Its atelier (in The Atelier since 24/11/2026): the same film, once (one chapter).

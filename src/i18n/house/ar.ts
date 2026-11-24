@@ -163,5 +163,5 @@ export const ar: HouseTexts = {
     { label: "المسيرة", text: "كنت أسافر للقاء عملائي. واليوم، يأتون إليّ حيث اخترت أن أبني مستقبلي." },
   ],
   closing: "إرثٌ متوارَث. هويةٌ يُعتزّ بها. رؤيةٌ فريدة.",
-  signature: "Made by us. Inspired by you.",
+  signature: "من صنعنا. وبإلهام منكم.",
 };

@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { ArrowRight, Check, LoaderCircle, Mail, MapPin, PhoneCall, RotateCcw } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import Reveal from "@/components/Reveal";
-import { useI18n, type Messages } from "@/i18n";
+import { collectionWords, Link, useI18n, type Messages } from "@/i18n";
+import { collectionOf } from "@/data/collections";
 import WhatsAppHandoff from "@/components/WhatsAppHandoff";
 import { BUDGETS, EMAIL, HAS_SERVER, INSTAGRAM_HANDLE, INSTAGRAM_URL, PIECE_CHOICES, TIMINGS, waLink } from "@/lib/site";
 import { requestCallback } from "@/lib/api";
@@ -21,7 +22,8 @@ type Choice = { value: string; label: string };
 function stepsOf(t: Messages): { title: string; options: Choice[] }[] {
   const [type = "", budget = "", timing = ""] = t.contact.configSteps;
   return [
-    { title: type, options: PIECE_CHOICES.map((value) => ({ value, label: t.contact.pieceChoices[value] })) },
+    // The same words as the collections of the creations (24/11/2026): Pendants, Chains, Rings, Watches.
+    { title: type, options: PIECE_CHOICES.map((value) => ({ value, label: collectionWords(t, collectionOf(value).slug, collectionOf(value)).name })) },
     { title: budget, options: BUDGETS.map((value) => ({ value, label: t.contact.budgets[value] })) },
     { title: timing, options: TIMINGS.map((value) => ({ value, label: t.contact.timings[value] })) },
   ];
@@ -29,36 +31,48 @@ function stepsOf(t: Messages): { title: string; options: Choice[] }[] {
 
 export default function ContactBlock({ pieceName, compact = false, id }: ContactBlockProps) {
   const { t } = useI18n();
-  // The message of the page it is on (a person: the creations made for them; the home page; Private Enquiries).
+  // The message of the page it is on (a person: the creations made for them; a piece: its name; the contact page).
   const mainMessage = useWhatsAppMessage();
   const { people } = useCatalogue();
   const proof = [...people.filter((p) => p.kind === "club"), ...people.filter((p) => p.kind === "player" && p.number !== null)].map((p) => p.name);
 
+  // At the end of a page (a profile, the press): the invitation to begin, as everywhere (24/11/2026): its signature, one
+  // sentence, the two buttons of the house. The configurator and the call back live on the contact page.
+  if (compact) {
+    return (
+      <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} data-contact-compact className="relative scroll-mt-32 border-t border-white/10 bg-ink">
+        <div className="wrap flex flex-col items-center py-20 text-center lg:py-24">
+          <h2 id={(id ?? "contact-block") + "-title"} className="title-caps tracking-[0.12em] t-title ">{t.common.yourStory}</h2>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-bone">{t.contact.oneConversation}</p>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-x-8">
+            <Link to="/contact" data-cta className="btn-primary">
+              {t.common.startPiece}
+            </Link>
+            <a href={waLink(mainMessage)} target="_blank" rel="noreferrer" data-cta className="btn-secondary">
+              <BrandIcon name="whatsapp" className="size-4" /> {t.common.whatsapp}
+            </a>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className={"relative scroll-mt-32 bg-ink " + (compact ? "py-16 lg:py-20" : "py-16 lg:py-24")}>
-      <div className="mx-auto max-w-[1400px] px-5 sm:px-8 lg:px-12">
-        <div className="rule-rose mb-10 lg:mb-12" aria-hidden="true" />
+    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} className="relative scroll-mt-32 bg-ink py-14 lg:py-20">
+      <div className="wrap">
         <div className="grid gap-16 lg:grid-cols-12 lg:gap-12">
           {/* Left: the main call to action */}
           <div className="lg:col-span-5">
-            <p className="eyebrow">{pieceName ? t.contact.inspired : t.common.startPiece}</p>
-            <h2 id={(id ?? "contact-block") + "-title"} className={"title-caps mt-5 max-w-full text-balance break-words tracking-[0.14em] " + (compact ? "t-title lg:t-title" : "t-title lg:t-title")}>
-              {pieceName ? t.piece.want : t.common.yourStory}
+            <h2 id={(id ?? "contact-block") + "-title"} className="title-caps tracking-[0.12em] max-w-full text-balance break-words t-title ">
+              {t.common.yourStory}
             </h2>
-            <p className="mt-6 max-w-md text-base text-mist">
-              {t.contact.oneConversation}
-            </p>
-            <a
-              href={waLink(mainMessage)}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-10 flex min-h-16 w-full items-center justify-center gap-3 bg-white px-8 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light sm:w-auto sm:inline-flex"
-            >
-              <BrandIcon name="whatsapp" className="size-6" />
-              {t.common.chatWhatsapp}
+            <p className="mt-5 max-w-md text-base text-mist">{t.contact.oneConversation}</p>
+            <a href={waLink(mainMessage)} target="_blank" rel="noreferrer" data-cta className="btn-primary mt-8">
+              <BrandIcon name="whatsapp" className="size-4" />
+              {t.common.whatsapp}
             </a>
 
-            <ul className="mt-12 space-y-3 text-base text-bone">
+            <ul className="mt-10 space-y-1 text-base text-bone">
               <li className="flex min-h-12 items-center gap-3">
                 <MapPin className="size-5 text-rose-light" aria-hidden="true" />
                 {t.site.baseLine}
@@ -82,10 +96,9 @@ export default function ContactBlock({ pieceName, compact = false, id }: Contact
             {proof.length > 0 ? (
               <div className="mt-10 border-t border-white/15 pt-8">
                 <p className="eyebrow">{t.contact.trustedBy}</p>
-                <p className="mt-4 max-w-md font-display text-xl uppercase leading-relaxed tracking-[0.08em] text-white">{proof.join(" · ")}</p>
+                <p className="mt-4 max-w-md font-display t-sub uppercase leading-relaxed tracking-[0.08em] text-white">{proof.join(" · ")}</p>
               </div>
             ) : null}
-
           </div>
 
           {/* Right: configurator + call back */}
@@ -125,7 +138,7 @@ function Configurator({ pieceName }: { pieceName?: string }) {
   return (
     <div className="border-rose-gold bg-ink-soft p-6 sm:p-10">
       <div className="flex items-baseline justify-between gap-4">
-        <h3 className="title-caps text-2xl tracking-[0.14em] sm:text-3xl">{t.contact.configTitle}</h3>
+        <h3 className="title-caps t-sub tracking-[0.12em]">{t.contact.configTitle}</h3>
         <span className="text-rose-gold font-display text-2xl" aria-live="polite">
           {Math.min(step + 1, 3)}/3
         </span>
@@ -174,13 +187,8 @@ function Configurator({ pieceName }: { pieceName?: string }) {
             ))}
           </ul>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={waLink(message)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-12 items-center justify-center gap-3 bg-white px-6 text-base font-medium text-ink transition-colors hover:bg-rose-light"
-            >
-              <BrandIcon name="whatsapp" className="size-5" />
+            <a href={waLink(message)} target="_blank" rel="noreferrer" data-cta className="btn-primary">
+              <BrandIcon name="whatsapp" className="size-4" />
               {t.contact.openWhatsapp}
             </a>
             <button
@@ -240,7 +248,7 @@ function CallBack({ pieceName }: { pieceName?: string }) {
       >
         <span className="flex items-center gap-3">
           <PhoneCall className="size-5 text-rose-light" aria-hidden="true" />
-          <span className="title-caps text-xl tracking-[0.14em] sm:text-2xl">{t.contact.callTitle}</span>
+          <span className="title-caps t-sub tracking-[0.12em]">{t.contact.callTitle}</span>
         </span>
         <span className="text-rose-gold font-display text-3xl leading-none" aria-hidden="true">
           {open ? "−" : "+"}
@@ -291,7 +299,7 @@ function CallBack({ pieceName }: { pieceName?: string }) {
                 <button
                   type="submit"
                   disabled={status === "sending"}
-                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.8125rem]"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-rose-light/80 px-6 text-base font-medium uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink disabled:opacity-70 sm:w-auto lg:min-h-11 lg:text-[0.75rem]"
                 >
                   {status === "sending" ? <LoaderCircle className="size-5 animate-spin" aria-hidden="true" /> : null}
                   {t.contact.callButton}

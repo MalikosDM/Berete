@@ -26,14 +26,14 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   await expect(page.locator(".universe")).toHaveCount(0);
   // (Since the second call of 23/11/2026: the pencil sketch that becomes the jewel came first; since 24/11/2026 one photo,
   // full screen, still: no film moved by the scroll any more.)
-  await expect(page.locator("[data-home-hero] video")).toHaveCount(0);
+  await expect(page.locator("[data-home-story='house'] video")).toHaveCount(0);
   await expect(page.locator("[data-scroll-video]")).toHaveCount(0);
   await expect(page.locator("[data-home-photo] [data-home-photo-img]")).toBeVisible();
   // One sentence of who Berete is, the hook, two buttons.
-  const hero = page.locator("[data-home-hero]");
+  const hero = page.locator("[data-home-story='house']");
   await expect(hero.locator("h1")).toHaveText("We don't begin with what has been done. We begin with what could be.");
   await expect(hero).toContainText("house of bespoke high jewellery");
-  await expect(hero.locator('a[href="/contact"]')).toBeVisible();
+  // One subject, one way in (24/11/2026): All Creations.
   await expect(hero.locator('a[href="/creations"]')).toBeVisible();
   // The Butterfly pendant on its chain, on the black bust, large.
   const jewel = hero.locator("[data-hero-piece] img");
@@ -43,7 +43,7 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   expect(box.height).toBeGreaterThan(desktop(info.project.name) ? 450 : 300);
   await page.screenshot({ path: shotPath(info, "yoni2311-home") });
   // In this order: the photo, the piece, the innovation, the commissions, the selection, the press.
-  const order = await page.evaluate(() => ["[data-home-photo]", "[data-home-hero]", "[data-home-innovation]", "[data-special-project]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
+  const order = await page.evaluate(() => ["[data-home-photo]", "[data-home-story='house']", "[data-home-innovation]", "[data-special-ring]", "[data-home-selection]", "[data-home-press]"].map((s) => document.querySelector(s)?.getBoundingClientRect().top ?? -1));
   expect(order.every((y, i) => y >= 0 && (i === 0 || y > order[i - 1]!))).toBe(true);
   // The Dragon Ball: since 24/11/2026 its photo and a circle where only its sphere turns (its film stays on its page), one
   // sentence, its capsule.
@@ -276,11 +276,15 @@ test("atelier, journey, house, press", async ({ page }, info) => {
   await page.screenshot({ path: shotPath(info, "yoni2311-atelier") });
 
   await open(page, "/process");
-  const journey = page.locator("[data-journey]");
-  await expect(journey.locator("[data-journey-step]")).toHaveCount(4);
-  for (let i = 1; i <= 4; i++) await expect.poll(() => journey.locator("[data-journey-step='" + i + "'] img").evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
-  await expect(journey.locator("[data-journey-time]")).toContainText("around ten weeks");
-  await expect(journey.locator("[data-journey-order]")).toContainText("How do I order?");
+  // Six steps everywhere since 24/11/2026 (no more journey "in four steps" above them).
+  await expect(page.locator("[data-timeline-step]")).toHaveCount(6);
+  for (let i = 1; i <= 6; i++) {
+    // (Each image loads as it comes near the screen.)
+    await page.locator("[data-timeline-step='" + i + "']").scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator("[data-timeline-step='" + i + "'] img").evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+  }
+  await expect(page.locator("[data-journey-time]")).toContainText("around ten weeks");
+  await expect(page.locator("[data-journey-order]")).toContainText("How do I order?");
   await page.screenshot({ path: shotPath(info, "yoni2311-journey") });
   await open(page, "/fr/process");
   await expect(page.locator("[data-journey-time]")).toContainText("environ dix semaines");

@@ -81,7 +81,7 @@ const BACKDROPS = [
  */
 const scene = (id, name, focus, extra = {}) => ({ id, file: id + "-desktop.jpg", mobileFile: id + "-mobile.jpg", name, focus, mobile: [0.5, 0.5], ...extra });
 const SCENES = [
-  scene("arene", "Arène de combat, projecteur doré (Lasana Keita)", [0.64, 0.55], {
+  scene("arene", "Arène de combat, projecteur doré (Losene Keita)", [0.64, 0.55], {
     spots: [
       { k: "cone", tone: "gold", d: [0.643, 0.01, 0.3, 0.62, 0], m: [0.5, 0.01, 0.78, 0.5, 0] },
       { k: "glow", tone: "gold", d: [0.643, 0.03, 0.07], m: [0.5, 0.025, 0.17] },
@@ -190,7 +190,7 @@ const SCENES = [
 BACKDROPS.push(...SCENES);
 
 /*
- * The night of Lasana Keita (21/11/2026, the celebration of the "Black Panther" after a knockout in the first round, out
+ * The night of Losene Keita (21/11/2026, the celebration of the "Black Panther" after a knockout in the first round, out
  * of the cage to the front row): three images that follow one another slowly behind his panther, the knockout (the
  * panther of smoke leaping), the open cage (the path of light to a seat of the front row), the celebration (his silhouette
  * from behind, applauding himself before the crowd). The phone image of the celebration shows him sitting in the cage:
@@ -198,14 +198,14 @@ BACKDROPS.push(...SCENES);
  * the width). Each image has its spotlight; the crowd of the celebration has its camera flashes (region "crowd").
  */
 const KEITA = [
-  scene("keita-ko", "Le KO : la panthère de fumée qui bondit (Lasana Keita)", [0.64, 0.4], {
+  scene("keita-ko", "Le KO : la panthère de fumée qui bondit (Losene Keita)", [0.64, 0.4], {
     spots: [
       { k: "cone", tone: "gold", d: [0.643, 0, 0.3, 0.62, 0], m: [0.58, 0, 0.7, 0.45, 0] },
       { k: "glow", tone: "gold", d: [0.643, 0.02, 0.07], m: [0.58, 0.01, 0.17] },
     ],
   }),
   {
-    ...scene("keita-cage", "La cage ouverte, le chemin de lumière (Lasana Keita)", [0.63, 0.55], {
+    ...scene("keita-cage", "La cage ouverte, le chemin de lumière (Losene Keita)", [0.63, 0.55], {
       spots: [
         { k: "cone", tone: "gold", d: [0.635, 0.08, 0.26, 0.7, 0], m: [0.58, 0, 0.62, 0.55, 0] },
         { k: "glow", tone: "gold", d: [0.635, 0.1, 0.06], m: [0.58, 0.01, 0.16] },
@@ -215,7 +215,7 @@ const KEITA = [
     mobileFile: "keita-cage-ouverte-mobile.jpg",
   },
   {
-    ...scene("keita-tribune", "La célébration : il s'applaudit face à la foule (Lasana Keita)", [0.67, 0.5], {
+    ...scene("keita-tribune", "La célébration : il s'applaudit face à la foule (Losene Keita)", [0.67, 0.5], {
       spots: [
         { k: "cone", tone: "gold", d: [0.64, 0, 0.32, 0.6, 0], m: [0.55, 0, 0.8, 0.5, 0] },
         { k: "glow", tone: "gold", d: [0.64, 0.02, 0.08], m: [0.55, 0.01, 0.2] },
@@ -283,7 +283,7 @@ BACKDROPS.push(
 );
 
 /** Backdrops made of several images that follow one another in a slow fade (src/components/Universe.tsx): hold = seconds each. */
-const SEQUENCES = [{ id: "keita", name: "La nuit de Lasana Keita : KO, cage ouverte, célébration (séquence)", frames: ["keita-ko", "keita-cage", "keita-tribune"], hold: 8 }];
+const SEQUENCES = [{ id: "keita", name: "La nuit de Losene Keita : KO, cage ouverte, célébration (séquence)", frames: ["keita-ko", "keita-cage", "keita-tribune"], hold: 8 }];
 
 /** The title fonts: package, file (latin letters only: the titles of the site), and the part of Yuji Boku that holds 力. */
 const FONT_FILES = [

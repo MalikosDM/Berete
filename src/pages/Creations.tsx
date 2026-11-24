@@ -45,7 +45,7 @@ export default function Creations() {
     <>
       <PageIntro eyebrow={t.creations.eyebrow} title={t.creations.title} lead={t.creations.lead} compact />
 
-      <section aria-label={t.creations.listLabel} className="mx-auto max-w-[1400px] px-4 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+      <section aria-label={t.creations.listLabel} className="wrap pb-20  lg:pb-28">
         <div role="group" aria-label={t.creations.filterLabel} className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:flex-wrap sm:px-0">
           {FILTERS.map((f) => {
             const on = f.key === active;
@@ -89,8 +89,8 @@ export default function Creations() {
         ) : null}
 
         {collection && list.length > 0 ? (
-          <Link to={collectionPath(sub ?? collection)} className="mt-3 inline-flex min-h-12 items-center gap-2 text-base font-normal uppercase tracking-[0.14em] text-white hover:text-rose-light lg:min-h-10 lg:text-[0.75rem]">
-            {t.creations.enterCollection(sub ? collectionWords(t, sub.slug, sub).name : collectionName)} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+          <Link to={collectionPath(sub ?? collection)} data-cta className="btn-secondary mt-3">
+            {sub ? collectionWords(t, sub.slug, sub).name : collectionName} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         ) : null}
 
@@ -99,7 +99,7 @@ export default function Creations() {
             <div className="border border-white/15 p-10 text-center">
               <p className="title-caps text-2xl tracking-[0.14em]">{t.common.newPiecesTitle}</p>
               <p className="mt-4 text-base text-bone">{t.common.newPiecesText}</p>
-              <Link to="/contact" className="mt-8 inline-flex min-h-12 items-center bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
+              <Link to="/contact" data-cta className="btn-primary mt-8">
                 {t.common.startPiece}
               </Link>
             </div>

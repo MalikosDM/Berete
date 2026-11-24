@@ -20,7 +20,7 @@ function HousePhoto({ photo, alt, className = "", top = false, eager = false }: 
   return (
     <Reveal mask className={className}>
       <figure data-house-photo className="overflow-hidden bg-ink-soft">
-        <MediaView item={photo} alt={photo.alt ?? alt} fit="cover" eager={eager} sizes="(max-width: 1023px) 100vw, 40vw" className={"aspect-[4/5]" + (top ? " object-top" : "")} />
+        <MediaView item={photo} alt={photo.alt || alt} fit="cover" eager={eager} sizes="(max-width: 1023px) 100vw, 40vw" className={"aspect-[4/5]" + (top ? " object-top" : "")} />
       </figure>
     </Reveal>
   );
@@ -42,32 +42,32 @@ export default function About() {
     <article data-house>
       {/* The opening: the house, its founder, his line */}
       <section aria-label={t.about.founderLabel} className="relative bg-ink pt-28 pb-12 sm:pt-32 lg:pt-36 lg:pb-16">
-        <div className={"mx-auto grid max-w-[1240px] gap-10 px-5 sm:px-8 lg:px-12 " + (portrait ? "lg:grid-cols-12 lg:items-end lg:gap-12" : "")}>
+        <div className={"wrap grid gap-10  " + (portrait ? "lg:grid-cols-12 lg:items-end lg:gap-12" : "")}>
           <div className={portrait ? "lg:col-span-7" : "max-w-5xl"}>
-            <p className="eyebrow">{t.about.title}</p>
-            {/* Small and thin (Yoni, 24/11/2026), the name first. */}
-            <h1 className="mt-4">
-              <span className="title-caps block t-hero leading-[1.05] tracking-[0.14em] text-white">{house.name}</span>
-              <span className="mt-3 block font-display t-sub font-light tracking-[0.08em] text-rose-light">{house.role}</span>
-            </h1>
+            {/* The name of the page is the name of the menu (24/11/2026); then its founder, small and thin. */}
+            <h1 className="title-caps tracking-[0.12em] t-hero leading-[1.1] text-white">{t.nav.about}</h1>
+            <p className="mt-4">
+              <span className="title-caps block t-sub tracking-[0.1em] text-white">{house.name}</span>
+              <span className="mt-1 block font-display t-sub font-light tracking-[0.06em] text-rose-light">{house.role}</span>
+            </p>
             <Reveal delay={0.15}>
               <p className="mt-7 max-w-2xl font-display t-lead font-light italic leading-[1.25] text-white [text-wrap:balance]">{house.tagline}</p>
             </Reveal>
             <Reveal delay={0.25}>
-              <p className="mt-5 max-w-2xl text-base leading-relaxed text-mist lg:text-[0.9375rem]">{t.about.lead}</p>
+              <p className="mt-5 max-w-2xl text-base leading-relaxed text-mist">{t.about.lead}</p>
             </Reveal>
           </div>
           <HousePhoto photo={portrait} alt={t.about.founderPortrait} top eager className="lg:col-span-4 lg:col-start-9" />
         </div>
-        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-12">
+        <div className="wrap">
           <div className="rule-rose mt-10 origin-left animate-draw rtl:origin-right lg:mt-12" aria-hidden="true" />
         </div>
       </section>
 
       {/* The chapters of his story, with his quotes */}
       <section aria-labelledby="house-chapters" className="bg-ink pb-20 lg:pb-28">
-        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 lg:px-12">
-          <h2 id="house-chapters" className="eyebrow pt-6">{t.about.chapters}</h2>
+        <div className="wrap">
+          <h2 id="house-chapters" className="title-caps tracking-[0.12em] t-title pt-6 ">{t.about.chapters}</h2>
           <ol className="mt-6">
             {house.chapters.map((chapter, i) => {
               const photo = houseChapterPhoto(cat, i);
@@ -87,7 +87,7 @@ export default function About() {
                     <div className="max-w-2xl space-y-4 lg:col-span-7 lg:col-start-6">
                       {chapter.paragraphs.map((paragraph, k) => (
                         <Reveal key={k} delay={Math.min(k, 3) * 0.04}>
-                          <p className={"text-base leading-relaxed lg:text-[0.9375rem] " + (k === 0 ? "text-white" : "text-bone")}>{paragraph}</p>
+                          <p className={"text-base leading-relaxed " + (k === 0 ? "text-white" : "text-bone")}>{paragraph}</p>
                         </Reveal>
                       ))}
                     </div>
@@ -102,7 +102,7 @@ export default function About() {
                               {t.about.quoted(quote.text)}
                             </p>
                           </blockquote>
-                          <figcaption className={"mt-6 flex items-center gap-4 text-base uppercase tracking-[0.2em] text-rose-light lg:text-[0.8125rem] " + (quotePhoto ? "" : "justify-center")}>
+                          <figcaption className={"mt-6 flex items-center gap-4 text-base uppercase tracking-[0.2em] text-rose-light lg:text-[0.75rem] " + (quotePhoto ? "" : "justify-center")}>
                             <span className="rule-rose w-12" aria-hidden="true" />
                             {house.name}
                           </figcaption>
@@ -127,7 +127,7 @@ export default function About() {
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 to="/contact"
-                className="inline-flex min-h-12 items-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.16em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+                className="inline-flex min-h-12 items-center gap-3 border border-rose-light/55 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
               >
                 {t.common.startPiece}
                 <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
@@ -136,7 +136,7 @@ export default function About() {
                 href={waLink(waMessage)}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-12 items-center gap-3 border border-white/35 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]"
+                className="inline-flex min-h-12 items-center gap-3 border border-white/35 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]"
               >
                 <BrandIcon name="whatsapp" className="size-5" />
                 {t.common.chatWhatsapp}

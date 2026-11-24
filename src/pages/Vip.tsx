@@ -71,9 +71,9 @@ export default function Vip() {
     return (
       <section className="mx-auto max-w-xl px-5 pt-40 pb-24 sm:px-8" data-vip-soon>
         <p className="eyebrow">{w.eyebrow}</p>
-        <h1 className="title-caps mt-4 t-hero tracking-[0.1em]">{w.title}</h1>
+        <h1 className="title-caps tracking-[0.12em] mt-4 t-hero ">{w.title}</h1>
         <p className="mt-5 text-base text-bone">{w.soon}</p>
-        <a href={waLink(w.soonMessage)} target="_blank" rel="noreferrer" className={button + " mt-10 w-full bg-white text-ink hover:bg-rose-light sm:w-auto"}>
+        <a href={waLink(w.soonMessage)} target="_blank" rel="noreferrer" className={button + " mt-10 w-full border border-rose-light/55 text-white hover:border-rose-light hover:text-rose-light sm:w-auto"}>
           <BrandIcon name="whatsapp" className="size-5" /> {t.contact.openWhatsapp}
         </a>
       </section>
@@ -92,11 +92,11 @@ export default function Vip() {
 
   if (state.state === "ok") {
     return (
-      <section className="mx-auto max-w-[1400px] px-5 pt-36 pb-24 sm:px-8 lg:px-12 lg:pt-44" data-vip-space>
+      <section className="wrap pt-36 pb-24  lg:pt-44" data-vip-space>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow">{w.eyebrow}</p>
-            <h1 className="title-caps mt-4 t-hero tracking-[0.1em] break-words">{w.hello(state.name)}</h1>
+            <h1 className="title-caps tracking-[0.12em] mt-4 t-hero break-words">{w.hello(state.name)}</h1>
             <p className="mt-4 text-base text-bone">{w.intro}</p>
           </div>
           <button type="button" onClick={() => void leave()} className={button + " border border-white/40 text-white hover:border-rose-light hover:text-rose-light"}>
@@ -128,7 +128,7 @@ export default function Vip() {
   return (
     <section className="mx-auto max-w-xl px-5 pt-40 pb-24 sm:px-8" data-vip-login>
       <p className="eyebrow">{w.eyebrow}</p>
-      <h1 className="title-caps mt-4 t-hero tracking-[0.1em]">{w.title}</h1>
+        <h1 className="title-caps tracking-[0.12em] mt-4 t-hero ">{w.title}</h1>
       <p className="mt-5 text-base text-bone">{state.state === "lost" ? w.linkMissing : w.intro}</p>
       <form onSubmit={submit} className="mt-10 grid gap-5">
         <label className="block text-base text-bone">
@@ -145,7 +145,7 @@ export default function Vip() {
           <span className="mt-2 block text-base text-mist">{w.codeHint}</span>
         </label>
         {wrong ? <p role="alert" className="text-base text-rose-light">{w.wrong}</p> : null}
-        <button type="submit" disabled={busy || code.replace(/[^0-9A-Z]/g, "").length < 8} className={button + " bg-white text-ink hover:bg-rose-light disabled:opacity-60"}>
+        <button type="submit" disabled={busy || code.replace(/[^0-9A-Z]/g, "").length < 8} className={button + " border border-rose-light/55 text-white hover:border-rose-light hover:text-rose-light disabled:opacity-60"}>
           {busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : null} {w.enter}
         </button>
         <a href={waLink(w.askMessage)} target="_blank" rel="noreferrer" className="inline-flex min-h-12 items-center justify-center gap-2 text-base text-mist hover:text-rose-light">
@@ -173,7 +173,7 @@ function VipPiece({ model }: { model: PublicModel }) {
         className="mt-6"
         actions={
           <>
-            <a href={waLink(clean(t.viewer.loveMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " w-full bg-white py-3 text-center text-ink hover:bg-rose-light"}>
+            <a href={waLink(clean(t.viewer.loveMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " w-full border border-rose-light/55 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>
               <BrandIcon name="whatsapp" className="size-5 shrink-0" /> {t.viewer.love}
             </a>
             <a href={waLink(clean(t.viewer.changeMessage(model.name, metals, "")))} target="_blank" rel="noreferrer" className={button + " w-full border border-white/40 py-3 text-center text-white hover:border-rose-light hover:text-rose-light"}>

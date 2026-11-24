@@ -153,7 +153,7 @@ export default function PieceFilm({ title, film, poster, theme, onClose }: { tit
             type="button"
             onClick={leave}
             data-piece-film-skip
-            className="inline-flex min-h-12 w-full items-center justify-center gap-3 bg-white px-6 text-base font-medium uppercase tracking-[0.12em] text-ink transition-colors hover:bg-rose-light sm:w-auto lg:mt-4 lg:min-h-11 lg:text-[0.8125rem]"
+            className="inline-flex min-h-12 w-full items-center justify-center gap-3 border border-rose-light/55 px-6 text-base font-normal uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light sm:w-auto lg:mt-4 lg:min-h-11 lg:text-[0.75rem]"
           >
             {t.films.skip} <ArrowRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
           </button>

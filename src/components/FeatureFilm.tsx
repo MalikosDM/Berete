@@ -11,7 +11,7 @@ import { useI18n } from "@/i18n";
  * wider than it. Never before it is near (its file is asked for then), never on its own with "reduce motion" (a button plays
  * it). On a phone, its lighter copy.
  */
-export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, children, data, flip = false, compact = false }: { film: FeatureFilmData; id: string; anchor?: string; label: string; eyebrow: string; title: string; children?: ReactNode; data: string; flip?: boolean; compact?: boolean }) {
+export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, children, data, flip = false, compact = false }: { film: FeatureFilmData; id: string; anchor?: string; label: string; eyebrow?: string; title: string; children?: ReactNode; data: string; flip?: boolean; compact?: boolean }) {
   const { t } = useI18n();
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -93,8 +93,8 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
   // Whole in the screen: as high as the screen allows (under the menu), as wide as the page allows.
   const tall = compact ? "min(74svh, 40rem" : "min(86svh, 52rem";
   return (
-    <section id={anchor} aria-labelledby={id} data-feature-film={data} className="scroll-mt-24 border-t border-white/10">
-      <div className={"mx-auto grid items-center gap-8 px-5 sm:px-8 lg:grid-cols-12 lg:gap-14 lg:px-12 " + (compact ? "max-w-[1240px] py-14 lg:py-16" : "max-w-[1400px] py-16 lg:py-24")}>
+    <section id={anchor} aria-labelledby={id} data-feature-film={data} data-piece-section="film" className="scroll-mt-24 border-t border-white/10">
+      <div className={"wrap grid items-center gap-8 lg:grid-cols-12 lg:gap-14 " + (compact ? "py-14 lg:py-16" : "py-16 lg:py-24")}>
         <div className={"flex justify-center lg:col-span-7 " + (flip ? "lg:order-2" : "")}>
           <div
             ref={frameRef}
@@ -133,8 +133,8 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
           </div>
         </div>
         <div className={"lg:col-span-5 " + (flip ? "lg:order-1" : "")}>
-          <p className="eyebrow">{eyebrow}</p>
-          <h2 id={id} className="title-caps mt-4 t-title leading-[1.15] tracking-[0.1em] text-white [text-wrap:balance]">
+          {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
+          <h2 id={id} className="title-caps tracking-[0.12em] t-title leading-[1.15] text-white [text-wrap:balance]">
             {title}
           </h2>
           {children}

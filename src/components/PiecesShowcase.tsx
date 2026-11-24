@@ -67,7 +67,7 @@ export default function PiecesShowcase({
             <p className="eyebrow">{t.showcase.eyebrow}</p>
             <h2
               id="capsules-title"
-              className="title-caps mt-4 t-title tracking-[0.14em]"
+              className="title-caps tracking-[0.12em] mt-4 t-title "
             >
               {t.showcase.title}
             </h2>

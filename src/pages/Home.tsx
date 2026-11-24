@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
-import { ArrowDown, ArrowRight, ArrowUpRight } from "lucide-react";
-import ContactBlock from "@/components/ContactBlock";
+import { useEffect, useRef, type ReactNode } from "react";
+import { ArrowDown, ArrowRight } from "lucide-react";
+import BrandIcon from "@/components/BrandIcon";
 import { MediaView } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
 import Reveal from "@/components/Reveal";
@@ -16,6 +16,8 @@ import type { Piece } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
+import { waLink } from "@/lib/site";
+import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /*
  * The home page (Yoni, 23/11/2026, then the call of 23-24/11/2026: "luxury does not shout"): one large photo first, full
@@ -89,7 +91,7 @@ function HeroPhoto() {
         <p data-home-tagline className="font-display text-base font-light uppercase tracking-[0.16em] whitespace-nowrap text-bone sm:text-[0.9375rem] sm:tracking-[0.32em]">
           {t.site.tagline}
         </p>
-        <button type="button" onClick={() => scrollToId("home-next")} data-home-discover className="mt-3 inline-flex min-h-12 items-center gap-2 text-[0.75rem] font-normal uppercase tracking-[0.24em] text-mist transition-colors hover:text-rose-light max-sm:text-base">
+        <button type="button" onClick={() => scrollToId("home-next")} data-home-discover data-cta className="btn-secondary mt-2 text-mist">
           {t.home.discoverMore}
           <ArrowDown className="size-3.5" aria-hidden="true" />
         </button>
@@ -98,66 +100,70 @@ function HeroPhoto() {
   );
 }
 
-/** The opening: who Berete is, in one sentence, beside one piece, large, on black, in a luxurious light. */
-function Hero() {
-  const { t } = useI18n();
-  const cat = useCatalogue();
-  const piece = cat.pieces.find((p) => p.slug === HERO_PIECE);
-  const [dir, file] = HERO_PHOTOS[HERO_PHOTO];
-  const photo = yoni(dir, file, { alt: piece?.title ?? "" });
+/**
+ * One section of the home page, as a magazine does it (24/11/2026, "comme chez Rolex"): one subject, its picture, its name,
+ * one short sentence, one way in; centred, nothing beside it that competes with it.
+ */
+function Story({ id, data, visual, title, text, link, heading = "h2", children, attrs, linkAttrs }: { id: string; data: string; visual: ReactNode; title: string; text?: string; link?: { to: string; label: string; external?: boolean }; heading?: "h1" | "h2"; children?: ReactNode; attrs?: Record<string, string>; linkAttrs?: Record<string, string> }) {
+  const H = heading;
   return (
-    <section id="home-next" aria-labelledby="home-title" data-home-hero className="relative isolate scroll-mt-0 overflow-hidden">
-      {/* The light: a soft warm glow behind the piece, a touch of rose gold, the edges in deep black. */}
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(60%_55%_at_70%_48%,rgba(232,180,160,0.13),rgba(156,91,79,0.05)_45%,transparent_72%)] max-lg:bg-[radial-gradient(80%_45%_at_50%_30%,rgba(232,180,160,0.13),rgba(156,91,79,0.05)_45%,transparent_75%)]" />
-      <div className="mx-auto grid max-w-[1400px] items-center gap-6 px-5 pt-24 pb-16 sm:px-8 desk:pt-32 lg:grid-cols-12 lg:gap-12 lg:px-12 lg:pb-20">
-        {/* The piece: the top of the screen on a phone, the right on a computer. */}
-        <div className="relative h-[42svh] min-h-64 lg:order-2 lg:col-span-6 lg:h-[58svh] lg:max-h-[38rem]">
-          {piece && photo ? (
-            <Link to={"/pieces/" + piece.slug} data-hero-piece={piece.slug} data-hero-photo={HERO_PHOTO} className="home-hero-piece block h-full w-full" aria-label={t.common.enterWorld + " · " + piece.title}>
-              <MediaView item={photo} alt={piece.title} fit="contain" priority sizes="(max-width: 1023px) 92vw, 55vw" />
+    <section id={id} aria-labelledby={id + "-title"} data-home-story={data} {...attrs} className="scroll-mt-0 border-t border-white/10">
+      <div className="wrap flex flex-col items-center py-20 text-center lg:py-28">
+        <Reveal className="w-full">{visual}</Reveal>
+        <H id={id + "-title"} className={"title-caps tracking-[0.12em] mt-10 max-w-3xl text-white [text-wrap:balance] lg:mt-12 " + (heading === "h1" ? "t-hero" : "t-title")}>
+          {title}
+        </H>
+        {text ? <p className="mt-5 max-w-xl text-base leading-relaxed text-bone lg:text-[1rem]">{text}</p> : null}
+        {children}
+        {link ? (
+          link.external ? (
+            <a href={link.to} target="_blank" rel="noreferrer" data-cta {...linkAttrs} className="btn-secondary mt-7">
+              {link.label} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+            </a>
+          ) : (
+            <Link to={link.to} data-cta {...linkAttrs} className="btn-secondary mt-7">
+              {link.label} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
-          ) : piece ? (
-            <MediaView item={piece.cover} alt={piece.title} fit="contain" priority sizes="(max-width: 1023px) 80vw, 50vw" />
-          ) : null}
-        </div>
-        <div className="home-hero-text lg:order-1 lg:col-span-6 xl:col-span-5">
-          <p className="eyebrow flex items-center gap-4">
-            <span aria-hidden="true" className="bg-rose-gold hidden h-px w-10 sm:block" />
-            {t.home.kicker}
-          </p>
-          <h1 id="home-title" className="mt-5 font-display t-hero font-light leading-[1.15] tracking-[0.01em] text-white [text-wrap:balance]">
-            {t.home.hook}
-          </h1>
-          <p className="mt-6 max-w-xl text-base leading-relaxed text-bone">{t.home.who}</p>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link to="/contact" className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-7 text-base font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-rose-light lg:min-h-11 lg:text-[0.8125rem]">
-              {t.common.startPiece}
-              <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-            </Link>
-            <Link to="/creations" className="inline-flex min-h-12 items-center justify-center gap-2 border border-rose-light/70 px-7 text-base font-medium uppercase tracking-[0.14em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.8125rem]">
-              {t.home.discover}
-            </Link>
-          </div>
-          {piece ? (
-            <p className="mt-10 text-base text-mist">
-              <Link to={"/pieces/" + piece.slug} className="inline-flex min-h-12 items-center gap-2 hover:text-rose-light">
-                <span aria-hidden="true" className="bg-rose-gold block h-px w-6" />
-                {piece.title}
-              </Link>
-            </p>
-          ) : null}
-        </div>
+          )
+        ) : null}
       </div>
     </section>
   );
 }
 
+/** The house: who Berete is, in one sentence, with one piece on black (the Butterfly on its chain, on the black bust). */
+function House() {
+  const { t } = useI18n();
+  const cat = useCatalogue();
+  const piece = cat.pieces.find((p) => p.slug === HERO_PIECE);
+  const [dir, file] = HERO_PHOTOS[HERO_PHOTO];
+  const photo = yoni(dir, file, { alt: piece?.title ?? "" });
+  const shown = photo ?? piece?.cover;
+  return (
+    <Story
+      id="home-next"
+      data="house"
+      heading="h1"
+      title={t.home.hook}
+      text={t.home.who}
+      link={{ to: "/creations", label: t.common.allCreations }}
+      visual={
+        shown && piece ? (
+          <Link to={"/pieces/" + piece.slug} data-hero-piece={piece.slug} data-hero-photo={HERO_PHOTO} className="relative mx-auto block aspect-[4/5] w-full max-w-[26rem]" aria-label={t.common.enterWorld + " · " + piece.title}>
+            <MediaView item={shown} alt={piece.title} fit="contain" priority sizes="(max-width: 1023px) 90vw, 26rem" />
+          </Link>
+        ) : null
+      }
+    />
+  );
+}
+
 /**
- * The Dragon Ball pendant (Yoni, 24/11/2026: "the immersive part is not for the home page" — its film stays at the top of its
- * own page): its photo and, beside it, a circle where only its sphere turns, in a loop, silent, started when it comes on
- * screen (phones too). Not to explain the piece: to make one want to enter its world. Its title, one sentence, "Enter the World".
+ * The Mechanism (Yoni, 24/11/2026: "the immersive part is not for the home page" — its film stays on its own page): the Dragon
+ * Ball pendant and, set on it, a circle where only its sphere turns, in a loop, silent, while it is on screen. Its name, one
+ * sentence of its story, "Enter the World".
  */
-function Innovation() {
+function Mechanism() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const piece = cat.pieces.find((p) => p.slug === INNOVATION);
@@ -185,84 +191,58 @@ function Innovation() {
   const view = resolveShowcase(piece.slug, piece.showcase).views[0];
   const line = storyLines(piece, defaultCatalogue.pieces.find((p) => p.slug === INNOVATION), DRAGON_BALL_LINE)[0];
   return (
-    <section aria-labelledby="innovation-title" data-home-innovation className="border-t border-white/10">
-      <div className="mx-auto grid max-w-[1400px] items-center gap-10 px-5 py-20 sm:px-8 lg:grid-cols-12 lg:gap-16 lg:px-12 lg:py-24">
-        <div className="relative lg:col-span-6">
-          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" className="relative mx-auto block aspect-[4/5] w-full max-w-[22rem] lg:max-w-[26rem]">
+    <Story
+      id="innovation"
+      data="mechanism"
+      attrs={{ "data-home-innovation": "" }}
+      linkAttrs={{ "data-innovation-link": "" }}
+      title={t.feature.mechanism}
+      text={line}
+      link={{ to: "/pieces/" + piece.slug, label: t.common.enterWorld }}
+      visual={
+        <div className="relative mx-auto aspect-[4/5] w-full max-w-[24rem]">
+          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" className="block h-full w-full">
             {view ? (
-              <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 1023px) 80vw, 26rem" alt="" width={view.width} height={view.height} loading="lazy" decoding="async" draggable={false} data-innovation-photo className="h-full w-full object-contain" />
+              <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 1023px) 80vw, 24rem" alt={piece.title} width={view.width} height={view.height} loading="lazy" decoding="async" draggable={false} data-innovation-photo className="h-full w-full object-contain" />
             ) : (
-              <MediaView item={piece.cover} alt="" fit="contain" sizes="(max-width: 1023px) 80vw, 26rem" />
+              <MediaView item={piece.cover} alt={piece.title} fit="contain" sizes="(max-width: 1023px) 80vw, 24rem" />
             )}
           </Link>
-          {/* Its sphere that turns, in a circle beside the piece. */}
-          <div className="absolute end-0 bottom-0 w-[38%] max-w-44 sm:end-[6%] lg:end-0 lg:max-w-48">
+          {/* Its sphere that turns, in a circle set on the piece's frame. */}
+          <div className="absolute -end-2 bottom-0 w-[36%] max-w-40 sm:-end-6">
             <div className="relative aspect-square overflow-hidden rounded-full border border-rose-light/40 bg-ink-soft shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
               <video ref={videoRef} poster={sphere.poster} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full object-cover" />
             </div>
           </div>
         </div>
-        <div className="lg:col-span-5 lg:col-start-8">
-          <h2 id="innovation-title" className="title-caps t-title leading-[1.15] tracking-[0.1em] [text-wrap:balance]">
-            {t.feature.dragonTitle}
-          </h2>
-          {line ? <p className="mt-5 max-w-md text-base leading-relaxed text-bone">{line}</p> : null}
-          <Link to={"/pieces/" + piece.slug} data-innovation-link className="mt-8 inline-flex min-h-12 items-center gap-3 border border-rose-light/70 px-6 text-base font-normal uppercase tracking-[0.16em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-11 lg:text-[0.8125rem]">
-            {t.common.enterWorld}
-            <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-          </Link>
-        </div>
-      </div>
-    </section>
+      }
+    />
   );
 }
 
-/** The great commissions: the championship rings of Inter Milan and VfB Stuttgart, side by side, each leading to its capsule. */
-function Commissions() {
+/** A great commission (the championship rings of Inter Milan and VfB Stuttgart): one ring, one section each. */
+function Commission({ slug, index }: { slug: string; index: number }) {
   const { t } = useI18n();
   const cat = useCatalogue();
-  const rings = SPECIAL_PROJECT.map((r) => {
-    const piece = cat.pieces.find((p) => p.slug === r.slug);
-    // Its main photo (the ring whole, on black).
-    return piece ? { ...r, piece, photo: piece.cover } : null;
-  }).filter((r) => r !== null);
-  if (rings.length === 0) return null;
+  const piece = cat.pieces.find((p) => p.slug === slug);
+  if (!piece) return null;
   return (
-    <section aria-labelledby="special-title" data-special-project className="border-t border-white/10">
-      <div className="mx-auto max-w-[1400px] px-5 pt-16 pb-8 sm:px-8 lg:px-12 lg:pt-20 lg:pb-10">
-        <p className="eyebrow">{t.home.special.eyebrow}</p>
-        <h2 id="special-title" className="title-caps mt-4 t-title tracking-[0.14em] [text-wrap:balance]">
-          {t.home.special.title}
-        </h2>
-        <p className="mt-5 max-w-2xl text-base text-bone">{t.home.special.lead}</p>
-      </div>
-      <ul className="mx-auto grid max-w-[1400px] gap-px bg-white/10 md:grid-cols-2">
-        {rings.map((r) => (
-          <li key={r.slug} data-special-ring={r.slug} className="bg-ink">
-            <Link to={"/pieces/" + r.piece.slug} className="group flex h-full flex-col">
-              <span className="relative block h-[36svh] min-h-60 overflow-hidden sm:h-[40svh] lg:max-h-[24rem]">
-                <span className="absolute inset-0 p-6 transition-transform duration-[1.8s] ease-out group-hover:scale-[1.03] sm:p-8">
-                  <MediaView item={r.photo} fit="contain" sizes="(max-width: 767px) 100vw, 50vw" />
-                </span>
-              </span>
-              <span className="flex flex-1 flex-col px-5 pt-4 pb-8 sm:px-8 lg:pb-10">
-                <span className="eyebrow">{r.piece.client ?? r.piece.title}</span>
-                <span className="title-caps mt-2 block t-sub leading-[1.15] tracking-[0.08em] text-white [text-wrap:balance] group-hover:text-rose-light">{r.trophy}</span>
-                {r.piece.line ? <span className="mt-3 block max-w-md text-base text-bone">{r.piece.line}</span> : null}
-                <span className="mt-4 inline-flex min-h-11 items-center gap-3 text-base font-normal uppercase tracking-[0.14em] text-white group-hover:text-rose-light lg:min-h-10 lg:text-[0.8125rem]">
-                  {t.home.special.discover}
-                  <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-                </span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Story
+      id={"commission-" + index}
+      data={"ring-" + slug}
+      title={piece.title}
+      text={piece.line || undefined}
+      link={{ to: "/pieces/" + piece.slug, label: t.common.enterWorld }}
+      visual={
+        <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-special-ring={piece.slug} className="relative mx-auto block aspect-[4/3] w-full max-w-[34rem]">
+          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" sizes="(max-width: 1023px) 90vw, 34rem" />
+        </Link>
+      }
+    />
   );
 }
 
-/** A balanced selection of the house: pendants, chains and rings. */
+/** The creations: a balanced selection (pendants, chains, rings), the Safi Link first, then the way to all of them. */
 function Selection() {
   const { t } = useI18n();
   const cat = useCatalogue();
@@ -270,17 +250,9 @@ function Selection() {
   if (pieces.length === 0) return null;
   return (
     <section aria-labelledby="selection-title" data-home-selection className="border-t border-white/10">
-      <div className="mx-auto max-w-[1400px] px-5 py-16 sm:px-8 lg:px-12 lg:py-20">
-        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-          <div>
-            <p className="eyebrow">{t.home.selection.eyebrow}</p>
-            <h2 id="selection-title" className="title-caps mt-4 t-title tracking-[0.14em]">{t.home.selection.title}</h2>
-          </div>
-          <Link to="/creations" className="inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.2em] text-white hover:text-rose-light">
-            {t.common.allCreations} <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-          </Link>
-        </div>
-        <ul className="mt-10 grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-5 lg:grid-cols-3 lg:gap-x-8">
+      <div className="wrap flex flex-col items-center py-20 text-center lg:py-28">
+        <h2 id="selection-title" className="title-caps tracking-[0.12em] t-title ">{t.nav.creations}</h2>
+        <ul className="mt-12 grid w-full grid-cols-2 gap-x-3 gap-y-10 text-start sm:gap-x-5 lg:grid-cols-3 lg:gap-x-8">
           {pieces.map((p, i) => (
             <li key={p.slug}>
               <Reveal delay={(i % 3) * 0.06} className="h-full">
@@ -289,35 +261,56 @@ function Selection() {
             </li>
           ))}
         </ul>
+        <Link to="/creations" data-cta className="btn-secondary mt-10">
+          {t.common.allCreations} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+        </Link>
       </div>
     </section>
   );
 }
 
-/** The press band: the newspapers that told the house, leading to the page In the Spotlight. */
+/** The press: the newspapers that told the house, each leading to its article; the name leads to the page Press. */
 function PressBand() {
   const { t } = useI18n();
   const articles = publishedPress();
   if (articles.length === 0) return null;
   return (
-    <section aria-labelledby="press-band-title" data-home-press className="border-y border-white/10">
-      <div className="mx-auto flex max-w-[1400px] flex-col gap-6 px-5 py-12 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-12 lg:py-14">
-        <div className="shrink-0">
-          <p className="eyebrow">{t.press.eyebrow}</p>
-          <h2 id="press-band-title" className="title-caps mt-3 t-lead tracking-[0.14em]">{t.press.title}</h2>
-        </div>
-        <ul className="flex flex-wrap items-center gap-x-10 gap-y-4 lg:justify-center">
+    <section aria-labelledby="press-band-title" data-home-press className="border-t border-white/10">
+      <div className="wrap flex flex-col items-center py-16 text-center lg:py-20">
+        <h2 id="press-band-title" className="title-caps tracking-[0.12em] t-title ">
+          <Link to="/press" className="transition-colors duration-500 hover:text-rose-light">{t.press.title}</Link>
+        </h2>
+        <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-3">
           {articles.map((a) => (
             <li key={a.url}>
-              <a href={a.url} target="_blank" rel="noreferrer" data-press-outlet={a.outlet} className="inline-flex min-h-12 items-center font-display t-sub uppercase tracking-[0.12em] text-bone transition-colors hover:text-rose-light">
+              <a href={a.url} target="_blank" rel="noreferrer" data-press-outlet={a.outlet} className="inline-flex min-h-12 items-center font-display t-sub uppercase tracking-[0.12em] text-bone transition-colors duration-500 hover:text-rose-light">
                 {a.outlet}
               </a>
             </li>
           ))}
         </ul>
-        <Link to="/press" className="inline-flex min-h-12 shrink-0 items-center gap-2 text-base font-medium uppercase tracking-[0.2em] text-white hover:text-rose-light">
-          {t.press.all} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-        </Link>
+      </div>
+    </section>
+  );
+}
+
+/** The last section: the invitation to begin, as on every page (its two buttons). */
+function Begin() {
+  const { t } = useI18n();
+  const waMessage = useWhatsAppMessage();
+  return (
+    <section aria-labelledby="home-begin-title" data-home-begin className="border-t border-white/10">
+      <div className="wrap flex flex-col items-center py-20 text-center lg:py-28">
+        <h2 id="home-begin-title" className="title-caps tracking-[0.12em] t-title ">{t.common.yourStory}</h2>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-bone">{t.contact.oneConversation}</p>
+        <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-x-8">
+          <Link to="/contact" data-cta className="btn-primary">
+            {t.common.startPiece}
+          </Link>
+          <a href={waLink(waMessage)} target="_blank" rel="noreferrer" data-cta className="btn-secondary">
+            <BrandIcon name="whatsapp" className="size-4" /> {t.common.whatsapp}
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -348,7 +341,7 @@ export function SketchToJewel() {
       from: 0.82,
       to: 1,
       align: "center",
-      content: <p className="title-caps mx-auto max-w-4xl text-center t-title tracking-[0.12em] text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">{t.site.tagline}</p>,
+      content: <p className="title-caps tracking-[0.12em] mx-auto max-w-4xl text-center t-title  text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.75)]">{t.site.tagline}</p>,
     },
   ];
   return <ScrollVideo media={film} steps={steps} label={t.home.sketchLabel} heightVh={320} showProgress={false} />;
@@ -358,12 +351,14 @@ export default function Home() {
   return (
     <>
       <HeroPhoto />
-      <Hero />
-      <Innovation />
-      <Commissions />
+      <House />
+      <Mechanism />
+      {SPECIAL_PROJECT.map((r, i) => (
+        <Commission key={r.slug} slug={r.slug} index={i + 1} />
+      ))}
       <Selection />
       <PressBand />
-      <ContactBlock id="home-contact" compact />
+      <Begin />
     </>
   );
 }

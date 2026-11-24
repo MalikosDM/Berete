@@ -14,6 +14,6 @@ export type HouseTexts = {
   quotes: { label: string; text: string }[];
   /** The last line of the story, before the signature of the house. */
   closing: string;
-  /** "Made by us. Inspired by you.", as Yoni ends his story (in English, in every language). */
+  /** "Made by us. Inspired by you.", as Yoni ends his story, in the words of each language (24/11/2026: no sentence left in English). */
   signature: string;
 };

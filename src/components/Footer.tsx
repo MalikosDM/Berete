@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
@@ -8,7 +8,7 @@ import { useCatalogue } from "@/lib/catalogue";
 import { EMAIL, INSTAGRAM_HANDLE, INSTAGRAM_URL, waLink, HAS_SERVER } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
-const linkCls = "inline-flex min-h-11 items-center text-base text-bone transition-colors hover:text-rose-light lg:min-h-9 lg:text-[0.875rem]";
+const linkCls = "inline-flex min-h-11 items-center text-base text-bone transition-colors hover:text-rose-light lg:min-h-9";
 
 export default function Footer() {
   const { t } = useI18n();
@@ -92,11 +92,6 @@ export default function Footer() {
                   </a>
                 </li>
               ) : null}
-              <li>
-                <Link to="/contact" className={linkCls}>
-                  {t.footer.contactPage}
-                </Link>
-              </li>
               {/* The client space needs the server: no link to it on the version online without one. */}
               {HAS_SERVER ? (
                 <li>
@@ -108,14 +103,10 @@ export default function Footer() {
             </ul>
           </div>
           <div className="lg:col-span-3">
-            <h2 className="eyebrow mb-4">{t.footer.yourPiece}</h2>
+            <h2 className="eyebrow mb-4">{t.common.yourStory}</h2>
             <p className="text-base text-bone">{t.footer.pitch}</p>
-            <Link
-              to="/contact"
-              className="mt-6 inline-flex min-h-12 items-center gap-2 border border-rose-light/70 px-5 text-base font-normal uppercase tracking-[0.18em] text-white transition-colors hover:bg-rose-light hover:text-ink lg:min-h-10 lg:text-[0.75rem]"
-            >
+            <Link to="/contact" data-cta className="btn-primary mt-6">
               {t.common.startPiece}
-              <ArrowUpRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
           </div>
         </div>
