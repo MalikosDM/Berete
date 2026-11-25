@@ -90,6 +90,12 @@ services:
       - app
     logging: *logging
 
+networks:
+  default:
+    # IPv6 inside Docker too: a visitor who comes over IPv6 reaches Caddy with his own address (not the one of Docker), so the
+    # limits of tries (forms, admin, « Imaginez votre création ») count him alone. Docker gives the network its addresses.
+    enable_ipv6: true
+
 volumes:
   db-data:
   caddy-data:
