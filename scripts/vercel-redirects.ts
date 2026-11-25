@@ -32,6 +32,8 @@ export function vercelRedirects(): Redirect[] {
   if (!MOVED_TO) return catalogueRedirects();
   return [
     ...catalogueRedirects().map((r) => ({ ...r, destination: MOVED_TO + r.destination })),
+    // The home page apart: Vercel serves "/" from its files before "/:path*" sees it.
+    { source: "/", destination: MOVED_TO + "/", statusCode: 301 },
     { source: "/:path*", destination: MOVED_TO + "/:path*", statusCode: 301 },
   ];
 }
