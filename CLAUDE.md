@@ -42,7 +42,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
   « Entrer dans l'univers ». Catégories Pendants/Chains/Rings/Watches inchangées.
 - Une pièce retirée n'est jamais supprimée : elle passe en « non publiée » (case dans l'admin), son adresse redirige
   (301) vers son joueur, sinon /creations (`npm run redirects` pour Vercel).
-- Mise en ligne : un envoi sur GitHub (main) met à jour le site Vercel tout seul : https://berete-nxsp.vercel.app
+- Mise en ligne : un envoi sur GitHub (main) met à jour le site sur le VPS tout seul (2 à 5 min) : https://beretejewellers.com
+  (adresse de secours https://85-190-121-137.sslip.io, jamais indexée). La copie Vercel (berete-nxsp.vercel.app) redirige
+  chaque adresse (301) vers le domaine (`MOVED_TO` de `scripts/vercel-redirects.ts`, `npm run redirects`).
+- **Site en construction** tant que Yoni ne l'ouvre pas : le public ne voit que « Coming soon » ; le vrai site seulement avec
+  le mot de passe d'accès privé (voir « Passe site en construction »). Ne jamais l'ouvrir sans son accord.
 
 ## Où sont les fichiers (Mac de Malik)
 - **Depuis le 19/11/2026, tous les fichiers du projet sont sur le disque externe** `/Volumes/Disque externe/` (plus rien
@@ -161,6 +165,49 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
+
+## Passe « site en construction + accès privé » (beretejewellers.com en ligne) — état au 25/11/2026
+- [x] **Domaine en ligne** : beretejewellers.com et www pointent sur le VPS (A 85.190.121.137, AAAA 2001:880:a:337::1d0,
+      testé en IPv6), HTTPS Let's Encrypt (demandé à la première visite, `on_demand_tls` de `deploy/Caddyfile`), www → domaine
+      (301), HSTS. E-mail du domaine intact (MX one.com, `ed1._domainkey`). Vercel redirige tout vers le domaine.
+- [x] **« Coming soon » pour le public** (`server/access.ts`, la barrière ; `server/door.ts`, la page) : sur toutes les
+      adresses (pages, 6 langues, photos, films, /media, sitemap, API du site : 403), y compris l'adresse sslip.io. Fond noir,
+      monogramme BRT or rose, BERETE JEWELLERS, « Coming soon » / « Bientôt disponible » (langue du navigateur), la signature,
+      @beretejewellers (`src/lib/site.ts`) ; ses seuls fichiers : `public/soon/` (`npm run soon` : monogramme, polices, image
+      d'aperçu 1200 × 630). Aperçu de lien : « Berete Jewellers — Coming soon » + monogramme. `noindex` partout, robots.txt
+      interdit tout, pas de sitemap.
+- [x] **Accès privé** : lien discret « Private access » / « Accès privé » en bas → un mot de passe → le vrai site, à la page
+      demandée (un lien de pièce envoyé par WhatsApp), 180 jours par appareil (cookie `bj_access` HttpOnly, Secure, SameSite=Lax,
+      signé avec le secret du serveur et le mot de passe : changer le mot de passe referme tous les appareils). 5 essais par
+      minute et par adresse IP. Se connecter à l'admin ouvre aussi le site sur cet appareil.
+- [x] **Toujours accessibles** : /admin (sa propre porte au même style, puis le mot de passe admin), les liens des clients VIP
+      (/vip/<jeton>, l'espace une fois entré, le code d'accès) et les liens 3D (/view/<jeton>) : leur page **seule**, sans le
+      menu ni les pages du site (`PrivateApp` de `src/App.tsx`, `<meta name="bj-private">`), avec seulement le code des pages
+      et le logo ; /api/health. Rien d'autre.
+- [x] **Admin → « Accès au site »** (`src/pages/admin/Access.tsx`, 1er onglet) : interrupteur « Site en construction »
+      (activé par défaut ; le décocher ouvre le site à tous, après confirmation), mot de passe tapé deux fois, phrase d'état.
+      Seule l'empreinte (scrypt + sel) est gardée, dans la base (`ServerSetting` : `access.construction`, `access.password`) :
+      sauvegardée chaque nuit, gardée aux mises à jour et restaurations. Sans réglage ou base illisible : en construction.
+      Tant qu'aucun mot de passe n'est choisi, personne n'entre et l'admin s'ouvre sur « Choisissez le mot de passe… ».
+- [x] **Terminal (secours)** : `npm run vps -- access` (mot de passe demandé deux fois, masqué), `access off` (ouvre le site),
+      `access on`, `access status` ; `status` l'affiche ; `launch` refuse tant que le site est en construction. Le serveur voit
+      un changement fait au Terminal en 5 s.
+- [x] **Tests** : `ACCESS_PASSWORD=… ` (tapé dans le Terminal, jamais écrit) fait entrer les tests (`tests/fixtures.ts`) et
+      `npm run audit:coherence` (`BASE_URL=https://beretejewellers.com`). Sur le Mac, le serveur local n'arrête pas le Mac
+      lui-même (`ACCESS_LOCAL=closed npm start` pour tester la barrière). Vérifié en ligne le 25/11 sur le domaine et sslip.io
+      (ordinateur, iPhone, Safari) : sans accès 10 pages, 5 fichiers /media, sitemap → « Coming soon » ; lien profond → même
+      pièce ; mauvais mot de passe → message ; 6e essai bloqué ; accès gardé après redémarrage ; nouveau mot de passe → tout
+      refermé ; admin et lien VIP (3D) sans le mot de passe du site, client de test supprimé ; mot de passe de test effacé.
+      `npm run audit:coherence` une fois entré : 522 pages × 1280, 1440, 1512 Retina, iPhone, 0 problème (le profil de
+      Mittelstädt repassé seul après un chargement lent). Adresses détournées (`/soon/../…`, points encodés) refusées : seuls
+      les fichiers de la porte et des pages privées passent, chacun par son nom exact.
+      Captures : `/Volumes/Disque externe/_verif/acces-prive/`.
+- [ ] **Malik** : admin → Accès au site → choisir le mot de passe (aujourd'hui personne n'entre) ; `npm run vps -- set
+      OPENAI_API_KEY` et `set SMTP_USER SMTP_PASS ALERT_TO` (valeurs demandées sans s'afficher ; send.one.com, port 465 déjà
+      réglés). Puis tester qu'un message du formulaire arrive à ALERT_TO.
+- [ ] **Dépôt GitHub encore public** (code et photos lisibles) : le VPS lit déjà GitHub avec sa propre clé, le dépôt peut passer
+      en privé sans rien casser (`gh repo edit MalikosDM/Berete --visibility private`). Anciennes adresses de chaque version
+      Vercel : vérifier dans Vercel que « Deployment Protection » les protège (seule l'adresse principale redirige).
 
 ## Passe « audit du site en ligne (24/11 au soir) : 14 incohérences » — état au 25/11/2026
 - [x] **Plus de mention provisoire** : la ligne « Precious materials … to be confirmed by the atelier » et la ligne « Matières
@@ -1002,7 +1049,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       BRT) : même pièce photographiée sans la plaque, ou deux chaînes ? (BRT Flower reste en ligne.) Making-of de Sirius en
       meilleure qualité.
 
-## Passe « mise en ligne sur VPS » (tout en un) — état au 20/11/2026
+## Passe « mise en ligne sur VPS » (tout en un) — état au 25/11/2026
 - [x] **Tout sur une machine** (`docker-compose.yml`) : base PostgreSQL 17, site construit (`Dockerfile` : pages, API,
       admin, visualiseur 3D, espace VIP), Caddy devant (`deploy/Caddyfile` : HTTPS tout seul, `www.` → sans `www.`).
       Photos et vidéos du site (1 Go) gardées hors de l'image, prêtées au site depuis le code (`public/media`).
@@ -1020,11 +1067,12 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       une construction Docker en prend ~4 (`docker builder prune -af` après). La construction du site ne recopie plus les
       photos dans `dist-ssr` (1,5 Go gagnés, `copyPublicDir` dans `vite.config.ts`).
 - [x] Clé SSH du Mac pour le VPS : `~/.ssh/berete_vps` (la clé publique va dans le panneau Hostinger à la création).
-- [ ] Malik : acheter le VPS (Ubuntu 24.04, clé `berete_vps.pub`), donner l'IP → ajouter `Host berete-vps` dans
-      `~/.ssh/config`, puis `npm run vps -- install`, `npm run vps -- 3d`.
-- [ ] Yoni : accès DNS chez one.com (A `@` et `www` vers l'IP), boîte e-mail pour les alertes (SMTP one.com :
-      `send.one.com`, port 465), puis `npm run vps -- domain <domaine>` et `set SMTP_…`.
-- [ ] Avant d'ouvrir au public : repo GitHub en privé (`npm run vps -- private` d'abord), droits Dragon Ball, `launch`.
+- [x] VPS de Yoni chez one.com (Cloud server M, Ubuntu 26.04, 85.190.121.137), `Host berete-vps` (root, `~/.ssh/id_ed25519`),
+      SSH par clé seulement (root et administrator), installé, 3D envoyée, clé de déploiement GitHub en place, domaine
+      beretejewellers.com (25/11). `deploy/restore.sh --test` relit une sauvegarde dans une base à part. Docker en IPv6 (chaque
+      visiteur IPv6 garde son adresse : limites d'essais justes).
+- [ ] Boîte e-mail des alertes (`set SMTP_USER SMTP_PASS ALERT_TO`) et clé OpenAI (`set OPENAI_API_KEY`) : Malik les tape.
+- [ ] Avant d'ouvrir au public : repo GitHub en privé, droits Dragon Ball, ouvrir le site (admin), puis `launch`.
 
 ## Ce que Yoni a demandé le 9/11 — état au 13/11/2026
 - [x] Stories façon Instagram, pages pièces avec histoire et fabrication, 6 langues, page Process, contact WhatsApp.
