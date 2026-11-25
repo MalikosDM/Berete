@@ -181,11 +181,13 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   await expect(page.locator("main")).toContainText("From the streets of New York to Biggie making it legendary");
   await open(page, "/fr/creations/pendants/jesus-pieces");
   await expect(page.locator("main")).toContainText("Des rues de New York à Biggie");
-  // Press: the card opens the article in a new tab; a way to the world of the piece under it.
+  // Press: the card opens the article in a new tab; one button per card, the article (25/11/2026), a photo on every card.
   await open(page, "/fr/press");
   const card = page.locator("[data-press-card]").first();
   await expect(card.locator("a[data-press-link]")).toHaveAttribute("target", "_blank");
-  await expect(card.locator("[data-press-piece]")).toContainText("Entrer dans l’univers");
+  await expect(page.locator("[data-press-piece]")).toHaveCount(0);
+  const cards = await page.locator("[data-press-card]").count();
+  await expect(page.locator("[data-press-card] img")).toHaveCount(cards);
   // The trunks: the Dragon Ball trunk large first, then the selection; the real photos of the Campione case.
   await open(page, "/boxes");
   // (24/11/2026: no large opening any more, the page starts with the trunks themselves.)

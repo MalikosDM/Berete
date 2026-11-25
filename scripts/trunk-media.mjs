@@ -272,7 +272,7 @@ for (const box of BOXES) {
     // the places of its light and of its piece (src/data/trunks.ts) follow the same frame.
     ...(marble ? { marble: round(marble), frame: round({ x: frame.x, y: frame.y, size: frame.size }) } : {}),
   };
-  if (photos.length > 0) entry.photos = photos.map(({ name, zoom, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
+  if (photos.length > 0) entry.photos = photos.map(({ name, zoom: _zoom, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
   for (const p of photos) if (p.zoom) loupes.set(base + "/" + versioned(p.name, v), { src: base + "/" + versioned(p.name.replace(/\.webp$/, ".loupe.webp"), v), ...p.zoom });
   loupeBoxes.push(base + "/");
   made[box.slug] = entry;

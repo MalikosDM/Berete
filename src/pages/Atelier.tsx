@@ -31,6 +31,16 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
 /** The place of each box of the catalogue on the page of the trunks. */
 const BOX_ORDER = new Map(BOXES.map((b, i) => [b.slug, i]));
 
+/**
+ * The copies of a large photo of The Atelier (scripts/import-media.mjs, 25/11/2026): 640 and 1080 px (scripts/media-sizes.mjs),
+ * 1440 and 2160 px, and the photo itself (2880 px at most): sharp across a Retina screen, light on a phone.
+ */
+function wideSrcSet(src: string, width: number | undefined): string | undefined {
+  if (!width || !src.endsWith(".webp")) return undefined;
+  const copies = [...[640, 1080].filter((w) => width >= w * 1.25), ...[1440, 2160].filter((w) => width >= w * 1.1)];
+  return [...copies.map((w) => src.replace(/\.webp$/, ".w" + w + ".webp") + " " + w + "w"), src + " " + width + "w"].join(", ");
+}
+
 export default function Atelier() {
   const { t } = useI18n();
   /* The atelier photos, in the order of their numbers (warm black and white from the import). */
@@ -59,10 +69,9 @@ export default function Atelier() {
       <section aria-labelledby="philosophy-title" data-philosophy className="relative z-20 bg-ink">
         <div className="wrap grid gap-8 py-16 lg:grid-cols-12 lg:gap-14  lg:py-20">
           <Reveal className="lg:col-span-6">
-            <p className="eyebrow">{t.atelier.philosophy.eyebrow}</p>
-            <h2 id="philosophy-title" className="mt-5 font-display t-title font-light leading-[1.12] text-white [text-wrap:balance]">
-              {t.atelier.philosophy.title}
-            </h2>
+            {/* One style for every title of section (25/11/2026); the sentence of the house is a quote, in italics, not a title. */}
+            <h2 id="philosophy-title" className="title-caps tracking-[0.12em] t-title">{t.atelier.philosophy.eyebrow}</h2>
+            <p data-quote className="mt-5 font-display t-lead italic font-light leading-[1.25] text-white [text-wrap:balance]">{t.atelier.philosophy.title}</p>
           </Reveal>
           <Reveal className="lg:col-span-5 lg:col-start-8 lg:self-end" delay={0.1}>
             {t.atelier.philosophy.text.map((p) => (
@@ -73,7 +82,7 @@ export default function Atelier() {
       </section>
 
       <section aria-labelledby="atelier-steps" className="relative">
-        <h2 id="atelier-steps" className="sr-only">
+        <h2 id="atelier-steps" className="sr-only uppercase">
           {t.atelier.making}
         </h2>
         {photos.map((photo, i) => {
@@ -81,7 +90,17 @@ export default function Atelier() {
           return (
             <article key={photo.src} className="sticky top-0 h-svh w-full overflow-hidden bg-ink" style={{ zIndex: i + 1 }}>
               <div data-mask className="absolute inset-0 overflow-hidden">
-                <Img src={photo.src} alt={t.atelier.stepAlt(step.title)} width={photo.width} height={photo.height} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+                <Img
+                  src={photo.src}
+                  srcSet={wideSrcSet(photo.src, photo.width)}
+                  sizes={"(max-aspect-ratio: " + (photo.width ?? 3) + "/" + (photo.height ?? 4) + ") " + Math.round(((photo.width ?? 3) / (photo.height ?? 4)) * 100) + "vh, 100vw"}
+                  alt={t.atelier.stepAlt(step.title)}
+                  width={photo.width}
+                  height={photo.height}
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
               </div>
               <div className="wrap relative z-10 flex h-full flex-col justify-end pb-28 md:pb-20">
@@ -326,7 +345,7 @@ export function Boxes() {
       <PageIntro title={t.boxes.title} compact oneLine />
 
       <section aria-labelledby="boxes-list-title" className="wrap">
-        <h2 id="boxes-list-title" className="sr-only">{t.boxes.listLabel}</h2>
+        <h2 id="boxes-list-title" className="sr-only uppercase">{t.boxes.listLabel}</h2>
         <ul className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
           {boxes.map((box) => {
             return (

@@ -35,11 +35,13 @@ const DATA = join(ROOT, "src", "data", "pages.generated.json");
 const onlyArg = process.argv.find((a) => a.startsWith("--only="));
 const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 
-/** Each picture: its name, its file, its widths. */
+/** Each picture: its name, its file, its widths, and the part of it kept (shares of its width and height), if any. */
 const PICTURES = {
   home: [
     ["hero-desktop", join(YONI, "Accueil (photo ecrin)", "accueil-ecrin-sirius-desktop.jpg"), [1280, 1920, 2560, 3200]],
-    ["hero-mobile", join(YONI, "Accueil (photo ecrin)", "accueil-ecrin-sirius-mobile.jpg"), [720, 1080, 1440]],
+    // Phones (25/11/2026): the vertical version cut the trunk; the photo of computers, framed on the two cases (10 % to 93 %
+    // of its width, its whole height), so that both stay whole and centred on an iPhone.
+    ["hero-phone", join(YONI, "Accueil (photo ecrin)", "accueil-ecrin-sirius-desktop.jpg"), [720, 1080, 1440, 1920], { crop: [0.1, 0, 0.83, 1] }],
   ],
   journey: [
     ["journey-consultation", join(YONI, "Bespoke Journey (images)", "01-consultation-privee.jpg"), [480, 800, 1200]],
@@ -63,15 +65,18 @@ async function clear(name) {
 
 for (const [key, list] of Object.entries(PICTURES)) {
   if (!want(key)) continue;
-  for (const [name, file, widths] of list) {
+  for (const [name, file, widths, options = {}] of list) {
     if (!existsSync(file)) throw new Error("Missing: " + file + " (is the disk plugged in?)");
     const original = readFileSync(file);
-    const meta = await sharp(original).metadata();
-    const v = fingerprint(Buffer.concat([original, Buffer.from(JSON.stringify(widths))]));
+    const full = await sharp(original).rotate().metadata();
+    const [cx, cy, cw, ch] = options.crop ?? [0, 0, 1, 1];
+    const region = { left: Math.round(cx * full.width), top: Math.round(cy * full.height), width: Math.round(cw * full.width), height: Math.round(ch * full.height) };
+    const meta = { width: region.width, height: region.height };
+    const v = fingerprint(Buffer.concat([original, Buffer.from(JSON.stringify(options.crop ? [widths, options] : widths))]));
     await clear(name);
     const srcs = { avif: [], webp: [] };
     for (const w of widths.filter((w) => w <= meta.width)) {
-      const base = sharp(original).rotate().resize({ width: w, withoutEnlargement: true });
+      const base = sharp(await sharp(original).rotate().extract(region).toBuffer()).resize({ width: w, withoutEnlargement: true });
       const webp = name + "-" + w + "." + v + ".webp";
       const avif = name + "-" + w + "." + v + ".avif";
       await base.clone().webp({ quality: 82 }).toFile(join(OUT, webp));

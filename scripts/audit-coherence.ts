@@ -37,6 +37,7 @@ import { fr } from "../src/i18n/ui/fr";
 import { es } from "../src/i18n/ui/es";
 import { de } from "../src/i18n/ui/de";
 import { nl } from "../src/i18n/ui/nl";
+import sharp from "sharp";
 import { ar } from "../src/i18n/ui/ar";
 import type { Messages } from "../src/i18n/ui/en";
 
@@ -164,6 +165,8 @@ type Found = {
   cut: string[];
   blurry: string[];
   watermark: boolean;
+  empty: string[];
+  names: [string, string][];
   edge: string[];
   order: string[];
   allText: string[];
@@ -254,7 +257,8 @@ async function inspect(page: Page, phone: boolean): Promise<Found> {
     const media: string[] = [];
     const counts = new Map<string, number>();
     for (const el of document.querySelectorAll("main img, main video")) {
-      if (!visible(el) || decorative(el)) continue;
+      // The cards of the press show the photo of their piece, the same for two articles about one piece (25/11/2026).
+      if (!visible(el) || decorative(el) || el.closest("[data-press-card]")) continue;
       const src = el.tagName === "IMG" ? (el.getAttribute("src") ?? "") : ((el as HTMLVideoElement).currentSrc || el.getAttribute("src") || el.querySelector("source")?.getAttribute("src") || "");
       if (!src || src.endsWith(".svg") || src.startsWith("data:") || src.startsWith("blob:")) continue;
       const k = key(src);
@@ -342,13 +346,137 @@ async function inspect(page: Page, phone: boolean): Promise<Found> {
         return (cs.maskImage + " " + cs.getPropertyValue("-webkit-mask-image") + " " + cs.backgroundImage).includes("/media/brand/berete");
       });
 
+    // No empty section (25/11/2026): a title of section followed by another title, or by the foot of the page, with nothing in
+    // between (no text, no photo, no film, no button).
+    const empty: string[] = [];
+    const meaningful = (el: Element) =>
+      visible(el) && (["IMG", "VIDEO", "CANVAS", "IFRAME", "PICTURE"].includes(el.tagName) || (["P", "LI", "DD", "DT", "A", "BUTTON", "BLOCKQUOTE", "FIGCAPTION", "SPAN", "TIME"].includes(el.tagName) && ownText(el).length > 0));
+    for (const h of document.querySelectorAll("main h2")) {
+      if (!visible(h)) continue;
+      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+      walker.currentNode = h;
+      let next: Node | null = walker.nextSibling() ?? null;
+      // From the end of the title: the elements after it, in the order of the page.
+      for (let a: Node | null = h; !next && a; a = a.parentNode) {
+        walker.currentNode = a;
+        next = walker.nextSibling();
+      }
+      let verdict = "";
+      for (let n: Node | null = next; n; n = walker.nextNode()) {
+        const el = n as Element;
+        if (el.tagName === "H2" && visible(el)) {
+          verdict = "followed by the title “" + textOf(el).slice(0, 40) + "”";
+          break;
+        }
+        if (el.tagName === "FOOTER") {
+          verdict = "followed by the foot of the page";
+          break;
+        }
+        if (meaningful(el)) break;
+      }
+      if (verdict) empty.push("“" + textOf(h).slice(0, 50) + "” " + verdict);
+    }
+
+    // The name of each piece as written on its cards and on its page (one name per piece, 25/11/2026).
+    const names: [string, string][] = [];
+    for (const card of document.querySelectorAll("[data-piece-card], [data-player-piece]")) {
+      const slug = card.getAttribute("data-piece-card") ?? card.getAttribute("data-player-piece") ?? "";
+      const name = card.querySelector("[data-piece-name]");
+      if (slug && name && visible(name)) names.push([slug, textOf(name)]);
+    }
+    const own = /^\/(?:(?:fr|es|de|nl|ar)\/)?pieces\/([a-z0-9-]+)$/.exec(location.pathname);
+    const h1 = document.querySelector("h1");
+    if (own && h1) names.push([own[1]!, textOf(h1)]);
+
     const order = [...document.querySelectorAll("[data-piece-section]")].map((el) => el.getAttribute("data-piece-section") ?? "");
     const texts = [...document.querySelectorAll("main p, main h1, main h2, main h3, main li, main dt, main dd, main a, main button, main figcaption, header a, footer a, footer p")]
       .filter((el) => visible(el) && !el.closest("[lang]:not(html)") && !el.querySelector("[lang]") && !el.closest("[translate='no']"))
       .map((el) => textOf(el))
       .filter((tx) => tx.length >= 12 && /\p{L}{3,}.*\s.*\p{L}{3,}/u.test(tx));
-    return { wide: document.documentElement.scrollWidth - vw, fonts: [...fonts], loadedFonts, sizes, media, texts, repeated, buttons, noAlt, cut, blurry, watermark, edge, order, allText };
+    return { wide: document.documentElement.scrollWidth - vw, fonts: [...fonts], loadedFonts, sizes, media, texts, repeated, buttons, noAlt, cut, blurry, watermark, empty, names, edge, order, allText };
   }, phone);
+}
+
+/** Words of a text not finished, in the six languages (25/11/2026). */
+const PROVISIONAL = /\bto be confirmed\b|à confirmer|\bTBD\b|\bplaceholder\b|\bcoming soon\b|por confirmar|zu bestätigen|te bevestigen|lorem ipsum/i;
+
+/** The names of each piece by language and address of the piece, to find a piece called two ways. */
+const pieceNames = new Map<string, Map<string, string>>();
+
+/** The size at which the thumbnails are measured. */
+const THUMB_SIZE = "1440x900";
+
+/**
+ * Every thumbnail of a piece on the page ([data-thumb-frame]): the band of 6 px along the edges of its frame no lighter than
+ * the black of the page by more than 3 % of luminance (no rectangle of a photo), and the jewel between 55 and 75 % of the
+ * height of its frame, or across its width when it is wider than high (the pixels clearly lighter than the black).
+ */
+async function thumbnails(page: Page, path: string, size: string) {
+  const frames = page.locator("[data-thumb-frame]");
+  const n = await frames.count();
+  for (let i = 0; i < n; i++) {
+    const frame = frames.nth(i);
+    if (!(await frame.isVisible())) continue;
+    await frame.scrollIntoViewIfNeeded().catch(() => undefined);
+    // The photo loaded (a lazy one comes as it nears the screen).
+    await frame.locator("img").first().evaluate((img: HTMLImageElement) => (img.complete ? null : new Promise((r) => img.addEventListener("load", r, { once: true })))).catch(() => undefined);
+    await page.waitForTimeout(150);
+    const slug = (await frame.evaluate((el) => el.closest("[data-piece-card], [data-player-piece], [data-special-ring]")?.getAttribute("data-piece-card") ?? el.closest("[data-player-piece]")?.getAttribute("data-player-piece") ?? el.getAttribute("data-special-ring") ?? "")) || "?";
+    const shot = await frame.screenshot({ type: "png", animations: "disabled" }).catch(() => null);
+    if (!shot) continue;
+    const { data, info } = await sharp(shot).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    const lum = (x: number, y: number) => {
+      const o = (y * info.width + x) * 3;
+      return (0.2126 * data[o]! + 0.7152 * data[o + 1]! + 0.0722 * data[o + 2]!) / 255;
+    };
+    const bg = 10 / 255;
+    const band = 6;
+    let sum = 0;
+    let count = 0;
+    for (let y = 0; y < info.height; y++)
+      for (let x = 0; x < info.width; x++) {
+        if (x >= band && x < info.width - band && y >= band && y < info.height - band) continue;
+        sum += lum(x, y);
+        count += 1;
+      }
+    const edge = sum / count - bg;
+    if (edge > 0.03) add("thumbnails", path, size, slug + ": an edge shows (" + Math.round(edge * 1000) / 10 + " % lighter than the page)");
+    let top = -1;
+    let bottom = -1;
+    for (let y = 0; y < info.height; y++) {
+      let lit = 0;
+      for (let x = 0; x < info.width; x++) if (lum(x, y) > bg + 0.1) lit += 1;
+      if (lit >= Math.max(2, info.width * 0.01)) {
+        if (top < 0) top = y;
+        bottom = y;
+      }
+    }
+    const share = top < 0 ? 0 : (bottom - top + 1) / info.height;
+    // A jewel wider than high fills the width of its frame instead (never cut by it).
+    let left = info.width;
+    let right = -1;
+    for (let y = Math.max(0, top); y <= bottom; y++)
+      for (let x = 0; x < info.width; x++)
+        if (lum(x, y) > bg + 0.1) {
+          left = Math.min(left, x);
+          right = Math.max(right, x);
+        }
+    const across = right < 0 ? 0 : (right - left + 1) / info.width;
+    if (share > 0.75 || (share < 0.55 && across < 0.85)) add("thumbnails", path, size, slug + ": the jewel takes " + Math.round(share * 100) + " % of the height of its frame (" + Math.round(across * 100) + " % of its width)");
+  }
+}
+
+/** The addresses of the plan of the site that answer with a redirection (25/11/2026: none may). */
+async function sitemapRedirects(list: string[]) {
+  const queue = [...list];
+  await Promise.all(
+    Array.from({ length: 8 }, async () => {
+      for (let p = queue.shift(); p !== undefined; p = queue.shift()) {
+        const res = await fetch(BASE + p, { redirect: "manual" }).catch(() => null);
+        if (res && res.status >= 300 && res.status < 400) add("sitemap", p, "-", "redirects (" + res.status + ") to " + (res.headers.get("location") ?? "?"));
+      }
+    }),
+  );
 }
 
 const ORDER: Record<string, number> = { opening: 0, film: 1, angles: 2, story: 3, details: 3.1, "worn-as": 3.2, composition: 4, "created-for": 5, trunk: 6, atelier: 7, press: 7.5, end: 8 };
@@ -390,10 +518,23 @@ async function check(page: Page, path: string, lang: string, size: string, phone
   for (const x of f.edge) add("overflow", path, size, "cut by the edge of the screen: " + x);
   for (const x of f.blurry) add("sharpness", path, size, "photo less sharp than the screen: " + x);
   if (f.watermark) add("watermark", path, size, "the name BERETE still in the background");
+  for (const x of f.empty) add("empty", path, size, "empty section: " + x);
+  // No provisional words on screen (25/11/2026).
+  const provisional = PROVISIONAL.exec(all);
+  if (provisional) add("provisional", path, size, "“" + provisional[0] + "”");
+  for (const [slug, name] of f.names) {
+    const key = lang + "|" + slug;
+    const set = pieceNames.get(key) ?? new Map<string, string>();
+    if (!set.has(name.toLocaleLowerCase(lang))) set.set(name.toLocaleLowerCase(lang), name + " (" + path + ")");
+    pieceNames.set(key, set);
+  }
+  // The thumbnails of the pieces (English pages of one size: the same everywhere): no visible edge, the jewel at its share.
+  if (lang === "en" && size === THUMB_SIZE) await thumbnails(page, path, size);
   if (onPiece) {
     const ranks = f.order.map((s) => ORDER[s] ?? -1);
     const sorted = ranks.every((r, i) => i === 0 || r >= ranks[i - 1]!);
-    const missing = ["opening", "story", "created-for", "end"].filter((s) => !f.order.includes(s));
+    // (Since 25/11/2026 « Created exclusively for » is a section only when it has someone or something to show.)
+    const missing = ["opening", "story", "end"].filter((s) => !f.order.includes(s));
     if (!sorted || missing.length > 0) add("order", path, size, "sections: " + f.order.join(" > ") + (missing.length ? " · missing: " + missing.join(", ") : ""));
   }
   if (lang === "en") {
@@ -431,6 +572,7 @@ async function context(browser: Browser, size: string): Promise<BrowserContext> 
 
 async function main() {
   const list = await pages();
+  await sitemapRedirects(list);
   const desktop = await chromium.launch({ args: ["--mute-audio", "--autoplay-policy=user-gesture-required"] });
   const phoneBrowser = SIZES.includes("iphone") ? await webkit.launch() : null;
   let done = 0;
@@ -464,9 +606,10 @@ async function main() {
   }
   await desktop.close();
   await phoneBrowser?.close();
+  for (const [key, names] of pieceNames) if (names.size > 1) add("names", "/" + key.split("|")[0] + "/pieces/" + key.split("|")[1], "-", "one piece, " + names.size + " names: " + [...names.values()].join(" · "));
 
   mkdirSync(OUT, { recursive: true });
-  const checks = ["fonts", "sizes", "duplicates", "buttons", "photos", "gold tone", "english", "names", "overflow", "order", "sharpness", "watermark", "page"];
+  const checks = ["fonts", "sizes", "duplicates", "buttons", "photos", "gold tone", "english", "names", "overflow", "order", "sharpness", "watermark", "provisional", "empty", "thumbnails", "sitemap", "page"];
   const lines = [
     "# Contrôle de cohérence",
     "",

@@ -37,12 +37,13 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "inter-3-detail-en-grand"), type: "jpeg", quality: 70 });
   await page.keyboard.press("Escape");
-  // The technical sheet says what the photos show, as a draft.
-  await page.locator("#sheet-title").scrollIntoViewIfNeeded();
-  await expect(page.locator("[data-spec='seen']")).toHaveCount(1);
-  await expect(page.locator("[data-seen-note]")).toBeVisible();
-  await expect(page.locator("#sheet-title").locator("xpath=..")).not.toContainText("Shared on request");
-  await page.screenshot({ path: shotPath(info, "inter-4-fiche-technique"), type: "jpeg", quality: 70 });
+  // The technical sheet: only what Yoni gave, never a provisional line (« as seen in the photos, to be confirmed », 25/11/2026).
+  await expect(page.locator("main")).not.toContainText("to be confirmed");
+  await expect(page.locator("main")).not.toContainText("Shared on request");
+  if ((await page.locator("#sheet-title").count()) > 0) {
+    await page.locator("#sheet-title").scrollIntoViewIfNeeded();
+    await page.screenshot({ path: shotPath(info, "inter-4-fiche-technique"), type: "jpeg", quality: 70 });
+  }
   expect(problems.errors).toEqual([]);
 });
 

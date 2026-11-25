@@ -3303,8 +3303,14 @@ html[lang="ar"] [data-piece] [data-u-title] {
   bottom: calc(50cqh - min(100cqh, 100cqw / var(--r)) / 2);
 }
 @media (max-aspect-ratio: 1/1) {
+  /* A screen held upright (25/11/2026): the photo of the two cases is wider than high, its words go under it, on the black,
+     never over the cases. */
+  .home-photo-box {
+    top: calc(50% - 3rem);
+  }
   .home-photo-caption {
-    bottom: calc(50cqh - min(100cqh, 100cqw / var(--rm)) / 2);
+    top: calc(50cqh - 3rem + min(100cqh, 100cqw / var(--rm)) / 2 + 0.75rem);
+    bottom: auto;
   }
 }
 
@@ -3424,5 +3430,46 @@ html[lang="ar"] [data-piece] [data-u-title] {
   }
   .monogram-shift {
     transform: none !important;
+  }
+}
+
+/* The thumbnails of the pieces (src/components/PieceThumb.tsx, 25/11/2026): a photo fades into the page on every side, both at
+   its own edges and at the edges of its frame, so that no rectangle ever shows; a cut-out keeps a soft shadow. */
+.thumb-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, #000 9%, #000 91%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 9%, #000 91%, transparent 100%);
+  mask-composite: intersect;
+}
+.thumb-photo {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%), linear-gradient(to bottom, transparent 0, #000 10%, #000 90%, transparent 100%);
+  mask-composite: intersect;
+}
+.thumb-cutout {
+  filter: drop-shadow(0 14px 18px rgb(0 0 0 / 0.55));
+}
+
+/* « Enter the World → » of the cards (src/components/PieceGrid.tsx, EnterWorld, 25/11/2026): the look of the secondary button,
+   its words in one piece so that its arrow stays held to its last word; on a phone 16 px (the rule of the house) in plain
+   letters, so that it holds on one line in a card of two columns (a longer language may take two, its arrow with it). */
+.card-enter {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: color 0.6s ease;
+}
+@media (max-width: 639px) {
+  .card-enter {
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    text-transform: none;
   }
 }

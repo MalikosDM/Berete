@@ -256,10 +256,12 @@ test("admin: Yoni changes the text of a photo, and its French, then puts it back
   await page.locator("[data-angles-field]").screenshot({ path: DIR + "/admin-sous-tous-les-angles.jpg", type: "jpeg", quality: 70 });
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.locator("[data-angles-field]")).toHaveCount(0);
-  // On the page, in English and in French.
-  for (const [path, title] of [["/pieces/" + slug, "Test title from the admin"], ["/fr/pieces/" + slug, "Titre d’essai depuis l’admin"]] as const) {
+  // On the page, in English and in French: no caption under the photos any more (25/11/2026: none, since not every photo has
+  // a text of Yoni); the title stays kept in the admin.
+  for (const path of ["/pieces/" + slug, "/fr/pieces/" + slug]) {
     await page.goto(path, { waitUntil: "load" });
-    await expect(page.locator("[data-every-angle] [data-angle='1'] [data-angle-title]")).toHaveText(title, { timeout: 15_000 });
+    await expect(page.locator("[data-every-angle] [data-angle='1']")).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator("[data-every-angle] [data-angle-title]")).toHaveCount(0);
   }
   // Put back.
   const again = await open();
@@ -269,8 +271,6 @@ test("admin: Yoni changes the text of a photo, and its French, then puts it back
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.locator("[data-angles-field]")).toHaveCount(0);
   await page.goto("/fr/pieces/" + slug, { waitUntil: "load" });
-  const restored = page.locator("[data-every-angle] [data-angle='1'] [data-angle-title]");
-  if (before.title) await expect(restored).toHaveText(fr[before.title]!, { timeout: 15_000 });
-  else await expect(restored).toHaveCount(0, { timeout: 15_000 });
+  await expect(page.locator("[data-every-angle] [data-angle-title]")).toHaveCount(0, { timeout: 15_000 });
   expect(problems.errors).toEqual([]);
 });

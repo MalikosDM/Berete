@@ -40,39 +40,6 @@
   ],
   "src": "/media/pages/hero-desktop-3200.0a5b02735b.webp"
  },
- "hero-mobile": {
-  "width": 3072,
-  "height": 5504,
-  "avif": [
-   {
-    "w": 720,
-    "src": "/media/pages/hero-mobile-720.8e6d48e2b0.avif"
-   },
-   {
-    "w": 1080,
-    "src": "/media/pages/hero-mobile-1080.8e6d48e2b0.avif"
-   },
-   {
-    "w": 1440,
-    "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.avif"
-   }
-  ],
-  "webp": [
-   {
-    "w": 720,
-    "src": "/media/pages/hero-mobile-720.8e6d48e2b0.webp"
-   },
-   {
-    "w": 1080,
-    "src": "/media/pages/hero-mobile-1080.8e6d48e2b0.webp"
-   },
-   {
-    "w": 1440,
-    "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.webp"
-   }
-  ],
-  "src": "/media/pages/hero-mobile-1440.8e6d48e2b0.webp"
- },
  "journey-consultation": {
   "width": 4176,
   "height": 3119,
@@ -169,5 +136,46 @@
    }
   ],
   "src": "/media/pages/journey-cad-776.efa054a27a.webp"
+ },
+ "hero-phone": {
+  "width": 4568,
+  "height": 3072,
+  "avif": [
+   {
+    "w": 720,
+    "src": "/media/pages/hero-phone-720.10b92a2213.avif"
+   },
+   {
+    "w": 1080,
+    "src": "/media/pages/hero-phone-1080.10b92a2213.avif"
+   },
+   {
+    "w": 1440,
+    "src": "/media/pages/hero-phone-1440.10b92a2213.avif"
+   },
+   {
+    "w": 1920,
+    "src": "/media/pages/hero-phone-1920.10b92a2213.avif"
+   }
+  ],
+  "webp": [
+   {
+    "w": 720,
+    "src": "/media/pages/hero-phone-720.10b92a2213.webp"
+   },
+   {
+    "w": 1080,
+    "src": "/media/pages/hero-phone-1080.10b92a2213.webp"
+   },
+   {
+    "w": 1440,
+    "src": "/media/pages/hero-phone-1440.10b92a2213.webp"
+   },
+   {
+    "w": 1920,
+    "src": "/media/pages/hero-phone-1920.10b92a2213.webp"
+   }
+  ],
+  "src": "/media/pages/hero-phone-1920.10b92a2213.webp"
  }
 }

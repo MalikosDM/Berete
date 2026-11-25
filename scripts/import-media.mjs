@@ -95,7 +95,10 @@ const WARM_BW = "format=gray,format=rgb24,colorchannelmixer=rr=1:gg=0.93:bb=0.82
 const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
 
 const SITE_GROUPS = [
-  { key: "atelier", folder: "03 - Atelier", numbers: range(2, 5), filter: WARM_BW },
+  // The four large photos of The Atelier, shown across the whole screen (25/11/2026): their originals (1080 and 1536 px wide)
+  // doubled by Swin2SR (scripts/universe-upscale.py, masters in .local/atelier, never in Git), then 2880 px and copies of
+  // 1440 and 2160 px, so they stay sharp on a Retina screen.
+  { key: "atelier", folder: "03 - Atelier", numbers: range(2, 5), filter: WARM_BW, upscale: true, maxW: 2880, widths: [1440, 2160] },
   { key: "pieces/vfb-stuttgart-dfb-pokal-2025", folder: "04 - Capsule VfB Stuttgart", numbers: range(1, 11) },
   { key: "pieces/campione-d-italia-2023-2024", folder: "05 - Capsule Inter", numbers: range(1, 3) },
   { key: "pieces/the-hand", folder: "06 - Pendentifs", numbers: range(1, 6) },
@@ -280,10 +283,10 @@ async function loupe(src, out, vf = "", { seek = [], scale = LOUPE_SCALE, after 
 
 /* ---------- Recipes ---------- */
 
-async function photo(src, out, filter = "") {
-  const scale = "scale='min(" + PHOTO.maxW + ",iw)':-2:flags=lanczos";
+async function photo(src, out, filter = "", maxW = PHOTO.maxW) {
+  const scale = "scale='min(" + maxW + ",iw)':-2:flags=lanczos";
   const vf = filter ? filter + "," + scale : scale;
-  const recipe = "photo:" + PHOTO.maxW + ":" + PHOTO.quality + ":" + vf;
+  const recipe = "photo:" + maxW + ":" + PHOTO.quality + ":" + vf;
   await produce(out, src, recipe, ["-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PHOTO.quality), "-compression_level", "6"]);
   await loupe(src, out, filter);
   const p = await probe(out);
@@ -404,6 +407,9 @@ async function filesByNumber(folder) {
   return map;
 }
 
+/** The photos doubled by the model, one after the other (scripts/universe-upscale.py). */
+let upscaling = Promise.resolve();
+
 async function importSite() {
   if (!existsSync(SITE_DIR)) {
     console.warn("Site folder not found, skipped: " + SITE_DIR);
@@ -421,7 +427,24 @@ async function importSite() {
       if (!src) return;
       const out = join(MEDIA, g.key, pad2(i + 1) + ".webp");
       jobs.push(async () => {
-        list[i] = await photo(src, out, g.filter);
+        if (!g.upscale) {
+          list[i] = await photo(src, out, g.filter);
+          return;
+        }
+        // Doubled once by the model (its master kept in .local/atelier), then its widths.
+        const master = join(ROOT, ".local", g.key, pad2(i + 1) + ".jpg");
+        if (!existsSync(master) || (await stat(master)).mtimeMs < (await stat(src)).mtimeMs) {
+          await mkdir(dirname(master), { recursive: true });
+          // One at a time: the model takes a lot of memory (25/11/2026: four at once filled the Mac).
+          upscaling = upscaling.then(() => run("python3", [join(ROOT, "scripts", "universe-upscale.py"), src, master, "x2"]));
+          await upscaling;
+        }
+        list[i] = await photo(master, out, g.filter, g.maxW);
+        for (const w of g.widths ?? []) {
+          if (w * 1.1 > list[i].width) continue;
+          const copy = out.replace(/\.webp$/, ".w" + w + ".webp");
+          await produce(copy, master, "photo-width:" + w + ":" + PHOTO.quality + ":" + g.filter, ["-i", master, "-vf", (g.filter ? g.filter + "," : "") + "scale=" + w + ":-2:flags=lanczos", "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PHOTO.quality), "-compression_level", "6"]);
+        }
       });
     });
   }

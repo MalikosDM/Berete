@@ -276,12 +276,9 @@ export const en = {
     seePhoto: "Discover the Detail",
     /** Above the title of the championship rings (the special project). */
     historic: "Historic Commissions",
-    /** Under the technical sheet of a draft: the row "Precious Materials" comes from the photos. */
-    seenNote: "Precious materials: as seen in the photos, to be confirmed by the atelier.",
     madeFor: "Created Exclusively for",
     theClub: "Discover Their World",
     theProfile: "Discover Their World",
-    stories: (_count: number) => "The Moments",
     andOthers: (names: string) => "And " + names + ".",
     seenInStories: "Seen in our stories",
     wornOn: "Worn on",
@@ -353,7 +350,8 @@ export const en = {
     bioStories: (name: string) => "The moments shared with " + name + " on our Instagram.",
     watch: (_count: number) => "Discover Their World",
     pieces: (count: number) => n(count, "Personal Creation", "Personal Creations"),
-    stories: "The Moments",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, "Their Creation", "Their Creations"),
     moments: (count: number) => n(count, "# moment", "# moments"),
     theirPlayers: "The Athletes",
     logoOf: (name: string) => "The emblem of " + name,

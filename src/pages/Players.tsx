@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
-import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ArrowLeft, Play } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
 import { MediaView } from "@/components/Media";
+import PieceThumb from "@/components/PieceThumb";
 import PageIntro from "@/components/PageIntro";
 import PlayerWall, { PlayerPortrait } from "@/components/PlayerWall";
 import SplitHeading from "@/components/SplitHeading";
@@ -14,7 +15,8 @@ import { boxesOf, findPerson, instagramOf, leftTheCircle, mediaOfPiece, membersO
 import { BOX_PEOPLE } from "@/data/pieces";
 import BoxSection from "@/components/BoxSection";
 import type { PersonKind } from "@/data/types";
-import { Link, Navigate, useI18n } from "@/i18n";
+import { Link, Navigate, useI18n, useMadeFor } from "@/i18n";
+import { CardLine, EnterWorld } from "@/components/PieceGrid";
 import { useCatalogue } from "@/lib/catalogue";
 import NotFound from "@/pages/NotFound";
 
@@ -47,6 +49,7 @@ export function PlayerPage() {
   const { slug = "" } = useParams();
   const { t } = useI18n();
   const cat = useCatalogue();
+  const madeFor = useMadeFor();
   const [open, setOpen] = useState<number | null>(null);
   const [step, setStep] = useState(0);
   const person = findPerson(cat, slug);
@@ -101,7 +104,7 @@ export function PlayerPage() {
           <div data-player-portrait className="mx-auto w-full max-w-sm lg:col-span-4 lg:max-w-none">
             <PlayerPortrait person={person} big priority sizes="(max-width: 1023px) 92vw, 26rem" className="aspect-[4/5] w-full border border-white/10" />
           </div>
-          <div className="min-w-0 lg:col-span-7 lg:col-start-6 lg:pb-4">
+          <div className="min-w-0 lg:col-span-8 lg:col-start-5 lg:pb-4">
             {kindLabel ? <p data-player-club className="eyebrow">{kindLabel}</p> : null}
             <SplitHeading as="h1" className="mt-3 t-hero tracking-[0.05em] break-words">
               {person.name}
@@ -124,22 +127,30 @@ export function PlayerPage() {
 
       {pieces.length > 0 ? (
         <section aria-labelledby="player-pieces" data-player-pieces className="wrap scroll-mt-32 pb-16  lg:pb-20">
-          <h2 id="player-pieces" className="title-caps tracking-[0.12em] t-title ">{t.players.pieces(pieces.length)}</h2>
+          <h2 id="player-pieces" className="title-caps tracking-[0.12em] t-title ">{person.kind === "club" ? t.players.clubPieces(pieces.length) : t.players.pieces(pieces.length)}</h2>
           <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6">
             {pieces.map((p) => {
               const visual = pieceVisualFor(p, person);
               return (
                 <li key={p.slug}>
                   <Link to={"/pieces/" + p.slug} data-player-piece={p.slug} className="group block">
-                    <span className="relative block aspect-[4/5] overflow-hidden border border-white/10 bg-ink">
-                      <span className="absolute inset-0 p-4 transition-opacity duration-700 group-hover:opacity-90">
-                        <MediaView item={visual} alt={visual.alt ?? p.title} fit="contain" sizes="(max-width: 1023px) 46vw, 18rem" />
-                      </span>
+                    {/* The same card as everywhere (25/11/2026): the jewel on the black, at the same share of its frame; their own
+                        ring (a photo of it), its edges fading into the page. */}
+                    <span data-thumb-frame className="relative block aspect-[4/5] overflow-hidden bg-ink">
+                      {visual === p.cover ? (
+                        <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
+                          <PieceThumb piece={p} sizes="(max-width: 1023px) 46vw, 18rem" />
+                        </span>
+                      ) : (
+                        <span className="thumb-fade absolute inset-0 p-4 transition-opacity duration-700 group-hover:opacity-90">
+                          <MediaView item={visual} alt={visual.alt ?? p.title} fit="contain" sizes="(max-width: 1023px) 46vw, 18rem" />
+                        </span>
+                      )}
                     </span>
                     <span data-piece-name className="title-caps mt-3 block text-base tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light lg:text-[1.0625rem]">{p.title}</span>
-                    <span className="mt-1 block text-base text-mist">{visual.caption && visual !== p.cover ? visual.caption : t.types[p.type]}</span>
-                    <span data-cta className="btn-secondary mt-1 group-hover:text-rose-light">
-                      {t.common.enterWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+                    <CardLine piece={p} who={madeFor(cat, p)} />
+                    <span data-enter-world data-cta className="card-enter group-hover:text-rose-light">
+                      <EnterWorld text={t.common.enterWorld} />
                     </span>
                   </Link>
                 </li>
@@ -154,7 +165,7 @@ export function PlayerPage() {
 
       {photos.length > 0 || stories.length > 0 ? (
         <section aria-labelledby="player-photos" data-player-moments className="wrap pb-20 lg:pb-28">
-          <h2 id="player-photos" className="title-caps tracking-[0.12em] t-title ">{photos.length > 0 ? t.players.photos : t.players.stories}</h2>
+          <h2 id="player-photos" className="title-caps tracking-[0.12em] t-title ">{t.players.photos}</h2>
           {photos.length > 0 ? (
             <ul data-player-photos className="mt-10 grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3">
               {photos.map((m, i) => (
@@ -185,7 +196,6 @@ export function PlayerPage() {
             {members.map((m) => (
               <li key={m.slug}>
                 <Link to={personHref(cat, m)} className="inline-flex min-h-12 items-baseline gap-2 font-display t-lead uppercase tracking-[0.05em] text-white hover:text-rose-light">
-                  {m.number !== null ? <span className="text-rose-gold text-xl">{m.number}</span> : null}
                   {m.name}
                 </Link>
               </li>

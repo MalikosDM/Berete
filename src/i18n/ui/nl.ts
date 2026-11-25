@@ -260,11 +260,9 @@ export const nl: Messages = {
     detailsEyebrow: "Elk detail vertelt een verhaal",
     seePhoto: "Ontdek het detail",
     historic: "Historische opdrachten",
-    seenNote: "Kostbare materialen: zoals te zien op de foto’s, nog te bevestigen door het atelier.",
     madeFor: "Exclusief gecreëerd voor",
     theClub: "Ontdek zijn wereld",
     theProfile: "Ontdek zijn wereld",
-    stories: (_count: number) => "De momenten",
     andOthers: (names: string) => "En ook " + names + ".",
     seenInStories: "Te zien in onze stories",
     wornOn: "Gedragen aan",
@@ -333,7 +331,8 @@ export const nl: Messages = {
     bioStories: (name: string) => "De momenten die we met " + name + " deelden op ons Instagram-account.",
     watch: (_count: number) => "Ontdek zijn wereld",
     pieces: (count: number) => n(count, "Persoonlijke creatie", "Persoonlijke creaties"),
-    stories: "De momenten",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, "Hun creatie", "Hun creaties"),
     moments: (count: number) => n(count, "# moment", "# momenten"),
     theirPlayers: "De atleten",
     logoOf: (name: string) => "Het embleem van " + name,
@@ -639,10 +638,6 @@ export const nl: Messages = {
     "/creations/chains/cuban": {
       title: "Cubaanse kettingen met diamanten",
       description: "De Cubaanse kettingen van Berete Jewellers, bezet met diamanten in verschillende breedtes, gemaakt in Dubai.",
-    },
-    "/creations/chains/tennis": {
-      title: "Tenniskettingen",
-      description: "De tenniskettingen van Berete Jewellers: een lijn van diamanten, steen na steen, gemaakt in Dubai.",
     },
     "/creations/chains/infinity": {
       title: "Infinity-kettingen",

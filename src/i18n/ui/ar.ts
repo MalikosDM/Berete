@@ -255,11 +255,9 @@ export const ar: Messages = {
     detailsEyebrow: "لكل تفصيل حكاية",
     seePhoto: "اكتشفوا التفصيل",
     historic: "إبداعات تاريخية",
-    seenNote: "المواد الثمينة: كما تظهر في الصور، بانتظار تأكيد المشغل.",
     madeFor: "أُبدعت حصرياً من أجل",
     theClub: "اكتشفوا عالمه",
     theProfile: "اكتشفوا عالمه",
-    stories: (_count: number) => "اللحظات",
     andOthers: (names: string) => "وكذلك " + names + ".",
     seenInStories: "ظهرت في قصصنا",
     wornOn: "تُرتدى على",
@@ -328,7 +326,8 @@ export const ar: Messages = {
     bioStories: (name: string) => "اللحظات التي شاركناها مع " + name + " على حسابنا في Instagram.",
     watch: (_count: number) => "اكتشفوا عالمه",
     pieces: (count: number) => n(count, { one: "إبداع شخصي", two: "إبداعان شخصيان", other: "إبداعات شخصية" }),
-    stories: "اللحظات",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, { one: "إبداعهم", two: "إبداعاهم", other: "إبداعاتهم" }),
     moments: (count: number) => n(count, { zero: "# لحظة", one: "لحظة واحدة", two: "لحظتان", few: "# لحظات", many: "# لحظة", other: "# لحظة" }),
     theirPlayers: "الرياضيون",
     logoOf: (name: string) => "شعار " + name,
@@ -634,10 +633,6 @@ export const ar: Messages = {
     "/creations/chains/cuban": {
       title: "سلاسل كوبية بالألماس",
       description: "السلاسل الكوبية من بيريتي للمجوهرات، مرصّعة بالألماس بعروض مختلفة، صُنعت في دبي.",
-    },
-    "/creations/chains/tennis": {
-      title: "سلاسل التنس",
-      description: "سلاسل التنس من بيريتي للمجوهرات: خط من الألماس، حجر بعد حجر، صُنعت في دبي.",
     },
     "/creations/chains/infinity": {
       title: "سلاسل اللانهاية",

@@ -22,31 +22,26 @@ function LiftingRing({ piece, trophy, closed, open }: { piece: Piece; trophy: st
   const lift = lifted ? t.home.closeTop : t.home.liftTop;
   return (
     <li data-lifting-ring={piece.slug} className="flex flex-col">
-      <div className="group relative aspect-square w-full overflow-hidden border border-white/10 bg-ink">
+      {/* The ring itself lifts its top (hover on a computer, a touch everywhere); one button on the card: its world (25/11/2026). */}
+      <button
+        type="button"
+        onClick={() => setLifted((v) => !v)}
+        aria-pressed={lifted}
+        aria-label={lift + " · " + piece.title}
+        className="group relative block aspect-square w-full cursor-pointer overflow-hidden border border-white/10 bg-ink"
+      >
         <span className={"absolute inset-0 p-4 transition-opacity duration-700 sm:p-6 " + (lifted ? "opacity-0" : "md:group-hover:opacity-0")}>
           <MediaView item={closed} fit="contain" sizes="(max-width: 767px) 92vw, 30vw" />
         </span>
         <span className={"absolute inset-0 p-4 transition-opacity duration-700 sm:p-6 " + (lifted ? "opacity-100" : "opacity-0 md:group-hover:opacity-100")}>
           <MediaView item={open} fit="contain" sizes="(max-width: 767px) 92vw, 30vw" />
         </span>
-      </div>
+      </button>
       <p className="eyebrow mt-4">{piece.client ?? piece.title}</p>
       <p className="title-caps mt-2 text-xl tracking-[0.08em] text-white">{trophy}</p>
-      <div className="mt-2 flex flex-wrap items-center gap-x-6">
-        <button
-          type="button"
-          onClick={() => setLifted((v) => !v)}
-          aria-pressed={lifted}
-          aria-label={lift + " · " + piece.title}
-          className="inline-flex min-h-12 items-center gap-3 text-base font-medium uppercase tracking-[0.18em] text-bone transition-colors hover:text-rose-light"
-        >
-          <span aria-hidden="true" className="bg-rose-gold block h-px w-8" />
-          {lift}
-        </button>
-        <Link to={"/pieces/" + piece.slug} className="inline-flex min-h-12 items-center gap-2 text-base text-mist hover:text-rose-light">
-          {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-        </Link>
-      </div>
+      <Link to={"/pieces/" + piece.slug} data-cta className="btn-secondary mt-2 text-bone">
+        {t.common.enterWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+      </Link>
     </li>
   );
 }

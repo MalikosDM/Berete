@@ -162,6 +162,52 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « audit du site en ligne (24/11 au soir) : 14 incohérences » — état au 25/11/2026
+- [x] **Plus de mention provisoire** : la ligne « Precious materials … to be confirmed by the atelier » et la ligne « Matières
+      précieuses » tirée des photos ne s'affichent plus (seulement ce que Yoni a donné) ; l'audit interdit « to be confirmed »,
+      « à confirmer », « TBD », « placeholder », « coming soon » (et leurs équivalents).
+- [x] **Plus de section vide** : pièce pour un collectionneur privé = une fine ligne sous son nom (`data-made-for-line`, accordée) ;
+      la section « Created exclusively for » seulement s'il y a une personne (ou des photos portées : « Worn »). L'audit vérifie
+      qu'aucun titre de section n'est suivi d'un autre titre ou du pied de page.
+- [x] **Vignettes sur le même noir** (`src/components/PieceThumb.tsx`, `npm run thumbs` → `scripts/thumbs.ts`,
+      `src/data/thumbs.generated.json`) : le détourage de l'ouverture (35 pièces) sinon la photo de couverture aux bords fondus ;
+      le bijou à 65 % de la hauteur du cadre, centré (sa place mesurée dans l'image ; `BOX` pour corriger à la main : panthère,
+      Oval Eternity, Red Flowers sans leur reflet ni leur sol) ; une photo n'est montrée qu'autour du bijou, bords fondus ; un bijou
+      plus large que haut (chaînes, Sirius, Loïs Openda) remplit la largeur du cadre (94 %) au lieu de 55 % de sa hauteur. Créations,
+      accueil (cartes et bagues Inter / VfB), « autres créations », profils. L'audit mesure le bord (6 px, ≤ 3 % plus clair que la
+      page) et la part du bijou (55–75 % de la hauteur, ou ≥ 85 % de la largeur pour un bijou plus large que haut). Planche :
+      `.local/verif/audit-2411/vignettes-avant-apres.jpg` (le disque externe était débranché le 25/11 : à recopier dans
+      `_verif/audit-2411/`).
+- [x] **Cercle** : une règle pour toutes les cartes (le nom ; le club dessous seulement Inter Milan ou VfB Stuttgart) ; le numéro
+      seulement sur la page du joueur (« No. 9 »), plus sur la page du club. **Sambi Lokonga** hors du Cercle et du plan du site
+      (301 vers /players) tant qu'il n'a pas de pièce publiée (règle générale de `publicCatalogue`). Portrait de **Tanguy Nianzou**
+      recadré sans le texte de la story (`scripts/piece-media.mjs`).
+- [x] **Un seul nom** : « In Pictures » / « En images » (« The Moments » retiré), « Their Creation(s) » / « Leur(s) création(s) »
+      pour un club, l'écrin de The Hand porte le nom de la pièce dans chaque langue (« Cube La Main »…). L'audit vérifie qu'une
+      pièce porte un seul nom par langue.
+- [x] **Titres de section** : un seul style (capitales espacées) ; la phrase de l'Atelier devient une citation en italique ;
+      « Your story, in diamonds » une seule fois sur /contact.
+- [x] **Atelier** : ses 4 grandes photos doublées par Swin2SR depuis leurs originaux (1080 et 1536 px ; maîtres dans `.local/atelier`,
+      jamais dans Git, un à la fois), puis 2880 px et copies 1440 / 2160 ; `sizes` justes.
+- [x] **iPhone** : l'accueil prend une version de la photo cadrée sur les deux écrins (`hero-phone`, `npm run page-media`), entiers
+      et centrés, la phrase et « Discover More » dessous sur le noir ; cartes : « Enter the World → » sur une ligne, sa flèche collée
+      au dernier mot (16 px en lettres simples sur téléphone, la règle des 16 px ; une langue plus longue peut passer à la ligne avec
+      sa flèche), le type seul sous le nom.
+- [x] **Un seul bouton par carte** : mécanismes de l'Atelier (« Enter the World » ; la bague se soulève au survol ou au toucher),
+      presse (l'article ; une photo sur chaque carte, Stuttgarter Nachrichten compris).
+- [x] **Cartes de pièces, un seul format** : NOM, une ligne « Type · mention », « Enter the World → » (`CardLine`, `EnterWorld` de
+      `src/components/PieceGrid.tsx`).
+- [x] **Every Angle** : plus aucune légende ; les 4 premières photos sont 4 vues différentes (empreintes d'image,
+      `scripts/angle-views.ts` → `src/data/angle-views.generated.json`, `diverseFirst` de `src/data/pageMedia.ts`).
+- [x] **Plan du site** : `/creations/chains/tennis` retiré ; l'audit vérifie qu'aucune adresse du plan ne redirige.
+- [x] **Mise en page** : page d'un club comme celle d'un joueur (nom près de la photo, aligné en bas) ; The Bespoke Journey en une
+      colonne centrée de 760 px (titre, frise, les deux encadrés de même largeur).
+- `tests/audit2411.spec.ts` (ordinateur, Safari, iPhone). Toute la batterie passe en local (727 tests, ordinateur, iPhone, Safari,
+  25/11). Captures avant (de l'audit) : `_verif/audit-2411/` ; après : `_verif/audit-2411/apres/` (ou `.local/verif/` si le
+  disque est débranché).
+- [ ] Yoni : la pièce de Sambi Lokonga ; une photo propre de Tanguy Nianzou si le recadrage ne lui plaît pas ; les matières, poids et
+      carats de chaque pièce (la ligne « Matières précieuses » reviendra avec ses chiffres).
+
 ## Passe « photos nettes à la loupe + monogramme BRT » — état au 24/11/2026
 - [x] **Palier loupe** (`scripts/loupe.mjs`) : chaque photo qui s'ouvre dans la visionneuse a, à côté de sa copie de page, une
       copie tirée de l'original du disque (côté long 3200 px au plus, jamais agrandie, WebP qualité 86, lanczos), faite par les

@@ -59,7 +59,7 @@ test("home: one photo of the Sirius trunk full screen, its signature in the blac
     await open(page, lang + "/");
     const photo = page.locator("[data-home-photo-img]");
     await expect(photo).toBeVisible();
-    await expect.poll(() => photo.evaluate((i) => (i as HTMLImageElement).currentSrc)).toMatch(/\/media\/pages\/hero-(desktop|mobile)-\d+\.[0-9a-f]{10}\.(avif|webp)$/);
+    await expect.poll(() => photo.evaluate((i) => (i as HTMLImageElement).currentSrc)).toMatch(/\/media\/pages\/hero-(desktop|phone)-\d+\.[0-9a-f]{10}\.(avif|webp)$/);
     const box = (await page.locator("[data-home-photo]").boundingBox())!;
     const view = page.viewportSize()!;
     expect(box.height).toBeGreaterThanOrEqual(view.height - 1);
@@ -67,8 +67,14 @@ test("home: one photo of the Sirius trunk full screen, its signature in the blac
     const line = (await page.locator("[data-home-tagline]").boundingBox())!;
     expect(line.height).toBeLessThan(40);
     const img = (await page.locator("[data-home-photo-box]").boundingBox())!;
-    expect(line.y).toBeGreaterThan(img.y + img.height * 0.75);
-    expect(line.y + line.height).toBeLessThanOrEqual(img.y + img.height + 1);
+    if (view.width >= view.height) {
+      expect(line.y).toBeGreaterThan(img.y + img.height * 0.75);
+      expect(line.y + line.height).toBeLessThanOrEqual(img.y + img.height + 1);
+    } else {
+      // A phone (25/11/2026): the photo of the two cases is wider than high; its signature under it, on the black.
+      expect(line.y).toBeGreaterThanOrEqual(img.y + img.height - 1);
+      expect(line.y + line.height).toBeLessThanOrEqual(view.height);
+    }
     // No film moved by the scroll, no "Scroll" on the home page any more.
     await expect(page.locator("[data-scroll-video], [data-sketch-intro]")).toHaveCount(0);
     await expect(page.locator("[data-stories-bar], [data-story-bubble]")).toHaveCount(0);

@@ -89,7 +89,9 @@ export const PORTRAITS = [
   { key: "portraits/samuel-ballet", from: "story:15/03", at: 0, crop: [0.0, 0.0625, 1.0, 0.7031] },
   { key: "portraits/keita-losene", from: "story:16/02", crop: [0.0, 0.3385, 0.5926, 0.4167] },
   { key: "portraits/sambi-lokonga", from: "story:22/01", crop: [0.0463, 0.1719, 0.6667, 0.4688] },
-  { key: "portraits/tanguy-nianzou", from: "story:23/04", crop: [0.4074, 0.1198, 0.5926, 0.4167] },
+  // Lower and to the right (25/11/2026): the words of the story ("Keep winning on and off the field", "bro") left out, his
+  // face whole.
+  { key: "portraits/tanguy-nianzou", from: "story:23/04", crop: [0.462, 0.1505, 0.538, 0.3785] },
   { key: "portraits/tajon-buchanan", from: "story:25/03", crop: [0.0787, 0.1406, 0.5185, 0.3646] },
   { key: "portraits/jeff-chabot", from: "story:30/02", crop: [0.0972, 0.0938, 0.8333, 0.5859] },
   { key: "portraits/inter-milan", from: "story:21/02", crop: [0.037, 0.1979, 0.9259, 0.651] },

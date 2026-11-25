@@ -1,11 +1,10 @@
-import { ArrowRight } from "lucide-react";
-import { MediaView } from "@/components/Media";
+import PieceThumb from "@/components/PieceThumb";
 import { SIZES_FOR } from "@/lib/responsive";
 import type { Piece } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { usePieceModels } from "@/lib/models";
-import { CardLine } from "@/components/PieceGrid";
+import { CardLine, EnterWorld } from "@/components/PieceGrid";
 
 type Props = { piece: Piece; eager?: boolean; priority?: boolean; showType?: boolean; className?: string; compact?: boolean };
 
@@ -14,7 +13,7 @@ type Props = { piece: Piece; eager?: boolean; priority?: boolean; showType?: boo
  * the page Créations (six on a row on a computer, two on a phone): its name, the name of the one it was made for, and its
  * way in, in smaller letters (never under 16 px).
  */
-export default function PieceCard({ piece, eager = false, priority = false, showType = false, className = "", compact = false }: Props) {
+export default function PieceCard({ piece, eager = false, priority = false, className = "", compact = false }: Props) {
   const cat = useCatalogue();
   const { t } = useI18n();
   const madeFor = useMadeFor();
@@ -22,9 +21,9 @@ export default function PieceCard({ piece, eager = false, priority = false, show
   if (compact) {
     return (
       <Link to={"/pieces/" + piece.slug} data-piece-card={piece.slug} data-compact className={"group block " + className}>
-        <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
-          <span className="absolute inset-0 p-3 transition-opacity duration-700 group-hover:opacity-90 lg:p-4">
-            <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" eager={eager} priority={priority} sizes={SIZES_FOR.grid6} />
+        <span data-thumb-frame className="relative block aspect-[4/5] overflow-hidden bg-ink">
+          <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
+            <PieceThumb piece={piece} eager={eager} priority={priority} sizes={SIZES_FOR.grid6} />
           </span>
           <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
           {in3d ? (
@@ -36,11 +35,10 @@ export default function PieceCard({ piece, eager = false, priority = false, show
         </span>
         <span className="mt-3 block">
           <span data-piece-name className="title-caps block text-base leading-snug tracking-[0.05em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]">{piece.title}</span>
-          <CardLine piece={piece} who={madeFor(cat, piece)} showType={showType} />
+          <CardLine piece={piece} who={madeFor(cat, piece)} />
           {/* The signature button of every piece. */}
-          <span data-enter-world data-cta className="btn-secondary text-rose-light group-hover:text-white">
-            {t.common.enterWorld}
-            <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+          <span data-enter-world data-cta className="card-enter text-rose-light group-hover:text-white">
+            <EnterWorld text={t.common.enterWorld} />
           </span>
         </span>
       </Link>
@@ -48,9 +46,9 @@ export default function PieceCard({ piece, eager = false, priority = false, show
   }
   return (
     <Link to={"/pieces/" + piece.slug} data-piece-card={piece.slug} className={"group block " + className}>
-      <span className="relative block aspect-[4/5] overflow-hidden bg-ink">
-        <span className="absolute inset-0 p-5 transition-opacity duration-700 group-hover:opacity-90 sm:p-6">
-          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" eager={eager} priority={priority} sizes={SIZES_FOR.grid3} />
+      <span data-thumb-frame className="relative block aspect-[4/5] overflow-hidden bg-ink">
+        <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
+          <PieceThumb piece={piece} eager={eager} priority={priority} sizes={SIZES_FOR.grid3} />
         </span>
         <span aria-hidden="true" className="bg-rose-gold absolute bottom-0 start-0 h-px w-0 transition-[width] duration-700 ease-out group-hover:w-full" />
         {/* The pieces the jeweller attached a 3D model to. */}
@@ -63,11 +61,10 @@ export default function PieceCard({ piece, eager = false, priority = false, show
       </span>
       <span className="mt-4 block">
         <span data-piece-name className="title-caps block text-base tracking-[0.06em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]">{piece.title}</span>
-        <CardLine piece={piece} who={madeFor(cat, piece)} showType={showType} />
+        <CardLine piece={piece} who={madeFor(cat, piece)} />
         {/* The signature button of every piece. */}
-        <span data-enter-world data-cta className="btn-secondary text-white group-hover:text-rose-light">
-          {t.common.enterWorld}
-          <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+        <span data-enter-world data-cta className="card-enter text-white group-hover:text-rose-light">
+          <EnterWorld text={t.common.enterWorld} />
         </span>
       </span>
     </Link>

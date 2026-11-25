@@ -262,11 +262,9 @@ export const es: Messages = {
     detailsEyebrow: "Cada detalle cuenta una historia",
     seePhoto: "Descubrir el detalle",
     historic: "Encargos históricos",
-    seenNote: "Materiales preciosos: según las fotos, pendiente de confirmación por el taller.",
     madeFor: "Creada en exclusiva para",
     theClub: "Descubrir su universo",
     theProfile: "Descubrir su universo",
-    stories: (_count: number) => "Los momentos",
     andOthers: (names: string) => "También " + names + ".",
     seenInStories: "Vista en nuestras historias",
     wornOn: "Se lleva en",
@@ -335,7 +333,8 @@ export const es: Messages = {
     bioStories: (name: string) => "Los momentos compartidos con " + name + " en nuestro Instagram.",
     watch: (_count: number) => "Descubrir su universo",
     pieces: (count: number) => n(count, "Creación personal", "Creaciones personales"),
-    stories: "Los momentos",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, "Su creación", "Sus creaciones"),
     moments: (count: number) => n(count, "# momento", "# momentos"),
     theirPlayers: "Los deportistas",
     logoOf: (name: string) => "El emblema de " + name,
@@ -641,10 +640,6 @@ export const es: Messages = {
     "/creations/chains/cuban": {
       title: "Cadenas cubanas con diamantes",
       description: "Las cadenas cubanas de Berete Jewellers, cubiertas de diamantes en distintos anchos, creadas en Dubái.",
-    },
-    "/creations/chains/tennis": {
-      title: "Cadenas tenis",
-      description: "Las cadenas tenis de Berete Jewellers: una línea de diamantes, piedra tras piedra, creadas en Dubái.",
     },
     "/creations/chains/infinity": {
       title: "Cadenas infinito",

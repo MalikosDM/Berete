@@ -157,10 +157,10 @@ test("a photo of a phone keeps its size: its zoom stops at its own pixels (« Po
   await expect.poll(() => p.locator("[data-lightbox-image]").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   const viewer = p.locator("[data-lightbox]");
   await expect(viewer).toBeVisible();
-  const { width, max } = await p.evaluate(() => ({
-    width: document.querySelector<HTMLImageElement>("[data-lightbox-loupe]")?.naturalWidth ?? document.querySelector<HTMLImageElement>("[data-lightbox-image]")!.naturalWidth,
-    max: Number(document.querySelector("[data-lightbox-stage]")!.getAttribute("data-zoom-max")),
-  }));
+  // Its largest file: its loupe copy when it has one (from the list, loaded or not yet), else the photo itself.
+  const src = (await p.locator("[data-lightbox-image]").getAttribute("src"))!;
+  const width = LOUPES[src]?.width ?? (await p.locator("[data-lightbox-image]").evaluate((img: HTMLImageElement) => img.naturalWidth));
+  const max = Number(await p.locator("[data-lightbox-stage]").getAttribute("data-zoom-max"));
   const drawn = (await p.locator("[data-lightbox-photo]").boundingBox())!.width;
   expect(max).toBeLessThanOrEqual(Math.max(1, width / drawn) + 0.01);
   await close();

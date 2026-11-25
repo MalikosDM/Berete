@@ -271,12 +271,10 @@ export const de: Messages = {
     detailsEyebrow: "Jedes Detail erzählt eine Geschichte",
     seePhoto: "Das Detail entdecken",
     historic: "Historische Auftragswerke",
-    seenNote: "Edle Materialien: nach den Fotos, vom Atelier noch zu bestätigen.",
     madeFor: "Exklusiv geschaffen für",
     theClub: "Seine Welt entdecken",
     // No "his" or "her": the profile may be of anyone.
     theProfile: "Seine Welt entdecken",
-    stories: (_count: number) => "Die Momente",
     andOthers: (names: string) => "Sowie " + names + ".",
     seenInStories: "Zu sehen in unseren Storys",
     wornOn: "Getragen an",
@@ -346,7 +344,8 @@ export const de: Messages = {
     // No "his" or "her": the profile may be of anyone.
     watch: (_count: number) => "Seine Welt entdecken",
     pieces: (count: number) => n(count, "Persönliche Kreation", "Persönliche Kreationen"),
-    stories: "Die Momente",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, "Ihre Kreation", "Ihre Kreationen"),
     moments: (count: number) => n(count, "# Moment", "# Momente"),
     theirPlayers: "Die Athleten",
     logoOf: (name: string) => "Das Emblem " + ofName(name),
@@ -652,10 +651,6 @@ export const de: Messages = {
     "/creations/chains/cuban": {
       title: "Kubanische Ketten mit Diamanten",
       description: "Die kubanischen Ketten von Berete Jewellers, mit Diamanten besetzt, in verschiedenen Breiten, gefertigt in Dubai.",
-    },
-    "/creations/chains/tennis": {
-      title: "Tennisketten",
-      description: "Die Tennisketten von Berete Jewellers: eine Linie aus Diamanten, Stein für Stein, gefertigt in Dubai.",
     },
     "/creations/chains/infinity": {
       title: "Infinity-Ketten",

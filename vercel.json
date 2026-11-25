@@ -117,6 +117,16 @@
       "statusCode": 301
     },
     {
+      "source": "/players/sambi-lokonga",
+      "destination": "/players",
+      "statusCode": 301
+    },
+    {
+      "source": "/:lang(fr|es|de|nl|ar)/players/sambi-lokonga",
+      "destination": "/:lang/players",
+      "statusCode": 301
+    },
+    {
       "source": "/players/jeff-chabot",
       "destination": "/players",
       "statusCode": 301

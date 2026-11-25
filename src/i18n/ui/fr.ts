@@ -273,11 +273,9 @@ export const fr: Messages = {
     detailsEyebrow: "Chaque détail raconte une histoire",
     seePhoto: "Découvrir le détail",
     historic: "Créations historiques",
-    seenNote: "Matières précieuses : d’après les photos, à confirmer par l’atelier.",
     madeFor: "Créée exclusivement pour",
     theClub: "Découvrir son univers",
     theProfile: "Découvrir son univers",
-    stories: (_count: number) => "Moments exclusifs",
     andOthers: (names: string) => "Ainsi que " + names + ".",
     seenInStories: "À voir dans nos stories",
     wornOn: "Se porte sur",
@@ -346,7 +344,8 @@ export const fr: Messages = {
     bioStories: (name: string) => "Les moments partagés avec " + named(name) + " sur notre Instagram.",
     watch: (_count: number) => "Découvrir son univers",
     pieces: (count: number) => n(count, { one: "Création personnelle", other: "Créations personnelles" }),
-    stories: "Moments exclusifs",
+    /** The pieces of a club (25/11/2026): never « personal ». */
+    clubPieces: (count: number) => n(count, { one: "Leur création", other: "Leurs créations" }),
     moments: (count: number) => n(count, { one: "# moment", other: "# moments" }),
     theirPlayers: "Les athlètes",
     logoOf: (name: string) => "L’emblème " + ofName(name),
@@ -652,10 +651,6 @@ export const fr: Messages = {
     "/creations/chains/cuban": {
       title: "Chaînes cubaines glacées",
       description: "Les chaînes cubaines de Berete Jewellers, glacées de diamants, en plusieurs largeurs, créées à Dubaï.",
-    },
-    "/creations/chains/tennis": {
-      title: "Chaînes tennis",
-      description: "Les chaînes tennis de Berete Jewellers : une ligne de diamants, pierre après pierre, créées à Dubaï.",
     },
     "/creations/chains/infinity": {
       title: "Chaînes infini",

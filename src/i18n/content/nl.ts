@@ -692,7 +692,7 @@ const content: Record<string, string> = {
   "The case open": "De koffer geopend",
   "The medallion on its display, beside the case": "Het medaillon op zijn display, naast de koffer",
   "The back of the trunk": "De achterkant van de koffer",
-  "The Hand Cube": "The Hand-kubus",
+  "The Hand Cube": "De Hand-kubus",
   "A black cube with a drawing in rose gold on its front. It opens on the pendant, lit from inside, and folds into a display.": "Een zwarte kubus met een tekening in roségoud op de voorkant. Hij opent zich op de hanger, van binnenuit verlicht, en vouwt zich tot een display.",
   "The cube closed, its drawing in rose gold": "De kubus gesloten, zijn tekening in roségoud",
   "The cube from the side": "De kubus van opzij",

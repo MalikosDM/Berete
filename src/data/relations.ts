@@ -20,9 +20,11 @@ export const TYPE_LABELS: Record<PieceType, string> = {
 export function publicCatalogue(cat: Catalogue): Catalogue {
   const hidden = new Set(cat.pieces.filter((p) => p.published === false).map((p) => p.slug));
   const hiddenBoxes = new Set(cat.boxes.filter((b) => b.published === false).map((b) => b.slug));
-  if (hidden.size === 0 && hiddenBoxes.size === 0) return cat;
   const pieces = cat.pieces.filter((p) => !hidden.has(p.slug)).map((p) => (p.boxSlug && hiddenBoxes.has(p.boxSlug) ? { ...p, boxSlug: null } : p));
-  const gone = new Set(cat.people.filter((person) => cat.pieces.some((p) => p.people.includes(person.slug)) && !pieces.some((p) => p.people.includes(person.slug))).map((p) => p.slug));
+  // Out of the circle: whoever has no published piece (all theirs unpublished, or none given yet by Yoni: Sambi Lokonga,
+  // 25/11/2026). Their page leads to /players until a piece of theirs is published.
+  const gone = new Set(cat.people.filter((person) => !pieces.some((p) => p.people.includes(person.slug))).map((p) => p.slug));
+  if (hidden.size === 0 && hiddenBoxes.size === 0 && gone.size === 0) return cat;
   return {
     ...cat,
     pieces: pieces.map((p) => (p.people.some((x) => gone.has(x)) ? { ...p, people: p.people.filter((x) => !gone.has(x)) } : p)),
@@ -44,7 +46,7 @@ export function removedPieceTarget(full: Catalogue, slug: string): string | null
   return person ? "/players/" + person.slug : "/creations";
 }
 
-/** Whether a person left the circle (all their pieces unpublished): their page leads to /players. */
+/** Whether a person left the circle (no published piece of theirs): their page leads to /players. */
 export function leftTheCircle(full: Catalogue, slug: string): boolean {
   return full.people.some((p) => p.slug === slug) && !publicCatalogue(full).people.some((p) => p.slug === slug);
 }

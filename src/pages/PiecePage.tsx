@@ -74,9 +74,11 @@ export default function PiecePage() {
   const who = madeFor(cat, piece);
   const named = who !== t.common.privateCollector;
   const signature = SIGNATURE_PIECES.includes(piece.slug);
-  // The rows of the sheet by their English label (the page shows them translated): the row "Precious Materials" says what the photos show.
+  // Someone to show under « Created exclusively for … » (a player, a club): else the line goes under the name of the piece.
+  const showsPerson = named && people.length > 0;
+  // The rows of the sheet by their English label (the page shows them translated). The row "Precious Materials" said what the
+  // photos seemed to show, to be confirmed: never shown any more (25/11/2026), only what Yoni gave.
   const sheetRows = (raw.pieces.find((p) => p.slug === piece.slug)?.specs.map((s) => s.label) ?? []).map((l) => (l === OLD_SEEN_LABEL ? SEEN_LABEL : l));
-  const seenRow = sheetRows.includes(SEEN_LABEL);
   const feature = featureFilmOf(piece.slug);
 
   const theme = resolveTheme(piece.theme);
@@ -122,7 +124,9 @@ export default function PiecePage() {
   // Its making-of lives in The Atelier (Yoni, 24/11/2026): a way there when it has one (its film, or the photos of its steps).
   const inAtelier = Boolean(atelier || completeMakingOf(piece.slug, piece.atelier) || makingSteps(piece, box?.images[0]).length > 0);
   // The lines of its composition that are filled (the others never show).
-  const specs = piece.specs.map((s, i) => ({ ...s, row: sheetRows[i] })).filter((s) => s.value.trim() !== "");
+  const specs = piece.specs
+    .map((s, i) => ({ ...s, row: sheetRows[i] }))
+    .filter((s) => s.value.trim() !== "" && s.row !== SEEN_LABEL && s.label !== SEEN_LABEL && s.label !== OLD_SEEN_LABEL);
   // Its sentence under the title, unless its story already says it (the last words of the Dragon Ball pendant): once.
   const storyTexts = storyBlocks(piece.story).map((b) => b.text.trim());
   const line = piece.line && !storyTexts.some((x) => x.includes(piece.line.trim().replace(/[.!]+$/, ""))) ? piece.line : "";
@@ -175,6 +179,8 @@ export default function PiecePage() {
               <h1 id="piece-title" data-u-title className="title-caps mt-2 leading-[1.15] tracking-[0.08em] break-words text-white [text-wrap:balance]">
                 {piece.title}
               </h1>
+              {/* For whom, when no one can be shown below (a private collector): a fine line under its name, never a section. */}
+              {!showsPerson && !signature ? <p data-made-for-line className="mt-2 text-base text-mist">{t.common.madeFor(who, piece.type)}</p> : null}
               {line ? <p className="mt-3 text-base leading-relaxed text-bone">{line}</p> : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-7">
@@ -225,22 +231,22 @@ export default function PiecePage() {
           <h2 id="sheet-title" className="title-caps tracking-[0.12em] t-title ">{t.piece.sheet}</h2>
           <dl className="mt-8 grid gap-x-10 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
             {specs.map((s) => (
-              <div key={s.label} data-spec={s.row === SEEN_LABEL ? "seen" : undefined} className="border-t border-white/12 pt-3">
+              <div key={s.label} className="border-t border-white/12 pt-3">
                 <dt className="text-[0.75rem] font-normal uppercase tracking-[0.2em] text-mist max-md:text-base max-md:tracking-[0.12em]">{t.piece.composition[s.label] ?? s.label}</dt>
                 <dd className="mt-1 text-base leading-snug text-white">{s.value}</dd>
               </div>
             ))}
           </dl>
-          {/* What the photos show, written before the jeweller confirms it: said as such while the piece is a draft. */}
-          {piece.draft && seenRow ? <p data-seen-note className="mt-4 text-base text-mist">{t.piece.seenNote}</p> : null}
         </section>
       ) : null}
 
       {/* 6. Created exclusively for…: one section (24/11/2026) for whom it was made and the photos where it is worn; a chain of
-          the house is "A Berete Signature"; a piece without a name, "a private collector", said once. */}
+          the house is "A Berete Signature". Shown only when it has someone or something to show (25/11/2026): a piece for a
+          private collector says so in a fine line under its name, and has this section only for the photos where it is worn. */}
+      {signature || showsPerson || worn.length > 0 ? (
       <section aria-labelledby="made-for-title" data-made-for data-piece-section="created-for" className="wrap border-t border-white/10 py-14 lg:py-16">
         <h2 id="made-for-title" className="title-caps tracking-[0.12em] t-title [text-wrap:balance]">
-          {signature ? t.common.signature : t.common.madeFor(who, piece.type)}
+          {signature ? t.common.signature : showsPerson ? t.common.madeFor(who, piece.type) : t.piece.wornBy(named ? who : null)}
         </h2>
         {signature ? <p className="mt-4 max-w-xl text-base text-bone">{t.common.signatureText}</p> : null}
         {named && people.length > 0 ? (
@@ -303,6 +309,7 @@ export default function PiecePage() {
         ) : null}
         {wornOpen !== null ? createPortal(<Lightbox items={worn.map((m) => ({ ...m, caption: undefined }))} index={wornOpen} onIndex={setWornOpen} onClose={() => setWornOpen(null)} />, document.body) : null}
       </section>
+      ) : null}
 
       {/* 7. The Trunk: all its photos, whole; the way to it on the page of the trunks when it opens there. */}
       {box ? <BoxSection boxes={[box]} title={t.piece.trunk} id="piece-trunk" /> : null}

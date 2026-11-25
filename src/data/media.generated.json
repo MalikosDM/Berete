@@ -4,26 +4,26 @@
       {
         "type": "image",
         "src": "/media/atelier/01.webp",
-        "width": 1080,
-        "height": 1440
+        "width": 2160,
+        "height": 2880
       },
       {
         "type": "image",
         "src": "/media/atelier/02.webp",
-        "width": 1080,
-        "height": 1440
+        "width": 2160,
+        "height": 2880
       },
       {
         "type": "image",
         "src": "/media/atelier/03.webp",
-        "width": 1080,
-        "height": 1440
+        "width": 2880,
+        "height": 3840
       },
       {
         "type": "image",
         "src": "/media/atelier/04.webp",
-        "width": 1080,
-        "height": 1440
+        "width": 2880,
+        "height": 3840
       }
     ],
     "pieces/vfb-stuttgart-dfb-pokal-2025": [
@@ -592,8 +592,8 @@
     "portraits/tanguy-nianzou": {
       "type": "image",
       "src": "/media/portraits/tanguy-nianzou.webp",
-      "width": 764,
-      "height": 954
+      "width": 694,
+      "height": 868
     },
     "portraits/tajon-buchanan": {
       "type": "image",

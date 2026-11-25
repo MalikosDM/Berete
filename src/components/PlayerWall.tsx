@@ -50,6 +50,7 @@ export function facesFirst(people: Person[], cat: Catalogue): Person[] {
 export default function PlayerWall({ people, compact = false }: { people: Person[]; compact?: boolean }) {
   const { t } = useI18n();
   const cat = useCatalogue();
+  const houseClubs = new Set(cat.people.filter((x) => x.kind === "club").map((x) => x.name));
   // Four on a row on a computer, smaller (Yoni, 24/11/2026).
   const columns = compact ? "grid-cols-3 gap-x-3 gap-y-8 sm:grid-cols-4 sm:gap-x-5 lg:grid-cols-7 lg:gap-x-6" : "grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 sm:gap-x-5 lg:grid-cols-4 lg:gap-x-6";
   const sizes = compact ? "(max-width: 639px) 31vw, (max-width: 1023px) 23vw, 13vw" : "(max-width: 639px) 46vw, (max-width: 1023px) 31vw, 18rem";
@@ -57,7 +58,9 @@ export default function PlayerWall({ people, compact = false }: { people: Person
     <ul data-player-wall className={"grid " + columns}>
       {people.map((p) => {
         const instagram = instagramOf(p);
-        const role = p.kind === "club" ? t.players.club : p.kind === "personality" ? t.players.personality : p.club;
+        // One rule for every card (25/11/2026): the name, and under it the club only when it is a club of the house (Inter
+        // Milan, VfB Stuttgart); the number of the jersey only on the page of the player.
+        const role = p.kind === "player" && p.club && houseClubs.has(p.club) ? p.club : null;
         return (
           <li key={p.slug} data-player-card={p.slug} className="group relative">
             <Link to={personHref(cat, p)} data-player-link className="block">
@@ -72,7 +75,6 @@ export default function PlayerWall({ people, compact = false }: { people: Person
                   (compact ? "text-base font-medium max-sm:mt-3 sm:font-display sm:text-lg sm:font-normal sm:uppercase sm:tracking-[0.05em]" : "font-display text-base uppercase tracking-[0.06em] sm:text-lg")
                 }
               >
-                {p.number !== null ? <span className="text-rose-gold shrink-0">{p.number}</span> : null}
                 <span className="min-w-0 break-words">{p.name}</span>
               </span>
               {role ? <span className="mt-1 block text-base text-mist">{role}</span> : null}

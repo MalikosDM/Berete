@@ -58,9 +58,12 @@ export default function Process() {
   return (
     <>
       <section aria-labelledby="journey-title" data-journey className="bg-ink pt-24 pb-4 desk:pt-28">
+        {/* One centred column of about 760 px (25/11/2026): the title, the six steps and the two questions under each other. */}
         <div className="wrap">
-        <h1 id="journey-title" className="title-caps tracking-[0.12em] t-hero text-white">{t.process.title}</h1>
-          <p className="mt-3 max-w-2xl text-base text-bone lg:text-[1rem]">{t.process.quick.lead}</p>
+          <div className="mx-auto max-w-[760px]">
+            <h1 id="journey-title" className="title-caps tracking-[0.12em] t-hero text-white">{t.process.title}</h1>
+            <p className="mt-3 text-base text-bone">{t.process.quick.lead}</p>
+          </div>
         </div>
       </section>
       <Timeline steps={stepsOf(t)} />
@@ -75,7 +78,7 @@ function Timeline({ steps }: { steps: ReturnType<typeof stepsOf> }) {
   return (
     <section aria-label={t.process.overviewTitle} data-timeline className="bg-ink pt-8 pb-14 lg:pt-10 lg:pb-16">
       <div className="wrap">
-        <ol className="relative max-w-3xl">
+        <ol data-timeline-list className="relative mx-auto max-w-[760px]">
           {/* The fine line that joins the steps. */}
           <span aria-hidden="true" className="absolute top-2 bottom-2 start-[0.6875rem] w-px bg-white/15" />
           {steps.map((s, i) => {
@@ -124,7 +127,7 @@ function Questions() {
   return (
     <section aria-label={t.process.quick.orderQ} data-journey-questions className="bg-ink pb-14 lg:pb-16">
       <div className="wrap">
-        <dl className="grid max-w-5xl gap-px border border-white/10 bg-white/10 md:grid-cols-2">
+        <dl className="mx-auto grid max-w-[760px] gap-px border border-white/10 bg-white/10 md:grid-cols-2">
           <div data-journey-order className="bg-ink p-6">
             <dt className="title-caps t-sub tracking-[0.1em] text-white">{t.process.quick.orderQ}</dt>
             <dd className="mt-2 text-base leading-relaxed text-bone">{t.process.quick.orderA}</dd>

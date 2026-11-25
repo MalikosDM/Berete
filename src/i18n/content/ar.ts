@@ -698,7 +698,7 @@ const content: Record<string, string> = {
   "The case open": "الحقيبة مفتوحة",
   "The medallion on its display, beside the case": "الميدالية على حامل عرضها، بجانب الحقيبة",
   "The back of the trunk": "ظهر الصندوق",
-  "The Hand Cube": "مكعب The Hand",
+  "The Hand Cube": "مكعب اليد",
   "A black cube with a drawing in rose gold on its front. It opens on the pendant, lit from inside, and folds into a display.": "مكعب أسود يحمل على واجهته رسماً بالذهب الوردي. ينفتح على القلادة المضاءة من الداخل، ثم ينطوي ليصبح حامل عرض.",
   "The cube closed, its drawing in rose gold": "المكعب مغلقاً، ورسمه بالذهب الوردي",
   "The cube from the side": "المكعب من الجانب",

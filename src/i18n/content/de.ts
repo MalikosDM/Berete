@@ -692,7 +692,7 @@ const content: Record<string, string> = {
   "The case open": "Der Koffer geöffnet",
   "The medallion on its display, beside the case": "Das Medaillon auf seinem Display, neben dem Koffer",
   "The back of the trunk": "Die Rückseite des Koffers",
-  "The Hand Cube": "The-Hand-Würfel",
+  "The Hand Cube": "Die-Hand-Würfel",
   "A black cube with a drawing in rose gold on its front. It opens on the pendant, lit from inside, and folds into a display.": "Ein schwarzer Würfel mit einer Zeichnung in Roségold auf der Vorderseite. Er öffnet sich auf den Anhänger, von innen beleuchtet, und klappt sich zu einem Display zusammen.",
   "The cube closed, its drawing in rose gold": "Der Würfel geschlossen, seine Zeichnung in Roségold",
   "The cube from the side": "Der Würfel von der Seite",

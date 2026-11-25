@@ -37,9 +37,10 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
   const items = strongestFirst(given);
   const shown = expanded ? items : items.slice(0, FIRST);
   const hidden = items.length - shown.length;
+  // No caption (25/11/2026): Yoni wrote none for every photo, so none at all, under the photos as in full screen; the short
+  // titles of src/data/angles.json stay in the descriptions of the photos (alt).
   const captionOf = (item: MediaItem) => angleOf(piece, item.src)?.title.trim() ?? "";
-  // Full screen: the same short caption, or none (never the old descriptive one).
-  const viewed = items.map((item) => ({ ...item, caption: captionOf(item) || undefined }));
+  const viewed = items.map((item) => ({ ...item, caption: undefined }));
 
   return (
     <section aria-labelledby="every-angle" data-every-angle data-piece-section="angles" className="wrap py-16 lg:py-20">
@@ -77,11 +78,6 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
                   </span>
                 ) : null}
               </button>
-              {caption ? (
-                <p data-angle-title className="mt-3 text-base leading-snug text-bone [text-shadow:0_1px_18px_rgba(0,0,0,0.85)]">
-                  {caption}
-                </p>
-              ) : null}
             </li>
           );
         })}

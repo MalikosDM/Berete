@@ -33,6 +33,12 @@ export function coverSizes(sizes: string, width: number | undefined, height: num
   if (!width || !height) return sizes;
   const k = width / height / frame;
   if (k <= 1.02) return sizes;
+  return scaleSizes(sizes, k);
+}
+
+/** A `sizes` multiplied by k (a photo drawn k times as wide as the place it is given). */
+export function scaleSizes(sizes: string, k: number): string {
+  if (Math.abs(k - 1) < 0.02) return sizes;
   const f = Math.round(k * 100) / 100;
   return sizes
     .split(",")

@@ -59,14 +59,12 @@ export default function ContactBlock({ pieceName, compact = false, id, extra }: 
   }
 
   return (
-    <section id={id} aria-labelledby={(id ?? "contact-block") + "-title"} data-contact-block className="relative scroll-mt-32 bg-ink pt-6 pb-12 lg:pt-8 lg:pb-14">
+    <section id={id} aria-label={t.common.startPiece} data-contact-block className="relative scroll-mt-32 bg-ink pt-6 pb-12 lg:pt-8 lg:pb-14">
       <div className="wrap">
         <div data-contact-columns className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           {/* Left: the main call to action */}
           <div className="lg:col-span-5">
-            <h2 id={(id ?? "contact-block") + "-title"} className="sr-only">
-              {t.common.yourStory}
-            </h2>
+            {/* « Your story, in diamonds » once on the page: in its last block (25/11/2026). */}
             <p className="max-w-md text-base text-bone">{t.contact.oneConversation}</p>
             <a href={waLink(mainMessage)} target="_blank" rel="noreferrer" data-cta className="btn-primary mt-5">
               <BrandIcon name="whatsapp" className="size-4" />

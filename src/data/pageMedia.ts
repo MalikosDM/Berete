@@ -3,6 +3,7 @@
  * opening of a piece shows its jewel cut out of one or several photos: those photos are then not shown again in Every Angle;
  * the film of the finished piece (or of its mechanism) is not shown again among its films either.
  */
+import views from "./angle-views.generated.json" with { type: "json" };
 import { anglePhotos, wornSet } from "./angles.js";
 import { resolveReveal } from "./atelier.js";
 import { featureFilmOf } from "./featureFilms.js";
@@ -81,6 +82,26 @@ export function uniqueMedia<T extends { src: string }>(items: T[], already: Set<
  * piece), the photos of the part worn apart, the photos of Every Angle (never one its opening shows, nor its trunk's, nor that
  * film), the photos where it is worn. The page and its tests read the same lists.
  */
+/**
+ * The first four photos of Every Angle show four different views (audit of 24/11/2026): two photos of one view
+ * (scripts/angle-views.ts, by their fingerprints) never both among the first four; the others keep their order after them.
+ */
+export function diverseFirst(items: MediaItem[], sameViews: string[][], count = 4): MediaItem[] {
+  if (sameViews.length === 0) return items;
+  const viewOf = new Map<string, number>();
+  sameViews.forEach((names, i) => names.forEach((n) => viewOf.set(n, i)));
+  const first: MediaItem[] = [];
+  const used = new Set<number>();
+  for (const m of items) {
+    if (first.length >= count) break;
+    const v = viewOf.get(fileBase(m.src));
+    if (v !== undefined && used.has(v)) continue;
+    if (v !== undefined) used.add(v);
+    first.push(m);
+  }
+  return [...first, ...items.filter((m) => !first.includes(m))];
+}
+
 export function pieceMediaOf(
   piece: Piece,
   { raw, box, part, opening }: { raw?: Piece; box?: { images: MediaItem[] }; part?: { piece: Piece; photos: string[] | "all" } | null; opening: { mode: string; views: Pick<CutoutView, "id" | "source">[] } },
@@ -92,7 +113,7 @@ export function pieceMediaOf(
   const partPhotos: MediaItem[] = !part ? [] : uniqueMedia(part.photos === "all" ? partAll : part.photos.map((n) => partAll.find((m) => fileBase(m.src) === n)).filter((m): m is MediaItem => Boolean(m)));
   const taken = new Set([...openingSources(piece, opening), ...(box?.images.map((m) => m.src) ?? []), ...partPhotos.map((m) => m.src)]);
   const wornSrcs = wornSet(raw ?? piece);
-  const angles = uniqueMedia(anglePhotos(piece, false, wornSrcs).filter((m) => !sameFilm(m, film?.source, film?.files)), taken);
+  const angles = diverseFirst(uniqueMedia(anglePhotos(piece, false, wornSrcs).filter((m) => !sameFilm(m, film?.source, film?.files)), taken), (views as Record<string, string[][]>)[piece.slug] ?? []);
   const worn = uniqueMedia(
     [...piece.handover, ...[piece.cover, ...piece.gallery].filter((m) => wornSrcs.has(m.src))].filter((m) => !sameFilm(m, film?.source, film?.files)),
     new Set([...taken, ...angles.map((m) => m.src)]),

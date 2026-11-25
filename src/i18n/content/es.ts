@@ -692,7 +692,7 @@ const content: Record<string, string> = {
   "The case open": "El estuche abierto",
   "The medallion on its display, beside the case": "El medallón en su expositor, junto al estuche",
   "The back of the trunk": "La parte trasera del baúl",
-  "The Hand Cube": "Cubo The Hand",
+  "The Hand Cube": "Cubo La Mano",
   "A black cube with a drawing in rose gold on its front. It opens on the pendant, lit from inside, and folds into a display.": "Un cubo negro con un dibujo en oro rosa en su frente. Se abre sobre el colgante, iluminado desde dentro, y se pliega en expositor.",
   "The cube closed, its drawing in rose gold": "El cubo cerrado, su dibujo en oro rosa",
   "The cube from the side": "El cubo, visto de lado",

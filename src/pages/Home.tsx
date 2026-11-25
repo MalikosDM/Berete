@@ -3,6 +3,7 @@ import { ArrowDown, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { MediaView } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
+import PieceThumb from "@/components/PieceThumb";
 import Reveal from "@/components/Reveal";
 import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
 import { defaultCatalogue, media } from "@/data/catalogue";
@@ -63,7 +64,8 @@ const srcset = (list: Sized[]) => list.map((x) => x.src + " " + x.w + "w").join(
 function HeroPhoto() {
   const { t } = useI18n();
   const d = pages["hero-desktop"];
-  const m = pages["hero-mobile"];
+  // Phones and screens held upright (25/11/2026): the same photo, framed on the two cases, both whole and centred.
+  const m = pages["hero-phone"];
   // (Yoni, 24/11/2026, on his 13-inch MacBook: the trunk was cut and room was left under it.) The photo starts under the
   // header (the header on black, never over the photo), whole (its handle, the SIRIUS plate, the chain), centred in the room
   // left; its box has the shape of the photo (a container query), so its sides and its floor melt into the black of the page
@@ -228,8 +230,9 @@ function Commission({ slug, index }: { slug: string; index: number }) {
       text={piece.line || undefined}
       link={{ to: "/pieces/" + piece.slug, label: t.common.enterWorld }}
       visual={
-        <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-special-ring={piece.slug} className="relative mx-auto block aspect-[4/3] w-full max-w-[34rem]">
-          <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" sizes="(max-width: 1023px) 90vw, 34rem" />
+        <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-special-ring={piece.slug} data-thumb-frame className="relative mx-auto block aspect-[4/3] w-full max-w-[34rem] overflow-hidden">
+          {/* The ring on the black, like every thumbnail (its cut-out: never the rectangle of its photo, 25/11/2026). */}
+          <PieceThumb piece={piece} frame={4 / 3} sizes="(max-width: 1023px) 90vw, 34rem" />
         </Link>
       }
     />

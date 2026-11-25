@@ -41,10 +41,17 @@ def upscale(img: Image.Image) -> Image.Image:
             th, tw = min(TILE, h - y) * 2, min(TILE, w - x) * 2
             out[y * 2 : y * 2 + th, x * 2 : x * 2 + tw] = rec[ty : ty + th, tx : tx + tw]
     big = Image.fromarray((out * 255).round().astype(np.uint8))
-    return big.resize((WIDTH, round(WIDTH * h / w)), Image.LANCZOS)
+    return big if WIDTH is None else big.resize((WIDTH, round(WIDTH * h / w)), Image.LANCZOS)
 
 
 if __name__ == "__main__":
+    # A third argument "x2" keeps the double of the source as it comes out of the model (the photos of The Atelier).
     source, master = sys.argv[1], sys.argv[2]
-    upscale(Image.open(source)).save(master)
+    if len(sys.argv) > 3 and sys.argv[3] == "x2":
+        WIDTH = None
+    big = upscale(Image.open(source))
+    if master.lower().endswith((".jpg", ".jpeg")):
+        big.save(master, quality=95, subsampling=0)
+    else:
+        big.save(master)
     print("  + " + master)

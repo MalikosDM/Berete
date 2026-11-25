@@ -1,10 +1,10 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import ContactBlock from "@/components/ContactBlock";
 import { MediaView } from "@/components/Media";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import { publishedPress, type PublishedArticle } from "@/data/press";
-import { Link, useI18n } from "@/i18n";
+import { useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 
 /** "24 September 2025" in the language of the page (the day of the article, whatever the time zone of the visitor). */
@@ -43,12 +43,6 @@ export function PressCard({ article, withPiece = true, image = true }: { article
           </span>
         </span>
       </a>
-      {piece ? (
-        <Link to={"/pieces/" + piece.slug} data-press-piece={piece.slug} data-cta className="btn-secondary mt-2 text-mist">
-          {t.common.enterWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
-          <span className="sr-only"> · {piece.title}</span>
-        </Link>
-      ) : null}
     </article>
   );
 }
@@ -68,8 +62,8 @@ export default function Press() {
           {articles.map((a, i) => (
             <li key={a.url}>
               <Reveal delay={(i % 3) * 0.06} className="h-full">
-                {/* The photo of its piece once on the page: the first article that tells it (24/11/2026). */}
-                <PressCard article={a} image={!articles.slice(0, i).some((b) => b.pieces[0] === a.pieces[0])} />
+                {/* Every card alike (25/11/2026): the photo of its piece, its newspaper, its headline, one button (the article). */}
+                <PressCard article={a} />
               </Reveal>
             </li>
           ))}
