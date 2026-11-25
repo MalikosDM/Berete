@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# Installs the whole site on a new VPS (Ubuntu 22.04 or 24.04), in one go: the site with its admin, 3D viewer and client
+# Installs the whole site on a new VPS (Ubuntu 22.04, 24.04 or 26.04), in one go: the site with its admin, 3D viewer and client
 # space, its base, HTTPS, the firewall, the updates from GitHub (every 2 minutes) and the nightly backups.
 # Can be run again at any time (it keeps what is there: base, passwords, 3D files).
 #
 # From the Mac:   npm run vps -- install [domain]
 # On the VPS:     bash /srv/berete/deploy/install.sh [domain]
 # Without a domain, the site answers at <IP with dashes>.sslip.io (with HTTPS) until the domain of the house points here.
+# Nothing secret is ever printed (the password of the admin: npm run vps -- admin).
 set -euo pipefail
 
 DOMAIN_ARG="${1:-}"
@@ -18,7 +19,11 @@ fail() { printf '\n\033[1;31mArrêt : %s\033[0m\n' "$*" >&2; exit 1; }
 
 [ "$(id -u)" -eq 0 ] || fail "à lancer en root (ssh root@<IP>)."
 . /etc/os-release
-[ "${ID:-}" = "ubuntu" ] || fail "prévu pour Ubuntu 22.04 ou 24.04 (ici : ${PRETTY_NAME:-inconnu})."
+[ "${ID:-}" = "ubuntu" ] || fail "prévu pour Ubuntu 22.04, 24.04 ou 26.04 (ici : ${PRETTY_NAME:-inconnu})."
+case "${VERSION_ID:-}" in
+  22.04 | 24.04 | 26.04) ;;
+  *) echo "Attention : Ubuntu ${VERSION_ID:-?} n'a pas été essayé (prévu pour 22.04, 24.04 ou 26.04) ; on continue." ;;
+esac
 export DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a GIT_TERMINAL_PROMPT=0
 APT=(apt-get -y -q -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
 
@@ -29,13 +34,20 @@ if ss -ltnpH '( sport = :80 or sport = :443 )' 2>/dev/null | grep -v -q -E 'dock
 fi
 
 say "Mise à jour du système et outils"
+# needrestart (installed by default since 24.04) restarts the services it must on its own and never asks anything,
+# here and during the automatic security updates.
+mkdir -p /etc/needrestart/conf.d
+printf "\$nrconf{restart} = 'a';\n\$nrconf{kernelhints} = 0;\n" > /etc/needrestart/conf.d/90-berete.conf
 apt-get update -q
 "${APT[@]}" upgrade
 "${APT[@]}" install git curl ca-certificates openssl rsync ufw fail2ban unattended-upgrades
 
 say "Docker"
+# The packages of Ubuntu (docker.io, docker-compose-v2, docker-buildx: 24.04 and 26.04), otherwise the official script.
 if ! docker compose version >/dev/null 2>&1; then
-  "${APT[@]}" install docker.io docker-compose-v2 || curl -fsSL https://get.docker.com | sh
+  "${APT[@]}" install docker.io docker-compose-v2 docker-buildx \
+    || "${APT[@]}" install docker.io docker-compose-v2 \
+    || curl -fsSL https://get.docker.com | sh
 fi
 systemctl enable --now docker
 docker compose version >/dev/null || fail "Docker Compose ne s'est pas installé."
@@ -58,7 +70,14 @@ ufw --force enable >/dev/null
 
 say "Sécurité : mises à jour automatiques, blocage des attaques SSH"
 printf 'APT::Periodic::Update-Package-Lists "1";\nAPT::Periodic::Unattended-Upgrade "1";\n' > /etc/apt/apt.conf.d/20auto-upgrades
-systemctl enable --now unattended-upgrades fail2ban >/dev/null 2>&1 || true
+# fail2ban: 5 wrong SSH logins in 10 minutes = 1 hour away. It reads the journal of the system (systemd) when there is
+# no /var/log/auth.log (Ubuntu without rsyslog).
+backend=auto
+[ -s /var/log/auth.log ] || backend=systemd
+printf '[sshd]\nenabled = true\nbackend = %s\nmaxretry = 5\nfindtime = 10m\nbantime = 1h\n' "$backend" > /etc/fail2ban/jail.d/90-berete.conf
+systemctl enable unattended-upgrades fail2ban >/dev/null 2>&1 || true
+systemctl restart fail2ban >/dev/null 2>&1 || true
+systemctl start unattended-upgrades >/dev/null 2>&1 || true
 # Password logins over SSH are closed only when a key already opens the server (never locked out).
 if [ -s /root/.ssh/authorized_keys ]; then
   printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\nPermitRootLogin prohibit-password\n' > /etc/ssh/sshd_config.d/10-berete.conf
@@ -94,15 +113,18 @@ cd "$APP"
 
 say "Réglages (.env)"
 NEW_PASSWORD=""
+# The address of the server itself (<IP with dashes>.sslip.io): the site until the domain points here, then its preview
+# address (SITE_PREVIEW, never indexed).
+ip="$(hostname -I | tr ' ' '\n' | grep -E '^[0-9]+(\.[0-9]+){3}$' | grep -v -E '^(10|127|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.' | head -1 || true)"
+SSLIP="${ip:+${ip//./-}.sslip.io}"
 if [ ! -f .env ]; then
-  domain="$DOMAIN_ARG"
-  if [ -z "$domain" ]; then
-    ip="$(hostname -I | tr ' ' '\n' | grep -E '^[0-9]+(\.[0-9]+){3}$' | grep -v -E '^(10|127|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.' | head -1 || true)"
-    [ -n "$ip" ] || fail "adresse IP publique introuvable : relancer avec le domaine (install.sh exemple.com)."
-    domain="${ip//./-}.sslip.io"
-  fi
+  domain="${DOMAIN_ARG:-$SSLIP}"
+  [ -n "$domain" ] || fail "adresse IP publique introuvable : relancer avec le domaine (install.sh exemple.com)."
+  preview=""
+  [ "$domain" = "$SSLIP" ] || preview="$SSLIP"
   NEW_PASSWORD="$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | cut -c1-20)"
   sed -e "s|^SITE_DOMAIN=.*|SITE_DOMAIN=$domain|" \
+    -e "s|^SITE_PREVIEW=.*|SITE_PREVIEW=$preview|" \
     -e "s|^ADMIN_PASSWORD=.*|ADMIN_PASSWORD=$NEW_PASSWORD|" \
     -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 24)|" \
     -e "s|^DATA_DIR=.*|DATA_DIR=$DATA|" deploy/env.example > .env
@@ -126,6 +148,9 @@ for _ in $(seq 1 120); do
 done
 echo
 [ "${ok:-}" = 1 ] || { docker compose logs --tail 60 app; fail "le site ne répond pas (journal ci-dessus)."; }
+# The door (Caddy) reads its Caddyfile without error.
+docker compose exec -T caddy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile >/dev/null 2>&1 \
+  || { docker compose logs --tail 30 caddy; fail "Caddy ne lit pas deploy/Caddyfile (journal ci-dessus)."; }
 docker image prune -f >/dev/null
 
 say "Mises à jour automatiques depuis GitHub et sauvegardes de nuit"
@@ -137,5 +162,5 @@ git rev-parse HEAD > "$DATA/deployed-commit"
 say "Terminé"
 echo "Site     : https://$DOMAIN"
 echo "Admin    : https://$DOMAIN/admin"
-if [ -n "$NEW_PASSWORD" ]; then echo "Mot de passe de l'admin : $NEW_PASSWORD   (à garder ; npm run vps -- admin le redonne)"; fi
-echo "Chaque envoi sur GitHub (main) est en ligne ici en 5 minutes environ ; sauvegarde chaque nuit dans $DATA/backups."
+if [ -n "$NEW_PASSWORD" ]; then echo "Mot de passe de l'admin : créé (npm run vps -- admin le donne)"; fi
+echo "Chaque envoi sur GitHub (main) est en ligne ici quelques minutes après ; sauvegarde chaque nuit dans $DATA/backups."

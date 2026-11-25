@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # The VPS of the site, driven from the Mac: npm run vps -- <command>
 #   install [domain]   installs everything on a new VPS (deploy/install.sh), or brings it up to date
-#   status             is the site up, which version, the disk, the last backups
-#   update             puts the last version of GitHub online now (otherwise it happens on its own within 5 minutes)
+#   status             is the site up, which version, the disk, the last and the next backups
+#   update             puts the last version of GitHub online now (otherwise it happens on its own: checked every 2 minutes)
 #   logs               what the site says (Ctrl+C to stop)
 #   admin              the address and the password of the admin
-#   set NAME=value     changes a setting of .env (SITE_DOMAIN, SMTP_…, ALERT_TO…) and restarts the site with it
+#   set NAME=value …   changes one or several settings of .env (SMTP_…, ALERT_TO, OPENAI_API_KEY…) and restarts the
+#                      site with them; NAME alone: the value is asked without being shown (a password, a key)
 #   domain example.com the address of the site becomes example.com (once its DNS points to the VPS)
 #   launch             opens the site to the search engines (SITE_INDEXING=on)
 #   3d                 sends the 3D models of this Mac (local base and storage/) to the VPS
@@ -35,15 +36,37 @@ fi
 on_vps() { ssh -o StrictHostKeyChecking=accept-new "$HOST" "$@"; }
 export RSYNC_RSH="ssh -o StrictHostKeyChecking=accept-new"
 
+# A setting of .env (NAME=value replaces its line, or is added at the end). The value travels through the standard input,
+# never on a command line, and is never shown. With other signs than letters, digits and . _ @ : / , + = - it is written
+# between single quotes: docker compose takes it as it is ($, # and spaces included).
+read -r -d '' SET_REMOTE <<'SH' || true
+IFS= read -r line
+N="${line%%=*}" L="$line" awk 'index($0, ENVIRON["N"] "=") == 1 { if (!done) print ENVIRON["L"]; done = 1; next } { print } END { if (!done) print ENVIRON["L"] }' .env > .env.new
+chmod 600 .env.new && mv .env.new .env
+SH
 setting() {
-  local pair="$1" name="${1%%=*}"
-  [[ "$pair" == *=* && "$name" =~ ^[A-Z_]+$ ]] || { echo "Écrire NOM=valeur (ex. ALERT_TO=contact@exemple.com)"; exit 1; }
-  local value="${pair#*=}"
-  [[ "$value" != *"|"* && "$value" != *"'"* && "$value" != *$'\n'* ]] || { echo "La valeur ne peut pas contenir | ni '"; exit 1; }
-  # For sed, & and \ are written \& and \\.
-  local escaped
-  escaped="$(printf '%s' "$value" | sed 's/[&\\]/\\&/g')"
-  run "if grep -q '^$name=' .env; then sed -i.bak 's|^$name=.*|$name=$escaped|' .env; else echo '$name=$value' >> .env; fi; rm -f .env.bak"
+  local name="$1" value="$2"
+  [[ "$name" =~ ^[A-Z][A-Z0-9_]*$ ]] || { echo "Nom de réglage invalide : $name (ex. ALERT_TO=contact@exemple.com)"; exit 1; }
+  [[ "$value" != *"'"* && "$value" != *$'\n'* ]] || { echo "La valeur de $name ne peut pas contenir d'apostrophe ' ni de retour à la ligne."; exit 1; }
+  [[ "$value" =~ ^[A-Za-z0-9._@:/,+=-]*$ ]] || value="'$value'"
+  printf '%s=%s\n' "$name" "$value" | run "$SET_REMOTE"
+}
+
+# The site starts again with the settings of .env: rebuilt when its address changes (it is written in the pages),
+# otherwise only restarted (a few seconds; Caddy makes the visitors wait).
+restart_site() {
+  if [ "$HOST" = local ]; then docker compose up -d --build; return; fi
+  if [ "${1:-}" = rebuild ]; then run "bash deploy/update.sh --force"; return; fi
+  run 'docker compose up -d >/dev/null 2>&1
+    for _ in $(seq 1 60); do curl -fsS http://127.0.0.1:3001/api/health >/dev/null 2>&1 && { echo "Site redémarré."; exit 0; }; sleep 2; done
+    echo "Le site ne répond pas : npm run vps -- logs"; exit 1'
+}
+
+# The address of the server itself: <its public IPv4 with dashes>.sslip.io.
+server_sslip() {
+  local ip
+  ip="$(on_vps "hostname -I" | tr ' ' '\n' | grep -E '^[0-9]+(\.[0-9]+){3}$' | grep -v -E '^(10|127|192\.168|172\.(1[6-9]|2[0-9]|3[01]))\.' | head -1 || true)"
+  [ -z "$ip" ] || printf '%s.sslip.io' "${ip//./-}"
 }
 
 # The key of the VPS may read the repository on GitHub (read only), with the GitHub CLI of the Mac.
@@ -81,10 +104,15 @@ case "$CMD" in
     run 'echo "Site : $(curl -fsS http://127.0.0.1:3001/api/health >/dev/null && echo "en ligne" || echo "NE RÉPOND PAS")"
       echo "Adresse : https://$(grep -E "^SITE_DOMAIN=" .env | cut -d= -f2-)"
       echo "Version : $(git log -1 --format="%h %s (%cr)")"
+      preview="$(grep -E "^SITE_PREVIEW=" .env | cut -d= -f2-)"
+      [ -z "$preview" ] || echo "Adresse du serveur (aperçu, jamais indexée) : https://$preview"
       echo "Moteurs de recherche : $(grep -q "^SITE_INDEXING=on" .env && echo ouvert || echo "fermé (noindex)")"
-      echo "Alertes e-mail : $(grep -qE "^SMTP_HOST=.+" .env && echo actives || echo "non configurées")"
+      filled() { grep -qE "^$1=.+" .env && ! grep -qE "^$1=(\"\"|'"''"')$" .env; }
+      echo "Alertes e-mail : $(filled SMTP_HOST && filled SMTP_USER && filled SMTP_PASS && filled ALERT_TO && echo actives || echo "non configurées (SMTP_USER, SMTP_PASS, ALERT_TO)")"
+      echo "Imaginez votre création : $(filled OPENAI_API_KEY && echo "active" || echo "cachée (pas de clé OPENAI_API_KEY)")"
       echo "Disque : $(df -h / | awk "NR==2 {print \$4\" libres sur \"\$2}")"
-      echo "Dernières sauvegardes : $(ls -1 '"$DATA"'/backups/db 2>/dev/null | tail -3 | tr "\n" " ")"
+      echo "Dernières sauvegardes : $(ls -1 '"$DATA"'/backups/db 2>/dev/null | grep -v before-restore | tail -3 | tr "\n" " ")"
+      echo "Prochaine sauvegarde : $(systemctl show berete-backup.timer -p NextElapseUSecRealtime --value 2>/dev/null) (3 h 30 à Dubaï)"
       tail -3 /var/log/berete-deploy.log 2>/dev/null || true'
     ;;
   update)
@@ -98,15 +126,30 @@ case "$CMD" in
     run 'echo "Admin : https://$(grep -E "^SITE_DOMAIN=" .env | cut -d= -f2-)/admin"; echo "Mot de passe : $(grep -E "^ADMIN_PASSWORD=" .env | cut -d= -f2-)"'
     ;;
   set)
-    [ $# -ge 1 ] || { echo "npm run vps -- set NOM=valeur"; exit 1; }
-    for pair in "$@"; do setting "$pair"; done
-    if [ "$HOST" = local ]; then docker compose up -d --build; else run "bash deploy/update.sh --force"; fi
+    [ $# -ge 1 ] || { echo "npm run vps -- set NOM=valeur … (ou NOM seul : la valeur est demandée sans s'afficher)"; exit 1; }
+    names=()
+    for arg in "$@"; do
+      if [[ "$arg" == *=* ]]; then
+        setting "${arg%%=*}" "${arg#*=}"
+      else
+        read -r -s -p "$arg (rien ne s'affiche en tapant, puis Entrée) : " value < /dev/tty
+        echo
+        setting "$arg" "$value"
+      fi
+      names+=("${arg%%=*}")
+    done
+    echo "Enregistré : ${names[*]}"
+    if [[ " ${names[*]} " == *" SITE_DOMAIN "* ]]; then restart_site rebuild; else restart_site; fi
     ;;
   domain)
     [ -n "${1:-}" ] || { echo "npm run vps -- domain exemple.com"; exit 1; }
     domain="${1#https://}"; domain="${domain#http://}"; domain="${domain%%/*}"
-    "$0" set "SITE_DOMAIN=$domain"
-    echo "Site : https://$domain (le certificat HTTPS arrive dans la minute si le DNS pointe déjà vers le VPS)."
+    # The address of the server itself stays open beside it (never indexed), to check the server whatever the DNS says.
+    preview=""
+    [ "$HOST" = local ] || preview="$(server_sslip)"
+    [ "$preview" != "$domain" ] || preview=""
+    "$0" set "SITE_DOMAIN=$domain" "SITE_PREVIEW=$preview"
+    echo "Site : https://$domain (son certificat HTTPS arrive à la première visite dès que le DNS pointe vers le VPS)."
     ;;
   launch)
     "$0" set SITE_INDEXING=on
@@ -145,7 +188,7 @@ case "$CMD" in
     ssh "$HOST"
     ;;
   *)
-    sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'
+    awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"
     exit 1
     ;;
 esac

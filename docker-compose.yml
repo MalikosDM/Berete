@@ -75,12 +75,15 @@ services:
     restart: unless-stopped
     environment:
       SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+      # The address of the server itself (deploy/Caddyfile); none: a name that never answers.
+      SITE_PREVIEW: ${SITE_PREVIEW:-preview.invalid}
     ports:
       - "${HTTP_PORT:-80}:80"
       - "${HTTPS_PORT:-443}:443"
       - "${HTTPS_PORT:-443}:443/udp"
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # The folder, not the file alone: a new Caddyfile from GitHub is seen at once (deploy/update.sh reloads it).
+      - ./deploy:/etc/caddy:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:

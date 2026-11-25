@@ -1,12 +1,37 @@
 # The door of the site on the internet (docker-compose.yml, service "caddy"): HTTPS for the address of the site
-# (SITE_DOMAIN in .env), certificate obtained and renewed on its own; www. leads to the address without it.
+# (SITE_DOMAIN in .env), www. leads to the address without it, and the address of the server itself (SITE_PREVIEW,
+# <IP with dashes>.sslip.io) serves the same site, never indexed.
+# Each certificate is asked at the first visit to its address ("on demand"), and only for these names: the domain can be
+# set before its DNS points here, and the first visitor who arrives once it does gets the site with its certificate,
+# without any error in between. Renewed on its own.
 
-{$SITE_DOMAIN} {
+{
+	on_demand_tls {
+		ask http://127.0.0.1:5555/check
+	}
+}
+
+# The names that may have a certificate (asked by Caddy itself; this port is never open to the outside).
+http://127.0.0.1:5555 {
+	bind 127.0.0.1
+	@ours query domain={$SITE_DOMAIN} domain=www.{$SITE_DOMAIN} domain={$SITE_PREVIEW}
+	respond @ours 200
+	respond 404
+}
+
+(site) {
 	reverse_proxy app:3001 {
 		# While a new version starts (a few seconds, deploy/update.sh), the visitor waits instead of seeing an error.
 		lb_try_duration 30s
 		lb_try_interval 500ms
 	}
+}
+
+{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
+	import site
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		-Server
@@ -14,5 +39,19 @@
 }
 
 www.{$SITE_DOMAIN} {
+	tls {
+		on_demand
+	}
 	redir https://{$SITE_DOMAIN}{uri} permanent
+}
+
+{$SITE_PREVIEW} {
+	tls {
+		on_demand
+	}
+	import site
+	header {
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
 }
