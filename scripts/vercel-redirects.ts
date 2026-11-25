@@ -8,7 +8,11 @@
  * - the address of a box (a box removed by Yoni, 21/11/2026, or any other: the boxes have no page of their own) -> /boxes;
  * - a sub-category under its old address (/creations/jesus-pieces, until 22/11/2026) -> its place in its collection;
  * in every language. With the server, server/index.ts does the same from the base. Run it again after publishing or
- * unpublishing a piece in src/data/pieces.ts (tests/site.spec.ts checks that vercel.json is up to date).
+ * unpublishing a piece in src/data/pieces.ts (tests/identity.spec.ts checks that vercel.json is up to date).
+ *
+ * Since the site lives on its own server at its domain (MOVED_TO, 25/11/2026), every address of Vercel leads there (301),
+ * the same address on the domain: the redirects above go straight to their page there, and every other address to itself
+ * on the domain. Vercel never competes with the real site again. MOVED_TO = "" brings the site back on Vercel.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -19,6 +23,18 @@ import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
 
 /** statusCode 301 (Vercel answers 308 for "permanent: true"). */
 export type Redirect = { source: string; destination: string; statusCode: 301 };
+
+/** The real site (its own server): where every address of Vercel leads. "" = the site is served by Vercel itself. */
+export const MOVED_TO = "https://beretejewellers.com";
+
+/** The redirects of vercel.json: those of the catalogue, then, once the site has moved, every address to the domain. */
+export function vercelRedirects(): Redirect[] {
+  if (!MOVED_TO) return catalogueRedirects();
+  return [
+    ...catalogueRedirects().map((r) => ({ ...r, destination: MOVED_TO + r.destination })),
+    { source: "/:path*", destination: MOVED_TO + "/:path*", statusCode: 301 },
+  ];
+}
 
 /** The redirects the catalogue needs, in order. */
 export function catalogueRedirects(): Redirect[] {
@@ -43,7 +59,7 @@ export function catalogueRedirects(): Redirect[] {
 if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.meta.filename)) {
   const file = path.resolve(import.meta.dirname, "..", "vercel.json");
   const config = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, unknown>;
-  const redirects = catalogueRedirects();
+  const redirects = vercelRedirects();
   // The redirects come right after the rewrites (same order of keys as before).
   const next: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(config)) {

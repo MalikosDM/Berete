@@ -201,7 +201,7 @@ test("the four pieces taken off: unpublished, kept; their old addresses lead to 
   }
   // The site without its server (Vercel) has the same redirects.
   const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as { redirects: { source: string; destination: string }[] };
-  for (const slug of TAKEN_OFF) expect(vercel.redirects.find((r) => r.source === "/pieces/" + slug)?.destination).toBe("/creations");
+  for (const slug of TAKEN_OFF) expect(vercel.redirects.find((r) => r.source === "/pieces/" + slug)?.destination).toMatch(/^(https:\/\/[^/]+)?\/creations$/);
   // In the browser, the old address lands on the creations.
   await skipIntro(page);
   await page.goto("/fr/pieces/flaneur-medallion");

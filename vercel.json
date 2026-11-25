@@ -8,362 +8,367 @@
   "redirects": [
     {
       "source": "/pieces/tanguy-nianzou-nz-ring",
-      "destination": "/players/tanguy-nianzou",
+      "destination": "https://beretejewellers.com/players/tanguy-nianzou",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/tanguy-nianzou-nz-ring",
-      "destination": "/:lang/players/tanguy-nianzou",
+      "destination": "https://beretejewellers.com/:lang/players/tanguy-nianzou",
       "statusCode": 301
     },
     {
       "source": "/pieces/marcus-thuram-signet-ring",
-      "destination": "/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-signet-ring",
-      "destination": "/:lang/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/:lang/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/pieces/marcus-thuram-t-monster-pendant",
-      "destination": "/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-t-monster-pendant",
-      "destination": "/:lang/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/:lang/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/pieces/marcus-thuram-jesus-piece",
-      "destination": "/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-jesus-piece",
-      "destination": "/:lang/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/:lang/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/pieces/marcus-thuram-snowflake-pendant",
-      "destination": "/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-snowflake-pendant",
-      "destination": "/:lang/players/marcus-thuram",
+      "destination": "https://beretejewellers.com/:lang/players/marcus-thuram",
       "statusCode": 301
     },
     {
       "source": "/pieces/tanguy-nianzou-nz-pendant",
-      "destination": "/players/tanguy-nianzou",
+      "destination": "https://beretejewellers.com/players/tanguy-nianzou",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/tanguy-nianzou-nz-pendant",
-      "destination": "/:lang/players/tanguy-nianzou",
+      "destination": "https://beretejewellers.com/:lang/players/tanguy-nianzou",
       "statusCode": 301
     },
     {
       "source": "/pieces/sidney-eweka-999-pendant",
-      "destination": "/creations",
+      "destination": "https://beretejewellers.com/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/sidney-eweka-999-pendant",
-      "destination": "/:lang/creations",
+      "destination": "https://beretejewellers.com/:lang/creations",
       "statusCode": 301
     },
     {
       "source": "/pieces/jeff-chabot-jc-pendant",
-      "destination": "/creations",
+      "destination": "https://beretejewellers.com/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/jeff-chabot-jc-pendant",
-      "destination": "/:lang/creations",
+      "destination": "https://beretejewellers.com/:lang/creations",
       "statusCode": 301
     },
     {
       "source": "/pieces/flaneur-medallion",
-      "destination": "/creations",
+      "destination": "https://beretejewellers.com/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/flaneur-medallion",
-      "destination": "/:lang/creations",
+      "destination": "https://beretejewellers.com/:lang/creations",
       "statusCode": 301
     },
     {
       "source": "/pieces/jack-nameplate-pendant",
-      "destination": "/creations",
+      "destination": "https://beretejewellers.com/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/jack-nameplate-pendant",
-      "destination": "/:lang/creations",
+      "destination": "https://beretejewellers.com/:lang/creations",
       "statusCode": 301
     },
     {
       "source": "/pieces/two-tone-iced-cuban-chain",
-      "destination": "/creations",
+      "destination": "https://beretejewellers.com/creations",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/two-tone-iced-cuban-chain",
-      "destination": "/:lang/creations",
+      "destination": "https://beretejewellers.com/:lang/creations",
       "statusCode": 301
     },
     {
       "source": "/players/sambi-lokonga",
-      "destination": "/players",
+      "destination": "https://beretejewellers.com/players",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/players/sambi-lokonga",
-      "destination": "/:lang/players",
+      "destination": "https://beretejewellers.com/:lang/players",
       "statusCode": 301
     },
     {
       "source": "/players/jeff-chabot",
-      "destination": "/players",
+      "destination": "https://beretejewellers.com/players",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/players/jeff-chabot",
-      "destination": "/:lang/players",
+      "destination": "https://beretejewellers.com/:lang/players",
       "statusCode": 301
     },
     {
       "source": "/players/sidney-eweka",
-      "destination": "/players",
+      "destination": "https://beretejewellers.com/players",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/players/sidney-eweka",
-      "destination": "/:lang/players",
+      "destination": "https://beretejewellers.com/:lang/players",
       "statusCode": 301
     },
     {
       "source": "/pieces/white-hands",
-      "destination": "/pieces/kenan-yildiz-celebration-pendant",
+      "destination": "https://beretejewellers.com/pieces/kenan-yildiz-celebration-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/white-hands",
-      "destination": "/:lang/pieces/kenan-yildiz-celebration-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/kenan-yildiz-celebration-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/t-serpent",
-      "destination": "/pieces/marcus-thuram-t-serpent-pendant",
+      "destination": "https://beretejewellers.com/pieces/marcus-thuram-t-serpent-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/t-serpent",
-      "destination": "/:lang/pieces/marcus-thuram-t-serpent-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/marcus-thuram-t-serpent-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/the-jersey",
-      "destination": "/pieces/noah-okafor-jersey-pendant",
+      "destination": "https://beretejewellers.com/pieces/noah-okafor-jersey-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/the-jersey",
-      "destination": "/:lang/pieces/noah-okafor-jersey-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/noah-okafor-jersey-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/rs",
-      "destination": "/pieces/angelo-stiller-as-pendant",
+      "destination": "https://beretejewellers.com/pieces/angelo-stiller-as-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/rs",
-      "destination": "/:lang/pieces/angelo-stiller-as-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/angelo-stiller-as-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/butterfly",
-      "destination": "/pieces/michy-batshuayi-butterfly-pendant",
+      "destination": "https://beretejewellers.com/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/butterfly",
-      "destination": "/:lang/pieces/michy-batshuayi-butterfly-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/michy-batshuayi-butterfly-chain",
-      "destination": "/pieces/michy-batshuayi-butterfly-pendant",
+      "destination": "https://beretejewellers.com/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/michy-batshuayi-butterfly-chain",
-      "destination": "/:lang/pieces/michy-batshuayi-butterfly-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/michy-batshuayi-butterfly-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/kevin-schade-twisted-chain",
-      "destination": "/pieces/brt-flower-chain",
+      "destination": "https://beretejewellers.com/pieces/brt-flower-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/kevin-schade-twisted-chain",
-      "destination": "/:lang/pieces/brt-flower-chain",
+      "destination": "https://beretejewellers.com/:lang/pieces/brt-flower-chain",
       "statusCode": 301
     },
     {
       "source": "/pieces/campione-d-italia-pendant",
-      "destination": "/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "destination": "https://beretejewellers.com/pieces/campione-d-italia-2023-2024#worn-as-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/campione-d-italia-pendant",
-      "destination": "/:lang/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/campione-d-italia-2023-2024#worn-as-pendant",
       "statusCode": 301
     },
     {
       "source": "/pieces/infinity-link-chain",
-      "destination": "/pieces/pear-link-chain",
+      "destination": "https://beretejewellers.com/pieces/pear-link-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/infinity-link-chain",
-      "destination": "/:lang/pieces/pear-link-chain",
+      "destination": "https://beretejewellers.com/:lang/pieces/pear-link-chain",
       "statusCode": 301
     },
     {
       "source": "/pieces/marcus-thuram-infinity-chain",
-      "destination": "/pieces/pear-link-chain",
+      "destination": "https://beretejewellers.com/pieces/pear-link-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/marcus-thuram-infinity-chain",
-      "destination": "/:lang/pieces/pear-link-chain",
+      "destination": "https://beretejewellers.com/:lang/pieces/pear-link-chain",
       "statusCode": 301
     },
     {
       "source": "/pieces/two-row-tennis-chain",
-      "destination": "/pieces/noah-okafor-octagon-pendant#its-chain",
+      "destination": "https://beretejewellers.com/pieces/noah-okafor-octagon-pendant#its-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/two-row-tennis-chain",
-      "destination": "/:lang/pieces/noah-okafor-octagon-pendant#its-chain",
+      "destination": "https://beretejewellers.com/:lang/pieces/noah-okafor-octagon-pendant#its-chain",
       "statusCode": 301
     },
     {
       "source": "/pieces/cross-infinity-chain",
-      "destination": "/pieces/lois-openda-script-pendant#its-chain",
+      "destination": "https://beretejewellers.com/pieces/lois-openda-script-pendant#its-chain",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/cross-infinity-chain",
-      "destination": "/:lang/pieces/lois-openda-script-pendant#its-chain",
+      "destination": "https://beretejewellers.com/:lang/pieces/lois-openda-script-pendant#its-chain",
       "statusCode": 301
     },
     {
       "source": "/pieces/script-nameplate-pendant",
-      "destination": "/pieces/lois-openda-script-pendant",
+      "destination": "https://beretejewellers.com/pieces/lois-openda-script-pendant",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/script-nameplate-pendant",
-      "destination": "/:lang/pieces/lois-openda-script-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/lois-openda-script-pendant",
       "statusCode": 301
     },
     {
       "source": "/boxes/:slug",
-      "destination": "/boxes",
+      "destination": "https://beretejewellers.com/boxes",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/boxes/:slug",
-      "destination": "/:lang/boxes",
+      "destination": "https://beretejewellers.com/:lang/boxes",
       "statusCode": 301
     },
     {
       "source": "/creations/celebration",
-      "destination": "/creations/pendants/celebration",
+      "destination": "https://beretejewellers.com/creations/pendants/celebration",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/celebration",
-      "destination": "/:lang/creations/pendants/celebration",
+      "destination": "https://beretejewellers.com/:lang/creations/pendants/celebration",
       "statusCode": 301
     },
     {
       "source": "/creations/cross",
-      "destination": "/creations/pendants/cross",
+      "destination": "https://beretejewellers.com/creations/pendants/cross",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/cross",
-      "destination": "/:lang/creations/pendants/cross",
+      "destination": "https://beretejewellers.com/:lang/creations/pendants/cross",
       "statusCode": 301
     },
     {
       "source": "/creations/name",
-      "destination": "/creations/pendants/name",
+      "destination": "https://beretejewellers.com/creations/pendants/name",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/name",
-      "destination": "/:lang/creations/pendants/name",
+      "destination": "https://beretejewellers.com/:lang/creations/pendants/name",
       "statusCode": 301
     },
     {
       "source": "/creations/letter",
-      "destination": "/creations/pendants/letter",
+      "destination": "https://beretejewellers.com/creations/pendants/letter",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/letter",
-      "destination": "/:lang/creations/pendants/letter",
+      "destination": "https://beretejewellers.com/:lang/creations/pendants/letter",
       "statusCode": 301
     },
     {
       "source": "/creations/jesus-pieces",
-      "destination": "/creations/pendants/jesus-pieces",
+      "destination": "https://beretejewellers.com/creations/pendants/jesus-pieces",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/jesus-pieces",
-      "destination": "/:lang/creations/pendants/jesus-pieces",
+      "destination": "https://beretejewellers.com/:lang/creations/pendants/jesus-pieces",
       "statusCode": 301
     },
     {
       "source": "/creations/signature",
-      "destination": "/creations/chains/signature",
+      "destination": "https://beretejewellers.com/creations/chains/signature",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/signature",
-      "destination": "/:lang/creations/chains/signature",
+      "destination": "https://beretejewellers.com/:lang/creations/chains/signature",
       "statusCode": 301
     },
     {
       "source": "/creations/cuban",
-      "destination": "/creations/chains/cuban",
+      "destination": "https://beretejewellers.com/creations/chains/cuban",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/cuban",
-      "destination": "/:lang/creations/chains/cuban",
+      "destination": "https://beretejewellers.com/:lang/creations/chains/cuban",
       "statusCode": 301
     },
     {
       "source": "/creations/infinity",
-      "destination": "/creations/chains/infinity",
+      "destination": "https://beretejewellers.com/creations/chains/infinity",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/creations/infinity",
-      "destination": "/:lang/creations/chains/infinity",
+      "destination": "https://beretejewellers.com/:lang/creations/chains/infinity",
+      "statusCode": 301
+    },
+    {
+      "source": "/:path*",
+      "destination": "https://beretejewellers.com/:path*",
       "statusCode": 301
     }
   ],

@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { expect, test, type Locator, type Page } from "./fixtures";
-import { catalogueRedirects } from "../scripts/vercel-redirects";
+import { vercelRedirects } from "../scripts/vercel-redirects";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { HOUSE_PHOTO_PLACES } from "../src/data/house";
 import { NEW_PIECES, REMOVED_PIECES, RENAMED_PIECES } from "../src/data/pieces";
@@ -53,9 +53,9 @@ test("the removed pieces appear nowhere; their addresses lead to their player, e
     const links = await page.locator("a[href*='/pieces/']").evaluateAll((els) => els.map((a) => a.getAttribute("href") ?? ""));
     for (const slug of REMOVED_PIECES) expect(links.filter((h) => h.endsWith("/pieces/" + slug)), slug + " on " + path).toEqual([]);
   }
-  // The site without its server (Vercel) has the same redirects.
+  // The site without its server (Vercel) has the same redirects (to the domain of the site, where it lives since 25/11/2026).
   const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as { redirects: unknown[]; headers: { headers: { value: string }[] }[] };
-  expect(vercel.redirects, "vercel.json is up to date (npm run redirects)").toEqual(catalogueRedirects());
+  expect(vercel.redirects, "vercel.json is up to date (npm run redirects)").toEqual(vercelRedirects());
   // The pages stay closed to search engines until the launch.
   expect(JSON.stringify(vercel.headers)).toContain("noindex");
 });
