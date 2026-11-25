@@ -20,3 +20,6 @@ storage/*
 
 # Python
 __pycache__/
+
+# Screenshots of the checks (tests, audit): on the Mac only, never in Git since 25/11/2026 (the older ones stay in the history)
+verification

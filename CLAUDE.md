@@ -18,6 +18,9 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - Il veut voir le projet avancer et en ligne ; ne le solliciter que pour une vraie décision.
 - Un seul prompt / une seule passe qui couvre tout, plutôt que des petites étapes.
 - Toujours vérifier soi-même (Playwright, ordinateur 1440 px + iPhone 390 px) avant de dire que c'est fini.
+- Les captures des tests et de l'audit (`verification/`) restent sur le Mac seulement : hors de Git depuis le 25/11/2026
+  (les anciennes restent dans l'historique de Git). Le Mac et le disque externe sont presque pleins : supprimer les
+  fichiers de travail après usage, et garder sur le disque seulement les planches utiles (`_verif/`).
 - Vérifications toujours **sans le son** (demande de Malik, 20/11) : les tests importent `test` de `tests/fixtures.ts`
   (iPhone/WebKit : volume réel des vidéos à 0) et Chromium tourne avec `--mute-audio`. Tout nouveau test ou script garde ça.
 - Vérifier en local : `SITE_URL=http://localhost:3001 npm run build`, `npm run build:server`, `npm start`, puis
@@ -223,8 +226,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       plus large que haut (chaînes, Sirius, Loïs Openda) remplit la largeur du cadre (94 %) au lieu de 55 % de sa hauteur. Créations,
       accueil (cartes et bagues Inter / VfB), « autres créations », profils. L'audit mesure le bord (6 px, ≤ 3 % plus clair que la
       page) et la part du bijou (55–75 % de la hauteur, ou ≥ 85 % de la largeur pour un bijou plus large que haut). Planche :
-      `.local/verif/audit-2411/vignettes-avant-apres.jpg` (le disque externe était débranché le 25/11 : à recopier dans
-      `_verif/audit-2411/`).
+      `/Volumes/Disque externe/_verif/audit-2411/vignettes-avant-apres.jpg`.
 - [x] **Cercle** : une règle pour toutes les cartes (le nom ; le club dessous seulement Inter Milan ou VfB Stuttgart) ; le numéro
       seulement sur la page du joueur (« No. 9 »), plus sur la page du club. **Sambi Lokonga** hors du Cercle et du plan du site
       (301 vers /players) tant qu'il n'a pas de pièce publiée (règle générale de `publicCatalogue`). Portrait de **Tanguy Nianzou**
@@ -251,8 +253,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       colonne centrée de 760 px (titre, frise, les deux encadrés de même largeur).
 - `tests/audit2411.spec.ts` (ordinateur, Safari, iPhone). Toute la batterie passe en local (727 tests, ordinateur, iPhone, Safari,
   25/11) ; en ligne : `audit2411`, `loupe`, `monogram` (ordinateur, Safari, iPhone) et `npm run audit:coherence` **522 pages × 1280,
-  1440, 1512 Retina, iPhone, 0 problème** (25/11). Captures avant (de l'audit) : `_verif/audit-2411/` ; après : `_verif/audit-2411/apres/` (ou `.local/verif/` si le
-  disque est débranché).
+  1440, 1512 Retina, iPhone, 0 problème** (25/11). Captures avant (de l'audit) : `_verif/audit-2411/` ; après : `_verif/audit-2411/apres/`.
 - [ ] Yoni : la pièce de Sambi Lokonga ; une photo propre de Tanguy Nianzou si le recadrage ne lui plaît pas ; les matières, poids et
       carats de chaque pièce (la ligne « Matières précieuses » reviendra avec ses chiffres).
 
