@@ -6,6 +6,8 @@ import express, { type NextFunction, type Request, type Response } from "express
 import { collectionPath, subcategoryByOldSlug } from "../src/data/collections.js";
 import { RENAMED_PIECES } from "../src/data/pieces.js";
 import { leftTheCircle, removedPieceTarget } from "../src/data/relations.js";
+import { access, accessAdmin, gate } from "./access.js";
+import { accessState, loadAccess } from "./access-state.js";
 import { readCatalogue, syncCatalogue } from "./catalogue.js";
 import { imagine } from "./imagine.js";
 import { seedDemo } from "./models/demo.js";
@@ -14,12 +16,16 @@ import { models } from "./routes/models.js";
 import { vip } from "./routes/vip.js";
 import { loadSecret } from "./secret.js";
 import { protect } from "./security.js";
-import { site } from "./routes/site.js";
+import { requireAdmin, site } from "./routes/site.js";
 
 const app = express();
 app.disable("x-powered-by");
 // Behind Caddy on the VPS: the real address of the visitor, the security headers, "noindex" until the launch.
 protect(app);
+// In production the same server serves the built front (npm run build -> dist/).
+const dist = path.resolve(process.env.STATIC_DIR ?? "dist");
+// While the site is under construction (server/access.ts): « Coming soon » for every visitor without access.
+app.use(gate(dist));
 // Pages, code and API answers travel compressed (about 5 times lighter); photos and videos already are.
 app.use(compression());
 // The private correspondence of the contact page carries its photos (up to 6, made lighter in the browser): its own limit.
@@ -27,6 +33,10 @@ const smallJson = express.json({ limit: "2mb" });
 const contactJson = express.json({ limit: "34mb" });
 app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact" ? contactJson : smallJson)(req, res, next));
 
+// The private access of the site under construction (the form of « Coming soon ») and its settings in the admin (before
+// the routes of the site: /admin/:kind would take /admin/access).
+app.use("/api", access);
+app.use("/api", accessAdmin(requireAdmin));
 app.use("/api", models);
 app.use("/api", vip);
 app.use("/api", site);
@@ -36,8 +46,6 @@ app.use("/api", (_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-// In production the same server serves the built front (npm run build -> dist/).
-const dist = path.resolve(process.env.STATIC_DIR ?? "dist");
 const LANGUAGES = ["fr", "es", "de", "nl", "ar"];
 
 // How long the browser keeps each file. The pages are checked again at every visit (a new version
@@ -48,7 +56,8 @@ const PAGE_CACHE = "no-cache";
 function cacheFor(file: string): string {
   const relative = path.relative(dist, file).split(path.sep).join("/");
   if (relative.startsWith("assets/")) return "public, max-age=31536000, immutable";
-  if (relative.startsWith("media/")) return "public, max-age=86400, stale-while-revalidate=604800";
+  // Under construction, a photo is kept by the browser of its visitor only (never by a cache on the way).
+  if (relative.startsWith("media/")) return (accessState().construction ? "private" : "public") + ", max-age=86400, stale-while-revalidate=604800";
   return PAGE_CACHE;
 }
 
@@ -131,6 +140,7 @@ app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 await loadSecret();
+await loadAccess();
 await syncCatalogue();
 await seedDemo();
 await resumeJobs();

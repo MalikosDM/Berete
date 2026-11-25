@@ -1,7 +1,9 @@
-import { Fragment, Suspense, type ReactNode } from "react";
+import { Fragment, Suspense, useEffect, type ReactNode } from "react";
 import { Route, Routes, useParams } from "react-router";
 import Layout from "@/components/Layout";
+import Logo from "@/components/Logo";
 import { lazyPart } from "@/lib/lazy";
+import { PRIVATE_ONLY } from "@/lib/private";
 import { DEFAULT_LOCALE, LOCALES, Navigate } from "@/i18n";
 import About from "@/pages/About";
 import Atelier, { Boxes } from "@/pages/Atelier";
@@ -62,7 +64,46 @@ function pages(prefix: string) {
   );
 }
 
+/** Any other address, from a private page opened alone: the server decides (« Coming soon » for this visitor). */
+function Elsewhere() {
+  useEffect(() => {
+    window.location.reload();
+  }, []);
+  return null;
+}
+
+/**
+ * A private page opened alone, while the site is under construction (src/lib/private.ts): the 3D link or the client space,
+ * with the logo of the house only; no menu, no other page of the site.
+ */
+function PrivateApp() {
+  const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
+  const vip = (
+    <div className="min-h-svh bg-ink" data-private-page>
+      <header className="flex justify-center px-5 pt-8">
+        <Logo variant="full" position="center" className="h-12 w-48 sm:h-14 sm:w-56" />
+      </header>
+      <Suspense fallback={null}>
+        <Vip />
+      </Suspense>
+    </div>
+  );
+  return (
+    <Routes>
+      {["", ...LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => l + "/")].map((prefix) => (
+        <Fragment key={"private-" + prefix}>
+          <Route path={prefix + "view/:token"} element={viewLink} />
+          <Route path={prefix + "vip"} element={vip} />
+          <Route path={prefix + "vip/:token"} element={vip} />
+        </Fragment>
+      ))}
+      <Route path="*" element={<Elsewhere />} />
+    </Routes>
+  );
+}
+
 export default function App() {
+  if (PRIVATE_ONLY) return <PrivateApp />;
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
   return (
     <Routes>

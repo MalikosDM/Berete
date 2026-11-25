@@ -59,7 +59,7 @@ function openSession(req: Request, res: Response, clientId: string): void {
   res.setHeader("Set-Cookie", COOKIE + "=" + value + "." + sign(value) + "; Path=/; Max-Age=" + SESSION_DAYS * 86400 + "; HttpOnly; SameSite=Lax" + (secure ? "; Secure" : ""));
 }
 
-function sessionClient(req: Request): string | null {
+export function sessionClient(req: Request): string | null {
   const cookie = (req.headers.cookie ?? "").split(";").map((c) => c.trim()).find((c) => c.startsWith(COOKIE + "="));
   if (!cookie) return null;
   const [id = "", exp = "", sig = ""] = cookie.slice(COOKIE.length + 1).split(".");

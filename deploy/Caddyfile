@@ -1,6 +1,7 @@
 # The door of the site on the internet (docker-compose.yml, service "caddy"): HTTPS for the address of the site
 # (SITE_DOMAIN in .env), www. leads to the address without it, and the address of the server itself (SITE_PREVIEW,
-# <IP with dashes>.sslip.io) serves the same site, never indexed.
+# <IP with dashes>.sslip.io) serves the same site, never indexed. While the site is under construction, the site itself
+# answers « Coming soon » to every visitor without its private access, on both addresses (server/access.ts).
 # Each certificate is asked at the first visit to its address ("on demand"), and only for these names: the domain can be
 # set before its DNS points here, and the first visitor who arrives once it does gets the site with its certificate,
 # without any error in between. Renewed on its own.
@@ -30,10 +31,7 @@ http://127.0.0.1:5555 {
 	tls {
 		on_demand
 	}
-	@all path *
-	header X-Robots-Tag "noindex, nofollow"
-	header Cache-Control "no-store"
-	respond `<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noindex,nofollow"><title>Berete Jewellers — Coming soon</title><style>html,body{margin:0;height:100%;background:#0A0A0A;color:#F4F2EF;font-family:Georgia,serif}main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}h1{font-weight:400;letter-spacing:.32em;font-size:22px;margin:0}p{margin:0;letter-spacing:.2em;text-transform:uppercase;font-size:13px;color:#E8B4A0}</style><main><h1>BERETE JEWELLERS</h1><p>Coming soon</p></main></html>` 200
+	import site
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		-Server
@@ -51,10 +49,7 @@ www.{$SITE_DOMAIN} {
 	tls {
 		on_demand
 	}
-	@all path *
-	header X-Robots-Tag "noindex, nofollow"
-	header Cache-Control "no-store"
-	respond `<!doctype html><html lang=en><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noindex,nofollow"><title>Berete Jewellers — Coming soon</title><style>html,body{margin:0;height:100%;background:#0A0A0A;color:#F4F2EF;font-family:Georgia,serif}main{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px}h1{font-weight:400;letter-spacing:.32em;font-size:22px;margin:0}p{margin:0;letter-spacing:.2em;text-transform:uppercase;font-size:13px;color:#E8B4A0}</style><main><h1>BERETE JEWELLERS</h1><p>Coming soon</p></main></html>` 200
+	import site
 	header {
 		X-Robots-Tag "noindex, nofollow"
 		-Server

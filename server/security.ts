@@ -27,7 +27,7 @@ export function visitor(req: Request): string {
   return req.ip ?? req.socket.remoteAddress ?? "";
 }
 
-const LOCAL = /^(::1|127\.\d+\.\d+\.\d+|::ffff:127\.\d+\.\d+\.\d+)$/;
+export const LOCAL = /^(::1|127\.\d+\.\d+\.\d+|::ffff:127\.\d+\.\d+\.\d+)$/;
 
 /**
  * At most `max` tries in `minutes` per visitor. `hit` counts one and says whether it is allowed, `wait` the minutes

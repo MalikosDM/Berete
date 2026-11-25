@@ -49,6 +49,21 @@ const ONLY = process.env.ONLY ?? "";
 const WORKERS = Number(process.env.WORKERS ?? 6);
 const OUT = resolve(import.meta.dirname, "..", "verification", "coherence");
 
+/**
+ * The site under construction (server/access.ts): ACCESS_PASSWORD (given in the Terminal, never written anywhere) enters
+ * it like a visitor who typed the private password; every page, the sitemap and the browsers then carry its cookie.
+ */
+let ACCESS_COOKIE = "";
+async function enter(): Promise<void> {
+  const password = process.env.ACCESS_PASSWORD;
+  if (!password) return;
+  const res = await fetch(BASE + "/api/access", { method: "POST", redirect: "manual", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ password, next: "/" }) });
+  const set = res.headers.getSetCookie().find((c) => c.startsWith("bj_access="));
+  if (!set) throw new Error("ACCESS_PASSWORD: the site did not open (" + res.status + ")");
+  ACCESS_COOKIE = set.split(";")[0]!;
+}
+const withAccess = (): RequestInit => (ACCESS_COOKIE ? { headers: { Cookie: ACCESS_COOKIE } } : {});
+
 const BUNDLES: Record<string, Messages> = { en, fr, es, de, nl, ar } as Record<string, Messages>;
 
 /** The words a button of the house may carry, in each language (24/11/2026, point B1), and the ways it is allowed to name. */
@@ -466,7 +481,7 @@ async function sitemapRedirects(list: string[]) {
   await Promise.all(
     Array.from({ length: 8 }, async () => {
       for (let p = queue.shift(); p !== undefined; p = queue.shift()) {
-        const res = await fetch(BASE + p, { redirect: "manual" }).catch(() => null);
+        const res = await fetch(BASE + p, { redirect: "manual", ...withAccess() }).catch(() => null);
         if (res && res.status >= 300 && res.status < 400) add("sitemap", p, "-", "redirects (" + res.status + ") to " + (res.headers.get("location") ?? "?"));
       }
     }),
@@ -540,7 +555,7 @@ async function check(page: Page, path: string, lang: string, size: string, phone
 }
 
 async function pages(): Promise<string[]> {
-  const xml = await (await fetch(BASE + "/sitemap.xml")).text();
+  const xml = await (await fetch(BASE + "/sitemap.xml", withAccess())).text();
   const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]!.replace(/^https?:\/\/[^/]+/, "") || "/");
   // The English pages first: the other languages compare their texts with them.
   const lang = (p: string) => /^\/(fr|es|de|nl|ar)(\/|$)/.exec(p)?.[1] ?? "en";
@@ -553,6 +568,7 @@ async function context(browser: Browser, size: string): Promise<BrowserContext> 
   const ctx = phone
     ? await browser.newContext({ ...devices["iPhone 13"], reducedMotion: "reduce" })
     : await browser.newContext({ viewport: { width: Number(dims.split("x")[0]), height: Number(dims.split("x")[1]) }, deviceScaleFactor: Number(density), reducedMotion: "reduce" });
+  if (ACCESS_COOKIE) await ctx.addCookies([{ name: "bj_access", value: ACCESS_COOKIE.slice("bj_access=".length), url: BASE }]);
   // tsx keeps the names of the functions (a helper "__name" the page does not have); silent: every film at volume 0.
   await ctx.addInitScript({
     content:
@@ -565,6 +581,7 @@ async function context(browser: Browser, size: string): Promise<BrowserContext> 
 }
 
 async function main() {
+  await enter();
   const list = await pages();
   await sitemapRedirects(list);
   const desktop = await chromium.launch({ args: ["--mute-audio", "--autoplay-policy=user-gesture-required"] });

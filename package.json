@@ -32,7 +32,8 @@
     "mechanisms": "node scripts/mechanism-media.mjs",
     "extra-media": "node scripts/extra-media.mjs",
     "page-media": "node scripts/page-media.mjs",
-    "thumbs": "tsx scripts/thumbs.ts && tsx scripts/angle-views.ts"
+    "thumbs": "tsx scripts/thumbs.ts && tsx scripts/angle-views.ts",
+    "soon": "node scripts/soon-media.mjs"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",

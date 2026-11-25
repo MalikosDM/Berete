@@ -28,6 +28,7 @@ import {
 import { PIECE_TYPES, type Angle, type MediaItem, type PieceAngles, type Translations } from "@/data/types";
 import { bundleOf, loadLocale, LOCALE_INFO, useI18n } from "@/i18n";
 import { Detail3D } from "@/viewer";
+import Access from "@/pages/admin/Access";
 import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
 import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
@@ -41,7 +42,7 @@ import { HAS_SERVER } from "@/lib/site";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "messages" | "3d" | "clients" | "house" | "cutouts";
+type Tab = Kind | "access" | "messages" | "3d" | "clients" | "house" | "cutouts";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -158,6 +159,7 @@ const KINDS: Record<Kind, { label: string; add: string; edit: string; name: stri
 
 /** The pieces and their 3D first: what the jeweller changes most. */
 const TABS: { key: Tab; label: string }[] = [
+  { key: "access", label: "Accès au site" },
   { key: "pieces", label: KINDS.pieces.label },
   { key: "3d", label: "Modèles 3D" },
   { key: "clients", label: "Clients VIP" },
@@ -1458,6 +1460,26 @@ export default function Admin() {
     setTab(next);
     writeTab(next);
   };
+  // The site under construction without its private password yet (server/access.ts): the admin says it first.
+  const [access, setAccess] = useState<{ construction: boolean; hasPassword: boolean } | null>(null);
+  useEffect(() => {
+    if (!token || !HAS_SERVER) return;
+    let alive = true;
+    adminCall(token, "GET", "/api/admin/access")
+      .then((s) => {
+        if (!alive) return;
+        const state = s as unknown as { construction: boolean; hasPassword: boolean };
+        setAccess(state);
+        if (state.construction && !state.hasPassword) {
+          setTab("access");
+          writeTab("access");
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [token]);
 
   const login = async (e: FormEvent) => {
     e.preventDefault();
@@ -1538,7 +1560,12 @@ export default function Admin() {
         ) : (
           <>
             <h1 className="sr-only">Administration · {TABS.find((t) => t.key === tab)?.label}</h1>
-            {tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+            {access && access.construction && !access.hasPassword && tab !== "access" ? (
+              <button type="button" onClick={() => open("access")} className="mb-8 flex min-h-12 w-full items-center justify-between gap-4 border border-rose-light/55 px-5 text-left text-base text-rose-light hover:border-rose-light">
+                Choisissez le mot de passe d'accès privé <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
+              </button>
+            ) : null}
+            {tab === "access" ? <Access token={token} onExpired={logout} onState={setAccess} /> : tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
           </>
         )}
       </main>

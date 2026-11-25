@@ -66,6 +66,8 @@ if [ -z "$healthy" ]; then
     docker image tag berete-app:previous berete-app:latest
     git reset --quiet --hard "$CURRENT"
     docker compose up -d --no-build app >> "$LOG" 2>&1
+    # The door of the previous version with it.
+    docker compose exec -T caddy caddy reload --config /etc/caddy/Caddyfile >> "$LOG" 2>&1 || true
   fi
   exit 1
 fi

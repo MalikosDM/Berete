@@ -8,7 +8,10 @@
 #   set NAME=value …   changes one or several settings of .env (SMTP_…, ALERT_TO, OPENAI_API_KEY…) and restarts the
 #                      site with them; NAME alone: the value is asked without being shown (a password, a key)
 #   domain example.com the address of the site becomes example.com (once its DNS points to the VPS)
-#   launch             opens the site to the search engines (SITE_INDEXING=on)
+#   access             the password of the private access of the site under construction, asked twice without being
+#                      shown (otherwise chosen in the admin: Accès au site); access off opens the site to everyone, access on
+#                      puts it back under construction, access status says where it is
+#   launch             opens the site to the search engines (SITE_INDEXING=on), once it is no longer under construction
 #   3d                 sends the 3D models of this Mac (local base and storage/) to the VPS
 #   backup [folder]    copies the backups of the VPS to the Mac (default: the external disk)
 #   private            lets the VPS read GitHub with its own key (before the repository becomes private)
@@ -106,6 +109,7 @@ case "$CMD" in
       echo "Version : $(git log -1 --format="%h %s (%cr)")"
       preview="$(grep -E "^SITE_PREVIEW=" .env | cut -d= -f2-)"
       [ -z "$preview" ] || echo "Adresse du serveur (aperçu, jamais indexée) : https://$preview"
+      echo "Accès au site : $(docker compose exec -T app node dist-server/server/access-cli.js status 2>/dev/null || echo "inconnu")"
       echo "Moteurs de recherche : $(grep -q "^SITE_INDEXING=on" .env && echo ouvert || echo "fermé (noindex)")"
       filled() { grep -qE "^$1=.+" .env && ! grep -qE "^$1=(\"\"|'"''"')$" .env; }
       echo "Alertes e-mail : $(filled SMTP_HOST && filled SMTP_USER && filled SMTP_PASS && filled ALERT_TO && echo actives || echo "non configurées (SMTP_USER, SMTP_PASS, ALERT_TO)")"
@@ -151,7 +155,28 @@ case "$CMD" in
     bash "$0" set "SITE_DOMAIN=$domain" "SITE_PREVIEW=$preview"
     echo "Site : https://$domain (son certificat HTTPS arrive à la première visite dès que le DNS pointe vers le VPS)."
     ;;
+  access)
+    # In the container of the site (server/access-cli.ts); the password travels through the standard input, never shown.
+    cli="docker compose exec -T app node dist-server/server/access-cli.js"
+    case "${1:-}" in
+      off | on | status) run "$cli $1" ;;
+      "")
+        read -r -s -p "Mot de passe d'accès privé (rien ne s'affiche en tapant, puis Entrée) : " first < /dev/tty
+        echo
+        read -r -s -p "Encore une fois : " again < /dev/tty
+        echo
+        [ "$first" = "$again" ] || { echo "Les deux mots de passe ne sont pas identiques : rien n'a changé."; exit 1; }
+        printf '%s\n' "$first" | run "$cli set"
+        ;;
+      *) echo "npm run vps -- access (choisir le mot de passe), access off (ouvrir le site), access on, access status"; exit 1 ;;
+    esac
+    ;;
   launch)
+    # Never the search engines on a site still closed to the public.
+    if run "docker compose exec -T app node dist-server/server/access-cli.js status" | grep -q "en construction"; then
+      echo "Le site est encore en construction : ouvrez-le d'abord (admin → Accès au site, décocher « Site en construction »), puis relancez launch."
+      exit 1
+    fi
     bash "$0" set SITE_INDEXING=on
     echo "Le site est ouvert aux moteurs de recherche."
     ;;

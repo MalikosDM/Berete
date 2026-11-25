@@ -12,6 +12,7 @@ import { PIECE_TYPES } from "../../src/data/types.js";
 import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, readHouse, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
 import { Prisma } from "../generated/prisma/client.js";
+import { grantAccess } from "../access-state.js";
 import { alertHouse } from "../alerts.js";
 import { serverSecret } from "../secret.js";
 import { limiter } from "../security.js";
@@ -232,6 +233,8 @@ site.post("/admin/login", async (req, res) => {
     return;
   }
   adminTries.clear(req);
+  // The admin sees the site under construction on this device (server/access.ts).
+  grantAccess(req, res);
   res.json({ token: adminToken(Math.floor(Date.now() / 1000) + ADMIN_HOURS * 3600) });
 });
 

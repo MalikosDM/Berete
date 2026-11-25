@@ -42,8 +42,13 @@ function silent() {
 export const silence = (context: BrowserContext) => context.addInitScript(silent);
 
 export const test = base.extend({
-  context: async ({ context }, use) => {
+  context: async ({ context, baseURL }, use) => {
     await silence(context);
+    // The site under construction (server/access.ts): ACCESS_PASSWORD (given in the Terminal, never written anywhere)
+    // enters it as a visitor who typed the private password (the cookie is shared with the pages of this context).
+    if (process.env.ACCESS_PASSWORD && baseURL) {
+      await context.request.post(new URL("/api/access", baseURL).href, { form: { password: process.env.ACCESS_PASSWORD, next: "/" }, maxRedirects: 0 });
+    }
     await use(context);
   },
 });

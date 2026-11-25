@@ -3473,3 +3473,9 @@ html[lang="ar"] [data-piece] [data-u-title] {
     text-transform: none;
   }
 }
+
+/* A private page opened alone while the site is under construction (src/App.tsx, PrivateApp): the small logo of the house
+   instead of the menu of the site, so its first block starts closer to the top. */
+[data-private-page] > section {
+  padding-top: 3.5rem;
+}
