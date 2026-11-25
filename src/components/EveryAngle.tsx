@@ -63,7 +63,7 @@ export default function EveryAngle({ piece, items: given }: { piece: Piece; item
                 aria-label={t.gallery.open(name)}
               >
                 <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
-                  <MediaView item={item} alt={name} sizes="(max-width: 1023px) 46vw, 18rem" />
+                  <MediaView item={item} alt={name} sizes="(max-width: 1023px) 46vw, 18rem" frame={4 / 5} />
                 </span>
                 {item.type === "video" ? (
                   <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-ink/60 px-3 py-1 text-sm text-white">

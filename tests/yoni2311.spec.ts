@@ -148,7 +148,8 @@ test("capsule: the piece at once, no film of a 3D render, the magnifying glass, 
   await lb.locator("[data-zoom-in]").click();
   await lb.locator("[data-zoom-in]").click();
   await expect.poll(async () => Number(await stage.getAttribute("data-zoom"))).toBeGreaterThan(2.5);
-  const img = lb.locator("[data-lightbox-image]");
+  // The frame of the photo moves (since 24/11/2026 the zoom scales the frame that holds the photo and its loupe copy).
+  const img = lb.locator("[data-lightbox-photo]");
   const before = await img.evaluate((el) => (el as HTMLElement).style.transform);
   const s = (await stage.boundingBox())!;
   await page.mouse.move(s.x + s.width / 2, s.y + s.height / 2);
@@ -178,8 +179,8 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   await open(page, "/pieces/kenan-yildiz-celebration-pendant");
   await expect.poll(backdrop).toMatch(new RegExp("/media/universes/bianconero-" + (phone ? "m-" : "") + "\\d+" + V + "(avif|webp)$"));
   await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-large", "");
-  // The name of the house in the depth of the capsule, behind the decor.
-  const brand = page.locator(".universe .u-brand");
+  // The monogram of the house in the depth of the capsule, behind the decor (in place of the name BERETE since 24/11/2026).
+  const brand = page.locator(".universe [data-monogram] .monogram-lines");
   await expect(brand).toHaveCount(1);
   expect(await brand.evaluate((el) => Number(getComputedStyle(el).opacity))).toBeLessThan(0.1);
   expect(await page.locator(".universe").getAttribute("aria-hidden")).toBe("true");

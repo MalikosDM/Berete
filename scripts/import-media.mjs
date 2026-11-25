@@ -44,6 +44,7 @@ import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises"
 import { cpus, tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { copyOf, makeSizes } from "./media-sizes.mjs";
+import { fingerprint, imageSize, LOUPE, LOUPE_MARGIN, LOUPE_SCALE, loupePath, saveLoupes, worthLoupe } from "./loupe.mjs";
 import { fileURLToPath } from "node:url";
 import { BOUTIQUE_VIDEOS, PORTRAITS, STILLS } from "./piece-media.mjs";
 import { HD } from "./hd-media.mjs";
@@ -217,6 +218,66 @@ async function produce(out, src, recipe, ffmpegArgs) {
   console.log("  + " + relative(ROOT, out));
 }
 
+/* ---------- The loupe copy of a photo (scripts/loupe.mjs) ---------- */
+
+/** By address of a photo of the site: its loupe copy ({ src, width, height }), or null when its copy already is whole. */
+const loupes = new Map();
+
+/**
+ * The loupe copy of the photo `out` (made from `src`): the same filters `vf` as its copy (crop, colours), then up to
+ * LOUPE.long px. `scale` replaces the scale of LOUPE_SCALE when the recipe needs its own (a portrait cut at 4:5). Remade
+ * only when its original or its recipe changed (its version is in its name).
+ */
+async function loupe(src, out, vf = "", { seek = [], scale = LOUPE_SCALE, after = "" } = {}) {
+  const key = webPath(out);
+  const shown = await probe(out);
+  const shownLong = Math.max(shown.width, shown.height);
+  const recipe = "loupe:" + vf + "|" + scale + "|" + after + "|" + seek.join(" ");
+  const v = await fingerprint(src, recipe);
+  const file = loupePath(out, v);
+  const none = cache["loupe:" + relative(ROOT, out)];
+  if (none && none.v === v && none.none) return loupes.set(key, null) && null;
+  if (!existsSync(file)) {
+    // An original hardly larger than its copy: its copy already is the whole photo.
+    if (!VIDEO_EXT.test(src)) {
+      const size = await imageSize(src);
+      if (!worthLoupe(size.width, size.height, shownLong)) {
+        cache["loupe:" + relative(ROOT, out)] = { v, none: true };
+        loupes.set(key, null);
+        return null;
+      }
+    }
+    let input = src;
+    // An iPhone photo (HEIC, made of tiles) goes through a JPEG first (sips, macOS), at its full size.
+    if (/\.heic$/i.test(src)) {
+      input = join(tmpdir(), "berete-" + process.pid + "-" + Math.random().toString(36).slice(2) + ".jpg");
+      await run("sips", ["-s", "format", "jpeg", "-s", "formatOptions", "95", src, "--out", input]);
+    }
+    try {
+      const filters = [vf, scale, after].filter(Boolean).join(",");
+      await run("ffmpeg", ["-v", "error", "-y", ...seek, "-i", input, "-vf", filters, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(LOUPE.quality), "-compression_level", "6", file]);
+    } finally {
+      if (input !== src) await rm(input, { force: true });
+    }
+    const made = await probe(file);
+    if (Math.max(made.width, made.height) < shownLong * LOUPE_MARGIN) {
+      // Its crop kept less than its original promised: no better than its copy.
+      await rm(file, { force: true });
+      cache["loupe:" + relative(ROOT, out)] = { v, none: true };
+      loupes.set(key, null);
+      return null;
+    }
+    encoded += 1;
+    console.log("  + " + relative(ROOT, file));
+  }
+  delete cache["loupe:" + relative(ROOT, out)];
+  produced.add(file);
+  const p = await probe(file);
+  const entry = { src: webPath(file), width: p.width, height: p.height };
+  loupes.set(key, entry);
+  return entry;
+}
+
 /* ---------- Recipes ---------- */
 
 async function photo(src, out, filter = "") {
@@ -224,6 +285,7 @@ async function photo(src, out, filter = "") {
   const vf = filter ? filter + "," + scale : scale;
   const recipe = "photo:" + PHOTO.maxW + ":" + PHOTO.quality + ":" + vf;
   await produce(out, src, recipe, ["-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PHOTO.quality), "-compression_level", "6"]);
+  await loupe(src, out, filter);
   const p = await probe(out);
   return { type: "image", src: webPath(out), width: p.width, height: p.height };
 }
@@ -412,11 +474,13 @@ async function still(src, out, { at, crop, mask = [] }) {
     const [x, y, w, h] = crop;
     filters.push("crop=iw*" + frac(w) + ":ih*" + frac(h) + ":iw*" + frac(x) + ":ih*" + frac(y));
   }
+  const before = filters.join(",");
   filters.push("scale='min(" + PHOTO.maxW + ",iw)':-2:flags=lanczos");
   const vf = filters.join(",");
   const seek = VIDEO_EXT.test(src) ? ["-ss", String(at ?? 0)] : [];
   const recipe = "still:" + (at ?? "") + ":" + vf + ":" + PHOTO.quality;
   await produce(out, src, recipe, [...seek, "-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(PHOTO.quality), "-compression_level", "6"]);
+  await loupe(src, out, before, { seek });
   const p = await probe(out);
   return { type: "image", src: webPath(out), width: p.width, height: p.height };
 }
@@ -457,6 +521,7 @@ const SKETCH = { maxW: 1440, maxH: 1920, quality: 80 };
 async function sketchPhoto(src, out) {
   const vf = "scale=w='min(" + SKETCH.maxW + ",iw)':h='min(" + SKETCH.maxH + ",ih)':force_original_aspect_ratio=decrease:flags=lanczos";
   await produce(out, src, "sketch:" + vf + ":" + SKETCH.quality, ["-i", src, "-vf", vf, "-frames:v", "1", "-c:v", "libwebp", "-quality", String(SKETCH.quality), "-compression_level", "6"]);
+  await loupe(src, out);
   const p = await probe(out);
   return { type: "image", src: webPath(out), width: p.width, height: p.height };
 }
@@ -568,6 +633,7 @@ async function hdPhoto(src, out, filter = "") {
   } finally {
     if (input !== src) await rm(input, { force: true });
   }
+  await loupe(src, out, filter);
   const p = await probe(out);
   return { type: "image", src: webPath(out), width: p.width, height: p.height, onBlack: await shotOnBlack(out) };
 }
@@ -882,6 +948,14 @@ async function playerPhoto(src, out, crop) {
       if (input !== src) await rm(input, { force: true });
     }
   }
+  {
+    // Its loupe copy: the same 4:5 cut and the same look, up to LOUPE.long px high.
+    const { width, height } = await probe(src);
+    const box = portraitBox(width, height, crop);
+    const [cw] = box.crop.split(":").map(Number);
+    const w = Math.min(Math.floor(cw / 8) * 8, Math.floor((LOUPE.long * 4) / 5 / 8) * 8);
+    await loupe(src, out, "crop=" + box.crop, { scale: "scale=" + w + ":" + (w * 5) / 4 + ":flags=lanczos", after: PLAYER_GRADE });
+  }
   const p = await probe(out);
   return { type: "image", src: webPath(out), width: p.width, height: p.height };
 }
@@ -1130,6 +1204,7 @@ if (runs("scroll")) {
 }
 await writeJson(mediaFile, media);
 
+await saveLoupes(loupes, pruneDirs.map((dir) => webPath(dir) + "/"));
 await prune(pruneDirs);
 await writeFile(CACHE_FILE, JSON.stringify(cache, null, 1));
 await makeSizes();

@@ -310,7 +310,9 @@ export const de: Messages = {
   },
 
   gallery: {
-    zoomHint: "Zoomen mit + und −, per Doppelklick oder mit zwei Fingern; ziehen, um das Foto zu verschieben.",
+    /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
+    clickToZoom: "Zum Vergrößern klicken",
+    tapToZoom: "Zum Vergrößern tippen",
     title: "Details",
     hintPinned: "Scrollen zum Entdecken · Tippen zum Vergrößern",
     hint: "Tippen zum Vergrößern",

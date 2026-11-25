@@ -36,6 +36,7 @@ import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
+import { LOUPE, LOUPE_MARGIN, saveLoupes } from "./loupe.mjs";
 import { MARGIN, SIZES, sizedPath } from "./media-sizes.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
@@ -272,6 +273,9 @@ try {
   /* first run */
 }
 await mkdir(OUT, { recursive: true });
+/** The loupe copies of the photos made now, by address of their photo. */
+const loupes = new Map();
+const gone = [];
 for (const key of keys) {
   const photos = PIECES[key];
   const dir = join(OUT, key);
@@ -292,7 +296,13 @@ for (const key of keys) {
       if (width < size.width * MARGIN) continue;
       await img.clone().resize(size.width, null, { kernel: "lanczos3" }).webp({ quality: size.quality, effort: 6 }).toFile(sizedPath(out, size.width));
     }
-    made.push({ name, width, height });
+    // Its loupe copy (scripts/loupe.mjs): the same photo, up to LOUPE.long px, for the viewer only; none when its original is
+    // hardly larger than its copy.
+    const zoom = join(tmp, name + ".loupe.webp");
+    const z = await img.clone().resize(LOUPE.long, LOUPE.long, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: LOUPE.quality, effort: 6 }).toFile(zoom);
+    const kept = Math.max(z.width, z.height) >= Math.max(width, height) * LOUPE_MARGIN;
+    if (!kept) await rm(zoom, { force: true });
+    made.push({ name, width, height, zoom: kept ? { width: z.width, height: z.height } : null });
   }
   // Its version: a fingerprint of every file made for it, in every name.
   const files = (await readdir(tmp)).sort();
@@ -312,15 +322,18 @@ for (const key of keys) {
         : { src: base + m.name + "." + v + ".webp", width: m.width, height: m.height },
     ]),
   );
+  for (const m of made) if (!m.video && m.zoom) loupes.set(base + m.name + "." + v + ".webp", { src: base + m.name + "." + v + ".loupe.webp", ...m.zoom });
   console.log("  + " + key + " (" + v + ", " + made.length + " photo" + (made.length > 1 ? "s" : "") + ")");
 }
 // A key no longer listed loses its files and its entry.
 for (const key of Object.keys(data)) {
   if (!PIECES[key]) {
     delete data[key];
+    gone.push(key);
     await rm(join(OUT, key), { recursive: true, force: true });
     console.log("  - " + key);
   }
 }
 await writeFile(DATA, JSON.stringify(Object.fromEntries(Object.keys(PIECES).filter((k) => data[k]).map((k) => [k, data[k]])), null, 1) + "\n");
 console.log("  = src/data/extra.generated.json");
+await saveLoupes(loupes, [...keys, ...gone].map((key) => "/media/extra/" + key + "/"));

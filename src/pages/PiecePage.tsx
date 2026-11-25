@@ -293,7 +293,7 @@ export default function PiecePage() {
                 <Reveal>
                   <button type="button" onClick={() => setWornOpen(i)} className="block w-full cursor-zoom-in text-start" aria-label={t.gallery.open(m.alt ?? piece.title)}>
                     <span className="block aspect-[4/5] overflow-hidden bg-ink-soft">
-                      <MediaView item={m} alt={m.alt ?? t.piece.wornAlt(piece.title)} fit="cover" sizes="(max-width: 1023px) 46vw, 18rem" />
+                      <MediaView item={m} alt={m.alt ?? t.piece.wornAlt(piece.title)} fit="cover" sizes={worn.length > 1 ? "(max-width: 1023px) 46vw, 18rem" : "(max-width: 639px) 92vw, 24rem"} frame={4 / 5} />
                     </span>
                   </button>
                 </Reveal>

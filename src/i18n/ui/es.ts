@@ -300,7 +300,9 @@ export const es: Messages = {
   },
 
   gallery: {
-    zoomHint: "Amplíe con + y −, un doble clic o dos dedos; deslice para mover la foto.",
+    /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
+    clickToZoom: "Haga clic para ampliar",
+    tapToZoom: "Toque para ampliar",
     title: "Detalles",
     hintPinned: "Desplácese para explorar · Toque para ampliar",
     hint: "Toque para ampliar",

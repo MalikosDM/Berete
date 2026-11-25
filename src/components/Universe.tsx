@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { useBrandWatermark } from "@/lib/brandmark";
 import { createPortal } from "react-dom";
 import { BACKDROPS, THEME_FONTS, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
-import brand from "@/data/brand.generated.json" with { type: "json" };
+import Monogram from "@/components/Monogram";
 import { afterLoad } from "@/lib/idle";
 
 /*
@@ -431,10 +431,10 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
         ) : null}
         {canvasEffects.length > 0 && !preview ? <canvas ref={canvasRef} className="u-fx" /> : null}
         <div className="u-veil" />
-        {/* The name of the house, very discreet, in every capsule (Yoni, 23/11/2026): over the decor and its veil (else the
-            veil of a phone hides it), under the whole page, never over a jewel (the universe is behind the page). Its
-            setting: BRAND_WATERMARK (src/lib/site.ts). */}
-        {preview || fixed || !watermark ? null : <span className="u-brand" style={{ "--u-brand": "url(" + brand.berete.src + ")" } as CSSProperties} />}
+        {/* The monogram BRT of the house in every capsule (24/11/2026, in place of the name BERETE): over the decor and its
+            veil (else the veil of a phone hides it), under the whole page, never over a jewel (the universe is behind the
+            page). Its setting: BRAND_WATERMARK (src/lib/site.ts). */}
+        {preview || fixed || !watermark ? null : <Monogram />}
         {/* The entrance only: hidden once it has played (src/index.css). */}
         <div className="u-entrance">
           <span className="u-flash" />

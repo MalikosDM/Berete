@@ -34,6 +34,7 @@ import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { MARGIN, SIZES, sizedPath } from "./media-sizes.mjs";
+import { LOUPE, LOUPE_MARGIN, saveLoupes } from "./loupe.mjs";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const DISK = process.env.BERETE_DISK ?? "/Volumes/Disque externe";
@@ -208,6 +209,9 @@ const reference = await measureBase(join(SETS[refBox.set], refBox.film, "closed.
 console.log("  reference " + REFERENCE + ": base " + Math.round(reference.width * 1000) / 10 + " % wide, plateau at " + Math.round(reference.top * 1000) / 10 + " %");
 // Some boxes alone: the others keep what was made for them.
 const made = ONLY.length > 0 && existsSync(DATA) ? JSON.parse(readFileSync(DATA, "utf8")).trunks : {};
+/** The loupe copies of the photos of the boxes made now (scripts/loupe.mjs), by address of their photo; and those boxes. */
+const loupes = new Map();
+const loupeBoxes = [];
 for (const box of BOXES) {
   if (ONLY.length > 0 && !ONLY.includes(box.slug)) continue;
   const dir = join(OUT, box.slug);
@@ -238,7 +242,12 @@ for (const box of BOXES) {
       if (width < size.width * MARGIN) continue;
       await img.clone().resize(size.width, null, { kernel: "lanczos3" }).webp({ quality: size.quality, effort: 6 }).toFile(sizedPath(out, size.width));
     }
-    photos.push({ name: "photo-" + name + ".webp", width, height, file: file.replace(/\.jpe?g$/i, "") });
+    // Its loupe copy (scripts/loupe.mjs): for the viewer only, when its original is larger than its copy.
+    const zoom = join(tmp, "photo-" + name + ".loupe.webp");
+    const z = await img.clone().resize(LOUPE.long, LOUPE.long, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: LOUPE.quality, effort: 6 }).toFile(zoom);
+    const kept = Math.max(z.width, z.height) >= Math.max(width, height) * LOUPE_MARGIN;
+    if (!kept) await rm(zoom, { force: true });
+    photos.push({ name: "photo-" + name + ".webp", width, height, file: file.replace(/\.jpe?g$/i, ""), zoom: kept ? { width: z.width, height: z.height } : null });
   }
   // Its version: a fingerprint of every file made for it.
   const files = (await readdir(tmp)).sort();
@@ -263,7 +272,9 @@ for (const box of BOXES) {
     // the places of its light and of its piece (src/data/trunks.ts) follow the same frame.
     ...(marble ? { marble: round(marble), frame: round({ x: frame.x, y: frame.y, size: frame.size }) } : {}),
   };
-  if (photos.length > 0) entry.photos = photos.map(({ name, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
+  if (photos.length > 0) entry.photos = photos.map(({ name, zoom, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
+  for (const p of photos) if (p.zoom) loupes.set(base + "/" + versioned(p.name, v), { src: base + "/" + versioned(p.name.replace(/\.webp$/, ".loupe.webp"), v), ...p.zoom });
+  loupeBoxes.push(base + "/");
   made[box.slug] = entry;
   console.log("  + " + box.slug + " (" + v + ", films " + openingDuration + " s / " + closingDuration + " s" + (photos.length ? ", " + photos.length + " photos" : "") + ")");
 }
@@ -279,3 +290,4 @@ for (const d of await readdir(OUT)) {
 const ordered = Object.fromEntries(BOXES.map((b) => b.slug).filter((slug) => made[slug]).map((slug) => [slug, made[slug]]));
 await writeFile(DATA, JSON.stringify({ trunks: ordered }, null, 1) + "\n");
 console.log("  = src/data/trunks.generated.json");
+await saveLoupes(loupes, loupeBoxes);

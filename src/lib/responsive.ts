@@ -24,6 +24,25 @@ export const SIZES_FOR = {
   thumb: "96px",
 };
 
+/**
+ * The `sizes` of a photo that fills a frame of ratio `frame` (width / height, "cover"): a photo wider than its frame is drawn
+ * wider than the frame (its sides cut), so the browser must take a copy as wide as the photo drawn, not as the frame
+ * (24/11/2026: a landscape photo in a frame of 4:5 was drawn from too small a copy).
+ */
+export function coverSizes(sizes: string, width: number | undefined, height: number | undefined, frame: number): string {
+  if (!width || !height) return sizes;
+  const k = width / height / frame;
+  if (k <= 1.02) return sizes;
+  const f = Math.round(k * 100) / 100;
+  return sizes
+    .split(",")
+    .map((part) => {
+      const m = /^(\s*(?:\([^)]*\)\s+)?)(.+?)\s*$/.exec(part);
+      return m ? m[1] + "calc(" + m[2] + " * " + f + ")" : part;
+    })
+    .join(",");
+}
+
 function sized(src: string, width: number): string {
   return src.replace(/\.webp$/, ".w" + width + ".webp");
 }

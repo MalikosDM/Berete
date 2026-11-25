@@ -123,7 +123,7 @@ test("the trunks of Keita and of Malik Tillman: on the panther and on their prof
   expect(problems.errors).toEqual([]);
 });
 
-test("the name BERETE in the background: home, pieces, circle; under everything; one setting, ?filigrane=0 removes it", async ({ page }, info) => {
+test("the monogram BRT in the background (in place of BERETE since 24/11/2026): home, pieces, circle; under everything; one setting, ?filigrane=0 removes it", async ({ page }, info) => {
   const problems = watch(page);
   const pages: [string, string][] = [
     ["/", "accueil"],
@@ -132,13 +132,13 @@ test("the name BERETE in the background: home, pieces, circle; under everything;
   ];
   for (const [path, name] of pages) {
     const piece = path.startsWith("/pieces/");
-    const mark = piece ? ".u-brand" : "[data-brand-mark]";
+    const mark = piece ? ".universe [data-monogram]" : "[data-monogram]";
     await open(page, path + "?filigrane=1");
     await expect(page.locator(mark)).toHaveCount(1);
-    // Fixed at the bottom of the screen (visible while the page scrolls), under the content.
+    // Fixed in the middle of the screen (visible while the page scrolls), under the content; its lines at 5 %.
     const style = await page.locator(mark).evaluate((el) => {
       const s = getComputedStyle(el);
-      return { position: s.position, z: s.zIndex, opacity: Number(s.opacity) };
+      return { position: s.position, z: s.zIndex, opacity: Number(getComputedStyle(el.querySelector(".monogram-lines")!).opacity) };
     });
     expect(style.opacity).toBeLessThan(0.08);
     if (!piece) {
@@ -167,9 +167,10 @@ test("the name BERETE in the background: home, pieces, circle; under everything;
   }
   // In French too.
   await page.goto("/fr/players/malik-tillman", { waitUntil: "load" });
-  await expect(page.locator("[data-brand-mark]")).toHaveCount(1);
-  // Not on the other pages (the house, the trunks...).
+  await expect(page.locator("[data-monogram]")).toHaveCount(1);
+  // Not on the other pages (the house, the trunks...); the name BERETE nowhere.
   await page.goto("/boxes", { waitUntil: "load" });
-  await expect(page.locator("[data-brand-mark]")).toHaveCount(0);
+  await expect(page.locator("[data-monogram]")).toHaveCount(0);
+  await expect(page.locator(".u-brand, .brand-mark, [data-brand-mark]")).toHaveCount(0);
   expect(problems.errors).toEqual([]);
 });

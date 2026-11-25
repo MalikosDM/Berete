@@ -1,6 +1,5 @@
-import type { CSSProperties } from "react";
 import { useLocation } from "react-router";
-import brand from "@/data/brand.generated.json";
+import Monogram from "@/components/Monogram";
 import { stripLocale } from "@/i18n/locales";
 import { useBrandWatermark } from "@/lib/brandmark";
 
@@ -8,13 +7,13 @@ import { useBrandWatermark } from "@/lib/brandmark";
 const SHOWN = (path: string) => path === "/" || path === "/players" || path.startsWith("/players/");
 
 /**
- * The name BERETE in the background (Yoni, 22/11/2026): very discreet, fixed at the bottom of the screen while the page
- * scrolls, drawn just above the background and under everything else (the pieces, their photos, the texts). The same mark
- * as in the universes of the pieces (.u-brand). Its setting: BRAND_WATERMARK (src/lib/site.ts).
+ * The monogram BRT in the background of the home page and of the circle (24/11/2026, in place of the name BERETE): fixed in
+ * the middle of the screen while the page scrolls, drawn just above the background and under everything else (the photo of
+ * the home page covers it). The same monogram as in the universes of the pieces. Its setting: BRAND_WATERMARK (src/lib/site.ts).
  */
 export default function BrandMark() {
   const { pathname } = useLocation();
   const on = useBrandWatermark();
   if (!on || !SHOWN(stripLocale(pathname))) return null;
-  return <span aria-hidden="true" data-brand-mark className="brand-mark" style={{ "--brand-mark": "url(" + brand.berete.src + ")" } as CSSProperties} />;
+  return <Monogram page />;
 }

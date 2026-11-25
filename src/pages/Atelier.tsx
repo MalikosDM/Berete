@@ -23,7 +23,7 @@ import type { Box, MediaItem } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
-import { srcSetOf } from "@/lib/responsive";
+import { coverSizes, srcSetOf } from "@/lib/responsive";
 import { waLink } from "@/lib/site";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
@@ -193,7 +193,7 @@ function AtelierFilms() {
                     <Img
                       src={atelier.poster}
                       srcSet={srcSetOf(atelier.poster, posterWidth(atelier.making.width, atelier.making.height))}
-                      sizes="(max-width: 767px) 46vw, (max-width: 1279px) 24vw, 18vw"
+                      sizes={coverSizes("(max-width: 767px) 46vw, (max-width: 1279px) 24vw, 18vw", atelier.making.width, atelier.making.height, 4 / 5)}
                       alt={piece.title}
                       loading="lazy"
                       decoding="async"

@@ -9,6 +9,7 @@ import { spawn } from "node:child_process";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
+import { isLoupe } from "./loupe.mjs";
 
 const MEDIA = fileURLToPath(new URL("../public/media", import.meta.url));
 
@@ -49,7 +50,8 @@ async function photos(dir) {
     // mechanisms (scripts/mechanism-media.mjs).
     if (entry.isDirectory()) {
       if (!entry.name.startsWith("frames-") && entry.name !== "universes" && entry.name !== "cutouts" && entry.name !== "trunks" && entry.name !== "extra" && entry.name !== "mechanisms") out.push(...(await photos(p)));
-    } else if (entry.name.endsWith(".webp") && !COPY.test(entry.name)) out.push(p);
+      // A loupe copy (scripts/loupe.mjs) is only for the viewer, never shown small.
+    } else if (entry.name.endsWith(".webp") && !COPY.test(entry.name) && !isLoupe(entry.name)) out.push(p);
   }
   return out;
 }

@@ -293,7 +293,9 @@ export const ar: Messages = {
   },
 
   gallery: {
-    zoomHint: "كبّر بـ + و −، أو بنقرة مزدوجة أو بإصبعين؛ واسحب لتحريك الصورة.",
+    /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
+    clickToZoom: "انقروا للتكبير",
+    tapToZoom: "المسوا للتكبير",
     title: "التفاصيل",
     hintPinned: "مرروا للاستكشاف · انقروا للتكبير",
     hint: "انقروا للتكبير",

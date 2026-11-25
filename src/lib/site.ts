@@ -8,8 +8,9 @@ export const INSTAGRAM_HANDLE = "beretejewellers";
 export const INSTAGRAM_URL = "https://www.instagram.com/" + INSTAGRAM_HANDLE + "/";
 
 /**
- * The name BERETE as a watermark, very discreet, in the background of the home page, of the pages of the pieces (in their
- * universe) and of the circle: true shows it, false removes it everywhere. Always under the pieces, never over a jewel.
+ * The monogram BRT of the house (since 24/11/2026, in place of the name BERETE), very discreet, in the background of the home
+ * page, of the pages of the pieces (in their universe) and of the circle: true shows it, false removes it everywhere. Always
+ * under the pieces, never over a jewel.
  */
 export const BRAND_WATERMARK = true;
 

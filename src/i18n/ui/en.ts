@@ -316,7 +316,9 @@ export const en = {
   },
 
   gallery: {
-    zoomHint: "Zoom with + and −, a double click or two fingers; drag to move the photo.",
+    /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
+    clickToZoom: "Click to zoom",
+    tapToZoom: "Tap to zoom",
     title: "Details",
     hintPinned: "Scroll to explore · Tap to zoom",
     hint: "Tap to zoom",

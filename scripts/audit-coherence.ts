@@ -42,7 +42,8 @@ import type { Messages } from "../src/i18n/ui/en";
 
 const BASE = (process.env.BASE_URL ?? "http://localhost:3001").replace(/\/$/, "");
 const LANGS = (process.env.LANGS ?? "en,fr,es,de,nl,ar").split(",");
-const SIZES = (process.env.SIZES ?? "1280x800,1440x900,iphone").split(",");
+// "1512x982@2": a screen of 1512 x 982 points drawn at 2 pixels per point (a Retina laptop): the sharpness of the photos.
+const SIZES = (process.env.SIZES ?? "1280x800,1440x900,1512x982@2,iphone").split(",");
 const ONLY = process.env.ONLY ?? "";
 const WORKERS = Number(process.env.WORKERS ?? 6);
 const OUT = resolve(import.meta.dirname, "..", "verification", "coherence");
@@ -63,6 +64,9 @@ function allowedButtons(t: Messages): Set<string> {
     // A button that opens photos, and the way from a trunk to its piece (24/11/2026).
     t.boxes.discoverPhotos,
     t.boxes.discoverPiece,
+    // The little help of the viewer (24/11/2026).
+    t.gallery.clickToZoom,
+    t.gallery.tapToZoom,
     ...Object.values(t.nav).filter((v): v is string => typeof v === "string"),
     ...Object.values(t.collections.items).map((c) => c.name),
   ];
@@ -158,6 +162,8 @@ type Found = {
   buttons: string[];
   noAlt: string[];
   cut: string[];
+  blurry: string[];
+  watermark: boolean;
   edge: string[];
   order: string[];
   allText: string[];
@@ -300,12 +306,48 @@ async function inspect(page: Page, phone: boolean): Promise<Found> {
       if (left < -1 || right > vw + 1) edge.push(key(el.getAttribute("src") ?? (el as HTMLVideoElement).currentSrc ?? "") + " [" + Math.round(left) + "…" + Math.round(right) + " / " + vw + "]");
     }
 
+    // Photos never less sharp than the screen (24/11/2026): on a screen of 2 or 3 pixels per point, the file the browser took
+    // is at least as wide as the photo drawn (in pixels of the screen), or it is the largest file of the photo.
+    const blurry: string[] = [];
+    const dpr = window.devicePixelRatio || 1;
+    if (dpr >= 2) {
+      for (const img of document.querySelectorAll("img")) {
+        const src = img.currentSrc;
+        if (!src || !img.complete || !img.naturalWidth || !visible(img) || img.closest("[data-lightbox]")) continue;
+        if (!src.includes("/media/") || /\.svg(\?|$)/.test(src) || src.startsWith("data:") || src.startsWith("blob:")) continue;
+        const holders = [img, ...(img.parentElement?.tagName === "PICTURE" ? [...img.parentElement.querySelectorAll("source")] : [])];
+        const candidates = holders.flatMap((el) =>
+          (el.getAttribute("srcset") ?? "")
+            .split(",")
+            .map((c) => c.trim().split(/\s+/))
+            .filter((c) => c[0] && c[1] && c[1].endsWith("w"))
+            .map((c) => ({ url: new URL(c[0]!, location.href).href, w: parseInt(c[1]!, 10) })),
+        );
+        const chosen = candidates.find((c) => c.url === src);
+        const fileWidth = chosen ? chosen.w : img.naturalWidth;
+        if (fileWidth >= Math.max(fileWidth, ...candidates.map((c) => c.w))) continue;
+        const r = img.getBoundingClientRect();
+        const ratio = img.naturalWidth / img.naturalHeight;
+        const fit = getComputedStyle(img).objectFit;
+        const drawn = fit === "cover" ? Math.max(r.width, r.height * ratio) : fit === "contain" || fit === "scale-down" ? Math.min(r.width, r.height * ratio) : r.width;
+        if (fileWidth < drawn * dpr * 0.98) blurry.push(key(src) + " · file " + fileWidth + " px for " + Math.round(drawn * dpr) + " px on screen");
+      }
+    }
+
+    // The name BERETE in the background is gone (24/11/2026: the monogram BRT in its place).
+    const watermark =
+      document.querySelector(".u-brand, .brand-mark, [data-brand-mark]") !== null ||
+      [...document.querySelectorAll("body *")].some((el) => {
+        const cs = getComputedStyle(el);
+        return (cs.maskImage + " " + cs.getPropertyValue("-webkit-mask-image") + " " + cs.backgroundImage).includes("/media/brand/berete");
+      });
+
     const order = [...document.querySelectorAll("[data-piece-section]")].map((el) => el.getAttribute("data-piece-section") ?? "");
     const texts = [...document.querySelectorAll("main p, main h1, main h2, main h3, main li, main dt, main dd, main a, main button, main figcaption, header a, footer a, footer p")]
       .filter((el) => visible(el) && !el.closest("[lang]:not(html)") && !el.querySelector("[lang]") && !el.closest("[translate='no']"))
       .map((el) => textOf(el))
       .filter((tx) => tx.length >= 12 && /\p{L}{3,}.*\s.*\p{L}{3,}/u.test(tx));
-    return { wide: document.documentElement.scrollWidth - vw, fonts: [...fonts], loadedFonts, sizes, media, texts, repeated, buttons, noAlt, cut, edge, order, allText };
+    return { wide: document.documentElement.scrollWidth - vw, fonts: [...fonts], loadedFonts, sizes, media, texts, repeated, buttons, noAlt, cut, blurry, watermark, edge, order, allText };
   }, phone);
 }
 
@@ -346,6 +388,8 @@ async function check(page: Page, path: string, lang: string, size: string, phone
   if (GOLD_TONE[lang]!.test(all)) add("gold tone", path, size, (all.match(GOLD_TONE[lang]!) ?? [""])[0]);
   for (const x of f.cut) add("names", path, size, "name cut: " + x);
   for (const x of f.edge) add("overflow", path, size, "cut by the edge of the screen: " + x);
+  for (const x of f.blurry) add("sharpness", path, size, "photo less sharp than the screen: " + x);
+  if (f.watermark) add("watermark", path, size, "the name BERETE still in the background");
   if (onPiece) {
     const ranks = f.order.map((s) => ORDER[s] ?? -1);
     const sorted = ranks.every((r, i) => i === 0 || r >= ranks[i - 1]!);
@@ -370,9 +414,10 @@ async function pages(): Promise<string[]> {
 
 async function context(browser: Browser, size: string): Promise<BrowserContext> {
   const phone = size === "iphone";
+  const [dims = "", density = "1"] = size.split("@");
   const ctx = phone
     ? await browser.newContext({ ...devices["iPhone 13"], reducedMotion: "reduce" })
-    : await browser.newContext({ viewport: { width: Number(size.split("x")[0]), height: Number(size.split("x")[1]) }, reducedMotion: "reduce" });
+    : await browser.newContext({ viewport: { width: Number(dims.split("x")[0]), height: Number(dims.split("x")[1]) }, deviceScaleFactor: Number(density), reducedMotion: "reduce" });
   // tsx keeps the names of the functions (a helper "__name" the page does not have); silent: every film at volume 0.
   await ctx.addInitScript({
     content:
@@ -421,7 +466,7 @@ async function main() {
   await phoneBrowser?.close();
 
   mkdirSync(OUT, { recursive: true });
-  const checks = ["fonts", "sizes", "duplicates", "buttons", "photos", "gold tone", "english", "names", "overflow", "order", "page"];
+  const checks = ["fonts", "sizes", "duplicates", "buttons", "photos", "gold tone", "english", "names", "overflow", "order", "sharpness", "watermark", "page"];
   const lines = [
     "# Contrôle de cohérence",
     "",

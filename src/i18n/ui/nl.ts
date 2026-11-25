@@ -298,7 +298,9 @@ export const nl: Messages = {
   },
 
   gallery: {
-    zoomHint: "Zoom met + en −, een dubbelklik of twee vingers; sleep om de foto te verplaatsen.",
+    /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
+    clickToZoom: "Klik om in te zoomen",
+    tapToZoom: "Tik om in te zoomen",
     title: "Details",
     hintPinned: "Scroll om te verkennen · Tik om te zoomen",
     hint: "Tik om te zoomen",

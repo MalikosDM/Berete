@@ -752,53 +752,10 @@ html.lenis body {
 }
 
 /* The watermark: a glyph or a number, very large, in the depth. */
-/* The name of the house in the depth of the capsule (Yoni, 23/11/2026): BERETE, in the letters of the logo, very discreet, low
-   on the screen, behind the decor and under the light (src/components/Universe.tsx). */
-.u-brand {
-  inset: auto;
-  left: 50%;
-  bottom: 7svh;
-  width: min(94vw, 150svh);
-  aspect-ratio: 4.345;
-  transform: translateX(-50%);
-  background: var(--color-white);
-  -webkit-mask: var(--u-brand) center / contain no-repeat;
-  mask: var(--u-brand) center / contain no-repeat;
-  opacity: 0.018;
-  pointer-events: none;
-}
-@media (max-width: 1023px) {
-  .u-brand {
-    bottom: 3svh;
-    width: 92vw;
-  }
-}
-/* The name BERETE in the background of the home page and of the circle (src/components/BrandMark.tsx): the same mark, fixed
-   while the page scrolls, under everything (the wrapper of the pages is isolated: drawn over its black, under its content). */
 /* A view shown very large (Showcase "xl"): its chain fades out at the top of the box, under the menu (the jewel stays whole). */
 .sv-xl {
   -webkit-mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
   mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
-}
-.brand-mark {
-  position: fixed;
-  left: 50%;
-  bottom: 7svh;
-  z-index: -1;
-  width: min(94vw, 150svh);
-  aspect-ratio: 4.345;
-  transform: translateX(-50%);
-  background: var(--color-white);
-  -webkit-mask: var(--brand-mark) center / contain no-repeat;
-  mask: var(--brand-mark) center / contain no-repeat;
-  opacity: 0.018;
-  pointer-events: none;
-}
-@media (max-width: 1023px) {
-  .brand-mark {
-    bottom: calc(76px + 3svh + env(safe-area-inset-bottom));
-    width: 92vw;
-  }
 }
 .u-mark {
   inset: auto;
@@ -3348,5 +3305,124 @@ html[lang="ar"] [data-piece] [data-u-title] {
 @media (max-aspect-ratio: 1/1) {
   .home-photo-caption {
     bottom: calc(50cqh - min(100cqh, 100cqw / var(--rm)) / 2);
+  }
+}
+
+/* The monogram BRT and its diamond in the background (src/components/Monogram.tsx, 24/11/2026; in place of the name BERETE):
+   fine lines at 5 %, large, in the middle of the screen, under everything; a soft light that lights its lines only (a radial
+   light masked by the drawing), a few points of the diamond that twinkle, a relief of a few pixels. Transforms and opacities
+   only. In a universe it sits over the decor and its veil; on a page (the home page, the circle) fixed under the content. */
+.monogram {
+  position: absolute;
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: min(78vw, calc(64svh * var(--monogram-ratio)));
+  aspect-ratio: var(--monogram-ratio);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.universe-stage > .monogram {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+}
+.monogram-page {
+  position: fixed;
+  z-index: -1;
+}
+@media (max-width: 1023px) {
+  .monogram {
+    width: 88vw;
+  }
+  .monogram-page {
+    top: calc(50% - 38px - env(safe-area-inset-bottom) / 2);
+  }
+}
+.monogram-shift,
+.monogram-lines,
+.monogram-glow {
+  position: absolute;
+  inset: 0;
+}
+.monogram-lines {
+  width: 100%;
+  height: 100%;
+  opacity: 0.05;
+  user-select: none;
+}
+.monogram-glow {
+  overflow: hidden;
+  -webkit-mask: var(--monogram) center / contain no-repeat;
+  mask: var(--monogram) center / contain no-repeat;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.monogram[data-lit] .monogram-glow {
+  opacity: 0.2;
+}
+.monogram-light {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle 220px at 50% 50%, rgb(255 247 240) 0%, rgb(232 180 160 / 0.6) 45%, transparent 72%);
+  will-change: transform;
+}
+.monogram-spark {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 250 245 / 0.95) 0%, rgb(232 180 160 / 0.45) 38%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+/* Without a mouse: the light passes alone, slowly, in a diagonal, once every 9 seconds; the points of the diamond twinkle as
+   it passes. */
+.monogram:not([data-follow]) .monogram-glow {
+  opacity: 0.2;
+}
+.monogram:not([data-follow]) .monogram-light {
+  transform: translate3d(-75%, -75%, 0);
+  animation: monogram-sweep 9s linear infinite;
+}
+.monogram:not([data-follow]) .monogram-spark {
+  transition: none;
+  animation: monogram-twinkle 9s linear infinite;
+  animation-delay: calc(0.27s + var(--i) * 0.27s);
+}
+.monogram[data-paused] .monogram-light,
+.monogram[data-paused] .monogram-spark {
+  animation-play-state: paused;
+}
+@keyframes monogram-sweep {
+  0% {
+    transform: translate3d(-75%, -75%, 0);
+  }
+  32%,
+  100% {
+    transform: translate3d(75%, 75%, 0);
+  }
+}
+@keyframes monogram-twinkle {
+  0%,
+  4% {
+    opacity: 0;
+  }
+  9% {
+    opacity: 0.55;
+  }
+  18%,
+  100% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .monogram-glow,
+  .monogram-spark {
+    display: none;
+  }
+  .monogram-shift {
+    transform: none !important;
   }
 }

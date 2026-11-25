@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ImgHTMLAttributes, type 
 import Logo from "@/components/Logo";
 import type { MediaItem } from "@/data/types";
 import { afterLoad } from "@/lib/idle";
-import { SIZES_FOR, srcSetOf } from "@/lib/responsive";
+import { coverSizes, SIZES_FOR, srcSetOf } from "@/lib/responsive";
 
 type ImgProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & { src: string; alt: string; fade?: boolean };
 
@@ -100,7 +100,28 @@ export function LoopVideo({ item, label, className = "" }: { item: MediaItem; la
  * the visitor comes near them. `priority`: the one main photo of the page,
  * downloaded before anything else. `fade`: a photo fades in once loaded.
  */
-export function MediaView({ item, alt, className = "", eager = false, priority = false, fit, sizes = SIZES_FOR.half, fade = false }: { item: MediaItem; alt?: string; className?: string; eager?: boolean; priority?: boolean; fit?: "contain" | "cover"; sizes?: string; fade?: boolean }) {
+export function MediaView({
+  item,
+  alt,
+  className = "",
+  eager = false,
+  priority = false,
+  fit,
+  sizes = SIZES_FOR.half,
+  frame,
+  fade = false,
+}: {
+  item: MediaItem;
+  alt?: string;
+  className?: string;
+  eager?: boolean;
+  priority?: boolean;
+  fit?: "contain" | "cover";
+  sizes?: string;
+  /** The ratio (width / height) of the frame it fills: a wider photo needs a wider copy (coverSizes). */
+  frame?: number;
+  fade?: boolean;
+}) {
   const [spot, ready] = useWhenNeeded(eager || priority);
   const label = alt ?? item.alt ?? "";
   const mode = fit ?? (item.onBlack ? "contain" : "cover");
@@ -111,7 +132,7 @@ export function MediaView({ item, alt, className = "", eager = false, priority =
     <Img
       src={item.src}
       srcSet={srcSetOf(item.src, item.width)}
-      sizes={sizes}
+      sizes={mode === "cover" && frame ? coverSizes(sizes, item.width, item.height, frame) : sizes}
       alt={label}
       width={item.width}
       height={item.height}

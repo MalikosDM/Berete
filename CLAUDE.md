@@ -162,6 +162,35 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « photos nettes à la loupe + monogramme BRT » — état au 24/11/2026
+- [x] **Palier loupe** (`scripts/loupe.mjs`) : chaque photo qui s'ouvre dans la visionneuse a, à côté de sa copie de page, une
+      copie tirée de l'original du disque (côté long 3200 px au plus, jamais agrandie, WebP qualité 86, lanczos), faite par les
+      scripts d'import eux-mêmes avec leurs recadrages et leurs couleurs : `import-media` (HD, stories, pièces, joueurs, croquis,
+      La Maison : `<photo>.loupe.<v>.webp`), `extra-media` et `trunk-media` (`<photo>.<v>.loupe.webp`). Seuls les manquants ou
+      périmés sont refaits ; une photo dont l'original est à peine plus grand que sa copie (WhatsApp 1080 × 1920) n'en a pas.
+      Liste : `src/data/loupe.generated.json` (adresse de la photo → src, largeur, hauteur), chargée par la visionneuse à
+      l'ouverture seulement (jamais avec les pages). **758 photos, 416 Mo** (24/11). `media-sizes` ne fait pas de petites copies
+      des paliers loupe. Les originaux ne vont jamais dans Git.
+- [x] **Visionneuse** (`src/components/Lightbox.tsx`, `src/lib/loupe.ts`) : la copie de page tout de suite, le palier loupe
+      derrière puis en fondu de 200 ms dans le même cadre ; paliers de la photo d'avant et d'après préchargés. Zoom maximum =
+      jamais plus d'un point d'écran par pixel du fichier (×3,6 sur un portable 1512 × 982 pour une photo de 3200 px de haut,
+      ×5,5 sur iPhone ; une photo de téléphone se zoome peu) ; + grisé à la limite. Clic / toucher = zoom à l'endroit visé, nouveau
+      clic = photo entière, molette et pincement par paliers doux, glisser pour se déplacer, curseur loupe, flèches = photo
+      suivante (zoom à 1). Aide « Click to zoom » / « Cliquez pour zoomer » (6 langues, « Touchez » sur téléphone) une fois par
+      visite, effacée au premier zoom. Plus de double clic.
+- [x] **Netteté des pages** : `npm run audit:coherence` passe aussi en 1512 × 982 à 2 pixels par point (`SIZES` « 1512x982@2 »)
+      et vérifie que chaque photo des pages vient d'un fichier au moins aussi large que la photo dessinée (contrôle
+      « sharpness »), ou du plus grand fichier qu'elle a. Corrigé : une photo plus large que son cadre (cadres 4:5 de « Porté
+      par », « Every Angle », films de l'Atelier) demande une copie plus large (`coverSizes` de `src/lib/responsive.ts`).
+- [x] **Monogramme BRT** (`src/components/Monogram.tsx`, `public/media/brand/monogram.<v>.svg` par `npm run brand`) à la place
+      du mot BERETE en fond (univers des pièces, accueil sous la photo, Cercle) : lettres BRT et diamant en traits fins à 5 %,
+      grand, au centre ; sur ordinateur un reflet (dégradé masqué par le dessin, 20 %, rayon 220 px) suit la souris avec
+      inertie, 3 points du diamant scintillent à son passage, relief de 10 px au plus ; sans souris le reflet passe seul en
+      diagonale toutes les 9 s (CSS) ; immobile avec « réduire les animations » ; arrêté onglet caché ou hors écran. Même
+      réglage `BRAND_WATERMARK` (et `?filigrane=0/1`). L'audit vérifie qu'aucun « BERETE » ne reste en fond (« watermark »).
+- `tests/loupe.spec.ts`, `tests/monogram.spec.ts` (Chromium 1512 × 982 à 2 pixels par point, WebKit, iPhone). Planche avant /
+  après : `/Volumes/Disque externe/_verif/loupe-hd/avant-apres.jpg` ; captures et films du monogramme : `_verif/brt-fond/`.
+
 ## Passe « retours vidéo de Yoni (24/11, 11 h 01 – 11 h 06) » — état au 24/11/2026
 - [x] **Plein écran** qu'on quitte toujours (`src/lib/fullscreen.ts`, `useFullscreen`) : c'est le cadre du film (avec ses boutons)
       qui passe en plein écran, jamais la vidéo seule ; le même bouton entre et sort, Échap et le geste du système aussi ; Safari
