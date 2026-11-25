@@ -148,11 +148,11 @@ case "$CMD" in
     preview=""
     [ "$HOST" = local ] || preview="$(server_sslip)"
     [ "$preview" != "$domain" ] || preview=""
-    "$0" set "SITE_DOMAIN=$domain" "SITE_PREVIEW=$preview"
+    bash "$0" set "SITE_DOMAIN=$domain" "SITE_PREVIEW=$preview"
     echo "Site : https://$domain (son certificat HTTPS arrive à la première visite dès que le DNS pointe vers le VPS)."
     ;;
   launch)
-    "$0" set SITE_INDEXING=on
+    bash "$0" set SITE_INDEXING=on
     echo "Le site est ouvert aux moteurs de recherche."
     ;;
   3d)
