@@ -203,7 +203,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Mise en page** : page d'un club comme celle d'un joueur (nom près de la photo, aligné en bas) ; The Bespoke Journey en une
       colonne centrée de 760 px (titre, frise, les deux encadrés de même largeur).
 - `tests/audit2411.spec.ts` (ordinateur, Safari, iPhone). Toute la batterie passe en local (727 tests, ordinateur, iPhone, Safari,
-  25/11). Captures avant (de l'audit) : `_verif/audit-2411/` ; après : `_verif/audit-2411/apres/` (ou `.local/verif/` si le
+  25/11) ; en ligne : `audit2411`, `loupe`, `monogram` (ordinateur, Safari, iPhone) et `npm run audit:coherence` **522 pages × 1280,
+  1440, 1512 Retina, iPhone, 0 problème** (25/11). Captures avant (de l'audit) : `_verif/audit-2411/` ; après : `_verif/audit-2411/apres/` (ou `.local/verif/` si le
   disque est débranché).
 - [ ] Yoni : la pièce de Sambi Lokonga ; une photo propre de Tanguy Nianzou si le recadrage ne lui plaît pas ; les matières, poids et
       carats de chaque pièce (la ligne « Matières précieuses » reviendra avec ses chiffres).
