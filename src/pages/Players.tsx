@@ -142,7 +142,7 @@ export function PlayerPage() {
                           <PieceThumb piece={p} sizes="(max-width: 1023px) 46vw, 18rem" />
                         </span>
                       ) : (
-                        <span className="thumb-fade absolute inset-0 p-4 transition-opacity duration-700 group-hover:opacity-90">
+                        <span className="thumb-fade absolute inset-0 p-[14%] transition-opacity duration-700 group-hover:opacity-90">
                           <MediaView item={visual} alt={visual.alt ?? p.title} fit="contain" sizes="(max-width: 1023px) 46vw, 18rem" />
                         </span>
                       )}

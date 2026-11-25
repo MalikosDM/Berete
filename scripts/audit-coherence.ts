@@ -346,35 +346,18 @@ async function inspect(page: Page, phone: boolean): Promise<Found> {
         return (cs.maskImage + " " + cs.getPropertyValue("-webkit-mask-image") + " " + cs.backgroundImage).includes("/media/brand/berete");
       });
 
-    // No empty section (25/11/2026): a title of section followed by another title, or by the foot of the page, with nothing in
-    // between (no text, no photo, no film, no button).
+    // No empty section (25/11/2026): a title of section whose own section shows nothing else (no text, no photo, no film, no
+    // button). A title that opens its content (a line that unfolds, inside its button) is not a section left empty.
     const empty: string[] = [];
     const meaningful = (el: Element) =>
-      visible(el) && (["IMG", "VIDEO", "CANVAS", "IFRAME", "PICTURE"].includes(el.tagName) || (["P", "LI", "DD", "DT", "A", "BUTTON", "BLOCKQUOTE", "FIGCAPTION", "SPAN", "TIME"].includes(el.tagName) && ownText(el).length > 0));
+      visible(el) && (["IMG", "VIDEO", "CANVAS", "IFRAME", "PICTURE"].includes(el.tagName) || (["P", "LI", "DD", "DT", "A", "BUTTON", "BLOCKQUOTE", "FIGCAPTION", "SPAN", "TIME", "H3"].includes(el.tagName) && ownText(el).length > 0));
     for (const h of document.querySelectorAll("main h2")) {
-      if (!visible(h)) continue;
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-      walker.currentNode = h;
-      let next: Node | null = walker.nextSibling() ?? null;
-      // From the end of the title: the elements after it, in the order of the page.
-      for (let a: Node | null = h; !next && a; a = a.parentNode) {
-        walker.currentNode = a;
-        next = walker.nextSibling();
-      }
-      let verdict = "";
-      for (let n: Node | null = next; n; n = walker.nextNode()) {
-        const el = n as Element;
-        if (el.tagName === "H2" && visible(el)) {
-          verdict = "followed by the title “" + textOf(el).slice(0, 40) + "”";
-          break;
-        }
-        if (el.tagName === "FOOTER") {
-          verdict = "followed by the foot of the page";
-          break;
-        }
-        if (meaningful(el)) break;
-      }
-      if (verdict) empty.push("“" + textOf(h).slice(0, 50) + "” " + verdict);
+      if (!visible(h) || h.closest("button, summary, [aria-expanded]")) continue;
+      const section = h.closest("section, article, details") ?? h.parentElement;
+      if (!section) continue;
+      const others = [...section.querySelectorAll("*")].filter((el) => el !== h && !h.contains(el) && !el.contains(h));
+      // Another title of section inside it: its own business (checked for itself).
+      if (!others.some((el) => meaningful(el) && !el.closest("h2"))) empty.push("“" + textOf(h).slice(0, 50) + "” with nothing in its section");
     }
 
     // The name of each piece as written on its cards and on its page (one name per piece, 25/11/2026).
@@ -422,7 +405,18 @@ async function thumbnails(page: Page, path: string, size: string) {
     await frame.locator("img").first().evaluate((img: HTMLImageElement) => (img.complete ? null : new Promise((r) => img.addEventListener("load", r, { once: true })))).catch(() => undefined);
     await page.waitForTimeout(150);
     const slug = (await frame.evaluate((el) => el.closest("[data-piece-card], [data-player-piece], [data-special-ring]")?.getAttribute("data-piece-card") ?? el.closest("[data-player-piece]")?.getAttribute("data-player-piece") ?? el.getAttribute("data-special-ring") ?? "")) || "?";
-    const shot = await frame.screenshot({ type: "png", animations: "disabled" }).catch(() => null);
+    // A capture of the screen where the frame stands, once it stands still (an element capture could catch another place of a
+    // page that moves while it loads).
+    let box = await frame.boundingBox();
+    for (let k = 0; k < 10; k++) {
+      await page.waitForTimeout(120);
+      const again = await frame.boundingBox();
+      if (box && again && Math.abs(again.y - box.y) < 0.5) break;
+      box = again;
+    }
+    const vp = page.viewportSize();
+    if (!box || !vp || box.y < 0 || box.y + box.height > vp.height) continue;
+    const shot = await page.screenshot({ type: "png", animations: "disabled", clip: box }).catch(() => null);
     if (!shot) continue;
     const { data, info } = await sharp(shot).removeAlpha().raw().toBuffer({ resolveWithObject: true });
     const lum = (x: number, y: number) => {
@@ -631,7 +625,7 @@ async function main() {
   if (issues.length === 0) lines.push("Aucun problème : le site est cohérent sur toutes ses pages, dans toutes ses langues.");
   writeFileSync(join(OUT, "rapport.md"), lines.join("\n") + "\n");
   writeFileSync(join(OUT, "rapport.json"), JSON.stringify({ base: BASE, pages: list.length, sizes: SIZES, issues }, null, 1) + "\n");
-  console.log(lines.slice(0, 18).join("\n"));
+  console.log(lines.slice(0, checks.length + 6).join("\n"));
   console.log("Report: verification/coherence/rapport.md");
   process.exit(issues.length === 0 ? 0 : 1);
 }

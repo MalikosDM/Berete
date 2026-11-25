@@ -39,7 +39,8 @@ test("3. every thumbnail on the same black: no edge, the jewel at the same share
     await frame.locator("img").first().evaluate((img: HTMLImageElement) => (img.complete ? null : new Promise((r) => img.addEventListener("load", r, { once: true }))));
     await page.waitForTimeout(100);
     const slug = await frame.evaluate((el) => el.closest("[data-piece-card]")?.getAttribute("data-piece-card"));
-    const { data, info: im } = await sharp(await frame.screenshot({ type: "png" })).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    const clip = (await frame.boundingBox())!;
+    const { data, info: im } = await sharp(await page.screenshot({ type: "png", clip })).removeAlpha().raw().toBuffer({ resolveWithObject: true });
     const lum = (x: number, y: number) => (0.2126 * data[(y * im.width + x) * 3]! + 0.7152 * data[(y * im.width + x) * 3 + 1]! + 0.0722 * data[(y * im.width + x) * 3 + 2]!) / 255;
     let sum = 0;
     let count = 0;
