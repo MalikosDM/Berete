@@ -51,8 +51,12 @@ function hasPass(req: Request): boolean {
 const OPEN_API = /^\/api\/(?:health$|access$|admin\/|vip\/|view\/|models\/[A-Za-z0-9_-]+\/files\/)/;
 /** The private pages, in every language: a 3D link, the client space (with his link, or once entered). */
 const PRIVATE_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?(view|vip)(?:\/([A-Za-z0-9_-]+))?\/?$/;
-/** What the private pages load: the code of the pages (and its fonts), the brand. */
-const PRIVATE_FILES = /^\/(?:assets\/|media\/brand\/)/;
+/** What the private pages load: the code of the pages (and its fonts), the brand (one file by its exact name). */
+const PRIVATE_FILES = /^\/(?:assets|media\/brand)\/[A-Za-z0-9_-][A-Za-z0-9._-]*$/;
+/** The files of the door itself, by their exact name (public/soon). */
+const DOOR_FILES = /^\/soon\/[a-z0-9-]+\.(?:svg|jpg|woff2)$/;
+/** An address that climbs out of its folder or hides its signs (.., encoded dots, slashes or backslashes). */
+const TWISTED = /(?:^|\/)\.\.?(?:\/|$)|%2e|%2f|%5c|\\|\/\//i;
 
 /** The address a visitor goes back to once in: a page of this site only. */
 function safeNext(value: unknown): string {
@@ -102,8 +106,10 @@ export function gate(dist: string): RequestHandler {
       return;
     }
     if (LOCAL.test(visitor(req)) && process.env.ACCESS_LOCAL !== "closed") return next();
+    // A twisted address (/soon/../media/…) never goes further without access.
+    if (TWISTED.test(p) && !hasAccess(req)) return sendDoor(req, res, "soon", 200, undefined, "/");
     // The files of the door itself (its fonts, monogram, preview image).
-    if (p.startsWith("/soon/")) return next();
+    if (DOOR_FILES.test(p)) return next();
     if (p.startsWith("/api/")) {
       if (OPEN_API.test(p) || hasAccess(req)) return next();
       res.status(403).setHeader("Cache-Control", "no-store");
