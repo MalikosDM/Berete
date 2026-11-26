@@ -1,17 +1,21 @@
 /*
- * The 3D pipeline: a file of the jeweller (.3dm, .glb, .gltf, .obj, .stl) becomes
+ * The 3D pipeline: a file of the jeweller (.3dm, .glb, .gltf, .obj, .stl, .fbx) becomes
  * two versions for the viewer, "full" (computers) and "light" (phones), plus the
  * list of its layers with a guessed role. The original is never changed. What the
  * file holds and the model does not show is reported (stats.skipped): a model with
  * volumes missing (stats.incomplete > 0) stays a draft, never shown on the site.
+ * Like iJewel3D's import (26/11/2026): layers named as iJewel names them (Metal 01, Gem 01...) take that role; each
+ * layer keeps its own colour; the file is checked (triangles, units, faces inside out, copies: stats.checks), and what
+ * the admin should know is said in simple French (stats.notes).
  */
 import fs from "node:fs";
 import path from "node:path";
+import type { DiamondParams } from "../../../src/data/scene3d.js";
 import { analyse, type StoneCount } from "./build.js";
-import { missingVolumes, readModel, type Progress, type Skipped, type SourceKind } from "./read.js";
+import { missingVolumes, readModel, type IjewelReport, type Progress, type Skipped, type SourceKind, type Units } from "./read.js";
 import { VERSIONS, writeVersion } from "./write.js";
 
-export type { Skipped, SourceKind };
+export type { IjewelReport, Skipped, SourceKind, Units };
 
 export type LayerRole = "metal" | "diamond" | "stone" | "enamel" | "hide";
 
@@ -27,6 +31,31 @@ export type LayerInfo = {
   guess: LayerRole;
   /** The guess is uncertain: the jeweller should check it. */
   check: boolean;
+  /** Its own colour in the file (#rrggbb): the Rhino layer's, or the base colour of its material (glTF, FBX). */
+  color?: string;
+  /** Stone settings given by an iJewel export (WEBGI_materials_diamond on its material). */
+  diamond?: Partial<DiamondParams>;
+};
+
+/**
+ * What the file was checked for at import, as iJewel does. Missing in the stats of models processed before 26/11/2026.
+ * - triangles: of the file, every copy counted; tooMany: above 200 000, iJewel's limit (our versions are simplified
+ *   anyway: `drawn` is what the full version draws); target and keep: the simplification to propose (200 000, the share
+ *   of the triangles it keeps), null when not too many;
+ * - units: what the file says (or what was taken), and whether a scale was applied to reach mm; `label` in French;
+ * - flipped: closed pieces whose faces looked inward, turned outward automatically (each copy counted);
+ * - instanced: identical stones drawn as copies of one mesh; copies: all copies of any mesh.
+ */
+export type ImportChecks = {
+  triangles: number;
+  tooMany: boolean;
+  target: number | null;
+  keep: number | null;
+  drawn: number;
+  units: Units & { label: string };
+  flipped: number;
+  instanced: number;
+  copies: number;
 };
 
 export type ModelStats = {
@@ -41,13 +70,46 @@ export type ModelStats = {
   stonesMissing: boolean;
   /** What the file holds and the model does not show (a .3dm). */
   skipped?: Skipped;
-  /** Volumes missing from the model (saved without their render mesh): more than 0, the model is incomplete. */
+  /** Volumes missing from the model (saved without render mesh, and that could not be meshed here): more than 0, the model is incomplete. */
   incomplete: number;
+  /** Volumes of a .3dm saved without render mesh, meshed here from their NURBS. */
+  tessellated?: number;
+  /** What an iJewel export said of its stones (their settings are put on their layers). */
+  ijewel?: IjewelReport;
+  checks?: ImportChecks;
+  /** What the admin should know of this file, in simple French. */
+  notes?: string[];
   versions: Record<keyof typeof VERSIONS, { bytes: number; triangles: number; drawn: number }>;
   seconds: number;
 };
 
 export type PipelineResult = { stats: ModelStats; layers: LayerInfo[] };
+
+/** iJewel3D's limit of triangles. */
+const IJEWEL_TRIANGLES = 200_000;
+
+/** The layer names iJewel3D reads: these say what the layer is, whatever its shape (spaces or "_" tolerated, any case). */
+function ijewelRole(name: string): LayerRole | null {
+  const n = name.trim().toLowerCase().replace(/[\s_]+/g, " ");
+  if (/^m[ée]tal( ?\d{1,2})?$/.test(n) || n === "head") return "metal";
+  if (/^(gems?|diamonds?)( ?\d{1,2})?$/.test(n)) return "diamond";
+  return null;
+}
+
+const RHINO_UNITS: Record<string, string> = { Millimeters: "millimètres", Centimeters: "centimètres", Meters: "mètres", Inches: "pouces", Feet: "pieds", Microns: "microns", None: "sans unité" };
+const SHORT_UNITS: Record<string, string> = { mm: "millimètres", cm: "centimètres", m: "mètres", inch: "pouces" };
+
+/** The unit of the file, said in French. */
+function unitsLabel(kind: SourceKind, units: Units): string {
+  const name = RHINO_UNITS[units.file] ?? SHORT_UNITS[units.file] ?? units.file;
+  const where = kind === "3dm" ? " (Rhino)" : kind === "fbx" ? " (FBX)" : "";
+  if (units.from === "assumed") return "Millimètres (le format ne donne pas l'unité)";
+  if (units.from === "size") return (units.mmPerUnit === 1000 ? "Mètres" : "Millimètres") + ", déduits de la taille du bijou" + (units.applied ? ", convertis en millimètres" : "");
+  const label = name.charAt(0).toUpperCase() + name.slice(1) + where;
+  return units.applied ? label + ", convertis en millimètres" : label;
+}
+
+const plural = (n: number, one: string, many: string) => n.toLocaleString("fr-FR") + " " + (n > 1 ? many : one);
 
 /** Layer names that say what they are, in the languages of jewellers' files. */
 const STONE_NAMES = /diam|gem|stone|pierre|brill|zircon|ruby|rubis|sapph|saphir|emerald|émeraude|钻|石/i;
@@ -106,11 +168,18 @@ export async function runPipeline(input: string, kind: SourceKind, outDir: strin
   }
   const total = [...byName.values()].reduce((s, l) => s + l.triangles, 0);
   const jewel = Math.max(...analysis.size, 1);
+  const fromFile = new Map(source.layers.map((l) => [l.name, l]));
   const layers: LayerInfo[] = [...byName.values()].map(({ lo, hi, stoneCopies, ...info }) => {
     const size = [0, 1, 2].map((k) => (hi[k]! > lo[k]! ? hi[k]! - lo[k]! : 0)) as [number, number, number];
+    const own = fromFile.get(info.name);
+    const extra = { ...(own?.color ? { color: own.color } : {}), ...(own?.diamond ? { diamond: own.diamond } : {}) };
     let guess: LayerRole = "metal";
     let check = false;
-    if (info.name.startsWith("stone_")) {
+    const named = ijewelRole(info.name);
+    // Named as iJewel names it, or given stone settings by an iJewel export: no doubt.
+    if (named) guess = named;
+    else if (own?.diamond) guess = "diamond";
+    else if (info.name.startsWith("stone_")) {
       guess = "diamond";
       // An unusual cut, or smaller than 0.6 mm: maybe a bead of metal.
       check = !analysis.stones.find((s) => s.material === info.name)?.known;
@@ -119,15 +188,31 @@ export async function runPipeline(input: string, kind: SourceKind, outDir: strin
     // A layer named after its material (Diamonds, Gems, Gold 18K, 钻石, 金...).
     else if (STONE_NAMES.test(info.name)) guess = "diamond";
     else if (METAL_NAMES.test(info.name)) guess = "metal";
-    // Many small convex copies: diamonds.
-    else if (stoneCopies >= 50 || (stoneCopies > 0 && stoneCopies === info.copies)) guess = "diamond";
+    // Many small convex copies: diamonds (to check when the layer also holds other pieces).
+    else if (stoneCopies >= 50 || (stoneCopies > 0 && stoneCopies === info.copies)) {
+      guess = "diamond";
+      check = stoneCopies < info.copies;
+    }
     // A large share of the jewel: metal.
     else if (info.triangles >= 0.1 * total || Math.max(...size) >= 0.3 * jewel) guess = "metal";
     // A few small objects: to check.
     else check = true;
-    return { ...info, size, guess, check };
+    return { ...info, size, guess, check, ...extra };
   });
 
+  const tooMany = source.triangles > IJEWEL_TRIANGLES;
+  const checks: ImportChecks = {
+    triangles: source.triangles,
+    tooMany,
+    target: tooMany ? IJEWEL_TRIANGLES : null,
+    keep: tooMany ? Math.round((IJEWEL_TRIANGLES / source.triangles) * 1000) / 1000 : null,
+    drawn: full.drawn,
+    units: { ...source.units, label: unitsLabel(kind, source.units) },
+    flipped: analysis.flipped,
+    instanced: analysis.instanced,
+    copies: analysis.copies,
+  };
+  const incomplete = missingVolumes(source.skipped);
   const stats: ModelStats = {
     kind,
     sourceTriangles: source.triangles,
@@ -137,9 +222,38 @@ export async function runPipeline(input: string, kind: SourceKind, outDir: strin
     stones: analysis.stones,
     stonesMissing: !source.layered && analysis.stones.length === 0,
     ...(source.skipped ? { skipped: source.skipped } : {}),
-    incomplete: missingVolumes(source.skipped),
+    incomplete,
+    ...(source.tessellated ? { tessellated: source.tessellated } : {}),
+    ...(source.ijewel ? { ijewel: source.ijewel } : {}),
+    checks,
+    notes: notesOf(source.skipped, incomplete, source.tessellated ?? 0, checks, source.ijewel),
     versions: { full, light },
     seconds: Math.round((Date.now() - started) / 100) / 10,
   };
   return { stats, layers };
+}
+
+/** What the admin should know of the file, in simple French (no jargon). */
+function notesOf(skipped: Skipped | undefined, incomplete: number, tessellated: number, checks: ImportChecks, ijewel: IjewelReport | undefined): string[] {
+  const notes: string[] = [];
+  if (tessellated > 0) notes.push(plural(tessellated, "volume était enregistré", "volumes étaient enregistrés") + " sans maillage de rendu : ils ont été maillés ici, à partir de leurs surfaces.");
+  if (incomplete > 0) {
+    const where = Object.entries(skipped?.noMesh.byLayer ?? {})
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([name, n]) => "« " + name + " » : " + n.toLocaleString("fr-FR"))
+      .join(", ");
+    notes.push(
+      plural(incomplete, "volume n'a pas pu être maillé", "volumes n'ont pas pu être maillés") + (where ? " (calques " + where + ")" : "") + " : le modèle reste un brouillon. Demandez au dessinateur d'ouvrir le fichier dans Rhino, de passer en vue Ombrée, puis d'enregistrer sans cocher « Enregistrer petit » ; ou d'exporter en GLB ou en OBJ.",
+    );
+  }
+  if (skipped?.unreadable) notes.push(plural(skipped.unreadable, "objet du fichier n'a pas pu être lu : il a été laissé de côté", "objets du fichier n'ont pas pu être lus : ils ont été laissés de côté") + ".");
+  if (skipped && skipped.stray.count > 0) notes.push(plural(skipped.stray.count, "image de référence placée", "images de référence placées") + " dans le fichier " + (skipped.stray.count > 1 ? "ne font" : "ne fait") + " pas partie du bijou : laissée" + (skipped.stray.count > 1 ? "s" : "") + " de côté.");
+  if (skipped && skipped.hidden > 0) notes.push(plural(skipped.hidden, "objet caché", "objets cachés") + " dans Rhino " + (skipped.hidden > 1 ? "ne sont" : "n'est") + " pas montré" + (skipped.hidden > 1 ? "s" : "") + ", comme dans Rhino.");
+  if (checks.flipped > 0) notes.push(plural(checks.flipped, "pièce avait ses faces à l'envers", "pièces avaient leurs faces à l'envers") + " : remise" + (checks.flipped > 1 ? "s" : "") + " à l'endroit.");
+  if (checks.tooMany) notes.push("Le fichier compte " + checks.triangles.toLocaleString("fr-FR") + " triangles (iJewel en accepte " + IJEWEL_TRIANGLES.toLocaleString("fr-FR") + ") : nos versions sont allégées, " + checks.drawn.toLocaleString("fr-FR") + " triangles affichés sur ordinateur.");
+  if (checks.units.applied || checks.units.from === "size") notes.push("Unité du fichier : " + checks.units.label.charAt(0).toLowerCase() + checks.units.label.slice(1) + ".");
+  if (checks.instanced > 0) notes.push(plural(checks.instanced, "pierre identique est dessinée", "pierres identiques sont dessinées") + " en copies d'une même forme (plus léger).");
+  if (ijewel && ijewel.materials.length > 0) notes.push("Réglages des pierres repris de l'export iJewel pour " + plural(ijewel.materials.length, "matière", "matières") + " : " + ijewel.materials.map((m) => "« " + m.name + " »").join(", ") + ".");
+  return notes;
 }

@@ -3742,3 +3742,10 @@ html[lang="ar"] [data-piece] [data-u-title] {
   pointer-events: none;
   background: radial-gradient(closest-side, rgb(6 6 7 / 0.96) 0%, rgb(6 6 7 / 0.9) 52%, rgb(6 6 7 / 0.55) 76%, transparent 100%);
 }
+
+/* 3D viewer (26/11/2026): "Drag to turn" at the first sight of the jewel, the hand sweeping left and right, then gone. */
+.viewer-prompt { animation: viewer-prompt-out 0.6s ease 6s forwards; }
+.viewer-prompt-hand { animation: viewer-prompt-hand 1.6s ease-in-out infinite; }
+@keyframes viewer-prompt-hand { 0%, 100% { transform: translateX(-6px) rotate(-8deg); } 50% { transform: translateX(6px) rotate(8deg); } }
+@keyframes viewer-prompt-out { to { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .viewer-prompt-hand { animation: none; } }

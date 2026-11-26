@@ -5,7 +5,7 @@
  *   GET  /view/:token                 a private link (POST with { password } when it has one)
  *   GET  /models/:id/files/:file      full.glb, light.glb, poster.webp (signed address, given by the two above)
  * and the admin (/admin/models..., /admin/links..., /admin/pieces/:slug/model), behind ADMIN_PASSWORD:
- *   upload by pieces (big files: .3dm, .glb, .gltf, .obj, .stl), processing in the background, layers
+ *   upload by pieces (big files: .3dm, .glb, .gltf, .obj, .stl, .fbx), processing in the background, layers
  *   and their roles, the piece it is shown on (one model per piece), private links.
  * A model "incomplete" (volumes of its .3dm saved without their render mesh) is a draft: the admin
  * sees it, but it can be put on no page, in no private link (and the VIP space shows only "ready").
@@ -56,6 +56,11 @@ export const SettingsSchema = z.object({
         .regex(/^#[0-9a-f]{6}$/i)
         .optional(),
       label: z.string().max(60).optional(),
+      material: z.string().max(120).optional(),
+      finish: z.object({ kind: z.enum(["polished", "satin", "brushed", "hammered", "aged"]), angle: z.number().optional() }).optional(),
+      diamond: z.record(z.string().max(40), z.unknown()).optional(),
+      bevel: z.number().min(0).max(16).optional(),
+      bloom: z.boolean().optional(),
     }),
   ),
   metals: z.array(z.enum(METALS)).max(METALS.length),
@@ -63,6 +68,15 @@ export const SettingsSchema = z.object({
   ambiance: z.enum(AMBIANCES),
   background: z.preprocess(backgroundOf, z.enum(BACKGROUNDS)),
   diamonds: z.enum(DIAMOND_LOOKS).default("realistic"),
+  // The scene of the 3D editor (26/11/2026), read with its defaults by src/data/scene3d.ts (a value of the wrong kind is ignored there).
+  scene: z.record(z.string().max(40), z.unknown()).optional(),
+  views: z.record(z.string().max(40), z.unknown()).optional(),
+  viewer: z.record(z.string().max(40), z.unknown()).optional(),
+  configurators: z
+    .array(z.object({ id: z.string().max(40), label: z.string().max(60), layers: z.array(z.string().max(200)).max(200), options: z.array(z.object({ material: z.string().max(120), label: z.string().max(60) })).max(40) }))
+    .max(20)
+    .optional(),
+  tryOn: z.record(z.string().max(40), z.unknown()).optional(),
 });
 
 export function settingsOf(v: unknown): ModelSettings {
@@ -195,7 +209,7 @@ models.post("/view/:token", (req, res) => {
 
 /* ---------- Admin ---------- */
 
-const KINDS: Record<string, SourceKind> = { ".stl": "stl", ".obj": "obj", ".glb": "glb", ".gltf": "gltf", ".3dm": "3dm" };
+const KINDS: Record<string, SourceKind> = { ".stl": "stl", ".obj": "obj", ".glb": "glb", ".gltf": "gltf", ".3dm": "3dm", ".fbx": "fbx" };
 /** Why an incomplete model cannot be shown. */
 const DRAFT = "Ce modèle 3D est incomplet (des volumes de métal manquent) : il reste un brouillon. Réenregistrez le fichier depuis Rhino avec les maillages de rendu, ou exportez-le en STL/OBJ/GLB, puis envoyez-le à nouveau.";
 const MAX_BYTES = 800 * 1024 * 1024;
@@ -231,7 +245,7 @@ models.post("/admin/models/uploads", requireAdmin, (req, res) => {
   }
   const ext = path.extname(body.data.name).toLowerCase();
   if (!KINDS[ext]) {
-    res.status(415).json({ error: "Formats acceptés : .3dm (Rhino), .glb, .gltf, .obj, .stl." });
+    res.status(415).json({ error: "Formats acceptés : .3dm (Rhino), .glb, .gltf, .fbx, .obj, .stl." });
     return;
   }
   if (body.data.size > MAX_BYTES) {
@@ -323,7 +337,7 @@ models.put("/admin/models/:id", requireAdmin, async (req, res) => {
     return;
   }
   const row = await prisma
-    .$transaction([...(slug ? [prisma.model3D.updateMany({ where: { pieceSlug: slug, id: { not: id } }, data: { pieceSlug: null } })] : []), prisma.model3D.update({ where: { id }, data: body.data })])
+    .$transaction([...(slug ? [prisma.model3D.updateMany({ where: { pieceSlug: slug, id: { not: id } }, data: { pieceSlug: null } })] : []), prisma.model3D.update({ where: { id }, data: { ...body.data, settings: body.data.settings as object } })])
     .catch(() => null);
   if (!row) {
     res.status(404).json({ error: "Modèle introuvable." });

@@ -6,8 +6,9 @@
  * so a new password closes every device). At most 5 tries per minute and per address.
  *
  * Always reachable, with their own protection: /admin and its API (the admin password; logging in also opens the site on
- * that device), the private links of the clients (/vip/<token>, /view/<token>, the client space once entered) and only the
- * files these pages need (the code of the pages, the brand), the checks of the server (/api/health). Nothing else.
+ * that device), the private links of the clients (/vip/<token>, /view/<token>, the sealed share links /s/<token>, the client
+ * space once entered) and only the files these pages need (the code of the pages, the brand), the checks of the server
+ * (/api/health). Nothing else.
  *
  * Settings, in the base (table ServerSetting, so in the backups, and kept through updates, reinstalls and restores):
  *   access.construction   "on" | "off"    (missing = on: the site never opens to the public by mistake)
@@ -23,6 +24,7 @@ import { z } from "zod";
 import { accessState, cookie, grantAccess, hasAccess, loadAccess, matches, MIN_PASSWORD, refreshAccess, setConstruction, setCookie, setPassword, valid } from "./access-state.js";
 import { prisma } from "./db.js";
 import { doorLang, doorPage, type DoorMessage, type DoorMode } from "./door.js";
+import { shareExists } from "./routes/shares.js";
 import { sessionClient } from "./routes/vip.js";
 import { serverSecret } from "./secret.js";
 import { limiter, LOCAL, visitor } from "./security.js";
@@ -47,12 +49,19 @@ function hasPass(req: Request): boolean {
 
 /* ---------- The gate ---------- */
 
-/** The API open to everyone: the checks, the private access, the admin, the client space, the 3D links (signed files). */
-const OPEN_API = /^\/api\/(?:health$|access$|admin\/|vip\/|view\/|models\/[A-Za-z0-9_-]+\/files\/)/;
-/** The private pages, in every language: a 3D link, the client space (with his link, or once entered). */
-const PRIVATE_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?(view|vip)(?:\/([A-Za-z0-9_-]+))?\/?$/;
-/** What the private pages load: the code of the pages (and its fonts), the brand (one file by its exact name). */
-const PRIVATE_FILES = /^\/(?:assets|media\/brand)\/[A-Za-z0-9_-][A-Za-z0-9._-]*$/;
+/**
+ * The API open to everyone: the checks, the private access, the admin, the client space, the 3D links (signed files), a
+ * sealed share link (what its page needs to decrypt, and the ciphertext).
+ */
+const OPEN_API = /^\/api\/(?:health$|access$|admin\/|vip\/|view\/|s\/[A-Za-z0-9_-]+(?:\/blob)?$|models\/[A-Za-z0-9_-]+\/files\/)/;
+/** The private pages, in every language: a 3D link, a sealed share link, the client space (with his link, or once entered). */
+const PRIVATE_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?(view|vip|s)(?:\/([A-Za-z0-9_-]+))?\/?$/;
+/**
+ * What the private pages load: the code of the pages (and its fonts), the brand, and what the 3D viewer reads (its lights
+ * /hdri and /hdri/<set>, its decoders /draco, its grounds /decor; the ring try-on's hand tracker /mediapipe, 26/11/2026);
+ * one file by its exact name.
+ */
+const PRIVATE_FILES = /^\/(?:(?:assets|media\/brand|hdri(?:\/[a-z0-9-]+)?|draco|decor)\/[A-Za-z0-9_-][A-Za-z0-9._-]*|mediapipe\/(?:hand_landmarker\.task|wasm\/vision_wasm_(?:nosimd_)?internal\.(?:js|wasm)))$/;
 /** The files of the door itself, by their exact name (public/soon). */
 const DOOR_FILES = /^\/soon\/[a-z0-9-]+\.(?:svg|jpg|woff2)$/;
 /** An address that climbs out of its folder or hides its signs (.., encoded dots, slashes or backslashes). */
@@ -85,6 +94,8 @@ function sendDoor(req: Request, res: Response, mode: DoorMode, status: number, m
 async function validPrivateToken(kind: string, token: string): Promise<boolean> {
   if (!/^[A-Za-z0-9_-]{20,64}$/.test(token)) return false;
   if (kind === "vip") return (await prisma.client.findUnique({ where: { token }, select: { id: true } })) !== null;
+  // A sealed share link that exists, even expired: its page says so (server/routes/shares.ts).
+  if (kind === "s") return shareExists(token);
   const link = await prisma.viewLink.findUnique({ where: { token }, include: { model: { select: { status: true } } } });
   return link !== null && link.model.status === "ready" && (!link.expiresAt || link.expiresAt.getTime() > Date.now());
 }

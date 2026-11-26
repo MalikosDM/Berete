@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Eye, EyeOff, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Upload } from "lucide-react";
-import { AMBIANCES, BACKGROUNDS, DIAMOND_LOOKS, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
-import { bundleOf, loadLocale, useI18n, type Messages } from "@/i18n";
-import { Jewel3D, type ViewerHandle } from "@/viewer";
+import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Undo2, Upload } from "lucide-react";
+import type { LayerRole, ModelSettings, PublicModel } from "@/data/models";
+import type { ViewerHandle } from "@/viewer";
+import type { StageApi } from "@/viewer/Stage";
+import Editor3D from "./editor3d/Editor3D";
+import SealedShare from "./SealedShare";
 import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
 
 /*
@@ -29,6 +31,11 @@ type Stats = {
   skipped?: Skipped;
   /** Volumes missing from the model: more than 0, it is a draft. */
   incomplete?: number;
+  /** Volumes saved without render mesh, meshed by the site. */
+  tessellated?: number;
+  /** What the admin should know, in simple French. */
+  notes?: string[];
+  checks?: { triangles: number; tooMany: boolean; units: { label: string }; flipped: number; instanced: number; copies: number };
   seconds?: number;
   versions?: Record<"full" | "light", { bytes: number; triangles: number; drawn: number }>;
 };
@@ -51,10 +58,6 @@ type ModelRow = {
   links: LinkRow[];
 };
 
-const ROLE_NAMES: Record<LayerRole, string> = { metal: "Métal", diamond: "Diamant", stone: "Pierre de couleur", enamel: "Émail", hide: "Masquer" };
-const METAL_NAMES: Record<string, string> = { "yellow-gold": "Or jaune 18 carats", "white-gold": "Or blanc 18 carats", "rose-gold": "Or rose 18 carats", platinum: "Platine", "black-rhodium": "Rhodium noir" };
-const AMBIANCE_NAMES: Record<string, string> = { studio: "Studio", warm: "Chaude", spotlight: "Projecteur (scintillement)" };
-const BACKGROUND_NAMES: Record<string, string> = { "studio-dark": "Studio sombre", black: "Noir", "studio-light": "Studio clair", white: "Blanc", rose: "Rosé", wood: "Table en noyer", velvet: "Velours noir", satin: "Satin champagne", leather: "Cuir blanc" };
 const STEP_NAMES: Record<string, string> = { read: "lecture du fichier", pieces: "pièces et pierres", full: "version ordinateur", light: "version téléphone" };
 
 
@@ -184,7 +187,7 @@ function StonesTable({ stats }: { stats: Stats }) {
 
 /** « 59 volumes de métal ignorés : … », for a .3dm saved without its render meshes. */
 function missingText(n: number): string {
-  return count(n) + (n > 1 ? " volumes de métal ignorés" : " volume de métal ignoré") + " : réenregistrer depuis Rhino avec les maillages de rendu, ou exporter en STL/OBJ/GLB";
+  return count(n) + (n > 1 ? " volumes n'ont pas pu être affichés" : " volume n'a pas pu être affiché") + " : dans Rhino, passer la vue en « Ombré », décocher « Enregistrer petit » (Save small) puis enregistrer ; ou exporter en .glb ou .obj";
 }
 
 /** An incomplete model: what is missing, and why it stays a draft. */
@@ -193,6 +196,52 @@ function IncompleteWarning({ stats }: { stats: Stats }) {
     <div role="alert" className="grid gap-1 border border-rose-light/60 p-4 text-base" data-model-incomplete={stats.incomplete ?? 0}>
       <p className="text-rose-light">{missingText(stats.incomplete ?? 0)}</p>
       <p className="text-mist">Modèle incomplet, gardé comme brouillon : il ne peut aller ni sur une page du site, ni dans l'espace VIP, ni dans un lien privé.</p>
+    </div>
+  );
+}
+
+/** For the jeweller's designer: how to save a Rhino file the way jewellers' viewers read it best. */
+function RhinoHelp() {
+  return (
+    <details className="group mt-4" data-rhino-help>
+      <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-bone hover:text-white">
+        <ChevronDown className="size-4 transition-transform group-open:rotate-180" aria-hidden="true" /> Comment enregistrer un fichier Rhino pour la 3D
+      </summary>
+      <ol className="mt-2 grid list-decimal gap-1 ps-6 text-base text-mist">
+        <li>Dans Rhino, passer la vue en mode « Ombré » (Shaded) : Rhino prépare les maillages de rendu.</li>
+        <li>Menu Fichier, « Enregistrer sous » : décocher « Enregistrer petit » (Save small), qui les efface.</li>
+        <li>Enregistrer. Ou bien exporter en .glb ou .obj.</li>
+        <li>Conseils des joailliers : en millimètres, un calque par matière (« Metal 01 », « Gem 01 »…), un calque de pierres par taille, les pierres identiques en blocs, moins de 200 000 triangles.</li>
+      </ol>
+      <p className="mt-2 text-base text-mist">Sans maillages de rendu, le site maille lui-même les surfaces (cela marche sur les fichiers reçus jusqu'ici) ; un volume qu'il ne sait pas mailler est signalé ici.</p>
+    </details>
+  );
+}
+
+/** What the import found, in simple words (server/models/pipeline: notes and checks). */
+function ImportNotes({ stats }: { stats: Stats }) {
+  const notes = stats.notes ?? [];
+  const c = stats.checks;
+  if (notes.length === 0 && !c) return null;
+  return (
+    <div className="grid gap-1 text-base" data-import-notes>
+      {c?.tooMany ? (
+        <p className="text-rose-light" data-too-many>
+          {count(c.triangles)} triangles : au-dessus des 200 000 conseillés. Le site en fait déjà des versions allégées pour l'affichage ({count(stats.versions?.full.triangles)} sur ordinateur, {count(stats.versions?.light.triangles)} sur téléphone) ; pour un fichier plus léger, le dessinateur peut simplifier les maillages dans Rhino.
+        </p>
+      ) : null}
+      {c ? (
+        <p className="text-mist">
+          Unités : {c.units.label}
+          {c.flipped > 0 ? " · " + count(c.flipped) + (c.flipped > 1 ? " pièces retournées (faces à l'envers), corrigées" : " pièce retournée (faces à l'envers), corrigée") : ""}
+          {c.instanced > 0 ? " · " + count(c.copies) + " pierres identiques dessinées comme des copies" : ""}
+        </p>
+      ) : null}
+      {notes.map((n) => (
+        <p key={n} className="text-mist">
+          {n}
+        </p>
+      ))}
     </div>
   );
 }
@@ -326,11 +375,12 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
     <div className="mt-8 grid gap-8" data-admin-3d>
       <div className="border border-white/15 p-5 sm:p-6">
         <h2 className="title-caps text-2xl tracking-[0.12em]">Envoyer un modèle 3D</h2>
-        <p className="mt-2 text-base text-mist">.3dm (le mieux, enregistré avec les maillages de rendu), .glb, .gltf, .obj ou .stl, jusqu'à 800 Mo.</p>
+        <p className="mt-2 text-base text-mist">.3dm (le mieux), .glb, .gltf, .fbx, .obj ou .stl, jusqu'à 800 Mo. Les calques nommés « Metal », « Metal 01 »… « Head » deviennent du métal, « Gem », « Gem 01 »… « Diamond » des diamants.</p>
+        <RhinoHelp />
         <label className={btnMain + " mt-4 cursor-pointer"}>
           {sending ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Upload className="size-4" aria-hidden="true" />}
           Choisir un fichier
-          <input type="file" accept=".3dm,.glb,.gltf,.obj,.stl" onChange={onFile} className="sr-only" disabled={sending !== null} data-model-input />
+          <input type="file" accept=".3dm,.glb,.gltf,.obj,.stl,.fbx" onChange={onFile} className="sr-only" disabled={sending !== null} data-model-input />
         </label>
         {sending ? (
           <div className="mt-4">
@@ -402,6 +452,7 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                       </summary>
                       <div className="mt-2 grid gap-3">
                         <p className="text-base text-mist">Fichier : {m.sourceName}</p>
+                        <ImportNotes stats={m.stats} />
                         <SkippedNotes stats={m.stats} />
                         <Weights m={m} />
                       </div>
@@ -422,6 +473,7 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
                       <div className="mt-2 grid gap-3">
                         <p className="text-base text-mist">Fichier : {m.sourceName}{m.links.length > 0 ? " · " + m.links.length + (m.links.length > 1 ? " liens privés" : " lien privé") : ""}</p>
                         <Weights m={m} />
+                        <ImportNotes stats={m.stats} />
                         <SkippedNotes stats={m.stats} />
                         {!m.stats.stonesMissing ? <StonesTable stats={m.stats} /> : null}
                       </div>
@@ -440,18 +492,22 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
 /* ---------- One model: layers, metals, view, piece, links ---------- */
 
 function Editor({ id, token, onExpired, onClose }: { id: string; token: string; onExpired: () => void; onClose: () => void }) {
-  const { t } = useI18n();
   const [model, setModel] = useState<ModelRow | null>(null);
   const [name, setName] = useState("");
   const [settings, setSettings] = useState<ModelSettings | null>(null);
   const [pieceSlug, setPieceSlug] = useState("");
   const [pieces, setPieces] = useState<PieceChoice[]>([]);
-  const [highlight, setHighlight] = useState<string | null>(null);
-  const [words, setWords] = useState<Messages["viewer"]>(t.viewer);
   const [saving, setSaving] = useState(false);
   const [note, setNote] = useState("");
   const [err, setErr] = useState("");
-  const viewer = useRef<ViewerHandle>(null);
+  // The stage of the editor: its image (still image of the model) and its camera (first view).
+  const stage = useRef<StageApi | null>(null);
+  const takeApi = useCallback((a: StageApi | null) => {
+    stage.current = a;
+  }, []);
+  const viewer = useRef<ViewerHandle>({ getView: () => stage.current?.getView() ?? null, capture: () => stage.current?.capture() ?? null, isReady: () => Boolean(stage.current?.handles.jewel()), seek: () => undefined });
+  // « Annuler »: back to the settings saved last.
+  const [saved, setSaved] = useState<ModelSettings | null>(null);
 
   const fail = useCallback(
     (x: unknown) => {
@@ -479,15 +535,12 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         setModel(m);
         setName(m.name);
         setSettings(m.settings);
+        setSaved(m.settings);
         setPieceSlug(m.pieceSlug ?? "");
       })
       .catch(fail);
     piecesOf(token)
       .then(setPieces)
-      .catch(() => undefined);
-    // The viewer speaks French here.
-    loadLocale("fr")
-      .then(() => setWords(bundleOf("fr").ui.viewer))
       .catch(() => undefined);
   }, [id, token, fail]);
 
@@ -517,10 +570,6 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
 
   // An incomplete model (volumes missing): a draft, seen here only.
   const draft = model.status === "incomplete";
-  // The layers of metal, and the metal the jewel shows first (the one of its first layer of metal).
-  const metalLayers = model.layers.filter((l) => (settings.layers[l.name]?.role ?? l.guess) === "metal").map((l) => l.name);
-  const mainMetal = (metalLayers[0] ? settings.layers[metalLayers[0]]?.metal : undefined) ?? "rose-gold";
-  const setLayer = (layer: string, patch: Partial<LayerSetting>) => setSettings((s) => (s ? { ...s, layers: { ...s.layers, [layer]: { ...(s.layers[layer] ?? { role: "metal" }), ...patch } } } : s));
 
   const save = async (extra?: Partial<ModelSettings>) => {
     setSaving(true);
@@ -531,6 +580,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
       // A draft never goes on a page of the site.
       await call(token, "PUT", "/api/admin/models/" + id, { name, settings: next, pieceSlug: draft ? null : pieceSlug || null });
       setSettings(next);
+      setSaved(next);
       setNote("Enregistré.");
       await load();
     } catch (x) {
@@ -549,9 +599,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   };
 
   const preview = model.preview;
-  const legend = "px-2 text-lg text-white";
   return (
-    <div className="grid gap-8 pb-28" data-model-editor={model.sourceName}>
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8 pb-28" data-model-editor={model.sourceName}>
       <button type="button" onClick={onClose} className={btn + " justify-self-start"}>
         <ArrowLeft className="size-4" aria-hidden="true" /> Revenir aux modèles
       </button>
@@ -573,153 +622,26 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </div>
       </div>
 
-      {preview ? <Jewel3D ref={viewer} model={preview} words={words} settings={settings} highlight={highlight} eager /> : null}
+      {preview ? <Editor3D model={preview} layers={model.layers} settings={settings} token={token} onChange={setSettings} onApi={takeApi} /> : null}
 
-      {/* The settings, in plain words (25/11/2026): the metal, the light, the diamonds, the angle of departure, then Save. */}
-      <fieldset className="grid gap-6 border border-white/15 p-4 sm:p-5" data-model-simple>
-        <legend className={legend}>Régler le modèle</legend>
-        {metalLayers.length > 0 ? (
-          <div>
-            <p className="text-base text-white">Métal</p>
-            <p className="text-base text-mist">Le métal dans lequel le bijou apparaît d'abord.</p>
-            <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Métal">
-              {METALS.map((m) => (
-                <button key={m} type="button" role="radio" aria-checked={mainMetal === m} data-main-metal={m} onClick={() => metalLayers.forEach((l) => setLayer(l, { metal: m }))} className={btn + (mainMetal === m ? " border-rose-light text-white" : "")}>
-                  {METAL_NAMES[m]}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* The first view of the jewel (and its still image), from where the camera stands now. */}
+      <div className="flex flex-wrap items-center gap-3 border border-white/15 p-4 sm:p-5" data-model-start-view>
+        <p className="min-w-0 flex-1 text-base text-bone">Angle de départ : tournez le bijou comme vous voulez qu'il apparaisse, puis gardez cet angle (il sert aussi d'image d'aperçu).</p>
+        <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
+          Garder cet angle
+        </button>
+        {settings.view ? (
+          <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
+            Revenir à l'angle de face
+          </button>
         ) : null}
-        <div>
-          <p className="text-base text-white">Métaux que le client peut essayer</p>
-          <div className="mt-1 flex flex-wrap gap-x-6">
-            {METALS.map((m) => (
-              <label key={m} className="flex min-h-12 items-center gap-3 text-base text-bone">
-                <input type="checkbox" className="size-5" checked={settings.metals.includes(m)} onChange={(e) => setSettings({ ...settings, metals: e.target.checked ? [...settings.metals, m] : settings.metals.filter((x) => x !== m) })} />
-                {METAL_NAMES[m]}
-              </label>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-base text-white">Lumière</p>
-          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Lumière">
-            {AMBIANCES.map((a) => (
-              <button key={a} type="button" role="radio" aria-checked={settings.ambiance === a} data-model-ambiance={a} onClick={() => setSettings({ ...settings, ambiance: a })} className={btn + (settings.ambiance === a ? " border-rose-light text-white" : "")}>
-                {AMBIANCE_NAMES[a]}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
-          <p className="text-base text-white">Diamants</p>
-          <p className="text-base text-mist">« Réaliste » : la lumière chaude d'un studio, les éclats seulement là où la lumière tape. « Ancien rendu » : pour comparer.</p>
-          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Diamants">
-            {DIAMOND_LOOKS.map((d) => (
-              <button key={d} type="button" role="radio" aria-checked={(settings.diamonds ?? "realistic") === d} data-model-diamonds={d} onClick={() => setSettings({ ...settings, diamonds: d })} className={btn + ((settings.diamonds ?? "realistic") === d ? " border-rose-light text-white" : "")}>
-                {d === "realistic" ? "Réaliste" : "Ancien rendu"}
-              </button>
-            ))}
-          </div>
-        </div>
-        <label className="block max-w-sm text-base text-white">
-          Fond
-          <select value={settings.background} onChange={(e) => setSettings({ ...settings, background: e.target.value as ModelSettings["background"] })} className={inputCls}>
-            {BACKGROUNDS.map((b) => (
-              <option key={b} value={b}>{BACKGROUND_NAMES[b]}</option>
-            ))}
-          </select>
-        </label>
-        <div>
-          <p className="text-base text-white">Angle de départ</p>
-          <p className="text-base text-mist">Tournez le bijou comme vous voulez qu'il apparaisse, puis gardez cet angle. Il sert aussi d'image d'aperçu.</p>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
-              Garder cet angle
-            </button>
-            {settings.view ? (
-              <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
-                Revenir à l'angle de face
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </fieldset>
-
-      {/* The layers of the file, for whoever knows them: closed by default. */}
-      <details className="group border border-white/15 p-4 sm:p-5" data-model-layers>
-        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-white">
-          <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden="true" /> Réglages avancés : les parties du bijou (calques du fichier)
-        </summary>
-        <div className="mt-3">
-      {/* Layers */}
-      <fieldset>
-        <legend className="sr-only">Matières</legend>
-        <p className="text-base text-mist">Choisissez le rôle de chaque calque. « Voir seul » montre un calque.</p>
-        <ul className="mt-4 grid gap-4">
-          {model.layers.map((layer) => {
-            const s = settings.layers[layer.name] ?? { role: layer.guess };
-            const solo = highlight === layer.name;
-            return (
-              <li key={layer.name} className={"grid gap-3 border p-4 " + (solo ? "border-rose-light" : "border-white/10")} data-layer={layer.name}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="min-w-0 break-words text-base text-white">
-                    {layer.name}
-                    {layer.check ? <span className="ml-3 inline-block border border-rose-light/60 px-2 text-base text-rose-light">À vérifier</span> : null}
-                    <span className="block text-mist">
-                      {count(layer.copies)} {layer.copies > 1 ? "exemplaires" : "exemplaire"}
-                    </span>
-                  </p>
-                  <button type="button" className={btn} aria-pressed={solo} onClick={() => setHighlight(solo ? null : layer.name)}>
-                    {solo ? <EyeOff className="size-4" aria-hidden="true" /> : <Eye className="size-4" aria-hidden="true" />} {solo ? "Tout voir" : "Voir seul"}
-                  </button>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <label className="block text-base text-bone">
-                    Rôle
-                    <select value={s.role} onChange={(e) => setLayer(layer.name, { role: e.target.value as LayerRole })} className={inputCls} data-role-select>
-                      {LAYER_ROLES.map((r) => (
-                        <option key={r} value={r}>{ROLE_NAMES[r]}</option>
-                      ))}
-                    </select>
-                  </label>
-                  {s.role === "metal" ? (
-                    <>
-                      <label className="block text-base text-bone">
-                        Métal de départ
-                        <select value={s.metal ?? "rose-gold"} onChange={(e) => setLayer(layer.name, { metal: e.target.value as LayerSetting["metal"] })} className={inputCls}>
-                          {METALS.map((m) => (
-                            <option key={m} value={m}>{METAL_NAMES[m]}</option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="block text-base text-bone">
-                        Nom pour le client
-                        <input value={s.label ?? ""} placeholder="ex. Maillons" onChange={(e) => setLayer(layer.name, { label: e.target.value })} className={inputCls + " placeholder:text-mist/60"} />
-                      </label>
-                    </>
-                  ) : null}
-                  {s.role === "stone" || s.role === "enamel" ? (
-                    <label className="block text-base text-bone">
-                      Couleur
-                      <input type="color" value={s.color ?? "#9b111e"} onChange={(e) => setLayer(layer.name, { color: e.target.value })} className={inputCls + " cursor-pointer px-2"} />
-                    </label>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </fieldset>
-
-        </div>
-      </details>
+      </div>
 
       {draft ? null : (
         <>
           <ShareVip model={model} token={token} onError={fail} />
           <Links model={model} token={token} onChange={() => void load()} onError={fail} />
+          {model.preview ? <SealedShare token={token} model={{ id: model.id, name: model.name, files: model.preview.files, settings, size: model.preview.size }} onError={fail} /> : null}
         </>
       )}
 
@@ -730,6 +652,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         <div className="mt-3 grid gap-4">
           <p className="text-base text-mist">Fichier : {model.sourceName}</p>
           <Weights m={model} />
+          <ImportNotes stats={model.stats} />
           <SkippedNotes stats={model.stats} />
           <StonesTable stats={model.stats} />
           <button type="button" onClick={() => void call(token, "POST", "/api/admin/models/" + id + "/reprocess").then(onClose, fail)} className={btn + " justify-self-start"}>
@@ -743,6 +666,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-5 py-3 sm:px-8">
           <button type="button" onClick={() => void save()} disabled={saving} className={btnMain} data-save-model>
             {saving ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Check className="size-4" aria-hidden="true" />} Enregistrer
+          </button>
+          <button type="button" onClick={() => saved && (setSettings(saved), setNote("Réglages enregistrés remis."))} disabled={saving || !saved || JSON.stringify(saved) === JSON.stringify(settings)} className={btn} data-cancel-model>
+            <Undo2 className="size-4" aria-hidden="true" /> Annuler
           </button>
           {note ? <p role="status" className="text-base text-bone">{note}</p> : null}
           {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}

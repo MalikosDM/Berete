@@ -16,7 +16,7 @@ export function protect(app: Express): void {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+    res.setHeader("Permissions-Policy", "camera=(self), microphone=(), geolocation=(), payment=()");
     if (!indexing) res.setHeader("X-Robots-Tag", "noindex, nofollow");
     next();
   });

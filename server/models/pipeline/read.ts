@@ -2,10 +2,13 @@
  * Reading a 3D file into layers of triangles, in mm:
  * - STL (binary or text), read piece by piece (files of several hundred MB);
  * - OBJ (text), read piece by piece, its materials (or groups) being the layers;
- * - glTF (.glb, or .gltf in one file), its materials being the layers (exports of Rhino via iJewel3D);
- * - Rhino (.3dm), its layers and its blocks (repeated stones). Only what Rhino saved as
- *   triangles can be read (meshes, render meshes of the polysurfaces): a polysurface saved
- *   without its render mesh is counted in `skipped`, as are the pictures placed in the file.
+ * - glTF (.glb, or .gltf in one file), its materials being the layers, with their colour (exports of Rhino via
+ *   iJewel3D); the diamond settings of an iJewel export (WEBGI_materials_diamond) are read with them;
+ * - FBX (./fbx.ts), its materials being the layers;
+ * - Rhino (.3dm), its layers (with their colour) and its blocks (repeated stones). Curves, dimensions and texts are
+ *   taken out before rhino3dm reads the file (./archive3dm.ts: one it cannot read would stop it there). A polysurface
+ *   saved without its render mesh (rhino3dm cannot make one) is meshed here from its NURBS (./nurbs.ts); a face that
+ *   cannot be meshed reliably leaves its volume counted in `skipped`, as are the pictures placed in the file.
  * A mesh drawn several times (glTF nodes sharing a mesh, Rhino blocks) is
  * kept once with the placement of each copy.
  */
@@ -13,20 +16,35 @@ import fs from "node:fs";
 import { Logger, NodeIO, type Document } from "@gltf-transform/core";
 import { ALL_EXTENSIONS } from "@gltf-transform/extensions";
 import draco3d from "draco3dgltf";
+import { diamondOfMaterial, colorOf } from "../../../src/data/ijewel.js";
+import type { DiamondParams } from "../../../src/data/scene3d.js";
+import { volumesOnly } from "./archive3dm.js";
+import { readFbx } from "./fbx.js";
 import { weld, Welder, type Soup } from "./geometry.js";
+import { meshBrep, type RhinoBrep } from "./nurbs.js";
 
 /** Several copies of one mesh: its triangles and one 4×4 matrix (column-major) per copy. */
 export type Repeated = { soup: Soup; matrices: Float32Array[] };
 
-export type Layer = { name: string; soups: Soup[]; repeated: Repeated[] };
+export type Layer = {
+  name: string;
+  soups: Soup[];
+  repeated: Repeated[];
+  /** Its own colour (#rrggbb): the Rhino layer's, or the base colour of the material of a glTF or an FBX. */
+  color?: string;
+  /** Stone settings given by an iJewel export (WEBGI_materials_diamond on its material). */
+  diamond?: Partial<DiamondParams>;
+};
 
 /** What a file holds and the model does not show (a .3dm only). */
 export type Skipped = {
   /**
-   * Volumes saved without their render mesh (rhino3dm cannot make one): missing from the
-   * model. Polysurfaces and surfaces, extrusions, SubD; a block counts once per copy.
+   * Volumes saved without their render mesh that could not be meshed here either: missing from the model.
+   * Polysurfaces and surfaces, extrusions, SubD; a block counts once per copy. `byLayer`: how many on each layer.
    */
-  noMesh: { breps: number; extrusions: number; subds: number; layers: string[] };
+  noMesh: { breps: number; extrusions: number; subds: number; layers: string[]; byLayer?: Record<string, number> };
+  /** Volumes (or block copies) rhino3dm could not read at all: left out, the rest of the file read; missing from the model. */
+  unreadable?: number;
   /** Objects that are not part of the jewel, left out: pictures placed in Rhino (a flat frame with a photo). */
   stray: { count: number; names: string[] };
   /** Objects hidden in Rhino, left out as Rhino does. */
@@ -35,12 +53,26 @@ export type Skipped = {
   drawings: number;
 };
 
-/** The volumes missing from the model: a model with any is incomplete. */
+/** The volumes missing from the model (not meshed, or not readable at all): a model with any is incomplete. */
 export function missingVolumes(skipped: Skipped | undefined): number {
-  return skipped ? skipped.noMesh.breps + skipped.noMesh.extrusions + skipped.noMesh.subds : 0;
+  return skipped ? skipped.noMesh.breps + skipped.noMesh.extrusions + skipped.noMesh.subds + (skipped.unreadable ?? 0) : 0;
 }
 
-export type SourceKind = "stl" | "obj" | "glb" | "gltf" | "3dm";
+export type SourceKind = "stl" | "obj" | "glb" | "gltf" | "3dm" | "fbx";
+
+/** The unit of the file and what was done to reach mm. */
+export type Units = {
+  /** The unit as the file gives it (Rhino's "Millimeters", FBX's "cm"...), or the one taken when it gives none. */
+  file: string;
+  /** "file": stated in the file; "assumed": the format states none (STL, OBJ, glTF), mm taken; "size": guessed from the size of the jewel. */
+  from: "file" | "assumed" | "size";
+  mmPerUnit: number;
+  /** A scale was applied to reach mm. */
+  applied: boolean;
+};
+
+/** What an iJewel export said of its stones: the materials with diamond settings, and the settings read on each. */
+export type IjewelReport = { materials: { name: string; params: string[] }[] };
 
 export type Source = {
   layers: Layer[];
@@ -48,6 +80,10 @@ export type Source = {
   layered: boolean;
   triangles: number;
   skipped?: Skipped;
+  units: Units;
+  /** Volumes of a .3dm saved without render meshes, meshed here from their NURBS. */
+  tessellated?: number;
+  ijewel?: IjewelReport;
 };
 
 export type Progress = (fraction: number, step: string) => void;
@@ -105,8 +141,13 @@ function readBinaryStl(fd: number, triangles: number, progress: Progress): Sourc
     progress((first + count) / triangles, "read");
   }
   const soup = { positions: welder.positions(), indices: indices.slice(0, n) };
-  return { layers: [{ name: "model", soups: [soup], repeated: [] }], layered: false, triangles };
+  return { layers: [{ name: "model", soups: [soup], repeated: [] }], layered: false, triangles, units: MM_ASSUMED };
 }
+
+/** STL, OBJ and glTF state no unit: the mm of jewellers' files. */
+const MM_ASSUMED: Units = { file: "mm", from: "assumed", mmPerUnit: 1, applied: false };
+/** A jewel smaller than 2 units across: read as metres (glTF's own unit). */
+const METRES_GUESSED: Units = { file: "m", from: "size", mmPerUnit: 1000, applied: true };
 
 async function readTextStl(file: string, size: number, progress: Progress): Promise<Source> {
   const welder = new Welder(1 << 16);
@@ -142,7 +183,7 @@ async function readTextStl(file: string, size: number, progress: Progress): Prom
     progress(Math.min(1, read / size), "read");
   }
   const soup = { positions: welder.positions(), indices: indices.slice(0, n) };
-  return { layers: [{ name: "model", soups: [soup], repeated: [] }], layered: false, triangles: n / 3 };
+  return { layers: [{ name: "model", soups: [soup], repeated: [] }], layered: false, triangles: n / 3, units: MM_ASSUMED };
 }
 
 /* ---------- OBJ ---------- */
@@ -285,7 +326,7 @@ export async function readObj(file: string, progress: Progress): Promise<Source>
   }
   progress(1, "read");
   if (triangles === 0) throw new Error("Aucune face trouvée dans ce fichier .obj.");
-  return { layers, layered: by !== null, triangles };
+  return { layers, layered: by !== null, triangles, units: scale === 1 ? MM_ASSUMED : METRES_GUESSED };
 }
 
 /* ---------- Matrices (4×4, column-major as glTF) ---------- */
@@ -314,7 +355,7 @@ async function gltfIo(): Promise<NodeIO> {
   return io;
 }
 
-type GltfJson = { buffers?: { uri?: string }[]; images?: { uri?: string }[] };
+type GltfJson = { buffers?: { uri?: string }[]; images?: { uri?: string }[]; materials?: unknown[] };
 
 const outside = (uri: string | undefined) => uri !== undefined && !uri.startsWith("data:");
 const ONE_FILE = "Ce fichier glTF renvoie à d'autres fichiers (.bin) : exportez-le en .glb (un seul fichier), ou en STL/OBJ.";
@@ -336,12 +377,12 @@ function glbJson(file: string): GltfJson | null {
   }
 }
 
-/** A .glb, or a .gltf in one file (its data inside): one sent with its .bin apart cannot be read. */
-async function gltfDocument(io: NodeIO, file: string): Promise<Document> {
+/** A .glb, or a .gltf in one file (its data inside): one sent with its .bin apart cannot be read. Also its raw JSON. */
+async function gltfDocument(io: NodeIO, file: string): Promise<{ doc: Document; json: GltfJson }> {
   const glb = glbJson(file);
   if (glb) {
     if (glb.buffers?.some((b) => outside(b.uri))) throw new Error(ONE_FILE);
-    return io.read(file);
+    return { doc: await io.read(file), json: glb };
   }
   let json: GltfJson;
   try {
@@ -351,16 +392,33 @@ async function gltfDocument(io: NodeIO, file: string): Promise<Document> {
   }
   if (json.buffers?.some((b) => outside(b.uri))) throw new Error(ONE_FILE);
   for (const image of json.images ?? []) if (outside(image.uri)) image.uri = PIXEL;
-  return io.readJSON({ json: json as Parameters<NodeIO["readJSON"]>[0]["json"], resources: {} });
+  return { doc: await io.readJSON({ json: json as Parameters<NodeIO["readJSON"]>[0]["json"], resources: {} }), json };
+}
+
+/**
+ * The stone settings of an iJewel export, by material name (WEBGI_materials_diamond, or the same settings kept in the
+ * material's extras), read from the raw JSON: gltf-transform does not keep extensions it does not know.
+ */
+function ijewelDiamonds(json: GltfJson): Map<string, Partial<DiamondParams>> {
+  const out = new Map<string, Partial<DiamondParams>>();
+  for (const [i, material] of (json.materials ?? []).entries()) {
+    const params = diamondOfMaterial(material);
+    if (!params || Object.keys(params).length === 0) continue;
+    const name = (material as { name?: unknown }).name;
+    out.set(typeof name === "string" && name ? name : "#" + i, params);
+  }
+  return out;
 }
 
 /** A .glb or a .gltf. */
 export async function readGltf(file: string, progress: Progress): Promise<Source> {
   progress(0, "read");
   const io = await gltfIo();
-  const doc: Document = await gltfDocument(io, file);
+  const { doc, json } = await gltfDocument(io, file);
   progress(0.5, "read");
   const root = doc.getRoot();
+  const diamonds = ijewelDiamonds(json);
+  const materialList = root.listMaterials();
   // Which meshes are drawn more than once.
   const uses = new Map<object, number>();
   for (const node of root.listNodes()) {
@@ -423,8 +481,18 @@ export async function readGltf(file: string, progress: Progress): Promise<Source
       if (prim.getMode() !== 4) continue; // triangles only
       const pos = prim.getAttribute("POSITION")?.getArray();
       if (!pos) continue;
-      const name = prim.getMaterial()?.getName() || "default";
+      const material = prim.getMaterial();
+      const name = material?.getName() || "default";
       const layer = layerOf(layers, name);
+      if (material && !layer.color) {
+        // glTF colours are linear: shown as sRGB.
+        const [r, g, b] = material.getBaseColorFactor();
+        layer.color = colorOf([r, g, b]);
+      }
+      if (material && !layer.diamond) {
+        const params = diamonds.get(material.getName()) ?? diamonds.get("#" + materialList.indexOf(material));
+        if (params) layer.diamond = params;
+      }
       if (shared) {
         if (!reps) {
           reps = [];
@@ -459,7 +527,14 @@ export async function readGltf(file: string, progress: Progress): Promise<Source
     if (i % 200 === 0) progress(0.5 + (0.5 * i) / nodes.length, "read");
   }
   progress(1, "read");
-  return { layers: [...layers.values()], layered: true, triangles };
+  const found = [...layers.values()].filter((l) => l.diamond);
+  return {
+    layers: [...layers.values()],
+    layered: true,
+    triangles,
+    units: scale === 1 ? MM_ASSUMED : METRES_GUESSED,
+    ...(diamonds.size > 0 ? { ijewel: { materials: found.map((l) => ({ name: l.name, params: Object.keys(l.diamond!) })) } } : {}),
+  };
 }
 
 /* ---------- Rhino ---------- */
@@ -470,12 +545,11 @@ type RhinoModule = Record<string, unknown> & {
   MeshType: Record<string, unknown>;
   UnitSystem: Record<string, unknown>;
   ObjectMaterialSource: Record<string, unknown>;
-  Mesh: { createFromBrep?: (brep: unknown, params: unknown) => unknown[] | null };
-  MeshingParameters: { qualityRenderMesh?: unknown; default?: unknown };
+  Brep: { createFromSurface?: (surface: unknown) => RhinoGeometry | null };
 };
 type RhinoFile = {
   objects(): { count: number; get(i: number): RhinoObject; findId(id: string): RhinoObject | null };
-  layers(): { count: number; get(i: number): { name: string; fullPath?: string } };
+  layers(): { count: number; get(i: number): { name: string; fullPath?: string; color?: { r: number; g: number; b: number } } };
   instanceDefinitions(): { count: number; get(i: number): RhinoIdef; findId(id: string): RhinoIdef | null };
   materials(): { count: number; get(i: number): { getBitmapTexture?: () => { fileName?: string } | null } | null };
   settings(): { modelUnitSystem: unknown };
@@ -489,6 +563,12 @@ type RhinoGeometry = Record<string, unknown> & { objectType: unknown; getBoundin
 type RhinoIdef = { getObjectIds(): string[]; id: string };
 
 const MM_PER_UNIT: Record<string, number> = { Millimeters: 1, Centimeters: 10, Meters: 1000, Inches: 25.4, Feet: 304.8, Microns: 0.001, None: 1 };
+
+/**
+ * Volumes saved without their render mesh are meshed here from their NURBS (./nurbs.ts). Checked on Yoni's three
+ * files of 26/11/2026 (3 234 faces, 264 closed volumes): every face meshed, every closed volume without a crack.
+ */
+const MESH_NURBS = true;
 
 function rhinoMeshSoup(mesh: Record<string, unknown>, scale: number): Soup | null {
   const vertices = (mesh.vertices as () => { count: number; get(i: number): number[] })();
@@ -513,21 +593,32 @@ function rhinoMeshSoup(mesh: Record<string, unknown>, scale: number): Soup | nul
 /** A volume Rhino saved without its render mesh, by kind (see Skipped). */
 type Missing = "breps" | "extrusions" | "subds" | null;
 
+/** The triangles of a polysurface made from its NURBS; `complete`: every face meshed (or without area). */
+function nurbsSoups(brep: RhinoGeometry | null | undefined, scale: number): { soups: Soup[]; complete: boolean } {
+  if (!brep || !MESH_NURBS) return { soups: [], complete: false };
+  try {
+    const made = meshBrep(brep as unknown as RhinoBrep, scale);
+    // No face failed: complete, even when it draws nothing (a surface shrunk to a curve has no area).
+    return { soups: made.soup ? [made.soup] : [], complete: made.failed === 0 };
+  } catch {
+    return { soups: [], complete: false };
+  }
+}
+
 /**
- * The triangles of one Rhino geometry: meshes, polysurfaces (their render mesh), extrusions,
- * SubD. `missing`: a volume saved without its render mesh (rhino3dm cannot make one; a
- * polysurface with only some faces meshed counts as missing too, its meshed faces are kept).
- * Curves, texts and the like give nothing and are not missing.
+ * The triangles of one Rhino geometry: meshes, polysurfaces (their render mesh, else meshed here from their NURBS),
+ * extrusions, lone surfaces, SubD. `missing`: a volume that could not be meshed (a polysurface with only some faces
+ * meshed counts as missing too, its meshed faces are kept); `tessellated`: meshed here from its NURBS. Curves, texts
+ * and the like give nothing and are not missing.
  */
-function rhinoSoups(rhino: RhinoModule, geometry: RhinoGeometry, scale: number): { soups: Soup[]; missing: Missing } {
+function rhinoSoups(rhino: RhinoModule, geometry: RhinoGeometry, scale: number): { soups: Soup[]; missing: Missing; tessellated: boolean } {
   const type = geometry.objectType;
   const types = rhino.ObjectType;
   if (type === types.Mesh) {
     const soup = rhinoMeshSoup(geometry, scale);
-    return { soups: soup ? [soup] : [], missing: null };
+    return { soups: soup ? [soup] : [], missing: null, tessellated: false };
   }
   const meshes: Record<string, unknown>[] = [];
-  let missing: Missing = null;
   if (type === types.Brep) {
     const faces = (geometry.faces as () => { count: number; get(i: number): { getMesh(t: unknown): Record<string, unknown> | null } })();
     let unmeshed = false;
@@ -536,26 +627,27 @@ function rhinoSoups(rhino: RhinoModule, geometry: RhinoGeometry, scale: number):
       if (m) meshes.push(m);
       else unmeshed = true;
     }
-    // No render mesh saved in the file: Rhino's own meshing, when available.
-    if (unmeshed && rhino.Mesh.createFromBrep) {
-      const made = rhino.Mesh.createFromBrep(geometry, rhino.MeshingParameters.qualityRenderMesh ?? rhino.MeshingParameters.default) ?? [];
-      if (made.length > 0) {
-        meshes.length = 0;
-        for (const m of made) meshes.push(m as Record<string, unknown>);
-        unmeshed = false;
-      }
+    if (unmeshed) {
+      // No render mesh saved in the file (or only for some faces): the whole polysurface meshed here.
+      const made = nurbsSoups(geometry, scale);
+      if (made.complete || made.soups.length > 0) return { soups: made.soups, missing: made.complete ? null : "breps", tessellated: made.complete };
+      return { soups: meshes.map((m) => rhinoMeshSoup(m, scale)).filter((s): s is Soup => s !== null), missing: "breps", tessellated: false };
     }
-    if (unmeshed) missing = "breps";
   } else if (type === types.Extrusion || type === types.SubD) {
     const getMesh = geometry.getMesh as ((t: unknown) => Record<string, unknown> | null) | undefined;
     const m = getMesh?.call(geometry, rhino.MeshType.Any);
     if (m) meshes.push(m);
-    else missing = type === types.Extrusion ? "extrusions" : "subds";
+    else if (type === types.Extrusion) {
+      const toBrep = geometry.toBrep as ((split: boolean) => RhinoGeometry | null) | undefined;
+      const made = nurbsSoups(toBrep?.call(geometry, true), scale);
+      return { soups: made.soups, missing: made.complete ? null : "extrusions", tessellated: made.complete };
+    } else return { soups: [], missing: "subds", tessellated: false };
   } else if (type === types.Surface) {
     // A lone surface keeps no render mesh in the file.
-    missing = "breps";
+    const made = nurbsSoups(rhino.Brep.createFromSurface?.(geometry), scale);
+    return { soups: made.soups, missing: made.complete ? null : "breps", tessellated: made.complete };
   }
-  return { soups: meshes.map((m) => rhinoMeshSoup(m, scale)).filter((s): s is Soup => s !== null), missing };
+  return { soups: meshes.map((m) => rhinoMeshSoup(m, scale)).filter((s): s is Soup => s !== null), missing: null, tessellated: false };
 }
 
 const IMAGE_NAME = /\.(jpe?g|png|bmp|gif|tiff?|webp|heic|psd)$/i;
@@ -585,27 +677,87 @@ function isDrawing(rhino: RhinoModule, geometry: RhinoGeometry): boolean {
   return ![t.Mesh, t.Brep, t.Surface, t.Extrusion, t.SubD, t.InstanceReference].includes(geometry.objectType);
 }
 
+/**
+ * The file as rhino3dm reads it: without its drawings (./archive3dm.ts), and without the objects rhino3dm cannot read
+ * (it stops at the first one, silently: the object it stopped at is taken out and the file read again).
+ */
+function openRhino(rhino: RhinoModule, bytes: Uint8Array): { doc: RhinoFile; drawings: number; unreadable: number } {
+  const skip = new Set<number>();
+  let best: { doc: RhinoFile; kept: number; count: number } | null = null;
+  let drawings = 0;
+  // The original number of the record rhino3dm stopped at.
+  let stoppedAt = -1;
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const pruned = volumesOnly(bytes, skip);
+    const doc = rhino.File3dm.fromByteArray(pruned.bytes);
+    if (!doc) break;
+    // Every record read gives one object: fewer, and rhino3dm stopped at the record after the last one it read (or
+    // dropped one on the way without a word).
+    const count = doc.objects().count;
+    const done = pruned.kept < 0 || count >= pruned.kept;
+    const at = done ? Infinity : pruned.records[count]!;
+    if (best && at <= stoppedAt) {
+      // Taking the object out did not get it further: it was dropped, not stopped at. The best reading is kept.
+      doc.delete?.();
+      skip.delete([...skip].pop()!);
+      break;
+    }
+    best?.doc.delete?.();
+    best = { doc, kept: pruned.kept, count };
+    drawings = Object.values(pruned.dropped).reduce((sum, n) => sum + n, 0);
+    stoppedAt = at;
+    if (done) break;
+    skip.add(at);
+  }
+  if (!best) throw new Error("Ce fichier .3dm ne peut pas être lu.");
+  // The records kept are volumes and block copies: each one that gave no object is a missing piece.
+  const lost = best.kept > 0 ? Math.max(0, best.kept - best.count) : 0;
+  return { doc: best.doc, drawings, unreadable: skip.size + lost };
+}
+
+const hexOf = (c: { r: number; g: number; b: number } | undefined) =>
+  c && [c.r, c.g, c.b].every((x) => Number.isFinite(x)) ? "#" + [c.r, c.g, c.b].map((x) => Math.round(Math.min(255, Math.max(0, x))).toString(16).padStart(2, "0")).join("") : undefined;
+
 export async function read3dm(file: string, progress: Progress): Promise<Source> {
   progress(0, "read");
   const { default: rhino3dm } = (await import("rhino3dm")) as unknown as { default: () => Promise<RhinoModule> };
   const rhino = await rhino3dm();
-  const doc = rhino.File3dm.fromByteArray(new Uint8Array(fs.readFileSync(file)));
-  if (!doc) throw new Error("Ce fichier .3dm ne peut pas être lu.");
+  const { doc, drawings, unreadable } = openRhino(rhino, new Uint8Array(fs.readFileSync(file)));
   const unitName = Object.entries(rhino.UnitSystem).find(([, v]) => v === doc.settings().modelUnitSystem)?.[0] ?? "Millimeters";
   const scale = MM_PER_UNIT[unitName] ?? 1;
   const layerNames: string[] = [];
+  const layerColors: (string | undefined)[] = [];
   const fileLayers = doc.layers();
-  for (let i = 0; i < fileLayers.count; i++) layerNames.push(fileLayers.get(i).name || "Layer " + (i + 1));
+  // Two layers of the same name in different groups (图层01 and 组名1::图层01) that both hold objects keep their full
+  // path, never merged; otherwise the short name (the one the jeweller sees, remembered from one model to the next).
+  const used = new Set<number>();
+  for (let i = 0; i < doc.objects().count; i++) used.add(doc.objects().get(i).attributes().layerIndex);
+  const usedNames = new Map<string, number>();
+  for (const i of used) if (i >= 0 && i < fileLayers.count) usedNames.set(fileLayers.get(i).name, (usedNames.get(fileLayers.get(i).name) ?? 0) + 1);
+  for (let i = 0; i < fileLayers.count; i++) {
+    const layer = fileLayers.get(i);
+    const name = layer.name || "Layer " + (i + 1);
+    layerNames.push((usedNames.get(layer.name) ?? 0) > 1 && layer.fullPath ? layer.fullPath : name);
+    layerColors.push(hexOf(layer.color));
+  }
   const layers = new Map<string, Layer>();
+  const layerAt = (index: number) => {
+    const name = layerNames[index] ?? "default";
+    const layer = layerOf(layers, name);
+    if (!layer.color && layerColors[index]) layer.color = layerColors[index];
+    return layer;
+  };
   let triangles = 0;
-  const skipped: Skipped = { noMesh: { breps: 0, extrusions: 0, subds: 0, layers: [] }, stray: { count: 0, names: [] }, hidden: 0, drawings: 0 };
+  let tessellated = 0;
+  const skipped: Skipped = { noMesh: { breps: 0, extrusions: 0, subds: 0, layers: [], byLayer: {} }, stray: { count: 0, names: [] }, hidden: 0, drawings, ...(unreadable ? { unreadable } : {}) };
   const miss = (kind: Missing, layer: string) => {
     if (!kind) return;
     skipped.noMesh[kind]++;
     if (!skipped.noMesh.layers.includes(layer)) skipped.noMesh.layers.push(layer);
+    skipped.noMesh.byLayer![layer] = (skipped.noMesh.byLayer![layer] ?? 0) + 1;
   };
-  // The geometry of a block, in mm in its own space, by layer; `missing`: a volume without its render mesh.
-  const blocks = new Map<string, { parts: { layer: string; soup: Soup; rep: Map<string, Repeated> }[]; missing: Missing; layer: string }>();
+  // The geometry of a block, in mm in its own space, by layer; `missing`: a volume that could not be meshed.
+  const blocks = new Map<string, { parts: { layer: number; soup: Soup; rep: Map<number, Repeated> }[]; missing: Missing; tessellated: boolean; layer: number }>();
   const turned = (soup: Soup): Soup => {
     const p = soup.positions;
     const out = new Float32Array(p.length);
@@ -625,24 +777,26 @@ export async function read3dm(file: string, progress: Progress): Promise<Source>
       const obj = doc.objects().findId(id);
       if (!obj) continue;
       const geometry = obj.geometry();
-      const layerName = layerNames[obj.attributes().layerIndex] ?? "default";
+      const layerIndex = obj.attributes().layerIndex;
       if (geometry.objectType === rhino.ObjectType.InstanceReference) {
         const inner = Float32Array.from((geometry.xform as { toFloatArray(rowMajor: boolean): number[] }).toFloatArray(false));
         for (let k = 12; k < 15; k++) inner[k]! *= scale;
         place(String(geometry.parentIdefId), multiply(matrix, inner), depth + 1);
         continue;
       }
+      if (isDrawing(rhino, geometry)) continue;
       const key = idefId + ":" + id;
       let block = blocks.get(key);
       if (!block) {
-        const { soups, missing } = rhinoSoups(rhino, geometry, scale);
-        block = { parts: soups.map((soup) => ({ layer: layerName, soup, rep: new Map() })), missing, layer: layerName };
+        const { soups, missing, tessellated: made } = rhinoSoups(rhino, geometry, scale);
+        block = { parts: soups.map((soup) => ({ layer: layerIndex, soup, rep: new Map() })), missing, tessellated: made, layer: layerIndex };
         blocks.set(key, block);
       }
-      // Each copy of a volume without its render mesh is missing.
-      miss(block.missing, block.layer);
+      // Each copy of a volume that could not be meshed is missing.
+      miss(block.missing, layerNames[block.layer] ?? "default");
+      if (block.tessellated) tessellated++;
       for (const part of block.parts) {
-        const layer = layerOf(layers, part.layer);
+        const layer = layerAt(part.layer);
         let rep = part.rep.get(part.layer);
         if (!rep) {
           rep = { soup: part.soup, matrices: [] };
@@ -676,15 +830,17 @@ export async function read3dm(file: string, progress: Progress): Promise<Source>
     } else if (isDrawing(rhino, geometry)) {
       skipped.drawings++;
     } else {
-      const { soups, missing } = rhinoSoups(rhino, geometry, scale);
+      const { soups, missing, tessellated: made } = rhinoSoups(rhino, geometry, scale);
       miss(missing, layerName);
+      if (made) tessellated++;
       for (const soup of soups) {
-        layerOf(layers, layerName).soups.push(turned(soup));
+        layerAt(attributes.layerIndex).soups.push(turned(soup));
         triangles += soup.indices.length / 3;
       }
     }
-    if (i % 100 === 0) progress(i / objects.count, "read");
+    if (i % 20 === 0) progress(i / objects.count, "read");
   }
+  doc.delete?.();
   // A block drawn once is ordinary geometry.
   for (const layer of layers.values()) {
     layer.repeated = layer.repeated.filter((rep) => {
@@ -704,18 +860,31 @@ export async function read3dm(file: string, progress: Progress): Promise<Source>
   progress(1, "read");
   if (triangles === 0) {
     const missing = missingVolumes(skipped);
+    const where = Object.entries(skipped.noMesh.byLayer ?? {})
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6)
+      .map(([name, n]) => "« " + name + " » : " + n)
+      .join(", ");
     throw new Error(
       missing > 0
-        ? "Rien à montrer : " + missing + (missing > 1 ? " volumes de métal ignorés" : " volume de métal ignoré") + " (enregistrés sans maillage de rendu). Réenregistrez depuis Rhino avec les maillages de rendu, ou exportez en STL/OBJ/GLB."
-        : "Aucune surface trouvée dans ce fichier .3dm.",
+        ? "Rien à montrer : " + missing + (missing > 1 ? " volumes n'ont pas pu être maillés" : " volume n'a pas pu être maillé") + (where ? " (calques " + where + ")" : "") + ". Demandez au dessinateur d'ouvrir le fichier dans Rhino, de passer en vue Ombrée, puis d'enregistrer sans cocher « Enregistrer petit » ; ou d'exporter en GLB ou en OBJ."
+        : "Aucun volume trouvé dans ce fichier .3dm (seulement des courbes, des cotes ou des objets cachés).",
     );
   }
-  return { layers: [...layers.values()].filter((l) => l.soups.length > 0 || l.repeated.length > 0), layered: true, triangles, skipped };
+  return {
+    layers: [...layers.values()].filter((l) => l.soups.length > 0 || l.repeated.length > 0),
+    layered: true,
+    triangles,
+    skipped,
+    units: { file: unitName, from: "file", mmPerUnit: scale, applied: scale !== 1 },
+    ...(tessellated > 0 ? { tessellated } : {}),
+  };
 }
 
 export async function readModel(file: string, kind: SourceKind, progress: Progress): Promise<Source> {
   if (kind === "stl") return readStl(file, progress);
   if (kind === "obj") return readObj(file, progress);
   if (kind === "3dm") return read3dm(file, progress);
+  if (kind === "fbx") return readFbx(file, progress);
   return readGltf(file, progress);
 }

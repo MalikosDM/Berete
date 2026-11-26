@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
-import { backgroundOf, type PublicModel } from "@/data/models";
+import { backgroundOf, sceneOf, type PublicModel } from "@/data/models";
 import type { Messages } from "@/i18n";
 import Logo from "@/components/Logo";
 import { backgroundCss } from "./backgrounds";
@@ -120,6 +120,7 @@ export default function DetailViewer({ model, marks, words, mode = "page", onPic
   // Admin: a click on the jewel (not a turn) gives its point.
   const down = useRef<{ x: number; y: number } | null>(null);
   const settings = model.settings;
+  const scene = useMemo(() => sceneOf(settings), [settings]);
   return (
     <div
       ref={box}
@@ -166,7 +167,7 @@ export default function DetailViewer({ model, marks, words, mode = "page", onPic
             simpleStones={false}
             settings={settings}
             choices={NO_CHOICES}
-            ambiance={settings.ambiance}
+            scene={scene}
             lightAngle={0}
             background={backgroundOf(settings.background)}
             autoRotate={!admin && onScreen}

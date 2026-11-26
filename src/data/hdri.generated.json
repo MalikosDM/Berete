@@ -1,0 +1,102 @@
+{
+  "studio-warm": {
+    "v": "30422722",
+    "bytes": 1290582,
+    "bytes1k": 379903
+  },
+  "softbox-wide": {
+    "v": "085a95b7",
+    "bytes": 1488015,
+    "bytes1k": 448654
+  },
+  "horizon-soft": {
+    "v": "d464bb75",
+    "bytes": 930872,
+    "bytes1k": 369428
+  },
+  "lounge-blur": {
+    "v": "d9edb144",
+    "bytes": 1593247,
+    "bytes1k": 488922
+  },
+  "daylight": {
+    "v": "4d1d5ce6",
+    "bytes": 258314,
+    "bytes1k": 73168
+  },
+  "backlight": {
+    "v": "73f3221a",
+    "bytes": 1357619,
+    "bytes1k": 406628
+  },
+  "studio-dark": {
+    "v": "a97e44b1",
+    "bytes": 323044,
+    "bytes1k": 89857
+  },
+  "ring-light": {
+    "v": "ce168861",
+    "bytes": 715991,
+    "bytes1k": 204974
+  },
+  "three-point": {
+    "v": "17a6daeb",
+    "bytes": 697455,
+    "bytes1k": 207081
+  },
+  "window": {
+    "v": "8fa40697",
+    "bytes": 1639332,
+    "bytes1k": 655540
+  },
+  "gem-bands": {
+    "v": "ab3db0b4",
+    "bytes": 213895,
+    "bytes1k": 74892
+  },
+  "gem-points": {
+    "v": "ae7d8175",
+    "bytes": 195809,
+    "bytes1k": 65519
+  },
+  "gem-ring": {
+    "v": "54dad67d",
+    "bytes": 143490,
+    "bytes1k": 39041
+  },
+  "gem-spot": {
+    "v": "c7925630",
+    "bytes": 378888,
+    "bytes1k": 102597
+  },
+  "gem-vitrine": {
+    "v": "d1503063",
+    "bytes": 196983,
+    "bytes1k": 61346
+  },
+  "gem-backlight": {
+    "v": "ed8fc683",
+    "bytes": 213797,
+    "bytes1k": 62700
+  },
+  "gem-cross": {
+    "v": "6f9679b8",
+    "bytes": 190615,
+    "bytes1k": 61046
+  },
+  "gem-stars": {
+    "v": "cf9c8f20",
+    "bytes": 391333,
+    "bytes1k": 157406
+  },
+  "gem-studio": {
+    "v": "1be57da2",
+    "bytes": 371620,
+    "bytes1k": 105947
+  },
+  "gem-classic": {
+    "v": "c4e4e152",
+    "bytes": 802456,
+    "bytes1k": 260355
+  }
+}

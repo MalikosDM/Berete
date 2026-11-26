@@ -6,11 +6,15 @@
  * the page gives (WhatsApp).
  * Loaded only when shown (three.js is heavy): see ./index.tsx.
  */
-import { useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
+import type { Object3D } from "three";
+import { lazy, Suspense, useCallback, useEffect, useId, useImperativeHandle, useMemo, useRef, useState, type ReactNode, type Ref } from "react";
 import { Canvas } from "@react-three/fiber";
 import { PerformanceMonitor } from "@react-three/drei";
-import { Camera, Maximize, Minimize, Pause, RotateCcw, Rotate3d, SlidersHorizontal, Sun } from "lucide-react";
-import { AMBIANCES, BACKGROUNDS, backgroundOf, METALS, type Ambiance, type Background, type MetalId, type ModelView, type PublicModel } from "@/data/models";
+import { Box, Camera, Expand, Hand, Maximize, Minimize, Minus, Pause, Play, Plus, RotateCcw, Rotate3d, Share2, SlidersHorizontal, Sun } from "lucide-react";
+import { AMBIANCES, BACKGROUNDS, backgroundOf, METALS, sceneOf, tryOnOf, viewerOf, viewsOf, type Ambiance, type Background, type MetalId, type ModelView, type PublicModel } from "@/data/models";
+import { AMBIANCE_SCENES, type SceneSettings } from "@/data/scene3d";
+import { TRY_ON_WORDS, type TryOnLang } from "./words/tryon";
+import { canQuickLook, canSceneViewer, openQuickLook, sceneViewerUrl } from "./ar";
 import type { Messages } from "@/i18n";
 import Logo from "@/components/Logo";
 import { METAL_LOOKS, STONE_COLORS } from "./materials";
@@ -24,7 +28,17 @@ export type ViewerHandle = {
   capture(): string | null;
   /** The model is loaded and drawn (the admin then makes its still image, when it has none). */
   isReady(): boolean;
+  /** The camera at t ∈ [0, 1] of the path through the saved views (the page's scrolling). */
+  seek(t: number): void;
 };
+
+const TryOn = lazy(() => import("./tryon/TryOn"));
+
+/** The language of the page, for the try-on words. */
+function pageLang(): TryOnLang {
+  const lang = (typeof document === "undefined" ? "en" : document.documentElement.lang || "en").slice(0, 2) as TryOnLang;
+  return lang in TRY_ON_WORDS ? lang : "en";
+}
 
 /** The metal chosen for each metal layer, for the WhatsApp message. */
 export type Selection = { layer: string; label: string; metal: MetalId }[];
@@ -90,9 +104,10 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
   const [ambiance, setAmbiance] = useState<Ambiance>(settings.ambiance);
   const [background, setBackground] = useState<Background>(() => backgroundOf(settings.background));
   const [lightAngle, setLightAngle] = useState(0);
-  const [autoRotate, setAutoRotate] = useState(false);
+  // The visitor's own choice of turning; until then, the jeweller's (viewer options).
+  const [rotateChoice, setRotateChoice] = useState<boolean | null>(null);
   const [full, setFull] = useState(false);
-  const [choices, setChoices] = useState<Choices>({ metals: {}, colors: {} });
+  const [choices, setChoices] = useState<Choices>({ metals: {}, colors: {}, materials: {} });
   const [present, setPresent] = useState<string[]>([]);
   const wrap = useRef<HTMLDivElement>(null);
   const api = useRef<StageApi | null>(null);
@@ -121,7 +136,57 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
     setBackground(backgroundOf(settings.background));
   }
 
-  useImperativeHandle(ref, () => ({ getView: () => api.current?.getView() ?? null, capture: () => api.current?.capture() ?? null, isReady: () => readyAt.current > 0 && api.current !== null }), []);
+  useImperativeHandle(ref, () => ({ getView: () => api.current?.getView() ?? null, capture: () => api.current?.capture() ?? null, isReady: () => readyAt.current > 0 && api.current !== null, seek: (t: number) => api.current?.seek(t) }), []);
+
+  // The scene the jeweller set (lightings, effects, ground...); the client's choice of lighting stands for one of the three first ones.
+  const options = useMemo(() => viewerOf(settings), [settings]);
+  const views = useMemo(() => viewsOf(settings), [settings]);
+  const tryOn = useMemo(() => tryOnOf(settings), [settings]);
+  const scene: SceneSettings = useMemo(() => {
+    const saved = sceneOf(settings);
+    if (ambiance === settings.ambiance) return { ...saved, render: { ...saved.render, quality: options.quality === "auto" ? saved.render.quality : options.quality } };
+    const pick = AMBIANCE_SCENES[ambiance] ?? AMBIANCE_SCENES.studio!;
+    return { ...saved, envMetal: { ...saved.envMetal, id: pick.envMetal, intensity: pick.metalIntensity }, envGem: { ...saved.envGem, id: pick.envGem } };
+  }, [settings, ambiance, options.quality]);
+  // Closest and farthest, by the shape of the frame (tall or wide).
+  const [portrait, setPortrait] = useState(false);
+  const frameBox = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = frameBox.current;
+    if (!el || typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(() => setPortrait(el.clientHeight > el.clientWidth));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  const distance = (portrait ? options.distance.portrait : options.distance.landscape) ?? null;
+  const [touring, setTouring] = useState(false);
+  const [trying, setTrying] = useState<Object3D | null>(null);
+  const [copied, setCopied] = useState(false);
+  const lang = useMemo(() => pageLang(), []);
+  const tryWords = TRY_ON_WORDS[lang];
+  const autoRotate = rotateChoice ?? options.autoRotate;
+  const share = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) await navigator.share({ title: model.name, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      // Closed by the visitor.
+    }
+  };
+  const quickLook = useMemo(() => canQuickLook(), []);
+  const sceneViewer = useMemo(() => canSceneViewer(), []);
+  const showAr = options.ar && (quickLook || sceneViewer);
+  const viewInSpace = () => {
+    const jewel = api.current?.handles.jewel();
+    if (!jewel) return;
+    if (quickLook) void openQuickLook(jewel, model.name);
+    else if (sceneViewer) window.location.href = sceneViewerUrl(new URL(model.files.full, window.location.href).href, model.name, window.location.href);
+  };
 
   const offered = settings.metals.length > 0 ? METALS.filter((m) => settings.metals.includes(m)) : [...METALS];
   const metalLayers = present.filter((name) => (settings.layers[name]?.role ?? "metal") === "metal");
@@ -204,6 +269,7 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
       {/* The wheel over the jewel brings it closer and never scrolls the page as well (data-lenis-prevent: the smooth
           scrolling of the site leaves it alone). */}
       <div
+        ref={frameBox}
         data-lenis-prevent
         onPointerDownCapture={() => setTouched(true)}
         onWheelCapture={() => setTouched(true)}
@@ -241,9 +307,12 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
               phone={phone}
               simpleStones={simpleStones}
               settings={settings}
+              scene={scene}
+              views={views}
               choices={choices}
-              ambiance={ambiance}
               lightAngle={lightAngle}
+              distance={distance}
+              zoom={options.zoom}
               background={background}
               autoRotate={autoRotate}
               highlight={highlight}
@@ -284,32 +353,142 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
 
         {status === "ready" ? (
           <>
-            {/* Views */}
-            <div className="absolute start-3 top-3 flex flex-wrap gap-2 sm:start-4 sm:top-4">
-              <button type="button" className={viewBtn} onClick={() => api.current?.view("front")}>{words.views.front}</button>
-              <button type="button" className={viewBtn} onClick={() => api.current?.view("side")}>{words.views.side}</button>
-              <button type="button" className={viewBtn} onClick={() => api.current?.view("top")}>{words.views.top}</button>
+            {/* At the top: the views on the left, try it on and see it at home on the right (never over one another) */}
+            <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-2 sm:inset-x-4 sm:top-4">
+            <div className="pointer-events-auto flex min-w-0 flex-wrap gap-2" data-viewer-views>
+              {options.views && views.list.length > 0 ? (
+                <>
+                  {views.list.map((v) => (
+                    <button key={v.id} type="button" className={viewBtn} data-saved-view={v.id} onClick={() => (setTouring(false), api.current?.goTo(v, views.duration, views.ease, views.interpolation))}>
+                      {v.name}
+                    </button>
+                  ))}
+                  {views.list.length > 1 ? (
+                    <button type="button" className={viewBtn} aria-pressed={touring} data-views-tour onClick={() => setTouring((t) => (api.current?.playViews(!t), !t))}>
+                      {touring ? <Pause className="me-2 size-4" aria-hidden="true" /> : <Play className="me-2 size-4" aria-hidden="true" />} {touring ? words.stopViews : words.playViews}
+                    </button>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <button type="button" className={viewBtn} onClick={() => api.current?.view("front")}>{words.views.front}</button>
+                  <button type="button" className={viewBtn} onClick={() => api.current?.view("side")}>{words.views.side}</button>
+                  <button type="button" className={viewBtn} onClick={() => api.current?.view("top")}>{words.views.top}</button>
+                </>
+              )}
             </div>
+            {(options.tryOn && tryOn.enabled) || showAr ? (
+              <div className="pointer-events-auto flex shrink-0 flex-col items-end gap-2">
+                {options.tryOn && tryOn.enabled ? (
+                  <button type="button" className={viewBtn} onClick={() => setTrying(api.current?.handles.jewel() ?? null)} data-try-on>
+                    <Hand className="me-2 size-4" aria-hidden="true" /> {tryWords.tryOn}
+                  </button>
+                ) : null}
+                {showAr ? (
+                  <button type="button" className={viewBtn} onClick={viewInSpace} data-view-ar>
+                    <Box className="me-2 size-4" aria-hidden="true" /> {tryWords.viewInSpace}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            </div>
+            {/* At the foot: the configurator's chips, then the buttons (never over one another) */}
+            <div className="pointer-events-none absolute inset-x-3 bottom-3 flex flex-col gap-2 sm:inset-x-4 sm:bottom-4">
+            {/* The configurator: the jeweller's choices of material, in chips at the foot of the jewel */}
+            {options.configurator && (settings.configurators ?? []).length > 0 ? (
+              <div className="pointer-events-auto grid justify-items-center gap-2" data-configurator>
+                {(settings.configurators ?? []).map((cfg) => {
+                  const current = cfg.options.find((o) => cfg.layers.every((l) => choices.materials?.[l] === o.material))?.material ?? null;
+                  return (
+                    <div key={cfg.id} role="radiogroup" aria-label={cfg.label} className="flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full border border-white/15 bg-ink/70 p-1 backdrop-blur-sm">
+                      <span className="px-3 text-sm uppercase tracking-[0.18em] text-rose-light">{cfg.label}</span>
+                      {cfg.options.map((o) => (
+                        <button
+                          key={o.material}
+                          type="button"
+                          role="radio"
+                          aria-checked={current === o.material}
+                          data-config-option={o.material}
+                          onClick={() =>
+                            setChoices((c) => {
+                              // A metal of the library also shows in the panel's swatches (and the swatches undo it).
+                              const metal = o.material.startsWith("metal/") ? (o.material.split("/")[1] as MetalId) : null;
+                              return {
+                                ...c,
+                                materials: { ...c.materials, ...Object.fromEntries(cfg.layers.map((l) => [l, o.material])) },
+                                metals: metal ? { ...c.metals, ...Object.fromEntries(cfg.layers.map((l) => [l, metal])) } : c.metals,
+                              };
+                            })
+                          }
+                          className={"min-h-12 rounded-full px-4 text-base transition-colors " + (current === o.material ? "bg-white font-medium text-ink" : "text-bone hover:text-rose-light")}
+                        >
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
             {/* Actions */}
-            <div className="absolute end-3 bottom-3 flex flex-wrap justify-end gap-2 sm:end-4 sm:bottom-4">
+            <div className="flex items-end justify-between gap-3">
+              <p className={"pointer-events-none hidden max-w-[50%] text-base transition-opacity duration-700 lg:block " + (touched ? "opacity-0 " : "") + (dark ? "text-mist" : "text-ink/70")}>{hint}</p>
+              <div className="pointer-events-auto ms-auto flex flex-wrap justify-end gap-2">
+              {options.zoom && options.zoomButtons && !phone ? (
+                <>
+                  <button type="button" className={iconBtn} onClick={() => api.current?.zoomBy(0.75)} aria-label={words.zoomIn} title={words.zoomIn} data-zoom-in>
+                    <Plus className="size-5" aria-hidden="true" />
+                  </button>
+                  <button type="button" className={iconBtn} onClick={() => api.current?.zoomBy(1.33)} aria-label={words.zoomOut} title={words.zoomOut} data-zoom-out>
+                    <Minus className="size-5" aria-hidden="true" />
+                  </button>
+                </>
+              ) : null}
+              <button type="button" className={iconBtn} onClick={() => api.current?.fit()} aria-label={words.fit} title={words.fit} data-fit>
+                <Expand className="size-5" aria-hidden="true" />
+              </button>
               <button type="button" className={iconBtn} onClick={() => api.current?.view("reset")} aria-label={words.reset} title={words.reset}>
                 <RotateCcw className="size-5" aria-hidden="true" />
               </button>
-              <button type="button" className={iconBtn + (autoRotate ? " !border-rose-light !text-rose-light" : "")} onClick={() => setAutoRotate((a) => !a)} aria-pressed={autoRotate} aria-label={autoRotate ? words.stopRotate : words.autoRotate} title={autoRotate ? words.stopRotate : words.autoRotate}>
+              <button type="button" className={iconBtn + (autoRotate ? " !border-rose-light !text-rose-light" : "")} onClick={() => setRotateChoice(!autoRotate)} aria-pressed={autoRotate} aria-label={autoRotate ? words.stopRotate : words.autoRotate} title={autoRotate ? words.stopRotate : words.autoRotate}>
                 {autoRotate ? <Pause className="size-5" aria-hidden="true" /> : <Rotate3d className="size-5" aria-hidden="true" />}
               </button>
-              <button type="button" className={iconBtn} onClick={capture} aria-label={words.capture} title={words.capture}>
-                <Camera className="size-5" aria-hidden="true" />
-              </button>
-              <button type="button" className={iconBtn} onClick={() => void toggleFull()} aria-label={isFull ? words.exitFullscreen : words.fullscreen} title={isFull ? words.exitFullscreen : words.fullscreen}>
-                {isFull ? <Minimize className="size-5" aria-hidden="true" /> : <Maximize className="size-5" aria-hidden="true" />}
-              </button>
+              {!phone ? (
+                <button type="button" className={iconBtn} onClick={capture} aria-label={words.capture} title={words.capture}>
+                  <Camera className="size-5" aria-hidden="true" />
+                </button>
+              ) : null}
+              {options.share ? (
+                <button type="button" className={iconBtn} onClick={() => void share()} aria-label={copied ? words.copied : words.share} title={copied ? words.copied : words.share} data-share>
+                  <Share2 className="size-5" aria-hidden="true" />
+                </button>
+              ) : null}
+              {options.fullscreen ? (
+                <button type="button" className={iconBtn} onClick={() => void toggleFull()} aria-label={isFull ? words.exitFullscreen : words.fullscreen} title={isFull ? words.exitFullscreen : words.fullscreen}>
+                  {isFull ? <Minimize className="size-5" aria-hidden="true" /> : <Maximize className="size-5" aria-hidden="true" />}
+                </button>
+              ) : null}
             </div>
-            <p className={"pointer-events-none absolute start-4 bottom-4 hidden max-w-[50%] text-base transition-opacity duration-700 lg:block " + (touched ? "opacity-0 " : "") + (dark ? "text-mist" : "text-ink/70")}>{hint}</p>
+              </div>
+            </div>
+            {copied ? <p role="status" className="absolute start-1/2 top-1/2 -translate-x-1/2 rounded-full bg-white px-4 py-2 text-base text-ink">{words.copied}</p> : null}
+            {/* "Drag to turn", at the first sight of the jewel */}
+            {options.prompt && !touched ? (
+              <div className="viewer-prompt pointer-events-none absolute inset-0 flex items-center justify-center" data-viewer-prompt aria-hidden="true">
+                <span className="flex items-center gap-3 rounded-full border border-white/20 bg-ink/60 px-5 py-3 text-base text-white backdrop-blur-sm">
+                  <Hand className="viewer-prompt-hand size-5 text-rose-light" aria-hidden="true" /> {words.dragToTurn}
+                </span>
+              </div>
+            ) : null}
           </>
         ) : null}
       </div>
 
+      {trying ? (
+        <Suspense fallback={null}>
+          <TryOn jewel={trying} settings={tryOn} words={tryWords} onClose={() => setTrying(null)} />
+        </Suspense>
+      ) : null}
       {/* The panel of choices: beside the jewel (computer), under it (phone) */}
       <div role="group" aria-labelledby={panelTitle} data-viewer-panel className={"relative " + PANEL + (isFull ? " border-x-0 border-b-0 lg:border-y-0 lg:border-e-0 lg:border-s" : " border-t-0 lg:border-t")}>
         <div ref={panelScroll} data-lenis-prevent={panelScrolls ? "" : undefined} className="lg:absolute lg:inset-0 lg:overflow-y-auto lg:overscroll-contain">
@@ -334,7 +513,13 @@ export default function JewelViewer({ model, words, highlight = null, settings: 
                                 aria-checked={current === metal}
                                 aria-label={words.metals[metal]}
                                 data-metal={metal}
-                                onClick={() => setChoices((c) => ({ ...c, metals: { ...c.metals, [name]: metal } }))}
+                                onClick={() =>
+                                  setChoices((c) => {
+                                    const materials = { ...c.materials };
+                                    delete materials[name];
+                                    return { ...c, metals: { ...c.metals, [name]: metal }, materials };
+                                  })
+                                }
                                 className={"group " + ring(current === metal)}
                               >
                                 <span className="block h-full w-full rounded-full border border-ink/40" style={swatchStyle(METAL_LOOKS[metal].swatch)} />

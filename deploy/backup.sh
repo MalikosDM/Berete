@@ -18,7 +18,7 @@ docker compose exec -T db pg_dump -U berete -d berete -Fc > "$B/db/berete-$DAY.d
 mv "$B/db/berete-$DAY.dump.part" "$B/db/berete-$DAY.dump"
 
 last="$(find "$B/storage" -mindepth 1 -maxdepth 1 -type d ! -name "$DAY" | sort | tail -1)"
-rsync -a --delete --exclude 'uploads/' ${last:+--link-dest="$last"} "$DATA/storage/" "$B/storage/$DAY/"
+rsync -a --delete --exclude 'uploads/' --exclude 'shares/' ${last:+--link-dest="$last"} "$DATA/storage/" "$B/storage/$DAY/"
 
 find "$B/db" -name 'berete-*.dump' -mtime +"$KEEP" -delete
 find "$B/storage" -mindepth 1 -maxdepth 1 -type d | sort | head -n -"$KEEP" | xargs -r rm -rf

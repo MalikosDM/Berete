@@ -4,9 +4,16 @@
  * a role (metal, diamond...) chosen in the admin, stored with the model.
  */
 
-/** The metals the client can choose, in the order of the swatches. */
-export const METALS = ["yellow-gold", "white-gold", "rose-gold", "platinum", "black-rhodium"] as const;
+import { AMBIANCE_SCENES, CLASSIC_DIAMOND, DEFAULT_DIAMOND, DEFAULT_SCENE, DEFAULT_TRY_ON, DEFAULT_VIEWER, DEFAULT_VIEWS, merged, type Configurator, type DiamondParams, type SceneSettings, type TryOnSettings, type ViewerOptions, type ViewsSettings } from "./scene3d.js";
+
+/**
+ * The metals the client can choose, in the order of the swatches: 18 carats first (the five of the first versions,
+ * offered by default), then 14 carats, palladium and silver (26/11/2026, the library of the 3D editor).
+ */
+export const METALS = ["yellow-gold", "white-gold", "rose-gold", "platinum", "black-rhodium", "yellow-gold-14", "white-gold-14", "rose-gold-14", "palladium", "silver"] as const;
 export type MetalId = (typeof METALS)[number];
+/** Offered to the client when the jeweller has not chosen. */
+export const CLASSIC_METALS: MetalId[] = ["yellow-gold", "white-gold", "rose-gold", "platinum", "black-rhodium"];
 
 export const LAYER_ROLES = ["metal", "diamond", "stone", "enamel", "hide"] as const;
 export type LayerRole = (typeof LAYER_ROLES)[number];
@@ -22,7 +29,7 @@ export type DiamondLook = (typeof DIAMOND_LOOKS)[number];
 export type Ambiance = (typeof AMBIANCES)[number];
 
 /** Backgrounds of the viewer: plain colours, studio gradients, and settings (a surface in front of a room out of focus). */
-export const BACKGROUNDS = ["studio-dark", "black", "studio-light", "white", "rose", "wood", "velvet", "satin", "leather"] as const;
+export const BACKGROUNDS = ["studio-dark", "black", "studio-light", "white", "rose", "wood", "velvet", "satin", "leather", "marble"] as const;
 export type Background = (typeof BACKGROUNDS)[number];
 
 /** A background from the settings (the first versions only had "dark" and "light"). */
@@ -41,6 +48,16 @@ export type LayerSetting = {
   color?: string;
   /** Name shown to the client above the swatches of this metal ("Links", "Flowers"...). */
   label?: string;
+  /** A material of the library (src/viewer/library): a finish of metal, a stone, a pearl... (else the one of its role). */
+  material?: string;
+  /** Metal finish: polished (default), satin, brushed (with the direction of the brushing, degrees), hammered, aged. */
+  finish?: { kind: "polished" | "satin" | "brushed" | "hammered" | "aged"; angle?: number };
+  /** Settings of a stone (role diamond or stone), over the defaults. */
+  diamond?: Partial<DiamondParams>;
+  /** Edges rounded on the screen for this material, 0–16 (null: the scene's). */
+  bevel?: number;
+  /** Glow on this material. */
+  bloom?: boolean;
 };
 
 /** A camera place, in the units of the model (metres). */
@@ -57,9 +74,48 @@ export type ModelSettings = {
   background: Background;
   /** How the diamonds are drawn (missing in the settings saved before 25/11/2026: realistic). */
   diamonds?: DiamondLook;
+  /** The scene of the 3D editor (26/11/2026): lightings, effects, ground, stand... (missing: from `ambiance`). */
+  scene?: Partial<SceneSettings>;
+  views?: Partial<ViewsSettings>;
+  viewer?: Partial<ViewerOptions>;
+  configurators?: Configurator[];
+  tryOn?: Partial<TryOnSettings>;
 };
 
-export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...METALS], view: null, ambiance: "studio", background: "studio-dark", diamonds: "realistic" };
+export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...CLASSIC_METALS], view: null, ambiance: "studio", background: "studio-dark", diamonds: "realistic" };
+
+/** The whole scene of a model: what was saved over the defaults (a model saved before 26/11: its ambiance). */
+export function sceneOf(settings: ModelSettings): SceneSettings {
+  const from = AMBIANCE_SCENES[settings.ambiance] ?? AMBIANCE_SCENES.studio!;
+  const base: SceneSettings = {
+    ...DEFAULT_SCENE,
+    envMetal: { ...DEFAULT_SCENE.envMetal, id: from.envMetal, intensity: from.metalIntensity },
+    envGem: { ...DEFAULT_SCENE.envGem, id: settings.diamonds === "classic" ? "gem-classic" : from.envGem },
+    ground: { ...DEFAULT_SCENE.ground, preset: settings.background === "black" ? "none" : DEFAULT_SCENE.ground.preset },
+  };
+  return merged(base, settings.scene);
+}
+
+export function viewsOf(settings: ModelSettings): ViewsSettings {
+  return merged(DEFAULT_VIEWS, settings.views);
+}
+
+export function viewerOf(settings: ModelSettings): ViewerOptions {
+  return merged(DEFAULT_VIEWER, settings.viewer);
+}
+
+export function tryOnOf(settings: ModelSettings): TryOnSettings {
+  return merged(DEFAULT_TRY_ON, settings.tryOn);
+}
+
+/** The settings of the stones of a layer: the defaults, the old rendering if chosen, then the layer's own. */
+export function diamondOf(layer: LayerSetting | undefined, look: DiamondLook = "realistic"): DiamondParams {
+  const base = look === "classic" ? merged(DEFAULT_DIAMOND, CLASSIC_DIAMOND) : DEFAULT_DIAMOND;
+  const own = merged(base, layer?.diamond);
+  // A coloured stone keeps its colour when its settings have none.
+  if (layer?.role === "stone" && !layer.diamond?.color && layer.color) return { ...own, color: layer.color, absorption: own.absorption || 1.2 };
+  return own;
+}
 
 /** What a visitor receives to show a model. */
 export type PublicModel = {

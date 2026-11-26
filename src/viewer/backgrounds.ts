@@ -30,6 +30,8 @@ export type BackgroundLook = {
   light: boolean;
   surface?: Surface;
   room?: Room;
+  /** The black marble of the house behind the jewel. */
+  marble?: boolean;
 };
 
 export const BACKGROUND_LOOKS: Record<Background, BackgroundLook> = {
@@ -59,6 +61,8 @@ export const BACKGROUND_LOOKS: Record<Background, BackgroundLook> = {
     surface: { name: "crepe_satin", tile: 0.3, sheen: "#fff3dc", roughness: 0.55 },
     room: { file: "/hdri/cayley_interior.hdr", blur: 0.5, intensity: 0.75, rotation: 1.2 },
   },
+  // Black marble of the house (26/11/2026): a dark polished stone with fine light veins, made by code (./textures.ts).
+  marble: { inner: "#24201f", outer: "#060505", light: false, marble: true },
   leather: {
     inner: "#f2efe9",
     outer: "#c9c2b6",
@@ -77,7 +81,8 @@ export function backgroundCss(background: Background): string {
 
 /** The image of a swatch: the surface itself when there is one. */
 export function swatchCss(background: Background): string {
-  const { surface } = BACKGROUND_LOOKS[background];
+  const { surface, marble } = BACKGROUND_LOOKS[background];
+  if (marble) return "linear-gradient(125deg, transparent 46%, rgba(232,180,160,0.35) 48%, transparent 51%), linear-gradient(35deg, transparent 60%, rgba(255,255,255,0.18) 61%, transparent 63%), radial-gradient(circle at 40% 35%, #2b2625, #070606)";
   if (!surface) return backgroundCss(background);
   const tint = surface.tint ? "linear-gradient(" + surface.tint + "cc, " + surface.tint + "cc), " : "";
   return tint + "url(/decor/" + surface.name + "_diff.jpg) center / 300%";

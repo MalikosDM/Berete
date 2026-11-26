@@ -21,7 +21,11 @@ import Process from "@/pages/Process";
 // The back-office and the private 3D links are loaded only when they are opened.
 const Admin = lazyPart(() => import("@/pages/Admin"));
 const ViewLink = lazyPart(() => import("@/pages/ViewLink"));
+// A share link sealed on the admin's device (/s/<token>): decrypted in the browser of the client.
+const SealedView = lazyPart(() => import("@/pages/SealedView"));
 const Vip = lazyPart(() => import("@/pages/Vip"));
+// The 3D lab (pictures of the editor, comparisons of the diamonds): on the Mac only, never in the built site.
+const Lab3D = import.meta.env.DEV ? lazyPart(() => import("@/pages/Lab3D")) : null;
 
 /**
  * A page of one piece, person or collection starts afresh when its address
@@ -78,6 +82,7 @@ function Elsewhere() {
  */
 function PrivateApp() {
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
+  const sealed = <Suspense fallback={null}><SealedView /></Suspense>;
   const vip = (
     <div className="min-h-svh bg-ink" data-private-page>
       <header className="flex justify-center px-5 pt-8">
@@ -93,6 +98,7 @@ function PrivateApp() {
       {["", ...LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => l + "/")].map((prefix) => (
         <Fragment key={"private-" + prefix}>
           <Route path={prefix + "view/:token"} element={viewLink} />
+          <Route path={prefix + "s/:token"} element={sealed} />
           <Route path={prefix + "vip"} element={vip} />
           <Route path={prefix + "vip/:token"} element={vip} />
         </Fragment>
@@ -105,12 +111,18 @@ function PrivateApp() {
 export default function App() {
   if (PRIVATE_ONLY) return <PrivateApp />;
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
+  const sealed = <Suspense fallback={null}><SealedView /></Suspense>;
   return (
     <Routes>
       {/* A private 3D link sent to a client: its own sober page, without the menu of the site. */}
       <Route path="view/:token" element={viewLink} />
       {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
         <Route key={"view-" + l} path={l + "/view/:token"} element={viewLink} />
+      ))}
+      {/* A share link sealed on the admin's device: its own sober page too (it speaks the language of the browser). */}
+      <Route path="s/:token" element={sealed} />
+      {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
+        <Route key={"s-" + l} path={l + "/s/:token"} element={sealed} />
       ))}
       <Route element={<Layout />}>
         {pages("")}
@@ -122,6 +134,7 @@ export default function App() {
       </Route>
       {/* The back-office, in French for the owner: one address only, its own sober page without the menu of the site. */}
       <Route path="admin" element={<Suspense fallback={null}><Admin /></Suspense>} />
+      {Lab3D ? <Route path="lab3d" element={<Suspense fallback={null}><Lab3D /></Suspense>} /> : null}
     </Routes>
   );
 }

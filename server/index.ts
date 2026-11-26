@@ -13,6 +13,7 @@ import { imagine } from "./imagine.js";
 import { seedDemo } from "./models/demo.js";
 import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
+import { shares } from "./routes/shares.js";
 import { vip } from "./routes/vip.js";
 import { loadSecret } from "./secret.js";
 import { protect } from "./security.js";
@@ -38,6 +39,8 @@ app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact
 app.use("/api", access);
 app.use("/api", accessAdmin(requireAdmin));
 app.use("/api", models);
+// The share links sealed on the admin's device (/s/<token> and its API): server/routes/shares.ts.
+app.use(shares);
 app.use("/api", vip);
 app.use("/api", site);
 // « Imaginez votre création » (Private Enquiries): a first image of the idea of the visitor, made by OpenAI (server/imagine.ts).
@@ -56,6 +59,8 @@ const PAGE_CACHE = "no-cache";
 function cacheFor(file: string): string {
   const relative = path.relative(dist, file).split(path.sep).join("/");
   if (relative.startsWith("assets/")) return "public, max-age=31536000, immutable";
+  // The try-on's hand tracker and the lightings of the 3D (their address carries their version): kept 30 days.
+  if (relative.startsWith("mediapipe/") || relative.startsWith("hdri/")) return "public, max-age=2592000";
   // Under construction, a photo is kept by the browser of its visitor only (never by a cache on the way).
   if (relative.startsWith("media/")) return (accessState().construction ? "private" : "public") + ", max-age=86400, stale-while-revalidate=604800";
   return PAGE_CACHE;

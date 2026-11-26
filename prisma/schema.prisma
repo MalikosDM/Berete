@@ -197,6 +197,7 @@ model Model3D {
   pieceSlug  String?
   links      ViewLink[]
   clients    ClientModel[]
+  shares     SealedShare[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
 }
@@ -212,6 +213,29 @@ model ViewLink {
   expiresAt    DateTime?
   passwordHash String?
   createdAt    DateTime  @default(now())
+}
+
+/// A share link sealed on the admin's device (/s/<token>, server/routes/shares.ts): the model is encrypted in the browser
+/// (AES-256-GCM), with a key derived from an optional password (PBKDF2-SHA-256) or a random key carried only in the
+/// #fragment of the link. The server keeps the ciphertext (storage/shares/<token>.bin) and what the page needs to decrypt
+/// it (salt, iv, iterations, a small verifier), never the key nor the password. Its file goes when it expires; the row is
+/// kept 30 days more, so the page can say "expired".
+model SealedShare {
+  id          String   @id @default(cuid())
+  token       String   @unique
+  modelId     String
+  model       Model3D  @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  hasPassword Boolean  @default(false)
+  salt        String   @default("")
+  iv          String
+  iterations  Int      @default(0)
+  verifier    String
+  bytes       Int
+  createdAt   DateTime @default(now())
+
+  @@index([modelId])
+  @@index([expiresAt])
 }
 
 /// The role last given to a layer name in /admin (LayerSetting, src/data/models.ts):

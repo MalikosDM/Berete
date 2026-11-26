@@ -12,10 +12,12 @@
  *   centre stone of a ring); everything else is metal;
  * - in such a file, stones fused into the metal (only their crown left, glued
  *   to it: `fusedStones`) are taken out of it and made whole again;
- * - the other pieces of a layer are joined, in a few blocks.
+ * - the other pieces of a layer are joined, in a few blocks;
+ * - a closed piece whose faces look inward (inside out) is turned outward first (./checks.ts).
  * Lengths in mm.
  */
 import { align, alignFree, boundsOf, centered, connectedPieces, extract, isConvex, looksCut, merge, mirrored, renumbered, sameShape, shapeOf, tableShare, type Placement, type Shape, type Soup } from "./geometry.js";
+import { orientOutward } from "./checks.js";
 import { FUSED_SEARCH_FROM, fusedStones, type FusedStone } from "./fused.js";
 import type { Progress, Source } from "./read.js";
 
@@ -53,6 +55,11 @@ export type Analysis = {
   unaligned: number;
   /** Size of the jewel (mm). */
   size: [number, number, number];
+  /** Closed pieces whose faces looked inward, turned outward (each copy counted). */
+  flipped: number;
+  /** Stones drawn as copies of one mesh (instancing), and all copies of any mesh. */
+  instanced: number;
+  copies: number;
 };
 
 const KNOWN_STONES = new Set([174, 40]);
@@ -204,6 +211,7 @@ export function analyse(source: Source, progress: Progress): Analysis {
   const stoneCounts = new Map<string, StoneCount>();
   let pieceCount = 0;
   let unaligned = 0;
+  let flipped = 0;
 
   // The longest side of the jewel, to keep neighbouring pieces in the same block.
   const lo = [Infinity, Infinity, Infinity];
@@ -234,6 +242,7 @@ export function analyse(source: Source, progress: Progress): Analysis {
 
     // Meshes already repeated in the file (glTF nodes, Rhino blocks).
     for (const rep of layer.repeated) {
+      flipped += orientOutward(rep.soup) * rep.matrices.length;
       const triangles = rep.soup.indices.length / 3;
       const shape = shapeOf(rep.soup.positions);
       const stone = triangles < STONE_MAX_TRIANGLES && rep.matrices.length >= 3 && isConvex({ positions: centered(rep.soup.positions, shape.center), indices: rep.soup.indices }, shape.extents[2]);
@@ -255,6 +264,7 @@ export function analyse(source: Source, progress: Progress): Analysis {
     const buckets = new Map<string, Piece[][]>();
     for (let i = 0; i < found.count; i++) {
       const soup = extract(joined, found.list, found.offsets[i]!, found.offsets[i + 1]!, scratch);
+      flipped += orientOutward(soup);
       const piece = { soup, shape: shapeOf(soup.positions) };
       const key = soup.indices.length + ":" + soup.positions.length;
       let clusters = buckets.get(key);
@@ -379,5 +389,12 @@ export function analyse(source: Source, progress: Progress): Analysis {
     for (const [material, pieces] of single) for (const soup of blocks(pieces, axis)) parts.push({ material, soup, instances: null, stone: false });
     report(1);
   }
-  return { parts, stones: [...stoneCounts.values()].sort((a, b) => b.count - a.count), pieces: pieceCount, unaligned, size };
+  let instanced = 0;
+  let copies = 0;
+  for (const part of parts) {
+    if (!part.instances) continue;
+    copies += part.instances.length;
+    if (part.stone) instanced += part.instances.length;
+  }
+  return { parts, stones: [...stoneCounts.values()].sort((a, b) => b.count - a.count), pieces: pieceCount, unaligned, size, flipped, instanced, copies };
 }

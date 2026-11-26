@@ -369,12 +369,14 @@ const knownIds = (await api("GET", "/api/admin/models", undefined, token)).items
   }
   // The editor: layers recognised from their names, one layer shown alone. (The new model is first in the list.)
   await page.locator('[data-model-row="ZN1242-bj001.glb"] [data-open-model]').first().click();
-  await page.waitForSelector("[data-model-editor] [data-viewer] [data-metal]", { timeout: 120_000 });
+  // The 3D editor (26/11/2026): the jewel in the middle, the parts on the right.
+  await page.waitForSelector("[data-model-editor] [data-editor-canvas] canvas", { timeout: 120_000 });
+  await page.waitForFunction(() => !document.querySelector("[data-editor-canvas] [role=status]"), null, { timeout: 120_000 });
   await page.waitForTimeout(1500);
   await page.screenshot({ path: path.join(OUT, "admin-3-reglages.jpg"), type: "jpeg", quality: 85, fullPage: true });
-  await page.locator('[data-layer="图层05"] button[aria-pressed]').click();
+  await page.locator('[data-part="图层05"] button[aria-pressed]').click();
   await page.waitForTimeout(1200);
-  await page.locator("[data-model-editor] [data-viewer]").screenshot({ path: path.join(OUT, "admin-4-calque-seul-图层05.jpg"), type: "jpeg", quality: 85 });
+  await page.locator("[data-model-editor] [data-editor-canvas]").screenshot({ path: path.join(OUT, "admin-4-calque-seul-图层05.jpg"), type: "jpeg", quality: 85 });
   await context.close();
 }
 

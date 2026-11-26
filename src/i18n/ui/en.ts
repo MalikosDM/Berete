@@ -655,7 +655,7 @@ export const en = {
     detailHint: "Drag to turn the piece · Click it, then scroll to zoom",
     detailHintTouch: "One finger to turn the piece · Pinch to zoom",
     metal: "Metal",
-    metals: { "yellow-gold": "18k yellow gold", "white-gold": "18k white gold", "rose-gold": "18k rose gold", platinum: "Platinum", "black-rhodium": "Black rhodium" },
+    metals: { "yellow-gold": "18k yellow gold", "white-gold": "18k white gold", "rose-gold": "18k rose gold", platinum: "Platinum", "black-rhodium": "Black rhodium", "yellow-gold-14": "14k yellow gold", "white-gold-14": "14k white gold", "rose-gold-14": "14k rose gold", "palladium": "Palladium", "silver": "Silver" },
     stoneColor: "Colour of the stones",
     /** The title of the panel of choices beside the 3D viewer (metals, background, lighting). */
     customize: "Customise",
@@ -670,7 +670,7 @@ export const en = {
     exitFullscreen: "Leave full screen",
     capture: "Save an image (PNG)",
     background: "Background",
-    backgrounds: { black: "Black", "studio-dark": "Dark studio", "studio-light": "Light studio", white: "White", rose: "Rose", wood: "Walnut table", velvet: "Black velvet", satin: "Champagne satin", leather: "White leather" },
+    backgrounds: { black: "Black", "studio-dark": "Dark studio", "studio-light": "Light studio", white: "White", rose: "Rose", wood: "Walnut table", velvet: "Black velvet", satin: "Champagne satin", leather: "White leather", marble: "Black marble" },
     want: "Begin Your Creation",
     metalOf: (metal: string, part: string) => metal + " (" + part + ")",
     wantMessage: (piece: string, metals: string) => 'Hello Berete Jewellers, I want the piece "' + piece + '"' + (metals ? " in " + metals : "") + ". Can we talk about it?",
@@ -693,6 +693,14 @@ export const en = {
     open: "Open",
     wrongPassword: "This password is not the right one.",
     validUntil: (date: string) => "Link valid until " + date,
+    share: "Share",
+    copied: "Link copied",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    fit: "See the whole piece",
+    dragToTurn: "Drag to turn",
+    playViews: "Guided tour",
+    stopViews: "Stop the tour",
   },
   /** The private space of the clients (/vip). */
   vip: {

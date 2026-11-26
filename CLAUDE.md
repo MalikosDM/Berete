@@ -78,7 +78,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - Fichiers 3D de Yoni : `Berete - 3D/fichiers de test/ZN1242-bj001.glb` (bracelet iJewel3D). Les 4 STL (ZN1059 collier,
   zp1864 pendentif, 0542, ZR0982 bague) ne sont plus sur le Mac ni sur le disque : les remettre dans `Berete - 3D/`
   (`npm run verify:3d` les y cherche ; une copie de chacun reste dans `storage/models/*/original.stl`, importée dans l'admin). Ses fichiers sortent de
-  **Rhino** : demander les **.3dm** (gardent métal et pierres séparés).
+  **Rhino** : demander les **.3dm** (gardent métal et pierres séparés ; depuis le 26/11 le site maille lui-même les surfaces
+  enregistrées sans maillage de rendu).
 
 ## Passe « identité Berete » (fichiers de Yoni du 19/11/2026) — état au 19/11/2026
 - [x] **Wording** de Yoni sur tout le site (menu, accueil, Créations, pièces, The Berete Circle, Championship rings,
@@ -168,6 +169,67 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [ ] Yoni : fichiers 3D des pièces (.3dm de préférence), d'abord la bague Inter (ses 9 détails attendent leurs points) ;
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
+
+## Passe « 3D au niveau d'iJewel » (visualiseur et éditeur, cahier des charges v2) — état au 26/11/2026
+- [x] **Diamants refaits de zéro** (`src/viewer/gems.ts`) : chaque pixel suit la lumière dans la pierre (réfraction, réflexions
+      internes, sortie) jusqu'à **l'éclairage des pierres**, séparé de celui du métal (Environment / Gem Environment). Tous les
+      réglages d'iJewel, mêmes noms (`DiamondParams` de `src/data/scene3d.ts`) : Environment, Color, Env Intensity (1,30), Env
+      Rotation + X/Y/Z, Dispersion, Absorption, Refractive Index (2,60), Gamma, RGB Boost, Transmission, Reflectivity, Ray
+      Bounces (5, jusqu'à 16), Diamond Oriented Lighting ; Fixed Env Direction pour la scène ; inclusions en option. **Deux modes** :
+      lancer de rayons (BVH, grosses pierres et pierres soudées) et **mode rapide** (une image cube des normales intérieures par
+      taille de pierre, 256/512/1024 selon le nombre, partagée par toutes les pierres de même taille : l'équivalent du cacheKey).
+      Piège corrigé : three-mesh-bvh accepte un impact 10 µm derrière le rayon (`TRI_INTERSECT_EPSILON`), le rayon retouchait sa
+      propre facette (pierres floues) : 1 µm. Ancien rendu gardé (`gem-classic`, « Ancien rendu »).
+- [x] **Bibliothèque d'éclairages faite par code** (`src/viewer/hdri/library.ts`, `npm run hdri` → `public/hdri/berete/<id>.hdr`
+      2048 × 1024 et `-1k` pour les téléphones, RGBE, 16,9 Mo) : 10 « métal » (studio chaud, grandes boîtes, horizon, salon flou,
+      jour, contre-jour, studio sombre, anneau, trois lumières, fenêtre) et 10 « pierres » (bandes, points, anneau, spot, vitrine,
+      contre-jour, croix, ciel étoilé, studio — par défaut —, ancien rendu). Les éclairages des pierres ramenés au niveau du studio
+      (`GEM_GAIN`) ; le studio a reçu une bande basse et des cartes dessous (sans elles un pavé serti virait au noir).
+- [x] **Effets** (`src/viewer/screen.ts`) : un premier passage d'écran (normales, profondeur, miroir, lueur par matière) sert aux
+      **reflets à l'écran (SSR, réglages iJewel)**, au **biseau à l'écran (SSBevel, scène 0–8, matière 0–16)** et à la **lueur par
+      matière** (bloom avec seuil, seuil doux, intensité, rayon, puissance, itérations, mode contrôle). Tons : 6 modes (ACES, AgX,
+      linéaire, Reinhard, Cineon, Uncharted 2), exposition, saturation, contraste, fond transparent ; AO, profondeur de champ,
+      vignette, aberration, grain. Rendu progressif à l'arrêt (48 images, 96 en « très haute ») et **TAA en mouvement**
+      (`accumulate.ts`). Sol : ombre douce (AccumulativeShadows + lumière aléatoire), ombre de contact, sol réfléchissant.
+      Lumières en plus. Vues de caméra (`cameraPath.ts` : durée, ease, sphérique/linéaire, pause, boucle). Pose stable (`pose.ts`).
+- [x] **Éditeur de l'admin** (`src/pages/admin/editor3d/`, remplace « Régler le modèle ») en trois zones : à gauche en un clic avec
+      vignettes (éclairage du métal, des pierres, fond, ambiances, socle, sol, pose, exporter, rendu en série, réglages avancés,
+      essayage) ; au centre la pièce, contour or rose au clic, barre d'outils (plein écran, réinitialiser, recadrer, vues en boucle,
+      animation, rotation, capture, .glb) ; à droite les onglets Vue, Parties, Scène, Rendu, Effets, Vues de caméra, Configurateur,
+      Export. Enregistrer / Annuler. **117 vignettes faites par notre moteur** (`scripts/lab-thumbs.ts` → `public/media/3d-lib/`) à
+      l'aide du **laboratoire 3D** (`/lab3d`, sur le Mac seulement : la route n'existe pas dans le site construit).
+- [x] **Bibliothèque de matières** (`src/viewer/library/materials.ts`, 82) : or jaune/blanc/rose 18 et 14 ct, platine, palladium,
+      argent, rhodium noir × poli, satiné, brossé (sens réglable), martelé, vieilli ; émaux ; diamant avec et sans feu, diamants de
+      couleur, saphirs bleu et rose, rubis, émeraude (+ inclusions) ; perles avec orient, céramique laquée, onyx, nacre. Chaque
+      matière s'exporte et s'importe en `.json`. 5 nouveaux métaux dans `METALS` (14 ct, palladium, argent ; 6 langues) ; le client
+      se voit proposer par défaut les 5 d'avant (`CLASSIC_METALS`).
+- [x] **Socles faits par code** (`src/viewer/stands.ts`) : écrin à bague ouvert, présentoir, cône, socle en marbre noir Berete,
+      buste ; textures par code (`src/viewer/textures.ts`) ; fond « Marbre noir » ajouté (6 langues).
+- [x] **Import comme iJewel** (`server/models/pipeline/`) : calques `Metal`, `Metal 01–05`, `Head` → métal ; `Gem`, `Gem 01–05`,
+      `Diamond` → diamant ; les autres gardent leur couleur ; FBX lu ; contrôles en mots simples (`stats.notes`, `stats.checks` :
+      triangles et alerte au-delà de 200 000, unités, pièces retournées corrigées, pierres en copies) ; **maillage des NURBS par le
+      site** (`nurbs.ts`, rhino3dm + cdt2d) : les 3 fichiers Rhino de Yoni s'ouvrent en entier (pendentif OKA d'Okafor, octogone « N »
+      d'Okafor en deux versions), 3 234 faces, 0 échec. Lecture des exports iJewel (`src/data/ijewel.ts` : GLB `WEBGI_materials_diamond`
+      à l'import, scène `.vjson` dans l'onglet Export) **écrite sans exemple réel : à vérifier sur le premier export de Yoni**.
+- [x] **Visualiseur du client** (`JewelViewer.tsx`) : vues enregistrées et visite guidée, configurateur en pastilles en bas, + et −
+      (ordinateur), recadrer, invite « Glissez pour tourner », partager, limites du zoom par orientation, qualité ; **essayage des
+      bagues** (`src/viewer/tryon/`, MediaPipe Hands en local dans `public/mediapipe/`, 25,9 Mo, chargé seulement au clic ; réglage
+      par bague sur un cylindre dans l'éditeur ; à cocher par pièce) ; **« Voir chez moi »** (Quick Look iPhone, USDZ fait sur le
+      téléphone ; Scene Viewer Android) ; **Seek on Scroll** sur la page de la pièce. Caméra autorisée par le serveur
+      (`camera=(self)`), fichiers de l'essayage admis sur les pages privées.
+- [x] **Export** (`src/viewer/export/`) : images PNG/JPEG/WebP jusqu'à 4K (fond transparent), films MP4 (tour ou parcours des vues,
+      6–15 s, 1080p/4K, carré, 9:16, 16:9) encodés dans le navigateur (WebCodecs + mp4-muxer, sinon MediaRecorder), rendu en série
+      (vues × métaux, zip), fichier .glb. Testé sur le vrai moteur : 4K transparent en 1 s, film 1080 × 1920 de 8 s en 16 s.
+- [x] **Lien de partage chiffré** (`server/routes/shares.ts`, `/s/<token>`, `src/pages/SealedView.tsx`) : 7 jours par défaut, mot
+      de passe facultatif, AES-256-GCM sur l'appareil, le mot de passe jamais envoyé (sans mot de passe, la clé reste dans `#k=`).
+      Migration `20261126120000_sealed_shares`. Les éclairages (`/hdri`) passent maintenant aussi sur les pages privées (le métal
+      était presque noir sur `/view/<token>`).
+- Captures et planches : `~/Downloads/_verif-3d/` (éditeur, éclairages, matières, socles, planche `diamants.jpg`, essayage,
+  export 4K et film, fichiers Rhino de Yoni). Tests : `tests/editor3d.spec.ts` (ADMIN_PASSWORD).
+- [ ] Reste en dessous d'iJewel : le rendu des pierres soudées au métal des STL (bague VfB 0542 : pierres reconstituées, grises) ; la
+      lecture des exports iJewel n'a vu aucun vrai fichier ; vitesse jamais mesurée sur un vrai iPhone 13 ni un MacBook Air M1.
+- [ ] Yoni : un **export iJewel** (GLB + .vjson) d'une pièce pour la planche iJewel contre nous ; les fichiers Rhino des autres pièces
+      (calques nommés « Metal 01 », « Gem 01 » si possible) ; l'avis de son spécialiste 3D sur les diamants.
 
 ## Passe « retours de Yoni du 25/11 (2 appels + vidéo de l'Atelier) » — état au 26/11/2026
 - [x] **WhatsApp** : le vrai numéro de Yoni, **+971 58 593 0211** (`WHATSAPP_NUMBER` = `971585930211`, `PHONE_DISPLAY` de

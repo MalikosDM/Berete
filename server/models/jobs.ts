@@ -37,14 +37,30 @@ async function pump(): Promise<void> {
 
 /**
  * Settings of a processed model: what the jeweller set is kept; a new layer
- * gets the role last given to a layer of the same name (LayerMemory), else
- * the role guessed from its shape.
+ * gets the stone settings an iJewel export gives it (WEBGI_materials_diamond),
+ * else the role last given to a layer of the same name (LayerMemory), else
+ * the role guessed from its name or shape (a coloured stone with the colour of
+ * its layer in the file).
  */
 export async function mergeSettings(current: Partial<ModelSettings>, result: PipelineResult): Promise<ModelSettings> {
   const layers = { ...(current.layers ?? {}) };
   const names = result.layers.map((l) => l.name);
   const memory = new Map((await prisma.layerMemory.findMany({ where: { name: { in: names } } })).map((m) => [m.name, m.setting as LayerSetting]));
-  for (const layer of result.layers) layers[layer.name] ??= memory.get(layer.name) ?? settingFor(layer.name, layer.guess);
+  for (const layer of result.layers) {
+    if (layers[layer.name]) continue;
+    if (layer.diamond && Object.keys(layer.diamond).length > 0) {
+      layers[layer.name] = { role: "diamond", diamond: layer.diamond };
+      continue;
+    }
+    const remembered = memory.get(layer.name);
+    if (remembered) {
+      layers[layer.name] = remembered;
+      continue;
+    }
+    const setting = settingFor(layer.name, layer.guess);
+    if (setting.role === "stone" && layer.color) setting.color = layer.color;
+    layers[layer.name] = setting;
+  }
   return { ...DEFAULT_SETTINGS, ...current, layers };
 }
 
