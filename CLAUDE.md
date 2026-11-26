@@ -218,8 +218,12 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       (`admin-ordered:<kind>`), une photo retirée ou l'ordre des photos ne reviennent plus à la mise à jour suivante
       (`mergeChosen`, `gallery-seed:<pièce>`). `tests/admin-sync.spec.ts` (ADMIN_PASSWORD) change chaque réglage, vérifie le site,
       remet l'état d'origine.
-- `tests/retours2511.spec.ts` (ordinateur, iPhone), captures `verification/retours2511/` ; avant / après :
-  `~/Downloads/_verif-retours-25-11/avant/` et `apres/`.
+- `tests/retours2511.spec.ts` (ordinateur, iPhone, Safari), captures `verification/retours2511/` ; avant / après :
+  `~/Downloads/_verif-retours-25-11/avant/` et `apres/`. Toute la batterie passe en local (759 tests) ; `npm run audit:coherence`
+  local : 522 pages × 1280, 1440, 1512 Retina, iPhone, **0 problème** (26/11). En ligne le 26/11 : `retours2511`, `whatsapp`,
+  `admin-sync` (sur la vraie base, remise à l'identique), `audit2411` (ordinateur, iPhone, Safari). Tests en ligne derrière la porte :
+  mot de passe de test, l'empreinte du vrai mot de passe mise de côté puis remise à l'identique (les appareils de Malik et Yoni
+  retrouvent leur accès).
 - [ ] Yoni : relire les phrases à côté des photos de détail ; valider les photos IA restantes ; l'avis de son spécialiste 3D sur le
       rendu des diamants ; ses textes.
 

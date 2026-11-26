@@ -2,10 +2,16 @@
 // the films, the magnifying glass that follows the pointer, the L of Deniz Undav without any image made by AI, the Genkidama
 // v2, the gold and the depth of the universes, the universes placed under the piece at every size, The Bespoke Journey (the
 // client space, the price), the atelier around its films, the padlock of the admin. Computer, iPhone, Safari.
-import { expect, test, type Page } from "./fixtures";
+import { expect, silence, test, type BrowserContext, type Page } from "./fixtures";
 import { mkdirSync } from "node:fs";
 import { skipIntro, watch } from "./helpers";
 import { BACKDROPS } from "../src/data/themes";
+
+/** A context made by hand enters the site under construction as the others do (tests/fixtures.ts), silent. */
+async function enter(ctx: BrowserContext, baseURL: string | undefined) {
+  await silence(ctx);
+  if (process.env.ACCESS_PASSWORD && baseURL) await ctx.request.post(new URL("/api/access", baseURL).href, { form: { password: process.env.ACCESS_PASSWORD, next: "/" }, maxRedirects: 0 });
+}
 
 const DIR = "verification/retours2511";
 mkdirSync(DIR, { recursive: true });
@@ -174,8 +180,9 @@ test("Inter and VfB: the gold of the champions, the depth", async ({ page }, inf
   }
 });
 
-test("asked for less motion: no depth, nothing moves", async ({ browser }) => {
-  const ctx = await browser.newContext({ reducedMotion: "reduce" });
+test("asked for less motion: no depth, nothing moves", async ({ browser, baseURL }) => {
+  const ctx = await browser.newContext({ reducedMotion: "reduce", baseURL });
+  await enter(ctx, baseURL);
   const page = await ctx.newPage();
   await skipIntro(page);
   await page.goto("/pieces/campione-d-italia-2023-2024", { waitUntil: "load" });
@@ -184,11 +191,12 @@ test("asked for less motion: no depth, nothing moves", async ({ browser }) => {
   await ctx.close();
 });
 
-test("a universe falls the same on every screen: the piece on its anchor", async ({ browser }) => {
+test("a universe falls the same on every screen: the piece on its anchor", async ({ browser, baseURL }) => {
   // The Hand between its two spheres: the centre of the piece is the same point of the image at three sizes.
   const at: number[][] = [];
   for (const [w, h] of [[1280, 800], [1440, 900], [1920, 1080]] as const) {
-    const ctx = await browser.newContext({ viewport: { width: w, height: h } });
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, baseURL });
+    await enter(ctx, baseURL);
     const page = await ctx.newPage();
     await skipIntro(page);
     await page.goto("/pieces/the-hand", { waitUntil: "load" });

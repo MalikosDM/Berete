@@ -31,6 +31,6 @@ export default defineConfig({
     { name: "iphone-pro-max", testMatch: /home\.spec\.ts/, use: { ...devices["iPhone 15 Pro Max"], viewport: { width: 430, height: 932 } } },
     // Safari on a laptop, at a middle width (Yoni, 23/11/2026: the menu of the phone showed there): tests/yoni2311.spec.ts.
     // The trunks too (23/11/2026: open and close again in Safari), and the call of 24/11/2026.
-    { name: "safari", testMatch: /yoni2311\.spec\.ts|trunks\.spec\.ts|yoni2411\.spec\.ts|coherence2411\.spec\.ts|retours2411\.spec\.ts|loupe\.spec\.ts|monogram\.spec\.ts|audit2411\.spec\.ts/, use: { ...devices["Desktop Safari"], viewport: { width: 1280, height: 800 } } },
+    { name: "safari", testMatch: /yoni2311\.spec\.ts|trunks\.spec\.ts|yoni2411\.spec\.ts|coherence2411\.spec\.ts|retours2411\.spec\.ts|loupe\.spec\.ts|monogram\.spec\.ts|audit2411\.spec\.ts|retours2511\.spec\.ts/, use: { ...devices["Desktop Safari"], viewport: { width: 1280, height: 800 } } },
   ],
 });
