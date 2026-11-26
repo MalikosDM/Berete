@@ -15,12 +15,15 @@ async function session(request: APIRequestContext): Promise<string> {
   return ((await res.json()) as { token: string }).token;
 }
 
-async function aModel(request: APIRequestContext, token: string): Promise<Row> {
+async function aModel(request: APIRequestContext, token: string, phone = false): Promise<Row> {
   const res = await request.get("/api/admin/models", { headers: { Authorization: "Bearer " + token } });
   const items = ((await res.json()) as { items: Row[] }).items.filter((m) => m.status === "ready");
   // A light model with metal and stones (a ring of three stones) when there, else the first ready one: the checks run
-  // without a graphics card too, where a bracelet of 4 000 stones takes seconds per image.
-  return items.find((m) => /ZR0982/i.test(m.name)) ?? items.find((m) => /ZN1242/i.test(m.name)) ?? items[0]!;
+  // without a graphics card too, where a bracelet of 4 000 stones takes seconds per image. The phone takes another model
+  // (the computer and the phone run at the same time: never the same model changed twice at once).
+  const light = items.filter((m) => !/ZN1242/i.test(m.name));
+  const pick = phone ? (light.find((m) => /zp1864/i.test(m.name)) ?? light[1]) : light.find((m) => /ZR0982/i.test(m.name));
+  return pick ?? light[phone ? 1 : 0] ?? items[0]!;
 }
 
 async function full(request: APIRequestContext, token: string, id: string): Promise<Row> {
@@ -114,7 +117,7 @@ test("the editor: three zones, the tabs, the pictures, a stone's settings saved"
 test("the client's viewer: saved views, configurator chips, zoom, share, drag-to-turn", async ({ page, request, browser, isMobile }) => {
   test.setTimeout(240_000);
   const token = await session(request);
-  const row = await full(request, token, (await aModel(request, token)).id);
+  const row = await full(request, token, (await aModel(request, token, isMobile)).id);
   const original = structuredClone(row.settings);
   const metal = row.layers.find((l) => l.guess === "metal")?.name ?? row.layers[0]!.name;
   const settings = {
@@ -132,7 +135,8 @@ test("the client's viewer: saved views, configurator chips, zoom, share, drag-to
     expect(link).toBeTruthy();
     await page.goto("/view/" + link!.token + "?debug3d");
     await page.locator("[data-viewer-views] [data-saved-view]").first().waitFor({ timeout: 120_000 });
-    await expect(page.locator("[data-viewer-prompt]")).toBeVisible();
+    // "Drag to turn" at the first sight of the jewel (it fades by itself after 6 s; the first touch removes it).
+    await expect(page.locator("[data-viewer-prompt]")).toHaveCount(1);
     await expect(page.locator("[data-saved-view]")).toHaveCount(2);
     await expect(page.locator("[data-views-tour]")).toBeVisible();
     await expect(page.locator('[data-config-option="metal/white-gold/polished"]')).toBeVisible();
@@ -145,6 +149,7 @@ test("the client's viewer: saved views, configurator chips, zoom, share, drag-to
     expect(box.height, "chips of 48 px at least").toBeGreaterThanOrEqual(isMobile ? 47.5 : 44.5);
     await page.locator('[data-config-option="metal/white-gold/polished"]').click();
     await expect(page.locator('[data-config-option="metal/white-gold/polished"]')).toHaveAttribute("aria-checked", "true");
+    await expect(page.locator("[data-viewer-prompt]")).toHaveCount(0);
     await page.locator('[data-saved-view="v2"]').click();
     await page.waitForTimeout(1500);
     await page.screenshot({ path: "verification/editor3d/client-" + (browser.browserType().name() === "webkit" ? "iphone" : "ordinateur") + ".png" });

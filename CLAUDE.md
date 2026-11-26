@@ -225,7 +225,13 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       Migration `20261126120000_sealed_shares`. Les éclairages (`/hdri`) passent maintenant aussi sur les pages privées (le métal
       était presque noir sur `/view/<token>`).
 - Captures et planches : `~/Downloads/_verif-3d/` (éditeur, éclairages, matières, socles, planche `diamants.jpg`, essayage,
-  export 4K et film, fichiers Rhino de Yoni). Tests : `tests/editor3d.spec.ts` (ADMIN_PASSWORD).
+  export 4K et film, fichiers Rhino de Yoni). Tests : `tests/editor3d.spec.ts` (ADMIN_PASSWORD ; l'ordinateur et le téléphone
+  changent chacun un modèle différent, remis à l'identique). Sans carte graphique (rendu logiciel : tests sans écran, certains
+  ordinateurs de bureau), le visualiseur prend la version légère d'un téléphone (`lowEnd` de `Stage.tsx`). Batterie locale du
+  26/11 : 732 réussis, 1 échec par interférence (galerie de l'Inter pendant que `capsules` y pose un modèle 3D ; réussi seul).
+  En ligne le 26/11 : `editor3d` (ordinateur, iPhone, Safari) et `retours2511` (33) passent ; modèles en ligne vérifiés propres ;
+  mot de passe d'accès réel remis à l'identique. Fluidité mesurée sur ce Mac : 60 images/s en tournant (bracelet de 3 601
+  diamants compris), ordinateur et téléphone simulé.
 - [ ] Reste en dessous d'iJewel : le rendu des pierres soudées au métal des STL (bague VfB 0542 : pierres reconstituées, grises) ; la
       lecture des exports iJewel n'a vu aucun vrai fichier ; vitesse jamais mesurée sur un vrai iPhone 13 ni un MacBook Air M1.
 - [ ] Yoni : un **export iJewel** (GLB + .vjson) d'une pièce pour la planche iJewel contre nous ; les fichiers Rhino des autres pièces
