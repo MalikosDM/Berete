@@ -1,7 +1,9 @@
 /* Settings shared by the whole site. The only place to change the contact details. The words of the site are in src/i18n. */
 
-/** WhatsApp number, digits only with the country code. Placeholder: replace with the real number. */
-export const WHATSAPP_NUMBER = "971XXXXXXXXX";
+/** WhatsApp number of the house (Yoni, 25/11/2026), digits only with the country code: every wa.me link of the site. */
+export const WHATSAPP_NUMBER = "971585930211";
+/** The same number written for people, wherever it is shown in clear (and in the structured data of the pages). */
+export const PHONE_DISPLAY = "+971 58 593 0211";
 /** Public email address. Empty: not shown on the site (the email form still works). */
 export const EMAIL = "";
 export const INSTAGRAM_HANDLE = "beretejewellers";

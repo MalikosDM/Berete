@@ -89,7 +89,7 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   expect(quality.score, id + " cover sharpness").toBeGreaterThan(250);
   // Begin Your Creation leads to the contact page with the piece; WhatsApp writes its name (24/11/2026).
   await expect(page.locator("[data-want-piece]"), id).toHaveAttribute("href", "/contact?piece=" + piece.slug);
-  await expect(page.locator("[data-piece-whatsapp]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971XXXXXXXXX\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+  await expect(page.locator("[data-piece-whatsapp]"), id).toHaveAttribute("href", new RegExp("wa\\.me/971585930211\\?text=.*" + encodeURIComponent(piece.title).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   // "Every Angle": every photo and film, each with its text; the first ones when there are many, then "See N more".
   const part = partOf(piece.slug);
   const partPiece = part ? defaultCatalogue.pieces.find((p) => p.slug === part.slug) : undefined;

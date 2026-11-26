@@ -13,6 +13,8 @@ import { skipIntro, watch } from "./helpers";
 
 /** The number of src/lib/site.ts (read as text: the module needs the build of the site). */
 const WHATSAPP_NUMBER = /WHATSAPP_NUMBER = "([^"]+)"/.exec(readFileSync("src/lib/site.ts", "utf8"))![1]!;
+/** The number of Yoni (25/11/2026): +971 58 593 0211. Every WhatsApp link of the site is https://wa.me/971585930211?text=… */
+const YONI = "971585930211";
 const DIR = "verification/whatsapp";
 mkdirSync(DIR, { recursive: true });
 
@@ -34,7 +36,8 @@ async function links(page: Page): Promise<string[]> {
 /** The link of WhatsApp: its number, its text decoded; the text written as UTF-8 percent codes, nothing left raw. */
 function read(href: string): string {
   const url = new URL(href);
-  expect(url.origin + url.pathname).toBe("https://wa.me/" + WHATSAPP_NUMBER);
+  expect(url.origin + url.pathname).toBe("https://wa.me/" + YONI);
+  expect(WHATSAPP_NUMBER).toBe(YONI);
   const raw = href.split("?text=")[1] ?? "";
   expect(raw, "encoded text").toMatch(/^[A-Za-z0-9\-_.!~*'()%]+$/);
   const text = decodeURIComponent(raw);
@@ -99,4 +102,15 @@ test("the messages: every page and piece in six languages, the special letters k
   // The example of Yoni, word for word.
   expect(en.whatsapp.piece("Butterfly Chain")).toBe("Hello Berete, I discovered the Butterfly Chain on your website and would like to discuss a bespoke creation of my own.");
   expect(en.whatsapp.piece("The Hand")).toBe("Hello Berete, I discovered The Hand on your website and would like to discuss a bespoke creation of my own.");
+});
+
+// Every WhatsApp link of the main pages and of the contact page goes to the number of the house (25/11/2026).
+test("every WhatsApp link goes to +971 58 593 0211", async ({ page }) => {
+  await skipIntro(page);
+  for (const path of ["/", "/creations", "/players", "/atelier", "/boxes", "/process", "/about", "/press", "/contact", "/fr/contact", "/pieces/kevin-schade-dragon-ball-pendant"]) {
+    await page.goto(path, { waitUntil: "load" });
+    const all = await page.locator("a[href*='wa.me']").evaluateAll((els) => els.map((e) => (e as HTMLAnchorElement).href));
+    expect(all.length, path).toBeGreaterThan(0);
+    for (const href of all) expect(href.startsWith("https://wa.me/" + YONI + "?text="), path + " " + href).toBe(true);
+  }
 });
