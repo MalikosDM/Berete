@@ -227,7 +227,7 @@ export default function PiecePage() {
       >
         <div className="wrap grid gap-10 py-14 lg:grid-cols-12 lg:gap-14 lg:py-20">
           {film ? (
-            <div className="lg:col-span-6">
+            <div className="min-w-0 lg:col-span-6">
               <div className="flex flex-col items-center lg:sticky lg:top-28">
                 <FilmFrame film={film.data} label={film.label} tall="min(76svh, 44rem" />
                 <p className="eyebrow mt-4 self-center text-center">{film.title}</p>
@@ -235,7 +235,7 @@ export default function PiecePage() {
               </div>
             </div>
           ) : null}
-          <div data-piece-story className={film ? "lg:col-span-6" : "lg:col-span-8 lg:col-start-3"}>
+          <div data-piece-story className={"min-w-0 " + (film ? "lg:col-span-6" : "lg:col-span-8 lg:col-start-3")}>
             {/* Its name stands right above, in the opening: once on the page (the rule of the house). */}
             <h2 id="piece-story-title" className="title-caps leading-[1.15] tracking-[0.12em] t-title text-white [text-wrap:balance]">{t.piece.story}</h2>
             {line ? <p data-piece-line className="mt-5 font-display t-lead font-light italic leading-[1.25] text-white [text-wrap:balance]">{line}</p> : null}

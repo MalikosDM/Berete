@@ -115,14 +115,18 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
   };
 
   const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/35 bg-ink/60 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:size-10";
-  // Whole in the screen: as high as the screen allows (under the menu), as wide as the page allows.
+  // Whole in the screen: as high as the screen allows (under the menu), as wide as the page allows. Its width is given
+  // outright from that height and its proportions (26/11/2026): left to "fit its content", a browser could make the frame
+  // as narrow as its progress bar (a range is 129 px wide by default) and show the film as a strip with black above and
+  // below. Narrower than its column, its height follows its proportions (never a black band).
+  const height = tall + ", calc((100vw - 2.5rem) * " + film.height + " / " + film.width + "))";
   return (
-    <div className={"w-fit max-w-full " + className} data-film-block>
+    <div className={"w-fit min-w-0 max-w-full " + className} data-film-block>
       <div
         ref={frameRef}
         data-feature-frame
-        className="feature-film relative max-w-full overflow-hidden border border-white/10 bg-black"
-        style={{ aspectRatio: film.width + " / " + film.height, height: tall + ", calc((100vw - 2.5rem) * " + film.height + " / " + film.width + "))" }}
+        className="feature-film relative overflow-hidden border border-white/10 bg-black"
+        style={{ aspectRatio: film.width + " / " + film.height, width: "calc(" + height + " * " + film.width + " / " + film.height + ")", maxWidth: "100%" }}
       >
         <video
           ref={videoRef}
@@ -139,7 +143,8 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
           onClick={togglePlay}
           className="h-full w-full cursor-pointer object-contain"
         />
-        <div className="absolute end-2.5 bottom-2.5 flex gap-1.5">
+        {/* The buttons never wider than the frame: on a very narrow frame they go on two lines rather than being cut. */}
+        <div className="absolute end-2.5 bottom-2.5 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1.5">
           <button type="button" onClick={togglePlay} data-feature-play aria-label={playing ? t.feature.pause : t.feature.play} className={btn}>
             {playing ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4 translate-x-0.5" aria-hidden="true" />}
           </button>

@@ -252,6 +252,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       haut garde toujours un paragraphe. `OVERVIEW` : photos d'ensemble choisies à l'œil (Dragon Ball, T-Serpent). L'**ordre de
       l'admin prime** (`adminOrdered` : la liste de la base n'est pas celle du catalogue). Les légendes écrites dans l'admin
       s'affichent sous la photo et en plein écran (`ownCaption`). Films de la visionneuse : la même barre.
+      **Correction du 26/11** (capture de Malik : le film en bande étroite de 128 px, noir dessus et dessous, boutons coupés) : le
+      cadre du film prend sa largeur de sa hauteur et de ses proportions (`FilmFrame` de `src/components/FeatureFilm.tsx`), plus
+      jamais « à la taille de son contenu » (un navigateur le mesurait à sa barre de progression, 129 px par défaut) ; serré, il
+      garde ses proportions et ses boutons passent sur deux lignes. `tests/film-frame.spec.ts` (7 tailles de fenêtre, colonne
+      serrée à 128 px ; ordinateur, iPhone, Safari ; vérifié aussi dans Firefox).
 - [x] **Loupe au survol** (`src/components/Lightbox.tsx`, `MagnifyingGlass`) : ronde, 180 px, bord or rose, tirée du fichier loupe ;
       seulement sur la photo (jamais sur les flèches, la croix, à côté) ; molette = grossissement ×2 à ×5, jamais plus d'un pixel du
       fichier par point d'écran ; clic pour zoomer et glisser gardés ; iPhone : appui long, la loupe au-dessus du doigt et qui le suit.
