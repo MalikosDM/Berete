@@ -25,6 +25,7 @@
     "media:share": "tsx scripts/share-images.ts",
     "redirects": "tsx scripts/vercel-redirects.ts",
     "universes": "node scripts/universe-media.mjs",
+    "universes:depth": ".local/venv-cutout/bin/python scripts/universe-depth.py",
     "trunks": "node scripts/trunk-media.mjs",
     "cutouts": "node scripts/cutouts.mjs",
     "vps": "bash deploy/vps.sh",

@@ -118,7 +118,9 @@ for (const slug of PAGES) {
     const section = page.locator("[data-every-angle]");
     await section.scrollIntoViewIfNeeded();
     const tiles = page.locator("[data-angle]");
-    await expect(tiles).toHaveCount(anglesShownFirst(angles.length));
+    // Since 25/11/2026 a magazine: four photos of the whole at most, the details beside their sentence, then See more.
+    expect(await section.locator("[data-angle]").count()).toBeLessThanOrEqual(Math.max(1, anglesShownFirst(angles.length)));
+    expect(await tiles.count()).toBeLessThanOrEqual(angles.length);
     const more = page.locator("[data-angle-more]");
     if (await more.count()) await more.click();
     await expect(tiles).toHaveCount(angles.length);

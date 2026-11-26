@@ -224,7 +224,8 @@ test("the Bosnia ring, its trunk", async ({ page }, info) => {
   await expect(page.locator(".universe")).toHaveAttribute("data-universe", "noir");
   await expect(page.locator("main")).toContainText("First World Cup Game");
   await page.locator("[data-angle-more]").click();
-  await expect(page.locator("[data-every-angle] [data-angle]")).toHaveCount(17);
+  // (25/11/2026: the photos of the whole, the details beside their words, then the others: every photo of the page.)
+  await expect(page.locator("[data-angle]")).toHaveCount(17);
   await page.screenshot({ path: shotPath(info, "yoni2311-bosnia") });
   await expect(page.locator('[data-custom-box="world-cup-display"]')).toBeVisible();
   // From its trunk: the way to the piece.

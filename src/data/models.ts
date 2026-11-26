@@ -13,6 +13,12 @@ export type LayerRole = (typeof LAYER_ROLES)[number];
 
 /** Lighting of the scene: soft studio, warm, or one spotlight that makes the stones sparkle. */
 export const AMBIANCES = ["studio", "warm", "spotlight"] as const;
+/**
+ * How the diamonds are drawn (25/11/2026): "realistic", a warm studio light, the sparkles only where the light strikes, a light
+ * fire (index 2.42); "classic", the rendering before (brighter everywhere), kept to compare.
+ */
+export const DIAMOND_LOOKS = ["realistic", "classic"] as const;
+export type DiamondLook = (typeof DIAMOND_LOOKS)[number];
 export type Ambiance = (typeof AMBIANCES)[number];
 
 /** Backgrounds of the viewer: plain colours, studio gradients, and settings (a surface in front of a room out of focus). */
@@ -49,9 +55,11 @@ export type ModelSettings = {
   view: ModelView | null;
   ambiance: Ambiance;
   background: Background;
+  /** How the diamonds are drawn (missing in the settings saved before 25/11/2026: realistic). */
+  diamonds?: DiamondLook;
 };
 
-export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...METALS], view: null, ambiance: "studio", background: "studio-dark" };
+export const DEFAULT_SETTINGS: ModelSettings = { layers: {}, metals: [...METALS], view: null, ambiance: "studio", background: "studio-dark", diamonds: "realistic" };
 
 /** What a visitor receives to show a model. */
 export type PublicModel = {

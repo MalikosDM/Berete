@@ -30,6 +30,16 @@ export function angleOf(piece: Pick<Piece, "angles">, src: string): Angle | null
   return a && (a.title.trim() !== "" || a.text.trim() !== "") ? a : null;
 }
 
+/**
+ * Whether Yoni wrote the caption of a photo himself in the admin (25/11/2026: what he changes there shows on the site): its
+ * title differs from the one of the catalogue. The site shows only these captions, under the photo and full screen.
+ */
+export function ownCaption(english: Pick<Piece, "slug" | "angles"> | undefined, src: string): boolean {
+  const a = english?.angles[src];
+  if (!english || !a || a.title.trim() === "") return false;
+  return a.title.trim() !== (DEFAULT_ANGLES[english.slug]?.[src]?.title ?? "").trim();
+}
+
 /** The words of a photo that show it worn or held (its English text, as written in the catalogue). */
 const WORN_TEXT = /\b(wearing|worn by|being worn|worn for the first|worn on|held in|held up|gloved hand|on (his|the) wrist|at the house)\b|, worn\b/i;
 

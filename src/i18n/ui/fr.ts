@@ -129,6 +129,7 @@ export const fr: Messages = {
     pitch: "Chaînes, pendentifs et bagues de champion, dessinés avec vous et réalisés pour le moment.",
     legal: "Mentions légales",
     privacy: "Confidentialité",
+    admin: "Espace admin",
   },
 
   collections: {
@@ -311,7 +312,9 @@ export const fr: Messages = {
   gallery: {
     /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
     clickToZoom: "Cliquez pour zoomer",
+    hoverToMagnify: "Survolez la photo pour la loupe · molette pour la grossir · cliquez pour zoomer",
     tapToZoom: "Touchez pour zoomer",
+    holdToMagnify: "Appui long pour la loupe · touchez pour zoomer",
     title: "Détails",
     hintPinned: "Faites défiler pour explorer · Touchez pour agrandir",
     hint: "Touchez pour agrandir",
@@ -430,6 +433,8 @@ export const fr: Messages = {
     /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
     liveWithSpace: "Photos et vidéos de l’avancement en direct sur WhatsApp et dans votre espace client privé.",
     spaceAfterDeposit: "Après l’acompte du design, vous accédez à votre espace client privé : votre pièce en 3D et son avancement en direct.",
+    live: { title: "Suivez votre pièce, en direct", text: "Dans votre espace privé, vous voyez le design 3D de votre pièce et le validez, puis vous suivez chaque étape de sa fabrication en photos et en vidéos, comme un colis que l’on suit, sans avoir à le demander." },
+    price: { title: "Comment le prix est-il fixé ?", items: ["Vous venez avec votre budget, et le design est pensé pour ce budget.", "Un budget minimum est demandé.", "Le prix dépend des matières, de la qualité des diamants, du poids de l’or, de la complexité de la pièce et de ses mécanismes (pièces qui s’ouvrent, qui tournent)."] },
     quick: {
       lead: "Du premier croquis à la remise dans son écrin : six étapes, suivies avec vous sur WhatsApp.",
       steps: [
@@ -816,6 +821,7 @@ export const fr: Messages = {
     soundOff: "Couper le son",
     fullscreen: "Voir en plein écran",
     dragonLine: "Son Genkidama serti de diamants tourne.",
+    progress: "Avancement du film : tirez pour avancer ou reculer",
   },
   films: {
     pieceSection: "La pièce achevée",

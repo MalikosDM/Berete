@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, Eye, EyeOff, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Upload } from "lucide-react";
-import { AMBIANCES, BACKGROUNDS, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
+import { AMBIANCES, BACKGROUNDS, DIAMOND_LOOKS, LAYER_ROLES, METALS, type LayerRole, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
 import { bundleOf, loadLocale, useI18n, type Messages } from "@/i18n";
 import { Jewel3D, type ViewerHandle } from "@/viewer";
 import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
@@ -346,10 +346,17 @@ export default function Models3D({ token, onExpired }: { token: string; onExpire
       ) : items.length === 0 ? (
         <p className="border border-white/15 p-8 text-center text-bone">Aucun modèle pour l'instant.</p>
       ) : (
-        <ul className="border-t border-white/15">
+        // One card per model, with its image (25/11/2026: simpler for Yoni).
+        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((m) => (
-            <li key={m.id} className="grid gap-4 border-b border-white/15 py-6 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6" data-model-row={m.sourceName} data-status={m.status}>
-              <Poster m={m} className="size-28" />
+            <li key={m.id} className="grid content-start gap-4 border border-white/15 p-4" data-model-row={m.sourceName} data-status={m.status} data-model-card>
+              {m.status === "ready" || m.status === "incomplete" ? (
+                <button type="button" onClick={() => setOpen(m.id)} aria-label={"Régler le modèle " + m.name} className="block">
+                  <Poster m={m} className="aspect-square w-full" />
+                </button>
+              ) : (
+                <Poster m={m} className="aspect-square w-full" />
+              )}
               <div className="grid min-w-0 gap-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0">
@@ -510,6 +517,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
 
   // An incomplete model (volumes missing): a draft, seen here only.
   const draft = model.status === "incomplete";
+  // The layers of metal, and the metal the jewel shows first (the one of its first layer of metal).
+  const metalLayers = model.layers.filter((l) => (settings.layers[l.name]?.role ?? l.guess) === "metal").map((l) => l.name);
+  const mainMetal = (metalLayers[0] ? settings.layers[metalLayers[0]]?.metal : undefined) ?? "rose-gold";
   const setLayer = (layer: string, patch: Partial<LayerSetting>) => setSettings((s) => (s ? { ...s, layers: { ...s.layers, [layer]: { ...(s.layers[layer] ?? { role: "metal" }), ...patch } } } : s));
 
   const save = async (extra?: Partial<ModelSettings>) => {
@@ -565,9 +575,87 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
 
       {preview ? <Jewel3D ref={viewer} model={preview} words={words} settings={settings} highlight={highlight} eager /> : null}
 
+      {/* The settings, in plain words (25/11/2026): the metal, the light, the diamonds, the angle of departure, then Save. */}
+      <fieldset className="grid gap-6 border border-white/15 p-4 sm:p-5" data-model-simple>
+        <legend className={legend}>Régler le modèle</legend>
+        {metalLayers.length > 0 ? (
+          <div>
+            <p className="text-base text-white">Métal</p>
+            <p className="text-base text-mist">Le métal dans lequel le bijou apparaît d'abord.</p>
+            <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Métal">
+              {METALS.map((m) => (
+                <button key={m} type="button" role="radio" aria-checked={mainMetal === m} data-main-metal={m} onClick={() => metalLayers.forEach((l) => setLayer(l, { metal: m }))} className={btn + (mainMetal === m ? " border-rose-light text-white" : "")}>
+                  {METAL_NAMES[m]}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
+        <div>
+          <p className="text-base text-white">Métaux que le client peut essayer</p>
+          <div className="mt-1 flex flex-wrap gap-x-6">
+            {METALS.map((m) => (
+              <label key={m} className="flex min-h-12 items-center gap-3 text-base text-bone">
+                <input type="checkbox" className="size-5" checked={settings.metals.includes(m)} onChange={(e) => setSettings({ ...settings, metals: e.target.checked ? [...settings.metals, m] : settings.metals.filter((x) => x !== m) })} />
+                {METAL_NAMES[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-base text-white">Lumière</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Lumière">
+            {AMBIANCES.map((a) => (
+              <button key={a} type="button" role="radio" aria-checked={settings.ambiance === a} data-model-ambiance={a} onClick={() => setSettings({ ...settings, ambiance: a })} className={btn + (settings.ambiance === a ? " border-rose-light text-white" : "")}>
+                {AMBIANCE_NAMES[a]}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-base text-white">Diamants</p>
+          <p className="text-base text-mist">« Réaliste » : la lumière chaude d'un studio, les éclats seulement là où la lumière tape. « Ancien rendu » : pour comparer.</p>
+          <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Diamants">
+            {DIAMOND_LOOKS.map((d) => (
+              <button key={d} type="button" role="radio" aria-checked={(settings.diamonds ?? "realistic") === d} data-model-diamonds={d} onClick={() => setSettings({ ...settings, diamonds: d })} className={btn + ((settings.diamonds ?? "realistic") === d ? " border-rose-light text-white" : "")}>
+                {d === "realistic" ? "Réaliste" : "Ancien rendu"}
+              </button>
+            ))}
+          </div>
+        </div>
+        <label className="block max-w-sm text-base text-white">
+          Fond
+          <select value={settings.background} onChange={(e) => setSettings({ ...settings, background: e.target.value as ModelSettings["background"] })} className={inputCls}>
+            {BACKGROUNDS.map((b) => (
+              <option key={b} value={b}>{BACKGROUND_NAMES[b]}</option>
+            ))}
+          </select>
+        </label>
+        <div>
+          <p className="text-base text-white">Angle de départ</p>
+          <p className="text-base text-mist">Tournez le bijou comme vous voulez qu'il apparaisse, puis gardez cet angle. Il sert aussi d'image d'aperçu.</p>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+            <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
+              Garder cet angle
+            </button>
+            {settings.view ? (
+              <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
+                Revenir à l'angle de face
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </fieldset>
+
+      {/* The layers of the file, for whoever knows them: closed by default. */}
+      <details className="group border border-white/15 p-4 sm:p-5" data-model-layers>
+        <summary className="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 text-base text-white">
+          <ChevronDown className="size-5 transition-transform group-open:rotate-180" aria-hidden="true" /> Réglages avancés : les parties du bijou (calques du fichier)
+        </summary>
+        <div className="mt-3">
       {/* Layers */}
-      <fieldset className="border border-white/15 p-4 sm:p-5">
-        <legend className={legend}>Matières</legend>
+      <fieldset>
+        <legend className="sr-only">Matières</legend>
         <p className="text-base text-mist">Choisissez le rôle de chaque calque. « Voir seul » montre un calque.</p>
         <ul className="mt-4 grid gap-4">
           {model.layers.map((layer) => {
@@ -625,53 +713,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </ul>
       </fieldset>
 
-      {/* Metals, lighting, background, first view */}
-      <fieldset className="grid gap-5 border border-white/15 p-4 sm:p-5">
-        <legend className={legend}>Présentation</legend>
-        <div>
-          <p className="text-base text-bone">Métaux proposés au client</p>
-          <div className="mt-2 flex flex-wrap gap-x-6">
-            {METALS.map((m) => (
-              <label key={m} className="flex min-h-12 items-center gap-3 text-base text-bone">
-                <input type="checkbox" className="size-5" checked={settings.metals.includes(m)} onChange={(e) => setSettings({ ...settings, metals: e.target.checked ? [...settings.metals, m] : settings.metals.filter((x) => x !== m) })} />
-                {METAL_NAMES[m]}
-              </label>
-            ))}
-          </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block text-base text-bone">
-            Lumière de départ
-            <select value={settings.ambiance} onChange={(e) => setSettings({ ...settings, ambiance: e.target.value as ModelSettings["ambiance"] })} className={inputCls}>
-              {AMBIANCES.map((a) => (
-                <option key={a} value={a}>{AMBIANCE_NAMES[a]}</option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-base text-bone">
-            Fond de départ
-            <select value={settings.background} onChange={(e) => setSettings({ ...settings, background: e.target.value as ModelSettings["background"] })} className={inputCls}>
-              {BACKGROUNDS.map((b) => (
-                <option key={b} value={b}>{BACKGROUND_NAMES[b]}</option>
-              ))}
-            </select>
-          </label>
-        </div>
-        <div>
-          <p className="text-base text-bone">Vue de départ</p>
-          <p className="text-base text-mist">Tournez le bijou comme vous voulez qu'il apparaisse, puis enregistrez la vue. Elle sert aussi d'image d'aperçu.</p>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-            <button type="button" onClick={() => void saveView()} disabled={saving} className={btn} data-save-view>
-              Enregistrer la vue
-            </button>
-            {settings.view ? (
-              <button type="button" onClick={() => void save({ view: null })} disabled={saving} className={btn}>
-                Effacer la vue
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </fieldset>
+      </details>
 
       {draft ? null : (
         <>

@@ -9,7 +9,7 @@
  * table (see TRACE in ./materials.ts); the metal keeps the studio photographs.
  */
 import { DataTexture, DataUtils, EquirectangularReflectionMapping, HalfFloatType, LinearFilter, LinearMipmapLinearFilter, RepeatWrapping, RGBAFormat } from "three";
-import type { Ambiance } from "@/data/models";
+import type { Ambiance, DiamondLook } from "@/data/models";
 
 /** lon, lat: centre (degrees); w, h: size (degrees, w measured on the sphere); power: brightness. */
 type Panel = { lon: number; lat: number; w: number; h: number; power: number };
@@ -34,6 +34,29 @@ function ring(count: number, lat: number, w: number, h: number, power: number, o
 /** Small very bright lights scattered above, always at the same places. */
 function pins(count: number, power: number, seed: number, low = 8, high = 80): Panel[] {
   return Array.from({ length: count }, (_, i) => ({ lon: hash(i, seed) * 360, lat: low + hash(i, seed + 1) * (high - low), w: 1.6, h: 1.6, power: power * (0.6 + 0.8 * hash(i, seed + 2)) }));
+}
+
+/**
+ * The realistic look (25/11/2026): a warm studio — one large soft box above and in front (the key light), two strips on the
+ * sides, a soft card below, and only a few small bright points. A facet lights up only where it sends that light back to the
+ * eye: the sparkles come where the light strikes, the rest of the stone stays deep, as in a photograph of the atelier.
+ */
+function realisticOf(ambiance: Ambiance): Lighting {
+  const warm: [number, number, number] = ambiance === "studio" ? [1, 0.93, 0.84] : ambiance === "warm" ? [1, 0.84, 0.66] : [1, 0.95, 0.9];
+  const strength = ambiance === "spotlight" ? 1.25 : 1;
+  return {
+    room: 0.01,
+    floor: 0.016,
+    tint: warm,
+    panels: [
+      { lon: 0, lat: 62, w: 70, h: 34, power: 5.2 * strength },
+      { lon: 90, lat: 22, w: 12, h: 46, power: 3.2 * strength },
+      { lon: 270, lat: 22, w: 12, h: 46, power: 2.6 * strength },
+      { lon: 180, lat: 38, w: 40, h: 18, power: 1.6 * strength },
+      { lon: 0, lat: -30, w: 120, h: 24, power: 0.9 },
+      ...pins(14, 60 * strength, 21, 20, 75),
+    ],
+  };
 }
 
 function lightingOf(ambiance: Ambiance): Lighting {
@@ -66,12 +89,13 @@ function cover(d: number, half: number, size: number): number {
   return Math.min(1, Math.max(0, (half - d) / Math.max(size * EDGE, 0.15)));
 }
 
-const cache = new Map<Ambiance, DataTexture>();
+const cache = new Map<string, DataTexture>();
 
-export function diamondEnv(ambiance: Ambiance): DataTexture {
-  const found = cache.get(ambiance);
+export function diamondEnv(ambiance: Ambiance, look: DiamondLook = "realistic"): DataTexture {
+  const key = ambiance + ":" + look;
+  const found = cache.get(key);
   if (found) return found;
-  const { panels, room, floor, tint } = lightingOf(ambiance);
+  const { panels, room, floor, tint } = look === "realistic" ? realisticOf(ambiance) : lightingOf(ambiance);
   const light = new Float32Array(WIDTH * HEIGHT);
   const degX = 360 / WIDTH;
   const degY = 180 / HEIGHT;
@@ -122,6 +146,6 @@ export function diamondEnv(ambiance: Ambiance): DataTexture {
   texture.minFilter = LinearMipmapLinearFilter;
   texture.generateMipmaps = true;
   texture.needsUpdate = true;
-  cache.set(ambiance, texture);
+  cache.set(key, texture);
   return texture;
 }

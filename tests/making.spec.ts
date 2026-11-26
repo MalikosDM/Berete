@@ -66,7 +66,8 @@ for (const slug of PAGES) {
     if (firstAmateur >= 0) expect(photos.slice(firstAmateur).every((m) => AMATEUR_FILMS.has(m.src)), "amateur films last").toBe(true);
     const more = page.locator("[data-angle-more]");
     if (await more.count()) await more.click();
-    const types = await page.locator("[data-every-angle] [data-angle]").evaluateAll((els) => els.map((e) => e.querySelector("video")?.getAttribute("src") ?? e.querySelector("video source")?.getAttribute("src") ?? ""));
+    // (25/11/2026: the photos of the whole, then the details beside their words, then See more: every photo of the page.)
+    const types = await page.locator("[data-angle]").evaluateAll((els) => els.map((e) => e.querySelector("video")?.getAttribute("src") ?? e.querySelector("video source")?.getAttribute("src") ?? ""));
     expect(types.length).toBe(photos.length);
 
     // "The Making of a Masterpiece": not on the page of the piece any more (24/11/2026), a way to The Atelier.
@@ -128,9 +129,9 @@ test("N14: every useful photo of folder 22 with its text, its professional film 
   // Every Angle: its photos (since 23/11/2026, no text).
   const section = page.locator("[data-every-angle]");
   await section.scrollIntoViewIfNeeded();
-  const more = section.locator("[data-angle-more]");
+  const more = page.locator("[data-angle-more]");
   if (await more.count()) await more.click();
-  await expect(section.locator("[data-angle]")).toHaveCount(pageAngles(piece).length);
+  await expect(page.locator("[data-angle]")).toHaveCount(pageAngles(piece).length);
   await expect(section.locator("[data-angle-text]")).toHaveCount(0);
   await shot(page, info.project.name + "-n14-2-angles");
   // Its atelier (in The Atelier since 24/11/2026): the same film, once (one chapter).
@@ -172,7 +173,8 @@ test("the panther: the knockout, the open cage and the celebration follow one an
   // Its effects: the canvas (embers, golden confetti, flashes), the spotlight of each image.
   await expect(world.locator("canvas.u-fx")).toHaveAttribute("data-running", "");
   // The text of the celebration, in its story.
-  await expect(page.locator("[data-story-paragraph='2']")).toContainText("Black Panther");
+  // (25/11/2026: its first sentence stands beside the photo of its jaws; the night stays in the story at the top.)
+  await expect(page.locator("[data-piece-story]")).toContainText("Black Panther");
   expect(problems.errors).toEqual([]);
 });
 

@@ -223,7 +223,9 @@ const VIEWS = {
   // The L of Deniz Undav: its cutout made by hand (transparent PNG, 23/11/2026), kept as it is. Its HD photos (folder 38)
   // are no longer cut out: the dark underside and sides of the L melt into the black background (a black block under the
   // front view, pieces of background stuck to p08 and p02).
-  "deniz-undav-l-pendant": [{ id: "studio", kind: "face", from: "png:Pieces sans photo pro (IA)/deniz-undav-l-pendant-detoure.png" }],
+  // The L of Deniz Undav: not cut out (25/11/2026). Its image made by AI is gone (Yoni: "ce n'est pas ma pièce"); its real
+  // photo p10 cut out loses either the L (the cherub alone) or the shadows of the cherub (by its light): it opens on its photo,
+  // whole, its edges faded into the black.
   // Its back (story 06) is not cut out: the dark side of the plate along its bottom edge comes out ragged and speckled.
   "samuel-ballet-jesus-piece": [{ id: "s02", kind: "face", from: "/media/stories/samuel-ballet/02.webp" }],
   "malik-tillman-tm-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/malik-tillman-tm-pendant-studio-ia.jpg" }],

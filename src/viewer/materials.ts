@@ -7,7 +7,7 @@
 import { BufferGeometry, Color, DoubleSide, LinearSRGBColorSpace, Matrix3, Matrix4, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, Quaternion, Vector3, type Material, type Texture } from "three";
 import { MeshBVH, MeshBVHUniformStruct, SAH } from "three-mesh-bvh";
 import { MeshRefractionMaterial } from "@react-three/drei/materials/MeshRefractionMaterial.js";
-import type { LayerSetting, MetalId } from "@/data/models";
+import type { DiamondLook, LayerSetting, MetalId } from "@/data/models";
 
 type MetalLook = { color: [number, number, number]; roughness: number; swatch: string };
 
@@ -205,7 +205,7 @@ export function gemFrame(geometry: BufferGeometry, oneStone: boolean, world: Mat
  * file) carry their table's direction on each vertex (`_gemup`): each one
  * faces the top of the lighting, as a repeated stone does.
  */
-export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame: GemFrame, color = "#ffffff", quality: "high" | "light" = "high"): RefractionMaterial {
+export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame: GemFrame, color = "#ffffff", quality: "high" | "light" = "high", look: DiamondLook = "realistic"): RefractionMaterial {
   const material = new MeshRefractionMaterial() as RefractionMaterial;
   let bvh = bvhCache.get(geometry);
   if (!bvh) {
@@ -251,16 +251,18 @@ export function refractionMaterial(geometry: BufferGeometry, env: Texture, frame
   material.uniforms.envRotation = { value: new Matrix3() };
   material.uniforms.gemOrientU = { value: frame.orient };
   material.uniforms.gemEpsilon = { value: frame.epsilon };
-  material.uniforms.contrast = { value: 1.25 };
-  material.uniforms.gain = { value: 1.2 };
+  // Realistic (25/11/2026): no facet brightened for nothing (the light decides), a light fire; classic: the rendering before.
+  const real = look === "realistic";
+  material.uniforms.contrast = { value: real ? 1.08 : 1.25 };
+  material.uniforms.gain = { value: real ? 1.0 : 1.2 };
   // Diamond: index 2.408 for red, 2.451 for blue, about 0.9 % on each side of 2.418; a little more, as in photographs.
-  material.uniforms.gemDispersion = { value: 0.012 };
+  material.uniforms.gemDispersion = { value: real ? 0.009 : 0.012 };
   material.uniforms.envMap!.value = env;
   material.uniforms.bvh!.value = bvh;
   material.uniforms.bounces!.value = quality === "high" ? 5 : 4;
   material.uniforms.ior!.value = 2.418;
   material.uniforms.fresnel!.value = 1;
-  material.uniforms.aberrationStrength!.value = 0.02;
+  material.uniforms.aberrationStrength!.value = real ? 0.012 : 0.02;
   (material.uniforms.color!.value as Color).set(color);
   material.needsUpdate = true;
   return material;

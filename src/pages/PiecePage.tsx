@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { useParams } from "react-router";
-import { ArrowRight, ArrowUpRight, Newspaper, ZoomIn } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Newspaper } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
-import EveryAngle from "@/components/EveryAngle";
+import MagazineGallery from "@/components/MagazineGallery";
 import { Lightbox } from "@/components/HorizontalGallery";
 import BoxSection from "@/components/BoxSection";
 import { Img, MediaView } from "@/components/Media";
@@ -12,7 +12,7 @@ import PieceCard from "@/components/PieceCard";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import Showcase from "@/components/Showcase";
-import FeatureFilm from "@/components/FeatureFilm";
+import { FilmFrame } from "@/components/FeatureFilm";
 import { featureFilmOf, type FeatureFilmData } from "@/data/featureFilms";
 import JewelFx from "@/components/universe/JewelFx";
 import Universe, { universeProps } from "@/components/Universe";
@@ -22,21 +22,19 @@ import { OLD_SEEN_LABEL, partOf, RENAMED_PIECES, SEEN_LABEL, SIGNATURE_PIECES, w
 import { findPiece, initials, peopleOf, personHref, portraitOf, removedPieceTarget, similarPieces } from "@/data/relations";
 import { resolveAtelier, resolveReveal } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
-import { pointsFor } from "@/data/details3d";
-import type { PublicModel } from "@/data/models";
-import { pieceMediaOf } from "@/data/pageMedia";
+import { adminOrdered, magazineOf } from "@/data/magazine";
+import { pieceMediaOf, sameViewsOf } from "@/data/pageMedia";
 import { resolveShowcase } from "@/data/showcase";
 import { pressOfPiece } from "@/data/press";
-import { storyBlocks } from "@/data/story";
-import { jewelOf, resolveTheme } from "@/data/themes";
+import { storyBlocks, type StoryBlock } from "@/data/story";
+import { BACKDROPS, jewelOf, resolveTheme } from "@/data/themes";
 import type { MediaItem, Piece } from "@/data/types";
 import { listOf } from "@/i18n/format";
 import { collectionWords, Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue, useLocalizedPiece, useRawCatalogue } from "@/lib/catalogue";
 import { clubLogo } from "@/lib/clubs";
 import { usePieceModel } from "@/lib/models";
-import { Detail3D, type DetailMark } from "@/viewer";
-import { waLink } from "@/lib/site";
+import { HAS_SERVER, waLink } from "@/lib/site";
 import NotFound from "@/pages/NotFound";
 import { pressDate } from "@/pages/Press";
 
@@ -45,7 +43,7 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
   const { slug = "" } = useParams();
-  const { t, intl } = useI18n();
+  const { t, intl, locale } = useI18n();
   const madeFor = useMadeFor();
   const cat = useCatalogue();
   const raw = useRawCatalogue();
@@ -82,6 +80,8 @@ export default function PiecePage() {
   const feature = featureFilmOf(piece.slug);
 
   const theme = resolveTheme(piece.theme);
+  // Room kept above the piece for what its world holds there (the sphere of the Genkidama v2), as its image asks.
+  const below = theme.backdrop ? BACKDROPS[theme.backdrop]?.below : undefined;
   // The effect of its universe on the piece itself (a reflection, sparkles, a halo...).
   const jewel = jewelOf(theme.effects);
   // The jewel of the opening: cut out, in one view or a showcase of several; else its photo.
@@ -109,8 +109,12 @@ export default function PiecePage() {
   // part worn apart (the top of the Inter ring, the chain of a pendant) never come back in Every Angle nor among the photos
   // where it is worn (src/data/pageMedia.ts).
   const part = partOf(piece.slug);
+  const own = raw.pieces.find((p) => p.slug === piece.slug);
+  // The order of the photos Yoni gave in the admin comes first (src/data/magazine.ts).
+  const ordered = HAS_SERVER && adminOrdered(own, defaultCatalogue.pieces.find((p) => p.slug === piece.slug));
   const { partPhotos, angles, worn } = pieceMediaOf(piece, {
-    raw: raw.pieces.find((p) => p.slug === piece.slug),
+    ordered,
+    raw: own,
     box,
     part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
     opening,
@@ -127,6 +131,8 @@ export default function PiecePage() {
   const specs = piece.specs
     .map((s, i) => ({ ...s, row: sheetRows[i] }))
     .filter((s) => s.value.trim() !== "" && s.row !== SEEN_LABEL && s.label !== SEEN_LABEL && s.label !== OLD_SEEN_LABEL);
+  // The story at the top, beside its film: without the sentences told beside the photos of its details (src/data/magazine.ts).
+  const topStory = magazineOf(piece, own, angles, { lang: locale, ordered, sameViews: sameViewsOf(piece.slug) }).story;
   // Its sentence under the title, unless its story already says it (the last words of the Dragon Ball pendant): once.
   const storyTexts = storyBlocks(piece.story).map((b) => b.text.trim());
   const line = piece.line && !storyTexts.some((x) => x.includes(piece.line.trim().replace(/[.!]+$/, ""))) ? piece.line : "";
@@ -142,6 +148,7 @@ export default function PiecePage() {
       data-draft={piece.draft ? "true" : undefined}
       data-entering=""
       data-entrance={theme.entrance}
+      data-champion={theme.effects.includes("gold-light") ? "" : undefined}
       {...universeProps(theme)}
       className="relative *:relative"
     >
@@ -152,10 +159,23 @@ export default function PiecePage() {
       <section aria-labelledby="piece-title" data-piece-opening data-piece-section="opening" className="relative flex flex-col overflow-hidden lg:grid lg:min-h-[min(100svh,60rem)] lg:grid-cols-12 lg:items-end">
         {/* The jewel: the top of the screen on phones, the right of the screen on computers; behind it a calm dark light
             (.piece-calm): its universe never takes over the piece (Yoni, 23/11/2026). */}
-        <div data-piece-cover className={"piece-calm relative shrink-0 px-6 pt-20 sm:px-12 lg:order-2 lg:col-span-7 lg:h-[min(100svh,60rem)] lg:px-16 desk:pt-28 lg:pb-12 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[62svh] sm:h-[66svh]" : "h-[52svh] sm:h-[58svh]")}>
+        <div data-piece-cover data-below={below ? "" : undefined} style={below ? ({ "--u-below": below[0], "--u-below-m": below[1] } as CSSProperties) : undefined} className={"piece-calm relative shrink-0 px-6 pt-20 sm:px-12 lg:order-2 lg:col-span-7 lg:h-[min(100svh,60rem)] lg:px-16 desk:pt-28 lg:pb-12 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[62svh] sm:h-[66svh]" : "h-[52svh] sm:h-[58svh]")}>
           {opening.mode === "photo" ? (
             <>
-              <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
+              {/* A photo on black (no clean cut-out of the jewel): whole, its edges faded into the black (25/11/2026). */}
+              {piece.cover.onBlack !== false && piece.cover.width && piece.cover.height ? (
+                <span className="flex h-full w-full items-center justify-center">
+                  <span className="relative block h-full max-w-full" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height }}>
+                    {/* A soft pool of dark behind the photo: its black melts into the world around it (a light sky, an arena). */}
+                    <span aria-hidden="true" className="opening-halo" />
+                    <span data-opening-fade className="opening-fade absolute inset-0 block">
+                      <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
+                    </span>
+                  </span>
+                </span>
+              ) : (
+                <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
+              )}
               {jewel ? (
                 <span aria-hidden="true" className="pointer-events-none absolute inset-0 px-6 pt-20 sm:px-12 lg:px-16 desk:pt-28 lg:pb-12">
                   <span className="relative block h-full w-full">
@@ -181,7 +201,6 @@ export default function PiecePage() {
               </h1>
               {/* For whom, when no one can be shown below (a private collector): a fine line under its name, never a section. */}
               {!showsPerson && !signature ? <p data-made-for-line className="mt-2 text-base text-mist">{t.common.madeFor(who, piece.type)}</p> : null}
-              {line ? <p className="mt-3 text-base leading-relaxed text-bone">{line}</p> : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-7">
               <Link to={"/contact?piece=" + piece.slug} data-cta data-want-piece className="btn-primary">
@@ -195,31 +214,44 @@ export default function PiecePage() {
         </div>
       </section>
 
-      {/* 2. The Finished Piece (or The Mechanism): it plays by itself, silent, in a loop, as soon as it is on screen; whole in
-          the screen, never cut; its sound and full screen at small buttons. */}
-      {film ? (
-        <FeatureFilm film={film.data} id="piece-film-title" anchor="piece-film" data={piece.slug} label={film.label} title={film.title} compact>
-          {film.text ? <p className="mt-4 max-w-md text-base leading-relaxed text-bone">{film.text}</p> : null}
-        </FeatureFilm>
-      ) : null}
-
-      {/* 3. Every Angle: four photos, the strongest first, never one the opening already shows; then See More. */}
-      <div id="piece-details" className="scroll-mt-32">
-        <EveryAngle piece={piece} items={angles} />
-      </div>
-
-      {model ? <Piece3D piece={piece} model={model} /> : null}
-
-      {/* 4. Behind the Creation: its story, right after what is seen. */}
-      <section aria-labelledby="piece-story-title" data-piece-story data-piece-section="story" className="wrap border-t border-white/10 py-16 lg:py-20">
-        <div className="max-w-2xl">
-          <h2 id="piece-story-title" className="title-caps tracking-[0.12em] t-title ">{t.piece.story}</h2>
-          <StoryText story={piece.story} />
-          <WornWith slug={piece.slug} />
+      {/* 2. Its film and its story side by side, as in a magazine (Yoni, 25/11/2026): the film of the finished piece (or of its
+          mechanism) on the left, playing by itself, silent, with its bar; its name, its sentence and its story on the right
+          (one under the other on a phone). The story is read from the arrival; the photos come after it. */}
+      <section
+        id="piece-film"
+        aria-labelledby="piece-story-title"
+        data-piece-spread
+        data-feature-film={film ? piece.slug : undefined}
+        data-piece-section={film ? "film" : "story"}
+        className="scroll-mt-24 border-t border-white/10"
+      >
+        <div className="wrap grid gap-10 py-14 lg:grid-cols-12 lg:gap-14 lg:py-20">
+          {film ? (
+            <div className="lg:col-span-6">
+              <div className="flex flex-col items-center lg:sticky lg:top-28">
+                <FilmFrame film={film.data} label={film.label} tall="min(76svh, 44rem" />
+                <p className="eyebrow mt-4 self-center text-center">{film.title}</p>
+                {film.text ? <p className="mt-2 max-w-md text-center text-base text-mist">{film.text}</p> : null}
+              </div>
+            </div>
+          ) : null}
+          <div data-piece-story className={film ? "lg:col-span-6" : "lg:col-span-8 lg:col-start-3"}>
+            {/* Its name stands right above, in the opening: once on the page (the rule of the house). */}
+            <h2 id="piece-story-title" className="title-caps leading-[1.15] tracking-[0.12em] t-title text-white [text-wrap:balance]">{t.piece.story}</h2>
+            {line ? <p data-piece-line className="mt-5 font-display t-lead font-light italic leading-[1.25] text-white [text-wrap:balance]">{line}</p> : null}
+            <StoryText blocks={topStory} />
+            <WornWith slug={piece.slug} />
+          </div>
         </div>
       </section>
 
-      {piece.details.length > 0 ? <DetailsSection piece={piece} model={model} /> : null}
+      {/* 3. The photos, from the whole to the detail: four photos of the whole piece, then at most five details beside their
+          sentence, then See more (src/components/MagazineGallery.tsx). */}
+      <div id="piece-details" className="scroll-mt-32">
+        <MagazineGallery piece={piece} english={own} items={angles} ordered={ordered} model={model} sameViews={sameViewsOf(piece.slug)} />
+      </div>
+
+      {model ? <Piece3D piece={piece} model={model} /> : null}
 
       {/* The part of the piece worn on its own (the top of the Inter ring, worn as a pendant): here, never a piece apart. */}
       {part && partPiece && partPhotos.length > 0 ? <WornAs piece={partPiece} photos={partPhotos} anchor={part.anchor} title={part.kind === "chain" ? t.piece.itsChain : t.piece.wornAsPendant} /> : null}
@@ -418,68 +450,11 @@ function WornAs({ piece, photos, anchor, title }: { piece: Piece; photos: MediaI
 }
 
 /**
- * "The Art of Detail": each symbol of the piece and what it stands for, numbered; a detail shown by a photo of the piece opens
- * it in full screen. A piece with a 3D model shows it above them, turning, its details pointed at on the jewel (the points
- * placed in the admin: src/data/details3d.ts, src/viewer/DetailViewer.tsx).
- */
-function DetailsSection({ piece, model }: { piece: Piece; model: PublicModel | null }) {
-  const { t } = useI18n();
-  const marks: DetailMark[] = model
-    ? pointsFor(piece.detailPoints, model.id, piece.details.length).map((p) => ({ n: p.detail + 1, title: piece.details[p.detail]!.title, at: p.at }))
-    : [];
-  const photos = [piece.cover, ...piece.gallery].filter((m, i, all) => m.src && all.findIndex((x) => x.src === m.src) === i);
-  const [open, setOpen] = useState<number | null>(null);
-  return (
-    <section aria-labelledby="details-title" data-details data-piece-section="details" className="border-t border-white/10">
-      <div className="wrap py-16 lg:py-20">
-        <h2 id="details-title" className="title-caps tracking-[0.12em] t-title ">
-          {t.piece.details}
-        </h2>
-        {model ? (
-          <div className="mt-12" data-details-3d>
-            <Detail3D model={model} marks={marks} words={t.viewer} className="h-[62svh] max-h-[760px] min-h-[340px] border border-white/10 lg:h-[72svh]" />
-            <p className="mt-4 text-base text-mist">
-              <span className="[@media(pointer:coarse)]:hidden">{t.viewer.detailHint}</span>
-              <span className="hidden [@media(pointer:coarse)]:inline">{t.viewer.detailHintTouch}</span>
-            </p>
-          </div>
-        ) : null}
-        {/* Each detail and what it stands for; one shown by a photo of the piece opens it full screen from its title (the
-            photo itself is not shown again here: each photo once on the page). */}
-        <ol className="mt-10 grid gap-x-10 gap-y-9 border-t border-white/12 pt-9 md:grid-cols-2 xl:grid-cols-3">
-          {piece.details.map((d, i) => {
-            const index = d.photo ? photos.findIndex((m) => m.src === d.photo) : -1;
-            return (
-              <li key={d.title + i} data-detail={i + 1} className="flex gap-5">
-                <span className="text-rose-gold w-8 shrink-0 font-display text-xl leading-none">{String(i + 1).padStart(2, "0")}</span>
-                <div className="min-w-0 flex-1">
-                  {index >= 0 ? (
-                    <button type="button" data-detail-photo onClick={() => setOpen(index)} aria-label={t.gallery.open(d.title)} className="group flex items-start gap-2 text-start">
-                      <span className="title-caps t-sub leading-tight tracking-[0.08em] text-white transition-colors group-hover:text-rose-light">{d.title}</span>
-                      <ZoomIn className="mt-0.5 size-4 shrink-0 text-rose-light" aria-hidden="true" />
-                    </button>
-                  ) : (
-                    <h3 className="title-caps t-sub leading-tight tracking-[0.08em] text-white">{d.title}</h3>
-                  )}
-                  <p className="mt-2 text-base text-bone">{d.text}</p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
-      {open !== null ? createPortal(<Lightbox items={photos} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
-    </section>
-  );
-}
-
-/**
  * The text of a piece: its paragraphs; the titles of its parts ("## " in the text) and its closing words set apart as a
  * quote ("> "), in the style of the quotes of the house (src/data/story.ts).
  */
-function StoryText({ story }: { story: string }) {
+function StoryText({ blocks }: { blocks: StoryBlock[] }) {
   const { t } = useI18n();
-  const blocks = storyBlocks(story);
   // The number of each paragraph among the paragraphs.
   const numbers = blocks.map((_, i) => blocks.slice(0, i + 1).filter((x) => x.kind === "paragraph").length);
   return (

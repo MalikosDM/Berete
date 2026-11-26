@@ -236,6 +236,150 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     };
   }, [seqLength, hold, preview]);
 
+  // The universes fall the same on every screen (25/11/2026): the image is placed so that its anchor (where the piece stands in
+  // the picture: between the two spheres of The Hand, under the sphere of the Genkidama) is under the centre of the piece,
+  // whatever the size of the window — the cover of the image computed from the piece, not from the window. The light laid on
+  // the image (the sphere, the moon) and its lights follow it (the same box).
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (preview || fixed || !el || !backdrop) return undefined;
+    const stage = el.querySelector<HTMLElement>(".universe-stage");
+    const cover = el.closest("article")?.querySelector<HTMLElement>("[data-piece-cover]");
+    if (!stage || !cover) return undefined;
+    const portrait = window.matchMedia("(max-aspect-ratio: 4/5)");
+    const place = () => {
+      const tall = portrait.matches;
+      const ratio = tall ? 9 / 16 : backdrop.ratio;
+      const [ax, ay] = (tall ? backdrop.mobileAnchor : backdrop.anchor) ?? (tall ? [0.5, 0.42] : [backdrop.focusX, backdrop.focusY]);
+      const sw = stage.clientWidth;
+      const sh = stage.clientHeight;
+      const u = el.getBoundingClientRect();
+      const c = cover.getBoundingClientRect();
+      const cs = getComputedStyle(cover);
+      const pl = parseFloat(cs.paddingLeft) || 0;
+      const pr = parseFloat(cs.paddingRight) || 0;
+      const pt = parseFloat(cs.paddingTop) || 0;
+      const pb = parseFloat(cs.paddingBottom) || 0;
+      // The centre of the piece in the stage (the stage is at the top of the page when the page is at its top).
+      const px = c.left - u.left + pl + (c.width - pl - pr) / 2;
+      const py = Math.min(sh, c.top - u.top + pt + (c.height - pt - pb) / 2);
+      const a = Math.min(0.98, Math.max(0.02, ax));
+      const b = Math.min(0.98, Math.max(0.02, ay));
+      // As small as it can be while covering the whole screen with its anchor on the piece (never more than three times).
+      const base = Math.max(sw, sh * ratio);
+      const sphere = tall ? backdrop.mobileCore : backdrop.core;
+      let w: number;
+      let top: number;
+      if (backdrop.below && sphere) {
+        // The sphere of the Genkidama v2 stands right above the piece: the bottom of the sphere on the top of the piece, at every
+        // size (its centre and radius: shares of the height and of the width of the image).
+        const ct = c.top - u.top + pt;
+        const above = sphere[1] / ratio + sphere[2];
+        const k = (1 - sphere[1]) / ratio - sphere[2];
+        w = Math.min(base * 3, Math.max(base, px / a, (sw - px) / (1 - a), k > 0 ? (sh - ct) / k : 0, ct / Math.max(above, 0.01)));
+        top = ct - w * above;
+      } else {
+        w = Math.min(base * 3, Math.max(base, px / a, (sw - px) / (1 - a), (py / b) * ratio, ((sh - py) / (1 - b)) * ratio));
+        top = py - b * (w / ratio);
+      }
+      const h = w / ratio;
+      const left = Math.min(0, Math.max(sw - w, px - a * w));
+      top = Math.min(0, Math.max(sh - h, top));
+      el.style.setProperty("--u-img-w", w.toFixed(1) + "px");
+      el.style.setProperty("--u-img-l", left.toFixed(1) + "px");
+      el.style.setProperty("--u-img-t", top.toFixed(1) + "px");
+      el.style.setProperty("--u-img-ratio", String(ratio));
+      el.setAttribute("data-anchored", tall ? "tall" : "wide");
+    };
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(stage);
+    ro.observe(cover);
+    portrait.addEventListener("change", place);
+    return () => {
+      ro.disconnect();
+      portrait.removeEventListener("change", place);
+      el.removeAttribute("data-anchored");
+    };
+  }, [preview, fixed, backdrop]);
+
+  // The depth (25/11/2026): the background in planes that move with the mouse, the jewel a little, the background less and the
+  // other way (src/components/universe/depth.ts, its maps by scripts/universe-depth.py). A sequence and the admin keep their
+  // flat image; without WebGL, a plain parallax in CSS; nothing with "reduce motion".
+  const depthMap = !sequence && backdrop?.depth ? backdrop.depth : null;
+  const depthCanvas = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (preview || fixed || !el || !backdrop || sequence) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+    const article = el.closest("article");
+    const opening = article?.querySelector("[data-piece-opening]");
+    if (!article || !opening) return undefined;
+    // The pointer, -1 to 1: the page moves the jewel with it (src/index.css, [data-depth]).
+    const move = (p: { x: number; y: number }) => {
+      article.style.setProperty("--u-mx", p.x.toFixed(4));
+      article.style.setProperty("--u-my", p.y.toFixed(4));
+    };
+    let handle: { stop: () => void } | null = null;
+    let cancelled = false;
+    let fallback: (() => void) | null = null;
+    const css = () => {
+      // Without WebGL: the image moves as one plane, the other way, a little.
+      article.setAttribute("data-depth", "css");
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      let frame = 0;
+      const target = { x: 0, y: 0 };
+      const now = { x: 0, y: 0 };
+      const tick = () => {
+        now.x += (target.x - now.x) * 0.08;
+        now.y += (target.y - now.y) * 0.08;
+        move(now);
+        frame = Math.abs(target.x - now.x) + Math.abs(target.y - now.y) > 0.001 ? requestAnimationFrame(tick) : 0;
+      };
+      const onPointer = (e: PointerEvent) => {
+        target.x = (e.clientX / window.innerWidth) * 2 - 1;
+        target.y = (e.clientY / window.innerHeight) * 2 - 1;
+        if (!frame) frame = requestAnimationFrame(tick);
+      };
+      window.addEventListener("pointermove", onPointer, { passive: true });
+      fallback = () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener("pointermove", onPointer);
+      };
+    };
+    const cancel = afterLoad(
+      () => {
+        const canvas = depthCanvas.current;
+        const tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+        const id = theme.backdrop;
+        const v = backdrop.version ? "." + backdrop.version : "";
+        const map = depthMap ? (tall ? depthMap.m : depthMap.d) : undefined;
+        if (!canvas || !map) return css();
+        const image = "/media/universes/" + id + (tall ? "-m-1080" : "-1600") + v + ".webp";
+        const depthFile = "/media/universes/" + id + (tall ? "-m-depth." : "-depth.") + map + ".webp";
+        void import("./universe/depth")
+          .then(async (m) => {
+            if (cancelled) return;
+            if (!m.canDepth()) return css();
+            handle = await m.startDepth(canvas, image, depthFile, { watch: opening, onMove: move, onReady: () => article.setAttribute("data-depth", "gl") });
+            if (cancelled) handle?.stop();
+            else if (!handle) css();
+          })
+          .catch(() => css());
+      },
+      { delay: 500 },
+    );
+    return () => {
+      cancelled = true;
+      cancel();
+      handle?.stop();
+      fallback?.();
+      article.removeAttribute("data-depth");
+    };
+    // depthMap and the backdrop stand for the image.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preview, fixed, theme.backdrop]);
+
   // The backdrop goes back into the depth once the opening has passed: the texts below read on a calm ground.
   useEffect(() => {
     if (preview || fixed) return undefined;
@@ -346,6 +490,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
                 <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(id, b.mobileWidths, "-m-", "webp")} sizes="57vh" />
                 <source type="image/avif" srcSet={set(id, b.widths, "-", "avif")} sizes="145vw" />
                 <img src={file(id, "-", 1600, "webp")} srcSet={set(id, b.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
+                {/* The same image drawn in depth, over it, once ready (src/components/universe/depth.ts). */}
+                {i === 0 && depthMap && !preview && !fixed ? <canvas ref={depthCanvas} className="u-depth" /> : null}
               </picture>
             ) : null,
           )
@@ -396,6 +542,11 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           </div>
         ) : null}
         <div className="u-light" />
+        {effects.includes("gold-light") ? (
+          <div className="u-gold">
+            <span className="u-gold-sheen" />
+          </div>
+        ) : null}
         <div className="u-texture" />
         {/* The large signs of the universes (力, OKA, T…) are no longer drawn (24/11/2026): they competed with the piece and
             brought other fonts. Kept in the themes, never shown. */}

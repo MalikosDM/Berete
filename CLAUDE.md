@@ -169,6 +169,60 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 25/11 (2 appels + vidéo de l'Atelier) » — état au 26/11/2026
+- [x] **WhatsApp** : le vrai numéro de Yoni, **+971 58 593 0211** (`WHATSAPP_NUMBER` = `971585930211`, `PHONE_DISPLAY` de
+      `src/lib/site.ts`), sur tous les boutons et dans les données des pages (`telephone` de l'organisation,
+      `src/extensions/seo/settings.ts`). Test : chaque lien du site est `https://wa.me/971585930211?text=…`.
+- [x] **Pages des pièces en magazine** (`src/pages/PiecePage.tsx`, `src/components/MagazineGallery.tsx`, `src/data/magazine.ts`) :
+      après l'ouverture, le film à gauche (collant en descendant, barre pour avancer ou reculer : `src/components/SeekBar.tsx`) et
+      à droite « Behind the Creation », la phrase et l'histoire (le nom est juste au-dessus, dans l'ouverture : une seule fois par
+      page, règle de l'audit) ; puis « Every Angle » : 4 photos d'ensemble (principale, face, profil, dos) ; puis
+      « The Art of Detail » : au plus 5 photos de détail en petit, chacune à côté de la phrase de Yoni qu'elle montre, texte et photo
+      alternés ; puis « See more ». `EXPLAIN` : la photo de chaque détail et sa phrase (référence à un paragraphe ou à des phrases
+      de l'histoire, ou à un détail : jamais un texte nouveau), 28 pièces faites photo par photo ; une phrase déplacée à côté de sa
+      photo quitte l'histoire du haut (lue une fois) ; une traduction coupée autrement prend le paragraphe entier ; l'histoire du
+      haut garde toujours un paragraphe. `OVERVIEW` : photos d'ensemble choisies à l'œil (Dragon Ball, T-Serpent). L'**ordre de
+      l'admin prime** (`adminOrdered` : la liste de la base n'est pas celle du catalogue). Les légendes écrites dans l'admin
+      s'affichent sous la photo et en plein écran (`ownCaption`). Films de la visionneuse : la même barre.
+- [x] **Loupe au survol** (`src/components/Lightbox.tsx`, `MagnifyingGlass`) : ronde, 180 px, bord or rose, tirée du fichier loupe ;
+      seulement sur la photo (jamais sur les flèches, la croix, à côté) ; molette = grossissement ×2 à ×5, jamais plus d'un pixel du
+      fichier par point d'écran ; clic pour zoomer et glisser gardés ; iPhone : appui long, la loupe au-dessus du doigt et qui le suit.
+- [x] **Pendentif L** : l'image IA retirée partout (photo studio, détourage, vignette, carte, Cercle) ; ouverture sur la vraie
+      photo p10 (le L entier, l'illusion de relief), aux bords fondus dans le noir, une ombre douce derrière (`.opening-halo`) :
+      détourée, elle perdait soit le L, soit les ombres de l'angelot. Les autres images IA encore en ligne (Thorned T, TM, FAM, les
+      3 montres) : liste et vraie photo la plus proche dans `~/Downloads/_verif-retours-25-11/photos-ia.md`, **à valider par Yoni**.
+- [x] **Univers Dragon Ball v2** (`genkidama` : canyon en feu, éclairs bleus, sphère en haut ; l'ancien gardé en `genkidama-v1`,
+      choisissable dans l'admin) : la pièce (taille « large ») juste sous la sphère, le bas de la sphère calé sur le haut de la pièce
+      à toutes les tailles (`below` du fond) ; énergie qui monte (genkidama), éclairs dans les nuages (régions `bolts`), braises des
+      feux (région `fires`) ; la vignette Dragon Ball (Créations, accueil) sur ce décor, bords fondus (`THUMB_DECOR` de `PieceThumb`).
+- [x] **Inter et VfB** : l'or des champions (`gold-light` : lueur et reflet dorés, confettis dorés, filet or sous le titre).
+      **Profondeur double** sur tous les univers à fond (`src/components/universe/depth.ts`) : cartes de profondeur par Depth Anything
+      V2 small en ONNX sur le Mac (`npm run universes:depth`, `scripts/universe-depth.py`, modèle dans `.local/models/`, jamais dans
+      Git ; onnxruntime dans `.local/venv-cutout`) ; le fond en plans dans un shader WebGL, le bijou bouge un peu avec la souris, le
+      fond moins et à l'inverse ; sans WebGL une parallaxe CSS ; iPhone : dérive lente ; rien avec « réduire les animations » ;
+      arrêté hors écran.
+- [x] **Univers calés sur la pièce** (`src/components/Universe.tsx`, `data-anchored`) : chaque fond a son point d'ancrage
+      (`anchor` / `mobileAnchor` de `universes.generated.json`, `npm run universes -- --meta` les réécrit sans refaire d'image) ; l'image
+      est placée pour que ce point soit sous le centre de la pièce, quelle que soit la fenêtre. Planche des 22 univers à 390, 430,
+      1280, 1440, 1920 et 2560 px : `~/Downloads/_verif-retours-25-11/univers/` (`.local/scripts/univers.ts`).
+- [x] **The Bespoke Journey** : « Follow your piece, live » / « Suivez votre pièce, en direct » (signature de la maison, encadré, entre
+      les étapes 03 et 04) et « How is the price set? » / « Comment le prix est-il fixé ? » (budget du client, budget minimum, ce dont
+      le prix dépend ; aucun chiffre), 6 langues.
+- [x] **Atelier** : le making-of dans une scène d'atelier (vraie photo de l'établi floue et assombrie, lampe chaude, grain, le film
+      posé sur l'établi), le nom et les étapes de la pièce, plein écran dans les deux sens ; iPhone : la scène autour du film.
+- [x] **Admin** : petit cadenas en bas du pied de page vers /admin, seulement pour un appareil entré par l'accès privé ou l'admin
+      (marque `bj_in`, `server/access-state.ts`) ; « Stories » retiré ; modèles 3D en cartes avec aperçu, « Régler le modèle » :
+      métal, métaux à essayer, lumière, diamants, fond, angle de départ, puis Enregistrer (calques en réglages avancés) ; **diamants
+      « Réaliste »** (studio chaud, éclats seulement là où la lumière tape, dispersion légère, `DIAMOND_LOOKS`) ou « Ancien rendu ».
+      **Ce que Yoni change dans l'admin reste** : l'ordre des pièces n'est plus remis à l'ordre du catalogue après qu'il les a ordonnées
+      (`admin-ordered:<kind>`), une photo retirée ou l'ordre des photos ne reviennent plus à la mise à jour suivante
+      (`mergeChosen`, `gallery-seed:<pièce>`). `tests/admin-sync.spec.ts` (ADMIN_PASSWORD) change chaque réglage, vérifie le site,
+      remet l'état d'origine.
+- `tests/retours2511.spec.ts` (ordinateur, iPhone), captures `verification/retours2511/` ; avant / après :
+  `~/Downloads/_verif-retours-25-11/avant/` et `apres/`.
+- [ ] Yoni : relire les phrases à côté des photos de détail ; valider les photos IA restantes ; l'avis de son spécialiste 3D sur le
+      rendu des diamants ; ses textes.
+
 ## Passe « site en construction + accès privé » (beretejewellers.com en ligne) — état au 25/11/2026
 - [x] **Domaine en ligne** : beretejewellers.com et www pointent sur le VPS (A 85.190.121.137, AAAA 2001:880:a:337::1d0,
       testé en IPv6), HTTPS Let's Encrypt (demandé à la première visite, `on_demand_tls` de `deploy/Caddyfile`), www → domaine
@@ -1094,7 +1148,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] Page Boxes : bouton **« Create your own box »** en haut et en bas (WhatsApp pré-rempli).
 - [x] Atelier : vidéo d'ouverture remplacée (plan horizontal net, noir et blanc chaud). [ ] Revoir la vidéo IA verticale.
 - [x] Photos des pièces : **haute résolution et fond noir en premier** pour les 15 pièces dont Yoni a envoyé les photos.
-- [ ] WhatsApp : vrai numéro (encore 971XXXXXXXXX) ; message pré-rempli selon la page et la pièce (21/11, voir plus haut) ; Bracelet et
+- [x] WhatsApp : vrai numéro (+971 58 593 0211, 25/11) ; message pré-rempli selon la page et la pièce (21/11, voir plus haut) ; Bracelet et
       Montre ajoutés au configurateur de contact (fait).
 - [x] La Maison : biographie (fait), portrait noir et blanc en haut de la page (22/11). [ ] Photos personnelles de Yoni pour
       les citations et les chapitres (il les envoie).
@@ -1107,7 +1161,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 ## Attendu de Yoni (bloque le lancement)
 Photos personnelles pour La Maison (citations, chapitres ; le portrait est en ligne depuis le 22/11), autres noms des pièces publiées le 20/11 s'il en veut (et leurs
 destinataires), photos des étapes de
-fabrication, 2-3 fichiers 3D (.3dm de préférence), vrai numéro WhatsApp, email, accord sur les visuels Dragon Ball.
+fabrication, 2-3 fichiers 3D (.3dm de préférence), email, accord sur les visuels Dragon Ball.
 
 ## Points relevés à l'analyse du 12/11/2026 (à corriger)
 - [x] iPhone (SE, 13, 15 Pro Max) : titre, phrase et 3 boutons entiers sous les bulles, noms qui ne se touchent plus ;

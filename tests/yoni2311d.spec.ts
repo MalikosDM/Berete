@@ -28,7 +28,8 @@ test("the magnifying glass: in the full screen only, photos only, never a film; 
   const problems = watch(page);
   const lb = page.locator("[data-lightbox]");
   const zoom = async () => Number(await lb.locator("[data-lightbox-stage]").getAttribute("data-zoom"));
-  const pieces = ["kevin-schade-dragon-ball-pendant", "campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "the-hand", "deniz-undav-l-pendant"];
+  // (The L of Deniz Undav opens on its photo since 25/11/2026, no cut-out view to click: tests/retours2511.spec.ts.)
+  const pieces = ["kevin-schade-dragon-ball-pendant", "campione-d-italia-2023-2024", "vfb-stuttgart-dfb-pokal-2025", "michy-batshuayi-butterfly-pendant", "the-hand"];
   for (const slug of pieces) {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
@@ -44,10 +45,13 @@ test("the magnifying glass: in the full screen only, photos only, never a film; 
     await expect(lb, slug).toBeVisible();
     await expect(lb.locator("[data-zoom-in]")).toBeVisible();
     if (slug === "kevin-schade-dragon-ball-pendant") {
-      // The wheel brings it closer where the pointer is (no key needed), + and − too.
+      // A pinch of the trackpad (the wheel with Ctrl) brings it closer where the pointer is, + and − too; the wheel alone makes
+      // the magnifying glass stronger (25/11/2026).
       const s = (await lb.locator("[data-lightbox-stage]").boundingBox())!;
       await page.mouse.move(s.x + s.width * 0.55, s.y + s.height * 0.5);
+      await page.keyboard.down("Control");
       await page.mouse.wheel(0, -300);
+      await page.keyboard.up("Control");
       await expect.poll(zoom).toBeGreaterThan(1);
       await page.waitForTimeout(400);
       await page.screenshot({ path: shotPath(info, "yoni2311d-loupe-dragonball") });
@@ -65,8 +69,9 @@ test("the magnifying glass: in the full screen only, photos only, never a film; 
     }
     if (slug === "campione-d-italia-2023-2024") {
       // A film of the gallery (the films come last, after "See more") full screen: no glass, no zoom.
-      await page.locator("[data-every-angle] [data-angle-more]").click();
-      await page.locator("[data-every-angle] [data-angle-type='video'] button").first().click();
+      // (25/11/2026: See more after the photos of the details.)
+      await page.locator("[data-angle-more]").click();
+      await page.locator("[data-angle-type='video'] button").first().click();
       await expect(lb).toBeVisible();
       await expect(lb.locator("video")).toHaveCount(1);
       await expect(lb.locator("[data-zoom-in], [data-zoom-out]")).toHaveCount(0);
@@ -201,7 +206,8 @@ test("the studio photos first, the L cut out cleanly; Marcus Thuram with Kanye W
   const problems = watch(page);
   // Data: their studio photo first in "Every Angle", their worn ones in "Worn by".
   // (The twisted chain of Kevin Schade is BRT Flowers since 24/11/2026: its own photos of the chain on black first.)
-  for (const slug of ["radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion", "deniz-undav-l-pendant"]) {
+  // (The L of Deniz Undav: no image made by AI since 25/11/2026, its real photo p10: tests/retours2511.spec.ts.)
+  for (const slug of ["radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion"]) {
     const piece = cat.pieces.find((p) => p.slug === slug)!;
     expect(piece.cover.src, slug).toMatch(new RegExp("^/media/extra/" + slug + "/studio" + V + "webp$"));
     const shown = resolveShowcase(slug, piece.showcase);
@@ -218,9 +224,9 @@ test("the studio photos first, the L cut out cleanly; Marcus Thuram with Kanye W
   expect(first("noah-okafor-jersey-pendant")).toMatch(/\/p20\./);
   expect(first("tulips-on-tour-medallion")).toMatch(/\/p22\./);
   expect(first("sirius")).toMatch(/\/p27\./);
-  // The L on the site: its studio view, in the sky.
+  // The L on the site: its real photo, in the sky (25/11/2026).
   await open(page, "/pieces/deniz-undav-l-pendant");
-  await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "studio");
+  await expect(page.locator("[data-opening-fade] img").first()).toHaveAttribute("src", /\/media\/hd\/deniz-undav-l-pendant\/p10/);
   await page.waitForTimeout(1200);
   await page.screenshot({ path: shotPath(info, "yoni2311d-l-ange-ciel") });
   // Marcus Thuram with Kanye West, on his profile only.

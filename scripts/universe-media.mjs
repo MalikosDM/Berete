@@ -56,14 +56,36 @@ const BACKDROPS = [
   // 21/11/2026: the stadium at night, red flares and golden confetti (its own portrait for phones).
   { id: "vfb", file: "vfb-stade-desktop.jpg", mobileFile: "vfb-stade-mobile.jpg", name: "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)", focus: [0.6, 0.48], mobile: [0.5, 0.5] },
   { id: "tunnel", file: "Noah Okafor - tunnel vestiaire.png", name: "Tunnel du vestiaire (Noah Okafor)", focus: [0.5, 0.55], mobile: [0.5, 0.5] },
-  // Black, the sphere of light at the top (20/11/2026: large enough as they are, never enlarged; a portrait of its own
-  // for phones). core: the centre and the radius of the sphere (share of the width), for its glow and the particles
-  // that rise to it (src/components/Universe.tsx, "genkidama").
+  // 25/11/2026 (Yoni): the Genkidama v2, the burning canyon and the blue lightning of his reference, the sphere of energy kept at
+  // the top (cut by the top of the image). core: the centre and the radius of the sphere (share of the width), for its glow and
+  // the particles that rise to it (src/components/Universe.tsx, "genkidama"); anchor: where the piece hangs, right under the
+  // sphere (the same vertical axis), as if the hero held it up; the same on the phone image (sphere in the middle).
   {
     id: "genkidama",
+    file: "dragon-ball-genkidama-v2-desktop.jpg",
+    mobileFile: "dragon-ball-genkidama-v2-mobile.jpg",
+    name: "Genkidama v2 : canyon en feu, éclairs bleus, la sphère en haut (Dragon Ball)",
+    focus: [0.597, 0.62],
+    mobile: [0.5, 0.51],
+    // The share of the height of the opening kept free above the piece, for the sphere (computer, phone).
+    below: [0.3, 0.3],
+    core: [0.597, 0.045, 0.141],
+    mobileCore: [0.5, 0.042, 0.45],
+    // Where its lightning strikes (the clouds left and right of the sphere) and where its embers rise (the fires of the canyon):
+    // [left, top, right, bottom], shares of the image (src/components/universe/fx.ts).
+    regions: {
+      bolts: { d: [0.1, 0.08, 0.36, 0.5], m: [0, 0.36, 0.22, 0.62] },
+      bolts2: { d: [0.74, 0.04, 0.92, 0.42], m: [0.8, 0.4, 1, 0.56] },
+      fires: { d: [0.16, 0.5, 0.96, 0.66], m: [0.32, 0.64, 1, 0.76] },
+    },
+  },
+  // The first Genkidama (20/11/2026: black, the sphere of light at the top), kept to go back to it (Yoni: 9/10): choose it in
+  // the admin (« Univers de la page », fond « genkidama-v1 »).
+  {
+    id: "genkidama-v1",
     file: "dragon-ball-genkidama-desktop.jpg",
     mobileFile: "dragon-ball-genkidama-mobile.jpg",
-    name: "Genkidama, sphère de lumière (Dragon Ball)",
+    name: "Genkidama v1, sphère de lumière sur fond noir (Dragon Ball)",
     focus: [0.5, 0.42],
     mobile: [0.5, 0.5],
     core: [0.5, 0.148, 0.15],
@@ -353,6 +375,20 @@ async function backdrop(b) {
   return { ...made, version };
 }
 
+/**
+ * Where the piece stands in the image (25/11/2026, the universes fall the same on every screen): its centre, as shares of the
+ * computer image (anchor) and of the phone image (mobileAnchor). The page places the image so that this point is always under
+ * the piece, whatever the size of the window (src/components/Universe.tsx). By default the heart of the image (focus); on a
+ * phone image cropped from the computer one, the same point of the picture.
+ */
+function anchors(b, width, height, crop) {
+  const anchor = b.anchor ?? b.focus;
+  let mobileAnchor = b.mobileAnchor ?? (b.mobileFile ? b.mobile : null);
+  if (!mobileAnchor && crop) mobileAnchor = [(anchor[0] * width - crop.left) / crop.w, (anchor[1] * height - crop.top) / crop.h];
+  const round = (v) => Math.round(Math.min(1, Math.max(0, v)) * 10000) / 10000;
+  return { anchor: anchor.map(round), mobileAnchor: (mobileAnchor ?? [0.5, 0.42]).map(round) };
+}
+
 async function backdropFiles(b) {
   const file = b.sails ? await withoutSails(b) : await master(b);
   const { width, height } = await sharp(file).metadata();
@@ -363,7 +399,7 @@ async function backdropFiles(b) {
     const left = Math.round(Math.min(width - w, Math.max(0, b.mobileCrop * width - w / 2)));
     for (const mw of MOBILE_WIDTHS) await write(sharp(file).extract({ left, top: 0, width: w, height }).resize({ width: mw, height: Math.round((mw * 16) / 9), kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", portrait cropped at " + b.mobileCrop + ")");
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, spots: b.spots, regions: b.regions };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, { left, top: 0, w, h: height }), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, spots: b.spots, regions: b.regions };
   }
   if (b.mobileFile) {
     // Its own portrait for phones: 9:16, from the middle of it.
@@ -372,7 +408,7 @@ async function backdropFiles(b) {
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
     // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;
@@ -384,7 +420,7 @@ async function backdropFiles(b) {
     await write(sharp(file).extract({ left, top, width: w, height: h }).resize({ width: mw, height: Math.round((mw * 16) / 9), kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
   }
   console.log("  + " + b.id + " (" + width + " x " + height + ", portrait from " + w + " x " + h + ")");
-  return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], widths: WIDTHS, mobileWidths: MOBILE_WIDTHS };
+  return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, { left, top, w, h }), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS };
 }
 
 async function fonts() {
@@ -404,14 +440,38 @@ async function fonts() {
 await mkdir(OUT, { recursive: true });
 const only = process.argv.find((a) => a.startsWith("--only="))?.slice(7).split(",") ?? null;
 let backdrops = {};
-if (only) {
+if (only && !process.argv.includes("--meta")) {
   try {
     backdrops = JSON.parse(await readFile(DATA, "utf8")).backdrops ?? {};
   } catch {
     /* first run */
   }
 }
-for (const b of BACKDROPS) if (!only || only.includes(b.id) || SEQUENCES.some((q) => only.includes(q.id) && q.frames.includes(b.id))) backdrops[b.id] = await backdrop(b);
+// --meta: the words and the points of every background written again (its name, its anchors, its sphere, its lights), its
+// files and their versions kept as they are (no image made again).
+const meta = process.argv.includes("--meta");
+if (meta) {
+  backdrops = JSON.parse(await readFile(DATA, "utf8")).backdrops ?? {};
+  for (const b of BACKDROPS) {
+    const e = backdrops[b.id];
+    if (!e) continue;
+    const width = e.ratio * 10000;
+    const height = 10000;
+    let crop = null;
+    if (b.mobileCrop) {
+      const w = (height * 9) / 16;
+      crop = { left: Math.min(width - w, Math.max(0, b.mobileCrop * width - w / 2)), top: 0, w, h: height };
+    } else if (!b.mobileFile) {
+      const [fx, fy] = b.mobile;
+      const h = Math.min(height, (fy * height) / MOBILE_AT_Y, ((1 - fy) * height) / (1 - MOBILE_AT_Y));
+      const w = (h * 9) / 16;
+      crop = { left: Math.min(width - w, Math.max(0, fx * width - w / 2)), top: Math.min(height - h, Math.max(0, fy * height - MOBILE_AT_Y * h)), w, h };
+    }
+    Object.assign(e, { name: b.name, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, crop) });
+    for (const k of ["core", "mobileCore", "moon", "mobileMoon", "spots", "regions", "below"]) if (b[k] !== undefined) e[k] = b[k];
+  }
+}
+for (const b of meta ? [] : BACKDROPS) if (!only || only.includes(b.id) || SEQUENCES.some((q) => only.includes(q.id) && q.frames.includes(b.id))) backdrops[b.id] = await backdrop(b);
 // A sequence: the sizes of its first image, its images in their order.
 for (const q of SEQUENCES) {
   const first = backdrops[q.frames[0]];
@@ -420,6 +480,6 @@ for (const q of SEQUENCES) {
 // In the order of the list.
 const order = [...BACKDROPS.map((b) => b.id), ...SEQUENCES.map((q) => q.id)];
 backdrops = Object.fromEntries(order.filter((id) => backdrops[id]).map((id) => [id, backdrops[id]]));
-if (!only) await fonts();
+if (!only && !meta) await fonts();
 await writeFile(DATA, JSON.stringify({ backdrops }, null, 1) + "\n");
 console.log("  = src/data/universes.generated.json");

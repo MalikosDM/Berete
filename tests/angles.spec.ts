@@ -27,8 +27,6 @@ const desktopOnly = () => test.skip(test.info().project.name !== "desktop", "onc
 // (24/11/2026: the White Iced Cuban chain is back on the site, and the chain of folder 09 as the Infinity Link; the two
 // others stay off.)
 const TAKEN_OFF = ["flaneur-medallion", "two-tone-iced-cuban-chain"];
-/** "Every Angle" shows four photos, then "See N more" (24/11/2026, src/components/EveryAngle.tsx). */
-const anglesShownFirst = (n: number) => Math.min(n, 4);
 const JESUS_PIECES = ["samuel-ballet-jesus-piece", "crown-of-thorns-jesus-piece", "jesus-piece-red-flowers"];
 const PUBLISHED = publicCatalogue(defaultCatalogue).pieces;
 /** The photos of Every Angle on its page: each once on the page (src/data/pageMedia.ts), never one its opening shows. */
@@ -118,7 +116,10 @@ for (const slug of PAGES) {
     await section.scrollIntoViewIfNeeded();
     await expect(section.locator("h2")).toHaveText("Sous tous les angles");
     const tiles = section.locator("[data-angle]");
-    await expect(tiles).toHaveCount(anglesShownFirst(photos.length));
+    // Since 25/11/2026: four photos of the whole at most here; the details beside their sentence after it; then See more.
+    expect(await tiles.count()).toBeLessThanOrEqual(4);
+    expect(await tiles.count()).toBeGreaterThan(0);
+    const all = page.locator("[data-angle]");
     // No text that describes what is seen.
     await expect(section.locator("[data-angle-text]")).toHaveCount(0);
     // A gallery: four on a row on a computer, two on a phone.
@@ -140,13 +141,13 @@ for (const slug of PAGES) {
     await page.waitForTimeout(700);
     await shot(page, info.project.name + "-" + slug + "-1");
     // Many photos: the first ones, then "See N more" shows all of them.
-    const more = section.locator("[data-angle-more]");
-    if (photos.length > anglesShownFirst(photos.length)) {
+    const more = page.locator("[data-angle-more]");
+    if (photos.length > (await all.count())) {
       await expect(more).toHaveText("Voir plus");
       await more.scrollIntoViewIfNeeded();
       await shot(page, info.project.name + "-" + slug + "-2-voir-plus");
       await more.click();
-      await expect(tiles).toHaveCount(photos.length);
+      await expect(all).toHaveCount(photos.length);
     } else await expect(more).toHaveCount(0);
     // A film keeps its place, silent.
     for (const v of await section.locator("[data-angle-type='video'] video").all()) {

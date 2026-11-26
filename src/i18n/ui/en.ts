@@ -125,6 +125,7 @@ export const en = {
     pitch: "Chains, pendants and championship rings, designed with you and crafted for the moment.",
     legal: "Legal notice",
     privacy: "Privacy",
+    admin: "Admin space",
   },
 
   collections: {
@@ -315,7 +316,9 @@ export const en = {
   gallery: {
     /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
     clickToZoom: "Click to zoom",
+    hoverToMagnify: "Move over the photo to magnify · scroll to change the magnifying glass · click to zoom",
     tapToZoom: "Tap to zoom",
+    holdToMagnify: "Touch and hold for the magnifying glass · tap to zoom",
     title: "Details",
     hintPinned: "Scroll to explore · Tap to zoom",
     hint: "Tap to zoom",
@@ -439,6 +442,8 @@ export const en = {
     /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
     liveWithSpace: "Live progress photos and videos on WhatsApp and in your private client space.",
     spaceAfterDeposit: "After the design deposit, you enter your private client space: your piece in 3D and its progress, live.",
+    live: { title: "Follow your piece, live", text: "In your private space, you see the 3D design of your piece and approve it, then follow each step of its making in photos and videos, like a parcel you track, without having to ask." },
+    price: { title: "How is the price set?", items: ["You come with your budget, and the design is conceived for that budget.", "A minimum budget is required.", "The price depends on the materials, the quality of the diamonds, the weight of the gold, the complexity of the piece and its mechanisms (pieces that open, that turn)."] },
     quick: {
       lead: "From a first sketch to the handover in its case: six steps, followed with you on WhatsApp.",
       steps: [
@@ -742,6 +747,7 @@ export const en = {
     soundOff: "Turn the sound off",
     fullscreen: "Watch full screen",
     dragonLine: "Its Spirit Bomb, set with diamonds, turns.",
+    progress: "Where the film is: pull to move forward or back",
   },
   films: {
     pieceSection: "The Finished Piece",

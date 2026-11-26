@@ -143,16 +143,15 @@
   ]
  },
  "deniz-undav-l-pendant": {
-  "kind": "cutout",
-  "src": "/media/cutouts/deniz-undav-l-pendant/studio-1600.4fcb322b01.webp",
-  "srcSet": "/media/cutouts/deniz-undav-l-pendant/studio-480.4fcb322b01.webp 480w, /media/cutouts/deniz-undav-l-pendant/studio-960.4fcb322b01.webp 960w, /media/cutouts/deniz-undav-l-pendant/studio-1600.4fcb322b01.webp 1600w",
-  "width": 1600,
-  "height": 2518,
+  "kind": "photo",
+  "src": "/media/hd/deniz-undav-l-pendant/p10.webp",
+  "width": 1440,
+  "height": 2160,
   "box": [
-   0.0719,
-   0.0457,
-   0.8563,
-   0.9087
+   0.17,
+   0.05,
+   0.6675,
+   0.8383
   ]
  },
  "samuel-ballet-jesus-piece": {

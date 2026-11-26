@@ -471,7 +471,9 @@ async function thumbnails(page: Page, path: string, size: string) {
           right = Math.max(right, x);
         }
     const across = right < 0 ? 0 : (right - left + 1) / info.width;
-    if (share > 0.75 || (share < 0.55 && across < 0.85)) add("thumbnails", path, size, slug + ": the jewel takes " + Math.round(share * 100) + " % of the height of its frame (" + Math.round(across * 100) + " % of its width)");
+    // A card in its world (the Dragon Ball pendant on its canyon, 25/11/2026): the light of the world is not the jewel.
+    const decor = (await frame.locator("[data-thumb-decor]").count()) > 0;
+    if (!decor && (share > 0.75 || (share < 0.55 && across < 0.85))) add("thumbnails", path, size, slug + ": the jewel takes " + Math.round(share * 100) + " % of the height of its frame (" + Math.round(across * 100) + " % of its width)");
   }
 }
 
@@ -488,7 +490,9 @@ async function sitemapRedirects(list: string[]) {
   );
 }
 
-const ORDER: Record<string, number> = { opening: 0, film: 1, angles: 2, story: 3, details: 3.1, "worn-as": 3.2, composition: 4, "created-for": 5, trunk: 6, atelier: 7, press: 7.5, end: 8 };
+// Since 25/11/2026 a magazine: the film and the story side by side right after the opening (one section, "film", or "story"
+// for a piece without a film), then the photos of the whole ("angles"), the details beside their words ("details").
+const ORDER: Record<string, number> = { opening: 0, film: 1, story: 1, angles: 2, details: 2.5, "worn-as": 3.2, composition: 4, "created-for": 5, trunk: 6, atelier: 7, press: 7.5, end: 8 };
 const ALLOWED_FONTS = new Set(["Cormorant Garamond", "Manrope", "Cormorant Fallback", "Manrope Fallback", "Amiri", "IBM Plex Sans Arabic"]);
 
 /** The English texts of each address (the English page), to find a sentence left untranslated. */
@@ -543,7 +547,8 @@ async function check(page: Page, path: string, lang: string, size: string, phone
     const ranks = f.order.map((s) => ORDER[s] ?? -1);
     const sorted = ranks.every((r, i) => i === 0 || r >= ranks[i - 1]!);
     // (Since 25/11/2026 « Created exclusively for » is a section only when it has someone or something to show.)
-    const missing = ["opening", "story", "end"].filter((s) => !f.order.includes(s));
+    const missing = ["opening", "end"].filter((s) => !f.order.includes(s));
+    if (!f.order.includes("story") && !f.order.includes("film")) missing.push("story");
     if (!sorted || missing.length > 0) add("order", path, size, "sections: " + f.order.join(" > ") + (missing.length ? " · missing: " + missing.join(", ") : ""));
   }
   if (lang === "en") {

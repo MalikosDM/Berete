@@ -238,7 +238,14 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
   let lines: { a: number; r: number; l: number; wd: number }[] = [];
 
   const newDust = (anywhere: boolean): P => ({ x: rand(0, w), y: anywhere ? rand(0, h) : h + 10, vx: rand(-0.08, 0.08), vy: rand(-0.25, -0.06), life: 0, max: rand(500, 1100), size: rand(0.6, 1.8), spin: 0, angle: 0, hue: 0, color: "", kind: 0 });
+  // The fires of the image (a region "fires", the canyon of the Genkidama v2, 25/11/2026): the embers rise from them, in the
+  // colour of fire, never from the piece.
+  const fireSprite = sprite([255, 138, 61]);
   const newEmber = (anywhere: boolean): P => {
+    if (boxes.fires) {
+      const b = boxes.fires;
+      return { x: rand(b.x0, b.x1), y: anywhere ? rand(b.y0 - (b.y1 - b.y0) * 2, b.y1) : rand(b.y0, b.y1), vx: rand(-0.25, 0.25), vy: rand(-0.9, -0.3), life: 0, max: rand(140, 360), size: rand(0.7, 2), spin: rand(0, Math.PI * 2), angle: rand(0.01, 0.05), hue: 0, color: "fire", kind: 0 };
+    }
     const near = Math.random() < 0.55;
     return {
       x: near ? cx + rand(-0.22, 0.22) * w : rand(0, w),
@@ -386,6 +393,15 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
       }
       pts.push(seg);
     };
+    // In the sky of the image when it has one (regions "bolts", "bolts2": the lightning of the Genkidama v2): from the clouds
+    // down, now and then, never a flash of the whole screen.
+    const sky = [boxes.bolts, boxes.bolts2].filter((b): b is Box => Boolean(b));
+    if (sky.length > 0) {
+      const b = sky[Math.floor(Math.random() * sky.length)]!;
+      branch(rand(b.x0, b.x1), b.y0 + rand(0, (b.y1 - b.y0) * 0.25), Math.PI / 2 + rand(-0.45, 0.45), (b.y1 - b.y0) * rand(0.7, 1.05), 0);
+      bolt = { pts, life: 0 };
+      return;
+    }
     const a = rand(0, Math.PI * 2);
     const r = Math.min(w, h) * rand(0.08, 0.16);
     branch(cx + Math.cos(a) * r, cy + Math.sin(a) * r, a, Math.max(w, h) * rand(0.3, 0.5), 0);
@@ -787,8 +803,9 @@ export function startFx(canvas: HTMLCanvasElement, opts: FxOptions): { stop: () 
         const a = Math.min(1, p.life / 30, (p.max - p.life) / 60) * flicker;
         ctx.globalAlpha = Math.max(0, a);
         const s = p.size * (1 + boost * 0.6);
-        ctx.drawImage(glowSprite, p.x - s * 4, p.y - s * 4, s * 8, s * 8);
-        ctx.fillStyle = rgba(light, Math.max(0, a));
+        const fire = p.color === "fire";
+        ctx.drawImage(fire ? fireSprite : glowSprite, p.x - s * 4, p.y - s * 4, s * 8, s * 8);
+        ctx.fillStyle = fire ? rgba([255, 200, 150], Math.max(0, a)) : rgba(light, Math.max(0, a));
         ctx.fillRect(p.x - s * 0.4, p.y - s * 0.4, s * 0.8, s * 0.8);
         if (p.life > p.max || p.y < -30) embers[i] = newEmber(false);
       }

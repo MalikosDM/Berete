@@ -27,11 +27,13 @@ test("Inter ring: created exclusively for Inter Milan, a historic commission, Ma
   const details = page.locator("[data-details]");
   await details.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1200);
-  await expect(details.locator("[data-detail]")).toHaveCount(9);
+  // Since 25/11/2026 (a magazine): the details shown by a photo stand beside it, the others listed after them — nine in all.
+  expect((await details.locator("[data-detail]").count()) + (await details.locator("[data-magazine-text] h3").count())).toBe(9);
   for (const words of ["Six Months of Craftsmanship", "The Secret Within", "Beyond a Ring", "Twenty stars", "Black, blue, black, blue", "Italian flag", "Forza Inter", "Serie A", "Campione d'Italia", "cup", "pendant"]) await expect(details).toContainText(words);
   await page.screenshot({ path: shotPath(info, "inter-2-details"), type: "jpeg", quality: 70 });
-  const photos = details.locator("[data-detail-photo]");
-  expect(await photos.count()).toBeGreaterThanOrEqual(8);
+  // Every detail shown by a photo opens it: the photos beside their words, and the titles of the others.
+  const photos = details.locator("[data-detail-photo], [data-magazine-photo]");
+  expect(await photos.count()).toBeGreaterThanOrEqual(6);
   await photos.nth(3).click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.waitForTimeout(800);

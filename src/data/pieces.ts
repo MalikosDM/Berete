@@ -508,13 +508,16 @@ const SITE_PIECES: Piece[] = [
     people: ["kevin-schade"],
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
-    theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "impact"] },
+    // The Genkidama v2 (25/11/2026): the energy rises from the canyon to the sphere, lightning now and then in the clouds, embers
+    // from the fires.
+    theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "lightning", "embers", "impact"] },
     // Its main view much larger at the opening (feedback of Yoni, 21/11/2026), whole, on a computer and on a phone.
     // 23/11/2026 (Yoni): the view with its chain alone and larger at the opening; its back no longer first (at the end of
     // its photos).
     // 23/11/2026 evening (Yoni: « la photo avec la chaîne est trop petite ») : on a computer larger still ("xl"), its chain
     // leaving the top of the screen, faded; on a phone it already fills the frame.
-    showcase: { size: "xl", mode: "single", views: ["p19"] },
+    // Under the sphere of the Genkidama v2 (25/11/2026): large, no longer very large, so that the sphere shows above it.
+    showcase: { size: "large", mode: "single", views: ["p19"] },
     // Its edit 13/v01 opens on its 3D model: a making-of (in The Atelier), never its finished piece (Yoni, 24/11/2026); the
     // film of its finished piece is its hero film (src/data/featureFilms.ts).
     atelier: { reveal: null },
@@ -876,7 +879,9 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "ciel", mark: "L" },
     // Its photos in HD (folder 38, 20/11/2026).
     // Its studio image first (23/11/2026, the L cut out by Malik), then its photos, the whole piece first, the backs last.
-    ...withStudio("deniz-undav-l-pendant", "The L pendant of Deniz Undav, its cherub in rose gold", sorted("deniz-undav-l-pendant", [], firsts("deniz-undav-l-pendant", ["p10", "p08", "p04", "p07", "p09", "p03", "p06", "p05", "p01", "p02"]))),
+    // Never an image made by AI (Yoni, 25/11/2026: "ce n'est pas ma pièce"): the real photo of the whole L first, the one that
+    // shows its illusion best (a flat L that looks in relief, like cards set off one from the other).
+    ...sorted("deniz-undav-l-pendant", [], firsts("deniz-undav-l-pendant", ["p10", "p08", "p04", "p07", "p09", "p03", "p06", "p05", "p01", "p02"])),
     specs: [
       ["Type", "Pendant"],
       ["Motif", "The letter L and a cherub"],

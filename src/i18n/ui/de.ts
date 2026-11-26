@@ -126,6 +126,7 @@ export const de: Messages = {
     pitch: "Ketten, Anhänger und Meisterringe, gemeinsam mit Ihnen entworfen und für den großen Moment gefertigt.",
     legal: "Impressum",
     privacy: "Datenschutz",
+    admin: "Admin-Bereich",
   },
 
   collections: {
@@ -310,7 +311,9 @@ export const de: Messages = {
   gallery: {
     /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
     clickToZoom: "Zum Vergrößern klicken",
+    hoverToMagnify: "Über das Foto fahren für die Lupe · Mausrad zum Vergrößern · klicken zum Zoomen",
     tapToZoom: "Zum Vergrößern tippen",
+    holdToMagnify: "Lange drücken für die Lupe · tippen zum Zoomen",
     title: "Details",
     hintPinned: "Scrollen zum Entdecken · Tippen zum Vergrößern",
     hint: "Tippen zum Vergrößern",
@@ -430,6 +433,8 @@ export const de: Messages = {
     /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
     liveWithSpace: "Fotos und Videos vom Fortschritt live auf WhatsApp und in Ihrem privaten Kundenbereich.",
     spaceAfterDeposit: "Nach der Design-Anzahlung erhalten Sie Zugang zu Ihrem privaten Kundenbereich: Ihr Stück in 3D und sein Fortschritt, live.",
+    live: { title: "Verfolgen Sie Ihr Stück, live", text: "In Ihrem privaten Bereich sehen Sie das 3D-Design Ihres Stücks und geben es frei; danach verfolgen Sie jeden Schritt seiner Fertigung in Fotos und Videos, wie ein Paket, das man verfolgt, ohne nachfragen zu müssen." },
+    price: { title: "Wie wird der Preis festgelegt?", items: ["Sie kommen mit Ihrem Budget, und das Design wird für dieses Budget entworfen.", "Ein Mindestbudget wird vorausgesetzt.", "Der Preis hängt von den Materialien, der Qualität der Diamanten, dem Goldgewicht, der Komplexität des Stücks und seinen Mechanismen ab (Stücke, die sich öffnen oder drehen)."] },
     quick: {
       lead: "Von der ersten Skizze bis zur Übergabe in der Schatulle: sechs Schritte, gemeinsam mit Ihnen auf WhatsApp begleitet.",
       steps: [
@@ -816,6 +821,7 @@ export const de: Messages = {
     soundOff: "Ton ausschalten",
     fullscreen: "Im Vollbild ansehen",
     dragonLine: "Seine mit Diamanten besetzte Spirit Bomb dreht sich.",
+    progress: "Fortschritt des Films: ziehen zum Vor- oder Zurückspulen",
   },
   films: {
     pieceSection: "Das fertige Stück",

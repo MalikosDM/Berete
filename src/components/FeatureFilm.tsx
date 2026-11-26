@@ -3,6 +3,7 @@ import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react"
 import type { FeatureFilmData } from "@/data/featureFilms";
 import { useI18n } from "@/i18n";
 import { useFullscreen } from "@/lib/fullscreen";
+import SeekBar from "@/components/SeekBar";
 
 
 /**
@@ -13,6 +14,30 @@ import { useFullscreen } from "@/lib/fullscreen";
  * it). On a phone, its lighter copy.
  */
 export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, children, data, flip = false, compact = false }: { film: FeatureFilmData; id: string; anchor?: string; label: string; eyebrow?: string; title: string; children?: ReactNode; data: string; flip?: boolean; compact?: boolean }) {
+  return (
+    <section id={anchor} aria-labelledby={id} data-feature-film={data} data-piece-section="film" className="scroll-mt-24 border-t border-white/10">
+      <div className={"wrap grid items-center gap-8 lg:grid-cols-12 lg:gap-14 " + (compact ? "py-14 lg:py-16" : "py-16 lg:py-24")}>
+        <div className={"flex justify-center lg:col-span-7 " + (flip ? "lg:order-2" : "")}>
+          <FilmFrame film={film} label={label} tall={compact ? "min(74svh, 40rem" : "min(86svh, 52rem"} />
+        </div>
+        <div className={"lg:col-span-5 " + (flip ? "lg:order-1" : "")}>
+          {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
+          <h2 id={id} className="title-caps tracking-[0.12em] t-title leading-[1.15] text-white [text-wrap:balance]">
+            {title}
+          </h2>
+          {children}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The film itself, whole in its frame: it plays silently while it is on screen; its buttons (play, sound, full screen) and,
+ * under it, its bar to pull forward or back (25/11/2026). `tall`: the most it may take of the height of the screen ("min(74svh,
+ * 40rem" without its closing bracket: the width of the page finishes it).
+ */
+export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = "" }: { film: FeatureFilmData; label: string; tall?: string; className?: string }) {
   const { t } = useI18n();
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -91,55 +116,46 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
 
   const btn = "inline-flex size-12 items-center justify-center rounded-full border border-white/35 bg-ink/60 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light lg:size-10";
   // Whole in the screen: as high as the screen allows (under the menu), as wide as the page allows.
-  const tall = compact ? "min(74svh, 40rem" : "min(86svh, 52rem";
   return (
-    <section id={anchor} aria-labelledby={id} data-feature-film={data} data-piece-section="film" className="scroll-mt-24 border-t border-white/10">
-      <div className={"wrap grid items-center gap-8 lg:grid-cols-12 lg:gap-14 " + (compact ? "py-14 lg:py-16" : "py-16 lg:py-24")}>
-        <div className={"flex justify-center lg:col-span-7 " + (flip ? "lg:order-2" : "")}>
-          <div
-            ref={frameRef}
-            data-feature-frame
-            className="feature-film relative max-w-full overflow-hidden border border-white/10 bg-black"
-            style={{ aspectRatio: film.width + " / " + film.height, height: tall + ", calc((100vw - 2.5rem) * " + film.height + " / " + film.width + "))" }}
-          >
-            <video
-              ref={videoRef}
-              src={src}
-              poster={film.poster}
-              muted={muted}
-              loop
-              playsInline
-              preload="none"
-              aria-label={label}
-              data-feature-video
-              onPlaying={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onClick={togglePlay}
-              className="h-full w-full cursor-pointer object-contain"
-            />
-            <div className="absolute end-2.5 bottom-2.5 flex gap-1.5">
-              <button type="button" onClick={togglePlay} data-feature-play aria-label={playing ? t.feature.pause : t.feature.play} className={btn}>
-                {playing ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4 translate-x-0.5" aria-hidden="true" />}
-              </button>
-              {film.audio ? (
-                <button type="button" onClick={toggleSound} data-feature-sound aria-pressed={!muted} aria-label={muted ? t.feature.soundOn : t.feature.soundOff} className={btn}>
-                  {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4" aria-hidden="true" />}
-                </button>
-              ) : null}
-              <button type="button" onClick={fullScreen} data-feature-fullscreen aria-pressed={full} aria-label={full ? t.viewer.exitFullscreen : t.feature.fullscreen} className={btn}>
-                {full ? <Minimize className="size-4" aria-hidden="true" /> : <Maximize className="size-4" aria-hidden="true" />}
-              </button>
-            </div>
-          </div>
+    <div className={"w-fit max-w-full " + className} data-film-block>
+      <div
+        ref={frameRef}
+        data-feature-frame
+        className="feature-film relative max-w-full overflow-hidden border border-white/10 bg-black"
+        style={{ aspectRatio: film.width + " / " + film.height, height: tall + ", calc((100vw - 2.5rem) * " + film.height + " / " + film.width + "))" }}
+      >
+        <video
+          ref={videoRef}
+          src={src}
+          poster={film.poster}
+          muted={muted}
+          loop
+          playsInline
+          preload="none"
+          aria-label={label}
+          data-feature-video
+          onPlaying={() => setPlaying(true)}
+          onPause={() => setPlaying(false)}
+          onClick={togglePlay}
+          className="h-full w-full cursor-pointer object-contain"
+        />
+        <div className="absolute end-2.5 bottom-2.5 flex gap-1.5">
+          <button type="button" onClick={togglePlay} data-feature-play aria-label={playing ? t.feature.pause : t.feature.play} className={btn}>
+            {playing ? <Pause className="size-4" aria-hidden="true" /> : <Play className="size-4 translate-x-0.5" aria-hidden="true" />}
+          </button>
+          {film.audio ? (
+            <button type="button" onClick={toggleSound} data-feature-sound aria-pressed={!muted} aria-label={muted ? t.feature.soundOn : t.feature.soundOff} className={btn}>
+              {muted ? <VolumeX className="size-4" aria-hidden="true" /> : <Volume2 className="size-4" aria-hidden="true" />}
+            </button>
+          ) : null}
+          <button type="button" onClick={fullScreen} data-feature-fullscreen aria-pressed={full} aria-label={full ? t.viewer.exitFullscreen : t.feature.fullscreen} className={btn}>
+            {full ? <Minimize className="size-4" aria-hidden="true" /> : <Maximize className="size-4" aria-hidden="true" />}
+          </button>
         </div>
-        <div className={"lg:col-span-5 " + (flip ? "lg:order-1" : "")}>
-          {eyebrow ? <p className="eyebrow mb-4">{eyebrow}</p> : null}
-          <h2 id={id} className="title-caps tracking-[0.12em] t-title leading-[1.15] text-white [text-wrap:balance]">
-            {title}
-          </h2>
-          {children}
-        </div>
+        {/* In full screen, its bar comes with it (the frame is what goes full screen). */}
+        {full ? <SeekBar video={videoRef} className="absolute inset-x-4 bottom-16" /> : null}
       </div>
-    </section>
+      {!full ? <SeekBar video={videoRef} className="mt-1" /> : null}
+    </div>
   );
 }

@@ -38,7 +38,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { HDRLoader } from "three/examples/jsm/loaders/HDRLoader.js";
 import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
-import type { Ambiance, Background, LayerSetting, MetalId, ModelSettings, ModelView } from "@/data/models";
+import type { Ambiance, Background, DiamondLook, LayerSetting, MetalId, ModelSettings, ModelView } from "@/data/models";
 import { AccumulatePass, jitter } from "./accumulate";
 import { BACKGROUND_LOOKS, backgroundOfScene, fadeTexture, type Surface } from "./backgrounds";
 import { diamondEnv } from "./diamondEnv";
@@ -304,14 +304,14 @@ export default function Stage(props: Props) {
   useEffect(() => {
     const loaded = model.current;
     if (!loaded || frame === null) return undefined;
-    const { made, refracting } = applyMaterials(loaded, { settings: settings.layers, choices, highlight, phone, simpleStones, ambiance });
+    const { made, refracting } = applyMaterials(loaded, { settings: settings.layers, choices, highlight, phone, simpleStones, ambiance, look: settings.diamonds ?? "realistic" });
     refraction.current = refracting;
     dirty.current = true;
     get().invalidate();
     return () => {
       for (const m of made) m.dispose();
     };
-  }, [frame, settings.layers, choices, highlight, phone, simpleStones, ambiance, get]);
+  }, [frame, settings.layers, settings.diamonds, choices, highlight, phone, simpleStones, ambiance, get]);
 
   /* Every frame drawn: the stones follow the camera, near and far follow the distance */
   useFrame((state, delta) => {
@@ -666,10 +666,10 @@ export default function Stage(props: Props) {
   );
 }
 
-type Looks = { settings: ModelSettings["layers"]; choices: Choices; highlight: string | null; phone: boolean; simpleStones: boolean; ambiance: Ambiance };
+type Looks = { settings: ModelSettings["layers"]; choices: Choices; highlight: string | null; phone: boolean; simpleStones: boolean; ambiance: Ambiance; look: DiamondLook };
 
 /** Gives each mesh the material of its layer's role; returns the materials made (to dispose) and the refracting ones. */
-function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, simpleStones, ambiance }: Looks): { made: Material[]; refracting: RefractionMaterial[] } {
+function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, simpleStones, ambiance, look }: Looks): { made: Material[]; refracting: RefractionMaterial[] } {
   const made: Material[] = [];
   const refracting: RefractionMaterial[] = [];
   const metalByLayer = new Map<string, MeshStandardMaterial>();
@@ -705,12 +705,12 @@ function applyMaterials(loaded: Loaded, { settings, choices, highlight, phone, s
         // True refraction (lighter on phones), or a glass of the same index when the device is too slow for it.
         if (!simpleStones) {
           const oneStone = (mesh as unknown as InstancedMesh).isInstancedMesh === true;
-          const material = refractionMaterial(mesh.geometry as BufferGeometry, diamondEnv(ambiance), gemFrame(mesh.geometry as BufferGeometry, oneStone, mesh.matrixWorld), color, phone ? "light" : "high");
+          const material = refractionMaterial(mesh.geometry as BufferGeometry, diamondEnv(ambiance, look), gemFrame(mesh.geometry as BufferGeometry, oneStone, mesh.matrixWorld), color, phone ? "light" : "high", look);
           refracting.push(material);
           made.push(material);
           mesh.material = material;
         } else {
-          const material = lightStoneMaterial(color, diamondEnv(ambiance));
+          const material = lightStoneMaterial(color, diamondEnv(ambiance, look));
           made.push(material);
           mesh.material = material;
         }

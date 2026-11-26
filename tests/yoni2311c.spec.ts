@@ -21,25 +21,18 @@ test("Dragon Ball: the view with its chain larger on a computer, its chain fadin
   await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
   await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
   await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p19");
-  await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-xl", "");
+  // Since 25/11/2026 (the Genkidama v2): large, under the sphere of its world, whole above the bottom of the screen.
+  await expect(page.locator("[data-showcase]")).toHaveAttribute("data-showcase-large", "");
   if (desktop(info.project.name)) {
-    // Larger than its frame (a fifth until 24/11/2026; since then 1.04, the whole piece in the first screen of a laptop), the
-    // jewel itself above the bottom of the screen.
-    const view = page.locator(".sv-xl");
-    await expect(view).toHaveCount(1);
-    const cover = page.locator("[data-piece-cover]");
-    const frame = (await cover.boundingBox())!;
-    const pad = await cover.evaluate((e) => parseFloat(getComputedStyle(e).paddingTop) + parseFloat(getComputedStyle(e).paddingBottom));
-    const box = (await view.boundingBox())!;
-    expect(box.height).toBeGreaterThan((frame.height - pad) * 1.02);
+    const box = (await page.locator("[data-piece-cover] [data-showcase]").boundingBox())!;
     expect(box.y + box.height).toBeLessThanOrEqual(900);
   }
   await page.waitForTimeout(800);
   await page.screenshot({ path: shotPath(info, "yoni2311c-dragonball"), type: "jpeg", quality: 70 });
-  // "Every Angle": its back is not among the first three photos.
-  const first = await page.locator("[data-every-angle] [data-angle] img").evaluateAll((imgs) => imgs.slice(0, 3).map((i) => (i as HTMLImageElement).getAttribute("src") ?? ""));
-  expect(first.length).toBe(3);
-  for (const src of first) expect(src).not.toMatch(/\/p06[.-]/);
+  // "Every Angle": the photos of the whole (25/11/2026: its main photo, its front, its back), the back last of them.
+  const first = await page.locator("[data-every-angle] [data-angle] img").evaluateAll((imgs) => imgs.map((i) => (i as HTMLImageElement).getAttribute("src") ?? ""));
+  expect(first.length).toBeGreaterThanOrEqual(3);
+  for (const src of first.slice(0, -1)) expect(src).not.toMatch(/\/p06[.-]/);
   expect(problems.errors).toEqual([]);
 });
 

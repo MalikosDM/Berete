@@ -67,6 +67,8 @@ test("the data: the text of Yoni word for word, its line, its sheet, nothing els
   expect(piece.details).toEqual([]);
 });
 
+const norm = (x: string) => x.replace(/\s+/g, " ").trim();
+
 async function story(page: Page) {
   const section = page.locator("[data-story-title]").first().locator("xpath=..");
   return {
@@ -90,16 +92,17 @@ for (const lang of ["en", "fr"] as const) {
     const s = await story(page);
     if (lang === "en") {
       expect(s.titles.map((t) => t.toLowerCase())).toEqual(["the vision behind the creation"]);
-      // Whole, its line breaks kept.
-      expect(s.paragraphs).toEqual(VISION);
+      // Whole (25/11/2026: the sentences that a detail shows stand beside its photo, once): every sentence on the page.
+      const all = norm([...s.paragraphs, ...(await page.locator("[data-magazine-text] p").allInnerTexts())].join(" "));
+      for (const p of VISION) for (const part of p.split(/\n/)) expect(all).toContain(norm(part));
       expect(s.quote).toBe("“" + LAST + "”");
     } else {
       expect(s.titles.map((t) => t.toLowerCase())).toEqual(FR.titles.map((t) => t.toLowerCase()));
+      const all = norm([...s.paragraphs, ...(await page.locator("[data-magazine-text] p").allInnerTexts())].join(" "));
       expect(s.paragraphs[0]).toBe(FR.first);
       expect(s.paragraphs[1]).toBe(FR.second);
-      expect(s.paragraphs.join(" ")).toContain(FR.reverse);
+      expect(all).toContain(norm(FR.reverse));
       expect(s.paragraphs[s.paragraphs.length - 1]).toBe(FR.tribute);
-      expect(s.paragraphs).toHaveLength(VISION.length);
       expect(s.quote).toBe("« " + FR.last + " »");
     }
     // The line is not written again at the top of the text (its titles stand there).

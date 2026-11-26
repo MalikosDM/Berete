@@ -72,7 +72,10 @@ test("3. every thumbnail on the same black: no edge, the jewel at the same share
           right = Math.max(right, x);
         }
     const across = right < 0 ? 0 : (right - left + 1) / im.width;
-    if (edge > 0.03 || share > 0.75 || (share < 0.55 && across < 0.85)) bad.push(slug + " (edge " + (edge * 100).toFixed(1) + " %, jewel " + Math.round(share * 100) + " % high, " + Math.round(across * 100) + " % wide)");
+    // A card in its world (the Dragon Ball pendant on its canyon, Yoni 25/11/2026): its edges fade into the black like every
+    // card, but the world around the jewel is lit: the share of the jewel is not measured by the light.
+    const decor = (await frame.locator("[data-thumb-decor]").count()) > 0;
+    if (edge > 0.03 || (!decor && (share > 0.75 || (share < 0.55 && across < 0.85)))) bad.push(slug + " (edge " + (edge * 100).toFixed(1) + " %, jewel " + Math.round(share * 100) + " % high, " + Math.round(across * 100) + " % wide)");
   }
   expect(bad).toEqual([]);
   await page.screenshot({ path: "verification/" + info.project.name + "/audit2411-creations.jpg", type: "jpeg", quality: 70, fullPage: true });

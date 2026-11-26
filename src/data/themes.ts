@@ -57,6 +57,9 @@ export const THEME_EFFECTS = [
   "maple",
   // The sky of the angel (Deniz Undav, 23/11/2026): a few white feathers drifting down.
   "feathers",
+  // The gold of the champions (Inter, VfB, 25/11/2026): a golden light and reflections on the background, a golden rule under
+  // the title.
+  "gold-light",
   // An effect on the piece itself, that ties it to its world (src/components/universe/JewelFx.tsx).
   "jewel-sheen",
   "jewel-sparkle",
@@ -126,6 +129,16 @@ export type Backdrop = {
   /** Where the heart of the image is (0 to 1): it is placed behind the piece. */
   focusX: number;
   focusY: number;
+  /**
+   * Where the piece stands in the image (25/11/2026): its centre as shares of the computer image (anchor) and of the phone image
+   * (mobileAnchor); the page places the image so that this point is under the piece at every size (src/components/Universe.tsx).
+   */
+  anchor?: [number, number];
+  mobileAnchor?: [number, number];
+  /** The share of the height of the opening kept free above the piece, for what the image holds there (the sphere): computer, phone. */
+  below?: [number, number];
+  /** Its depth maps (scripts/universe-depth.py): their versions, computer (d) and phone (m), "<id>-depth.<v>.webp". */
+  depth?: { d: string; m?: string };
   /** The widths of the files, landscape ("<id>-<w>") and portrait for phones ("<id>-m-<w>"), each in AVIF and WebP. */
   widths: number[];
   mobileWidths: number[];
@@ -217,13 +230,16 @@ export const THEME_PRESETS: Record<string, Preset> = {
   // the blue lights of the stadium; a light rain of confetti, blue, black and gold, behind the ring (src/components/universe/fx.ts).
   "victoire-nuit": {
     name: "Victoire : l'équipe soulève le trophée, projecteurs bleus, confettis (Inter Milan)",
-    theme: { base: "#03050b", tint: "#0b1733", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: INTER_VICTORY, entrance: "stars", effects: ["twenty-stars", "confetti", "glints"], mark: "" },
+    // 25/11/2026 (Yoni): the gold of a champions' special edition signs the capsule: golden confetti, a golden light and
+    // reflections on the background, a fine golden rule under the title ("gold-light"); Inter keeps its blue.
+    theme: { base: "#03050b", tint: "#0b1733", glow: "#f0d49a", texture: "grain", light: "spotlight", font: "trophee", backdrop: INTER_VICTORY, entrance: "stars", effects: ["twenty-stars", "confetti", "gold-confetti", "glints", "gold-light"], mark: "" },
   },
   // 23/11/2026 (Yoni: more triumph, the red he loves): the squad of VfB lifting its cup behind the ring, red flares; a light
   // rain of confetti, gold and red.
   "victoire-rouge": {
     name: "Victoire : l'équipe soulève la coupe, fumigènes rouges, confettis or et rouges (VfB Stuttgart)",
-    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: VFB_VICTORY, entrance: "smoke", effects: ["confetti", "glints"], mark: "" },
+    // 25/11/2026: the gold of the champions too (Stuttgart keeps its red).
+    theme: { base: "#070303", tint: "#330c10", glow: "#ff5a4a", texture: "grain", light: "spotlight", font: "gothique-allemande", backdrop: VFB_VICTORY, entrance: "smoke", effects: ["confetti", "gold-confetti", "glints", "gold-light"], mark: "" },
   },
   // 23/11/2026 (Yoni: the sky, for the meaning of the angel; no more cathedral): above the clouds, rays of golden light, a
   // few feathers. The L and its angel large in front.
@@ -407,6 +423,7 @@ export const EFFECT_NAMES: Record<ThemeEffect, string> = {
   smoke: "Fumée",
   "smoke-rise": "Fumée qui monte (fumigènes)",
   genkidama: "Genkidama : la lumière monte vers la sphère",
+  "gold-light": "Or de champion : lueur et reflets dorés sur le décor, filet or sous le titre",
   moon: "La lune brille à peine (fond avec une lune)",
   scene: "Le décor s'anime (projecteur, étoile, bougies, faisceaux… propres au fond)",
   flashes: "Flashs d'appareils photo dans la foule",

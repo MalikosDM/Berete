@@ -141,7 +141,7 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   await ready(page);
   await expect
     .poll(() => page.locator(".u-backdrop img").evaluate((i) => ((i as HTMLImageElement).complete ? (i as HTMLImageElement).currentSrc : "")))
-    .toMatch(new RegExp("/media/universes/genkidama" + (phone ? "-m-\\d+" : "-\\d+") + "\\.(avif|webp)$"));
+    .toMatch(new RegExp("/media/universes/genkidama" + (phone ? "-m-\\d+" : "-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"));
   // The glow on the sphere, breathing; the sphere at the top of the screen, in the middle of the image.
   const glow = page.locator("article[data-piece] .u-genki-glow");
   await expect(glow).toBeVisible();

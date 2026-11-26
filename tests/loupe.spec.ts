@@ -125,7 +125,8 @@ test("the help « Click to zoom »: shown once per visit, gone at the first zoom
   await p.evaluate(() => sessionStorage.removeItem("bj-zoom-help"));
   await openPhoto(p, "[data-angle][data-angle-type='image']");
   const help = p.locator("[data-zoom-help]");
-  await expect(help).toHaveText(phone ? "Touchez pour zoomer" : "Cliquez pour zoomer");
+  // (25/11/2026: the magnifying glass that follows the pointer, a long press on a phone.)
+  await expect(help).toHaveText(phone ? "Appui long pour la loupe · touchez pour zoomer" : "Survolez la photo pour la loupe · molette pour la grossir · cliquez pour zoomer");
   // The loupe copies of the photo after and of the photo before load too.
   const items = (await p.locator("[data-lightbox] p").first().innerText()).split("/").map((x) => Number(x.trim()));
   expect(items[0]).toBe(1);

@@ -102,9 +102,14 @@ export function diverseFirst(items: MediaItem[], sameViews: string[][], count = 
   return [...first, ...items.filter((m) => !first.includes(m))];
 }
 
+/** The photos of a piece that show the same view (scripts/angle-views.ts, by their fingerprints). */
+export function sameViewsOf(slug: string): string[][] {
+  return (views as Record<string, string[][]>)[slug] ?? [];
+}
+
 export function pieceMediaOf(
   piece: Piece,
-  { raw, box, part, opening }: { raw?: Piece; box?: { images: MediaItem[] }; part?: { piece: Piece; photos: string[] | "all" } | null; opening: { mode: string; views: Pick<CutoutView, "id" | "source">[] } },
+  { raw, box, part, opening, ordered = false }: { raw?: Piece; box?: { images: MediaItem[] }; part?: { piece: Piece; photos: string[] | "all" } | null; opening: { mode: string; views: Pick<CutoutView, "id" | "source">[] }; ordered?: boolean },
 ): { film: { source?: string; files: string[] } | null; partPhotos: MediaItem[]; angles: MediaItem[]; worn: MediaItem[] } {
   const feature = featureFilmOf(piece.slug);
   const reveal = resolveReveal(piece.slug, piece.atelier);
@@ -113,7 +118,9 @@ export function pieceMediaOf(
   const partPhotos: MediaItem[] = !part ? [] : uniqueMedia(part.photos === "all" ? partAll : part.photos.map((n) => partAll.find((m) => fileBase(m.src) === n)).filter((m): m is MediaItem => Boolean(m)));
   const taken = new Set([...openingSources(piece, opening), ...(box?.images.map((m) => m.src) ?? []), ...partPhotos.map((m) => m.src)]);
   const wornSrcs = wornSet(raw ?? piece);
-  const angles = diverseFirst(uniqueMedia(anglePhotos(piece, false, wornSrcs).filter((m) => !sameFilm(m, film?.source, film?.files)), taken), (views as Record<string, string[][]>)[piece.slug] ?? []);
+  // The order of the admin, when Yoni gave one (src/data/magazine.ts adminOrdered), is kept as it is.
+  const kept = uniqueMedia(anglePhotos(piece, false, wornSrcs).filter((m) => !sameFilm(m, film?.source, film?.files)), taken);
+  const angles = ordered ? kept : diverseFirst(kept, sameViewsOf(piece.slug));
   const worn = uniqueMedia(
     [...piece.handover, ...[piece.cover, ...piece.gallery].filter((m) => wornSrcs.has(m.src))].filter((m) => !sameFilm(m, film?.source, film?.files)),
     new Set([...taken, ...angles.map((m) => m.src)]),

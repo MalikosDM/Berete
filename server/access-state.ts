@@ -110,6 +110,10 @@ export function setCookie(req: Request, res: Response, name: string, value: stri
 export function grantAccess(req: Request, res: Response): void {
   const exp = Math.floor(Date.now() / 1000) + DAYS * 86400;
   setCookie(req, res, COOKIE, exp + "." + accessSig(exp), DAYS * 86400);
+  // A mark the pages can read (it opens nothing): this device came in by the private access or the admin, so the footer shows
+  // the small padlock that leads to the admin (Yoni, 25/11/2026). The site is opened by the signed cookie above only.
+  const secure = req.secure || req.headers["x-forwarded-proto"] === "https";
+  res.append("Set-Cookie", "bj_in=1; Path=/; Max-Age=" + DAYS * 86400 + "; SameSite=Lax" + (secure ? "; Secure" : ""));
 }
 
 export function hasAccess(req: Request): boolean {

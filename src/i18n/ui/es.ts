@@ -118,6 +118,7 @@ export const es: Messages = {
     pitch: "Cadenas, colgantes y anillos de campeón, diseñados con usted y creados para el momento.",
     legal: "Aviso legal",
     privacy: "Privacidad",
+    admin: "Espacio de administración",
   },
 
   collections: {
@@ -300,7 +301,9 @@ export const es: Messages = {
   gallery: {
     /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
     clickToZoom: "Haga clic para ampliar",
+    hoverToMagnify: "Pase sobre la foto para la lupa · rueda para ampliarla · haga clic para acercar",
     tapToZoom: "Toque para ampliar",
+    holdToMagnify: "Mantenga pulsado para la lupa · toque para ampliar",
     title: "Detalles",
     hintPinned: "Desplácese para explorar · Toque para ampliar",
     hint: "Toque para ampliar",
@@ -419,6 +422,8 @@ export const es: Messages = {
     /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
     liveWithSpace: "Fotos y vídeos del avance en directo por WhatsApp y en su espacio privado de cliente.",
     spaceAfterDeposit: "Tras el anticipo del diseño, accede a su espacio privado de cliente: su pieza en 3D y su avance en directo.",
+    live: { title: "Siga su pieza, en directo", text: "En su espacio privado, ve el diseño 3D de su pieza y lo aprueba; después sigue cada etapa de su fabricación en fotos y vídeos, como un paquete que se rastrea, sin tener que pedirlo." },
+    price: { title: "¿Cómo se fija el precio?", items: ["Usted llega con su presupuesto, y el diseño se concibe para ese presupuesto.", "Se pide un presupuesto mínimo.", "El precio depende de los materiales, la calidad de los diamantes, el peso del oro, la complejidad de la pieza y sus mecanismos (piezas que se abren, que giran)."] },
     quick: {
       lead: "Del primer boceto a la entrega en su estuche: seis etapas, seguidas con usted por WhatsApp.",
       steps: [
@@ -805,6 +810,7 @@ export const es: Messages = {
     soundOff: "Silenciar",
     fullscreen: "Ver en pantalla completa",
     dragonLine: "Su Spirit Bomb engastada con diamantes gira.",
+    progress: "Avance del vídeo: deslice para avanzar o retroceder",
   },
   films: {
     pieceSection: "La pieza terminada",

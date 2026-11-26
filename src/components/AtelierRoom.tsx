@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, LoaderCircle, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowRight, LoaderCircle, Maximize, Minimize, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
 import { media } from "@/data/catalogue";
+import { makingSteps } from "@/data/making";
+import type { MakingStep } from "@/data/types";
+import { useCatalogue } from "@/lib/catalogue";
+import { useFullscreen } from "@/lib/fullscreen";
 import { filmTime, type Film, type FilmKind, type ResolvedAtelier } from "@/data/atelier";
 import { Link, useI18n } from "@/i18n";
 import { wantsLight } from "@/lib/films";
@@ -52,6 +56,15 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
   const src = light ? film.mobile : film.src;
   const filmName = kind === "making" ? t.films.making : t.films.reveal;
   const bench = media.groups["atelier"]?.[2];
+  // The steps of its making (wax, setting, polishing…), when the house has them: in small under its name (25/11/2026).
+  const cat = useCatalogue();
+  const piece = cat.pieces.find((p) => p.slug === slug);
+  const box = piece?.boxSlug ? cat.boxes.find((b) => b.slug === piece.boxSlug) : undefined;
+  const steps = piece ? makingSteps(piece, box?.images[0]).map((x) => x.step) : [];
+  const STEP_NAMES: Record<MakingStep, { title: string }> = t.piece.steps;
+  // Full screen: the film with its controls, and the same button (or Escape) leaves it (src/lib/fullscreen.ts).
+  const filmRef = useRef<HTMLDivElement>(null);
+  const { full, toggle: toggleFull } = useFullscreen(filmRef, videoRef);
 
   // The room is one step of the history: the back gesture (or button) of the phone leaves it.
   const pushed = useRef(false);
@@ -147,7 +160,7 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
   // Escape leaves, wherever the focus is (a click on the film leaves it on the page).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
+      if (e.key !== "Escape" || document.fullscreenElement) return;
       e.preventDefault();
       close();
     };
@@ -174,7 +187,7 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
   const chapters: { kind: FilmKind; name: string; film: Film }[] = [{ kind: "making", name: t.films.making, film: atelier.making }];
   if (atelier.reveal) chapters.push({ kind: "reveal", name: t.films.reveal, film: atelier.reveal });
   const duration = film.duration || 1;
-  const frame = { "--fa": film.width + " / " + film.height, "--fh": "min(80svh, calc(50vw * " + film.height + " / " + film.width + "))" } as CSSProperties;
+  const frame = { "--fa": film.width + " / " + film.height, "--fr": String(film.width / film.height), "--fh": "min(76svh, calc(50vw * " + film.height + " / " + film.width + "))" } as CSSProperties;
   const btn = "inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/45 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light";
 
   const room = (
@@ -187,11 +200,15 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
       data-film={kind}
       data-lenis-prevent
       onKeyDown={onKeyDown}
+      style={frame}
       className="atelier-room fixed inset-0 z-[95] overflow-hidden bg-[#0b0806] text-white"
     >
       {/* The room: a photo of the bench in the dark, the lamp, the wood, the grain */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        {bench ? <img src={bench.src} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-[0.16] blur-[6px]" /> : null}
+        {/* A real photo of the atelier of the house, blurred and darkened (25/11/2026: the film is watched in his atelier, never in
+            a black window). */}
+        {bench ? <img src={bench.src} alt="" data-atelier-scene className="absolute inset-0 h-full w-full scale-110 object-cover opacity-[0.5] blur-[10px]" /> : null}
+        <span className="ar-dim absolute inset-0" />
         <span className="ar-lamp absolute inset-0" />
         <span className="ar-bench absolute inset-x-0 bottom-0 h-[22svh]" />
         <span className="ar-grain absolute inset-0" />
@@ -209,6 +226,16 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
               {title}
             </h2>
             {madeFor !== t.common.privateCollector ? <p className="mt-1 text-base text-bone lg:mt-3">{t.common.madeFor(madeFor, type)}</p> : null}
+            {steps.length > 0 ? (
+              <ul data-atelier-steps className="mt-3 hidden flex-wrap gap-x-3 gap-y-1 text-[0.75rem] uppercase tracking-[0.16em] text-mist sm:flex lg:mt-5">
+                {steps.map((step, i) => (
+                  <li key={step} className="flex items-center gap-3">
+                    {i > 0 ? <span aria-hidden="true" className="inline-block h-px w-3 bg-rose-light/60" /> : null}
+                    {STEP_NAMES[step]?.title ?? step}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
             {world ? (
               // "Enter the World" on phones, under the name of the piece (computers: under the button to leave).
               <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-2 inline-flex min-h-12 items-center gap-2 text-base font-medium uppercase tracking-[0.1em] text-rose-light lg:hidden">
@@ -239,7 +266,7 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
         </div>
 
         {/* The film */}
-        <div style={frame} className="absolute inset-0 lg:relative lg:inset-auto lg:h-[var(--fh)] lg:[aspect-ratio:var(--fa)] lg:max-w-[52vw]">
+        <div ref={filmRef} data-atelier-film className="ar-film lg:relative lg:h-[var(--fh)] lg:[aspect-ratio:var(--fa)] lg:max-w-[52vw]">
           <div className="ar-frame absolute inset-0 overflow-hidden bg-black lg:border lg:border-rose-light/20">
             <video
               ref={videoRef}
@@ -344,6 +371,9 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
               ) : (
                 <span className="sr-only">{t.films.silent}</span>
               )}
+              <button type="button" onClick={toggleFull} data-atelier-fullscreen aria-pressed={full} aria-label={full ? t.viewer.exitFullscreen : t.feature.fullscreen} className={btn}>
+                {full ? <Minimize className="size-5" aria-hidden="true" /> : <Maximize className="size-5" aria-hidden="true" />}
+              </button>
             </div>
           </div>
         </div>

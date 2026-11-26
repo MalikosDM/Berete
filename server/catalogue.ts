@@ -92,6 +92,43 @@ function list<T>(schema: z.ZodType<T>, v: unknown): T[] {
 /** What identifies an imported file: its address and its size (a file redone under the same name changes size). */
 const fileKey = (m: MediaItem) => [m.src, m.width ?? "", m.height ?? "", m.duration ?? "", m.poster ?? ""].join(",");
 
+/**
+ * The photos of a piece as Yoni chose them in the admin (25/11/2026: "tout ce que Yoni change dans l'admin doit apparaître sur
+ * le site"): the base remembers the list of the catalogue it last followed (`seed`, ServerSetting "gallery-seed:<slug>:<field>").
+ * When the admin changed the list since (a photo removed, the order changed), only what the catalogue changed since is applied
+ * (a photo added by the import at the end, a photo gone from the folders removed): his choices and his order stay. When the
+ * admin never touched it, the list follows the catalogue as before.
+ */
+export function mergeChosen(current: MediaItem[], defaults: MediaItem[], seed: string[] | null): MediaItem[] {
+  const keys = (l: MediaItem[]) => l.filter((m) => m.src.startsWith(IMPORTED)).map(fileKey);
+  const now = keys(current);
+  const sameSet = (a: string[], b: string[]) => a.length === b.length && [...a].sort().join("|") === [...b].sort().join("|");
+  // Never touched since the catalogue was last followed (same files, in the order of the catalogue): it follows the catalogue.
+  if (seed === null || now.join("|") === seed.join("|")) return mergeImported(current, defaults);
+  const wanted = keys(defaults);
+  if (sameSet(wanted, seed)) return current;
+  const added = defaults.filter((m) => m.src.startsWith(IMPORTED) && !seed.includes(fileKey(m)));
+  const gone = new Set(seed.filter((k) => !wanted.includes(k)));
+  const kept = current.filter((m) => !m.src.startsWith(IMPORTED) || !gone.has(fileKey(m)));
+  return [...kept, ...added.filter((m) => !kept.some((k) => fileKey(k) === fileKey(m)))];
+}
+
+async function seedOf(key: string): Promise<string[] | null> {
+  const row = await prisma.serverSetting.findUnique({ where: { key } });
+  if (!row) return null;
+  try {
+    const v = JSON.parse(row.value) as unknown;
+    return Array.isArray(v) ? v.map(String) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function remember(key: string, list: MediaItem[]): Promise<void> {
+  const value = JSON.stringify(list.filter((m) => m.src.startsWith(IMPORTED)).map(fileKey));
+  await prisma.serverSetting.upsert({ where: { key }, create: { key, value }, update: { value } });
+}
+
 /** The imported files follow the folders; the rest of the list (admin uploads) stays. */
 export function mergeImported(current: MediaItem[], defaults: MediaItem[]): MediaItem[] {
   const imported = (l: MediaItem[]) => l.filter((m) => m.src.startsWith(IMPORTED)).map(fileKey).sort().join("|");
@@ -330,6 +367,9 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     if (texts) await prisma.person.update({ where: { id: row.id }, data: { ...texts.texts, seedHash: texts.seedHash } });
   }
 
+  // Yoni ordered the pieces (or the trunks) in the admin: their order is his from then on (server/routes/site.ts, reorder).
+  const piecesOrdered = (await prisma.serverSetting.findUnique({ where: { key: "admin-ordered:pieces" } })) !== null;
+  const boxesOrdered = (await prisma.serverSetting.findUnique({ where: { key: "admin-ordered:boxes" } })) !== null;
   for (const [i, p] of cat.pieces.entries()) {
     const row = await prisma.piece.findUnique({ where: { slug: p.slug } });
     if (row === null) {
@@ -339,8 +379,8 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     await mark("piece:" + p.slug, seeded);
     const currentGallery = mediaList(row.gallery);
     const currentHandover = mediaList(row.handover);
-    const gallery = mergeImported(currentGallery, p.gallery);
-    const handover = mergeImported(currentHandover, p.handover);
+    const gallery = mergeChosen(currentGallery, p.gallery, await seedOf("gallery-seed:" + p.slug + ":gallery"));
+    const handover = mergeChosen(currentHandover, p.handover, await seedOf("gallery-seed:" + p.slug + ":handover"));
     const cover = mediaOne(row.cover);
     const nextCover = cover.src === "" || (cover.src.startsWith(IMPORTED) && fileKey(cover) !== fileKey(p.cover)) ? p.cover : cover;
     // The texts as the base holds them (the texts of the photos of the catalogue are not added to them here).
@@ -355,9 +395,13 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
         where: { id: row.id },
         // A piece that follows the catalogue also follows its order.
         // Published again in the catalogue (24/11/2026: its "published" left out of its texts means published): published here too.
-        data: { gallery, handover, cover: nextCover, ...theme, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) },
+        // The order of the pieces: the one of the catalogue until Yoni orders them in the admin (then his order stays).
+        data: { gallery, handover, cover: nextCover, ...theme, ...(making !== currentMaking ? { making } : {}), ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, ...(piecesOrdered ? {} : { sortOrder: i + 1 }) } : {}) },
       });
     }
+    // The list of the catalogue now followed, to know later what the admin changed.
+    await remember("gallery-seed:" + p.slug + ":gallery", p.gallery);
+    await remember("gallery-seed:" + p.slug + ":handover", p.handover);
   }
 
   for (const [i, b] of cat.boxes.entries()) {
@@ -370,7 +414,7 @@ export async function syncCatalogue(cat: Catalogue = defaultCatalogue): Promise<
     const current = mediaList(row.images);
     const images = mergeImported(current, b.images);
     const texts = textUpdate(boxTexts(toBox(row)), boxTexts(b), row.seedHash);
-    if (images !== current || texts) await prisma.box.update({ where: { id: row.id }, data: { images, ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, sortOrder: i + 1 } : {}) } });
+    if (images !== current || texts) await prisma.box.update({ where: { id: row.id }, data: { images, ...(texts ? { ...texts.texts, published: texts.texts.published ?? true, seedHash: texts.seedHash, ...(boxesOrdered ? {} : { sortOrder: i + 1 }) } : {}) } });
   }
 }
 

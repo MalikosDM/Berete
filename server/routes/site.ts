@@ -9,6 +9,7 @@ import { cleanDetailPoints } from "../../src/data/details3d.js";
 import { cleanShowcase } from "../../src/data/showcase.js";
 import { cleanTheme } from "../../src/data/themes.js";
 import { PIECE_TYPES } from "../../src/data/types.js";
+import { defaultCatalogue } from "../../src/data/catalogue.js";
 import { DetailSchema, MakingSchema, MediaItemSchema, MediaListSchema, PressSchema, readCatalogue, readHouse, SpecSchema, toBox, toPerson, toPiece, toStory, TranslationsSchema } from "../catalogue.js";
 import { prisma } from "../db.js";
 import { Prisma } from "../generated/prisma/client.js";
@@ -510,6 +511,19 @@ site.post("/admin/:kind/reorder", requireAdmin, async (req, res) => {
   if (!p.success) return invalid(res, p.error);
   await guard(res, async () => {
     for (const [i, id] of p.data.ids.entries()) await kind.table().update({ where: { id }, data: { sortOrder: i + 1 } });
+    // From now on his order stays, whatever the catalogue brings (server/catalogue.ts); back to the order of the catalogue, the
+    // catalogue leads again.
+    const kindName = String(req.params.kind);
+    if (kindName === "pieces" || kindName === "boxes") {
+      const key = "admin-ordered:" + kindName;
+      const rows = kindName === "pieces" ? await prisma.piece.findMany({ select: { id: true, slug: true } }) : await prisma.box.findMany({ select: { id: true, slug: true } });
+      const slugOf = new Map(rows.map((r) => [r.id, r.slug]));
+      const listed = (kindName === "pieces" ? defaultCatalogue.pieces : defaultCatalogue.boxes).map((x) => x.slug);
+      const given = p.data.ids.map((id) => slugOf.get(id)).filter((x): x is string => x !== undefined && listed.includes(x));
+      const catalogueOrder = listed.filter((x) => given.includes(x));
+      if (given.join("|") === catalogueOrder.join("|")) await prisma.serverSetting.deleteMany({ where: { key } });
+      else await prisma.serverSetting.upsert({ where: { key }, create: { key, value: "1" }, update: { value: "1" } });
+    }
     res.json({ ok: true });
   });
 });

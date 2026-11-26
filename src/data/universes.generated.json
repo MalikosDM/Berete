@@ -13,7 +13,19 @@
    "mobileWidths": [
     720,
     1080
-   ]
+   ],
+   "anchor": [
+    0.5,
+    0.48
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.32
+   ],
+   "depth": {
+    "d": "318df79d11",
+    "m": "ec6656f711"
+   }
   },
   "butterfly": {
    "name": "Forêt violette au clair de lune (Butterfly)",
@@ -39,7 +51,19 @@
     0.4985,
     0.1255,
     0.167
-   ]
+   ],
+   "anchor": [
+    0.62,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "724faa8594",
+    "m": "5ed991cc0f"
+   }
   },
   "inter": {
    "name": "Stade de nuit (Inter Milan)",
@@ -54,7 +78,19 @@
    "mobileWidths": [
     720,
     1080
-   ]
+   ],
+   "anchor": [
+    0.5,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.4138
+   ],
+   "depth": {
+    "d": "356b16ad4c",
+    "m": "c635887fef"
+   }
   },
   "vfb": {
    "name": "Stade de nuit, fumigènes rouges et confettis dorés (VfB Stuttgart)",
@@ -70,7 +106,19 @@
     720,
     1080
    ],
-   "portrait": true
+   "portrait": true,
+   "anchor": [
+    0.6,
+    0.48
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "e81290eb87",
+    "m": "5ee3e8f3aa"
+   }
   },
   "tunnel": {
    "name": "Tunnel du vestiaire (Noah Okafor)",
@@ -85,13 +133,120 @@
    "mobileWidths": [
     720,
     1080
-   ]
+   ],
+   "anchor": [
+    0.5,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.388
+   ],
+   "depth": {
+    "d": "81db1a7518",
+    "m": "b14a128d2f"
+   }
   },
   "genkidama": {
-   "name": "Genkidama, sphère de lumière (Dragon Ball)",
+   "name": "Genkidama v2 : canyon en feu, éclairs bleus, la sphère en haut (Dragon Ball)",
+   "ratio": 1.792,
+   "focusX": 0.597,
+   "focusY": 0.62,
+   "anchor": [
+    0.597,
+    0.62
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.51
+   ],
+   "widths": [
+    960,
+    1600,
+    2560
+   ],
+   "mobileWidths": [
+    720,
+    1080
+   ],
+   "portrait": true,
+   "core": [
+    0.597,
+    0.045,
+    0.141
+   ],
+   "mobileCore": [
+    0.5,
+    0.042,
+    0.45
+   ],
+   "version": "9297bbdde5",
+   "depth": {
+    "d": "d29792dec3",
+    "m": "322b76429a"
+   },
+   "regions": {
+    "bolts": {
+     "d": [
+      0.1,
+      0.08,
+      0.36,
+      0.5
+     ],
+     "m": [
+      0,
+      0.36,
+      0.22,
+      0.62
+     ]
+    },
+    "bolts2": {
+     "d": [
+      0.74,
+      0.04,
+      0.92,
+      0.42
+     ],
+     "m": [
+      0.8,
+      0.4,
+      1,
+      0.56
+     ]
+    },
+    "fires": {
+     "d": [
+      0.16,
+      0.5,
+      0.96,
+      0.66
+     ],
+     "m": [
+      0.32,
+      0.64,
+      1,
+      0.76
+     ]
+    }
+   },
+   "below": [
+    0.3,
+    0.3
+   ]
+  },
+  "genkidama-v1": {
+   "name": "Genkidama v1, sphère de lumière sur fond noir (Dragon Ball)",
    "ratio": 1.792,
    "focusX": 0.5,
    "focusY": 0.42,
+   "anchor": [
+    0.5,
+    0.42
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
    "widths": [
     960,
     1600,
@@ -111,7 +266,12 @@
     0.5,
     0.223,
     0.26
-   ]
+   ],
+   "version": "fab2e8bce7",
+   "depth": {
+    "d": "9e15732667",
+    "m": "665302ef41"
+   }
   },
   "arene": {
    "name": "Arène de combat, projecteur doré (Losene Keita)",
@@ -161,7 +321,19 @@
       0.17
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.64,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "562d41310f",
+    "m": "97e12ecd56"
+   }
   },
   "bianconero": {
    "name": "Stade en noir et blanc, rayures de lumière (Kenan Yildiz)",
@@ -286,7 +458,19 @@
      ]
     }
    },
-   "version": "0daf078d52"
+   "version": "0daf078d52",
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "228cd478a6",
+    "m": "908319f43a"
+   }
   },
   "okafor-jersey": {
    "name": "Projecteurs vert, blanc et rouge sur une scène (Noah Okafor, pendentif maillot)",
@@ -303,7 +487,19 @@
     1080
    ],
    "portrait": true,
-   "version": "ba612a2b19"
+   "version": "ba612a2b19",
+   "anchor": [
+    0.56,
+    0.66
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "b616d71fe7",
+    "m": "39cc23e5b8"
+   }
   },
   "okafor-oka": {
    "name": "Camouflage or rose et lignes de carte (Noah Okafor, pendentif OKA)",
@@ -320,7 +516,19 @@
     1080
    ],
    "portrait": true,
-   "version": "0cf81f72af"
+   "version": "0cf81f72af",
+   "anchor": [
+    0.6,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "4c1443fb76",
+    "m": "65c8e195c4"
+   }
   },
   "serpent": {
    "name": "Temple sombre, serpents or rose, lueur rouge (Marcus Thuram)",
@@ -368,6 +576,18 @@
       0.72
      ]
     }
+   },
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "663512d33b",
+    "m": "f42ca89e73"
    }
   },
   "sirius": {
@@ -400,7 +620,19 @@
       0.085
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.62,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "915bee4b96",
+    "m": "af404f927e"
+   }
   },
   "tulipes": {
    "name": "Champ de tulipes au crépuscule, moulins (Tulips on Tour)",
@@ -450,7 +682,19 @@
      ],
      "i": 1
     }
-   ]
+   ],
+   "anchor": [
+    0.66,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "6110713c5e",
+    "m": "f9d7c3cf59"
+   }
   },
   "flaneur": {
    "name": "Rue de Paris la nuit sous la pluie (Flâneur)",
@@ -528,6 +772,18 @@
       0.4
      ]
     }
+   },
+   "anchor": [
+    0.6,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "660b12acd6",
+    "m": "55db8379db"
    }
   },
   "trefle": {
@@ -576,6 +832,18 @@
       1
      ]
     }
+   },
+   "anchor": [
+    0.66,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "309e6fe0ee",
+    "m": "ab874f2671"
    }
   },
   "the-hand": {
@@ -654,6 +922,18 @@
       0.46
      ]
     }
+   },
+   "anchor": [
+    0.68,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "510e52de6d",
+    "m": "80a22c5580"
    }
   },
   "forge": {
@@ -717,6 +997,18 @@
       0.94
      ]
     }
+   },
+   "anchor": [
+    0.64,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "de164db994",
+    "m": "15acfddd8f"
    }
   },
   "sacre": {
@@ -751,7 +1043,19 @@
       19
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.62,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "6a22df7d93",
+    "m": "83874d7871"
+   }
   },
   "roses": {
    "name": "Roseraie de nuit (Roseraie)",
@@ -799,6 +1103,18 @@
       0.98
      ]
     }
+   },
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "100ca275a4",
+    "m": "f939b586a4"
    }
   },
   "velours": {
@@ -920,7 +1236,19 @@
       0.07
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.7,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "6d1988072a",
+    "m": "b8a2d9b6d9"
+   }
   },
   "facettes": {
    "name": "Salle de miroirs facettés (Facettes)",
@@ -936,7 +1264,19 @@
     720,
     1080
    ],
-   "portrait": true
+   "portrait": true,
+   "anchor": [
+    0.6,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "8688212da4",
+    "m": "fd41fd317e"
+   }
   },
   "mecanique": {
    "name": "Mouvement de montre géant (Mécanique)",
@@ -996,7 +1336,19 @@
       0.17
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.7,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "33b8b845fc",
+    "m": "a14a24b230"
+   }
   },
   "n14": {
    "name": "Ciel doux, une constellation qui dessine un N (N14)",
@@ -1201,7 +1553,19 @@
      ],
      "i": 4
     }
-   ]
+   ],
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "d2c8bd0cd6",
+    "m": "0e9605b941"
+   }
   },
   "ciel": {
    "name": "Ciel au-dessus des nuages, rayons de lumière dorée (Deniz Undav, le L à l'ange)",
@@ -1218,7 +1582,19 @@
     1080
    ],
    "portrait": true,
-   "version": "a376cd672d"
+   "version": "a376cd672d",
+   "anchor": [
+    0.6,
+    0.36
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "aec40ccd42",
+    "m": "4760c6b573"
+   }
   },
   "inter-victoire": {
    "name": "Victoire : l'équipe de l'Inter soulève le trophée, projecteurs bleus, confettis, feux d'artifice (Inter Milan)",
@@ -1235,7 +1611,19 @@
     1080
    ],
    "portrait": true,
-   "version": "b8133c78cd"
+   "version": "b8133c78cd",
+   "anchor": [
+    0.5,
+    0.42
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "e6958ca99a",
+    "m": "32c95e6c1e"
+   }
   },
   "inter-victoire-echarpes": {
    "name": "Victoire : l'équipe de l'Inter, écharpes levées (Inter Milan, variante)",
@@ -1252,7 +1640,19 @@
     1080
    ],
    "portrait": true,
-   "version": "72dcacad8a"
+   "version": "72dcacad8a",
+   "anchor": [
+    0.5,
+    0.42
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "10d862dc8b",
+    "m": "93f97ec44e"
+   }
   },
   "vfb-victoire": {
    "name": "Victoire : l'équipe du VfB soulève la coupe, fumigènes rouges, confettis or et rouges, feux d'artifice (VfB Stuttgart)",
@@ -1269,7 +1669,19 @@
     1080
    ],
    "portrait": true,
-   "version": "e8c7b4b5f9"
+   "version": "e8c7b4b5f9",
+   "anchor": [
+    0.55,
+    0.42
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "2257ffe083",
+    "m": "96bbe2debc"
+   }
   },
   "inter-victoire-v2": {
    "name": "Victoire, la nuit : toute l'équipe de l'Inter écharpes levées, confettis, feux d'artifice (Inter Milan, v2)",
@@ -1286,7 +1698,19 @@
     1080
    ],
    "portrait": true,
-   "version": "fc9eb9b671"
+   "version": "fc9eb9b671",
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "ba0c03551b",
+    "m": "ee50f52e81"
+   }
   },
   "vfb-victoire-v2": {
    "name": "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)",
@@ -1303,7 +1727,19 @@
     1080
    ],
    "portrait": true,
-   "version": "91ac804abc"
+   "version": "91ac804abc",
+   "anchor": [
+    0.66,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "d82d4f048e",
+    "m": "dfa5042efa"
+   }
   },
   "gothique": {
    "name": "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)",
@@ -1320,7 +1756,19 @@
     1080
    ],
    "portrait": true,
-   "version": "c58598fd94"
+   "version": "c58598fd94",
+   "anchor": [
+    0.6,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "d996435532",
+    "m": "078818b29a"
+   }
   },
   "keita-ko": {
    "name": "Le KO : la panthère de fumée qui bondit (Losene Keita)",
@@ -1370,7 +1818,19 @@
       0.17
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.64,
+    0.4
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "1cb941f559",
+    "m": "ca7339eda0"
+   }
   },
   "keita-cage": {
    "name": "La cage ouverte, le chemin de lumière (Losene Keita)",
@@ -1420,7 +1880,19 @@
       0.16
      ]
     }
-   ]
+   ],
+   "anchor": [
+    0.63,
+    0.55
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "46b6294f18",
+    "m": "6c62f6ff56"
+   }
   },
   "keita-tribune": {
    "name": "La célébration : il s'applaudit face à la foule (Losene Keita)",
@@ -1486,6 +1958,18 @@
       0.75
      ]
     }
+   },
+   "anchor": [
+    0.67,
+    0.5
+   ],
+   "mobileAnchor": [
+    0.5159,
+    0.5
+   ],
+   "depth": {
+    "d": "317e59bb28",
+    "m": "1be7447750"
    }
   },
   "infini": {
@@ -1512,7 +1996,19 @@
     0.5,
     0.383,
     0.233
-   ]
+   ],
+   "anchor": [
+    0.711,
+    0.39
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "faa95993ac",
+    "m": "74af9f61c1"
+   }
   },
   "sirius-japon": {
    "name": "Nuit japonaise, lune de sang, pagode, masques oni (Sirius)",
@@ -1754,7 +2250,19 @@
      ],
      "i": 1
     }
-   ]
+   ],
+   "anchor": [
+    0.668,
+    0.42
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "4717568927",
+    "m": "a63537235b"
+   }
   },
   "keita": {
    "name": "La nuit de Losene Keita : KO, cage ouverte, célébration (séquence)",
@@ -1771,6 +2279,18 @@
     1080
    ],
    "portrait": true,
+   "anchor": [
+    0.64,
+    0.4
+   ],
+   "mobileAnchor": [
+    0.5,
+    0.5
+   ],
+   "depth": {
+    "d": "1cb941f559",
+    "m": "ca7339eda0"
+   },
    "sequence": [
     "keita-ko",
     "keita-cage",

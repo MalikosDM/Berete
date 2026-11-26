@@ -860,7 +860,6 @@ const content: Record<string, string> = {
   "A tribute to imagination, craftsmanship, and the legacy of Akira Toriyama, whose universe taught generations that true strength is never singular.": "Een eerbetoon aan verbeelding, vakmanschap en de nalatenschap van Akira Toriyama, wiens universum generaties leerde dat ware kracht nooit alleen staat.",
   "Classic, bezel, channel, reverse": "Klassiek, kast, rail, omgekeerd",
   // The studio photos first (23/11/2026).
-  "The L pendant of Deniz Undav, its cherub in rose gold": "De L-hanger van Deniz Undav, met zijn engeltje in roségoud",
   "Tanguy Nianzou's FAM medallion": "Het FAM-medaillon van Tanguy Nianzou",
   "Tajon Buchanan's square watch set with diamonds": "Het vierkante, met diamanten gezette horloge van Tajon Buchanan",
   "Radja Nainggolan's iced watch": "Het iced horloge van Radja Nainggolan",

@@ -3,6 +3,28 @@ import thumbs from "@/data/thumbs.generated.json" with { type: "json" };
 import type { Piece } from "@/data/types";
 import { MediaView, Img } from "@/components/Media";
 import { scaleSizes, srcSetOf } from "@/lib/responsive";
+import { BACKDROPS } from "@/data/themes";
+
+/**
+ * The card of a piece in its world (Yoni, 25/11/2026: the Dragon Ball pendant "with the earth and the lightning"): the image of
+ * its universe behind the jewel, its sphere above it, its edges fading into the black of the page like every card.
+ */
+const THUMB_DECOR: Record<string, string> = { "kevin-schade-dragon-ball-pendant": "genkidama" };
+
+function Decor({ id, frame }: { id: string; frame: number }) {
+  const b = BACKDROPS[id];
+  if (!b) return null;
+  const v = b.version ? "." + b.version : "";
+  // An upright card takes the phone image (its sphere at the top), a wide one the computer image, its sphere above the middle.
+  const tall = frame <= 1;
+  const ratio = tall ? 9 / 16 : b.ratio;
+  const [ax] = (tall ? b.mobileAnchor : b.anchor) ?? [0.5, 0.5];
+  // The image covers the card; its anchor (the axis of the sphere) on the middle of the card.
+  const iw = Math.max(1, ratio / frame);
+  const x = iw > 1.001 ? Math.min(100, Math.max(0, ((ax * iw - 0.5) / (iw - 1)) * 100)) : 50;
+  const src = "/media/universes/" + id + (tall ? "-m-1080" : "-1600") + v + ".webp";
+  return <img src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" data-thumb-decor={id} className="thumb-decor absolute inset-0 h-full w-full object-cover" style={{ objectPosition: x.toFixed(1) + "% 0%" }} />;
+}
 
 type Thumb = { kind: "cutout" | "photo"; src: string; srcSet?: string; width: number; height: number; box: number[] };
 const THUMBS = thumbs as Record<string, Thumb>;
@@ -53,8 +75,14 @@ export default function PieceThumb({ piece, sizes, frame = 4 / 5, eager = false,
       style={style}
     />
   );
+  const decor = THUMB_DECOR[piece.slug];
   if (th.kind === "cutout") {
-    return <span data-thumb="cutout" className="absolute inset-0">{img({ width: iw * 100 + "%", left: left * 100 + "%", top: (top / H) * 100 + "%" })}</span>;
+    return (
+      <span data-thumb="cutout" className="absolute inset-0">
+        {decor ? <Decor id={decor} frame={frame} /> : null}
+        {img({ width: iw * 100 + "%", left: left * 100 + "%", top: (top / H) * 100 + "%" })}
+      </span>
+    );
   }
   // A photo: only the jewel and a little air around it (never its reflection, its stand, its floor), its edges fading into
   // the page; the frame fades too.

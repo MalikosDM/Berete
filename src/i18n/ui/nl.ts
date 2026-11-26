@@ -116,6 +116,7 @@ export const nl: Messages = {
     pitch: "Kettingen, hangers en kampioensringen, samen met u ontworpen en gemaakt voor het moment.",
     legal: "Juridische informatie",
     privacy: "Privacy",
+    admin: "Beheerruimte",
   },
 
   collections: {
@@ -298,7 +299,9 @@ export const nl: Messages = {
   gallery: {
     /** The little help of the viewer, once per visit (src/components/Lightbox.tsx). */
     clickToZoom: "Klik om in te zoomen",
+    hoverToMagnify: "Beweeg over de foto voor het vergrootglas · scroll om het te vergroten · klik om te zoomen",
     tapToZoom: "Tik om in te zoomen",
+    holdToMagnify: "Lang drukken voor het vergrootglas · tik om te zoomen",
     title: "Details",
     hintPinned: "Scroll om te verkennen · Tik om te zoomen",
     hint: "Tik om te zoomen",
@@ -417,6 +420,8 @@ export const nl: Messages = {
     /** With the server only (the client space): step 04 and step 02 of the timeline (24/11/2026). */
     liveWithSpace: "Live foto’s en video’s van de voortgang via WhatsApp en in uw privé-klantenruimte.",
     spaceAfterDeposit: "Na de aanbetaling voor het ontwerp krijgt u toegang tot uw privé-klantenruimte: uw stuk in 3D en de voortgang ervan, live.",
+    live: { title: "Volg uw stuk, live", text: "In uw privéruimte ziet u het 3D-ontwerp van uw stuk en keurt u het goed; daarna volgt u elke stap van de vervaardiging in foto’s en video’s, zoals een pakket dat u volgt, zonder erom te hoeven vragen." },
+    price: { title: "Hoe wordt de prijs bepaald?", items: ["U komt met uw budget, en het ontwerp wordt voor dat budget bedacht.", "Er wordt een minimumbudget gevraagd.", "De prijs hangt af van de materialen, de kwaliteit van de diamanten, het gewicht van het goud, de complexiteit van het stuk en zijn mechanismen (stukken die opengaan, die draaien)."] },
     quick: {
       lead: "Van een eerste schets tot de overhandiging in zijn koffer: zes stappen, samen met u gevolgd via WhatsApp.",
       steps: [
@@ -802,6 +807,7 @@ export const nl: Messages = {
     soundOff: "Geluid uitzetten",
     fullscreen: "Bekijk op volledig scherm",
     dragonLine: "Zijn met diamanten gezette Spirit Bomb draait.",
+    progress: "Voortgang van de film: sleep om vooruit of terug te gaan",
   },
   films: {
     pieceSection: "Het voltooide stuk",

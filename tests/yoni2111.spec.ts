@@ -102,7 +102,8 @@ test("Dragon Ball: its main view much larger and whole; its film after the openi
   await expect.poll(() => img.evaluate((i) => (i as HTMLImageElement).naturalWidth), { timeout: 15_000 }).toBeGreaterThan(0);
   const box = await drawn(img);
   const vp = page.viewportSize()!;
-  expect(box.height / vp.height, "its height on the screen").toBeGreaterThan(phone ? 0.52 : 0.75);
+  // (Since 25/11/2026 under the sphere of the Genkidama v2: large, lower, the sphere above it.)
+  expect(box.height / vp.height, "its height on the screen").toBeGreaterThan(phone ? 0.3 : 0.5);
   expect(box.top).toBeGreaterThanOrEqual(0);
   expect(box.top + box.height).toBeLessThanOrEqual(vp.height + 1);
   expect(box.left).toBeGreaterThanOrEqual(0);
@@ -310,5 +311,5 @@ test("admin: the NZ Travel Case kept, unpublished; the size of the piece in the 
   await page.getByRole("tab", { name: "Pièces" }).click();
   await page.locator("[data-admin-row='" + DRAGON + "'] button[aria-label='Modifier']").click();
   // Larger still since the evening of 23/11/2026 (its chain leaving the top, on a computer).
-  await expect(page.locator("[data-showcase-size='xl']")).toBeChecked();
+  await expect(page.locator("[data-showcase-size='large']")).toBeChecked();
 });

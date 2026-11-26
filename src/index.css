@@ -3479,3 +3479,266 @@ html[lang="ar"] [data-piece] [data-u-title] {
 [data-private-page] > section {
   padding-top: 3.5rem;
 }
+
+/* The bar of a film (src/components/SeekBar.tsx, 25/11/2026): a fine line of rose gold, a small round handle to pull forward
+   or back; 48 px to touch on a phone. */
+.seek {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  width: 100%;
+  height: 2rem;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+.seek::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-rose-light) var(--seek, 0%), rgb(255 255 255 / 0.3) var(--seek, 0%));
+}
+.seek::-moz-range-track {
+  height: 2px;
+  background: rgb(255 255 255 / 0.3);
+}
+.seek::-moz-range-progress {
+  height: 2px;
+  background: var(--color-rose-light);
+}
+.seek::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -6px;
+  border: 1px solid var(--color-rose-light);
+  border-radius: 9999px;
+  background: var(--color-bone);
+}
+.seek::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-rose-light);
+  border-radius: 9999px;
+  background: var(--color-bone);
+}
+.seek:focus-visible {
+  outline: 1px solid var(--color-rose-light);
+  outline-offset: 4px;
+}
+.seek:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+@media (pointer: coarse) {
+  .seek {
+    height: 3rem;
+  }
+  .seek::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    margin-top: -9px;
+  }
+}
+
+/* The opening of a piece shown by its photo on black (no clean cut-out, 25/11/2026): its four edges faded into the black, so
+   that no frame of the photo shows on its universe. */
+.opening-fade {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent), linear-gradient(to bottom, transparent, #000 10%, #000 88%, transparent);
+  mask-composite: intersect;
+}
+
+/* The image of a universe placed under the piece (25/11/2026, src/components/Universe.tsx): its anchor under the centre of the
+   piece at every size of window; the image, its depth, its sphere and its lights share the same box. */
+.universe[data-anchored] .u-backdrop img,
+.universe[data-anchored] .u-depth,
+.universe[data-anchored] .u-genki-box,
+.universe[data-anchored] .u-spots-box {
+  position: absolute;
+  left: var(--u-img-l);
+  top: var(--u-img-t);
+  width: var(--u-img-w);
+  height: auto;
+  aspect-ratio: var(--u-img-ratio);
+  max-width: none;
+  object-fit: cover;
+  object-position: 50% 50%;
+  transform: none;
+}
+/* The flat image drawn 3 % larger, as its depth is (its edges never show when the planes move): no jump from one to the other. */
+.universe[data-anchored] .u-backdrop img {
+  scale: 1.03;
+}
+.u-depth {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+[data-depth="gl"] .u-depth {
+  opacity: 1;
+}
+[data-depth="gl"] .u-backdrop img {
+  visibility: hidden;
+}
+/* The jewel moves a little with the mouse (the background less and the other way: in its shader, or in CSS without WebGL). */
+[data-depth] [data-piece-cover] {
+  transform: translate3d(calc(var(--u-mx, 0) * 9px), calc(var(--u-my, 0) * 6px), 0);
+}
+[data-depth="css"] .universe .u-backdrop img {
+  translate: calc(var(--u-mx, 0) * -10px) calc(var(--u-my, 0) * -6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-depth] [data-piece-cover],
+  [data-depth="css"] .universe .u-backdrop img {
+    transform: none;
+    translate: none;
+  }
+}
+
+/* The world behind the jewel of a card (the Dragon Ball pendant, 25/11/2026): its edges fade into the black of the page. */
+.thumb-decor {
+  opacity: 0.9;
+  -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent 97%);
+  mask-image: radial-gradient(closest-side, #000 55%, transparent 97%);
+}
+
+/* The gold of the champions (Inter Milan, VfB Stuttgart, 25/11/2026): a golden light behind the ring, a slow golden reflection
+   crossing the background, a fine golden rule under the title. Their blue and their red stay; the gold signs them. */
+.u-gold {
+  background:
+    radial-gradient(34% 30% at var(--u-at-x) var(--u-at-y), rgb(240 204 120 / 0.2), transparent 72%),
+    radial-gradient(70% 40% at 50% 0%, rgb(232 190 96 / 0.12), transparent 70%);
+  mix-blend-mode: screen;
+  overflow: hidden;
+}
+.u-gold-sheen {
+  position: absolute;
+  inset: -20% -60%;
+  background: linear-gradient(105deg, transparent 42%, rgb(246 214 140 / 0.1) 48%, rgb(255 236 180 / 0.16) 50%, rgb(246 214 140 / 0.1) 52%, transparent 58%);
+  animation: u-gold-sheen 11s ease-in-out infinite;
+}
+@keyframes u-gold-sheen {
+  0%,
+  35% {
+    transform: translateX(-38%);
+  }
+  75%,
+  100% {
+    transform: translateX(38%);
+  }
+}
+.universe[data-deep] .u-gold-sheen {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .u-gold-sheen {
+    animation: none;
+    opacity: 0;
+  }
+}
+[data-champion] #piece-title::after {
+  content: "";
+  display: block;
+  width: 4.5rem;
+  height: 1px;
+  margin-top: 0.85rem;
+  background: linear-gradient(90deg, #a77b2f, #f3d68d 50%, #a77b2f);
+}
+
+/* The atelier of a piece (25/11/2026, the video of Yoni): the film is watched in his atelier — a real photo of the bench,
+   blurred and darkened, the warm light of the bench lamp falling on the film, a light grain, the film standing on the bench. */
+.atelier-room .ar-dim {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgb(20 12 6 / 0.25), rgb(8 5 3 / 0.82) 100%),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.35), transparent 30%, transparent 70%, rgb(0 0 0 / 0.55));
+}
+.atelier-room .ar-lamp {
+  background:
+    radial-gradient(ellipse 34% 62% at 50% -6%, rgb(255 206 150 / 0.3), transparent 72%),
+    radial-gradient(ellipse 60% 45% at 50% -8%, rgb(255 214 170 / 0.18), transparent 70%),
+    radial-gradient(ellipse 120% 80% at 50% 50%, transparent 45%, rgb(0 0 0 / 0.6) 100%);
+}
+.atelier-room .ar-grain {
+  opacity: 0.12;
+}
+/* The film on a phone: as large as the screen allows under the name of the piece, never wider than the screen, in the scene. */
+.atelier-room .ar-film {
+  position: absolute;
+  left: 50%;
+  top: 7.5rem;
+  width: min(calc(100vw - 2rem), calc((100svh - 9.5rem) * var(--fr, 0.5625)));
+  aspect-ratio: var(--fa);
+  transform: translateX(-50%);
+}
+@media (min-width: 1024px) {
+  .atelier-room .ar-film {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: auto;
+    transform: none;
+  }
+  /* The bench comes up to the foot of the film: the film stands on it. */
+  .atelier-room .ar-bench {
+    height: calc(50svh - var(--fh, 76svh) / 2 + 2.5svh);
+  }
+}
+/* The lamp lights the film from above; its shadow falls on the bench. */
+.atelier-room .ar-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 55% at 50% -10%, rgb(255 214 160 / 0.14), transparent 70%);
+  mix-blend-mode: soft-light;
+}
+.atelier-room .ar-film::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -18px;
+  height: 26px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 30%, rgb(0 0 0 / 0.75), transparent 70%);
+  filter: blur(4px);
+}
+.atelier-room .ar-film:fullscreen {
+  width: 100%;
+  height: 100%;
+  transform: none;
+  left: 0;
+  top: 0;
+  background: #000;
+}
+.atelier-room .ar-film:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
+  transform: none;
+  left: 0;
+  top: 0;
+  background: #000;
+}
+
+/* Room above the piece for what its world holds there (the sphere of the Genkidama v2, 25/11/2026): the jewel stands lower in
+   the opening, right under the sphere. */
+[data-piece-cover][data-below] {
+  padding-top: max(5rem, calc(var(--u-below-m, 0.3) * 62svh));
+}
+@media (min-width: 1024px) {
+  [data-piece-cover][data-below] {
+    padding-top: max(7rem, calc(var(--u-below, 0.3) * min(100svh, 60rem)));
+  }
+}
+/* The depth is drawn only once the image is placed under the piece (never a small frame of its own before). */
+.universe:not([data-anchored]) .u-depth {
+  display: none;
+}
+.opening-halo {
+  position: absolute;
+  inset: -14% -42%;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgb(6 6 7 / 0.96) 0%, rgb(6 6 7 / 0.9) 52%, rgb(6 6 7 / 0.55) 76%, transparent 100%);
+}

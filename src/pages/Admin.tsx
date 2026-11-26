@@ -163,7 +163,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "pieces", label: KINDS.pieces.label },
   { key: "3d", label: "Modèles 3D" },
   { key: "clients", label: "Clients VIP" },
-  { key: "stories", label: KINDS.stories.label },
+  // « Stories » removed from the admin (Yoni, 25/11/2026): the stories are no longer shown on the site.
   { key: "people", label: KINDS.people.label },
   { key: "boxes", label: KINDS.boxes.label },
   { key: "cutouts", label: "Détourages" },

@@ -83,10 +83,11 @@ function Timeline({ steps }: { steps: ReturnType<typeof stepsOf> }) {
           <span aria-hidden="true" className="absolute top-2 bottom-2 start-[0.6875rem] w-px bg-white/15" />
           {steps.map((s, i) => {
             const image = TIMELINE_IMAGES[i];
+            const live = i === 2 ? <LiveStep key="live" /> : null;
             const to = TIMELINE_LINKS[i];
             const text = i === 3 && HAS_SERVER ? t.process.liveWithSpace : s.text;
             const frame = image ? <MediaView item={image} alt={s.title} fit="cover" sizes="11rem" /> : null;
-            return (
+            return [
               <li key={s.n} data-timeline-step={s.n} className="relative grid grid-cols-[1.375rem_1fr] gap-x-5 pb-10 last:pb-0 sm:gap-x-7">
                 <span aria-hidden="true" className="relative z-10 mt-1.5 flex size-[1.375rem] items-center justify-center rounded-full border border-rose-light/70 bg-ink">
                   <span className="bg-rose-gold block size-1.5 rounded-full" />
@@ -112,12 +113,32 @@ function Timeline({ steps }: { steps: ReturnType<typeof stepsOf> }) {
                     </p>
                   </div>
                 </div>
-              </li>
-            );
+              </li>,
+            ].concat(live ? [live] : []);
           })}
         </ol>
       </div>
     </section>
+  );
+}
+
+/**
+ * The client space set apart in the timeline (Yoni, 25/11/2026): a signature of the house, in a plain frame — the client sees the
+ * design of the piece in 3D, approves it, then follows every step of its making in photos and videos, without having to ask.
+ */
+function LiveStep() {
+  const { t } = useI18n();
+  return (
+    <li data-timeline-live className="relative grid grid-cols-[1.375rem_1fr] gap-x-5 pb-10 sm:gap-x-7">
+      <span aria-hidden="true" className="relative z-10 mt-6 flex size-[1.375rem] items-center justify-center rounded-full border border-rose-light bg-ink">
+        <span className="bg-rose-gold block size-2 rounded-full" />
+      </span>
+      <div className="border border-rose-light/40 bg-ink-soft/60 p-5 sm:p-6">
+        <p className="eyebrow">{t.common.signature}</p>
+        <h2 className="title-caps mt-2 t-sub tracking-[0.1em] text-white">{t.process.live.title}</h2>
+        <p className="mt-2 text-base leading-relaxed text-bone">{t.process.live.text}</p>
+      </div>
+    </li>
   );
 }
 
@@ -135,6 +156,20 @@ function Questions() {
           <div data-journey-time className="bg-ink p-6">
             <dt className="title-caps t-sub tracking-[0.1em] text-white">{t.process.quick.timeQ}</dt>
             <dd className="mt-2 text-base leading-relaxed text-bone">{t.process.quick.timeA}</dd>
+          </div>
+          {/* How the price is set (Yoni, 25/11/2026): what it depends on, never a figure. */}
+          <div data-journey-price className="bg-ink p-6 md:col-span-2">
+            <dt className="title-caps t-sub tracking-[0.1em] text-white">{t.process.price.title}</dt>
+            <dd className="mt-2">
+              <ul className="grid gap-2">
+                {t.process.price.items.map((item) => (
+                  <li key={item} className="flex gap-3 text-base leading-relaxed text-bone">
+                    <span aria-hidden="true" className="mt-[0.7em] inline-block h-px w-4 shrink-0 bg-rose-light" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </dd>
           </div>
         </dl>
       </div>

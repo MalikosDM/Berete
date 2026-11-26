@@ -19,8 +19,6 @@ import { checkPage, getCatalogue, skipIntro, watch } from "./helpers";
  * both directions; sharp, well framed main photos. Screenshots: verification/.
  */
 
-/** "Every Angle" shows four photos, then "See N more" (24/11/2026, src/components/EveryAngle.tsx). */
-const anglesShownFirst = (n: number) => Math.min(n, 4);
 
 const MAIN_PAGES = ["/", "/creations", "/players", "/atelier", "/boxes", "/process", "/about", "/press", "/contact", "/legal", "/privacy", "/admin"];
 
@@ -98,8 +96,12 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
     part: part && partPiece ? { piece: partPiece, photos: part.photos } : null,
     opening: resolveShowcase(piece.slug, piece.showcase),
   }).angles;
-  await expect(page.locator("[data-angle]"), id + " every angle").toHaveCount(anglesShownFirst(angles.length));
-  await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > anglesShownFirst(angles.length) ? 1 : 0);
+  // Since 25/11/2026 a magazine: four photos of the whole at most, the photos of the details beside their sentence, then See more.
+  expect(await page.locator("[data-every-angle] [data-angle]").count(), id + " every angle").toBeLessThanOrEqual(4);
+  const shownFirst = await page.locator("[data-angle]").count();
+  expect(shownFirst, id + " photos shown first").toBeLessThanOrEqual(angles.length);
+  expect(shownFirst, id + " photos shown first").toBeGreaterThan(0);
+  await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > shownFirst ? 1 : 0);
   for (const v of await page.locator("[data-angle] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }
@@ -396,8 +398,8 @@ test("contact: call back request reaches the admin", async ({ page }) => {
   await page.goto("/admin");
   await page.getByLabel("Mot de passe").fill(password!);
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page.getByRole("tab", { name: "Stories" })).toBeVisible();
-  await expect(page.locator("main li, section li").filter({ hasText: "/kenan-yildiz" })).toHaveCount(1);
+  // (« Stories » left the admin on 25/11/2026.)
+  await expect(page.getByRole("tab", { name: "Pièces" })).toBeVisible();
   await page.getByRole("tab", { name: "Messages" }).click();
   await expect(page.getByText("Test Verification").first()).toBeVisible();
   expect(problems.errors).toEqual([]);

@@ -5,6 +5,7 @@ import type { MediaItem } from "@/data/types";
 import { useI18n } from "@/i18n";
 import { getLenis } from "@/lib/gsap";
 import { loupeOf, preloadLoupe, useLoupes } from "@/lib/loupe";
+import SeekBar from "@/components/SeekBar";
 
 export type LightboxProps = {
   items: MediaItem[];
@@ -20,6 +21,13 @@ const CLICK_ZOOM = 2.5;
 const CEILING = 8;
 /** A move shorter than this (px) is a click, not a drag. */
 const CLICK = 6;
+/** The round magnifying glass that follows the pointer (Yoni, 25/11/2026): its size, its magnification by default, its limits. */
+const LENS = 180;
+const LENS_MAG = 2.5;
+const LENS_MIN = 2;
+const LENS_MAX = 5;
+/** A finger held still this long (ms) shows the magnifying glass above it. */
+const HOLD = 380;
 /** The little help « Click to zoom », once per visit. */
 const HELP_KEY = "bj-zoom-help";
 
@@ -54,10 +62,15 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
   const [sharp, setSharp] = useState<string | null>(null);
   const [help, setHelp] = useState(helpNotSeen);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const pointers = useRef(new Map<number, { x: number; y: number }>());
   const gesture = useRef<{ start: View; x: number; y: number; dist: number; moved: number; mid: { x: number; y: number } } | null>(null);
   const loupes = useLoupes();
+  // The magnifying glass over the photo: where the pointer is (in the stage), and whether a finger holds it.
+  const [lens, setLens] = useState<{ x: number; y: number; touch: boolean } | null>(null);
+  const [mag, setMag] = useState(LENS_MAG);
+  const hold = useRef<{ timer: number; id: number; x: number; y: number; on: boolean } | null>(null);
   const item = items[index];
   const count = items.length;
   // The magnifying glass is for photos only, never a film (Yoni, 23-24/11/2026).
@@ -72,6 +85,11 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
   const max = photo && box && fileWidth ? Math.min(CEILING, Math.max(1, fileWidth / box.w)) : 1;
   const canZoom = max > 1.05;
   const zoomed = view.s > 1.001;
+  // The magnifying glass goes as far as the file is sharp: one pixel of the file for one point of the screen at most.
+  const lensMax = photo && box && fileWidth ? Math.min(LENS_MAX, fileWidth / (box.w * Math.max(1, view.s))) : 0;
+  const lensMin = Math.min(LENS_MIN, lensMax);
+  const lensOk = lensMax >= 1.25;
+  const lensMag = Math.min(lensMax, Math.max(lensMin, mag));
 
   // The size of the stage, followed (a window resized, a phone turned).
   useLayoutEffect(() => {
@@ -177,6 +195,11 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
     if (!el) return undefined;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
+      if (lens && !lens.touch && !e.ctrlKey) {
+        // Over the photo, the wheel makes the magnifying glass stronger or weaker (x2 to x5, as far as the file is sharp).
+        setMag((m) => Math.min(LENS_MAX, Math.max(LENS_MIN, m * Math.exp(-e.deltaY * 0.0025))));
+        return;
+      }
       if (zoomed && !e.ctrlKey && Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
         setAnimate(false);
         setView((v) => clamp({ s: v.s, x: v.x - e.deltaX, y: v.y - e.deltaY }));
@@ -204,7 +227,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
       el.removeEventListener("gesturestart", onGestureStart);
       el.removeEventListener("gesturechange", onGestureChange);
     };
-  }, [zoomTo, clamp, zoomed, view.s]);
+  }, [zoomTo, clamp, zoomed, view.s, lens]);
 
   if (!item) return null;
 
@@ -214,14 +237,75 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
     const dist = pts.length >= 2 ? Math.hypot(pts[0]!.x - pts[1]!.x, pts[0]!.y - pts[1]!.y) : 0;
     gesture.current = { start: view, x: mid.x, y: mid.y, dist, moved: gesture.current?.moved ?? 0, mid };
   };
+  /** The point of the stage under the pointer, when it is over the photo (never over a button, never beside the photo). */
+  const overPhoto = (clientX: number, clientY: number, target: EventTarget | null): { x: number; y: number } | null => {
+    if (!photo || !box || !lensOk) return null;
+    if (target instanceof Element && target.closest("button, input, a")) return null;
+    const rect = stageRef.current?.getBoundingClientRect();
+    if (!rect) return null;
+    const v = clamp(view);
+    const w = box.w * v.s;
+    const h = box.h * v.s;
+    const left = rect.width / 2 + v.x - w / 2;
+    const top = rect.height / 2 + v.y - h / 2;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    if (x < Math.max(0, left) || x > Math.min(rect.width, left + w) || y < Math.max(0, top) || y > Math.min(rect.height, top + h)) return null;
+    return { x, y };
+  };
+  const endHold = () => {
+    if (hold.current) window.clearTimeout(hold.current.timer);
+    hold.current = null;
+  };
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.pointerType === "mouse" && e.button !== 0) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* a pointer the browser no longer knows */
+    }
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (pointers.current.size === 1) gesture.current = null;
     begin();
+    // A finger held still on the photo: the magnifying glass comes above it and follows it.
+    endHold();
+    if (e.pointerType !== "mouse" && pointers.current.size === 1 && overPhoto(e.clientX, e.clientY, e.target)) {
+      const id = e.pointerId;
+      const start = { x: e.clientX, y: e.clientY };
+      hold.current = {
+        id,
+        x: start.x,
+        y: start.y,
+        on: false,
+        timer: window.setTimeout(() => {
+          const h = hold.current;
+          const at = h ? overPhoto(h.x, h.y, null) : null;
+          if (!h || !at || pointers.current.size !== 1) return;
+          h.on = true;
+          setLens({ ...at, touch: true });
+        }, HOLD),
+      };
+    } else if (e.pointerType === "mouse") setLens(null);
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    // The mouse over the photo: the magnifying glass in place of the pointer; beside the photo (the arrows, the cross), none.
+    if (e.pointerType === "mouse" && !pointers.current.has(e.pointerId)) {
+      const at = overPhoto(e.clientX, e.clientY, e.target);
+      setLens(at ? { ...at, touch: false } : null);
+      return;
+    }
+    const h = hold.current;
+    if (h && h.id === e.pointerId) {
+      if (h.on) {
+        // The finger holds the magnifying glass: it follows the finger, the photo stays where it is.
+        h.x = e.clientX;
+        h.y = e.clientY;
+        const at = overPhoto(e.clientX, e.clientY, null);
+        setLens(at ? { ...at, touch: true } : null);
+        return;
+      }
+      if (Math.hypot(e.clientX - h.x, e.clientY - h.y) > CLICK) endHold();
+    }
     if (!pointers.current.has(e.pointerId)) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current;
@@ -249,6 +333,15 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
     }
   };
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
+    // The finger lifted after holding the magnifying glass: it goes, and nothing else happens (no zoom, no next photo).
+    const held = hold.current?.on && hold.current.id === e.pointerId;
+    endHold();
+    if (held) {
+      pointers.current.delete(e.pointerId);
+      gesture.current = null;
+      setLens(null);
+      return;
+    }
     const g = gesture.current;
     const last = pointers.current.get(e.pointerId);
     pointers.current.delete(e.pointerId);
@@ -276,7 +369,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
   // The stage may have changed size (a window resized, a phone turned): the zoom drawn stays inside the photo.
   const drawn = clamp(view);
   const touch = typeof window !== "undefined" && window.matchMedia("(hover: none)").matches;
-  const cursor = !photo || !canZoom ? "" : zoomed ? "cursor-zoom-out active:cursor-grabbing" : "cursor-zoom-in";
+  const cursor = lens && !lens.touch ? "cursor-none" : !photo || !canZoom ? "" : zoomed ? "cursor-zoom-out active:cursor-grabbing" : "cursor-zoom-in";
   const blend = item.onBlack ? "mix-blend-lighten" : "";
 
   return (
@@ -313,12 +406,15 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className={"relative flex-1 touch-none overflow-hidden select-none " + cursor}
+        onPointerLeave={(e) => (e.pointerType === "mouse" ? setLens(null) : undefined)}
+        onContextMenu={(e) => (hold.current ? e.preventDefault() : undefined)}
+        className={"relative flex-1 touch-none overflow-hidden select-none [-webkit-touch-callout:none] " + cursor}
       >
         {item.type === "video" ? (
           <video
             key={item.src}
             ref={(v) => {
+              videoRef.current = v;
               if (v) {
                 forceMuted(v);
                 v.play().catch(() => undefined);
@@ -381,9 +477,10 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
             ) : null}
           </div>
         )}
+        {lens && photo && box && lensOk ? <MagnifyingGlass lens={lens} mag={lensMag} box={box} view={drawn} stage={stage} src={zoom?.src ?? item.src} blend={Boolean(item.onBlack)} /> : null}
         {photo && help && canZoom && !zoomed ? (
           <p data-zoom-help aria-hidden="true" className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-ink/75 px-4 py-2 text-base whitespace-nowrap text-bone">
-            {touch ? t.gallery.tapToZoom : t.gallery.clickToZoom}
+            {touch ? t.gallery.holdToMagnify : lensOk ? t.gallery.hoverToMagnify : t.gallery.clickToZoom}
           </p>
         ) : null}
         {count > 1 ? (
@@ -398,7 +495,49 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
         ) : null}
       </div>
 
+      {/* A film: its bar, to pull forward or back (25/11/2026). */}
+      {item.type === "video" ? <SeekBar key={item.src} video={videoRef} className="mx-auto w-full max-w-3xl px-5 sm:px-8" /> : null}
       {item.caption ? <p className="px-5 py-4 text-center text-base text-bone sm:px-8">{item.caption}</p> : <div className="h-6" aria-hidden="true" />}
     </div>
+  );
+}
+
+/**
+ * The round magnifying glass (Yoni, 25/11/2026): 180 px, a fine rose gold edge, the photo under it magnified from its sharpest
+ * file (its loupe copy). With a mouse it takes the place of the pointer; under a finger it stands above the finger, so that
+ * the finger never hides it.
+ */
+function MagnifyingGlass({ lens, mag, box, view, stage, src, blend }: { lens: { x: number; y: number; touch: boolean }; mag: number; box: { w: number; h: number }; view: View; stage: { w: number; h: number } | null; src: string; blend: boolean }) {
+  const w = box.w * view.s;
+  const h = box.h * view.s;
+  const sw = stage?.w ?? 0;
+  const sh = stage?.h ?? 0;
+  // Where the photo is drawn in the stage, and the point of the photo under the pointer (0 to 1).
+  const left = sw / 2 + view.x - w / 2;
+  const top = sh / 2 + view.y - h / 2;
+  const fx = (lens.x - left) / w;
+  const fy = (lens.y - top) / h;
+  const r = LENS / 2;
+  // Under a finger: above it (never out of the screen).
+  const cx = lens.x;
+  const cy = lens.touch ? Math.max(r, lens.y - r - 56) : lens.y;
+  return (
+    <div
+      data-loupe-lens
+      data-mag={mag.toFixed(2)}
+      data-touch={lens.touch ? "" : undefined}
+      aria-hidden="true"
+      className={"pointer-events-none absolute z-10 rounded-full border border-rose-light shadow-[0_10px_40px_rgb(0_0_0/0.65)] " + (blend ? "bg-ink" : "bg-black")}
+      style={{
+        width: LENS,
+        height: LENS,
+        left: cx - r,
+        top: cy - r,
+        backgroundImage: 'url("' + src + '")',
+        backgroundRepeat: "no-repeat",
+        backgroundSize: w * mag + "px " + h * mag + "px",
+        backgroundPosition: r - fx * w * mag + "px " + (r - fy * h * mag) + "px",
+      }}
+    />
   );
 }

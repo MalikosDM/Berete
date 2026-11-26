@@ -1,4 +1,6 @@
 
+import { useEffect, useState } from "react";
+import { Lock } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import { LanguageLinks } from "@/components/LanguageMenu";
 import Logo from "@/components/Logo";
@@ -129,9 +131,39 @@ export default function Footer() {
                 {t.footer.privacy}
               </Link>
             </li>
+            <AdminLock />
           </ul>
         </div>
       </div>
     </footer>
+  );
+}
+
+/**
+ * The way to the admin from the site (Yoni, 25/11/2026): a small padlock, discreet, at the foot of the page; shown only to a
+ * device that came in by the private access or that logged in to the admin (the mark "bj_in" of server/access-state.ts, or the
+ * session of the admin), never to a visitor.
+ */
+function AdminLock() {
+  const { t } = useI18n();
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    let admin = false;
+    try {
+      admin = Boolean(sessionStorage.getItem("bj-admin-token"));
+    } catch {
+      /* private browsing */
+    }
+    // Known only in the browser (the page written by the server never shows it).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShown(admin || /(?:^|;\s*)bj_in=1/.test(document.cookie));
+  }, []);
+  if (!shown) return null;
+  return (
+    <li>
+      <a href="/admin" data-admin-lock aria-label={t.footer.admin} title={t.footer.admin} className="inline-flex size-12 items-center justify-center text-mist/70 transition-colors hover:text-rose-light">
+        <Lock className="size-4" aria-hidden="true" />
+      </a>
+    </li>
   );
 }

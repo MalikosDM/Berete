@@ -732,24 +732,6 @@
     "note": ""
    }
   ],
-  "deniz-undav-l-pendant": [
-   {
-    "id": "studio",
-    "kind": "face",
-    "width": 1600,
-    "height": 2518,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "version": "4fcb322b01",
-    "fade": null,
-    "clean": true,
-    "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/deniz-undav-l-pendant-detoure.png",
-    "note": ""
-   }
-  ],
   "samuel-ballet-jesus-piece": [
    {
     "id": "s02",

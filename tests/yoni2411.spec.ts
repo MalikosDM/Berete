@@ -129,7 +129,10 @@ test("the magnifying glass: none over the page; a photo opened large zooms where
   if (desktop(info.project.name)) {
     const b = (await stage.boundingBox())!;
     await page.mouse.move(b.x + b.width * 0.4, b.y + b.height * 0.4);
+    // (25/11/2026: the wheel alone makes the magnifying glass stronger; a pinch of the trackpad, the wheel with Ctrl, zooms.)
+    await page.keyboard.down("Control");
     await page.mouse.wheel(0, -400);
+    await page.keyboard.up("Control");
     await expect.poll(() => stage.getAttribute("data-zoom").then(Number)).toBeGreaterThan(1.2);
   } else {
     await box.locator("[data-zoom-in]").click();
@@ -172,7 +175,8 @@ test("every piece: the same order; its film plays by itself, whole in the screen
         expect(cover.y + cover.height).toBeLessThanOrEqual(view.height + 1);
       }
       // The order.
-      const order = ["[data-piece-opening]", "[data-feature-film]", "[data-every-angle]", "[data-piece-story]", "[data-composition]"];
+      // (25/11/2026, a magazine: its film and its story side by side right after the opening, then its photos.)
+      const order = ["[data-piece-opening]", "[data-piece-spread]", "[data-every-angle]", "[data-composition]"];
       const present: number[] = [];
       for (const sel of order) if ((await page.locator(sel).count()) > 0) present.push(await top(page, sel));
       expect(present).toEqual([...present].sort((a, b) => a - b));

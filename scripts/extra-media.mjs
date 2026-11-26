@@ -175,8 +175,7 @@ const PIECES = {
   "tajon-buchanan-iced-watch": [["studio", join(STUDIO, "tajon-buchanan-iced-watch-studio-ia.jpg")]],
   "marcus-thuram-skeleton-watch": [["studio", join(STUDIO, "marcus-thuram-skeleton-watch-studio-ia.jpg")]],
   "tanguy-nianzou-fam-medallion": [["studio", join(STUDIO, "tanguy-nianzou-fam-medallion-studio-ia.jpg")]],
-  // The L of Deniz Undav cut out by hand (transparent PNG): whole, its transparency kept (WebP with alpha).
-  "deniz-undav-l-pendant": [["studio", join(STUDIO, "deniz-undav-l-pendant-detoure.png")]],
+  // The L of Deniz Undav: no image made by AI any more (Yoni, 25/11/2026: it added metal and hid the flat L): its real photos.
   // Marcus Thuram with Kanye West and a third person, wearing his T (story 20/06): the photo only, without the frame of the
   // Instagram post around it; its right edge trimmed so that the "several photos" icon of Instagram in its corner goes.
   "players/marcus-thuram": [["kanye", story("20 Thuram SS23/20 Thuram SS23 - 06.jpg"), [0.0589, 0.1901, 0.8078, 0.6188]]],

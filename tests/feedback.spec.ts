@@ -80,7 +80,8 @@ test("Sirius, BRT Flower and the L pendant: every photo of their folders, their 
   expect(brt.making.polishing?.src).toBe("/media/hd/brt-flower-chain/v02-24_8s.webp");
   const deniz = pieceOf("deniz-undav-l-pendant");
   // Its 10 photos and, first since 23/11/2026, its studio image (also its cover).
-  expect(new Set([deniz.cover, ...deniz.gallery].map((m) => m.src)).size).toBe(11);
+  // Its ten real photos (25/11/2026: its image made by AI removed).
+  expect(new Set([deniz.cover, ...deniz.gallery].map((m) => m.src)).size).toBe(10);
   expect(FILMS["deniz-undav-l-pendant"]?.making?.source).toContain("38/v01");
   expect(deniz.making.polishing?.src).toBe("/media/hd/deniz-undav-l-pendant/v02.mp4");
 });
