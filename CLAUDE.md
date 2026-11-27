@@ -209,6 +209,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **Atelier** : les chapitres en vrais moments filmés en boucle, muets (`scripts/atelier-chapters.mjs`, `public/media/atelier-chapters/`) ;
       dans la fenêtre de l'atelier « Up next » (même personne, même catégorie…), à la fin « Enter the World » ou « Next film »
       (`tests/atelier2711.spec.ts`).
+- Vérifié le 27/11 : en local sur le site construit, 436 tests réussis (pages, contenus, univers, accueil, Atelier, anciens tests mis
+  à jour : ordinateur et iPhone) ; `npm run audit:coherence` 258 pages de pièces × 1440 et iPhone + Atelier + écrins, 6 langues,
+  0 problème ; `npm run i18n:check` complet. En ligne (commit 65344d51) : `contenus2711`, `universes2711`, `atelier2711`, `film-frame`
+  (ordinateur, iPhone) 57 réussis, `home2711` 8 réussis (sans son test admin), mot de passe réel remis à l'identique. Captures avant /
+  après : `~/Downloads/_verif-contenus-27-11/{avant,apres}/` (accueil, Atelier, écrins, 8 pages ; 1440, 1920, iPhone ; haut et entière).
 - [ ] **Malik** : copier les 4 fichiers de Dubaï (vidéo 00.30.56, photos 00.34.33, 00.34.33 (1), 00.49.17) dans
       `.local/yoni-2711/okafor-dubai/` (macOS bloque leur lecture depuis Téléchargements) puis `node scripts/yoni-2711-media.mjs
       --only=okafor-dubai` ; enregistrer depuis WhatsApp la photo de Yoni avec Thuram et Arnautović et la « photo 2 » (absentes des albums).

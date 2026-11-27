@@ -97,6 +97,8 @@ test.describe("the chapters of The Atelier", () => {
     const context = await browser.newContext({ ...info.project.use, reducedMotion: "reduce" });
     const { silence } = await import("./fixtures");
     await silence(context);
+    // Behind the door of the site under construction (online): enter it as tests/fixtures.ts does for its own context.
+    if (process.env.ACCESS_PASSWORD && info.project.use.baseURL) await context.request.post(new URL("/api/access", info.project.use.baseURL).href, { form: { password: process.env.ACCESS_PASSWORD, next: "/" }, maxRedirects: 0 });
     const page = await context.newPage();
     await skipIntro(page);
     await page.goto("/atelier", { waitUntil: "load" });
