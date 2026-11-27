@@ -61,6 +61,15 @@ export const SettingsSchema = z.object({
       diamond: z.record(z.string().max(40), z.unknown()).optional(),
       bevel: z.number().min(0).max(16).optional(),
       bloom: z.boolean().optional(),
+      // 27/11/2026: a layer lying apart shown anyway; the metal's own colour, roughness, clear coat and colour look.
+      showApart: z.boolean().optional(),
+      metalColor: z
+        .string()
+        .regex(/^#[0-9a-f]{6}$/i)
+        .optional(),
+      roughness: z.number().min(0).max(1).optional(),
+      clearcoat: z.number().min(0).max(1).optional(),
+      lut: z.string().max(40).nullable().optional(),
     }),
   ),
   metals: z.array(z.enum(METALS)).max(METALS.length),

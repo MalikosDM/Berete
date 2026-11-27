@@ -7,8 +7,14 @@
  *
  * Always reachable, with their own protection: /admin and its API (the admin password; logging in also opens the site on
  * that device), the private links of the clients (/vip/<token>, /view/<token>, the sealed share links /s/<token>, the client
- * space once entered) and only the files these pages need (the code of the pages, the brand), the checks of the server
- * (/api/health). Nothing else.
+ * space once entered, the embed code of a 3D link /embed/<token>) and only the files these pages need (the code of the
+ * pages, the brand), the checks of the server (/api/health). Nothing else.
+ *
+ * The embed code (27/11/2026) lives in a frame of another site, where a browser may refuse the cookies of this one: its
+ * pass is set for that case (SameSite=None, Partitioned, on https), and its files are also given to a request whose
+ * referrer is the embed page of a valid link (what a browser sends for the files of that page). Same as a 3D link: the
+ * token opens the page and its files, nothing more. The page itself is served here, open site or not (the app shows it
+ * alone: <meta name="bj-private">).
  *
  * Settings, in the base (table ServerSetting, so in the backups, and kept through updates, reinstalls and restores):
  *   access.construction   "on" | "off"    (missing = on: the site never opens to the public by mistake)
@@ -27,7 +33,7 @@ import { doorLang, doorPage, type DoorMessage, type DoorMode } from "./door.js";
 import { shareExists } from "./routes/shares.js";
 import { sessionClient } from "./routes/vip.js";
 import { serverSecret } from "./secret.js";
-import { limiter, LOCAL, visitor } from "./security.js";
+import { EMBED_PAGE, limiter, LOCAL, visitor } from "./security.js";
 
 /** The pass of a private page (a client link, a 3D link): the code of the page and the brand, for a day. */
 const PASS = "bj_pass";
@@ -45,6 +51,50 @@ function grantPass(req: Request, res: Response): void {
 /** A client entered in his space, or a visitor of a private link: the files of these pages only. */
 function hasPass(req: Request): boolean {
   return valid(cookie(req, PASS), passSig) || sessionClient(req) !== null;
+}
+
+/** The pass of the embed page, in a frame of another site: sent back there too (on https; else the usual one). */
+function grantEmbedPass(req: Request, res: Response): void {
+  if (!(req.secure || req.headers["x-forwarded-proto"] === "https")) return grantPass(req, res);
+  const exp = Math.floor(Date.now() / 1000) + PASS_HOURS * 3600;
+  res.append("Set-Cookie", PASS + "=" + exp + "." + passSig(exp) + "; Path=/; Max-Age=" + PASS_HOURS * 3600 + "; HttpOnly; Secure; SameSite=None; Partitioned");
+}
+
+/** The embed tokens checked lately (a frame asks for some thirty files at once): token → until when the answer holds. */
+const embedChecked = new Map<string, { ok: boolean; until: number }>();
+
+async function validEmbedToken(token: string): Promise<boolean> {
+  const known = embedChecked.get(token);
+  if (known && known.until > Date.now()) return known.ok;
+  const ok = await validPrivateToken("view", token);
+  if (embedChecked.size > 500) embedChecked.clear();
+  embedChecked.set(token, { ok, until: Date.now() + 60_000 });
+  return ok;
+}
+
+/** A file asked by the embed page of a valid link (its referrer, on this very site), when the frame has no cookie. */
+async function fromEmbed(req: Request): Promise<boolean> {
+  const referrer = req.get("referer");
+  if (!referrer) return false;
+  try {
+    const from = new URL(referrer);
+    const here = new URL(originOf(req));
+    if (from.host !== here.host) return false;
+    const page = EMBED_PAGE.exec(from.pathname);
+    return page ? await validEmbedToken(page[1] ?? "") : false;
+  } catch {
+    return false;
+  }
+}
+
+/** The page of the app, alone (<meta name="bj-private">: src/App.tsx shows that page only), with the pass of its files. */
+function sendPrivateShell(req: Request, res: Response, shell: string, pass: (req: Request, res: Response) => void, otherwise: () => void): void {
+  fs.readFile(shell, "utf8", (error, html) => {
+    if (error) return otherwise();
+    pass(req, res);
+    res.setHeader("Cache-Control", "no-store");
+    res.type("html").send(html.replace("<head>", '<head>\n    <meta name="bj-private" content="1" />'));
+  });
 }
 
 /* ---------- The gate ---------- */
@@ -108,9 +158,21 @@ export function gate(dist: string): RequestHandler {
   const shell = path.join(dist, "app.html");
   return (req: Request, res: Response, next: NextFunction) => {
     refreshAccess();
+    const p = req.path;
+    // The embed code of a 3D link: its page alone, open site or not.
+    const embed = req.method === "GET" || req.method === "HEAD" ? EMBED_PAGE.exec(p) : null;
+    if (embed) {
+      res.setHeader("X-Robots-Tag", "noindex, nofollow");
+      const open = !accessState().construction || hasAccess(req) || (LOCAL.test(visitor(req)) && process.env.ACCESS_LOCAL !== "closed");
+      if (open) return sendPrivateShell(req, res, shell, () => undefined, next);
+      void validEmbedToken(embed[1] ?? "").then(
+        (ok) => (ok ? sendPrivateShell(req, res, shell, grantEmbedPass, () => sendDoor(req, res, "soon", 200)) : sendDoor(req, res, "soon", 200)),
+        () => sendDoor(req, res, "soon", 200),
+      );
+      return;
+    }
     if (!accessState().construction) return next();
     res.setHeader("X-Robots-Tag", "noindex, nofollow");
-    const p = req.path;
     if (p === "/robots.txt") {
       res.type("text/plain").setHeader("Cache-Control", "no-store");
       res.send("User-agent: *\nDisallow: /\n");
@@ -150,6 +212,14 @@ export function gate(dist: string): RequestHandler {
       return;
     }
     if (PRIVATE_FILES.test(p) && hasPass(req)) return next();
+    // The files of the embed page in a frame of another site that refused its cookie.
+    if (PRIVATE_FILES.test(p)) {
+      void fromEmbed(req).then(
+        (ok) => (ok ? next() : sendDoor(req, res, "soon", 200)),
+        () => sendDoor(req, res, "soon", 200),
+      );
+      return;
+    }
     sendDoor(req, res, "soon", 200);
   };
 }

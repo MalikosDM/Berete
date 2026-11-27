@@ -4,6 +4,7 @@ import type { FeatureFilmData } from "@/data/featureFilms";
 import { useI18n } from "@/i18n";
 import { useFullscreen } from "@/lib/fullscreen";
 import SeekBar from "@/components/SeekBar";
+import { posterBehind } from "@/components/Media";
 
 
 /**
@@ -128,20 +129,32 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
         className="feature-film relative overflow-hidden border border-white/10 bg-black"
         style={{ aspectRatio: film.width + " / " + film.height, width: "calc(" + height + " * " + film.width + " / " + film.height + ")", maxWidth: "100%" }}
       >
+        {/* Its poster also under the film (posterBehind: Safari draws nothing while a film loads). A film that opens on black
+            (`start`: the Dragon Ball pendant fades in from black for 2 s) starts past it and loops back there, never a black box. */}
         <video
           ref={videoRef}
           src={src}
           poster={film.poster}
           muted={muted}
-          loop
+          loop={!film.start}
           playsInline
           preload="none"
           aria-label={label}
           data-feature-video
+          data-start={film.start || undefined}
+          onLoadedMetadata={(e) => {
+            if (film.start && e.currentTarget.currentTime < film.start) e.currentTarget.currentTime = film.start;
+          }}
+          onEnded={(e) => {
+            if (!film.start) return;
+            e.currentTarget.currentTime = film.start;
+            void e.currentTarget.play().catch(() => undefined);
+          }}
           onPlaying={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onClick={togglePlay}
           className="h-full w-full cursor-pointer object-contain"
+          style={posterBehind(film.poster)}
         />
         {/* The buttons never wider than the frame: on a very narrow frame they go on two lines rather than being cut. */}
         <div className="absolute end-2.5 bottom-2.5 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1.5">

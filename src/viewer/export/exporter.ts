@@ -7,6 +7,8 @@
  * is made image by image (never in real time) and a 4K film takes as long as it needs, without dropping a frame.
  * Films: WebCodecs (H.264) muxed into an .mp4 by mp4-muxer; where WebCodecs or H.264 is missing, MediaRecorder on a
  * canvas stream (an .mp4 in Safari, a .webm in browsers that only know that). The result says which one was used.
+ * A .webm (VP9) is made on request too, up to 4K, the same way: WebCodecs (VP9, else VP8) muxed by webm-muxer (same
+ * author as mp4-muxer, loaded only then), else MediaRecorder. Safari encodes no VP9: `canMakeWebm()` says no there.
  */
 import { ArrayBufferTarget, Muxer } from "mp4-muxer";
 import { Zip, ZipPassThrough } from "three/examples/jsm/libs/fflate.module.js";
@@ -58,7 +60,11 @@ export type FilmOptions = {
   signal?: AbortSignal;
   /** "auto" (default): WebCodecs, else MediaRecorder. The others force one (tests, or a browser that misbehaves). */
   encoder?: "auto" | "webcodecs" | "mediarecorder";
+  /** "mp4" (default, H.264) or "webm" (VP9; see `canMakeWebm`). */
+  container?: FilmContainer;
 };
+
+export type FilmContainer = "mp4" | "webm";
 
 export type FilmResult = { blob: Blob; mime: string; encoder: "webcodecs" | "mediarecorder" };
 
@@ -110,6 +116,8 @@ export function extensionOf(type: string): string {
     "video/x-matroska": "mkv",
     "application/zip": "zip",
     "model/gltf-binary": "glb",
+    "model/vnd.usdz+zip": "usdz",
+    "application/json": "json",
   };
   return known[t] ?? "bin";
 }
@@ -154,9 +162,10 @@ export async function exportImage(api: RenderApi, opts: ImageOptions): Promise<B
 
 /* ---------- Film ---------- */
 
-/** About 12 Mbit/s for 1080p, 40 Mbit/s for 4K (by the number of pixels, between 8 and 40). */
-function bitrateFor(width: number, height: number): number {
-  return Math.round(Math.min(40e6, Math.max(8e6, ((width * height) / (1920 * 1080)) * 12e6)));
+/** About 12 Mbit/s for 1080p, 40 Mbit/s for 4K (by the number of pixels, between 8 and 40); VP9 needs about 30 % less. */
+function bitrateFor(width: number, height: number, container: FilmContainer = "mp4"): number {
+  const h264 = Math.min(40e6, Math.max(8e6, ((width * height) / (1920 * 1080)) * 12e6));
+  return Math.round(container === "webm" ? h264 * 0.7 : h264);
 }
 
 /** H.264 profiles tried in order: High, then Main, then Baseline, at a level that holds the size (5.1 for 4K, 4.0 for 1080p). */
@@ -166,18 +175,27 @@ function codecCandidates(width: number, height: number): string[] {
   return ["avc1.640028", "avc1.64002a", "avc1.4d0028", "avc1.42e028"];
 }
 
-async function pickEncoderConfig(width: number, height: number, fps: number): Promise<VideoEncoderConfig | null> {
+/**
+ * VP9 profile 0 (8 bits, 4:2:0) at a level that holds the size (5.1 up to 4K, 4.1 up to 1080p), then VP8 (an older
+ * browser): both go in a .webm.
+ */
+function vpCandidates(width: number, height: number): string[] {
+  return width * height > 2_228_224 ? ["vp09.00.51.08", "vp09.00.50.08", "vp09.00.61.08", "vp8"] : ["vp09.00.41.08", "vp09.00.40.08", "vp09.00.31.08", "vp8"];
+}
+
+async function pickEncoderConfig(width: number, height: number, fps: number, container: FilmContainer = "mp4"): Promise<VideoEncoderConfig | null> {
   if (typeof VideoEncoder === "undefined" || typeof VideoFrame === "undefined") return null;
-  for (const codec of codecCandidates(width, height)) {
+  const webm = container === "webm";
+  for (const codec of webm ? vpCandidates(width, height) : codecCandidates(width, height)) {
     const config: VideoEncoderConfig = {
       codec,
       width,
       height,
-      bitrate: bitrateFor(width, height),
+      bitrate: bitrateFor(width, height, container),
       bitrateMode: "variable",
       framerate: fps,
       latencyMode: "quality",
-      avc: { format: "avc" },
+      ...(webm ? {} : { avc: { format: "avc" as const } }),
     };
     try {
       const support = await VideoEncoder.isConfigSupported(config);
@@ -208,15 +226,42 @@ function encoderDequeued(encoder: VideoEncoder): Promise<void> {
   });
 }
 
-type FilmPlan = { path: PathKind; frames: number; fps: number; width: number; height: number; samples: number; onProgress?: (f: number) => void; signal?: AbortSignal };
+type FilmPlan = { path: PathKind; frames: number; fps: number; width: number; height: number; samples: number; container: FilmContainer; onProgress?: (f: number) => void; signal?: AbortSignal };
+
+/** What the encoded chunks go into: an .mp4 (mp4-muxer) or a .webm (webm-muxer, loaded only for a .webm). */
+type FilmMuxer = { add(chunk: EncodedVideoChunk, meta?: EncodedVideoChunkMetadata): void; finish(): Blob };
+
+async function muxerFor(plan: FilmPlan, codec: string): Promise<FilmMuxer> {
+  const { width, height, fps } = plan;
+  if (plan.container === "webm") {
+    const webm = await import("webm-muxer");
+    const target = new webm.ArrayBufferTarget();
+    const muxer = new webm.Muxer({ target, video: { codec: codec.startsWith("vp8") ? "V_VP8" : "V_VP9", width, height, frameRate: fps } });
+    return {
+      add: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+      finish: () => {
+        muxer.finalize();
+        return new Blob([target.buffer], { type: "video/webm" });
+      },
+    };
+  }
+  const target = new ArrayBufferTarget();
+  const muxer = new Muxer({ target, video: { codec: "avc", width, height, frameRate: fps }, fastStart: "in-memory" });
+  return {
+    add: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    finish: () => {
+      muxer.finalize();
+      return new Blob([target.buffer], { type: "video/mp4" });
+    },
+  };
+}
 
 async function encodeWithWebCodecs(api: RenderApi, plan: FilmPlan, config: VideoEncoderConfig): Promise<FilmResult> {
   const { frames, fps, width, height } = plan;
-  const target = new ArrayBufferTarget();
-  const muxer = new Muxer({ target, video: { codec: "avc", width, height, frameRate: fps }, fastStart: "in-memory" });
+  const muxer = await muxerFor(plan, config.codec);
   let failure: unknown = null;
   const encoder = new VideoEncoder({
-    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+    output: (chunk, meta) => muxer.add(chunk, meta),
     error: (e) => {
       failure = e;
     },
@@ -242,9 +287,9 @@ async function encodeWithWebCodecs(api: RenderApi, plan: FilmPlan, config: Video
     }
     await encoder.flush();
     if (failure) throw failure;
-    muxer.finalize();
+    const blob = muxer.finish();
     plan.onProgress?.(1);
-    return { blob: new Blob([target.buffer], { type: "video/mp4" }), mime: "video/mp4", encoder: "webcodecs" };
+    return { blob, mime: blob.type, encoder: "webcodecs" };
   } finally {
     if (encoder.state !== "closed") encoder.close();
   }
@@ -252,6 +297,8 @@ async function encodeWithWebCodecs(api: RenderApi, plan: FilmPlan, config: Video
 
 /** The types MediaRecorder is asked for, best first: an .mp4 where the browser makes one (Safari, recent Chrome), else .webm. */
 const RECORDER_TYPES = ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+/** For a .webm asked: VP9 first. */
+const RECORDER_WEBM = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
 
 /**
  * The fallback: MediaRecorder on a canvas stream. The recorder is paused while each frame is drawn and runs 1/fps of
@@ -259,7 +306,7 @@ const RECORDER_TYPES = ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1",
  */
 async function encodeWithMediaRecorder(api: RenderApi, plan: FilmPlan): Promise<FilmResult> {
   if (typeof MediaRecorder === "undefined" || typeof HTMLCanvasElement.prototype.captureStream !== "function") throw new Error("no-encoder");
-  const mime = RECORDER_TYPES.find((t) => MediaRecorder.isTypeSupported(t));
+  const mime = (plan.container === "webm" ? RECORDER_WEBM : RECORDER_TYPES).find((t) => MediaRecorder.isTypeSupported(t));
   if (!mime) throw new Error("no-encoder");
   const { frames, fps, width, height } = plan;
   // Our own canvas: the stage may hand back a different canvas, or a WebGL one whose image goes once shown.
@@ -270,7 +317,7 @@ async function encodeWithMediaRecorder(api: RenderApi, plan: FilmPlan): Promise<
   if (!ctx) throw new Error("no-encoder");
   const stream = out.captureStream(0);
   const track = stream.getVideoTracks()[0] as CanvasCaptureMediaStreamTrack;
-  const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: bitrateFor(width, height) });
+  const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: bitrateFor(width, height, plan.container) });
   const chunks: Blob[] = [];
   recorder.ondataavailable = (e) => {
     if (e.data.size > 0) chunks.push(e.data);
@@ -319,13 +366,14 @@ export async function exportFilm(api: RenderApi, opts: FilmOptions): Promise<Fil
     width: even(opts.width),
     height: even(opts.height),
     samples: Math.max(1, Math.round(opts.samples ?? 4)),
+    container: opts.container === "webm" ? "webm" : "mp4",
     onProgress: opts.onProgress,
     signal: opts.signal,
   };
   const mode = opts.encoder ?? "auto";
   try {
     if (mode !== "mediarecorder") {
-      const config = await pickEncoderConfig(plan.width, plan.height, fps);
+      const config = await pickEncoderConfig(plan.width, plan.height, fps, plan.container);
       if (config) {
         try {
           return await encodeWithWebCodecs(api, plan, config);
@@ -343,6 +391,30 @@ export async function exportFilm(api: RenderApi, opts: FilmOptions): Promise<Fil
   } finally {
     api.restore();
   }
+}
+
+/** Safari, and every browser of an iPhone or iPad (all WebKit): no VP9 encoder. */
+function isWebKitOnly(): boolean {
+  if (typeof navigator === "undefined") return true;
+  const ua = navigator.userAgent;
+  return /iP(hone|ad|od)/.test(ua) || (/Safari\//.test(ua) && !/Chrome\/|Chromium\/|CriOS|FxiOS|Edg\/|Android/.test(ua)) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua) && !/Chrome\//.test(ua));
+}
+
+/**
+ * The browser can make a .webm (VP9) film: WebCodecs with a VP9 encoder at 1080p, or MediaRecorder for "video/webm;
+ * codecs=vp9". Never in Safari (it encodes no VP9): the option is hidden there.
+ */
+export async function canMakeWebm(): Promise<boolean> {
+  if (isWebKitOnly()) return false;
+  if (typeof VideoEncoder !== "undefined" && typeof VideoFrame !== "undefined") {
+    try {
+      const support = await VideoEncoder.isConfigSupported({ codec: "vp09.00.41.08", width: 1920, height: 1080, bitrate: 8e6, framerate: 30 });
+      if (support.supported) return true;
+    } catch {
+      /* not parsed: try MediaRecorder */
+    }
+  }
+  return typeof MediaRecorder !== "undefined" && typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported("video/webm;codecs=vp9");
 }
 
 /* ---------- Series ---------- */

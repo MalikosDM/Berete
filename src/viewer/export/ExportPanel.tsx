@@ -1,24 +1,37 @@
 /*
  * The export panel of the 3D editor (admin, 26/11/2026), in plain French: an image up to 4K, a film (one turn, or the
- * path through the saved views), a series (every view × every metal, in one zip), and the jewel as a .glb file.
+ * path through the saved views; MP4, or WebM where the browser makes VP9), a series (every view × every metal, in one
+ * zip), the jewel as a .glb file (its stones with our BERETE_gem extension) with its scene file (.berete-scene.json),
+ * a .usdz for Apple's devices, and the reading of a scene file back.
  * One export at a time (they all use the stage); each file goes to the downloads, with its name and size shown.
  */
-import { useEffect, useRef, useState, type ReactNode } from "react";
-import { CircleStop, Download, Film, ImageIcon, Images, LoaderCircle, Package } from "lucide-react";
-import type { MetalId } from "@/data/models";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { Box, CircleStop, Download, FileJson, Film, ImageIcon, Images, LoaderCircle, Package, Upload } from "lucide-react";
+import type { Object3D } from "three";
+import { readSceneJson, SCENE_SUFFIX, SceneFileError, sceneJson } from "@/data/bereteGem";
+import type { MetalId, ModelSettings } from "@/data/models";
 import { btn, btnMain, inputCls } from "@/pages/admin/ui";
 import type { PathKind, RenderApi } from "../types";
-import { download, exportFilm, exportImage, exportSeries, extensionOf, fileSlug, FILM_SECONDS, filmSize, isAbort, MAX_SIDE, naturalFilmSeconds, type ImageFormat } from "./exporter";
+import { canMakeWebm, download, exportFilm, exportImage, exportSeries, extensionOf, fileSlug, FILM_SECONDS, filmSize, isAbort, MAX_SIDE, naturalFilmSeconds, type FilmContainer, type ImageFormat } from "./exporter";
 
 type Props = {
   api: RenderApi | null;
   metals: MetalId[];
   metalNames: Record<string, string>;
   pieceName: string;
+  /** The stage's own .glb (older way, without the settings): used when `jewel` is not given. */
   onExportGlb?: () => Promise<Blob>;
+  /** The jewel as drawn (StageHandles.jewel): the .glb (with BERETE_gem) and the .usdz are made from it. */
+  jewel?: () => Object3D | null;
+  /** The whole settings of the model as edited (scene included): the stones of the .glb and the scene file. */
+  settings?: ModelSettings;
+  /** Reading a scene file back: the checked settings it gives (only what it holds) and notes in French. */
+  onImportScene?: (settings: Partial<ModelSettings>, notes: string[]) => void;
+  /** The names of the model's parts: only the settings of parts of the same name are taken from a scene file. */
+  layerNames?: string[];
 };
 
-type Task = "image" | "film" | "series" | "glb";
+type Task = "image" | "film" | "series" | "glb" | "usdz";
 type Outcome = { kind: "done"; name: string; blob: Blob; note?: string } | { kind: "error"; message: string } | { kind: "stopped" };
 type Size = { preset: string; width: number; height: number };
 
@@ -71,7 +84,7 @@ function progressReporter(set: (p: ProgressState) => void): (fraction: number) =
 function errorText(error: unknown, task: Task): string {
   const message = error instanceof Error ? error.message : "";
   if (message === "no-encoder") return "Ce navigateur ne sait pas fabriquer de film. Essayez avec Chrome ou Safari à jour.";
-  if (task === "glb") return "Le fichier 3D n'a pas pu être créé. Réessayez dans un instant.";
+  if (task === "glb" || task === "usdz") return "Le fichier 3D n'a pas pu être créé. Réessayez dans un instant.";
   return "L'export n'a pas abouti. Réessayez, ou choisissez une taille plus petite.";
 }
 
@@ -190,7 +203,7 @@ function Section({ title, icon, children, data }: { title: string; icon: ReactNo
   );
 }
 
-export default function ExportPanel({ api, metals, metalNames, pieceName, onExportGlb }: Props) {
+export default function ExportPanel({ api, metals, metalNames, pieceName, onExportGlb, jewel, settings, onImportScene, layerNames }: Props) {
   const base = fileSlug(pieceName) || "bijou";
   const views = api?.views() ?? [];
   const hasPath = views.length >= 2 && (api?.viewsDuration() ?? 0) > 0;
@@ -209,6 +222,11 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
   const [seconds, setSeconds] = useState(8);
   const [quality, setQuality] = useState<"1080p" | "4k">("1080p");
   const [shape, setShape] = useState<Shape>("square");
+  const [container, setContainer] = useState<FilmContainer>("mp4");
+  const [webmOk, setWebmOk] = useState(false);
+  // Scene file read back
+  const sceneInput = useRef<HTMLInputElement>(null);
+  const [sceneNotes, setSceneNotes] = useState<{ ok: boolean; lines: string[] } | null>(null);
   // Series
   const [offViews, setOffViews] = useState<Set<string>>(new Set());
   const [offMetals, setOffMetals] = useState<Set<string>>(new Set());
@@ -218,6 +236,14 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
 
   // Leaving the editor stops an export under way (the stage it draws on is going).
   useEffect(() => () => controller.current?.abort(), []);
+  // WebM only where the browser encodes VP9 (never Safari).
+  useEffect(() => {
+    let alive = true;
+    void canMakeWebm().then((ok) => alive && setWebmOk(ok));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const filmPath: PathKind = hasPath ? path : "turn";
   const chosenViews = views.map((v, i) => ({ v, i })).filter(({ v }) => !offViews.has(v.id));
@@ -259,15 +285,16 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
       return { kind: "done", name: `${base}_${imageSize.width}x${imageSize.height}.${ext}`, blob, note };
     });
 
+  const filmContainer: FilmContainer = webmOk ? container : "mp4";
   const onFilm = () =>
     run("film", async (signal, onProgress) => {
       if (!api) throw new Error("no-api");
       const { width, height } = filmSize(quality, shape);
-      const film = await exportFilm(api, { path: filmPath, seconds, fps: 30, width, height, onProgress, signal });
+      const film = await exportFilm(api, { path: filmPath, seconds, fps: 30, width, height, onProgress, signal, container: filmContainer });
       const ext = extensionOf(film.mime);
       const note =
         film.encoder === "mediarecorder"
-          ? ext === "webm"
+          ? ext === "webm" && filmContainer === "mp4"
             ? "Ce navigateur ne sait pas faire de MP4 : le film est en WebM (il se lit dans Chrome ou VLC). Pour un MP4, utilisez Chrome ou Safari à jour."
             : "Film fait avec la méthode de secours de ce navigateur : vérifiez-le avant de le publier."
           : undefined;
@@ -290,25 +317,73 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
       return { kind: "done", name: `${base}_serie_${seriesSize.width}x${seriesSize.height}.zip`, blob, note: seriesCount + (seriesCount > 1 ? " images dans le fichier." : " image dans le fichier.") };
     });
 
+  const sceneName = base + SCENE_SUFFIX;
+  /** The .glb: from the jewel with the settings (stones by their layer's role), else the stage's own. */
+  const makeGlb = async (): Promise<Blob> => {
+    const root = jewel?.() ?? null;
+    if (root) {
+      const { exportGlb } = await import("./glb");
+      return exportGlb(root, { settings });
+    }
+    if (onExportGlb) return onExportGlb();
+    throw new Error("no-glb");
+  };
+  const sceneBlob = () => new Blob([JSON.stringify(sceneJson(settings!, pieceName), null, 2)], { type: "application/json" });
+
   const onGlb = () =>
     run("glb", async () => {
-      if (!onExportGlb) throw new Error("no-glb");
-      const blob = await onExportGlb();
+      const blob = await makeGlb();
       return { kind: "done", name: `${base}.glb`, blob };
     });
+
+  /** The .glb and its scene file in one zip (the .glb compressed, the scene as text). */
+  const onGlbZip = () =>
+    run("glb", async () => {
+      const glb = new Uint8Array(await (await makeGlb()).arrayBuffer());
+      const scene = new Uint8Array(await sceneBlob().arrayBuffer());
+      const { zipSync } = await import("three/examples/jsm/libs/fflate.module.js");
+      const zipped = zipSync({ [`${base}.glb`]: [glb, { level: 6 }], [sceneName]: [scene, { level: 9 }] });
+      return { kind: "done", name: `${base}_3d.zip`, blob: new Blob([zipped as BlobPart], { type: "application/zip" }), note: "Dans le fichier : " + base + ".glb et " + sceneName + "." };
+    });
+
+  const onScene = () => run("glb", async () => ({ kind: "done", name: sceneName, blob: sceneBlob() }));
+
+  const onUsdz = () =>
+    run("usdz", async () => {
+      const root = jewel?.() ?? null;
+      if (!root) throw new Error("no-jewel");
+      const { exportUsdz } = await import("./usdz");
+      const blob = await exportUsdz(root);
+      return { kind: "done", name: `${base}.usdz`, blob, note: "Les pierres y sont d'une couleur unie : ce format n'a pas de diamant." };
+    });
+
+  const onSceneFile = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !onImportScene) return;
+    try {
+      if (file.size > 5 * 1024 * 1024) throw new SceneFileError("Ce fichier est trop lourd pour une scène.");
+      const { settings: read, notes } = readSceneJson(await file.text(), { layers: layerNames });
+      onImportScene(read, notes);
+      setSceneNotes({ ok: true, lines: [...notes, "Vérifiez le rendu, puis Enregistrer."] });
+    } catch (error) {
+      setSceneNotes({ ok: false, lines: [error instanceof SceneFileError ? error.message : "Ce fichier n'a pas pu être lu."] });
+    }
+  };
 
   const waiting = !api ? <p className="text-base text-mist">Le modèle se charge encore : l'export sera possible dans un instant.</p> : null;
   const spinner = <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />;
   const stop = () => controller.current?.abort();
 
   return (
-    <section className="grid gap-5" aria-labelledby="export-title" data-export-panel>
+    <section className="@container grid gap-5" aria-labelledby="export-title" data-export-panel>
       <div>
         <h2 id="export-title" className="title-caps text-2xl tracking-[0.12em]">Exporter</h2>
         <p className="mt-2 text-base text-mist">Des images et des films du bijou tel qu'il est réglé, pour le site, les réseaux ou l'impression.</p>
       </div>
       {waiting}
-      <div className="grid gap-5 lg:grid-cols-2">
+      {/* Two columns when the panel itself is wide (it may sit in a narrow column of the editor). */}
+      <div className="grid gap-5 @3xl:grid-cols-2">
         <Section title="Image" icon={<ImageIcon className="size-5" aria-hidden="true" />} data="image">
           <FormatPicker id="export-image-format" value={imageFormat} onChange={setImageFormat} />
           <SizePicker id="export-image-size" value={imageSize} onChange={setImageSize} />
@@ -365,6 +440,21 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
             </div>
             {quality === "4k" ? <p className="text-base text-mist">Un film en 4K prend plusieurs minutes à fabriquer.</p> : null}
           </fieldset>
+          {webmOk ? (
+            <fieldset className="grid gap-1" data-export-container>
+              <legend className="text-base text-white">Fichier</legend>
+              <div className="flex flex-wrap gap-x-6">
+                <label className={radioRow}>
+                  <input type="radio" name="export-container" value="mp4" className="size-5" checked={filmContainer === "mp4"} onChange={() => setContainer("mp4")} />
+                  MP4 (se lit partout)
+                </label>
+                <label className={radioRow}>
+                  <input type="radio" name="export-container" value="webm" className="size-5" checked={filmContainer === "webm"} onChange={() => setContainer("webm")} />
+                  WebM (VP9, pour le web)
+                </label>
+              </div>
+            </fieldset>
+          ) : null}
           <fieldset className="grid gap-1">
             <legend className="text-base text-white">Format</legend>
             <div className="flex flex-wrap gap-x-6">
@@ -454,13 +544,53 @@ export default function ExportPanel({ api, metals, metalNames, pieceName, onExpo
           )}
         </Section>
 
-        {onExportGlb ? (
-          <Section title="Fichier 3D (.glb)" icon={<Package className="size-5" aria-hidden="true" />} data="glb">
-            <p className="text-base text-mist">Le bijou en fichier 3D, avec ses métaux et ses pierres, à ouvrir dans un autre logiciel ou à envoyer à un partenaire.</p>
-            <button type="button" onClick={onGlb} disabled={!api || busy !== null} className={btnMain + " justify-self-start"} data-export-glb>
-              {busy === "glb" ? spinner : <Package className="size-4" aria-hidden="true" />} {busy === "glb" ? "Fichier en cours…" : "Exporter le fichier 3D"}
-            </button>
+        {onExportGlb || jewel ? (
+          <Section title="Fichier 3D (.glb) et scène" icon={<Package className="size-5" aria-hidden="true" />} data="glb">
+            <p className="text-base text-mist">
+              Le bijou en fichier 3D, avec ses métaux et ses pierres (et leurs réglages), à ouvrir dans un autre logiciel ou à envoyer à un partenaire.{settings ? " La scène (éclairages, fond, sol, effets, vues de caméra, configurateurs) part dans un fichier à côté, qui se recharge ici." : ""}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {settings ? (
+                <button type="button" onClick={onGlbZip} disabled={!api || busy !== null} className={btnMain} data-export-glb-zip>
+                  {busy === "glb" ? spinner : <Package className="size-4" aria-hidden="true" />} {busy === "glb" ? "Fichier en cours…" : "Fichier 3D + scène (.zip)"}
+                </button>
+              ) : null}
+              <button type="button" onClick={onGlb} disabled={!api || busy !== null} className={settings ? btn : btnMain} data-export-glb>
+                {busy === "glb" && !settings ? spinner : <Package className="size-4" aria-hidden="true" />} {busy === "glb" && !settings ? "Fichier en cours…" : settings ? "Le .glb seul" : "Exporter le fichier 3D"}
+              </button>
+              {settings ? (
+                <button type="button" onClick={onScene} disabled={busy !== null} className={btn} data-export-scene>
+                  <FileJson className="size-4" aria-hidden="true" /> La scène seule (.json)
+                </button>
+              ) : null}
+            </div>
             {busy === "glb" ? null : <Result outcome={outcomes.glb} />}
+            {onImportScene ? (
+              <div className="grid gap-2 border-t border-white/10 pt-4">
+                <p className="text-base text-mist">Reprendre une scène exportée d'ici ({SCENE_SUFFIX}) : ses éclairages, effets, sol, vues et configurateurs, et les réglages des parties de même nom.</p>
+                <button type="button" onClick={() => sceneInput.current?.click()} disabled={busy !== null} className={btn + " justify-self-start"} data-import-scene>
+                  <Upload className="size-4" aria-hidden="true" /> Charger une scène
+                </button>
+                <input ref={sceneInput} type="file" accept=".json,application/json" className="sr-only" tabIndex={-1} aria-hidden="true" onChange={(e) => void onSceneFile(e)} data-import-scene-input />
+                {sceneNotes ? (
+                  <ul className={"grid gap-1 text-base " + (sceneNotes.ok ? "text-bone" : "text-rose-light")} role={sceneNotes.ok ? "status" : "alert"} data-import-scene-notes>
+                    {sceneNotes.lines.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
+          </Section>
+        ) : null}
+
+        {jewel ? (
+          <Section title="Fichier pour iPhone et iPad (.usdz)" icon={<Box className="size-5" aria-hidden="true" />} data="usdz">
+            <p className="text-base text-mist">Le bijou à sa taille réelle, pour la réalité augmentée d'Apple (Quick Look), Keynote ou Reality Composer.</p>
+            <button type="button" onClick={onUsdz} disabled={!api || busy !== null} className={btnMain + " justify-self-start"} data-export-usdz>
+              {busy === "usdz" ? spinner : <Box className="size-4" aria-hidden="true" />} {busy === "usdz" ? "Fichier en cours…" : "Exporter le .usdz"}
+            </button>
+            {busy === "usdz" ? null : <Result outcome={outcomes.usdz} />}
           </Section>
         ) : null}
       </div>

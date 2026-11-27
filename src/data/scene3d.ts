@@ -12,10 +12,10 @@ export type Vec3 = [number, number, number];
 /* ---------- Lightings (our own HDR library: src/viewer/hdri) ---------- */
 
 /** Lightings of the metal (and of whatever is not a stone): studios, soft boxes, horizon... */
-export const METAL_ENVS = ["studio-warm", "softbox-wide", "horizon-soft", "lounge-blur", "daylight", "backlight", "studio-dark", "ring-light", "three-point", "window"] as const;
+export const METAL_ENVS = ["studio-clair", "studio-warm", "softbox-wide", "horizon-soft", "lounge-blur", "daylight", "backlight", "studio-dark", "ring-light", "three-point", "window"] as const;
 export type MetalEnvId = (typeof METAL_ENVS)[number];
 /** Lightings of the stones: almost black, a few small very bright sources, so that a facet lights up only when it sends one back. */
-export const GEM_ENVS = ["gem-bands", "gem-points", "gem-ring", "gem-spot", "gem-vitrine", "gem-backlight", "gem-cross", "gem-stars", "gem-studio", "gem-classic"] as const;
+export const GEM_ENVS = ["auto", "gem-studio", "gem-tente", "gem-boites", "gem-escalier", "gem-bands", "gem-points", "gem-ring", "gem-spot", "gem-vitrine", "gem-backlight", "gem-cross", "gem-stars", "gem-classic"] as const;
 export type GemEnvId = (typeof GEM_ENVS)[number];
 
 export type EnvSettings = { id: string; /** degrees around the vertical */ rotation: number; intensity: number };
@@ -53,6 +53,12 @@ export type DiamondParams = {
   bloom: boolean;
   /** Inclusions (a cloud inside the stone), off by default. */
   inclusions: { amount: number; scale: number; roughness: number } | null;
+  /** Thin film (iridescence): a coating that tints the surface's reflections like a soap bubble; thickness in nm. */
+  thinFilm: { amount: number; thickness: number } | null;
+  /** A colour look for this material only (« LUT par matière », src/viewer/looks.ts). */
+  lut: string | null;
+  /** Fast way: the size of the inside measure of the cut (shared by every stone of that cut and size), or chosen by the engine. */
+  cubeSize: "auto" | 256 | 512 | 1024;
 };
 
 /** iJewel-like defaults (index above the real 2.42 for more brilliance, as jewellers advise). */
@@ -74,6 +80,9 @@ export const DEFAULT_DIAMOND: DiamondParams = {
   mode: "auto",
   bloom: true,
   inclusions: null,
+  thinFilm: null,
+  lut: null,
+  cubeSize: "auto",
 };
 
 /** The rendering before 26/11 ("Ancien rendu"), kept to compare. */
@@ -81,7 +90,7 @@ export const CLASSIC_DIAMOND: Partial<DiamondParams> = { env: "gem-classic", ref
 
 /* ---------- Effects ---------- */
 
-export const TONEMAPS = ["aces", "agx", "linear", "reinhard", "cineon", "uncharted2"] as const;
+export const TONEMAPS = ["aces", "agx", "neutral", "linear", "reinhard", "cineon", "uncharted2"] as const;
 export type ToneMap = (typeof TONEMAPS)[number];
 
 export type PostSettings = {
@@ -91,7 +100,10 @@ export type PostSettings = {
   /** Edges rounded on the screen (SSBevel): radius 0–8 for the scene, each material 0–16. */
   bevel: { enabled: boolean; radius: number; intensity: number };
   ao: { enabled: boolean; intensity: number; radius: number };
-  dof: { enabled: boolean; aperture: number; maxBlur: number };
+  /** Depth of field; `focus`: the point of the jewel in focus (its own space), chosen by a click; null: its centre. */
+  dof: { enabled: boolean; aperture: number; maxBlur: number; focus?: Vec3 | null };
+  /** The scene's colour look (« LUT de scène », src/viewer/looks.ts), and how much of it. */
+  lut?: { id: string | null; intensity: number };
   vignette: { enabled: boolean; offset: number; darkness: number };
   chromatic: { enabled: boolean; offset: number };
   grain: { enabled: boolean; intensity: number };
@@ -100,7 +112,8 @@ export type PostSettings = {
 export const DEFAULT_POST: PostSettings = {
   tonemap: { mode: "aces", exposure: 1, saturation: 1, contrast: 1.03, background: false, clipBackground: false },
   ssr: { enabled: true, intensity: 1, boost: [1, 1, 1], radius: 1, autoRadius: true, power: 1.1, tolerance: 0.5, steps: 16, lowQualityFrames: 0, ignoreFront: true, frontFactor: -0.2 },
-  bloom: { enabled: true, threshold: 2.4, softThreshold: 0.4, intensity: 0.22, radius: 0.35, power: 1.2, iterations: 5, debug: false },
+  // A high threshold (27/11/2026: 2.4 → 3.4): only the real sparkles glow; a pendant covered with stones no longer burns.
+  bloom: { enabled: true, threshold: 3.4, softThreshold: 0.3, intensity: 0.16, radius: 0.3, power: 1.2, iterations: 5, debug: false },
   bevel: { enabled: true, radius: 2, intensity: 1 },
   ao: { enabled: true, intensity: 2, radius: 28 },
   dof: { enabled: false, aperture: 0.4, maxBlur: 0.6 },
@@ -142,6 +155,8 @@ export type GroundSettings = {
   light: { color: string; intensity: number; direction: Vec3; radius: number; bias: number; focus: number; spread: number };
   material: { color: string; roughness: number; metalness: number };
   opacity: number;
+  /** The mirror ground's blur, 0 (a sharp mirror) to 1 (a satin floor). */
+  mirrorBlur?: number;
 };
 
 export const DEFAULT_GROUND: GroundSettings = {
@@ -185,6 +200,8 @@ export type SceneSettings = {
   post: PostSettings;
   render: RenderSettings;
   camera: { fov: number; autoScale: boolean; autoCenter: boolean };
+  /** The simple mode's ambiance this scene came from (27/11/2026), to show it chosen; gone once a setting is changed in the expert mode. */
+  ambiance?: string;
 };
 
 /* ---------- Camera views ---------- */
@@ -217,6 +234,12 @@ export type ViewerOptions = {
   /** Closest and farthest distances, in times the size of the jewel ([] = free), on a tall screen and on a wide one. */
   distance: { portrait: [number, number] | null; landscape: [number, number] | null };
   autoRotate: boolean;
+  /** Radians per second of the turning; negative: the other way (27/11/2026). */
+  rotateSpeed?: number;
+  /** The camera's angle from the top kept between these, degrees (null: free). */
+  polarLimits?: [number, number] | null;
+  /** The client can move the jewel sideways (right button, two fingers). */
+  pan?: boolean;
   /** "Drag to turn" at the first sight of the jewel. */
   prompt: boolean;
   views: boolean;
@@ -233,6 +256,9 @@ export const DEFAULT_VIEWER: ViewerOptions = {
   zoomButtons: true,
   distance: { portrait: null, landscape: null },
   autoRotate: false,
+  rotateSpeed: 0.35,
+  polarLimits: null,
+  pan: true,
   prompt: true,
   views: true,
   configurator: true,
@@ -274,8 +300,9 @@ export const DEFAULT_TRY_ON: TryOnSettings = { enabled: false, finger: "ring", a
 /* ---------- Defaults of a whole scene, and the reading of saved settings ---------- */
 
 export const DEFAULT_SCENE: SceneSettings = {
-  envMetal: { id: "studio-warm", rotation: 0, intensity: 1 },
-  envGem: { id: "gem-studio", rotation: 0, intensity: 1 },
+  envMetal: { id: "studio-clair", rotation: 0, intensity: 1 },
+  // « auto »: each layer of stones gets the lighting the engine chooses for its cut (src/viewer/auto.ts).
+  envGem: { id: "auto", rotation: 0, intensity: 1 },
   fixedEnv: false,
   envBackground: false,
   backdrop: null,
@@ -309,7 +336,8 @@ export function merged<T>(base: T, over: unknown): T {
 
 /** Lightings that stand for the three ambiances of the first versions (studio, warm, spotlight). */
 export const AMBIANCE_SCENES: Record<string, { envMetal: string; envGem: string; metalIntensity: number }> = {
-  studio: { envMetal: "studio-warm", envGem: "gem-studio", metalIntensity: 1 },
-  warm: { envMetal: "lounge-blur", envGem: "gem-studio", metalIntensity: 1.05 },
+  // 27/11/2026: the light studio and the stones' lighting chosen per cut (the engine's perfect setting).
+  studio: { envMetal: "studio-clair", envGem: "auto", metalIntensity: 1 },
+  warm: { envMetal: "lounge-blur", envGem: "auto", metalIntensity: 1.05 },
   spotlight: { envMetal: "studio-dark", envGem: "gem-spot", metalIntensity: 0.8 },
 };

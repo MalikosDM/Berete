@@ -9,18 +9,30 @@ import type { MetalId } from "@/data/models";
 type MetalLook = { color: [number, number, number]; roughness: number; swatch: string };
 
 /** Linear reflectance colours of the alloys, and the colour of their swatch (sRGB). */
+/*
+ * The colour of each metal is its reflectance seen straight on (F0, linear RGB), from measurements (27/11/2026):
+ *  - 18 ct yellow gold = the ISO 8654 colour « 3N » (yellow), 18 ct rose gold = « 5N » (red): nominal CIELAB of ISO 8654:2018
+ *    Amd 1:2019 (3N: L* 89.1, a* 5.74, b* 23.05; 5N: L* 87.0, a* 9.51, b* 18.11, D65), turned into linear sRGB;
+ *  - platinum [0.765, 0.730, 0.676], palladium [0.734, 0.704, 0.662], silver [0.991, 0.985, 0.974]: physicallybased.info
+ *    (from the optical constants of refractiveindex.info: Pt Werner, Pd Palm, Ag Babar);
+ *  - white gold is sold rhodium plated: rhodium reflects about 78 % of the light across the visible, a hair less in the blue
+ *    (Palik, Handbook of Optical Constants of Solids: rhodium) → [0.78, 0.78, 0.76];
+ *  - 14 ct: no published colour found; derived: the 18 ct colour moved 30 % towards silver (yellow, less gold in the alloy),
+ *    25 % towards copper (rose: more copper), 15 % towards palladium (white, plated alike);
+ *  - black rhodium: no published reflectance found; a dark plating that sends back about a sixth of the light, neutral.
+ * The swatches stay as the eye sees the metal in a jewel (more contrasted than its F0), for choosing.
+ */
 export const METAL_LOOKS: Record<MetalId, MetalLook> = {
-  "yellow-gold": { color: [0.96, 0.74, 0.4], roughness: 0.1, swatch: "#e9c46f" },
-  "white-gold": { color: [0.84, 0.83, 0.8], roughness: 0.08, swatch: "#e4e2dc" },
-  "rose-gold": { color: [0.95, 0.64, 0.53], roughness: 0.1, swatch: "#e8b4a0" },
-  platinum: { color: [0.68, 0.66, 0.63], roughness: 0.12, swatch: "#bdbab4" },
-  "black-rhodium": { color: [0.1, 0.1, 0.11], roughness: 0.16, swatch: "#2b2a2c" },
-  // 14 carats (26/11/2026): a little less gold in the alloy, a paler colour.
-  "yellow-gold-14": { color: [0.93, 0.76, 0.48], roughness: 0.1, swatch: "#e6c98a" },
-  "white-gold-14": { color: [0.82, 0.8, 0.76], roughness: 0.09, swatch: "#dedbd3" },
-  "rose-gold-14": { color: [0.94, 0.67, 0.57], roughness: 0.1, swatch: "#e9bcab" },
-  palladium: { color: [0.73, 0.7, 0.65], roughness: 0.11, swatch: "#c4c0b8" },
-  silver: { color: [0.97, 0.96, 0.92], roughness: 0.08, swatch: "#efede8" },
+  "yellow-gold": { color: [0.967, 0.706, 0.458], roughness: 0.1, swatch: "#e9c46f" },
+  "white-gold": { color: [0.78, 0.78, 0.76], roughness: 0.08, swatch: "#e4e2dc" },
+  "rose-gold": { color: [0.946, 0.649, 0.48], roughness: 0.1, swatch: "#e8b4a0" },
+  platinum: { color: [0.765, 0.73, 0.676], roughness: 0.12, swatch: "#bdbab4" },
+  "black-rhodium": { color: [0.16, 0.16, 0.17], roughness: 0.18, swatch: "#2b2a2c" },
+  "yellow-gold-14": { color: [0.974, 0.79, 0.613], roughness: 0.1, swatch: "#e6c98a" },
+  "white-gold-14": { color: [0.773, 0.768, 0.745], roughness: 0.09, swatch: "#dedbd3" },
+  "rose-gold-14": { color: [0.943, 0.643, 0.49], roughness: 0.1, swatch: "#e9bcab" },
+  palladium: { color: [0.734, 0.704, 0.662], roughness: 0.11, swatch: "#c4c0b8" },
+  silver: { color: [0.991, 0.985, 0.974], roughness: 0.08, swatch: "#efede8" },
 };
 
 /** Colours a coloured stone can take (no blue: the house colours). */

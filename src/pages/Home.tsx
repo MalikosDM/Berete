@@ -1,7 +1,7 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
-import { MediaView } from "@/components/Media";
+import { MediaView, posterBehind } from "@/components/Media";
 import PieceCard from "@/components/PieceCard";
 import PieceThumb from "@/components/PieceThumb";
 import Reveal from "@/components/Reveal";
@@ -207,7 +207,7 @@ function Mechanism() {
           {/* Its sphere that turns, in a circle set on the piece's frame. */}
           <div className="absolute -end-2 bottom-0 w-[36%] max-w-40 sm:-end-6">
             <div className="relative aspect-square overflow-hidden rounded-full border border-rose-light/40 bg-ink-soft shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
-              <video ref={videoRef} poster={sphere.poster} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full object-cover" />
+              <video ref={videoRef} poster={sphere.poster} style={posterBehind(sphere.poster, "cover")} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full object-cover" />
             </div>
           </div>
         </div>

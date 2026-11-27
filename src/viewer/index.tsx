@@ -35,7 +35,7 @@ function Waiting({ model, words, className = "", failed = false }: { model: Publ
   return (
     <div className={VIEWER_GRID + " lg:gap-4 " + className} data-viewer-failed={failed || undefined}>
       <div className={"relative flex w-full items-center justify-center overflow-hidden bg-ink " + CANVAS_SIZE} role="status">
-        {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain opacity-60" /> : null}
+        {model.poster ? <img src={model.poster} alt="" className="absolute inset-0 h-full w-full object-contain" /> : null}
         {failed ? (
           <span className="relative flex flex-col items-center gap-4 px-6 text-center">
             <span className="text-base text-bone">{words.failed}</span>

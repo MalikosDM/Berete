@@ -21,6 +21,8 @@ import Process from "@/pages/Process";
 // The back-office and the private 3D links are loaded only when they are opened.
 const Admin = lazyPart(() => import("@/pages/Admin"));
 const ViewLink = lazyPart(() => import("@/pages/ViewLink"));
+// The embed code of a 3D link (/embed/<token>): the viewer alone, in a frame of another site.
+const Embed3D = lazyPart(() => import("@/pages/Embed3D"));
 // A share link sealed on the admin's device (/s/<token>): decrypted in the browser of the client.
 const SealedView = lazyPart(() => import("@/pages/SealedView"));
 const Vip = lazyPart(() => import("@/pages/Vip"));
@@ -77,12 +79,13 @@ function Elsewhere() {
 }
 
 /**
- * A private page opened alone, while the site is under construction (src/lib/private.ts): the 3D link or the client space,
- * with the logo of the house only; no menu, no other page of the site.
+ * A private page opened alone, while the site is under construction (src/lib/private.ts): the 3D link (or its embed code)
+ * or the client space, with the logo of the house only; no menu, no other page of the site.
  */
 function PrivateApp() {
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
   const sealed = <Suspense fallback={null}><SealedView /></Suspense>;
+  const embed = <Suspense fallback={null}><Embed3D /></Suspense>;
   const vip = (
     <div className="min-h-svh bg-ink" data-private-page>
       <header className="flex justify-center px-5 pt-8">
@@ -98,6 +101,7 @@ function PrivateApp() {
       {["", ...LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => l + "/")].map((prefix) => (
         <Fragment key={"private-" + prefix}>
           <Route path={prefix + "view/:token"} element={viewLink} />
+          <Route path={prefix + "embed/:token"} element={embed} />
           <Route path={prefix + "s/:token"} element={sealed} />
           <Route path={prefix + "vip"} element={vip} />
           <Route path={prefix + "vip/:token"} element={vip} />
@@ -112,12 +116,18 @@ export default function App() {
   if (PRIVATE_ONLY) return <PrivateApp />;
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
   const sealed = <Suspense fallback={null}><SealedView /></Suspense>;
+  const embed = <Suspense fallback={null}><Embed3D /></Suspense>;
   return (
     <Routes>
       {/* A private 3D link sent to a client: its own sober page, without the menu of the site. */}
       <Route path="view/:token" element={viewLink} />
       {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
         <Route key={"view-" + l} path={l + "/view/:token"} element={viewLink} />
+      ))}
+      {/* The embed code of a 3D link: the viewer alone, as large as the frame of the other site. */}
+      <Route path="embed/:token" element={embed} />
+      {LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => (
+        <Route key={"embed-" + l} path={l + "/embed/:token"} element={embed} />
       ))}
       {/* A share link sealed on the admin's device: its own sober page too (it speaks the language of the browser). */}
       <Route path="s/:token" element={sealed} />

@@ -23,6 +23,7 @@ import { findPiece, initials, peopleOf, personHref, portraitOf, removedPieceTarg
 import { resolveAtelier, resolveReveal } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
 import { adminOrdered, magazineOf } from "@/data/magazine";
+import openingMasks from "@/data/opening-masks.generated.json" with { type: "json" };
 import { pieceMediaOf, sameViewsOf } from "@/data/pageMedia";
 import { resolveShowcase } from "@/data/showcase";
 import { pressOfPiece } from "@/data/press";
@@ -39,6 +40,12 @@ import NotFound from "@/pages/NotFound";
 import { pressDate } from "@/pages/Press";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
+
+/** The soft outline of a photo as its mask, placed as the photo is (whole, centred in its box). */
+function outlineMask(src: string): CSSProperties {
+  const url = 'url("' + src + '")';
+  return { WebkitMaskImage: url, maskImage: url, WebkitMaskSize: "contain", maskSize: "contain", WebkitMaskPosition: "center", maskPosition: "center", WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat" };
+}
 
 /** The page of one piece (a "capsule"): /pieces/:slug. */
 export default function PiecePage() {
@@ -84,8 +91,9 @@ export default function PiecePage() {
   const below = theme.backdrop ? BACKDROPS[theme.backdrop]?.below : undefined;
   // The effect of its universe on the piece itself (a reflection, sparkles, a halo...).
   const jewel = jewelOf(theme.effects);
-  // The jewel of the opening: cut out, in one view or a showcase of several; else its photo.
+  // The jewel of the opening: cut out, in one view or a showcase of several; else its photo (with its soft outline, if made).
   const opening = resolveShowcase(piece.slug, piece.showcase);
+  const outline = (openingMasks as Record<string, string>)[piece.cover.src];
   // Its atelier (its making-of): in The Atelier, where the cinema window lives.
   const atelier = resolveAtelier(piece.slug, piece.atelier);
 
@@ -162,13 +170,15 @@ export default function PiecePage() {
         <div data-piece-cover data-below={below ? "" : undefined} style={below ? ({ "--u-below": below[0], "--u-below-m": below[1] } as CSSProperties) : undefined} className={"piece-calm relative shrink-0 px-6 pt-20 sm:px-12 lg:order-2 lg:col-span-7 lg:h-[min(100svh,60rem)] lg:px-16 desk:pt-28 lg:pb-12 xl:col-span-8 " + (opening.large && opening.mode !== "photo" ? "h-[62svh] sm:h-[66svh]" : "h-[52svh] sm:h-[58svh]")}>
           {opening.mode === "photo" ? (
             <>
-              {/* A photo on black (no clean cut-out of the jewel): whole, its edges faded into the black (25/11/2026). */}
+              {/* A photo on black (no clean cut-out of the jewel): whole, its edges faded into the black (25/11/2026). A photo
+                  with its soft outline (scripts/opening-masks.mjs, 26/11/2026: the pendant L, whose black showed as a rectangle
+                  on the sky): only the jewel and a thin dark edge melting into its world, never the rectangle of the photo. */}
               {piece.cover.onBlack !== false && piece.cover.width && piece.cover.height ? (
                 <span className="flex h-full w-full items-center justify-center">
                   <span className="relative block h-full max-w-full" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height }}>
                     {/* A soft pool of dark behind the photo: its black melts into the world around it (a light sky, an arena). */}
-                    <span aria-hidden="true" className="opening-halo" />
-                    <span data-opening-fade className="opening-fade absolute inset-0 block">
+                    {outline ? null : <span aria-hidden="true" className="opening-halo" />}
+                    <span data-opening-fade={outline ? "outline" : ""} className={(outline ? "" : "opening-fade ") + "absolute inset-0 block"} style={outline ? outlineMask(outline) : undefined}>
                       <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="contain" priority sizes="(max-width: 1023px) 75vw, 66vw" />
                     </span>
                   </span>

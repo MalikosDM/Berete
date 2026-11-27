@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { ArrowRight, LoaderCircle, Maximize, Minimize, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { posterBehind } from "@/components/Media";
 import { media } from "@/data/catalogue";
 import { makingSteps } from "@/data/making";
 import type { MakingStep } from "@/data/types";
@@ -287,6 +288,7 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
               onCanPlay={() => setWaiting(false)}
               onEnded={onEnded}
               className="h-full w-full object-contain"
+              style={posterBehind(poster || undefined)}
             />
             {waiting && playing ? (
               <span role="status" className="absolute inset-0 flex items-center justify-center">

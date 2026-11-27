@@ -15,7 +15,7 @@ import { Detail3D, type DetailMark } from "@/viewer";
 /**
  * The photos of a piece as in a magazine (Yoni, 25/11/2026), from the whole to the detail: "Every Angle", its four photos of
  * the whole piece; "The Art of Detail", at most five photos of its details, each small with the sentence of the house that it
- * shows beside it, the text and the photo changing sides from one to the next (src/data/magazine.ts); then "See more" for the
+ * shows beside it, the photo and the text changing sides from one to the next (src/data/magazine.ts); then "See more" for the
  * others. Every photo opens full screen, where the magnifying glass lives (src/components/Lightbox.tsx).
  */
 export default function MagazineGallery({ piece, english, items: given, ordered, model, sameViews }: { piece: Piece; english?: Piece; items: MediaItem[]; ordered: boolean; model: PublicModel | null; sameViews: string[][] }) {
@@ -84,7 +84,9 @@ export default function MagazineGallery({ piece, english, items: given, ordered,
           {mag.blocks.length > 0 ? (
             <ol className="mt-10 flex flex-col gap-12 lg:mt-12 lg:gap-16">
               {mag.blocks.map((b, i) => {
-                // Text on the left and photo on the right, then the other way round.
+                // The photo against the edge of the page and its sentence right beside it (the air on the other side): the photo
+                // on the left first, right under the title, then on the right (26/11/2026: the text first left the top left of
+                // the section empty, and each text floated far from its photo). On a phone, the photo on the left then on the right.
                 const flip = i % 2 === 1;
                 return (
                   <li key={b.item.src} data-magazine-block={i + 1} data-angle={mag.overview.length + i + 1} className="grid items-center gap-6 sm:grid-cols-12 sm:gap-8 lg:gap-12">
@@ -92,17 +94,17 @@ export default function MagazineGallery({ piece, english, items: given, ordered,
                       type="button"
                       onClick={(e) => show(b.item, e)}
                       data-magazine-photo
-                      className={"group relative block aspect-[4/5] w-2/3 cursor-zoom-in overflow-hidden bg-ink sm:col-span-5 sm:w-full lg:col-span-4 xl:col-span-3 " + (flip ? "sm:order-1" : "sm:order-2 sm:col-start-8 lg:col-start-9 xl:col-start-10")}
+                      className={"group relative block aspect-[4/5] w-2/3 cursor-zoom-in overflow-hidden bg-ink sm:col-span-5 sm:w-full lg:col-span-4 " + (flip ? "justify-self-end sm:order-2 sm:col-start-8 lg:col-start-9" : "sm:order-1 sm:col-start-1")}
                       aria-label={t.gallery.open(nameOf(b.item))}
                     >
                       <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
-                        <MediaView item={b.item} alt={nameOf(b.item)} sizes="(max-width: 639px) 66vw, (max-width: 1023px) 40vw, 20rem" frame={4 / 5} />
+                        <MediaView item={b.item} alt={nameOf(b.item)} sizes="(max-width: 639px) 66vw, (max-width: 1023px) 40vw, 25rem" frame={4 / 5} />
                       </span>
                       <span className="absolute end-3 bottom-3 hidden size-10 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-0 transition-opacity group-hover:opacity-100 lg:inline-flex">
                         <ZoomIn className="size-4" aria-hidden="true" />
                       </span>
                     </button>
-                    <div data-magazine-text className={"sm:col-span-7 lg:col-span-6 " + (flip ? "sm:order-2 sm:col-start-6 lg:col-start-6 xl:col-start-5" : "sm:order-1 sm:col-start-1 lg:col-start-2 xl:col-start-3")}>
+                    <div data-magazine-text className={"sm:col-span-7 lg:col-span-6 " + (flip ? "sm:order-1 sm:col-start-1 sm:justify-self-end lg:col-start-3 lg:pe-4" : "sm:order-2 sm:col-start-6 lg:col-start-5 lg:ps-4")}>
                       {b.texts.map((x, k) => (
                         <div key={k} className={k > 0 ? "mt-6" : ""}>
                           {x.title ? <h3 className="title-caps t-sub leading-tight tracking-[0.08em] text-white">{x.title}</h3> : null}

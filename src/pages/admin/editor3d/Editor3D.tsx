@@ -4,7 +4,7 @@
  * try-on); in the middle, the jewel and its toolbar; on the right, the tabs of every setting. In simple French; every
  * setting applies at once, « Enregistrer » and « Annuler » are at the foot of the page.
  */
-import { lazy, Suspense, useCallback, useMemo, useState, type ReactNode } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ArrowLeft, Box, Download, Gem, Hand, Layers, Mountain, Move3d, Palette, SlidersHorizontal, Sparkles, Sun } from "lucide-react";
 import { BACKGROUNDS, sceneOf, tryOnOf, viewerOf, viewsOf, type LayerSetting, type ModelSettings, type PublicModel } from "@/data/models";
 import { GEM_ENVS, GROUNDS, merged, METAL_ENVS, POSES, STANDS, type SceneSettings, type TryOnSettings, type ViewerOptions, type ViewsSettings } from "@/data/scene3d";
@@ -16,6 +16,9 @@ import { Range, Tile } from "./controls";
 import { TABS, type EditorCtx, type LayerInfo, type TabId } from "./context";
 import { BACKGROUND_NAMES_FR, GROUND_NAMES, POSE_NAMES, SCENE_PRESETS, STAND_NAMES_FR, thumb } from "./presets";
 import { CamerasTab, ConfiguratorTab, EffectsTab, ExportTab, PartsTab, RenderTab, SceneTab, ViewTab } from "./tabs";
+import SimpleMode from "./SimpleMode";
+import ConfortBar, { type EditorTools } from "./Confort";
+import type { LayerAnalysis } from "@/viewer/auto";
 
 const TryOnEditor = lazy(() => import("@/viewer/tryon/TryOnEditor"));
 
@@ -42,10 +45,46 @@ type Props = {
   token: string;
   onChange: (next: ModelSettings) => void;
   onApi?: (api: StageApi | null) => void;
+  /** The row above the editor (undo / redo, compare, presets, versions, the page of the piece, shortcuts): Confort.tsx. */
+  tools?: EditorTools;
 };
 
-export default function Editor3D({ model, layers, settings, token, onChange, onApi }: Props) {
+/** The mode the editor opens in: simple (Yoni), unless the expert mode was the last one used on this computer. */
+function firstMode(): "simple" | "expert" {
+  try {
+    return localStorage.getItem("bj-3d-mode") === "expert" ? "expert" : "simple";
+  } catch {
+    return "simple";
+  }
+}
+
+export default function Editor3D({ model, layers, settings, token, onChange, onApi, tools }: Props) {
   const [api, setApi] = useState<StageApi | null>(null);
+  const [mode, setModeState] = useState<"simple" | "expert">(firstMode);
+  const [analysis, setAnalysis] = useState<Record<string, LayerAnalysis> | null>(null);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const setMode = (next: "simple" | "expert") => {
+    setModeState(next);
+    try {
+      localStorage.setItem("bj-3d-mode", next);
+    } catch {
+      // A private window: the mode is not remembered.
+    }
+  };
+  // The row of comforts above the editor, with the keyboard shortcuts (the same in both modes: it keeps its panels open).
+  const bar = tools ? <ConfortBar tools={tools} api={api} mode={mode} onMode={setMode} autoRotate={autoRotate} onAutoRotate={setAutoRotate} /> : null;
+  const guesses = useMemo(() => Object.fromEntries(layers.map((l) => [l.name, l.guess])), [layers]);
+  // Opened: the editor scrolls just under the admin's header, the whole jewel above the bar « Enregistrer » (computers).
+  const shell = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = shell.current;
+    if (!el || window.innerWidth < 1024) return;
+    const header = document.querySelector("header")?.getBoundingClientRect().height ?? 110;
+    // The row of tools above the editor (undo, compare…) stays in sight too.
+    const bar = document.querySelector("[data-confort-bar]");
+    const top = Math.min(el.getBoundingClientRect().top, bar?.getBoundingClientRect().top ?? Infinity);
+    window.scrollTo({ top: Math.max(0, top + window.scrollY - header - 8) });
+  }, []);
   const [tab, setTab] = useState<TabId>("parts");
   const [drawer, setDrawer] = useState<Drawer>(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -80,7 +119,8 @@ export default function Editor3D({ model, layers, settings, token, onChange, onA
     highlight,
     token,
     set: onChange,
-    setScene: (next: SceneSettings) => onChange({ ...settings, scene: next }),
+    // A setting changed by hand: the scene is no longer exactly one of the simple mode's ambiances.
+    setScene: (next: SceneSettings) => onChange({ ...settings, scene: { ...next, ambiance: undefined } }),
     setViews: (next: ViewsSettings) => onChange({ ...settings, views: next }),
     setViewer: (next: ViewerOptions) => onChange({ ...settings, viewer: next }),
     setTryOn: (next: TryOnSettings) => onChange({ ...settings, tryOn: next }),
@@ -108,9 +148,27 @@ export default function Editor3D({ model, layers, settings, token, onChange, onA
     setDrawer(id);
   };
 
+  if (mode === "simple") {
+    return (
+      <>
+      {bar}
+      <div className="relative left-1/2 grid w-[calc(100vw-3rem)] max-w-[1600px] -translate-x-1/2 grid-cols-[minmax(0,1fr)] gap-px border border-white/15 bg-white/10 lg:h-[min(calc(100svh-250px),960px)] lg:grid-cols-[minmax(0,1fr)_26rem] xl:grid-cols-[minmax(0,1fr)_30rem]" data-editor-3d data-editor-mode="simple" ref={shell}>
+        <div className="min-h-[60svh] bg-ink lg:min-h-0" data-editor-middle>
+          <EditorCanvas model={model} settings={settings} scene={scene} views={views} selected={selected} highlight={highlight} onPick={onPick} onApi={takeApi} onLayers={onLayers} onAnalysis={setAnalysis} guesses={guesses} autoRotate={autoRotate} onAutoRotate={setAutoRotate} />
+        </div>
+        <section className="min-h-0 overflow-y-auto overscroll-contain bg-ink p-4" aria-label="Réglages simples" data-lenis-prevent data-editor-simple>
+          <SimpleMode c={c} analysis={analysis} autoRotate={autoRotate} onAutoRotate={setAutoRotate} onExpert={() => setMode("expert")} />
+        </section>
+      </div>
+      </>
+    );
+  }
+
   return (
     // As wide as the screen (the admin's column is narrower): the jewel needs the room, as in jewellers' tools.
-    <div className="relative left-1/2 grid w-[calc(100vw-3rem)] max-w-[1800px] -translate-x-1/2 grid-cols-[minmax(0,1fr)] gap-px border border-white/15 bg-white/10 lg:h-[min(88svh,960px)] lg:grid-cols-[15rem_minmax(0,1fr)_23rem] xl:grid-cols-[17rem_minmax(0,1fr)_26rem]" data-editor-3d>
+    <>
+    {bar}
+    <div className="relative left-1/2 grid w-[calc(100vw-3rem)] max-w-[1800px] -translate-x-1/2 grid-cols-[minmax(0,1fr)] gap-px border border-white/15 bg-white/10 lg:h-[min(calc(100svh-250px),960px)] lg:grid-cols-[15rem_minmax(0,1fr)_23rem] xl:grid-cols-[17rem_minmax(0,1fr)_26rem]" data-editor-3d data-editor-mode="expert" ref={shell}>
       {/* Left: one click, with a picture */}
       <aside className="order-2 min-h-0 overflow-y-auto bg-ink p-3 lg:order-none" aria-label="Choix rapides" data-editor-left>
         {drawer === null ? (
@@ -136,11 +194,14 @@ export default function Editor3D({ model, layers, settings, token, onChange, onA
 
       {/* Middle: the jewel */}
       <div className="order-1 min-h-[60svh] bg-ink lg:order-none lg:min-h-0" data-editor-middle>
-        <EditorCanvas model={model} settings={settings} scene={scene} views={views} selected={selected} highlight={highlight} onPick={onPick} onApi={takeApi} onLayers={onLayers} />
+        <EditorCanvas model={model} settings={settings} scene={scene} views={views} selected={selected} highlight={highlight} onPick={onPick} onApi={takeApi} onLayers={onLayers} onAnalysis={setAnalysis} guesses={guesses} autoRotate={autoRotate} onAutoRotate={setAutoRotate} />
       </div>
 
       {/* Right: the tabs */}
       <section className="order-3 flex min-h-0 flex-col bg-ink lg:order-none" aria-label="Réglages" data-editor-right>
+        <button type="button" onClick={() => setMode("simple")} className="flex min-h-12 shrink-0 items-center gap-2 border-b border-white/15 px-3 text-start text-base text-rose-light hover:text-white" data-close-expert>
+          <ArrowLeft className="size-4" aria-hidden="true" /> Mode simple
+        </button>
         <div role="tablist" aria-label="Réglages" className="flex shrink-0 gap-1 overflow-x-auto border-b border-white/15 p-1" data-editor-tabs>
           {TABS.map(([id, name]) => (
             <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={"min-h-12 shrink-0 px-3 text-base " + (tab === id ? "bg-white font-medium text-ink" : "text-bone hover:text-rose-light")} data-tab={id}>
@@ -160,6 +221,7 @@ export default function Editor3D({ model, layers, settings, token, onChange, onA
         </div>
       </section>
     </div>
+    </>
   );
 }
 
@@ -189,8 +251,9 @@ function DrawerContent({ drawer, c }: { drawer: Exclude<Drawer, null>; c: Editor
   const { scene } = c;
   const grid = "grid grid-cols-2 gap-2";
   if (drawer === "metal" || drawer === "gem") {
-    const ids = drawer === "metal" ? METAL_ENVS : GEM_ENVS;
     const current = drawer === "metal" ? scene.envMetal : scene.envGem;
+    // « Studio sombre » left the metal black (27/11/2026): shown only to a model that uses it (tabs.tsx, metalEnvsShown).
+    const ids = drawer === "metal" ? METAL_ENVS.filter((id) => id !== "studio-dark" || id === current.id) : GEM_ENVS;
     const set = (patch: Partial<typeof current>) => c.setScene({ ...scene, [drawer === "metal" ? "envMetal" : "envGem"]: { ...current, ...patch } });
     return (
       <>
@@ -200,8 +263,9 @@ function DrawerContent({ drawer, c }: { drawer: Exclude<Drawer, null>; c: Editor
             <Tile key={id} name={hdriName(id)} image={thumb("hdri", id)} active={current.id === id} data={id} onClick={() => set({ id })} />
           ))}
         </div>
-        <Range name="Rotation" value={current.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => set({ rotation })} />
-        <Range name="Intensité" value={current.intensity} min={0} max={3} step={0.01} onChange={(intensity) => set({ intensity })} />
+        <Range name="Rotation" value={current.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => set({ rotation })} data={"drawer-" + drawer + "-rotation"} help={drawer === "metal" ? "env-metal-rotation" : "env-gem-rotation"} />
+        {/* The bounds of the Scene tab (tabs.tsx, measured 27/11/2026): never a black or burnt metal, never a black or flat white stone. */}
+        <Range name="Intensité" value={current.intensity} min={drawer === "metal" ? 0.4 : 0.5} max={2.5} step={0.01} onChange={(intensity) => set({ intensity })} data={"drawer-" + drawer + "-intensity"} help={drawer === "metal" ? "env-metal-intensity" : "env-gem-intensity"} />
       </>
     );
   }
@@ -279,18 +343,14 @@ function DrawerContent({ drawer, c }: { drawer: Exclude<Drawer, null>; c: Editor
     );
   }
   if (drawer === "advanced") {
-    const p = scene.post;
     return (
       <div className="grid gap-3">
         <p className="text-base text-white">Éclairage du métal</p>
-        <Range name="Rotation" value={scene.envMetal.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => c.setScene({ ...scene, envMetal: { ...scene.envMetal, rotation } })} />
-        <Range name="Intensité" value={scene.envMetal.intensity} min={0} max={3} step={0.01} onChange={(intensity) => c.setScene({ ...scene, envMetal: { ...scene.envMetal, intensity } })} />
+        <Range name="Rotation" value={scene.envMetal.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => c.setScene({ ...scene, envMetal: { ...scene.envMetal, rotation } })} data="advanced-metal-rotation" help="env-metal-rotation" />
+        <Range name="Intensité" value={scene.envMetal.intensity} min={0.4} max={2.5} step={0.01} onChange={(intensity) => c.setScene({ ...scene, envMetal: { ...scene.envMetal, intensity } })} data="advanced-metal-intensity" help="env-metal-intensity" />
         <p className="text-base text-white">Éclairage des pierres</p>
-        <Range name="Rotation" value={scene.envGem.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => c.setScene({ ...scene, envGem: { ...scene.envGem, rotation } })} />
-        <Range name="Intensité" value={scene.envGem.intensity} min={0} max={3} step={0.01} onChange={(intensity) => c.setScene({ ...scene, envGem: { ...scene.envGem, intensity } })} />
-        <p className="text-base text-white">Biseau à l'écran (SSBevel)</p>
-        <Range name="Rayon" value={p.bevel.radius} min={0} max={8} step={0.1} onChange={(radius) => c.setScene({ ...scene, post: { ...p, bevel: { ...p.bevel, radius, enabled: radius > 0 } } })} />
-        <Range name="Intensité" value={p.bevel.intensity} min={0} max={1} step={0.01} onChange={(intensity) => c.setScene({ ...scene, post: { ...p, bevel: { ...p.bevel, intensity } } })} />
+        <Range name="Rotation" value={scene.envGem.rotation} min={-180} max={180} step={1} unit="°" onChange={(rotation) => c.setScene({ ...scene, envGem: { ...scene.envGem, rotation } })} data="advanced-gem-rotation" help="env-gem-rotation" />
+        <Range name="Intensité" value={scene.envGem.intensity} min={0.5} max={2.5} step={0.01} onChange={(intensity) => c.setScene({ ...scene, envGem: { ...scene.envGem, intensity } })} data="advanced-gem-intensity" help="env-gem-intensity" />
       </div>
     );
   }

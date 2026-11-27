@@ -9,6 +9,7 @@
  */
 import type { HandLandmarker as Landmarker } from "@mediapipe/tasks-vision";
 import type { Point3, Side } from "./place";
+import { OneEuro } from "./smooth";
 
 export type Delegate = "GPU" | "CPU";
 
@@ -39,37 +40,6 @@ const WASM_BASE = "/mediapipe/wasm";
 const MODEL = "/mediapipe/hand_landmarker.task";
 
 /* ---------- Smoothing ---------- */
-
-/** The one-euro filter (Casiez et al.): the cut-off frequency rises with the speed, so slow moves are smoothed, fast ones follow. */
-class OneEuro {
-  private x = 0;
-  private dx = 0;
-  private t = -1;
-  constructor(
-    private readonly minCutoff: number,
-    private readonly beta: number,
-    private readonly dCutoff = 1,
-  ) {}
-  private static alpha(cutoff: number, dt: number): number {
-    const tau = 1 / (2 * Math.PI * cutoff);
-    return 1 / (1 + tau / dt);
-  }
-  filter(value: number, t: number): number {
-    if (this.t < 0) {
-      this.t = t;
-      this.x = value;
-      this.dx = 0;
-      return value;
-    }
-    const dt = Math.max((t - this.t) / 1000, 1e-3);
-    this.t = t;
-    const dValue = (value - this.x) / dt;
-    this.dx += OneEuro.alpha(this.dCutoff, dt) * (dValue - this.dx);
-    const cutoff = this.minCutoff + this.beta * Math.abs(this.dx);
-    this.x += OneEuro.alpha(cutoff, dt) * (value - this.x);
-    return this.x;
-  }
-}
 
 /** The filters of one hand: 21 points × (x, y, z) for the image and for the world. */
 class HandSmoother {

@@ -3,6 +3,7 @@
 // configurator and the client's buttons on a private link. Every setting changed is put back as it was. Needs the
 // server (models, admin): ADMIN_PASSWORD (typed in the Terminal, never written). Desktop: the editor; iPhone: the viewer.
 import { expect, test, type APIRequestContext, type Page } from "./fixtures";
+import { GEM_ENVS } from "../src/data/scene3d";
 
 type Row = { id: string; name: string; status: string; settings: Record<string, unknown>; layers: { name: string; guess: string }[] };
 
@@ -54,6 +55,9 @@ async function openEditor(page: Page, token: string, id: string) {
     }
   }
   await page.locator("[data-editor-3d]").waitFor({ timeout: 30_000 });
+  // The editor opens in its simple mode (27/11/2026): these checks are about the expert one.
+  if ((await page.locator("[data-editor-mode=simple]").count()) > 0) await page.locator("[data-open-expert]").click();
+  await page.locator("[data-editor-mode=expert]").waitFor({ timeout: 10_000 });
   await page.waitForFunction(() => Boolean((window as unknown as { __berete3d?: unknown }).__berete3d) && !document.querySelector("[data-editor-canvas] [role=status]"), null, { timeout: 120_000 });
 }
 
@@ -71,9 +75,9 @@ test("the editor: three zones, the tabs, the pictures, a stone's settings saved"
     for (const tab of ["view", "parts", "scene", "render", "effects", "cameras", "configurator", "export"]) await expect(page.locator(`[data-tab="${tab}"]`)).toBeVisible();
     await page.screenshot({ path: "verification/editor3d/editeur.png" });
 
-    // The stones' lightings: ten pictures, one click applies.
+    // The stones' lightings: one picture each, one click applies.
     await page.locator('[data-left="gem"]').click();
-    await expect(page.locator("[data-drawer=gem] [data-tile]")).toHaveCount(10);
+    await expect(page.locator("[data-drawer=gem] [data-tile]")).toHaveCount(GEM_ENVS.length);
     await page.locator('[data-tile="gem-vitrine"]').click();
     await expect(page.locator('[data-tile="gem-vitrine"]')).toHaveAttribute("aria-pressed", "true");
     await page.screenshot({ path: "verification/editor3d/eclairages-pierres.png" });
@@ -87,6 +91,10 @@ test("the editor: three zones, the tabs, the pictures, a stone's settings saved"
     const ior = page.locator('[data-control="ior"] input[type=range]');
     await ior.fill("2.42");
     await expect(page.locator('[data-control="bounces"]')).toBeVisible();
+    // Every setting has its help: « ? » opens a sentence and the low and high values seen on a ring (pictures of our engine).
+    await page.locator('[data-control="ior"] [data-help-toggle]').click();
+    await expect(page.locator('[data-help="ior"] p')).toBeVisible();
+    await expect(page.locator('[data-help="ior"] img')).toHaveCount(2);
     await page.screenshot({ path: "verification/editor3d/diamant.png" });
 
     // A saved camera view.
@@ -159,7 +167,9 @@ test("the client's viewer: saved views, configurator chips, zoom, share, drag-to
   }
 });
 
-test("the lab of the 3D is not in the built site", async ({ page }) => {
+test("the lab of the 3D is not in the built site", async ({ page, request }) => {
+  // The development server has the lab (that is where it is used): this checks the built site only.
+  test.skip((await request.get("/@vite/client")).ok(), "the development server has the lab");
   const res = await page.goto("/lab3d");
   // The built site has no such page: the "not found" page of the site (or the door of the site under construction).
   await expect(page.locator("[data-lab-ready]")).toHaveCount(0);

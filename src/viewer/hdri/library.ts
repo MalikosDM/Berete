@@ -22,6 +22,7 @@ export type HdriKind = "metal" | "gem";
 export type HdriInfo = { kind: HdriKind; /** French, short (the admin) */ name: string; /** French, one simple sentence */ description: string };
 
 export const HDRI: Record<string, HdriInfo> = {
+  "studio-clair": { kind: "metal", name: "Studio clair", description: "Un studio gris clair aux grandes boîtes à lumière : le métal garde toujours de grandes zones claires, jamais noir." },
   "studio-warm": { kind: "metal", name: "Studio chaud", description: "Un studio photo sombre aux grandes boîtes à lumière chaudes : la lumière classique d'une photo de bijou." },
   "softbox-wide": { kind: "metal", name: "Grandes boîtes", description: "Deux très grandes boîtes à lumière à gauche et à droite, une au-dessus : des reflets larges et doux." },
   "horizon-soft": { kind: "metal", name: "Horizon doux", description: "Une bande de lumière douce tout autour, à l'horizon, sous un ciel et au-dessus d'un sol plus sombres." },
@@ -41,6 +42,9 @@ export const HDRI: Record<string, HdriInfo> = {
   "gem-cross": { kind: "gem", name: "Croix", description: "Deux bandes de lumière qui se croisent au-dessus de la pierre." },
   "gem-stars": { kind: "gem", name: "Ciel étoilé", description: "Des centaines de petits points de lumière plus ou moins forts : un scintillement très fin." },
   "gem-studio": { kind: "gem", name: "Studio", description: "Le studio chaud du rendu réaliste : une grande boîte devant et au-dessus, deux bandes et quelques points." },
+  "gem-tente": { kind: "gem", name: "Tente blanche", description: "Une tente de photo toute blanche, rayée de fines lignes sombres : des pierres claires et nettes, quelle que soit leur taille." },
+  "gem-boites": { kind: "gem", name: "Boîtes studio", description: "Quatre grandes boîtes à lumière sur un fond gris et des cartes noires : du contraste franc, des éclats." },
+  "gem-escalier": { kind: "gem", name: "Bandes en escalier", description: "Des bandes claires et sombres l'une au-dessus de l'autre : les marches des tailles émeraude, baguette et asscher se dessinent." },
   "gem-classic": { kind: "gem", name: "Ancien rendu", description: "L'éclairage des pierres d'avant le 26/11 : des anneaux de panneaux étroits et 90 points, gardé pour comparer." },
 };
 
@@ -137,6 +141,20 @@ function field(cv: Canvas, fn: (lon: number, lat: number) => Rgb): void {
       cv.px[o] = cv.px[o]! + a;
       cv.px[o + 1] = cv.px[o + 1]! + b;
       cv.px[o + 2] = cv.px[o + 2]! + c;
+    }
+  }
+}
+
+/** Multiplies what is drawn so far by `fn(lon, lat)` (0: black): the seams of a tent, a dark hole. */
+function darken(cv: Canvas, fn: (lon: number, lat: number) => number): void {
+  for (let r = 0; r < cv.h; r++) {
+    let o = r * cv.w * 3;
+    for (let i = 0; i < cv.w; i++, o += 3) {
+      const k = fn((cv.lon[i]! + 360) % 360, cv.lat[r]!);
+      if (k === 1) continue;
+      cv.px[o] = cv.px[o]! * k;
+      cv.px[o + 1] = cv.px[o + 1]! * k;
+      cv.px[o + 2] = cv.px[o + 2]! * k;
     }
   }
 }
@@ -436,6 +454,55 @@ const GEMS: Record<string, (cv: Canvas) => void> = {
       disc(cv, { lon: rand(i, 32) * 360, lat, r: 0.3 + 0.5 * bright, power: 20 + 180 * bright, color: rand(i, 34) < 0.35 ? WARM : WHITE, soft: 0.12 });
     }
   },
+  // 27/11/2026: three dense studios, made so that no cut comes out black — every direction a facet can send the light
+  // to meets either a lit surface or a narrow dark line, as in a photographer's light tent.
+  "gem-tente": (cv) => {
+    rows(cv, (lat) => {
+      const v = lat > 12 ? 0.95 : lat > -8 ? 0.14 : 0.03;
+      return [v * WARM_WHITE[0], v * WARM_WHITE[1], v * WARM_WHITE[2]];
+    });
+    // The seams of the tent: dark meridians and two dark rings, a black hole at the top (the camera's place).
+    darken(cv, (lon, lat) => {
+      if (lat > 80) return 0;
+      if (lat < 12) return 1;
+      const seam = Math.abs(((lon + 11.25) % 22.5) - 11.25) < 2.6 ? 0.04 : 1;
+      const rings = Math.abs(lat - 30) < 3 || Math.abs(lat - 50) < 3 || Math.abs(lat - 68) < 2.4 ? 0.05 : 1;
+      return Math.min(seam, rings);
+    });
+    box(cv, { lon: 180, lat: 2, w: 150, h: 10, power: 0.9, color: WARM_WHITE, soft: 0.2 });
+    for (let i = 0; i < 4; i++) box(cv, { lon: 45 + i * 90, lat: -30, w: 40, h: 16, power: 0.7, soft: 0.15 });
+    for (let i = 0; i < 10; i++) disc(cv, { lon: rand(i, 41) * 360, lat: 25 + rand(i, 42) * 45, r: 1.1, power: 40 + 30 * rand(i, 43), soft: 0.1 });
+  },
+  "gem-boites": (cv) => {
+    room(cv, 0.12, 0.04, 0.1, WHITE);
+    for (let i = 0; i < 4; i++) box(cv, { lon: 45 + i * 90, lat: 32, w: 52, h: 36, power: 4.2 * (0.85 + 0.3 * rand(i, 51)), color: i % 2 ? WHITE : WARM_WHITE, soft: 0.05 });
+    box(cv, { lon: 180, lat: 70, w: 44, h: 18, power: 3.2, color: WARM_WHITE, soft: 0.05 });
+    box(cv, { lon: 0, lat: 70, w: 44, h: 18, power: 2.6, soft: 0.05 });
+    for (let i = 0; i < 8; i++) box(cv, { lon: 22.5 + i * 45, lat: 6, w: 5, h: 14, power: 1.8, soft: 0.08 });
+    for (let i = 0; i < 4; i++) box(cv, { lon: i * 90, lat: -28, w: 46, h: 18, power: 0.6, soft: 0.2 });
+    darken(cv, (lon, lat) => (lat > 82 ? 0.1 : 1));
+    for (let i = 0; i < 12; i++) disc(cv, { lon: rand(i, 52) * 360, lat: 15 + rand(i, 53) * 60, r: 1.2, power: 50 + 40 * rand(i, 54), soft: 0.08 });
+  },
+  "gem-escalier": (cv) => {
+    room(cv, 0.025, 0.02, 0.025, WHITE);
+    // Bright bands stacked from the horizon up, dark gaps between them: a step cut's long facets each catch one.
+    const bands: [number, number, number][] = [
+      [6, 6, 1.6],
+      [20, 6.5, 2.4],
+      [35, 6.5, 2.0],
+      [50, 7, 2.6],
+      [66, 7, 1.8],
+    ];
+    rows(cv, (lat) => {
+      let v = 0;
+      for (const [c, h, power] of bands) v += power * smooth((h / 2 - Math.abs(lat - c)) / 1.2 + 0.5);
+      return [v * WARM_WHITE[0], v * WARM_WHITE[1], v * WARM_WHITE[2]];
+    });
+    // Four upright strips through the bands (the corners of a step cut catch them), the floor faintly lit.
+    for (let i = 0; i < 4; i++) box(cv, { lon: 45 + i * 90, lat: 38, w: 4, h: 64, power: 2.2, soft: 0.06 });
+    for (let i = 0; i < 4; i++) box(cv, { lon: i * 90, lat: -26, w: 50, h: 16, power: 0.5, soft: 0.2 });
+    for (let i = 0; i < 8; i++) disc(cv, { lon: rand(i, 61) * 360, lat: 12 + rand(i, 62) * 58, r: 1.1, power: 45, soft: 0.1 });
+  },
   // realisticOf("studio") of diamondEnv.ts (25/11/2026), with a low ring of strips and cards added (26/11/2026).
   "gem-studio": (cv) => {
     const strength = 1;
@@ -483,8 +550,29 @@ const GEMS: Record<string, (cv: Canvas) => void> = {
 /* ---------- The lightings of the metal ---------- */
 
 const METALS: Record<string, (cv: Canvas) => void> = {
+  // 27/11/2026, the default: a light grey studio, large soft boxes all around and above, a darker band low behind to
+  // draw the edges. A polished white gold or platinum finds a light surface to mirror in any direction (in the dark
+  // studios a profile view of white gold came out nearly black, rose gold a muddy brown).
+  "studio-clair": (cv) => {
+    // Walls dim but never black (a polished metal mirrors them in its dark parts: grey, not a hole), large boxes.
+    room(cv, 0.11, 0.1, 0.16, WARM_WHITE);
+    // A pale floor all around (the lower half of a ring seen in profile mirrors it).
+    for (let i = 0; i < 4; i++) box(cv, { lon: 45 + i * 90, lat: -40, w: 70, h: 30, power: 0.45, color: WARM_WHITE, soft: 0.4 });
+    box(cv, { lon: 215, lat: 30, w: 64, h: 46, power: 5.5, color: WARM_WHITE, soft: 0.12, falloff: 0.2 });
+    box(cv, { lon: 140, lat: 26, w: 50, h: 40, power: 3.6, color: WHITE, soft: 0.12, falloff: 0.2 });
+    box(cv, { lon: 180, lat: 76, w: 80, h: 30, power: 4.2, color: WARM_WHITE, soft: 0.15, falloff: 0.2 });
+    box(cv, { lon: 35, lat: 28, w: 40, h: 44, power: 3.0, color: WHITE, soft: 0.12, falloff: 0.2 });
+    box(cv, { lon: 325, lat: 28, w: 40, h: 44, power: 2.4, color: WARM_WHITE, soft: 0.12, falloff: 0.2 });
+    box(cv, { lon: 270, lat: 8, w: 30, h: 16, power: 1.4, color: WARM_WHITE, soft: 0.2 });
+    box(cv, { lon: 90, lat: 8, w: 30, h: 16, power: 1.2, color: WHITE, soft: 0.2 });
+    box(cv, { lon: 180, lat: -30, w: 110, h: 26, power: 0.7, color: WARM_WHITE, soft: 0.35 });
+    // A soft panel behind the camera, as a photographer sets one: a flat face turned to the eye (a pendant's front, its
+    // polished plates) mirrors light, not the dark of the room.
+    box(cv, { lon: 180, lat: 6, w: 46, h: 30, power: 0.7, color: WARM_WHITE, soft: 0.3, falloff: 0.3 });
+  },
   "studio-warm": (cv) => {
-    room(cv, 0.035, 0.022, 0.03, WARM);
+    // The walls a little lighter than at first (27/11/2026: 0.035 → 0.09): a polished metal never mirrors a black.
+    room(cv, 0.09, 0.06, 0.08, WARM);
     box(cv, { lon: 215, lat: 35, w: 55, h: 40, power: 14, color: WARM, soft: 0.25, falloff: 0.3 });
     box(cv, { lon: 180, lat: 78, w: 70, h: 32, power: 9, color: WARM, soft: 0.25, falloff: 0.25 });
     box(cv, { lon: 120, lat: 20, w: 30, h: 50, power: 4.5, color: WARM, soft: 0.3, falloff: 0.3 });
@@ -605,16 +693,55 @@ export function hdriPixels(id: string, width: number, height: number): Float32Ar
   draw(cv);
   const gain = GEM_GAIN[id] ?? 1;
   if (gain !== 1) for (let i = 0; i < cv.px.length; i++) cv.px[i]! *= gain;
+  const base = GEM_BASE[id];
+  if (base) softDome(cv, base);
   return cv.px;
 }
+
+/**
+ * A soft studio behind the few sources of the sparse lightings (27/11/2026): a pale dome cut by thin dark seams, a dim
+ * band at the horizon, a dark floor. Drawn alone, those lightings were black on nine tenths of the sky: a stone whose
+ * facets sent the light there (an emerald cut, a baguette) came out black. Now every facet finds at least a grey.
+ */
+function softDome(cv: Canvas, level: number): void {
+  for (let r = 0; r < cv.h; r++) {
+    const lat = cv.lat[r]!;
+    let o = r * cv.w * 3;
+    for (let i = 0; i < cv.w; i++, o += 3) {
+      const lon = (cv.lon[i]! + 360) % 360;
+      let v = lat > 10 ? 0.6 + 0.4 * smooth((lat - 10) / 70) : lat > -10 ? 0.35 : 0.06;
+      if (lat > 10 && lat < 84 && (Math.abs(((lon + 15) % 30) - 15) < 1.5 || Math.abs(lat - 42) < 2)) v *= 0.1;
+      if (lat >= 84) v *= 0.15;
+      cv.px[o] = cv.px[o]! + v * level;
+      cv.px[o + 1] = cv.px[o + 1]! + v * level * 0.98;
+      cv.px[o + 2] = cv.px[o + 2]! + v * level * 0.95;
+    }
+  }
+}
+
+/** Level of the soft studio added under each sparse lighting (see softDome). */
+const GEM_BASE: Record<string, number> = {
+  "gem-bands": 0.32,
+  "gem-points": 0.3,
+  "gem-ring": 0.32,
+  "gem-spot": 0.34,
+  "gem-vitrine": 0.32,
+  "gem-backlight": 0.32,
+  "gem-cross": 0.32,
+  "gem-stars": 0.28,
+};
 
 /**
  * The stones' lightings brought to the level of "gem-studio" (panels about 5, pins about 50, seen in the viewer on
  * 26/11/2026): drawn first with sources of 20 to 200, they burnt the stones white and the glow spread over the jewel.
  */
 const GEM_GAIN: Record<string, number> = {
+  // The old rendering's lighting, twice as strong as the others (27/11/2026: stones flat white at the bright end).
+  "gem-classic": 0.55,
+  "gem-boites": 0.55,
+  "gem-escalier": 0.72,
   "gem-bands": 0.15,
-  "gem-points": 0.32,
+  "gem-points": 0.27,
   "gem-ring": 0.12,
   "gem-spot": 0.35,
   "gem-vitrine": 0.38,

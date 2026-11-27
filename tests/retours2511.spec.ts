@@ -55,8 +55,9 @@ test("a magazine: the film and the story side by side, four photos of the whole,
         return photo.left > text.left ? "right" : "left";
       }),
     );
-    expect(sides[0]).toBe("right");
-    expect(sides[1]).toBe("left");
+    // The photo on the left first, right under the title (26/11/2026: the text first left the top left empty), then right.
+    expect(sides[0]).toBe("left");
+    expect(sides[1]).toBe("right");
   }
   // A photo of a detail opens full screen.
   await blocks.first().locator("[data-magazine-photo]").click();

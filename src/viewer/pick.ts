@@ -3,7 +3,7 @@
  * double-click glides to it, the admin places the points of "The Art of Detail"), which points the jewel hides, and
  * the first view of the camera.
  */
-import { Box3, FloatType, HalfFloatType, ShaderMaterial, Vector3, WebGLRenderTarget, type Object3D, type PerspectiveCamera, type Scene, type WebGLRenderer } from "three";
+import { Box3, FloatType, HalfFloatType, Matrix4, ShaderMaterial, Vector3, WebGLRenderTarget, type Object3D, type PerspectiveCamera, type Scene, type WebGLRenderer } from "three";
 import type { CameraControls } from "@react-three/drei";
 import type { ModelView } from "@/data/models";
 
@@ -106,7 +106,7 @@ export function lookAt(
 }
 
 /** The first view: the one the jeweller saved, else the whole jewel seen from the front and above, its long side across the screen. */
-export function startView(c: CameraControls, box: Box3, camera: PerspectiveCamera, view: ModelView | null, smooth: boolean, auto: { scale: boolean; center: boolean } = { scale: true, center: true }): void {
+export function startView(c: CameraControls, box: Box3, camera: PerspectiveCamera, view: ModelView | null, smooth: boolean, auto: { scale: boolean; center: boolean } = { scale: true, center: true }, points?: Vector3[] | null, upright = false): void {
   void c.zoomTo(1, smooth);
   if (view) {
     void c.setLookAt(...view.position, ...view.target, smooth);
@@ -119,30 +119,91 @@ export function startView(c: CameraControls, box: Box3, camera: PerspectiveCamer
     void c.setLookAt(target.x, target.y + distance * 0.45, target.z + distance * 0.9, target.x, target.y, target.z, smooth);
     return;
   }
+  // A pendant stood up by the engine: seen from the front, a little from above; else three quarters from above.
+  if (upright) return fitView(c, box, camera, 0.18, 1.3, smooth, points);
   const wide = box.max.x - box.min.x >= box.max.z - box.min.z;
-  fitView(c, box, camera, wide ? 0.25 : Math.PI / 2 + 0.25, 1.0, smooth);
+  fitView(c, box, camera, wide ? 0.25 : Math.PI / 2 + 0.25, 1.0, smooth, points);
 }
 
-/** Places the camera at these angles, as close as possible with the whole box on screen (with a margin). */
-export function fitView(c: CameraControls, box: Box3, camera: PerspectiveCamera, azimuth: number, polar: number, smooth: boolean): void {
-  const center = box.getCenter(new Vector3());
+/**
+ * Places the camera at these angles, as close as possible with the whole jewel on screen and a margin of a tenth around
+ * it. With the jewel's own points (27/11/2026), the frame is tight and centred on what is seen (the corners of the box
+ * made a jewel seen at an angle look small); else the corners of its box.
+ */
+export function fitView(c: CameraControls, box: Box3, camera: PerspectiveCamera, azimuth: number, polar: number, smooth: boolean, points?: Vector3[] | null): void {
   const toCamera = new Vector3().setFromSphericalCoords(1, polar, azimuth);
   const forward = toCamera.clone().negate();
   const right = new Vector3().crossVectors(forward, Math.abs(toCamera.y) > 0.999 ? new Vector3(0, 0, -1) : new Vector3(0, 1, 0)).normalize();
   const up = new Vector3().crossVectors(right, forward).normalize();
   const tanV = Math.tan((camera.fov * Math.PI) / 360);
   const tanH = tanV * camera.aspect;
-  const margin = 1.12;
+  const margin = 1.1;
+  const list: Vector3[] = points && points.length > 0 ? points : Array.from({ length: 8 }, (_, i) => new Vector3(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z));
+  const center = box.getCenter(new Vector3());
   let distance = MIN_DISTANCE;
-  const corner = new Vector3();
-  for (let i = 0; i < 8; i++) {
-    corner.set(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).sub(center);
-    const depth = corner.dot(toCamera);
-    distance = Math.max(distance, depth + (Math.abs(corner.dot(right)) * margin) / tanH, depth + (Math.abs(corner.dot(up)) * margin) / tanV);
+  const rel = new Vector3();
+  // Twice: frame, then move the target to the middle of what the camera sees, and frame again.
+  for (let pass = 0; pass < 2; pass++) {
+    distance = MIN_DISTANCE;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    for (const p of list) {
+      rel.subVectors(p, center);
+      const depth = rel.dot(toCamera);
+      distance = Math.max(distance, depth + (Math.abs(rel.dot(right)) * margin) / tanH, depth + (Math.abs(rel.dot(up)) * margin) / tanV);
+    }
+    if (pass === 1 || list.length <= 8) break;
+    // Where the points fall on the screen at that distance (perspective), and the middle of them.
+    for (const p of list) {
+      rel.subVectors(p, center);
+      const z = distance - rel.dot(toCamera);
+      if (z <= 0) continue;
+      const x = rel.dot(right) / z;
+      const y = rel.dot(up) / z;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x);
+      minY = Math.min(minY, y);
+      maxY = Math.max(maxY, y);
+    }
+    if (Number.isFinite(minX)) center.addScaledVector(right, ((minX + maxX) / 2) * distance).addScaledVector(up, ((minY + maxY) / 2) * distance);
   }
   const position = center.clone().addScaledVector(toCamera, distance);
   void c.zoomTo(1, smooth);
   void c.setLookAt(position.x, position.y, position.z, center.x, center.y, center.z, smooth);
+}
+
+/** Up to `cap` points of the jewel (vertices of its meshes, the corners of each copy of a repeated stone), in the space of `root`'s parent. */
+export function jewelPoints(root: Object3D, cap = 24000): Vector3[] {
+  const out: Vector3[] = [];
+  const meshes: import("three").Mesh[] = [];
+  root.updateMatrixWorld(true);
+  root.traverse((o) => {
+    const m = o as import("three").Mesh;
+    if (m.isMesh && m.visible) meshes.push(m);
+  });
+  const per = Math.max(64, Math.floor(cap / Math.max(1, meshes.length)));
+  const v = new Vector3();
+  const im = new Matrix4();
+  for (const mesh of meshes) {
+    const g = mesh.geometry;
+    const inst = mesh as unknown as import("three").InstancedMesh;
+    if (inst.isInstancedMesh) {
+      g.computeBoundingBox();
+      const b = g.boundingBox!;
+      const step = Math.max(1, Math.floor(inst.count / Math.max(1, per / 8)));
+      for (let i = 0; i < inst.count; i += step) {
+        inst.getMatrixAt(i, im);
+        for (let k = 0; k < 8; k++) out.push(v.set(k & 1 ? b.max.x : b.min.x, k & 2 ? b.max.y : b.min.y, k & 4 ? b.max.z : b.min.z).applyMatrix4(im).applyMatrix4(mesh.matrixWorld).clone());
+      }
+      continue;
+    }
+    const pos = g.getAttribute("position");
+    const step = Math.max(1, Math.floor(pos.count / per));
+    for (let i = 0; i < pos.count; i += step) out.push(v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld).clone());
+  }
+  return out;
 }
 
 export function halfToFloat(h: number): number {

@@ -17,7 +17,8 @@
   "width": 720,
   "height": 1280,
   "duration": 24.8,
-  "audio": true
+  "audio": true,
+  "start": 2
  },
  "tillman-cross-spin": {
   "video": "/media/mechanisms/tillman-cross-spin.cbd86f6ab2.mp4",

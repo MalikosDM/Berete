@@ -81,8 +81,8 @@ export function Ground({ ground, frame, light, onReady }: { ground: GroundSettin
       <circleGeometry args={[scale * 1.5, 96]} />
       <MeshReflectorMaterial
         resolution={1024}
-        blur={[200, 80]}
-        mixBlur={0.6}
+        blur={[Math.round(40 + 400 * (ground.mirrorBlur ?? 0.4)), Math.round(16 + 160 * (ground.mirrorBlur ?? 0.4))]}
+        mixBlur={0.2 + 1.6 * (ground.mirrorBlur ?? 0.4)}
         mixStrength={1.2}
         mirror={0.8}
         depthScale={0}

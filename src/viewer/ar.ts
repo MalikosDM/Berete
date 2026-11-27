@@ -3,6 +3,9 @@
  *   - iPhone and iPad (Safari): AR Quick Look. The .usdz file is made on the device from the jewel as the viewer draws it
  *     (three's USDZExporter): its metals as they are, its stones in a plain white (Quick Look has no diamond), in metres
  *     (true size: a ring of 2 cm stays 2 cm, the client can enlarge it with two fingers), set on its lowest point.
+ *   - Android (Chrome), where the browser has it: WebXR « immersive-ar » first (27/11/2026, ./webxr.ts, loaded only at the
+ *     tap): the jewel in the camera image of the page itself, placed on a table or the floor with a tap (hit test), at
+ *     its true size or larger. Otherwise, or when the session cannot start:
  *   - Android (Chrome): Scene Viewer, Google's own viewer, opened by an intent with the address of a .glb file. Google's
  *     application fetches the file itself, without the cookies of the site: the address must open without them (a signed
  *     link), and be absolute (https).
@@ -21,6 +24,20 @@ export function canSceneViewer(): boolean {
   if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent;
   return /android/i.test(ua) && !/firefox|fxios|oculusbrowser|quest/i.test(ua);
+}
+
+/** WebXR can show the jewel in the room (Chrome on Android with ARCore, some headsets): asked once, never throws. */
+let webXr: Promise<boolean> | null = null;
+export function canWebXrAr(): Promise<boolean> {
+  webXr ??= (async () => {
+    try {
+      const xr = typeof navigator === "undefined" ? undefined : (navigator as Navigator & { xr?: XRSystem }).xr;
+      return Boolean(xr && window.isSecureContext && (await xr.isSessionSupported("immersive-ar")));
+    } catch {
+      return false;
+    }
+  })();
+  return webXr;
 }
 
 /**
@@ -74,10 +91,10 @@ function withNormals(geometry: BufferGeometry, copies: BufferGeometry[]): Buffer
 }
 
 /**
- * The jewel for the .usdz: plain meshes (the copies of an instanced mesh, the stones repeated, become meshes of their own
+ * The jewel for the .usdz (and for WebXR, ./webxr.ts): plain meshes (the copies of an instanced mesh, the stones repeated, become meshes of their own
  * sharing one shape), the materials Quick Look reads, placed on y = 0 and centred.
  */
-function arScene(jewel: Object3D): { scene: Group; dispose(): void } {
+export function arScene(jewel: Object3D): { scene: Group; dispose(): void } {
   const stone = new MeshStandardMaterial({ name: "stone", color: new Color("#ffffff"), metalness: 0, roughness: 0.05 });
   const made = new Map<Material, MeshStandardMaterial>();
   const geometries: BufferGeometry[] = [];

@@ -3,18 +3,24 @@
  *   - The address of the visitor: the server trusts the "X-Forwarded-For" of a proxy on the same machine or the same
  *     private network (Caddy), never one sent from outside.
  *   - Headers on every answer: no guessing of file types, no framing by another site, the referrer kept short; and
- *     "noindex" everywhere until the launch (SITE_INDEXING=on opens the site to the search engines).
+ *     "noindex" everywhere until the launch (SITE_INDEXING=on opens the site to the search engines). One page only may be
+ *     framed by another site: the embed code of a 3D link (/embed/<token>, 27/11/2026: the viewer alone, in an <iframe>).
  *   - A limit of tries per visitor (address), kept in memory: the password of the admin, the forms, the codes of the
  *     client space and of the private 3D links. The machine itself (the checks, the tests) is never limited.
  */
 import type { Express, Request } from "express";
 
+/** The embed code of a private 3D link, in every language (src/pages/Embed3D.tsx): the only page another site may frame. */
+export const EMBED_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?embed\/([A-Za-z0-9_-]+)\/?$/;
+
 export function protect(app: Express): void {
   app.set("trust proxy", "loopback, uniquelocal");
   const indexing = process.env.SITE_INDEXING === "on";
-  app.use((_req, res, next) => {
+  app.use((req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+    // The embed page may be framed by any site (that is its use); every other answer by the site itself only.
+    if (EMBED_PAGE.test(req.path)) res.setHeader("Content-Security-Policy", "frame-ancestors *");
+    else res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
     res.setHeader("Permissions-Policy", "camera=(self), microphone=(), geolocation=(), payment=()");
     if (!indexing) res.setHeader("X-Robots-Tag", "noindex, nofollow");

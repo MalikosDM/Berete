@@ -170,6 +170,58 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « moteur 3D : corriger ce qui est faux, mode simple, parité iJewel » (retour de Malik du 26/11) — état au 27/11/2026
+- [x] **Pierres noires : deux causes trouvées et mesurées** (mode mesure du laboratoire, `?gemDebug=1|2` : rayons sortis,
+      rebonds, lumière trouvée) : 1) les fichiers allégés gardent les positions en entiers de 16 bits, three-mesh-bvh les recopiait
+      sans les décompresser : la pierre « vue » par les rayons était 32 767 fois plus grande, aucun rayon ne la touchait de
+      l'intérieur (grosse émeraude de ZR0982 : 7 % de rayons sortis → 73 %, 0 % de noir ; `floatCopy` de `src/viewer/gems.ts`) ;
+      2) les éclairages des pierres étaient noirs sur 90 % du ciel : une taille à degrés renvoyait sa lumière vers le noir. Fond
+      doux sous les éclairages épars (`softDome`), trois studios denses (`gem-tente`, `gem-boites`, `gem-escalier`), un rayon encore
+      enfermé prend la lumière floutée au lieu d'un tiers de la nette, un rayon qui ne touche rien (pierre ouverte) sort. Bornes de
+      sécurité dans `setGemParams` (intensité, gamma, renfort) : aucun curseur ne rend une pierre noire ou blanche plate.
+- [x] **Planche des 13 tailles** (`src/viewer/lab/cuts.ts`, `/lab3d?jewel=cuts`, `?quantize=1` pour les positions en entiers) et
+      `tests/gems-cuts.spec.ts` (serveur de développement) : chaque pierre, tracée et rapide, sous « auto », Studio, Vitrine, Points
+      et en entiers de 16 bits : luminance entre 0,12 et 0,88, contraste ≥ 0,06, < 40 % de noir. Échoue avec l'ancien moteur
+      (baguette 55 % noire ; page cassée sur les entiers), passe avec le nouveau. `.local/scripts/cuts-sheet.mjs` fait la planche.
+- [x] **Réglage parfait du moteur** (`src/viewer/auto.ts`) : chaque calque reconnu pierre ou métal par son nom PUIS par sa forme
+      (facettes taillées qui penchent depuis la table ; une lettre plate en métal reste du métal), famille de taille (à degrés /
+      ronde-fantaisie), éclairage des pierres « auto » par calque (bandes en escalier / tente blanche), rebonds (8 à degrés, 7 grosses
+      pierres, 4–5 pavé), lueur au seuil 3,4 (seuls les vrais éclats brillent). Un pendentif posé à plat dans le fichier est mis
+      debout, pierres devant, bélière en haut (`uprightPose` : la bélière est l'extrémité la plus étroite) ; cadrage serré sur les
+      points du bijou avec 10 % de marge (`fitView` de `pick.ts`), aussi pour une photo d'une autre forme que l'écran. Les pièces
+      posées à part dans un fichier (3 petites pièces à 23 cm du pendentif OKA, les plaques « N » de l'octogone v2) sont gardées ;
+      la caméra cadre la pièce principale (`mainBox` écrit par l'import) et un calque entièrement à part est caché (« Afficher »).
+- [x] **Mode simple de l'éditeur par défaut** (`src/pages/admin/editor3d/SimpleMode.tsx`) : 1. Ambiance (6 scènes complètes,
+      vignettes faites par le moteur : studio blanc, studio noir, chaud, vitrine, marbre noir Berete, fond transparent), 2. Métal
+      (or jaune, blanc, rose, platine, rhodium noir ; tout ou par partie), 3. Pierres (diamant blanc, jaune, rose, champagne, noir,
+      bleu, rouge, vert), 4. Vue (face, profil, 3/4, dessus, rotation), Exporter (photo 4K, film 8 s), « Revenir au réglage
+      parfait », avertissement « pierres trop sombres / blanches et plates » + « Corriger » (le moteur mesure chaque calque :
+      `measureStones`). « Mode expert » ouvre l'éditeur en trois zones. Parcours de Yoni mesuré : fichier Rhino neuf → photo 4K
+      en 4 clics et 12 s (`.local/scripts/yoni-path.mjs`, captures `yoni-parcours-1..5.png`).
+- [x] **Métaux calibrés** (valeurs et sources dans `src/viewer/materials.ts`) : or jaune 18 ct = ISO 8654 « 3N », or rose 18 ct =
+      « 5N » (CIELAB de la norme converti), platine, palladium, argent (physicallybased.info), or blanc rhodié (rhodium ≈ 78 %).
+      Nouvel éclairage métal par défaut « Studio clair » (jamais de noir à refléter, un panneau doux face au bijou) ; « Studio chaud »
+      éclairci. Ambiances d'avant « studio » et « chaud » : Studio clair + pierres « auto ».
+- [x] **Vignettes** : pierres et éclairages des pierres rendus par le vrai shader sur un rond brillant vu de 3/4 (plus jamais de
+      boule blanche), ambiances du mode simple (`npm run`… `npx tsx scripts/lab-thumbs.ts`, `ONLY=gems|ambiance|…`).
+- [x] **Options iJewel ajoutées** : film irisé et teinte (LUT) par matière, LUT de scène (`src/viewer/looks.ts`, looks faits par code),
+      tons « Neutral », vernis/rugosité/couleur du métal par calque, mise au point par clic, flou du sol miroir, carte intérieure
+      256/512/1024 au choix, vitesse et sens de rotation, limites d'angle, déplacement latéral oui/non, itérations de lueur 0–7.
+      Tableau complet : `docs/3d-parite-ijewel.md` ; réglages testés un par un : `docs/3d-reglages-testes.md`.
+- [x] Assistants de la passe : essayage (la bague suit l'axe et la largeur du doigt, moitié arrière cachée par un cylindre invisible,
+      photo enregistrée à l'endroit ; `tests/tryon.spec.ts`), fichiers Rhino (calques éteints sautés, blocs vérifiés,
+      `scripts/rhino-check.ts`, `tests/rhino-files.spec.ts`, `tests/rhino-framing.spec.ts`), visualiseur client (6 langues partout,
+      un seul choix de métal, image d'attente + barre, fond transparent, logo, `/embed/<jeton>` + bouton « Intégrer », WebXR sur
+      Android ; `tests/client3d.spec.ts`), export (GLB avec notre extension `BERETE_gem`, fichier `.berete-scene.json`, USDZ, WebM 4K,
+      import d'un HDR/EXR personnel `storage/hdri/`), confort (annuler/rétablir, raccourcis, comparaison avant/après à trait
+      coulissant, préréglages appliqués à plusieurs modèles, versions, aperçu sur la page de la pièce ; `tests/editor3d-confort.spec.ts`),
+      site (pendentif L sans rectangle noir, image d'attente des films derrière la vidéo, « The Art of Detail » rééquilibré).
+- Captures : `~/Downloads/_verif-3d-v3/` (planches avant/après, émeraude, vignettes, métaux, fichiers Rhino, essayage,
+  comparaisons photo/rendu, parité, parcours de Yoni). Photos de comparaison prises sur le site (disque externe non branché).
+- [ ] Yoni : un export iJewel d'une pièce (pour une vraie 3e colonne iJewel : aucune comparaison avec iJewel n'a été faite) ; le
+      .3dm de la bague VfB (le STL soude les pierres : rouges et baguettes reconstituées en blanc) ; la boule du pendentif OKA est sur
+      le calque du métal blanc (elle sort blanche, en or rose sur la photo) ; dire si les plaques « N » à côté de l'octogone v2 servent.
+
 ## Passe « 3D au niveau d'iJewel » (visualiseur et éditeur, cahier des charges v2) — état au 26/11/2026
 - [x] **Diamants refaits de zéro** (`src/viewer/gems.ts`) : chaque pixel suit la lumière dans la pierre (réfraction, réflexions
       internes, sortie) jusqu'à **l'éclairage des pierres**, séparé de celui du métal (Environment / Gem Environment). Tous les

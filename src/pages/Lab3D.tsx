@@ -14,7 +14,10 @@ import { merged, type SceneSettings } from "@/data/scene3d";
 import { sceneOf } from "@/data/models";
 import Stage, { type StageApi } from "@/viewer/Stage";
 import { testRing, testSphere } from "@/viewer/lab/testRing";
-import { SCENE_PRESETS } from "@/pages/admin/editor3d/presets";
+import { CUTS, cutGeometry } from "@/viewer/lab/cuts";
+import { BufferAttribute, Mesh, MeshStandardMaterial } from "three";
+import { SCENE_PRESETS, SIMPLE_AMBIANCES } from "@/pages/admin/editor3d/presets";
+import { brilliantGeometry } from "@/viewer/lab/testRing";
 
 function glbOf(root: Object3D): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -27,6 +30,42 @@ function glbOf(root: Object3D): Promise<string> {
   });
 }
 
+/**
+ * The test sheet of the cuts: one stone of each of the thirteen cuts per row, one row per way of drawing them ("trace",
+ * "fast"), 6 mm stones 9 mm apart, tables up; each stone its own layer, named "<mode>:<cut>".
+ */
+function cutsSheet(modes: string, quantize: boolean): Group {
+  const sheet = new Group();
+  const rows = modes.split(",");
+  rows.forEach((mode, r) => {
+    CUTS.forEach((cut, i) => {
+      const geometry = cutGeometry(cut, 0.006);
+      const mesh = new Mesh(geometry, new MeshStandardMaterial({ name: mode + ":" + cut }));
+      // ?quantize=1: positions kept as whole numbers of 16 bits read as −1…1, as the light files of the site store them
+      // (the large emerald cut of ZR0982 was black because of it, 27/11/2026).
+      if (quantize) {
+        const pos = geometry.getAttribute("position");
+        let far = 0;
+        for (let k = 0; k < pos.array.length; k++) far = Math.max(far, Math.abs(pos.array[k]!));
+        const q = new Int16Array(pos.array.length);
+        for (let k = 0; k < q.length; k++) q[k] = Math.round((pos.array[k]! / far) * 32767);
+        geometry.setAttribute("position", new BufferAttribute(q, 3, true));
+        mesh.scale.setScalar(far);
+      }
+      mesh.name = mode + ":" + cut;
+      mesh.position.set((i - (CUTS.length - 1) / 2) * 0.009, 0, (r - (rows.length - 1) / 2) * 0.011);
+      sheet.add(mesh);
+    });
+  });
+  return sheet;
+}
+
+// ?gemDebug=1|2: the stones' measures instead of their light (read by src/viewer/gems.ts when it makes a material).
+if (typeof window !== "undefined") {
+  const debug = new URLSearchParams(window.location.search).get("gemDebug");
+  if (debug) (window as unknown as { __gemDebug?: number }).__gemDebug = Number(debug);
+}
+
 export default function Lab3D() {
   const q = useMemo(() => new URLSearchParams(window.location.search), []);
   const [url, setUrl] = useState<string | null>(q.get("model"));
@@ -35,7 +74,14 @@ export default function Lab3D() {
   useEffect(() => {
     if (q.get("model")) return;
     const group = new Group();
-    group.add(jewel === "sphere" ? testSphere() : testRing());
+    if (jewel === "cuts") group.add(cutsSheet(q.get("modes") ?? "trace,fast", q.get("quantize") === "1"));
+    else if (jewel === "stone") {
+      // One round brilliant of 6 mm, table up: the pictures of the stones' materials and lightings.
+      const stone = new Mesh(brilliantGeometry(0.006), new MeshStandardMaterial({ name: "diamond" }));
+      stone.name = "diamond";
+      group.add(stone);
+    }
+    else group.add(jewel === "sphere" ? testSphere() : testRing());
     void glbOf(group).then(setUrl);
   }, [q, jewel]);
 
@@ -59,12 +105,17 @@ export default function Lab3D() {
       const [, m, kind] = material.split("/");
       base.layers.sample = { role: "metal", metal: m as MetalId, finish: { kind: (kind ?? "polished") as "polished" } };
     }
+    if (jewel === "cuts") {
+      for (const mode of (q.get("modes") ?? "trace,fast").split(",")) for (const cut of CUTS) base.layers[mode + ":" + cut] = { role: "diamond", diamond: { mode: mode as "trace" | "fast" } };
+    }
     const json = q.get("settings");
     return json ? merged(base, JSON.parse(json)) : base;
-  }, [q]);
+  }, [q, jewel]);
 
+  const simple = SIMPLE_AMBIANCES.find((a) => a.id === q.get("simple"));
+  const settingsShown = useMemo(() => (simple ? simple.apply(settings) : settings), [simple, settings]);
   const scene: SceneSettings = useMemo(() => {
-    let s = sceneOf(settings);
+    let s = sceneOf(settingsShown);
     const preset = SCENE_PRESETS.find((p) => p.id === q.get("preset"));
     if (preset) s = merged(s, preset.scene);
     const over: Partial<SceneSettings> = {};
@@ -75,7 +126,7 @@ export default function Lab3D() {
     if (q.get("fixed")) over.fixedEnv = true;
     const json = q.get("scene");
     return merged(merged(s, over), json ? JSON.parse(json) : undefined);
-  }, [q, settings]);
+  }, [q, settingsShown]);
 
   const onReady = useCallback(() => setReady(true), []);
   const noop = useCallback(() => undefined, []);
@@ -89,7 +140,7 @@ export default function Lab3D() {
     if (view === "front" || view === "side" || view === "top") window.setTimeout(() => api?.view(view), 50);
   }, [ready, view]);
   const preset = SCENE_PRESETS.find((p) => p.id === q.get("preset"));
-  const background = preset ? preset.background : settings.background;
+  const background = preset ? preset.background : settingsShown.background;
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "#0a0a0a" }} data-lab-ready={ready || undefined}>
@@ -100,7 +151,7 @@ export default function Lab3D() {
             bytes={0}
             phone={q.has("phone")}
             simpleStones={false}
-            settings={settings}
+            settings={settingsShown}
             scene={scene}
             choices={{ metals: {}, colors: {}, materials: {} }}
             lightAngle={0}

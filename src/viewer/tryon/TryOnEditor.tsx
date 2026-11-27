@@ -9,7 +9,7 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { DEFAULT_TRY_ON, FINGERS, type Finger, type TryOnSettings, type Vec3 } from "@/data/scene3d";
 import type { Object3D } from "three";
-import { cylinderFrame, FINGER_MM, measureRing, ringMatrix, ringPoints, SEGMENT_MM } from "./place";
+import { cylinderFrame, FINGER_MM, measureRing, ringMatrix, ringPoints, SEGMENT_MM, type RingFit } from "./place";
 import { prepareRing, useRoomEnvironment, type TryOnRing } from "./ring";
 
 type Props = {
@@ -30,6 +30,8 @@ const choice =
 export default function TryOnEditor({ jewel, settings, onChange }: Props) {
   const ring = useMemo(() => (jewel ? prepareRing(jewel) : null), [jewel]);
   useEffect(() => () => ring?.dispose(), [ring]);
+  // The hole measured once (and again when the axis changes): the same as on the client's hand.
+  const fit = useMemo(() => (ring ? measureRing(ringPoints(ring.root), settings.axis) : null), [ring, settings.axis]);
 
   const set = (patch: Partial<TryOnSettings>) => onChange({ ...settings, ...patch });
   const setVec = (key: "rotation" | "offset", i: number, value: number) => {
@@ -42,10 +44,10 @@ export default function TryOnEditor({ jewel, settings, onChange }: Props) {
     <div className="grid gap-6 text-white lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div>
         <div className="relative aspect-square w-full overflow-hidden border border-white/15 bg-ink">
-          {ring ? (
+          {ring && fit ? (
             <Canvas dpr={[1, 2]} camera={{ fov: 30, near: 0.001, far: 2, position: [0.045, 0.055, 0.12] }} gl={{ antialias: true }} frameloop="demand">
               <color attach="background" args={["#141313"]} />
-              <EditorScene ring={ring} settings={settings} />
+              <EditorScene ring={ring} fit={fit} settings={settings} />
             </Canvas>
           ) : (
             <p className="absolute inset-0 flex items-center justify-center text-base text-mist">Chargement du modèle…</p>
@@ -118,6 +120,11 @@ export default function TryOnEditor({ jewel, settings, onChange }: Props) {
         <fieldset className={field}>
           <legend className="mb-1 text-base text-mist">Axe du trou de la bague dans le fichier</legend>
           <p className="mb-3 text-base text-mist">Choisissez l’axe qui passe par le trou : la bague doit entourer le cylindre.</p>
+          {fit && fit.axisName !== settings.axis && (
+            <p className="mb-3 text-base text-rose-light" role="status">
+              Aucun trou selon l’{AXIS_NAMES[settings.axis].toLowerCase()} : l’{AXIS_NAMES[fit.axisName].toLowerCase()}, qui passe par le trou, est utilisé.
+            </p>
+          )}
           <div className="flex flex-wrap gap-2">
             {(Object.keys(AXIS_NAMES) as TryOnSettings["axis"][]).map((a) => (
               <label key={a} className={choice}>
@@ -168,10 +175,9 @@ function Slider(props: { label: string; hint?: string; min: number; max: number;
 
 const SKIN = "#c8977f";
 
-function EditorScene({ ring, settings }: { ring: TryOnRing; settings: TryOnSettings }) {
+function EditorScene({ ring, fit, settings }: { ring: TryOnRing; fit: RingFit; settings: TryOnSettings }) {
   useRoomEnvironment(1);
   const invalidate = useThree((s) => s.invalidate);
-  const fit = useMemo(() => measureRing(ringPoints(ring.root), settings.axis), [ring, settings.axis]);
 
   const rootRef = useRef<Object3D>(null);
 

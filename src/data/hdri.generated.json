@@ -1,8 +1,13 @@
 {
+  "studio-clair": {
+    "v": "abe9e5ed",
+    "bytes": 1808377,
+    "bytes1k": 564895
+  },
   "studio-warm": {
-    "v": "30422722",
-    "bytes": 1290582,
-    "bytes1k": 379903
+    "v": "004b6bcd",
+    "bytes": 1268938,
+    "bytes1k": 375465
   },
   "softbox-wide": {
     "v": "085a95b7",
@@ -50,53 +55,68 @@
     "bytes1k": 655540
   },
   "gem-bands": {
-    "v": "ab3db0b4",
-    "bytes": 213895,
-    "bytes1k": 74892
+    "v": "4d560191",
+    "bytes": 275477,
+    "bytes1k": 105327
   },
   "gem-points": {
-    "v": "ae7d8175",
-    "bytes": 195809,
-    "bytes1k": 65519
+    "v": "653d1294",
+    "bytes": 258515,
+    "bytes1k": 93423
   },
   "gem-ring": {
-    "v": "54dad67d",
-    "bytes": 143490,
-    "bytes1k": 39041
+    "v": "4af53ed3",
+    "bytes": 205210,
+    "bytes1k": 63777
   },
   "gem-spot": {
-    "v": "c7925630",
-    "bytes": 378888,
-    "bytes1k": 102597
+    "v": "e9f7621d",
+    "bytes": 388326,
+    "bytes1k": 117009
   },
   "gem-vitrine": {
-    "v": "d1503063",
-    "bytes": 196983,
-    "bytes1k": 61346
+    "v": "cfa8bf2c",
+    "bytes": 258583,
+    "bytes1k": 86817
   },
   "gem-backlight": {
-    "v": "ed8fc683",
-    "bytes": 213797,
-    "bytes1k": 62700
+    "v": "6a8308c1",
+    "bytes": 261791,
+    "bytes1k": 85084
   },
   "gem-cross": {
-    "v": "6f9679b8",
-    "bytes": 190615,
-    "bytes1k": 61046
+    "v": "f52d1206",
+    "bytes": 255891,
+    "bytes1k": 92694
   },
   "gem-stars": {
-    "v": "cf9c8f20",
-    "bytes": 391333,
-    "bytes1k": 157406
+    "v": "437b1f4c",
+    "bytes": 450352,
+    "bytes1k": 187566
   },
   "gem-studio": {
     "v": "1be57da2",
     "bytes": 371620,
     "bytes1k": 105947
   },
+  "gem-tente": {
+    "v": "b54ccd23",
+    "bytes": 347978,
+    "bytes1k": 118346
+  },
+  "gem-boites": {
+    "v": "faa35ec1",
+    "bytes": 566517,
+    "bytes1k": 161170
+  },
+  "gem-escalier": {
+    "v": "83c2eeb0",
+    "bytes": 353188,
+    "bytes1k": 102667
+  },
   "gem-classic": {
-    "v": "c4e4e152",
-    "bytes": 802456,
-    "bytes1k": 260355
+    "v": "542ec98e",
+    "bytes": 800977,
+    "bytes1k": 259827
   }
 }

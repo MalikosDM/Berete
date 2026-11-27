@@ -8,8 +8,11 @@ import films from "./mechanisms.generated.json" with { type: "json" };
 import { storyBlocks } from "./story.js";
 import type { Piece } from "./types.js";
 
-/** A film of scripts/mechanism-media.mjs: its file for computers, a lighter one for phones, its image, its size, its sound. */
-export type FeatureFilmData = { video: string; mobile?: string; poster: string; width: number; height: number; audio?: boolean };
+/**
+ * A film of scripts/mechanism-media.mjs: its file for computers, a lighter one for phones, its image, its size, its sound;
+ * `start`: the second it starts at and loops back to, past an opening on black (never a black box on the page).
+ */
+export type FeatureFilmData = { video: string; mobile?: string; poster: string; width: number; height: number; audio?: boolean; start?: number };
 
 /** The film of each piece, by its key in mechanisms.generated.json; "film": the finished piece, "mechanism": how it moves. */
 export const FEATURE_FILMS: Record<string, { key: string; kind: "film" | "mechanism" }> = {

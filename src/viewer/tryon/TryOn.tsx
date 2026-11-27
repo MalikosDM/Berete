@@ -6,19 +6,23 @@
  * Over everything, full screen, opened by a tap of the client only (the parent shows the button): the video in full
  * screen (cover), a transparent 3D canvas over it whose orthographic camera sees exactly the video's pixels (what the
  * hand tracking finds on the image stays on the image; the depth comes from the world points of the hand). The ring on
- * the base segment of the finger, a cylinder drawn in the depth only along the finger (and its neighbours) so that the
- * back of the band goes behind the finger. The back camera first on a phone, the front one mirrored. Hand lost: the ring
- * fades away and « Show the back of your hand » comes. A photo (the image and the ring together) is saved as a JPEG.
+ * the base segment of the finger (half way from the knuckle to the middle joint by default), its hole along the finger in
+ * 3D, its inner diameter the finger's width, its head out of the back of the hand; a cylinder drawn in the depth only along
+ * the finger (and its neighbours) so that the back of the band goes behind the finger, and a soft shadow on the skin on
+ * each side of the band. The placement is smoothed (./smooth.ts): still when the hand is still, quick when it moves.
+ * The back camera first on a phone, the front one mirrored on the screen only. Hand lost: the ring fades away and « Show
+ * the back of your hand » comes. A photo (the image and the ring together, never mirrored) is saved as a JPEG.
  * The camera needs https (the browser refuses it otherwise: said in words).
  */
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Canvas, useFrame, type RootState } from "@react-three/fiber";
-import { CylinderGeometry, Matrix4, MeshBasicMaterial, type Mesh, type Object3D, type OrthographicCamera } from "three";
+import { CylinderGeometry, Matrix4, MeshBasicMaterial, ShaderMaterial, Vector3, type Mesh, type Object3D, type OrthographicCamera } from "three";
 import { FINGERS, type Finger, type TryOnSettings } from "@/data/scene3d";
 import type { TryOnWords } from "@/viewer/words/tryon";
 import { loadHandTracker, type Delegate, type Hand, type HandTracker } from "./hands";
-import { fingerFrame, fingerOccluder, handInScene, measureRing, ringMatrix, ringPoints, type Point3 } from "./place";
+import { contactShadow, fingerFrame, fingerOccluder, handInScene, measureRing, ringMatrix, ringPoints, type FingerFrame, type HandInScene, type Point3 } from "./place";
+import { FrameSmoother } from "./smooth";
 import { prepareRing, useRoomEnvironment, type TryOnRing } from "./ring";
 
 type Props = {
@@ -34,8 +38,19 @@ type Props = {
 type Facing = "user" | "environment";
 type Problem = "needsHttps" | "cameraDenied" | "cameraMissing" | "unsupported" | "failed";
 
-/** What the hand tracking leaves for the 3D scene, read at every image drawn (never a React render). */
-type Pose = { ready: boolean; ring: Matrix4; occluders: (Matrix4 | null)[] };
+/**
+ * What the hand tracking leaves for the 3D scene, read at every image drawn (never a React render); and, for the checks,
+ * the finger's frame and the centre of the ring's hole (video pixels, centre of the frame at 0, y up).
+ */
+type Pose = {
+  ready: boolean;
+  ring: Matrix4;
+  occluders: (Matrix4 | null)[];
+  /** The soft shadow of the ring on the skin (./place.ts contactShadow). */
+  shadow: { matrix: Matrix4; half: number; fall: number } | null;
+  frame: FingerFrame | null;
+  centre: Vector3;
+};
 type Stats = { renders: number; frames: number; detections: number; detectMs: number };
 
 /** The fingers on each side of a finger: they hide the sides of the band when the fingers are together. */
@@ -61,13 +76,14 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
   const streamRef = useRef<MediaStream | null>(null);
   const trackerRef = useRef<HandTracker | null>(null);
   const storeRef = useRef<RootState | null>(null);
-  const pose = useRef<Pose>({ ready: false, ring: new Matrix4(), occluders: [null, null, null] });
+  const pose = useRef<Pose>({ ready: false, ring: new Matrix4(), occluders: [null, null, null], shadow: null, frame: null, centre: new Vector3() });
   const stats = useRef<Stats>({ renders: 0, frames: 0, detections: 0, detectMs: 0 });
 
   const [phase, setPhase] = useState<"starting" | "running" | "error">("starting");
   const [problem, setProblem] = useState<Problem | null>(null);
   const [facing, setFacing] = useState<Facing>(() => (isPhone() ? "environment" : "user"));
   const [mirror, setMirror] = useState(false);
+  const mirrorRef = useRef(false);
   const [canSwitch, setCanSwitch] = useState(false);
   const [seen, setSeen] = useState(false);
   const [finger, setFinger] = useState<Finger>(settings.finger);
@@ -141,7 +157,9 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
         ready.reset();
         setUsedDelegate(ready.delegate);
         const mode = stream.getVideoTracks()[0]?.getSettings().facingMode;
-        setMirror(mode ? mode === "user" : facing === "user");
+        const mirrored = mode ? mode === "user" : facing === "user";
+        mirrorRef.current = mirrored;
+        setMirror(mirrored);
         navigator.mediaDevices
           .enumerateDevices()
           .then((list) => alive && setCanSwitch(list.filter((d) => d.kind === "videoinput").length > 1))
@@ -186,20 +204,55 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
     let previous: { hand: Hand; t: number } | null = null;
     let latest: { hand: Hand; t: number } | null = null;
 
-    const place = (hand: Hand): boolean => {
+    // One smoother per finger and place on it (the ring's finger, and its neighbours whose cylinders hide the sides of
+    // the band), started afresh when it has not been followed for a moment (the hand lost, another finger chosen).
+    const smoothers = new Map<string, { smoother: FrameSmoother; last: number }>();
+    const frameOf = (scene: HandInScene, which: Finger, along: number, now: number): FingerFrame | null => {
+      const raw = fingerFrame(scene, which, along);
+      if (!raw) return null;
+      const key = which + ":" + along;
+      let entry = smoothers.get(key);
+      if (!entry) {
+        entry = { smoother: new FrameSmoother(), last: now };
+        smoothers.set(key, entry);
+      }
+      if (now - entry.last > 400) entry.smoother.reset();
+      entry.last = now;
+      return entry.smoother.smooth(raw, now);
+    };
+
+    // Where the ring is on the screen, for the checks (CSS pixels, as seen, mirrored or not): the centre of its hole, the
+    // finger's base knuckle and middle joint, the finger's diameter. Written with each placement, so it matches the image.
+    const mark = () => {
+      const root = rootRef.current;
+      const p = pose.current;
+      if (!root || !p.frame) return;
+      const width = root.clientWidth;
+      const height = root.clientHeight;
+      const k = Math.max(width / video.videoWidth, height / video.videoHeight);
+      const side = mirrorRef.current ? -1 : 1;
+      const at = (v: Vector3) => [width / 2 + side * v.x * k, height / 2 - v.y * k].map((n) => n.toFixed(1)).join(",");
+      root.dataset.ring = [at(p.centre), at(p.frame.base), at(p.frame.joint), (p.frame.diameter * k).toFixed(1)].join(",");
+    };
+
+    const place = (hand: Hand, now: number): boolean => {
       const { fit: f, settings: s, finger: which } = live.current;
       const scene = handInScene(hand.image, hand.world, hand.side, video.videoWidth, video.videoHeight);
-      const frameOf = fingerFrame(scene, which, s.along);
-      if (!frameOf || !(frameOf.diameter > 2)) return false;
+      const frame = frameOf(scene, which, s.along, now);
+      if (!frame || !(frame.diameter > 2)) return false;
       const p = pose.current;
-      p.ring.copy(ringMatrix(frameOf, f, s));
-      p.occluders[0] = fingerOccluder(frameOf, 0.94);
+      p.ring.copy(ringMatrix(frame, f, s));
+      p.frame = frame;
+      p.centre.copy(f.center).applyMatrix4(p.ring);
+      p.shadow = contactShadow(frame, f, p.centre, s.scale);
+      p.occluders[0] = fingerOccluder(frame, 0.94);
       NEIGHBOURS[which].forEach((n, i) => {
-        const other = fingerFrame(scene, n, 0.5);
+        const other = frameOf(scene, n, 0.5, now);
         p.occluders[i + 1] = other ? fingerOccluder(other, 0.9) : null;
       });
       for (let i = NEIGHBOURS[which].length + 1; i < p.occluders.length; i++) p.occluders[i] = null;
       p.ready = true;
+      mark();
       return true;
     };
 
@@ -211,7 +264,7 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
       }
       previous = latest;
       latest = { hand, t: now };
-      return place(hand);
+      return place(hand, now);
     };
 
     // Between two searches: where the hand would be now at the speed it had (at most one interval ahead).
@@ -221,7 +274,7 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
       if (span <= 0 || span > 200) return;
       const k = Math.min((now - latest.t) / span, 1);
       const ahead = (a: Point3[], b: Point3[]): Point3[] => b.map((q, i) => ({ x: q.x + (q.x - a[i].x) * k, y: q.y + (q.y - a[i].y) * k, z: q.z + (q.z - a[i].z) * k }));
-      place({ ...latest.hand, image: ahead(previous.hand.image, latest.hand.image), world: ahead(previous.hand.world, latest.hand.world) });
+      place({ ...latest.hand, image: ahead(previous.hand.image, latest.hand.image), world: ahead(previous.hand.world, latest.hand.world) }, now);
     };
 
     const step = () => {
@@ -315,7 +368,12 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
     stats.current.renders++;
   }, []);
 
-  /* The photo: the image as shown (cropped, mirrored), then the ring over it */
+  /*
+   * The photo: the image as shown (cropped as on the screen), then the ring over it, the right way round. The front
+   * camera is shown mirrored, as a mirror would (easier to move one's hand), but a photo must read as the world does
+   * (a name on a shirt must not come out backwards): the video and the ring's canvas are both drawn unmirrored, and since
+   * the ring's canvas is drawn in the video's own pixels (only the screen mirrors them both), the ring stays on the finger.
+   */
   const capture = useCallback(async () => {
     const st = storeRef.current;
     const video = videoRef.current;
@@ -326,10 +384,6 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
     out.height = glCanvas.height;
     const ctx = out.getContext("2d");
     if (!ctx) return;
-    if (mirror) {
-      ctx.translate(out.width, 0);
-      ctx.scale(-1, 1);
-    }
     const s = Math.max(out.width / video.videoWidth, out.height / video.videoHeight);
     const w = video.videoWidth * s;
     const h = video.videoHeight * s;
@@ -365,7 +419,7 @@ export default function TryOn({ jewel, settings, words, onClose, delegate }: Pro
     a.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 10_000);
     done();
-  }, [mirror]);
+  }, []);
 
   const shownProblem = blocked ?? (phase === "error" ? problem : null);
   const message = shownProblem ? words[shownProblem] : null;
@@ -514,13 +568,18 @@ function TryOnScene({ ring, pose, videoRef, onDrawn }: { ring: TryOnRing; pose: 
   const geometry = useMemo(() => new CylinderGeometry(1, 1, 1, 32, 1), []);
   // Drawn into the depth only, before everything: what is behind the finger is hidden, the video stays seen.
   const material = useMemo(() => new MeshBasicMaterial({ colorWrite: false }), []);
+  const shadowGeometry = useMemo(() => new CylinderGeometry(1, 1, 1, 48, 1, true), []);
+  const shadowMaterial = useMemo(() => makeShadowMaterial(), []);
   useEffect(
     () => () => {
       geometry.dispose();
       material.dispose();
+      shadowGeometry.dispose();
+      shadowMaterial.dispose();
     },
-    [geometry, material],
+    [geometry, material, shadowGeometry, shadowMaterial],
   );
+  const shadowRef = useRef<Mesh>(null);
   const rootRef = useRef<Object3D>(null);
   const occluders = useRef<(Mesh | null)[]>([]);
   const last = useRef("");
@@ -554,6 +613,17 @@ function TryOnScene({ ring, pose, videoRef, onDrawn }: { ring: TryOnRing; pose: 
         root.matrixWorldNeedsUpdate = true;
       }
     }
+    const shadow = shadowRef.current;
+    if (shadow) {
+      shadow.visible = p.ready && p.shadow !== null;
+      if (p.shadow) {
+        shadow.matrix.copy(p.shadow.matrix);
+        shadow.matrixWorldNeedsUpdate = true;
+        const { uniforms } = shadow.material as ShaderMaterial;
+        uniforms.uHalf.value = p.shadow.half;
+        uniforms.uFall.value = p.shadow.fall;
+      }
+    }
     occluders.current.forEach((mesh, i) => {
       if (!mesh) return;
       const m = p.occluders[i];
@@ -582,7 +652,40 @@ function TryOnScene({ ring, pose, videoRef, onDrawn }: { ring: TryOnRing; pose: 
           visible={false}
         />
       ))}
+      <mesh ref={shadowRef} geometry={shadowGeometry} material={shadowMaterial} renderOrder={1} matrixAutoUpdate={false} frustumCulled={false} visible={false} />
       <primitive ref={rootRef} object={ring.root} />
     </>
   );
+}
+
+/**
+ * The soft shadow of the ring on the skin: black, at its darkest where the ring touches the finger, fading over a
+ * millimetre or so on each side; a little lighter where the skin turns away from the camera. Drawn after the ring, never
+ * into the depth: the band hides it where the band is in front, the finger's cylinder hides its back half.
+ */
+function makeShadowMaterial(): ShaderMaterial {
+  return new ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: { uHalf: { value: 0.2 }, uFall: { value: 0.1 }, uStrength: { value: 0.5 } },
+    vertexShader: /* glsl */ `
+      varying float vAlong;
+      varying float vFacing;
+      void main() {
+        vAlong = position.y;
+        vFacing = normalize(normalMatrix * normal).z;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform float uHalf;
+      uniform float uFall;
+      uniform float uStrength;
+      varying float vAlong;
+      varying float vFacing;
+      void main() {
+        float d = max(abs(vAlong) - uHalf, 0.0) / max(uFall, 1e-4);
+        float a = uStrength * exp(-d * d) * mix(0.55, 1.0, clamp(vFacing, 0.0, 1.0));
+        gl_FragColor = vec4(0.0, 0.0, 0.0, a);
+      }`,
+  });
 }

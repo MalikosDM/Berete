@@ -7,9 +7,9 @@
  * joint; y along the finger (towards the nail), z out of the back of the hand, x across (x = y × z). Its unit is the
  * scene's; one millimetre is the finger's diameter / 17 (FINGER_MM), so the offsets of the admin mean the same on any hand.
  *
- * The ring, in its own space (the file): the axis of its hole (`axis` of the settings), the centre of the hole and its
- * inner radius, measured once on its points (measureRing), and the side of its head (the farthest part from the hole),
- * turned towards the back of the hand.
+ * The ring, in its own space (the file): the axis of its hole (`axis` of the settings, or the axis where a hole shows
+ * when the setting's has none), the centre of the hole and its inner radius, measured once on its points (measureRing),
+ * and the side of its head (the farthest part from the hole), turned towards the back of the hand.
  */
 import { Euler, MathUtils, Matrix4, Vector3, type BufferGeometry, type InstancedMesh, type Mesh, type Object3D } from "three";
 import type { Finger, TryOnSettings } from "@/data/scene3d";
@@ -32,6 +32,12 @@ export type RingFit = {
   axis: Vector3;
   /** Unit vector from the hole to the head of the ring, across the axis. */
   up: Vector3;
+  /** The axis of the hole actually used (the admin's, or the one where the hole shows when the admin's has none). */
+  axisName: Axis;
+  /** How clear the hole is: its radius over half the ring's largest size across the axis (0: no hole; 0.5 to 0.8 for a ring). */
+  clearness: number;
+  /** The width of the shank where it touches the finger (the band opposite the head), along the axis. */
+  bandWidth: number;
 };
 
 const AXES: Record<Axis, number> = { x: 0, y: 1, z: 2 };
@@ -78,19 +84,39 @@ export function ringPoints(root: Object3D, max = 20000): Float32Array {
   return new Float32Array(out);
 }
 
+/** Below this, the hole along an axis is not clear (the shank seen from the side, a pendant): the other axes are tried. */
+const CLEAR_HOLE = 0.3;
+
+/**
+ * The hole of a ring: along the admin's axis when a hole shows there, else along the axis where it shows best (a file
+ * whose hole is along y while the setting still says z: the ring would be seen from its side, standing on the finger).
+ * Something that is not a ring (no hole on any axis) keeps the admin's axis and a hole of 30 % of its size.
+ */
+export function measureRing(points: Float32Array, axisName: Axis): RingFit {
+  const wanted = measureAlong(points, axisName);
+  if (wanted.clearness >= CLEAR_HOLE) return wanted;
+  let best = wanted;
+  for (const other of ["x", "y", "z"] as Axis[]) {
+    if (other === axisName) continue;
+    const fit = measureAlong(points, other);
+    if (fit.clearness > best.clearness) best = fit;
+  }
+  return best.clearness >= CLEAR_HOLE ? best : wanted;
+}
+
 /**
  * The hole of a ring seen along `axis`: the largest empty circle around the middle of the ring (searched on a grid,
  * refined three times), its centre and radius; the head is the side where the points go farthest from the hole.
- * Something that is not a ring (no hole) still gets a fit: a hole of 30 % of its size, in its middle.
+ * No hole: a hole of 30 % of its size, in its middle, and a clearness of 0.
  */
-export function measureRing(points: Float32Array, axisName: Axis): RingFit {
+function measureAlong(points: Float32Array, axisName: Axis): RingFit {
   const a = AXES[axisName];
   const u = (a + 1) % 3;
   const w = (a + 2) % 3;
   const count = Math.floor(points.length / 3);
   const axis = new Vector3().setComponent(a, 1);
   const fallbackUp = new Vector3().setComponent(axisName === "y" ? 2 : 1, 1);
-  if (count < 3) return { center: new Vector3(), innerRadius: 0.0085, axis, up: fallbackUp };
+  if (count < 3) return { center: new Vector3(), innerRadius: 0.0085, axis, up: fallbackUp, axisName, clearness: 0, bandWidth: 0.004 };
 
   // At most 12000 points for the search (the hole is found as well, much faster).
   const step = Math.max(1, Math.ceil(count / 12000));
@@ -139,7 +165,9 @@ export function measureRing(points: Float32Array, axisName: Axis): RingFit {
     halfW = (2 * halfW) / cells;
   }
   let innerRadius = Math.sqrt(best);
+  let clearness = innerRadius / Math.max(Math.max(spanU, spanW) / 2, 1e-9);
   if (!(innerRadius > Math.min(spanU, spanW) * 0.08)) {
+    clearness = 0;
     // No hole: a pendant, a closed shape. Its middle, and a hole of 30 % of its size.
     cu = (minU + maxU) / 2;
     cw = (minW + maxW) / 2;
@@ -178,8 +206,23 @@ export function measureRing(points: Float32Array, axisName: Axis): RingFit {
   if (lean > 0.2) up.setComponent(u, sumU).setComponent(w, sumW).normalize();
   else up.copy(fallbackUp);
 
+  // The shank where it touches the finger, within 60° of the side opposite the head: the width of its soft shadow (the
+  // head and its prongs are often much wider than the band; their shadow would make a grey patch beside a thin band).
+  const upU = up.getComponent(u), upW = up.getComponent(w);
+  let shankMin = Infinity, shankMax = -Infinity;
+  for (let k = 0, i = 0; i < count; i += step, k++) {
+    const d = radial[k];
+    if (d > innerRadius * 1.15 || d < 1e-12) continue;
+    const du = points[i * 3 + u] - cu, dw = points[i * 3 + w] - cw;
+    if ((du * upU + dw * upW) / d > -0.5) continue;
+    const z = points[i * 3 + a];
+    shankMin = Math.min(shankMin, z);
+    shankMax = Math.max(shankMax, z);
+  }
+  const bandWidth = Number.isFinite(shankMin) ? shankMax - shankMin : Number.isFinite(bandMin) ? bandMax - bandMin : maxA - minA;
+
   const center = new Vector3().setComponent(u, cu).setComponent(w, cw).setComponent(a, middleA);
-  return { center, innerRadius, axis, up };
+  return { center, innerRadius, axis, up, axisName, clearness, bandWidth };
 }
 
 /* ---------- The finger ---------- */
@@ -197,6 +240,10 @@ export type FingerFrame = {
   /** The base knuckle and the middle joint, in the units of the scene. */
   base: Vector3;
   joint: Vector3;
+  /** Where the origin stands from the base knuckle (0) to the middle joint (1). */
+  along: number;
+  /** Units of the scene per metre of the hand (video pixels per metre on a hand of the camera; 1 for the admin's cylinder). */
+  scale: number;
 };
 
 /** The admin's finger: a cylinder of 17 mm along y, its base at y = 0, the back of the hand towards +z (units: metres). */
@@ -210,6 +257,8 @@ export function cylinderFrame(along: number): FingerFrame {
     diameter: FINGER_MM * mm,
     base: new Vector3(0, 0, 0),
     joint: new Vector3(0, SEGMENT_MM * mm, 0),
+    along,
+    scale: 1,
   };
 }
 
@@ -285,8 +334,9 @@ export function fingerFrame(hand: HandInScene, finger: Finger, along: number): F
   for (const b of j.beside) spacing += w[j.mcp].distanceTo(w[b]);
   spacing /= j.beside.length;
   const diameter = spacing * scale * j.width;
-  const origin = base.clone().lerp(joint, MathUtils.clamp(along, -0.5, 1.5));
-  return { origin, x, y, z, diameter, base, joint };
+  const at = MathUtils.clamp(along, -0.5, 1.5);
+  const origin = base.clone().lerp(joint, at);
+  return { origin, x, y, z, diameter, base, joint, along: at, scale };
 }
 
 /* ---------- The matrices ---------- */
@@ -322,6 +372,26 @@ export function cylinderMatrix(a: Vector3, b: Vector3, radius: number): Matrix4 
   const z = new Vector3().crossVectors(x, y);
   const mid = new Vector3().addVectors(a, b).multiplyScalar(0.5);
   return new Matrix4().makeBasis(x.multiplyScalar(radius), y.multiplyScalar(length), z.multiplyScalar(radius)).setPosition(mid);
+}
+
+/**
+ * The soft shadow of the ring on the skin, on both sides of what touches the finger: an open tube on the finger's skin
+ * (its back hidden by the finger's cylinder, like the band), centred on the ring along the finger. Its shader darkens it
+ * fully under the ring, then less and less over `fall` (2.4 mm of the finger) beyond each side. Returns the tube's
+ * matrix (a cylinder of radius 1 and height 1 along y) and the half-width and fall in the tube's own height (0 to 1).
+ */
+export function contactShadow(frame: FingerFrame, fit: RingFit, ringCentre: Vector3, scale: number): { matrix: Matrix4; half: number; fall: number } {
+  const mm = frame.diameter / FINGER_MM;
+  const size = ((frame.diameter / 2) * scale) / Math.max(fit.innerRadius, 1e-9);
+  const half = Math.max((fit.bandWidth * size) / 2, mm);
+  const fall = 2.4 * mm;
+  const length = 2 * (half + 3 * fall);
+  // The ring's centre brought onto the finger's axis.
+  const along = new Vector3().subVectors(ringCentre, frame.origin).dot(frame.y);
+  const mid = frame.origin.clone().addScaledVector(frame.y, along);
+  const a = mid.clone().addScaledVector(frame.y, -length / 2);
+  const b = mid.clone().addScaledVector(frame.y, length / 2);
+  return { matrix: cylinderMatrix(a, b, (frame.diameter / 2) * 0.99), half: half / length, fall: fall / length };
 }
 
 /**

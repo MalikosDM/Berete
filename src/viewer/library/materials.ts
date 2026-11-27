@@ -11,6 +11,7 @@ import { Color, LinearSRGBColorSpace, MeshPhysicalMaterial, type Material, type 
 import { METALS, type LayerSetting, type MetalId } from "@/data/models";
 import { DEFAULT_DIAMOND, type DiamondParams } from "@/data/scene3d";
 import { agedColor, agedRoughness, brushedNormal, hammeredNormal, nacreOrient, pearlOrient, tiled } from "../textures";
+import { METAL_LOOKS } from "../materials";
 
 export type MaterialCategory = "metals" | "gems" | "pearls" | "other";
 export const CATEGORY_NAMES: Record<MaterialCategory, string> = { metals: "Métaux", gems: "Pierres", pearls: "Perles et nacre", other: "Émaux, céramique, onyx" };
@@ -59,21 +60,11 @@ export const METAL_NAMES: Record<MetalId, string> = {
 
 /**
  * Linear reflectance of each alloy (F0, what a metal reflects straight on), the colour of its swatch (sRGB) and the
- * roughness of its polished finish: the same values as METAL_LOOKS of ../materials.ts, so nothing changes for a metal
- * already shown (one table can be made from the other).
+ * roughness of its polished finish: METAL_LOOKS of ../materials.ts (measured values and their sources are written there).
  */
-export const METAL_COLORS: Record<MetalId, { linear: [number, number, number]; swatch: string; roughness: number }> = {
-  "yellow-gold": { linear: [0.96, 0.74, 0.4], swatch: "#e9c46f", roughness: 0.1 },
-  "white-gold": { linear: [0.84, 0.83, 0.8], swatch: "#e4e2dc", roughness: 0.08 },
-  "rose-gold": { linear: [0.95, 0.64, 0.53], swatch: "#e8b4a0", roughness: 0.1 },
-  platinum: { linear: [0.68, 0.66, 0.63], swatch: "#bdbab4", roughness: 0.12 },
-  "black-rhodium": { linear: [0.1, 0.1, 0.11], swatch: "#2b2a2c", roughness: 0.16 },
-  "yellow-gold-14": { linear: [0.93, 0.76, 0.48], swatch: "#e6c98a", roughness: 0.1 },
-  "white-gold-14": { linear: [0.82, 0.8, 0.76], swatch: "#dedbd3", roughness: 0.09 },
-  "rose-gold-14": { linear: [0.94, 0.67, 0.57], swatch: "#e9bcab", roughness: 0.1 },
-  palladium: { linear: [0.73, 0.7, 0.65], swatch: "#c4c0b8", roughness: 0.11 },
-  silver: { linear: [0.97, 0.96, 0.92], swatch: "#efede8", roughness: 0.08 },
-};
+export const METAL_COLORS: Record<MetalId, { linear: [number, number, number]; swatch: string; roughness: number }> = Object.fromEntries(
+  Object.entries(METAL_LOOKS).map(([id, look]) => [id, { linear: look.color, swatch: look.swatch, roughness: look.roughness }]),
+) as Record<MetalId, { linear: [number, number, number]; swatch: string; roughness: number }>;
 
 /** Size of one repetition of each finish's texture on the jewel (metres): hammer dents of about 1.6 mm, lines of a few µm. */
 const HAMMER_TILE = 0.016;
@@ -105,8 +96,10 @@ export function setMetalLook(material: MeshPhysicalMaterial, metal: MetalId, fin
       material.roughness = Math.min(0.48, look.roughness + 0.26);
       break;
     case "brushed":
-      material.roughness = 0.24;
-      material.anisotropy = 0.8;
+      // 27/11/2026: less stretch and a little less light (the light studio smeared it into a flat white).
+      material.roughness = 0.34;
+      material.anisotropy = 0.45;
+      material.envMapIntensity = 0.62;
       // Across the lines. three.js measures it in the tangent frame of the normal map, whose UVs already turn by the
       // angle (the map's rotation): the angle is given once, to the map, and both turn together.
       material.anisotropyRotation = Math.PI / 2;
@@ -242,7 +235,7 @@ const STONES: { id: string; name: string; colour: string; gem: Partial<DiamondPa
   { id: "gem/ruby", name: "Rubis", colour: "#b0102c", gem: { ...tinted("#b0102c"), ...CORUNDUM } },
   { id: "gem/emerald", name: "Émeraude", colour: "#0f7f4c", gem: { ...tinted("#0f7f4c"), refractiveIndex: 1.57, dispersion: 0.0025 } },
 ];
-const INCLUSIONS = { amount: 0.3, scale: 1, roughness: 0.5 };
+const INCLUSIONS = { amount: 0.6, scale: 1, roughness: 0.5 };
 
 /* ---------- Swatches (CSS, while the 3D swatch is not drawn) ---------- */
 

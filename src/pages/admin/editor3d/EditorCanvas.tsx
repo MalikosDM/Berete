@@ -9,6 +9,7 @@ import { Camera, Expand, Film, FileBox, Maximize, Minimize, Pause, Play, RotateC
 import { backgroundOf, type ModelSettings, type PublicModel } from "@/data/models";
 import type { SceneSettings, ViewsSettings } from "@/data/scene3d";
 import Stage, { type StageApi } from "@/viewer/Stage";
+import type { LayerAnalysis } from "@/viewer/auto";
 import { backgroundCss } from "@/viewer/backgrounds";
 import { download, fileSlug } from "@/viewer/export/exporter";
 import { exitFullscreen, fullscreenElement } from "@/lib/fullscreen";
@@ -23,16 +24,29 @@ type Props = {
   onPick: (layer: string | null) => void;
   onApi: (api: StageApi | null) => void;
   onLayers: (names: string[]) => void;
+  /** What the engine read of each layer (the simple mode's lists). */
+  onAnalysis?: (analysis: Record<string, LayerAnalysis>) => void;
+  /** The import's guesses by layer (metal, diamond...). */
+  guesses?: Record<string, string>;
+  /** The turning, when the simple mode holds it. */
+  autoRotate?: boolean;
+  onAutoRotate?: (on: boolean) => void;
 };
 
 const NO_CHOICES = { metals: {}, colors: {}, materials: {} };
 
-export default function EditorCanvas({ model, settings, scene, views, selected, highlight, onPick, onApi, onLayers }: Props) {
+export default function EditorCanvas({ model, settings, scene, views, selected, highlight, onPick, onApi, onLayers, onAnalysis, guesses, ...turning }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const api = useRef<StageApi | null>(null);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [progress, setProgress] = useState(0);
-  const [autoRotate, setAutoRotate] = useState(false);
+  const [ownRotate, setOwnRotate] = useState(false);
+  const autoRotate = turning.autoRotate ?? ownRotate;
+  const setAutoRotate = (next: boolean | ((on: boolean) => boolean)) => {
+    const value = typeof next === "function" ? next(autoRotate) : next;
+    if (turning.onAutoRotate) turning.onAutoRotate(value);
+    else setOwnRotate(value);
+  };
   const [looping, setLooping] = useState(false);
   const [full, setFull] = useState(false);
   const [note, setNote] = useState("");
@@ -164,6 +178,8 @@ export default function EditorCanvas({ model, settings, scene, views, selected, 
             onApi={takeApi}
             onProgress={onProgress}
             onReady={onReady}
+            onAnalysis={onAnalysis}
+            guesses={guesses}
             onError={onError}
           />
         </Canvas>

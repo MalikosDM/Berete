@@ -13,6 +13,8 @@ import { imagine } from "./imagine.js";
 import { seedDemo } from "./models/demo.js";
 import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
+import { modelExtras } from "./routes/model-extras.js";
+import { hdri } from "./routes/hdri.js";
 import { shares } from "./routes/shares.js";
 import { vip } from "./routes/vip.js";
 import { loadSecret } from "./secret.js";
@@ -38,9 +40,13 @@ app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact
 // the routes of the site: /admin/:kind would take /admin/access).
 app.use("/api", access);
 app.use("/api", accessAdmin(requireAdmin));
+// The 3D editor's presets and the versions kept at each save of a model (before the save itself): server/routes/model-extras.ts.
+app.use("/api", modelExtras);
 app.use("/api", models);
 // The share links sealed on the admin's device (/s/<token> and its API): server/routes/shares.ts.
 app.use(shares);
+// The lightings uploaded in the 3D editor (/api/admin/hdri, their files at /hdri/custom/<file>): server/routes/hdri.ts.
+app.use(hdri);
 app.use("/api", vip);
 app.use("/api", site);
 // « Imaginez votre création » (Private Enquiries): a first image of the idea of the visitor, made by OpenAI (server/imagine.ts).

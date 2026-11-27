@@ -8,7 +8,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { CameraControls } from "@react-three/drei";
-import { Bloom, BrightnessContrast, ChromaticAberration, DepthOfField, EffectComposer, HueSaturation, N8AO, Noise, Outline, ToneMapping, Vignette } from "@react-three/postprocessing";
+import { Bloom, BrightnessContrast, ChromaticAberration, DepthOfField, EffectComposer, HueSaturation, LUT, N8AO, Noise, Outline, ToneMapping, Vignette } from "@react-three/postprocessing";
+import { LOOKS, lookMatrix, lookTexture, type LookId } from "./looks";
 import { BlendFunction, ToneMappingMode, type EffectComposer as Composer } from "postprocessing";
 import {
   Box3,
@@ -26,6 +27,7 @@ import {
   Sphere,
   Vector2,
   Vector3,
+  WebGLRenderTarget,
   type BufferGeometry,
   type InstancedMesh,
   type Material,
@@ -47,12 +49,13 @@ import { AccumulatePass, jitter } from "./accumulate";
 import { BACKGROUND_LOOKS, backgroundOfScene } from "./backgrounds";
 import { between, EASE, pathDuration, poseAt, turnAt, type Pose } from "./cameraPath";
 import { loadEnv } from "./envs";
-import { cubeResolution, gemMaterial, modeFor, orientOf, releaseCube, setGemEnv, setGemLighting, setGemParams, stoneCube, type GemMaterial } from "./gems";
+import { analyseLayer, autoDiamond, autoGemEnv, autoLayer, uprightPose, type LayerAnalysis } from "./auto";
+import { cubeResolution, gemMaterial, modeFor, orientOf, releaseCube, setGemEnv, setGemExposure, setGemLighting, setGemParams, stoneCube, type GemMaterial } from "./gems";
 import { disposeMaterial, materialById, makeMetal, setMetalLook } from "./library/materials";
 import { projectUv } from "./textures";
 import { enamelMaterial, ghostMaterial, lightStoneMaterial } from "./materials";
 import { splitMirrored } from "./mirror";
-import { fitView, halfToFloat, lookAt, makePicker, MIN_DISTANCE, pickMesh, startView } from "./pick";
+import { fitView, halfToFloat, jewelPoints, lookAt, makePicker, MIN_DISTANCE, pickMesh, startView } from "./pick";
 import { stablePose } from "./pose";
 import { BEVEL, patchBloom, Prepass, ReflectionPass, withBevel } from "./screen";
 import { Ground, Lights, SurfaceUnder, type Frame } from "./stageParts";
@@ -108,12 +111,23 @@ export type StageApi = {
   seek(t: number): void;
   /** Frames the whole jewel from where the camera looks. */
   fit(): void;
+  /** Frames the whole jewel from these angles (radians: around, and from the top), gliding there. */
+  look(azimuth: number, polar: number): void;
   /** Brings the camera closer (below 1) or farther (above 1), towards the middle of the view. */
   zoomBy(factor: number): void;
   /** iJewel's "Compute Stable Pose". */
   stablePose(kind: PoseKind): Vec3;
+  /**
+   * Measures each layer of stones as it is drawn now (alone, small, tone-mapped): mean brightness 0–1 and the shares of
+   * black and of burnt white pixels. The editor warns when a setting makes stones too dark or flat white.
+   */
+  measureStones(): Record<string, StoneMeasure>;
+  /** What the engine read of each layer (stone or metal, cut, copies). */
+  analysis(): Record<string, LayerAnalysis> | null;
   handles: StageHandles;
 };
+
+export type StoneMeasure = { mean: number; black: number; white: number; pixels: number };
 
 /** A point of the model on the screen (CSS pixels of the canvas), and whether the jewel hides it. */
 export type AnchorFrame = { x: number; y: number; visible: boolean };
@@ -150,14 +164,34 @@ type Props = {
   distance?: [number, number] | null;
   /** The wheel and the pinch bring the jewel closer (false: they scroll the page). */
   zoom?: boolean;
+  /** The jewel can be moved sideways (false: the right button and two fingers only zoom or do nothing). */
+  pan?: boolean;
+  /** The camera's angle from the top kept between these, degrees. */
+  polarLimits?: [number, number] | null;
   onApi: (api: StageApi | null) => void;
   onProgress: (percent: number) => void;
   onReady: (layers: string[]) => void;
+  /** What the engine read of each layer (stone or metal, cut, copies), once the jewel is loaded. */
+  onAnalysis?: (analysis: Record<string, LayerAnalysis>) => void;
+  /** The guesses of the import, by layer (metal, diamond...), a second opinion for the engine. */
+  guesses?: Record<string, string>;
   onError: () => void;
 };
 
 type LayerMeshes = Map<string, Mesh[]>;
-type Loaded = { root: Object3D; layers: LayerMeshes; box: Box3; sphere: Sphere; base: Box3 };
+type Loaded = {
+  root: Object3D;
+  layers: LayerMeshes;
+  box: Box3;
+  sphere: Sphere;
+  base: Box3;
+  analysis: Record<string, LayerAnalysis>;
+  /** Points of the jewel in its own space (for a tight frame); `points` gives them where the jewel stands now. */
+  local: Vector3[];
+  readonly points: Vector3[];
+  /** The engine's own pose (a flat pendant stood up), used while the scene's pose is the file's. */
+  autoPose: Quaternion | null;
+};
 
 /** Bounces of the light inside a stone while the camera moves (the settings' own once still), on phones at most. */
 const MOVING_BOUNCES = { computer: 4, phone: 2 };
@@ -166,6 +200,7 @@ const PHONE_MAX_BOUNCES = 5;
 const TONE: Record<ToneMap, ToneMappingMode> = {
   aces: ToneMappingMode.ACES_FILMIC,
   agx: ToneMappingMode.AGX,
+  neutral: ToneMappingMode.NEUTRAL,
   linear: ToneMappingMode.LINEAR,
   reinhard: ToneMappingMode.REINHARD,
   cineon: ToneMappingMode.OPTIMIZED_CINEON,
@@ -192,12 +227,16 @@ export default function Stage(props: Props) {
   const visible = useRef<boolean[]>([]);
   const lastLook = useRef(0);
   const sceneRef = useRef(scene);
+  const guessesRef = useRef(props.guesses);
+  const onAnalysisRef = useRef(props.onAnalysis);
   const viewsRef = useRef(views);
   const lightRef = useRef(lightAngle);
   useEffect(() => {
     anchors.current = props.anchors ?? [];
     onAnchors.current = props.onAnchors;
     sceneRef.current = scene;
+    guessesRef.current = props.guesses;
+    onAnalysisRef.current = props.onAnalysis;
     viewsRef.current = views;
     lightRef.current = lightAngle;
     lastLook.current = 0;
@@ -286,14 +325,71 @@ export default function Stage(props: Props) {
         const box = base.clone();
         const sphere = box.getBoundingSphere(new Sphere());
         three.add(root);
-        model.current = { root, layers: byLayer, box, sphere, base };
+        const analysis: Record<string, LayerAnalysis> = {};
+        for (const [name, meshes] of byLayer) analysis[name] = analyseLayer(name, meshes, guessesRef.current?.[name]);
+        // Parts lying apart in the file (a few far pieces, 27/11/2026: the client's Rhino files): they are drawn where they
+        // are, but the camera frames the main piece, as the import measured it (`mainBox`, when they are a small share).
+        let local = jewelPoints(root);
+        const extras = root.userData as { mainBox?: { min: number[]; max: number[] }; apartShare?: number };
+        if (extras.mainBox?.min?.length === 3 && extras.mainBox.max?.length === 3 && (extras.apartShare ?? 1) < 0.05) {
+          const [x0, y0, z0] = extras.mainBox.min as [number, number, number];
+          const [x1, y1, z1] = extras.mainBox.max as [number, number, number];
+          const pad = Math.max(x1 - x0, y1 - y0, z1 - z0) * 0.02;
+          const main = new Box3(new Vector3(x0 - pad, y0 - pad, z0 - pad), new Vector3(x1 + pad, y1 + pad, z1 + pad));
+          const kept = local.filter((p) => main.containsPoint(p));
+          if (kept.length > 16) {
+            local = kept;
+            box.copy(main);
+            box.getBoundingSphere(sphere);
+            base.copy(main);
+            // A layer lying wholly apart (a leftover, a reference drawing) is hidden by the engine; the admin can show it.
+            for (const [name, meshes] of byLayer) {
+              const away = meshes.every((m) => !new Box3().setFromObject(m, true).intersectsBox(main));
+              if (away && analysis[name]) analysis[name].apart = true;
+            }
+          }
+        }
+        // The stones' places (their side of a flat pendant faces the camera).
+        const stonePoints: Vector3[] = [];
+        for (const [name, meshes] of byLayer) {
+          if (analysis[name]?.kind !== "stone") continue;
+          for (const m of meshes) {
+            const inst = m as unknown as InstancedMesh;
+            if (inst.isInstancedMesh) {
+              const im = new Matrix4();
+              for (let i = 0; i < inst.count; i += Math.max(1, Math.floor(inst.count / 400))) {
+                inst.getMatrixAt(i, im);
+                stonePoints.push(new Vector3().setFromMatrixPosition(im).applyMatrix4(m.matrixWorld));
+              }
+            } else stonePoints.push(new Box3().setFromObject(m, true).getCenter(new Vector3()));
+          }
+        }
+        const autoPose = uprightPose(local, stonePoints);
+        model.current = {
+          root,
+          layers: byLayer,
+          box,
+          sphere,
+          base,
+          analysis,
+          local,
+          get points() {
+            return local.map((p) => p.clone().applyMatrix4(root.matrixWorld));
+          },
+          autoPose,
+        };
+        // The file's pose and no stand: the engine's own pose at once, so that the first frame is the right one.
+        const sc = sceneRef.current;
+        const upright = Boolean(autoPose && !sc.stand && sc.pose.kind === "auto" && sc.pose.rotation.every((v) => v === 0));
+        if (upright) placeRoot(model.current, autoPose!);
+        onAnalysisRef.current?.(analysis);
         const c = controls.current;
         if (c) {
           c.minDistance = MIN_DISTANCE;
           c.maxDistance = Math.max(sphere.radius * 10, 0.05);
-          startView(c, box, get().camera as PerspectiveCamera, savedView.current, false, { scale: sceneRef.current.camera.autoScale, center: sceneRef.current.camera.autoCenter });
+          startView(c, model.current.box, get().camera as PerspectiveCamera, savedView.current, false, { scale: sceneRef.current.camera.autoScale, center: sceneRef.current.camera.autoCenter }, model.current.points, upright);
         }
-        setFrame(frameOf(box, sphere));
+        setFrame(frameOf(model.current.box, model.current.sphere));
         onReady([...byLayer.keys()]);
         invalidate();
       },
@@ -341,21 +437,19 @@ export default function Stage(props: Props) {
       root.rotation.copy(standJewel.rotation);
     } else {
       const [x, y, z] = scene.pose.rotation;
-      // Turned around the middle of the jewel: it stays where it was.
-      const center = loaded.base.getCenter(new Vector3());
-      const q = new Quaternion().setFromEuler(new Euler(x * k, y * k, z * k, "XYZ"));
-      root.quaternion.copy(q);
-      root.position.copy(center.clone().sub(center.clone().applyQuaternion(q)));
+      // The file's pose: the engine's own (a flat pendant stood up); else the rotation chosen, around the jewel's middle.
+      const own = scene.pose.kind === "auto" && x === 0 && y === 0 && z === 0 && loaded.autoPose;
+      placeRoot(loaded, own ? loaded.autoPose! : new Quaternion().setFromEuler(new Euler(x * k, y * k, z * k, "XYZ")));
     }
     root.updateMatrixWorld(true);
-    loaded.box.setFromObject(root, true);
+    loaded.box.setFromPoints(loaded.points);
     loaded.box.getBoundingSphere(loaded.sphere);
     // A pose or a stand chosen after the first look: the camera frames the jewel (and its stand) again.
     const c = controls.current;
     if (c && posedOnce.current === frame.key) {
       const whole = loaded.box.clone();
       if (stand) whole.union(new Box3().setFromObject(stand.group));
-      fitView(c, whole, get().camera as PerspectiveCamera, c.azimuthAngle, Math.min(c.polarAngle, 1.25), true);
+      fitView(c, whole, get().camera as PerspectiveCamera, c.azimuthAngle, Math.min(c.polarAngle, 1.25), true, stand ? null : loaded.points);
     }
     posedOnce.current = frame.key;
     markDirty();
@@ -387,11 +481,11 @@ export default function Stage(props: Props) {
   /* The stones' lighting (Gem Environment) */
   useEffect(() => {
     let alive = true;
-    loadEnv(scene.envGem.id, phone)
+    loadEnv(scene.envGem.id, phone, "gem")
       .then((texture) => {
         if (!alive) return;
         setGemEnvTex(texture);
-        for (const m of gems.current) if (!m.userData.diamond.env) setGemEnv(m, texture);
+        for (const m of gems.current) if (!(m.userData as { envId?: string }).envId) setGemEnv(m, texture);
         markDirty();
       })
       .catch(() => undefined);
@@ -433,9 +527,9 @@ export default function Stage(props: Props) {
   /* Materials of each layer: rebuilt when what they are changes; their settings follow live (below). */
   const look: DiamondLook = settings.diamonds ?? "realistic";
   const structure = useMemo(() => {
-    const layers = Object.entries(settings.layers).map(([name, l]) => [name, l.role, l.metal, l.color, l.material, l.finish?.kind, l.finish?.angle, l.bevel, l.bloom, l.diamond?.mode, l.diamond?.env, (l.diamond?.transmission ?? 0) > 0]);
-    return JSON.stringify([layers, choices, highlight, simpleStones, look]);
-  }, [settings.layers, choices, highlight, simpleStones, look]);
+    const layers = Object.entries(settings.layers).map(([name, l]) => [name, l.showApart, l.role, l.metal, l.color, l.material, l.finish?.kind, l.finish?.angle, l.bevel, l.bloom, l.diamond?.mode, l.diamond?.env, (l.diamond?.transmission ?? 0) > 0, l.diamond?.cubeSize, l.metalColor, l.roughness, l.clearcoat, l.lut]);
+    return JSON.stringify([layers, choices, highlight, simpleStones, look, scene.envGem.id === "auto"]);
+  }, [settings.layers, choices, highlight, simpleStones, look, scene.envGem.id]);
   useEffect(() => {
     const loaded = model.current;
     if (!loaded || frame === null) return undefined;
@@ -449,19 +543,20 @@ export default function Stage(props: Props) {
       simpleStones,
       look,
       gemEnv,
+      autoGem: scene.envGem.id === "auto",
       ownEnv: (id) => ownEnvs.current.get(id) ?? null,
       renderer: gl,
       sceneTex: needsCopy ? sceneCopy.current : null,
     });
     gems.current = made.gems;
     metals.current = made.metals;
-    // The stones' own lightings, when one asks for another than the scene's.
+    // The stones' own lightings, when one asks for another than the scene's (or the engine chose one for its cut).
     for (const m of made.gems) {
-      const id = m.userData.diamond.env;
+      const id = (m.userData as { envId?: string }).envId;
       if (!id || ownEnvs.current.has(id)) continue;
-      void loadEnv(id, phone).then((t) => {
+      void loadEnv(id, phone, "gem").then((t) => {
         ownEnvs.current.set(id, t);
-        for (const g of gems.current) if (g.userData.diamond.env === id) setGemEnv(g, t);
+        for (const g of gems.current) if ((g.userData as { envId?: string }).envId === id) setGemEnv(g, t);
         markDirty();
       });
     }
@@ -495,14 +590,16 @@ export default function Stage(props: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frame, structure, phone, gemEnv === NO_LIGHT, needsCopy, get]);
 
-  /* Live settings of the stones (sliders of the editor) */
+  /* Live settings of the stones (sliders of the editor), with the scene's Gem Environment intensity over each stone's own (27/11/2026: read nowhere before); again after the materials are made */
+  const gemIntensity = scene.envGem.intensity ?? 1;
   useEffect(() => {
     for (const m of gems.current) {
       const layer = (m.userData as { layer?: string }).layer ?? "";
-      setGemParams(m, paramsOf(settings.layers[layer], look, choices.materials?.[layer]), phone ? PHONE_MAX_BOUNCES : 16);
+      const p = paramsOf(settings.layers[layer], look, choices.materials?.[layer], model.current?.analysis[layer]);
+      setGemParams(m, gemIntensity === 1 ? p : { ...p, envIntensity: p.envIntensity * gemIntensity }, phone ? PHONE_MAX_BOUNCES : 16);
     }
     markDirty();
-  }, [settings.layers, look, choices.materials, phone, markDirty]);
+  }, [settings.layers, look, choices.materials, phone, markDirty, gemIntensity, frame, structure, gemEnv]);
 
   /* Effects of the screen */
   useEffect(() => {
@@ -523,17 +620,24 @@ export default function Stage(props: Props) {
     const [lo, hi] = props.distance ?? [0, 0];
     c.minDistance = lo > 0 ? Math.max(MIN_DISTANCE, lo * frame.radius) : MIN_DISTANCE;
     c.maxDistance = hi > 0 ? hi * frame.radius : Math.max(frame.radius * 10, 0.05);
-    c.maxPolarAngle = scene.ground.limitCamera && scene.ground.preset !== "none" ? Math.PI / 2 - 0.02 : Math.PI;
-    // camera-controls' actions: DOLLY 16 for the wheel, TOUCH_DOLLY_TRUCK 4096 (pinch and move) or TOUCH_TRUCK 128 (move only).
+    const ground = scene.ground.limitCamera && scene.ground.preset !== "none" ? Math.PI / 2 - 0.02 : Math.PI;
+    const [minDeg, maxDeg] = props.polarLimits ?? [0, 180];
+    c.minPolarAngle = Math.max(0, Math.min(minDeg, maxDeg - 1)) * (Math.PI / 180);
+    c.maxPolarAngle = Math.min(ground, Math.max(maxDeg, minDeg + 1) * (Math.PI / 180));
+    // camera-controls' actions: DOLLY 16 for the wheel, TRUCK 2 for the right button, TOUCH_DOLLY_TRUCK 4096 (pinch and
+    // move), TOUCH_DOLLY 1024 (pinch only), TOUCH_TRUCK 128 (move only), NONE 0.
+    const pan = props.pan !== false;
     c.mouseButtons.wheel = props.zoom === false ? 0 : 16;
-    c.touches.two = props.zoom === false ? 128 : 4096;
-  }, [frame, props.distance, props.zoom, scene.ground.limitCamera, scene.ground.preset]);
+    c.mouseButtons.right = pan ? 2 : 0;
+    c.touches.two = props.zoom === false ? (pan ? 128 : 0) : pan ? 4096 : 1024;
+  }, [frame, props.distance, props.zoom, props.pan, props.polarLimits, scene.ground.limitCamera, scene.ground.preset]);
 
   /* Shift + drag moves the jewel (as in jewellers' tools), as the right button does */
+  const panAllowed = props.pan !== false;
   useEffect(() => {
     const set = (e: KeyboardEvent) => {
       const c = controls.current;
-      if (c && e.key === "Shift") c.mouseButtons.left = e.type === "keydown" ? 2 : 1;
+      if (c && e.key === "Shift" && panAllowed) c.mouseButtons.left = e.type === "keydown" ? 2 : 1;
     };
     window.addEventListener("keydown", set);
     window.addEventListener("keyup", set);
@@ -541,7 +645,7 @@ export default function Stage(props: Props) {
       window.removeEventListener("keydown", set);
       window.removeEventListener("keyup", set);
     };
-  }, []);
+  }, [panAllowed]);
 
   /* Every frame drawn */
   useFrame((state, delta) => {
@@ -631,6 +735,7 @@ export default function Stage(props: Props) {
     for (const m of gems.current) {
       const own = Math.min(max, m.userData.diamond.rayBounces + ultra);
       setGemLighting(m, s.envGem.rotation + (lightRef.current * 180) / Math.PI, turn, w, h, moving ? Math.min(own, light ? MOVING_BOUNCES.phone : MOVING_BOUNCES.computer) : own);
+      setGemExposure(m, s.post.tonemap.exposure);
     }
     const p = s.post;
     const wantPrepass = screenEffects && prepass !== null && loaded !== null;
@@ -872,6 +977,25 @@ export default function Stage(props: Props) {
         applyPath();
         controls.current?.update(0);
         cam.updateMatrixWorld(true);
+        // A still of another shape than the screen (a square 4K photo of a wide editor): if the jewel would be cut, the
+        // camera steps back along its line until the whole jewel is in, with a little margin (27/11/2026).
+        if (!path && model.current && controls.current) {
+          const pts = model.current.points;
+          const v = new Vector3();
+          for (let k = 0; k < 4; k++) {
+            cam.updateMatrixWorld(true);
+            let far = 0;
+            for (let i = 0; i < pts.length; i += Math.max(1, Math.floor(pts.length / 4000))) {
+              v.copy(pts[i]!).project(cam);
+              far = Math.max(far, Math.abs(v.x), Math.abs(v.y));
+            }
+            if (far <= 0.92) break;
+            const c = controls.current;
+            void c.dollyTo(c.distance * (far / 0.9), false);
+            c.update(0);
+          }
+          cam.updateMatrixWorld(true);
+        }
         accumulate.reset();
         accumulate.moving = false;
         const n = Math.max(1, Math.min(256, Math.round(samples)));
@@ -952,9 +1076,13 @@ export default function Stage(props: Props) {
         flight.current = null;
         playing.current = null;
         const camera = get().camera as PerspectiveCamera;
-        if (kind === "reset") return startView(c, loaded.box, camera, savedView.current, true, { scale: sceneRef.current.camera.autoScale, center: sceneRef.current.camera.autoCenter });
+        if (kind === "reset") {
+          const s = sceneRef.current;
+          const upright = Boolean(loaded.autoPose && !s.stand && s.pose.kind === "auto" && s.pose.rotation.every((v) => v === 0));
+          return startView(c, loaded.box, camera, savedView.current, true, { scale: s.camera.autoScale, center: s.camera.autoCenter }, loaded.points, upright);
+        }
         const [azimuth, polar] = { front: [0, Math.PI / 2], side: [Math.PI / 2, Math.PI / 2], top: [0, 0.0001] }[kind] as [number, number];
-        fitView(c, loaded.box, camera, azimuth, polar, true);
+        fitView(c, loaded.box, camera, azimuth, polar, true, loaded.points);
       },
       getView() {
         const c = controls.current;
@@ -1009,7 +1137,15 @@ export default function Stage(props: Props) {
         const c = controls.current;
         const loaded = model.current;
         if (!c || !loaded) return;
-        fitView(c, loaded.box, get().camera as PerspectiveCamera, c.azimuthAngle, c.polarAngle, true);
+        fitView(c, loaded.box, get().camera as PerspectiveCamera, c.azimuthAngle, c.polarAngle, true, loaded.points);
+      },
+      look(azimuth, polar) {
+        const c = controls.current;
+        const loaded = model.current;
+        if (!c || !loaded) return;
+        flight.current = null;
+        playing.current = null;
+        fitView(c, loaded.box, get().camera as PerspectiveCamera, azimuth, polar, true, loaded.points);
       },
       zoomBy(factor) {
         const c = controls.current;
@@ -1019,6 +1155,62 @@ export default function Stage(props: Props) {
       stablePose(kind) {
         const root = model.current?.root;
         return root ? stablePose(root, kind) : [0, 0, 0];
+      },
+      analysis: () => model.current?.analysis ?? null,
+      measureStones() {
+        const loaded = model.current;
+        const { gl, scene: three, camera } = get();
+        const out: Record<string, StoneMeasure> = {};
+        if (!loaded) return out;
+        const cam = camera as PerspectiveCamera;
+        const size = 160;
+        const target = new WebGLRenderTarget(size, Math.max(16, Math.round(size / Math.max(0.2, cam.aspect))), { type: HalfFloatType });
+        const back = three.background;
+        const shown = new Map<Object3D, boolean>();
+        three.traverse((o) => shown.set(o, o.visible));
+        const before = gl.getRenderTarget();
+        const clear = gl.getClearAlpha();
+        const exposure = gl.toneMappingExposure;
+        three.background = null;
+        const pixels = new Uint16Array(target.width * target.height * 4);
+        for (const [name, meshes] of loaded.layers) {
+          if (!meshes.some((m) => (m.material as GemMaterial).userData?.gem)) continue;
+          three.traverse((o) => {
+            if ((o as Mesh).isMesh) o.visible = false;
+          });
+          for (const m of meshes) m.visible = shown.get(m) ?? true;
+          for (const g of gems.current) setGemLighting(g, sceneRef.current.envGem.rotation + (lightRef.current * 180) / Math.PI, 0, target.width, target.height);
+          gl.setRenderTarget(target);
+          gl.setClearColor(0x000000, 0);
+          gl.clear();
+          gl.render(three, cam);
+          gl.readRenderTargetPixels(target, 0, 0, target.width, target.height, pixels);
+          let n = 0;
+          let sum = 0;
+          let black = 0;
+          let white = 0;
+          for (let i = 0; i < pixels.length; i += 4) {
+            if (halfToFloat(pixels[i + 3]!) < 0.5) continue;
+            // ACES (Narkowicz's fit) on the light × exposure, as the screen shows it.
+            const tone = (x: number) => {
+              const v = Math.max(0, x * exposure);
+              return Math.min(1, (v * (2.51 * v + 0.03)) / (v * (2.43 * v + 0.59) + 0.14));
+            };
+            const L = 0.2126 * tone(halfToFloat(pixels[i]!)) + 0.7152 * tone(halfToFloat(pixels[i + 1]!)) + 0.0722 * tone(halfToFloat(pixels[i + 2]!));
+            n++;
+            sum += L;
+            if (L < 0.04) black++;
+            if (L > 0.96) white++;
+          }
+          if (n > 0) out[name] = { mean: sum / n, black: black / n, white: white / n, pixels: n };
+        }
+        for (const [o, v] of shown) o.visible = v;
+        three.background = back;
+        gl.setRenderTarget(before);
+        gl.setClearAlpha(clear);
+        target.dispose();
+        markDirty();
+        return out;
       },
     };
     onApi(stageApi);
@@ -1030,7 +1222,8 @@ export default function Stage(props: Props) {
         ...stageApi,
         solo: (name: string | null) => {
           for (const [k, meshes] of model.current?.layers ?? []) for (const m of meshes) m.visible = name === null || k === name;
-          get().invalidate();
+          // A new image from scratch (the still image would keep averaging the old one).
+          markDirty();
         },
         lookAt: (p: number[], t: number[]) => {
           void controls.current?.setLookAt(p[0]!, p[1]!, p[2]!, t[0]!, t[1]!, t[2]!, false);
@@ -1076,6 +1269,22 @@ export default function Stage(props: Props) {
         zoom: () => (get().camera as PerspectiveCamera).zoom,
         center: () => model.current?.sphere.center.toArray() ?? null,
         refractingStones: () => gems.current.length,
+        analysis: () => model.current?.analysis ?? null,
+        // How the jewel fills the frame: the farthest of its points from the middle, in screen halves (1 = the edge).
+        framing: () => {
+          const pts = model.current?.points ?? [];
+          const cam = get().camera;
+          let x = 0;
+          let y = 0;
+          const v = new Vector3();
+          for (let i = 0; i < pts.length; i += Math.max(1, Math.floor(pts.length / 6000))) {
+            v.copy(pts[i]!).project(cam);
+            x = Math.max(x, Math.abs(v.x));
+            y = Math.max(y, Math.abs(v.y));
+          }
+          return { x, y, points: pts.length };
+        },
+        gemEnvs: () => gems.current.map((g) => (g.userData as { envId?: string; layer?: string }).layer + ":" + ((g.userData as { envId?: string }).envId ?? "scene")),
         gemModes: () => gems.current.map((g) => g.userData.mode),
         mirrorCopies: () => mirrorCopies.current,
         progressive: () => accumulate.count,
@@ -1100,15 +1309,28 @@ export default function Stage(props: Props) {
   const selectedMeshes = useMemo(() => (props.selected && model.current ? (model.current.layers.get(props.selected) ?? []) : []), [props.selected, frame]); // eslint-disable-line react-hooks/exhaustive-deps
   const bloomRef = useRef<unknown>(null);
   const bloomPatch = useRef<ReturnType<typeof patchBloom> | null>(null);
+  // The glow as it is attached (a new one when its args change), kept in state so that each one is patched (27/11/2026: the effect in use was never patched).
+  const [bloomEffect, setBloomEffect] = useState<unknown>(null);
+  const onBloom = useCallback((e: unknown) => {
+    bloomRef.current = e;
+    setBloomEffect(e);
+  }, []);
   useEffect(() => {
-    if (!bloomRef.current) {
+    if (!bloomEffect) {
       bloomPatch.current = null;
       return;
     }
-    bloomPatch.current = patchBloom(bloomRef.current, prepass);
+    bloomPatch.current = patchBloom(bloomEffect, prepass);
     bloomPatch.current.set(post.bloom.power, screenEffects);
     markDirty();
-  }, [post.bloom.enabled, post.bloom.power, screenEffects, prepass, markDirty]);
+  }, [post.bloom.enabled, post.bloom.power, bloomEffect, screenEffects, prepass, markDirty]);
+  // The point in focus (depth of field): the one clicked on the jewel (its own space), else its centre.
+  const focusPoint = useMemo(() => {
+    const f = post.dof.focus;
+    const root = model.current?.root;
+    if (f && root) return new Vector3(f[0], f[1], f[2]).applyMatrix4(root.matrixWorld);
+    return new Vector3(cx, cy, cz);
+  }, [post.dof.focus, cx, cy, cz]);
   const ground = scene.stand ? merged(scene.ground, { preset: scene.ground.preset === "reflective" ? "contact" : scene.ground.preset }) : scene.ground;
   return (
     <>
@@ -1122,10 +1344,10 @@ export default function Stage(props: Props) {
         {!light && post.ao.enabled ? <N8AO halfRes screenSpaceRadius aoRadius={post.ao.radius} distanceFalloff={0.6} intensity={post.ao.intensity} quality="medium" /> : <></>}
         {screenEffects && post.ssr.enabled && reflection ? <primitive object={reflection} /> : <></>}
         <primitive object={accumulate} />
-        {!light && post.dof.enabled ? <DepthOfField focusDistance={0} focalLength={Math.max(0.001, radius * 0.5)} bokehScale={post.dof.maxBlur * 6} height={720} /> : <></>}
-        {!light && post.bloom.enabled ? (
+        {!light && post.dof.enabled ? <DepthOfField target={focusPoint} worldFocusRange={Math.max(0.0005, radius * (0.15 + post.dof.aperture * 0.5))} bokehScale={post.dof.maxBlur * 6} height={720} /> : <></>}
+        {!light && post.bloom.enabled && post.bloom.iterations >= 1 ? (
           <Bloom
-            ref={bloomRef as never}
+            ref={onBloom as never}
             mipmapBlur
             luminanceThreshold={post.bloom.threshold}
             luminanceSmoothing={post.bloom.softThreshold}
@@ -1137,7 +1359,9 @@ export default function Stage(props: Props) {
         ) : (
           <></>
         )}
-        <ToneMapping mode={TONE[post.tonemap.mode]} />
+        <ToneMapping mode={TONE[post.tonemap.mode] ?? ToneMappingMode.ACES_FILMIC} />
+        {/* NORMAL: the strength mixes the look in (the LUT's own SRC blending ignores it, 27/11/2026) */}
+        {post.lut?.id && (LOOKS as readonly string[]).includes(post.lut.id) ? <LUT lut={lookTexture(post.lut.id as LookId)} blendFunction={BlendFunction.NORMAL} opacity={Math.min(1, Math.max(0, post.lut.intensity))} /> : <></>}
         {post.tonemap.saturation !== 1 ? <HueSaturation saturation={Math.max(-1, Math.min(1, post.tonemap.saturation - 1))} /> : <></>}
         {post.tonemap.contrast !== 1 ? <BrightnessContrast contrast={Math.max(-1, Math.min(1, (post.tonemap.contrast - 1) * 2))} /> : <></>}
         {post.chromatic.enabled ? <ChromaticAberration offset={new Vector2(post.chromatic.offset, post.chromatic.offset)} radialModulation={false} modulationOffset={0} /> : <></>}
@@ -1149,6 +1373,17 @@ export default function Stage(props: Props) {
       {frame && scene.envGem.id === "gem-spot" ? <spotLight position={[cx + Math.sin(lightAngle) * radius * 3, cy + radius * 4, cz + Math.cos(lightAngle) * radius * 3]} intensity={300 * radius * radius} angle={0.45} penumbra={0.6} decay={2} color="#fff6ec" /> : null}
     </>
   );
+}
+
+/** Turns the jewel around its own middle (it stays where it was) and measures it again (box, sphere: its main piece). */
+function placeRoot(loaded: Loaded, q: Quaternion): void {
+  const root = loaded.root;
+  const center = loaded.base.getCenter(new Vector3());
+  root.quaternion.copy(q);
+  root.position.copy(center.clone().sub(center.clone().applyQuaternion(q)));
+  root.updateMatrixWorld(true);
+  loaded.box.setFromPoints(loaded.points);
+  loaded.box.getBoundingSphere(loaded.sphere);
 }
 
 /** The frame of the jewel as it stands now (after its pose or its stand). */
@@ -1215,8 +1450,8 @@ function gradientOf(inner: string, outer: string): Texture {
 }
 
 /** The settings of a layer's stones: its own, the old rendering if chosen, and the configurator's choice of the library. */
-function paramsOf(layer: LayerSetting | undefined, look: DiamondLook, chosen: string | undefined): DiamondParams {
-  const own = diamondOf(layer, look);
+function paramsOf(layer: LayerSetting | undefined, look: DiamondLook, chosen: string | undefined, analysis?: LayerAnalysis): DiamondParams {
+  const own = merged(diamondOf(layer, look), autoDiamond(analysis, layer?.diamond));
   const lib = chosen ? materialById(chosen) : layer?.material ? materialById(layer.material) : null;
   return lib && "gem" in lib && lib.gem ? merged(own, lib.gem) : own;
 }
@@ -1238,6 +1473,8 @@ type Looks = {
   simpleStones: boolean;
   look: DiamondLook;
   gemEnv: Texture;
+  /** The scene's stones' lighting is « auto »: each layer gets the one the engine chooses for its cut. */
+  autoGem: boolean;
   ownEnv: (id: string) => Texture | null;
   renderer: WebGLRenderer;
   sceneTex: Texture | null;
@@ -1250,7 +1487,8 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
   const cubes: [BufferGeometry, number][] = [];
   const metals = new Map<string, MeshPhysicalMaterial>();
   for (const [name, meshes] of loaded.layers) {
-    const setting: LayerSetting = o.settings[name] ?? { role: "metal", metal: "rose-gold" };
+    const analysis = loaded.analysis[name];
+    const setting: LayerSetting = o.settings[name] ?? autoLayer(analysis);
     const shown = o.highlight === null || o.highlight === name;
     const chosen = o.choices.materials?.[name];
     const libId = chosen ?? setting.material;
@@ -1258,7 +1496,7 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
     const chosenMetal = metalOfId(libId);
     const isGem = setting.role === "diamond" || setting.role === "stone" || Boolean(lib && "gem" in lib && lib.gem);
     for (const mesh of meshes) {
-      mesh.visible = setting.role !== "hide" || o.highlight === name;
+      mesh.visible = (setting.role !== "hide" && !(analysis?.apart && !setting.showApart)) || o.highlight === name;
       mesh.renderOrder = isGem ? 2 : 0;
       mesh.userData.layer = name;
       if (!shown) {
@@ -1267,7 +1505,7 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
         continue;
       }
       if (isGem) {
-        const params = paramsOf(setting, o.look, chosen);
+        const params = paramsOf(setting, o.look, chosen, analysis);
         mesh.userData.mirror = 0;
         mesh.userData.bloom = setting.bloom ?? params.bloom;
         if (o.simpleStones) {
@@ -1281,14 +1519,17 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
         const mode = modeFor(mesh, params);
         let cube;
         if (mode === "fast") {
-          const res = cubeResolution(isInstanced ? (mesh as unknown as InstancedMesh).count : 1);
+          // The layer's own size first: merged() keeps the default "auto" under a number (27/11/2026: the choice did nothing).
+          const own = setting.diamond?.cubeSize ?? params.cubeSize;
+          const res = own && own !== "auto" ? own : cubeResolution(isInstanced ? (mesh as unknown as InstancedMesh).count : 1);
           cube = stoneCube(o.renderer, geometry, res);
           cubes.push([geometry, res]);
         }
+        const envId = params.env ?? (o.autoGem ? autoGemEnv(analysis?.cut ?? null) : undefined);
         const material = gemMaterial({
           geometry,
           mode,
-          env: (params.env ? o.ownEnv(params.env) : null) ?? o.gemEnv,
+          env: (envId ? o.ownEnv(envId) : null) ?? o.gemEnv,
           params,
           orient: orientOf(geometry, isInstanced, mesh.matrixWorld),
           cube,
@@ -1296,6 +1537,7 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
           sceneTex: o.sceneTex,
         });
         material.userData.layer = name;
+        (material.userData as { envId?: string }).envId = envId;
         gems.push(material);
         made.push(material);
         mesh.material = material;
@@ -1319,6 +1561,14 @@ function applyMaterials(loaded: Loaded, o: Looks): { made: Material[]; gems: Gem
         let material = metals.get(name);
         if (!material) {
           material = withBevel(makeMetal(metal, finish), setting.bevel ?? null);
+          // The metal's own settings over its alloy (27/11/2026): a colour, a roughness, a clear coat, a colour look.
+          if (setting.metalColor) material.color.set(setting.metalColor);
+          if (setting.roughness !== undefined) material.roughness = Math.min(1, Math.max(0, setting.roughness));
+          if (setting.clearcoat !== undefined) {
+            material.clearcoat = Math.min(1, Math.max(0, setting.clearcoat));
+            material.clearcoatRoughness = 0.04;
+          }
+          if (setting.lut && (LOOKS as readonly string[]).includes(setting.lut)) material.color.applyMatrix3(lookMatrix(setting.lut as LookId).matrix);
           metals.set(name, material);
           made.push(material);
         }

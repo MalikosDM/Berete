@@ -14,11 +14,13 @@ export { HDRI, hdriDirection, hdriLonLat, type HdriInfo, type HdriKind } from ".
 const VERSIONS: Record<string, { v: string; bytes: number; bytes1k: number }> = versions;
 
 /** The default lighting of each kind (what an unknown or removed id falls back to). */
-export const DEFAULT_HDRI: Record<HdriKind, string> = { metal: "studio-warm", gem: "gem-studio" };
+export const DEFAULT_HDRI: Record<HdriKind, string> = { metal: "studio-clair", gem: "gem-studio" };
 
 /** The id itself when the library has it, else the default of its kind (an id that starts with "gem-" lights stones). */
 export function knownHdri(id: string, kind?: HdriKind): string {
   if (HDRI[id] && VERSIONS[id]) return id;
+  // « auto » (the stones' lighting chosen per cut by the engine): the studio as the scene's own.
+  if (id === "auto") return "gem-tente";
   return DEFAULT_HDRI[kind ?? (id.startsWith("gem-") ? "gem" : "metal")];
 }
 
@@ -59,6 +61,7 @@ export function envTexture(id: string, phone: boolean): Promise<Texture> {
 
 /** The French name of a lighting, for the admin (the id itself when unknown). */
 export function hdriName(id: string): string {
+  if (id === "auto") return "Automatique";
   return HDRI[id]?.name ?? id;
 }
 

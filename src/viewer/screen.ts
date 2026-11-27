@@ -392,21 +392,26 @@ type BloomLike = {
  */
 export function patchBloom(effect: unknown, prepass: Prepass | null): { set(power: number, useMask: boolean): void } {
   const bloom = effect as BloomLike;
-  const power = new Uniform(1);
+  // Patched again (a setting changed): the uniforms already in the shader are kept and set (27/11/2026: new ones were lost).
+  const power = bloom.uniforms.get("bjPower") ?? new Uniform(1);
   bloom.uniforms.set("bjPower", power);
   const source = (bloom as { fragmentShader: string }).fragmentShader;
   if (source && !source.includes("bjPower")) {
     (bloom as { fragmentShader: string }).fragmentShader = source
       .replace("uniform float intensity;", "uniform float intensity;uniform float bjPower;")
       .replace("outputColor=texture2D(map,uv)*intensity;", "outputColor=pow(max(texture2D(map,uv),vec4(0.0)),vec4(bjPower))*intensity;");
+    // The pass compiles the new shader only when told (27/11/2026: the power did nothing once the pass was built).
+    bloom.setChanged?.();
   }
   const lum = bloom.luminanceMaterial;
-  const mask = { value: prepass?.texture ?? null } as { value: Texture | null };
-  const useMask = { value: 0 };
+  const mask = (lum.uniforms.bjMask as { value: Texture | null } | undefined) ?? ({ value: prepass?.texture ?? null } as { value: Texture | null });
+  const useMask = (lum.uniforms.bjUseMask as { value: number } | undefined) ?? { value: 0 };
   if (!lum.fragmentShader.includes("bjMaskOf")) {
     lum.fragmentShader = lum.fragmentShader
       .replace("varying vec2 vUv;", "varying vec2 vUv;\nuniform sampler2D bjMask;\nuniform float bjUseMask;\nfloat bjMaskOf(vec2 uv){if(bjUseMask<0.5)return 1.0;return texture2D(bjMask,uv).a>=0.5?1.0:0.0;}\n")
-      .replace("float mask=1.0;", "float mask=bjMaskOf(vUv);");
+      // On the output: the threshold sets `mask` again after its first line (27/11/2026: the choice per material was lost).
+      .replace("gl_FragColor=texel*mask;", "gl_FragColor=texel*mask*bjMaskOf(vUv);")
+      .replace("gl_FragColor=vec4(l*mask);", "gl_FragColor=vec4(l*mask*bjMaskOf(vUv));");
     lum.uniforms.bjMask = mask;
     lum.uniforms.bjUseMask = useMask;
     lum.needsUpdate = true;

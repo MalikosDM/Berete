@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type ImgHTMLAttributes, type RefObject } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ImgHTMLAttributes, type RefObject } from "react";
 import Logo from "@/components/Logo";
 import type { MediaItem } from "@/data/types";
 import { afterLoad } from "@/lib/idle";
@@ -54,6 +54,17 @@ export function forceMuted(v: HTMLVideoElement): void {
   v.setAttribute("playsinline", "");
 }
 
+/**
+ * The image of a film kept under the film itself (26/11/2026): Safari, and every iPhone, stops drawing the poster as soon as
+ * a film is asked to play and draws nothing until its first frame has arrived, so a film still loading showed as a black
+ * box. Its poster as the background of the video element shows through until then; once it plays, its frames cover it
+ * exactly (the same picture, the same fit). Chrome and Firefox draw the poster themselves: nothing changes there.
+ */
+export function posterBehind(poster: string | undefined, fit: "contain" | "cover" = "contain"): CSSProperties | undefined {
+  if (!poster) return undefined;
+  return { backgroundImage: 'url("' + poster.replace(/"/g, "%22") + '")', backgroundSize: fit, backgroundPosition: "center", backgroundRepeat: "no-repeat" };
+}
+
 /** A silent video that loops only while it is on screen (atelier, details of a piece). */
 export function LoopVideo({ item, label, className = "" }: { item: MediaItem; label: string; className?: string }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -86,6 +97,7 @@ export function LoopVideo({ item, label, className = "" }: { item: MediaItem; la
       aria-label={label}
       disablePictureInPicture
       className={className}
+      style={posterBehind(item.poster, /\bobject-cover\b/.test(className) ? "cover" : "contain")}
     />
   );
 }

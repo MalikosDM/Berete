@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Copy, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Undo2, Upload } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, Check, ChevronDown, Code2, Copy, LoaderCircle, Plus, RefreshCw, Rotate3d, Trash2, Undo2, Upload } from "lucide-react";
 import type { LayerRole, ModelSettings, PublicModel } from "@/data/models";
 import type { ViewerHandle } from "@/viewer";
 import type { StageApi } from "@/viewer/Stage";
 import Editor3D from "./editor3d/Editor3D";
+import type { EditorTools } from "./editor3d/Confort";
+import { useHistory } from "./editor3d/history";
 import SealedShare from "./SealedShare";
 import { adminCall as call, btn, btnMain, iconBtn, inputCls } from "./ui";
 
@@ -508,6 +510,11 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   const viewer = useRef<ViewerHandle>({ getView: () => stage.current?.getView() ?? null, capture: () => stage.current?.capture() ?? null, isReady: () => Boolean(stage.current?.handles.jewel()), seek: () => undefined });
   // « Annuler »: back to the settings saved last.
   const [saved, setSaved] = useState<ModelSettings | null>(null);
+  // « Annuler » / « Rétablir » every change of the editor (editor3d/history.ts, up to 100 steps), the settings shown
+  // instead of the draft while « Comparer » draws the saved ones, and the time of the last save (« Versions » read again).
+  const history = useHistory<ModelSettings>(settings, setSettings);
+  const [shown, setShown] = useState<ModelSettings | null>(null);
+  const [savedAt, setSavedAt] = useState(0);
 
   const fail = useCallback(
     (x: unknown) => {
@@ -579,8 +586,9 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
       const next = { ...settings, ...extra };
       // A draft never goes on a page of the site.
       await call(token, "PUT", "/api/admin/models/" + id, { name, settings: next, pieceSlug: draft ? null : pieceSlug || null });
-      setSettings(next);
+      history.change(next);
       setSaved(next);
+      setSavedAt(Date.now());
       setNote("Enregistré.");
       await load();
     } catch (x) {
@@ -599,6 +607,25 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
   };
 
   const preview = model.preview;
+  // The row above the editor (editor3d/Confort.tsx): undo / redo, compare, presets, versions, the page of the piece.
+  const tools: EditorTools = {
+    token,
+    modelId: id,
+    modelName: name.trim() || model.name,
+    pieceSlug: draft ? null : model.pieceSlug,
+    draft: settings,
+    saved,
+    undo: history.undo,
+    redo: history.redo,
+    canUndo: history.canUndo,
+    canRedo: history.canRedo,
+    put: history.change,
+    show: setShown,
+    save: () => void save(),
+    saving,
+    savedAt,
+    onError: fail,
+  };
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-8 pb-28" data-model-editor={model.sourceName}>
       <button type="button" onClick={onClose} className={btn + " justify-self-start"}>
@@ -622,7 +649,7 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
         </div>
       </div>
 
-      {preview ? <Editor3D model={preview} layers={model.layers} settings={settings} token={token} onChange={setSettings} onApi={takeApi} /> : null}
+      {preview ? <Editor3D model={preview} layers={model.layers} settings={shown ?? settings} token={token} onChange={history.change} onApi={takeApi} tools={tools} /> : null}
 
       {/* The first view of the jewel (and its still image), from where the camera stands now. */}
       <div className="flex flex-wrap items-center gap-3 border border-white/15 p-4 sm:p-5" data-model-start-view>
@@ -667,8 +694,8 @@ function Editor({ id, token, onExpired, onClose }: { id: string; token: string; 
           <button type="button" onClick={() => void save()} disabled={saving} className={btnMain} data-save-model>
             {saving ? <LoaderCircle className="size-4 animate-spin" aria-hidden="true" /> : <Check className="size-4" aria-hidden="true" />} Enregistrer
           </button>
-          <button type="button" onClick={() => saved && (setSettings(saved), setNote("Réglages enregistrés remis."))} disabled={saving || !saved || JSON.stringify(saved) === JSON.stringify(settings)} className={btn} data-cancel-model>
-            <Undo2 className="size-4" aria-hidden="true" /> Annuler
+          <button type="button" onClick={() => saved && (history.change(saved), setNote("Réglages enregistrés remis."))} disabled={saving || !saved || JSON.stringify(saved) === JSON.stringify(settings)} className={btn} data-cancel-model>
+            <Undo2 className="size-4" aria-hidden="true" /> Revenir à l'enregistré
           </button>
           {note ? <p role="status" className="text-base text-bone">{note}</p> : null}
           {err ? <p role="alert" className="text-base text-rose-light">{err}</p> : null}
@@ -723,12 +750,81 @@ function ShareVip({ model, token, onError }: { model: ModelRow; token: string; o
   );
 }
 
+/**
+ * « Intégrer » (27/11/2026): the code to paste in another site (a page of a partner, a shop) to show the piece in 3D there,
+ * the viewer alone in a frame (/embed/<token>, the same link: it stops with it). Its language, a transparent background,
+ * the small logo, the turning.
+ */
+function EmbedCode({ origin, token, title }: { origin: string; token: string; title: string }) {
+  const [lang, setLang] = useState("");
+  const [transparent, setTransparent] = useState(false);
+  const [logo, setLogo] = useState(true);
+  const [rotate, setRotate] = useState("");
+  const [copied, setCopied] = useState(false);
+  const query = [transparent ? "bg=transparent" : "", logo ? "" : "logo=0", rotate ? "rotate=" + rotate : ""].filter(Boolean).join("&");
+  const src = origin + (lang ? "/" + lang : "") + "/embed/" + token + (query ? "?" + query : "");
+  const safeTitle = (title + " — Berete Jewellers").replace(/[&"<>]/g, (c) => ({ "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" })[c]!);
+  const code = '<iframe src="' + src + '" title="' + safeTitle + '" width="100%" style="aspect-ratio: 1; border: 0;" loading="lazy" allow="fullscreen; xr-spatial-tracking; camera" allowfullscreen></iframe>';
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      window.prompt("Copiez le code :", code);
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <div className="grid w-full gap-3 border border-white/15 p-3 sm:p-4" data-embed-panel>
+      <p className="text-base text-mist">Collez ce code dans une page d'un autre site : la pièce y tourne en 3D, seule, à la largeur de la page. Il s'arrête avec ce lien (date, suppression).</p>
+      <div className="flex flex-wrap items-end gap-x-5 gap-y-3">
+        <label className="block text-base text-bone">
+          Langue
+          <select value={lang} onChange={(e) => setLang(e.target.value)} className={inputCls + " w-44"} data-embed-lang>
+            <option value="">Anglais</option>
+            <option value="fr">Français</option>
+            <option value="es">Espagnol</option>
+            <option value="de">Allemand</option>
+            <option value="nl">Néerlandais</option>
+            <option value="ar">Arabe</option>
+          </select>
+        </label>
+        <label className="block text-base text-bone">
+          Rotation
+          <select value={rotate} onChange={(e) => setRotate(e.target.value)} className={inputCls + " w-56"}>
+            <option value="">Comme réglé dans la 3D</option>
+            <option value="1">Tourne toute seule</option>
+            <option value="0">Immobile</option>
+          </select>
+        </label>
+        <label className="flex min-h-12 items-center gap-3 text-base text-bone">
+          <input type="checkbox" checked={transparent} onChange={(e) => setTransparent(e.target.checked)} className="size-5 accent-[#e8b4a0]" data-embed-transparent /> Fond transparent
+        </label>
+        <label className="flex min-h-12 items-center gap-3 text-base text-bone">
+          <input type="checkbox" checked={logo} onChange={(e) => setLogo(e.target.checked)} className="size-5 accent-[#e8b4a0]" /> Petit logo Berete
+        </label>
+      </div>
+      <textarea readOnly value={code} rows={3} onFocus={(e) => e.currentTarget.select()} className="block w-full resize-none border border-white/30 bg-ink p-3 font-mono text-base text-bone" aria-label="Code à intégrer" data-embed-code />
+      <div className="flex flex-wrap gap-3">
+        <button type="button" className={btnMain} onClick={() => void copy()} data-embed-copy>
+          {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />} {copied ? "Copié" : "Copier"}
+        </button>
+        <a href={src} target="_blank" rel="noreferrer" className={btn}>
+          <ArrowUpRight className="size-4" aria-hidden="true" /> Voir
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function Links({ model, token, onChange, onError }: { model: ModelRow; token: string; onChange: () => void; onError: (x: unknown) => void }) {
   const [title, setTitle] = useState(model.name);
   const [expires, setExpires] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
+  // The link whose embed code is shown (« Intégrer »).
+  const [embedFor, setEmbedFor] = useState("");
   const [now] = useState(() => Date.now());
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
@@ -807,9 +903,13 @@ function Links({ model, token, onChange, onError }: { model: ModelRow; token: st
                 <button type="button" className={btn} onClick={() => void copy(link)}>
                   {copied === link.id ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />} {copied === link.id ? "Copié" : "Copier le lien"}
                 </button>
+                <button type="button" className={btn} aria-expanded={embedFor === link.id} onClick={() => setEmbedFor(embedFor === link.id ? "" : link.id)} data-embed-open>
+                  <Code2 className="size-4" aria-hidden="true" /> Intégrer
+                </button>
                 <button type="button" aria-label="Supprimer le lien" className={iconBtn} onClick={() => void remove(link)}>
                   <Trash2 className="size-4" aria-hidden="true" />
                 </button>
+                {embedFor === link.id ? <EmbedCode origin={origin} token={link.token} title={link.title || model.name} /> : null}
               </li>
             );
           })}

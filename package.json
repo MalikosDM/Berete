@@ -36,7 +36,9 @@
     "thumbs": "tsx scripts/thumbs.ts && tsx scripts/angle-views.ts",
     "soon": "node scripts/soon-media.mjs",
     "hdri": "tsx scripts/hdri-library.ts",
-    "mediapipe": "node scripts/mediapipe-assets.mjs"
+    "mediapipe": "node scripts/mediapipe-assets.mjs",
+    "opening-masks": "node scripts/opening-masks.mjs",
+    "rhino-check": "tsx scripts/rhino-check.ts"
   },
   "dependencies": {
     "@fontsource/amiri": "^5.3.0",
@@ -71,6 +73,7 @@
     "rhino3dm": "^8.35.0",
     "simple-icons": "15.22.0",
     "three": "^0.182.0",
+    "webm-muxer": "5.1.4",
     "zod": "^4.6.5"
   },
   "devDependencies": {

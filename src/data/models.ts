@@ -58,6 +58,13 @@ export type LayerSetting = {
   bevel?: number;
   /** Glow on this material. */
   bloom?: boolean;
+  /** A layer lying apart from the jewel in the file is hidden by the engine; true shows it anyway. */
+  showApart?: boolean;
+  /** Metal (27/11/2026): its own colour over the alloy's (#rrggbb), roughness 0–1, clear coat (varnish) 0–1, colour look. */
+  metalColor?: string;
+  roughness?: number;
+  clearcoat?: number;
+  lut?: string | null;
 };
 
 /** A camera place, in the units of the model (metres). */

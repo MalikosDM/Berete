@@ -61,12 +61,14 @@ function flat(soup: Part["soup"]): Shaded {
   return creaseNormals(soup, 0.5);
 }
 
-export async function writeVersion(analysis: Analysis, version: Version, file: string, progress: Progress): Promise<Written> {
+/** `extras`: written on the scene of the GLB (three.js gives them as `gltf.scene.userData`): the box of the main piece. */
+export async function writeVersion(analysis: Analysis, version: Version, file: string, progress: Progress, extras?: Record<string, unknown>): Promise<Written> {
   await MeshoptSimplifier.ready;
   await MeshoptEncoder.ready;
   const doc = new Document().setLogger(new Logger(Logger.Verbosity.WARN));
   doc.createBuffer();
   const scene = doc.createScene("jewel");
+  if (extras) scene.setExtras(extras);
   doc.getRoot().setDefaultScene(scene);
   const instancing = doc.createExtension(EXTMeshGPUInstancing).setRequired(true);
   doc.createExtension(KHRMeshQuantization);

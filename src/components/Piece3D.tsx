@@ -16,6 +16,20 @@ import { Jewel3D, type Selection, type ViewerHandle } from "@/viewer";
  */
 export default function Piece3D({ piece, model }: { piece: Piece; model: PublicModel }) {
   const { t, intl } = useI18n();
+  // Admin « Voir sur la page de la pièce » (27/11/2026): with ?preview3d=1, on a device that came in by the admin (mark bj_in),
+  // the draft of the 3D editor (localStorage "bj-3d-preview:<id>", 30 minutes) replaces the saved settings, on this device only.
+  const [draft, setDraft] = useState<PublicModel["settings"] | null>(null);
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("preview3d") || !/(?:^|;\s*)bj_in=1/.test(document.cookie)) return;
+    try {
+      const kept = JSON.parse(localStorage.getItem("bj-3d-preview:" + model.id) ?? "null") as { settings?: PublicModel["settings"]; expires?: number } | null;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (kept?.settings && (kept.expires ?? 0) > Date.now()) setDraft(kept.settings);
+    } catch {
+      // Nothing readable: the saved settings.
+    }
+  }, [model.id]);
+  const shown = draft ? { ...model, settings: draft } : model;
   const [selection, setSelection] = useState<Selection>([]);
   const metals = metalsInWords(selection, t.viewer, intl);
   const section = useRef<HTMLElement>(null);
@@ -23,7 +37,7 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
   // scrolling of the page through the views while the viewer crosses the screen.
   const viewer = useRef<ViewerHandle>(null);
   const holder = useRef<HTMLDivElement>(null);
-  const views = viewsOf(model.settings);
+  const views = viewsOf(shown.settings);
   const seekOnScroll = views.seekOnScroll && views.list.length >= 2;
   useEffect(() => {
     const el = holder.current;
@@ -78,7 +92,8 @@ export default function Piece3D({ piece, model }: { piece: Piece; model: PublicM
       <div id="piece-3d-viewer" ref={holder} className="mt-10 scroll-mt-32" data-seek-on-scroll={seekOnScroll || undefined}>
         <Jewel3D
           ref={viewer}
-          model={model}
+          key={draft ? "draft" : "saved"}
+          model={shown}
           words={t.viewer}
           onSelection={setSelection}
           actions={

@@ -23,7 +23,7 @@ import { HDRI, hdriPixels } from "../src/viewer/hdri/library";
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const OUT_DIR = join(ROOT, "public", "hdri", "berete");
 const OUT_JSON = join(ROOT, "src", "data", "hdri.generated.json");
-const VERIF_DIR = join(homedir(), "Downloads", "_verif-3d");
+const VERIF_DIR = join(homedir(), "Downloads", "_verif-3d-v3");
 
 /* ---------- Radiance RGBE ---------- */
 

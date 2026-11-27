@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronLeft, ChevronRight, Minus, Plus, X } from "lucide-react";
-import { forceMuted } from "@/components/Media";
+import { forceMuted, posterBehind } from "@/components/Media";
 import type { MediaItem } from "@/data/types";
 import { useI18n } from "@/i18n";
 import { getLenis } from "@/lib/gsap";
@@ -428,6 +428,7 @@ export default function Lightbox({ items, index, onIndex, onClose }: LightboxPro
             autoPlay
             aria-label={item.alt ?? ""}
             className="pointer-events-none h-full w-full object-contain"
+            style={posterBehind(item.poster)}
           />
         ) : (
           // The photo in its frame, the size it is drawn whole; the zoom scales the frame (never a layer kept at a low

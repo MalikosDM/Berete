@@ -52,10 +52,15 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
 const DRAGON_BALL_HERO_SOURCE = join(ICLOUD, "13 Pendentif sculpte or jaune et rose", "Videos", "HD hero", "13 Dragon Ball - video hero pro (Yoni 23-11).mp4");
 const TILLMAN_CROSS_SOURCE = join(STORIES, "09 Collectors", "09 Collectors - 14.mp4");
 
-/** The films taken whole: their source, whether their sound is kept, the moment of their image before they play. */
+/**
+ * The films taken whole: their source, whether their sound is kept, the moment of their image before they play, and
+ * `start`: the second the page starts them at (and loops back to) when they open on black (26/11/2026: the frame on the page
+ * was a black box for those seconds).
+ */
 const WHOLE = [
-  // Its image: the pendant almost whole, from its sphere to the dragons, on black (3.5 s).
-  { key: "dragon-ball-hero", src: DRAGON_BALL_HERO_SOURCE, audio: true, poster: 3.5 },
+  // Its image: the pendant almost whole, from its sphere to the dragons, on black (3.5 s). It fades in from black: lit
+  // from 2 s (measured frame by frame).
+  { key: "dragon-ball-hero", src: DRAGON_BALL_HERO_SOURCE, audio: true, poster: 3.5, start: 2 },
   // Its image: the cross whole, worn (1 s).
   { key: "tillman-cross-spin", src: TILLMAN_CROSS_SOURCE, audio: false, poster: 1 },
 ];
@@ -104,7 +109,7 @@ function sizeOf(file) {
  * it is already H.264), for phones a lighter copy (the same size, a lower rate); ready to start before it is all loaded; its
  * sound kept if asked; its image, sharp.
  */
-async function whole({ key, src, audio, poster: at }) {
+async function whole({ key, src, audio, poster: at, start }) {
   if (!existsSync(src)) {
     console.error("Not found (plug the disk in): " + src);
     process.exit(1);
@@ -135,7 +140,7 @@ async function whole({ key, src, audio, poster: at }) {
   const duration = Number(spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", join(OUT, key + "." + v + ".mp4")], { encoding: "utf8" }).stdout.trim());
   console.log("  + " + key + " (" + v + ", " + width + " x " + height + ", " + duration.toFixed(1) + " s)");
   const base = "/media/mechanisms/" + key;
-  return { video: base + "." + v + ".mp4", mobile: base + "-mobile." + v + ".mp4", poster: base + "-poster." + v + ".webp", width, height, duration: Math.round(duration * 10) / 10, audio };
+  return { video: base + "." + v + ".mp4", mobile: base + "-mobile." + v + ".mp4", poster: base + "-poster." + v + ".webp", width, height, duration: Math.round(duration * 10) / 10, audio, ...(start ? { start } : {}) };
 }
 
 await mkdir(OUT, { recursive: true });
