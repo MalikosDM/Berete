@@ -49,14 +49,20 @@ test("a client signs in, sees his design and his quotation; no payment without t
     await page.locator("[data-atelier-invite] button[type=submit]").click();
     await page.locator("[data-invite-2fa] [data-2fa-choice='email']").click();
     await page.waitForURL(/\/vip(\?|$)/);
-    await page.locator("[data-signout]").first().click();
+    await page.request.post("/api/vip/atelier/signout");
     // The door of the client space (the site under construction): e-mail, password, then the code sent by e-mail.
     await page.goto("/vip");
     await page.locator("#signin input[name=email], [data-atelier-signin] input[name=email]").first().fill(email);
     await page.locator("#signin input[name=password], [data-atelier-signin] input[name=password]").first().fill(password);
     await page.locator("#signin button[type=submit], [data-atelier-signin] button[type=submit]").first().click();
-    const out = await call<{ items: { to: string; kind: string; text: string }[] }>("GET", "/api/admin/atelier/outbox");
-    const code = /\b(\d{6})\b/.exec(out.items.find((m) => m.to === email && m.kind === "code")!.text)![1]!;
+    // The code caught in the outbox (no mailbox on the server yet), as soon as it is written.
+    let mail: { text: string } | undefined;
+    for (let i = 0; i < 40 && !mail; i++) {
+      const out = await call<{ items: { to: string; kind: string; text: string }[] }>("GET", "/api/admin/atelier/outbox");
+      mail = out.items.find((m) => m.to === email && m.kind === "code");
+      if (!mail) await page.waitForTimeout(250);
+    }
+    const code = /\b(\d{6})\b/.exec(mail!.text)![1]!;
     await page.locator("#code input[name=code], [data-atelier-code] input[name=code]").first().fill(code);
     await page.locator("#code button[type=submit], [data-atelier-code] button[type=submit]").first().click();
     await expect(page.locator("[data-project-link='" + project.id + "']")).toBeVisible({ timeout: 20_000 });

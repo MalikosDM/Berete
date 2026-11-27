@@ -212,6 +212,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
   par défaut ; limites par visiteur et par jour ; coût estimé suivi. Tests : `tests/studio.spec.ts` (faux OpenAI `tests/support/fake-openai.mjs`).
 - **Phase 3** : métaux autorisés par Berete sur la 3D du client faits ; les pierres ne peuvent pas encore être limitées par le visualiseur
   (à faire), variantes supplémentaires du design = de nouvelles versions publiées par Berete.
+- Vérifié le 27/11 : en local sur le site construit, parcours complet réussi (ordinateur, iPhone), studio 8/8, 258 tests des pages
+  touchées réussis (seul écart : un léger décalage de la page Contact quand une clé OpenAI est réglée, la vieille étape « Imaginez votre
+  création » qui arrive après coup) ; anciens tests remis à jour (Genkidama v1, films, galeries, monogramme plus discret, polices des
+  univers). En ligne (commit 059ca6d6, migration appliquée) : `private-atelier-online` 4 réussis (connexion par la porte avec le code,
+  design validé, devis accepté, paiement caché, section du site), `retours2711b`, `home2711` ; mot de passe réel remis à l'identique.
 - Tests : `.local/scripts/atelier-smoke.mjs` (43 contrôles par l'API), `tests/private-atelier.spec.ts` (parcours complet avec le faux
   Stripe, ordinateur et iPhone : réussi), `tests/private-atelier-online.spec.ts` (en ligne sans clés). Captures :
   `~/Downloads/_verif-private-atelier/{client,admin,studio,parcours,en-ligne}/`.
@@ -243,6 +248,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **JL** : la photo portée avec la cubaine 14 mm en tête de ses photos portées, légende « JL + 14 mm Cuban » (6 langues).
 - [x] **Accueil, le rond du mécanisme** : la pièce et le rond remis à leur place d'avant le 27/11 (cadre 4:5, rond sur le coin) ;
       dans le rond seulement, la vidéo remontée (1,25 fois depuis la sphère, 9,5 % plus haut : la boule au centre, plus de noir en haut).
+- Vérifié en ligne (commit 76a49bd3) : 52 tests réussis (ordinateur, iPhone). Une capture en navigateur de test sans carte graphique
+  montre des carreaux sombres sur le ciel de l'AngeL à 1920 px (rendu logiciel du WebGL) : avec la carte graphique, le ciel est net.
 - Tests : `tests/retours2711b.spec.ts`, `tests/home2711.spec.ts` (rond), `tests/universes2711b.spec.ts`. Captures avant / après :
   `~/Downloads/_verif-private-atelier/retours-a/{avant,apres}/` (accueil, Genki Dama, Inter, AngeL, AS, JL ; 1440, 1920, iPhone).
 - [ ] Malik : `.local/yoni-2711/inter/photo-2-v2.jpeg` (la photo du joueur assis avec les trophées, version entière). Yoni : accord du
