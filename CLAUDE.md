@@ -206,7 +206,14 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
 - [x] **D'un univers à l'autre** (`src/components/PieceNav.tsx`) : flèches fines sur les côtés (nom au survol, ← → du clavier quand
       l'ouverture est à l'écran), sur iPhone deux boutons en bas et le glissement ; l'ordre des Créations, en boucle ; fondu (View
       Transitions, sinon fondu court ; instantané avec « réduire les animations »), sans recharger. `tests/piecenav2711.spec.ts`.
-- Tests : `tests/corrections2711.spec.ts` (ordinateur, iPhone).
+- Tests : `tests/corrections2711.spec.ts` (ordinateur, iPhone). Vérifié le 27/11 : en local sur le site construit, 390 + 136 tests
+  réussis (les anciens tests mis à jour pour les détourages coupés net, l'accueil iPhone, le T9), `audit:coherence` 0 problème
+  (258 pages de pièces + écrins, 6 langues, 1440 et iPhone ; les cartes d'une chaîne coupée en haut admises) ; en ligne (commit
+  3619d033) : corrections, contenus, navigation, écrins, univers, Atelier 137 réussis (ordinateur, iPhone), mot de passe réel remis à
+  l'identique. Captures : `~/Downloads/_verif-corrections-27-11/{avant,apres,detourages,ecrins,navigation}/`.
+- [ ] Yoni : photos studio de la bague NZ, de la chevalière et de JACK ; photos non coupées du JC et du 999 ; une photo HD du FAM ;
+      les photos des étapes 1 à 4 du T ; l'original HD du film de Dubaï ; dire si les écrins Dragon Ball et The Hand doivent passer
+      sur la même mise en scène.
 
 ## Passe « contenus définitifs de Yoni (26-27/11) : 9 pages de pièces, accueil, Atelier, écrins, typographie » — état au 27/11/2026
 - [x] **Textes de Yoni mot pour mot** (`src/data/yoni2711.ts`, recopiés par script depuis le prompt de Malik ; les blocs tels quels dans
