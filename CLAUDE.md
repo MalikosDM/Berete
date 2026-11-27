@@ -197,7 +197,7 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       bleu, rouge, vert), 4. Vue (face, profil, 3/4, dessus, rotation), Exporter (photo 4K, film 8 s), « Revenir au réglage
       parfait », avertissement « pierres trop sombres / blanches et plates » + « Corriger » (le moteur mesure chaque calque :
       `measureStones`). « Mode expert » ouvre l'éditeur en trois zones. Parcours de Yoni mesuré : fichier Rhino neuf → photo 4K
-      en 4 clics et 12 s (`.local/scripts/yoni-path.mjs`, captures `yoni-parcours-1..5.png`).
+      en 4 clics et 9 s (`.local/scripts/yoni-path.mjs`, captures `yoni-parcours-1..5.png`).
 - [x] **Métaux calibrés** (valeurs et sources dans `src/viewer/materials.ts`) : or jaune 18 ct = ISO 8654 « 3N », or rose 18 ct =
       « 5N » (CIELAB de la norme converti), platine, palladium, argent (physicallybased.info), or blanc rhodié (rhodium ≈ 78 %).
       Nouvel éclairage métal par défaut « Studio clair » (jamais de noir à refléter, un panneau doux face au bijou) ; « Studio chaud »
@@ -216,6 +216,20 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       import d'un HDR/EXR personnel `storage/hdri/`), confort (annuler/rétablir, raccourcis, comparaison avant/après à trait
       coulissant, préréglages appliqués à plusieurs modèles, versions, aperçu sur la page de la pièce ; `tests/editor3d-confort.spec.ts`),
       site (pendentif L sans rectangle noir, image d'attente des films derrière la vidéo, « The Art of Detail » rééquilibré).
+- Réglages experts testés un par un (`npx tsx scripts/settings-audit.ts`, ~1 h, `PHASE=lab,extremes,ui,doc`) : 154 réglages,
+  140 OK, 9 réparés (intensité de l'éclairage des pierres jamais lue, puissance de la lueur jamais appliquée, LUT de scène…),
+  7 retirés (biseau à l'écran : ne changeait rien ; lumière « Ambiante » ; « Studio sombre » et brossé cachés : métal noir ou
+  blanc plat), aide « ? » + aperçu avant/après (`public/media/3d-lib/help/`). Tous les curseurs des pierres poussés ensemble :
+  53 images lisibles sur 56, plus aucun noir nulle part (reste : un gris foncé à 0,11 sous « Spot », deux blancs sous
+  « Contre-jour » et « Ancien rendu »). La garde : lumière reçue × gain bornée 0,7–2,1, exposition vue par les pierres
+  0,8–1,4, plancher de lumière qui grandit avec le nombre de réglages poussés vers le sombre (`floorK` de `gems.ts`).
+- Vitesse (Mac de Malik, machine libre) : 54–60 images/s sur ordinateur (Chrome, Safari), 60 en iPhone émulé (carte graphique
+  du Mac : jamais mesuré sur un vrai iPhone), lien client en 4G simulée : image d'attente 1,7 s, bijou 1,9 s. La grosse émeraude
+  de ZR0982 (108 000 triangles) est tracée sur son enveloppe convexe (`hullOrCopy`) : 17 → 54 images/s.
+- Tests : `gems-cuts` (serveur de développement), `rhino-framing`, `rhino-files`, `client3d` (`--workers=1`), `tryon`,
+  `editor3d-confort` ; local le 27/11 : site ciblé 205 réussis, 3D et admin 61 réussis, 0 échec ; en ligne le 27/11 : `editor3d`,
+  `client3d`, `film-frame`, `retours2511`, `audit2411` (ordinateur, iPhone, Safari) 76 réussis, mot de passe réel remis à
+  l'identique. Les 3 fichiers Rhino de Yoni ne sont que sur le Mac (pas dans l'admin en ligne).
 - Captures : `~/Downloads/_verif-3d-v3/` (planches avant/après, émeraude, vignettes, métaux, fichiers Rhino, essayage,
   comparaisons photo/rendu, parité, parcours de Yoni). Photos de comparaison prises sur le site (disque externe non branché).
 - [ ] Yoni : un export iJewel d'une pièce (pour une vraie 3e colonne iJewel : aucune comparaison avec iJewel n'a été faite) ; le
