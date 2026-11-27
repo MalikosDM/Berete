@@ -16,6 +16,10 @@ export type YoniMedia = {
   interHandoverEdit?: YoniFilm;
   interPhotos?: { yoniWithPlayers?: MediaItem | null; photo2?: MediaItem | null; firstFour?: MediaItem[]; rest?: MediaItem[] };
   okaforReveal?: { film?: YoniFilm; portrait?: MediaItem; group?: MediaItem; fitting?: MediaItem };
+  /** The film of the AngeL Pendant (Deniz Undav), whole, with its music. */
+  angelFilm?: YoniFilm;
+  /** Pieces worn: Deniz Undav with the AngeL Pendant; the JL pendant on the 14 mm Cuban chain (caption « JL + 14 mm Cuban »). */
+  worn?: { angelUndav?: MediaItem; jlCuban?: MediaItem };
 };
 
 export const YONI_MEDIA: YoniMedia = media as YoniMedia;

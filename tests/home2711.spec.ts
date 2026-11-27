@@ -3,6 +3,7 @@
 // "the magnifying glass stays exactly where it is, but the image goes up: the ball must be here, so the whole piece is seen";
 // "same for the ring". Desktop (Chromium 1440 × 900, and 1280 × 800, 1920 × 1080) and iPhone (WebKit 390 × 844), silent.
 //   BASE_URL=http://localhost:5392 npx playwright test tests/home2711.spec.ts --project=desktop --project=iphone
+import sharp from "sharp";
 import monogram from "../src/data/monogram-lines.generated.json" with { type: "json" };
 import { HOUSE_PIECE, MECHANISM_PIECE } from "../src/data/homeTexts";
 import type { Catalogue } from "../src/data/types";
@@ -116,7 +117,8 @@ test("each piece on one side, in turn left and right, its words beside it (its l
   expect(problems.errors).toEqual([]);
 });
 
-test("The Mechanism: the circle where the sphere turns stays at the corner, the piece above it, whole down to its lowest Dragon Ball", async ({ page }, info) => {
+test("The Mechanism: the piece and its circle where they were, the sphere turning in the middle of the circle, whole, no black band", async ({ page }, info) => {
+  // Yoni, 26/11/2026, understood on 27/11: the picture and the circle never move; only what the circle shows goes up.
   await skipIntro(page);
   const sizes = isPhone(info.project.name) ? [null] : [{ width: 1280, height: 800 }, { width: 1440, height: 900 }, { width: 1920, height: 1080 }];
   for (const size of sizes) {
@@ -125,36 +127,49 @@ test("The Mechanism: the circle where the sphere turns stays at the corner, the 
     await show(page, "innovation");
     const photo = page.locator("[data-innovation-photo]");
     await expect.poll(() => photo.evaluate((i) => (i as HTMLImageElement).complete && (i as HTMLImageElement).naturalWidth > 0), { timeout: 15_000 }).toBe(true);
-    const m = await page.evaluate(async () => {
-      const img = document.querySelector<HTMLImageElement>("[data-innovation-photo]")!;
+    const m = await page.evaluate(() => {
       const visual = document.querySelector("[data-innovation-visual]")!.getBoundingClientRect();
       const loupe = document.querySelector("[data-innovation-loupe] > div")!.getBoundingClientRect();
-      // The lowest point of the jewel (its cut-out keeps a transparent margin), on the screen (object-fit: contain).
-      const copy = new Image();
-      copy.src = img.currentSrc || img.src;
-      await copy.decode();
-      const w = 240;
-      const h = Math.round((copy.naturalHeight / copy.naturalWidth) * w);
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(copy, 0, 0, w, h);
-      const alpha = ctx.getImageData(0, 0, w, h).data;
-      let lowest = 0;
-      for (let y = h - 1; y >= 0 && !lowest; y--) for (let x = 0; x < w; x++) if (alpha[(y * w + x) * 4 + 3]! > 40) lowest = (y + 1) / h;
-      const box = img.getBoundingClientRect();
-      const scale = Math.min(box.width / copy.naturalWidth, box.height / copy.naturalHeight);
-      const contentH = copy.naturalHeight * scale;
-      const top = box.top + (box.height - contentH) / 2;
-      return { pieceBottom: top + lowest * contentH, loupeTop: loupe.top, loupeBottom: loupe.bottom, loupeEnd: loupe.right, visualBottom: visual.bottom, visualEnd: visual.right, viewport: window.innerHeight, header: document.querySelector("header")!.getBoundingClientRect().bottom, visualTop: visual.top };
+      const film = document.querySelector("[data-sphere-film]")!.getBoundingClientRect();
+      return {
+        visual: { top: visual.top, bottom: visual.bottom, right: visual.right, ratio: visual.width / visual.height },
+        loupe: { top: loupe.top, bottom: loupe.bottom, left: loupe.left, right: loupe.right, width: loupe.width },
+        film: { top: film.top, bottom: film.bottom, left: film.left, right: film.right, width: film.width, height: film.height },
+        viewport: window.innerHeight,
+        header: document.querySelector("header")!.getBoundingClientRect().bottom,
+      };
     });
-    // The jewel ends above the circle (never under it), the circle at the bottom corner of the frame of the piece.
-    expect(m.pieceBottom).toBeLessThanOrEqual(m.loupeTop + 1);
-    expect(Math.abs(m.loupeBottom - m.visualBottom)).toBeLessThanOrEqual(1);
-    expect(Math.abs(m.loupeEnd - m.visualEnd)).toBeLessThanOrEqual(32);
+    // The picture of the piece in its 4:5 frame, the circle set on its bottom corner (over the piece, as before 27/11).
+    expect(Math.abs(m.visual.ratio - 0.8)).toBeLessThan(0.01);
+    expect(Math.abs(m.loupe.bottom - m.visual.bottom)).toBeLessThanOrEqual(1);
+    expect(Math.abs(m.loupe.right - m.visual.right)).toBeLessThanOrEqual(32);
+    expect(m.loupe.top).toBeGreaterThan(m.visual.top + (m.visual.bottom - m.visual.top) * 0.5);
     // The whole picture fits in the room under the header.
-    expect(m.visualBottom - m.visualTop).toBeLessThanOrEqual(m.viewport - m.header);
+    expect(m.visual.bottom - m.visual.top).toBeLessThanOrEqual(m.viewport - m.header);
+    // Inside the circle: the film still covers it whole, its sphere (at 60 % of the height of its square) in the middle.
+    expect(m.film.top).toBeLessThanOrEqual(m.loupe.top + 0.5);
+    expect(m.film.bottom).toBeGreaterThanOrEqual(m.loupe.bottom - 0.5);
+    expect(m.film.left).toBeLessThanOrEqual(m.loupe.left + 0.5);
+    expect(m.film.right).toBeGreaterThanOrEqual(m.loupe.right - 0.5);
+    const sphereY = m.film.top + 0.6 * m.film.height;
+    const middle = (m.loupe.top + m.loupe.bottom) / 2;
+    expect(Math.abs(sphereY - middle) / m.loupe.width).toBeLessThan(0.04);
+    // Never zoomed more than it must (1.25 times at most), so that the sphere stays whole in the circle.
+    expect(m.film.width / m.loupe.width).toBeLessThanOrEqual(1.26);
+    // No black band at the top of the circle: its top fifth (inside the round) mostly lit.
+    const shot = await page.locator("[data-innovation-loupe] > div").screenshot();
+    const { data, info: im } = await sharp(shot).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    let dark = 0;
+    let all = 0;
+    const r = im.width / 2;
+    for (let y = 0; y < im.height * 0.2; y++)
+      for (let x = 0; x < im.width; x++) {
+        if ((x - r) ** 2 + (y - r) ** 2 > (r * 0.94) ** 2) continue;
+        const i = (y * im.width + x) * 3;
+        all++;
+        if (Math.max(data[i]!, data[i + 1]!, data[i + 2]!) < 34) dark++;
+      }
+    expect(dark / all, "black at the top of the circle").toBeLessThan(0.3);
     await page.screenshot({ path: shotPath(info, "home2711-mechanism" + (size ? "-" + size.width : "")), type: "jpeg", quality: 70 });
   }
 });

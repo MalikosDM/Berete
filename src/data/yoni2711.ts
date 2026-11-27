@@ -204,6 +204,62 @@ export const YONI: Record<string, Texts> = {
       ["05 — TWO ELEMENTS, ONE SIGNATURE", "The white-gold T and rose-gold 9 come together in a sculptural design representing Marcus Thuram's initial and shirt number."],
     ],
   },
+  // Yoni's texts of 27/11/2026 (afternoon), word for word (tests/fixtures/yoni-2711b.json): the AngeL Pendant of Deniz Undav and
+  // the AS Pendant of Angelo Stiller (a label in capitals without value: the title of a group of its composition).
+  "deniz-undav-l-pendant": {
+    story: [
+      "An initial. An angel. A meaning beyond words.",
+      "Created exclusively for Deniz Undav, the AngeL Pendant was conceived as a deeply personal expression of family and love.",
+      "The letter L, representing his daughter's initial, takes shape in a sculptural three-dimensional design, entirely covered in diamonds.",
+      "Resting gently against the letter, a rose-gold angel introduces a softer dimension to the creation.",
+      "Its presence carries a meaning that goes beyond what can be seen — a quiet symbol of love, protection and an everlasting connection.",
+      "Two elements brought together in one creation, where craftsmanship becomes a personal expression of what matters most.",
+      "Some stories are not meant to be told. Only carried.",
+    ],
+    specs: [
+      ["GOLD WEIGHT", "69.90 g"],
+      ["VVS DIAMONDS", "23.921 ct"],
+      ["DIAMOND CUTS", "Round"],
+      ["GOLD COMPOSITION", "White & Rose Gold"],
+      ["SETTING TECHNIQUE", "Mosaic Setting"],
+      ["DESIGN", "Three-dimensional L initial with a sculpted rose-gold angel."],
+    ],
+    details: [
+      ["01 — THE SCULPTURAL INITIAL", "The letter L is constructed with depth and dimension, transforming a simple initial into a sculptural jewellery creation."],
+      ["02 — THE DIAMOND MOSAIC", "Round diamonds of varying sizes are arranged across the white-gold surface, creating a rich mosaic of light and texture."],
+      ["03 — THE GUARDIAN ANGEL", "Sculpted in rose gold, the angel rests against the diamond-set initial.\nA quiet symbol of love and protection, giving the creation a meaning beyond its precious materials."],
+      ["04 — THE HIDDEN CRAFTSMANSHIP", "The reverse of the pendant features an intricate geometric pattern, completed with the BERETE emblem in rose gold.\nEven the surfaces hidden from view receive the same attention to design and finishing."],
+      ["05 — THE CONTRAST OF MATERIALS", "The brilliance of white-gold diamond mosaic contrasts with the softly sculpted rose-gold angel, bringing together two different artistic expressions."],
+    ],
+  },
+  "angelo-stiller-as-pendant": {
+    story: [
+      "From a shared victory to a personal signature.",
+      "Our journey with Angelo Stiller began with the championship rings created for VfB Stuttgart's historic DFB-Pokal triumph.",
+      "What started as a celebration of the team became a personal connection. When Angelo decided to commission his first bespoke jewellery creation, he returned to BERETE.",
+      "His vision was simple: a clean, distinctive pendant built around his initials.",
+      "We translated the letters AS into a sculptural composition, combining geometrically arranged, invisible-set baguette diamonds with the brilliance of round VVS diamonds.",
+      "A creation defined not by excess, but by precision, balance and individuality.",
+      "Two initials. One personal signature.",
+    ],
+    specs: [
+      ["AS PENDANT", ""],
+      ["GOLD WEIGHT", "32.50 g"],
+      ["VVS DIAMONDS", "16.370 ct"],
+      ["DIAMOND CUTS", "Round · Baguette"],
+      ["SETTING TECHNIQUES", "Invisible Setting · Pavé"],
+      ["GOLD COMPOSITION", "White Gold"],
+      ["ACCOMPANYING TENNIS CHAIN", ""],
+      ["GOLD WEIGHT", "37.22 g"],
+      ["DIAMONDS", "43.880 ct · Round Cut"],
+      ["LENGTH", "53 cm"],
+    ],
+    details: [
+      ["01 — THE INVISIBLE DIAMOND COMPOSITION", "Invisible-set baguette diamonds form an intricate geometric pattern across the pendant, creating an interwoven composition with minimal visible metal and exceptional precision."],
+      ["02 — THE AS MONOGRAM", "Angelo's initials emerge from the diamond composition, outlined with round diamonds that contrast with the angular baguette pattern."],
+      ["03 — THE ARCHITECTURAL SILHOUETTE", "A distinctive pointed silhouette frames the monogram, combining strong geometry with carefully balanced proportions."],
+    ],
+  },
 };
 
 /** The story behind the Inter ring (Yoni, 26/11/2026), beside his photo with the players in Milan. */
@@ -259,6 +315,8 @@ export type PageSection =
   | "story-ring"
   | "reveal"
   | "evolution"
+  | "chain"
+  | "as-victory"
   | "trunk"
   | "presentation"
   | "atelier"
@@ -280,15 +338,33 @@ export const PAGE_ORDER: Record<string, PageSection[]> = {
   // Its details back between its composition and the rest (27/11/2026).
   "kevin-schade-dragon-ball-pendant": ["vision", "angles", "composition", "details", "model3d", "created-for", "trunk", "atelier", "press"],
   "campione-d-italia-2023-2024": ["vision", "angles", "composition", "details", "model3d", "story-ring", "champions", "presentation", "atelier", "press"],
-  "noah-okafor-oka-pendant": ["angles", "vision", "composition", "details", "model3d", "worn-with", "created-for", "atelier", "press"],
-  "noah-okafor-jersey-pendant": ["vision", "composition", "details", "model3d", "worn-with", "reveal", "created-for", "atelier", "press"],
-  "noah-okafor-octagon-pendant": ["angles", "vision", "composition", "details", "model3d", "part", "circle", "trunk", "atelier", "press"],
-  "marcus-thuram-t-serpent-pendant": ["angles", "vision", "composition", "details", "model3d", "evolution", "circle", "atelier", "press"],
+  // (27/11/2026, Yoni: on every page, without exception, the universe, then « The Vision Behind the Creation », then Every Angle.)
+  "noah-okafor-oka-pendant": ["vision", "angles", "composition", "details", "model3d", "worn-with", "created-for", "atelier", "press"],
+  "noah-okafor-jersey-pendant": ["vision", "angles", "composition", "details", "model3d", "worn-with", "reveal", "created-for", "atelier", "press"],
+  "noah-okafor-octagon-pendant": ["vision", "angles", "composition", "details", "model3d", "part", "circle", "trunk", "atelier", "press"],
+  "marcus-thuram-t-serpent-pendant": ["vision", "angles", "composition", "details", "model3d", "evolution", "circle", "atelier", "press"],
+  // The AngeL Pendant and the AS Pendant (Yoni, 27/11/2026).
+  "deniz-undav-l-pendant": ["vision", "angles", "composition", "details", "model3d", "circle", "atelier", "press"],
+  "angelo-stiller-as-pendant": ["vision", "angles", "composition", "details", "model3d", "chain", "as-victory", "circle", "atelier", "press"],
 };
 
 /** The four photos of the Inter case shown first in « The Art of Presentation »: its lid, open, the ring in it, its card. */
 export const PRESENTATION_FIRST: Record<string, string[]> = {
   "campione-d-italia-case": ["p22", "p20", "01", "p2"],
+};
+
+/**
+ * A chain of a piece shown in a section of its own, its photos out of the rest of the page (the tennis chain of the AS Pendant,
+ * 27/11/2026: whole, then its round diamonds set up close).
+ */
+export const CHAIN_PHOTOS: Record<string, string[]> = { "angelo-stiller-as-pendant": ["p03", "p02", "p04"] };
+
+/** The pieces whose Berete Circle says « Created Exclusively for … » (the AngeL Pendant, 27/11/2026). */
+export const CIRCLE_MADE_FOR = new Set(["deniz-undav-l-pendant"]);
+
+/** The words under the title of a piece in its universe (Yoni's mock-up for the Genki Dama, 27/11/2026). */
+export const HERO_LINES: Record<string, { tagline: string; dedication: string }> = {
+  "kevin-schade-dragon-ball-pendant": { tagline: "The Energy of All", dedication: "A one-of-one creation for Kevin Schade" },
 };
 
 /** The photo of The Berete Circle on a page (the octagon: Noah Okafor at the counter with its trunk); else his portrait. */
@@ -300,6 +376,15 @@ export const CIRCLE_PHOTO: Record<string, string> = {
 export const WORN_ON_NAME: Record<string, string> = {
   "noah-okafor-oka-pendant": "The Two-Tone Baguette Cuban",
 };
+
+/** The way from the AS Pendant to the championship ring where it began (Yoni, 27/11/2026). */
+export const AS_VICTORY = {
+  "title": "FROM A SHARED VICTORY TO A PERSONAL CREATION",
+  "text": "Our collaboration with Angelo Stiller began with the VfB Stuttgart championship rings. It later continued through a personal commission: his first bespoke AS Pendant."
+} as const;
+
+/** Yoni's caption of the JL pendant worn on its Cuban chain (27/11/2026, src/data/yoni2711.generated.json). */
+export const JL_CUBAN_CAPTION = "JL + 14 mm Cuban";
 
 /** The texts of these sections, to translate in every language (scripts/i18n-check.ts). */
 export const SECTION_TEXTS: string[] = [
@@ -313,4 +398,8 @@ export const SECTION_TEXTS: string[] = [
   ...T_EVOLUTION.steps,
   INTER_BEHIND,
   ...Object.values(WORN_ON_NAME),
+  AS_VICTORY.title,
+  AS_VICTORY.text,
+  ...Object.values(HERO_LINES).flatMap((h) => [h.tagline, h.dedication]),
+  JL_CUBAN_CAPTION,
 ];

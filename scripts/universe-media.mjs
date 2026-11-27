@@ -93,7 +93,7 @@ const BACKDROPS = [
     // Back on the pendant on 26/11/2026 (the choice of Yoni's wife): placed freely, its sphere above the piece and a little lower
     // in the frame (src/components/Universe.tsx), its edges fading into the black.
     free: true,
-    drop: [0.1, 0.05],
+    drop: [-0.05, -0.1],
   },
 ];
 

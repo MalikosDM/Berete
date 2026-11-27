@@ -74,6 +74,21 @@ export const EXPLAIN: Record<string, Explain[]> = {
     { photo: "p09", texts: [{ detail: 3 }] },
     { photo: "baguette-cuban-chain/p06", texts: [{ detail: 4 }] },
   ],
+  // The AngeL Pendant (27/11/2026): the volume of the L, the mosaic of its diamonds, the angel resting against it, the back and its
+  // emblem, the two golds together.
+  "deniz-undav-l-pendant": [
+    { photo: "p03", texts: [{ detail: 0 }] },
+    { photo: "p06", texts: [{ detail: 1 }] },
+    { photo: "p07", texts: [{ detail: 2 }] },
+    { photo: "p01", texts: [{ detail: 3 }] },
+    { photo: "p09", texts: [{ detail: 4 }] },
+  ],
+  // The AS Pendant (27/11/2026): the invisible-set baguettes, the AS monogram, the pointed silhouette.
+  "angelo-stiller-as-pendant": [
+    { photo: "p08", texts: [{ detail: 0 }] },
+    { photo: "p07", texts: [{ detail: 1 }] },
+    { photo: "p01", texts: [{ detail: 2 }] },
+  ],
   // The O of white gold, the N of rose gold, the two golds together, the double row of its tennis chain.
   "noah-okafor-octagon-pendant": [
     { photo: "p03", texts: [{ detail: 0 }] },
@@ -98,11 +113,6 @@ export const EXPLAIN: Record<string, Explain[]> = {
     { photo: "p06", texts: [{ detail: 2 }] },
     { photo: "p02", texts: [{ detail: 3 }] },
     { photo: "p12", texts: [{ detail: 4 }] },
-  ],
-  // The back and its BRT mark in rose gold, the bail on its tennis chain.
-  "angelo-stiller-as-pendant": [
-    { photo: "p01", texts: [{ story: 0, sentences: [1] }] },
-    { photo: "p04", texts: [{ story: 0, sentences: [2] }] },
   ],
   // The back engraved around the BRT mark.
   "samuel-ballet-jesus-piece": [{ photo: "06", texts: [{ story: 0, sentences: [1] }] }],
@@ -160,14 +170,18 @@ export const EXPLAIN: Record<string, Explain[]> = {
  */
 export const OVERVIEW: Record<string, string[]> = {
   // « Every Angle » of Yoni's pages (26-27/11/2026): four photos chosen first, the whole piece from the front always first (even
-  // when the opening shows it too), then See More. The jersey pendant of Noah Okafor has none (its page goes from its vision to
-  // its details): its other photos come after its details.
+  // when the opening shows it too), then See More.
   "kevin-schade-dragon-ball-pendant": ["p18", "p20", "p08", "p06"],
   "vfb-stuttgart-dfb-pokal-2025": ["p17", "p16", "p19", "p22"],
   "campione-d-italia-2023-2024": ["p55", "p01", "p06", "p41"],
   "kenan-yildiz-celebration-pendant": ["p07", "p06", "p02", "p03"],
   "noah-okafor-oka-pendant": ["p05", "p08", "p07", "p14"],
-  "noah-okafor-jersey-pendant": [],
+  // (27/11/2026, Yoni: Every Angle on every page, right after the vision: the jersey whole, its back, its collar, its base.)
+  "noah-okafor-jersey-pendant": ["p20", "p06", "p10", "p12"],
+  // The AngeL Pendant: whole from the front with its angel, three-quarters for the relief of the L, the mosaic, the angel.
+  "deniz-undav-l-pendant": ["p10", "p08", "p05", "p04"],
+  // The AS Pendant: whole from the front, three-quarters for its construction, the invisible-set baguettes, the round diamonds.
+  "angelo-stiller-as-pendant": ["p11", "p10", "p05", "p09"],
   // (27/11/2026: its bust p01, all black in a small frame, gives its place to the N and its pears.)
   "noah-okafor-octagon-pendant": ["p09", "p10", "p05", "p07"],
   // Its front, three-quarters for the relief, its back, the macro of its scales and its ruby.

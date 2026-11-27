@@ -294,6 +294,8 @@ export const fr: Messages = {
     behindCreation: "Au cœur de la création",
     watchMakingOf: "Voir la fabrication",
     accompanyingChains: "Les chaînes qui l’accompagnent",
+    accompanyingTennisChain: "La chaîne tennis qui l’accompagne",
+    discoverStuttgartRing: "Découvrir la bague de champion de Stuttgart",
     discoverHisWorld: "Découvrir son univers",
     cubanSection: "Découvrir la chaîne cubaine",
     makingEyebrow: "De la vision à la réalité",

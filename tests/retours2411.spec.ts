@@ -167,7 +167,8 @@ test("home: the photo of the Sirius trunk whole, under the header, centred, at e
   expect(bg).toMatch(/rgb\(10, 10, 10\)|rgba\(10, 10, 10, 1\)/);
   if (info.project.name !== "iphone") {
     const link = page.locator("[data-desktop-nav] a").nth(1);
-    expect(await link.evaluate((el) => getComputedStyle(el).fontWeight)).toBe("500");
+    // (Every weight a notch heavier since 27/11/2026: Manrope 600 for the menu.)
+    expect(await link.evaluate((el) => getComputedStyle(el).fontWeight)).toBe("600");
     const color = await link.evaluate((el) => getComputedStyle(el).color);
     const [r, g, b] = color.match(/\d+/g)!.map(Number);
     const lum = (c: number) => {

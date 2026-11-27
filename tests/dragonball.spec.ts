@@ -17,7 +17,8 @@ const LAST = "Every stone, every setting, every movement has a purpose.";
 
 test("the data: the text of Yoni word for word, its line, its composition, its details, its title without the client", () => {
   const piece = PIECES.find((p) => p.slug === SLUG)!;
-  expect(piece.title).toBe("Dragon Ball Pendant");
+  // « Genki Dama » since 27/11/2026 (Yoni's mock-up), its address kept.
+  expect(piece.title).toBe("Genki Dama");
   expect(storyBlocks(piece.story)).toEqual(TEXTS.story.map((text) => ({ kind: "paragraph", text })));
   expect(piece.line).toBe(LAST);
   expect(piece.specs.map((s) => [s.label, s.value])).toEqual(TEXTS.specs);

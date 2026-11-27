@@ -283,6 +283,8 @@ export const es: Messages = {
     behindCreation: "Detrás de la creación",
     watchMakingOf: "Ver la fabricación",
     accompanyingChains: "Las cadenas que la acompañan",
+    accompanyingTennisChain: "La cadena tenis que la acompaña",
+    discoverStuttgartRing: "Descubrir el anillo de campeón de Stuttgart",
     discoverHisWorld: "Descubrir su universo",
     cubanSection: "Descubrir la cadena cubana",
     makingEyebrow: "De la visión a la realidad",

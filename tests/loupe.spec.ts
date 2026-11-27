@@ -146,7 +146,8 @@ test("a photo of a phone keeps its size: its zoom stops at its own pixels (« Po
   const phone = info.project.name.startsWith("iphone");
   const { page: p, close } = await screen(page, browser, phone);
   // The photos where it is worn (stories, WhatsApp: small originals): the zoom never goes beyond their largest file.
-  await p.goto("/pieces/campione-d-italia-2023-2024", { waitUntil: "load" });
+  // (The Inter page shows its champions in its own section since 27/11/2026: the JL pendant, worn on its Cuban chain.)
+  await p.goto("/pieces/jamie-leweling-jl-pendant", { waitUntil: "load" });
   // A photo (never a film: the viewer has no zoom for a film), once the photos of the section are in the page.
   await p.locator("[data-worn-by]").scrollIntoViewIfNeeded();
   await p.waitForTimeout(1200);

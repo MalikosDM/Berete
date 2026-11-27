@@ -75,7 +75,8 @@ const order = (page: Page) => page.locator("[data-piece-section]").evaluateAll((
 test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
   test("Dragon Ball: title without the client, vision, composition in two columns, its figures beneath, its details", async ({ page }) => {
     await open(page, PIECES.db);
-    await expect(page.locator("#piece-title")).toHaveText("Dragon Ball Pendant");
+    // Its name since 27/11/2026 (Yoni's mock-up): GENKI DAMA, « The Energy of All », a fine rule, for whom (tests/retours2711b.spec.ts).
+    await expect(page.locator("#piece-title")).toHaveText("Genki Dama");
     await expect(page.locator("[data-piece]")).toHaveAttribute("data-font", "pinceau");
     await vision(page, "db-vision");
     // « Created Exclusively for Kevin Schade. » closes the composition and titles the section right under it: said once.
@@ -129,7 +130,7 @@ test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
     await vision(page, "kenan-vision");
   });
 
-  test("OKA: Every Angle first, the vision, the composition, five details, its Cuban chain, the Atelier", async ({ page }) => {
+  test("OKA: the vision, Every Angle, the composition, five details, its Cuban chain, the Atelier", async ({ page }) => {
     await open(page, PIECES.oka);
     await vision(page, "oka-vision");
     await composition(page, "oka-composition");
@@ -140,7 +141,8 @@ test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
     await expect(cuban).toContainText(/Worn on/i);
     await expect(cuban).toContainText(/The Two-Tone Baguette Cuban/i);
     await expect(cuban).toHaveAttribute("href", /\/pieces\/baguette-cuban-chain$/);
-    expect((await order(page)).slice(0, 7)).toEqual(["opening", "angles", "film", "composition", "details", "worn-with", "created-for"]);
+    // The vision second on every page (Yoni, 27/11/2026 afternoon), then Every Angle.
+    expect((await order(page)).slice(0, 7)).toEqual(["opening", "film", "angles", "composition", "details", "worn-with", "created-for"]);
   });
 
   test("The jersey of Noah Okafor: the Trophy Room, its vision, its composition and notes, eight details, the Safi Link, the moment of reveal", async ({ page }) => {
@@ -152,7 +154,7 @@ test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
     await expect(page.locator("#reveal-title")).toHaveText(new RegExp("^" + reveal[0]![0] + "$", "i"));
     const shown = norm((await page.locator("[data-reveal]").textContent()) ?? "");
     for (const g of reveal.slice(1)) expect(shown).toContain(norm(g.join(" ")));
-    expect(await order(page)).toEqual(["opening", "film", "composition", "details", "worn-with", "reveal", "created-for", "atelier", "end"]);
+    expect(await order(page)).toEqual(["opening", "film", "angles", "composition", "details", "worn-with", "reveal", "created-for", "atelier", "end"]);
     await expect(page.locator("[data-made-for] [data-worn-by]")).toHaveCount(0);
   });
 
@@ -178,7 +180,7 @@ test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
     await expect(page.locator("#evolution-title")).toHaveText(new RegExp("^" + ev[0]![0] + "$", "i"));
     expect(await texts(page, "[data-evolution-step] p")).toEqual(ev[2]!.map(norm));
     await expect(page.locator("[data-circle-link]")).toHaveAttribute("href", /\/players\/marcus-thuram$/);
-    expect(await order(page)).toEqual(["opening", "angles", "film", "composition", "details", "evolution", "circle", "atelier", "end"]);
+    expect(await order(page)).toEqual(["opening", "film", "angles", "composition", "details", "evolution", "circle", "atelier", "end"]);
   });
 
   test("No film plays with its sound by itself; every film has its image", async ({ page }) => {

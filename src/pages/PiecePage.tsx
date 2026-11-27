@@ -15,7 +15,7 @@ import Showcase from "@/components/Showcase";
 import PieceNav from "@/components/PieceNav";
 import { FilmFrame } from "@/components/FeatureFilm";
 import { featureFilmOf, PLAY_FROM, type FeatureFilmData } from "@/data/featureFilms";
-import { CIRCLE_PHOTO, DEFAULT_ORDER, INTER_BEHIND, INTER_STORY, JERSEY_REVEAL, PAGE_ORDER, PRESENTATION_FIRST, T_EVOLUTION, WORN_ON_NAME, YONI, type PageSection } from "@/data/yoni2711";
+import { AS_VICTORY, CHAIN_PHOTOS, CIRCLE_MADE_FOR, CIRCLE_PHOTO, DEFAULT_ORDER, HERO_LINES, INTER_BEHIND, INTER_STORY, JERSEY_REVEAL, PAGE_ORDER, PRESENTATION_FIRST, T_EVOLUTION, WORN_ON_NAME, YONI, type PageSection } from "@/data/yoni2711";
 import { filmData, YONI_MEDIA } from "@/data/yoniMedia";
 import { EXPLAIN } from "@/data/magazine";
 import { fileBase } from "@/data/pageMedia";
@@ -30,6 +30,7 @@ import { completeMakingOf, makingSteps } from "@/data/making";
 import { adminOrdered, magazineOf } from "@/data/magazine";
 import openingMasks from "@/data/opening-masks.generated.json" with { type: "json" };
 import { pieceMediaOf, sameViewsOf } from "@/data/pageMedia";
+import { KeepCase } from "@/lib/pieceName";
 import { resolveShowcase } from "@/data/showcase";
 import { pressOfPiece } from "@/data/press";
 import { storyBlocks, type StoryBlock } from "@/data/story";
@@ -150,14 +151,18 @@ export default function PiecePage() {
   // The lines of its composition that are filled (the others never show).
   const specs = piece.specs
     .map((s, i) => ({ ...s, row: sheetRows[i] }))
-    .filter((s) => s.value.trim() !== "" && s.row !== SEEN_LABEL && s.label !== SEEN_LABEL && s.label !== OLD_SEEN_LABEL);
+    .filter((s) => (s.value.trim() !== "" || isCaps(s.row ?? s.label)) && s.row !== SEEN_LABEL && s.label !== SEEN_LABEL && s.label !== OLD_SEEN_LABEL);
   // The order of its page (Yoni's pages of 26-27/11/2026 have their own: src/data/yoni2711.ts).
   const order: PageSection[] = PAGE_ORDER[piece.slug] ?? DEFAULT_ORDER;
   const yoniPage = Boolean(YONI[piece.slug]);
   // A part shown in a section of its own (the chains of the octagon); else its photos join the others (the crown of the Inter
   // ring worn as a pendant: told in its details, never twice).
   const partApart = order.includes("part");
-  const galleryItems = partApart ? angles : [...angles, ...partPhotos.filter((m) => !angles.some((x) => x.src === m.src))];
+  const chainFiles = CHAIN_PHOTOS[piece.slug] ?? [];
+  const isChain = (m: MediaItem) => chainFiles.length > 0 && m.src.includes("/" + piece.slug + "/") && chainFiles.includes(fileBase(m.src));
+  // Its chain in a section of its own (the tennis chain of the AS Pendant): its photos never in Every Angle.
+  const chainItems = chainFiles.map((f) => [piece.cover, ...piece.gallery].find((m) => isChain(m) && fileBase(m.src) === f)).filter((m): m is MediaItem => Boolean(m));
+  const galleryItems = (partApart ? angles : [...angles, ...partPhotos.filter((m) => !angles.some((x) => x.src === m.src))]).filter((m) => !isChain(m));
   // Photos it may still show beside a detail or first in Every Angle: the photos of its opening, a photo of its chain kept in the
   // folder of the chain (src/data/magazine.ts).
   const foreign = (EXPLAIN[piece.slug] ?? [])
@@ -172,7 +177,7 @@ export default function PiecePage() {
       return undefined;
     })
     .filter((m): m is MediaItem => Boolean(m));
-  const extra = [piece.cover, ...piece.gallery, ...foreign].filter((m) => m.src);
+  const extra = [piece.cover, ...piece.gallery, ...foreign].filter((m) => m.src && !isChain(m));
   // The story at the top, beside its film: without the sentences told beside the photos of its details (src/data/magazine.ts).
   const mag = magazineOf(piece, own, galleryItems, { lang: locale, ordered, sameViews: sameViewsOf(piece.slug), extra });
   const topStory = mag.story;
@@ -181,13 +186,16 @@ export default function PiecePage() {
   const storyTexts = storyBlocks(piece.story).map((b) => b.text.trim());
   const line = piece.line && !storyTexts.some((x) => x.includes(piece.line.trim().replace(/[.!]+$/, ""))) ? piece.line : "";
   // The first film of the page is the finished piece, presented (Yoni, 26/11/2026): the final film of the Inter ring.
-  const yoniFilm = piece.slug === "campione-d-italia-2023-2024" ? filmData(YONI_MEDIA.interFilm) : null;
+  const yoniFilm = piece.slug === "campione-d-italia-2023-2024" ? filmData(YONI_MEDIA.interFilm) : piece.slug === "deniz-undav-l-pendant" ? filmData(YONI_MEDIA.angelFilm) : null;
   const shownFilm = yoniFilm ? { data: yoniFilm, title: t.films.pieceSection, label: t.films.intro(piece.title) } : film;
   // Its composition: the rows by their English label too (a label in capitals: Yoni's composition, src/data/yoni2711.ts).
   const compositionRows = specs.map((s) => ({ ...s, en: s.row ?? s.label }));
   // « Created Exclusively for Kevin Schade. » closes its composition and titles the section of the one it was made for: said once.
   const hideClosing = order.includes("created-for") && showsPerson;
   const people3 = named && people.length > 0 ? people : [];
+  // The JL pendant worn on the 14 mm Cuban chain (Yoni, 27/11/2026), first among the photos where it is worn, with his caption.
+  const jl = piece.slug === "jamie-leweling-jl-pendant" ? YONI_MEDIA.worn?.jlCuban : undefined;
+  const wornShown: MediaItem[] = jl ? [jl, ...worn.filter((m) => m.src !== jl.src)] : worn;
 
   const sections: Partial<Record<PageSection, ReactNode>> = {
     // 2. Its film and its story side by side, as in a magazine (Yoni, 25/11/2026): the film of the finished piece (or of its
@@ -254,7 +262,7 @@ export default function PiecePage() {
     // 6. Created exclusively for…: one section (24/11/2026) for whom it was made and the photos where it is worn; a chain of the
     // house is "A Berete Signature". Shown only when it has someone or something to show (25/11/2026).
     "created-for":
-      signature || showsPerson || worn.length > 0 ? (
+      signature || showsPerson || wornShown.length > 0 ? (
         <section aria-labelledby="made-for-title" data-made-for data-piece-section="created-for" className="wrap border-t border-white/10 py-14 lg:py-16">
           <h2 id="made-for-title" className="title-caps tracking-[0.12em] t-title [text-wrap:balance]">
             {signature ? t.common.signature : showsPerson ? t.common.madeFor(who, piece.type) : t.piece.wornBy(named ? who : null)}
@@ -263,26 +271,47 @@ export default function PiecePage() {
           <PeopleRow people={people3} />
           {/* The photos where it is worn, held, handed over: under the one it was made for (the jersey of Noah Okafor: in its moment
               of reveal, never twice). */}
-          {worn.length > 0 && !order.includes("reveal") ? (
-            <ul data-worn-by className={"mt-10 grid gap-3 sm:gap-5 " + (worn.length > 1 ? "grid-cols-2 lg:grid-cols-4" : "max-w-sm")}>
-              {worn.map((m, i) => (
+          {wornShown.length > 0 && !order.includes("reveal") ? (
+            <ul data-worn-by className={"mt-10 grid gap-3 sm:gap-5 " + (wornShown.length > 1 ? "grid-cols-2 lg:grid-cols-4" : "max-w-sm")}>
+              {wornShown.map((m, i) => (
                 <li key={m.src}>
                   <Reveal>
                     <button type="button" onClick={() => setWornOpen(i)} className="block w-full cursor-zoom-in text-start" aria-label={t.gallery.open(m.alt ?? piece.title)}>
                       <span className="block aspect-[4/5] overflow-hidden bg-ink-soft">
-                        <MediaView item={m} alt={m.alt ?? t.piece.wornAlt(piece.title)} fit="cover" sizes={worn.length > 1 ? "(max-width: 1023px) 46vw, 18rem" : "(max-width: 639px) 92vw, 24rem"} frame={4 / 5} />
+                        <MediaView item={m} alt={m.alt ?? t.piece.wornAlt(piece.title)} fit="cover" sizes={wornShown.length > 1 ? "(max-width: 1023px) 46vw, 18rem" : "(max-width: 639px) 92vw, 24rem"} frame={4 / 5} />
                       </span>
                     </button>
+                    {m.caption ? <p data-worn-caption className="mt-3 text-base text-bone">{tc(m.caption)}</p> : null}
                   </Reveal>
                 </li>
               ))}
             </ul>
           ) : null}
-          {wornOpen !== null ? createPortal(<Lightbox items={worn.map((m) => ({ ...m, caption: undefined }))} index={wornOpen} onIndex={setWornOpen} onClose={() => setWornOpen(null)} />, document.body) : null}
+          {wornOpen !== null ? createPortal(<Lightbox items={wornShown.map((m) => ({ ...m, caption: undefined }))} index={wornOpen} onIndex={setWornOpen} onClose={() => setWornOpen(null)} />, document.body) : null}
         </section>
       ) : null,
     // The Berete Circle (Yoni, 27/11/2026): the one it was made for, his photo with the piece, the way to his world.
-    circle: people[0] ? <CircleSection person={people[0]} photo={piece.gallery.find((m) => m.src === CIRCLE_PHOTO[piece.slug]) ?? null} /> : null,
+    circle: people[0] ? (
+      <CircleSection
+        person={people[0]}
+        photo={(piece.slug === "deniz-undav-l-pendant" ? YONI_MEDIA.worn?.angelUndav : undefined) ?? piece.gallery.find((m) => m.src === CIRCLE_PHOTO[piece.slug]) ?? null}
+        madeFor={CIRCLE_MADE_FOR.has(piece.slug) ? t.common.madeFor(people[0].name, piece.type) : undefined}
+      />
+    ) : null,
+    // The tennis chain worn with the AS Pendant (Yoni, 27/11/2026): apart from the pendant, whole then up close, no figure again.
+    chain: chainItems.length > 0 ? <ChainSection items={chainItems} title={t.piece.accompanyingTennisChain} name={piece.title} /> : null,
+    // From the championship ring of Stuttgart to his own piece (Yoni, 27/11/2026): a short block, the way to the ring.
+    "as-victory": (
+      <section aria-labelledby="as-victory-title" data-as-victory data-piece-section="as-victory" className="wrap border-t border-white/10 py-14 lg:py-16">
+        <div className="max-w-2xl">
+          <h2 id="as-victory-title" className="title-caps tracking-[0.12em] t-title [text-wrap:balance]">{tc(AS_VICTORY.title)}</h2>
+          <p data-as-victory-text className="piece-text mt-5">{tc(AS_VICTORY.text)}</p>
+          <Link to="/pieces/vfb-stuttgart-dfb-pokal-2025" data-cta data-as-victory-link className="btn-secondary mt-6">
+            {t.piece.discoverStuttgartRing} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    ),
     // The Inter ring: the story behind it, then the champions with their rings (Yoni, 26/11/2026).
     "story-ring": <StoryRing />,
     champions: <Champions people={people3} worn={worn} title={piece.title} />,
@@ -399,10 +428,18 @@ export default function PiecePage() {
                 {collectionName}
               </Link>
               <h1 id="piece-title" data-u-title className="title-caps mt-2 leading-[1.15] tracking-[0.08em] break-words text-white [text-wrap:balance]">
-                {unbroken(piece.title)}
+                <KeepCase title={piece.title}>{unbroken}</KeepCase>
               </h1>
+              {/* Its words under its name, as on Yoni's mock-up (the Genki Dama): in italics, a fine rule, for whom. */}
+              {HERO_LINES[piece.slug] ? (
+                <div data-hero-lines>
+                  <p data-hero-tagline className="mt-3 font-display text-[1.375rem] leading-snug font-normal italic text-white lg:text-[1.5rem]">{tc(HERO_LINES[piece.slug]!.tagline)}</p>
+                  <span aria-hidden="true" data-hero-rule className="mt-4 block h-px w-16" style={{ background: "color-mix(in srgb, var(--u-glow, #e8b4a0) 70%, transparent)" }} />
+                  <p data-hero-dedication className="mt-4 text-base text-bone">{tc(HERO_LINES[piece.slug]!.dedication)}</p>
+                </div>
+              ) : null}
               {/* For whom, when no one can be shown below (a private collector): a fine line under its name, never a section. */}
-              {!showsPerson && !signature ? <p data-made-for-line className="mt-2 text-base text-mist">{t.common.madeFor(who, piece.type)}</p> : null}
+              {!showsPerson && !signature && !HERO_LINES[piece.slug] ? <p data-made-for-line className="mt-2 text-base text-mist">{t.common.madeFor(who, piece.type)}</p> : null}
             </div>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-7">
               <Link to={"/contact?piece=" + piece.slug} data-cta data-want-piece className="btn-primary">
@@ -653,6 +690,30 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
         </dl>
       </section>
     );
+  // A label in capitals without value: the title of a group of its composition (the AS Pendant, then its tennis chain, 27/11/2026),
+  // each group with its own figures and lines.
+  const isHeading = (r: (typeof rows)[number]) => r.value.trim() === "" && isCaps(r.en);
+  const groups: { heading: (typeof rows)[number] | null; rows: typeof rows }[] = [];
+  for (const r of rows) {
+    if (isHeading(r)) groups.push({ heading: r, rows: [] });
+    else if (groups.length === 0) groups.push({ heading: null, rows: [r] });
+    else groups[groups.length - 1]!.rows.push(r);
+  }
+  return (
+    <section aria-labelledby="sheet-title" data-composition data-composition-rich data-piece-section="composition" className="wrap border-t border-white/10 py-16 lg:py-24">
+      <h2 id="sheet-title" className="title-caps tracking-[0.12em] t-title ">{t.piece.sheet}</h2>
+      {groups.map((g, gi) => (
+        <div key={gi} data-composition-group={g.heading ? "" : undefined} className={g.heading && gi > 0 ? "mt-16 border-t border-white/12 pt-12" : ""}>
+          {g.heading ? <h3 data-composition-heading className="mt-10 font-display text-[1.375rem] leading-snug font-normal tracking-[0.14em] text-white uppercase lg:text-[1.5rem]">{g.heading.label}</h3> : null}
+          <RichRows rows={g.rows} hideClosing={hideClosing && gi === groups.length - 1} />
+        </div>
+      ))}
+    </section>
+  );
+}
+
+/** The lines of a rich composition: its first words, its figures in large, its two columns, its rules, its notes beneath. */
+function RichRows({ rows, hideClosing }: { rows: (Spec & { en: string })[]; hideClosing: boolean }) {
   const firstLabelled = rows.findIndex((r) => r.en !== "");
   const figures = rows.filter((r) => isCaps(r.en) && isFigure(r.value)).slice(0, 3);
   const notes = rows.filter((r) => r.en !== "" && !isCaps(r.en));
@@ -677,17 +738,16 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
   const body = parts.filter((p) => p.kind !== "intro");
   const label = "text-[0.75rem] font-medium uppercase tracking-[0.22em] text-mist max-md:text-base max-md:tracking-[0.14em]";
   return (
-    <section aria-labelledby="sheet-title" data-composition data-composition-rich data-piece-section="composition" className="wrap border-t border-white/10 py-16 lg:py-24">
-      <h2 id="sheet-title" className="title-caps tracking-[0.12em] t-title ">{t.piece.sheet}</h2>
+    <>
       {intro.map((p, i) => (
         <p key={i} data-composition-intro className="piece-lead mt-6 max-w-2xl">{p.text}</p>
       ))}
       {figures.length > 0 ? (
         <dl data-composition-figures className={"mt-12 grid gap-y-10 gap-x-12 " + (figures.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:max-w-3xl")}>
-          {figures.map((r) => {
+          {figures.map((r, i) => {
             const [main, ...more] = r.value.split("\n");
             return (
-              <div key={r.en} data-composition-figure className="border-t pt-5" style={{ borderColor: "color-mix(in srgb, var(--u-glow, #e8b4a0) 45%, transparent)" }}>
+              <div key={i} data-composition-figure className="border-t pt-5" style={{ borderColor: "color-mix(in srgb, var(--u-glow, #e8b4a0) 45%, transparent)" }}>
                 <dt className={label}>{r.label}</dt>
                 <dd className="mt-3">
                   <span className="block font-display text-[2.25rem] leading-none font-normal tracking-[0.01em] text-white">{main}</span>
@@ -707,8 +767,8 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
           <p key={i} data-composition-closing className="piece-lead mt-10">{p.text}</p>
         ) : p.kind === "grid" ? (
           <dl key={i} data-composition-rows className="mt-12 grid gap-x-16 gap-y-10 sm:grid-cols-2 lg:max-w-5xl">
-            {p.rows.map((r) => (
-              <div key={r.en}>
+            {p.rows.map((r, k) => (
+              <div key={k}>
                 <dt className={label}>{r.label}</dt>
                 <dd className="piece-text mt-3 whitespace-pre-line text-white">{r.value}</dd>
               </div>
@@ -718,19 +778,19 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
       )}
       {notes.length > 0 ? (
         <ul data-composition-notes className="mt-14 flex max-w-3xl flex-col gap-2 border-t border-white/12 pt-6">
-          {notes.map((r) => (
-            <li key={r.en} className="piece-text">
+          {notes.map((r, i) => (
+            <li key={i} className="piece-text">
               <span className="text-white">{r.label}</span> — {r.value}
             </li>
           ))}
         </ul>
       ) : null}
-    </section>
+    </>
   );
 }
 
 /** The Berete Circle (Yoni, 27/11/2026): the one a piece was made for, his photo with it, « Discover His World ». */
-function CircleSection({ person, photo }: { person: Person; photo: MediaItem | null }) {
+function CircleSection({ person, photo, madeFor }: { person: Person; photo: MediaItem | null; madeFor?: string }) {
   const { t } = useI18n();
   const cat = useCatalogue();
   const portrait = portraitOf(cat, person);
@@ -746,13 +806,36 @@ function CircleSection({ person, photo }: { person: Person; photo: MediaItem | n
         ) : null}
         <div className="sm:col-span-7 lg:col-span-6 lg:col-start-6">
           <p className="eyebrow">{t.nav.players}</p>
-          <h2 id="circle-title" className="title-caps mt-3 tracking-[0.1em] t-title text-white">{person.name}</h2>
+          <h2 id="circle-title" className="title-caps mt-3 tracking-[0.1em] t-title text-white [text-wrap:balance]">{madeFor ?? person.name}</h2>
           <Link to={"/players/" + person.slug} data-cta data-circle-link data-made-for-person={person.slug} className="btn-secondary mt-6">
             {t.piece.discoverHisWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         </div>
       </div>
       {open && item ? createPortal(<Lightbox items={[item]} index={0} onIndex={() => undefined} onClose={() => setOpen(false)} />, document.body) : null}
+    </section>
+  );
+}
+
+/** The chain worn with a pendant, apart (the tennis chain of the AS Pendant): whole, then its stones up close; each opens large. */
+function ChainSection({ items, title, name }: { items: MediaItem[]; title: string; name: string }) {
+  const { t } = useI18n();
+  const [open, setOpen] = useState<number | null>(null);
+  return (
+    <section aria-labelledby="chain-title" data-chain-section data-piece-section="chain" className="wrap border-t border-white/10 py-14 lg:py-16">
+      <h2 id="chain-title" className="title-caps tracking-[0.12em] t-title [text-wrap:balance]">{title}</h2>
+      <ul data-chain-photos className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 sm:grid sm:grid-cols-3 sm:gap-5 sm:overflow-visible lg:max-w-4xl">
+        {items.map((m, i) => (
+          <li key={m.src} className="w-[72%] shrink-0 snap-center sm:w-auto">
+            <button type="button" onClick={() => setOpen(i)} className="block w-full cursor-zoom-in" aria-label={t.gallery.open(m.alt ?? name)}>
+              <span className="block aspect-[2/3] overflow-hidden bg-ink-soft">
+                <MediaView item={m} alt={m.alt ?? name} fit="cover" sizes="(max-width: 639px) 72vw, (max-width: 1023px) 30vw, 18rem" frame={2 / 3} />
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+      {open !== null ? createPortal(<Lightbox items={items.map((m) => ({ ...m, caption: undefined }))} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </section>
   );
 }

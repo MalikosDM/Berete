@@ -19,6 +19,7 @@ import { Link, Navigate, useI18n, useMadeFor } from "@/i18n";
 import { CardLine, EnterWorld } from "@/components/PieceGrid";
 import { useCatalogue } from "@/lib/catalogue";
 import NotFound from "@/pages/NotFound";
+import { KeepCase } from "@/lib/pieceName";
 
 const GROUPS: PersonKind[] = ["player", "club", "personality"];
 
@@ -147,7 +148,7 @@ export function PlayerPage() {
                         </span>
                       )}
                     </span>
-                    <span data-piece-name className="title-caps mt-3 block text-base tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light lg:text-[1.0625rem]">{p.title}</span>
+                    <span data-piece-name className="title-caps mt-3 block text-base tracking-[0.08em] break-words text-white [text-wrap:balance] group-hover:text-rose-light lg:text-[1.0625rem]"><KeepCase title={p.title} /></span>
                     <CardLine piece={p} who={madeFor(cat, p)} />
                     <span data-enter-world data-cta className="card-enter group-hover:text-rose-light">
                       <EnterWorld text={t.common.enterWorld} />

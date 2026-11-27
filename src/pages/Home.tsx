@@ -183,9 +183,9 @@ function House() {
 
 /**
  * The Mechanism (Yoni, 24/11/2026: "the immersive part is not for the home page" — its film stays on its own page): the Dragon
- * Ball pendant and, under its corner, a circle where only its sphere turns, in a loop, silent, while it is on screen. Its name,
- * its short text, "Enter the World". (Yoni, 26/11/2026: "the magnifying glass stays exactly where it is, the image goes up, so
- * the whole piece is seen with its ball": the piece stands above the circle, never under it — its lowest Dragon Ball whole.)
+ * Ball pendant and, set on its corner, a circle where only its sphere turns, in a loop, silent, while it is on screen. Its name,
+ * its short text, "Enter the World". (Yoni, 26/11/2026, understood on 27/11: the piece and the circle stay where they are; what
+ * the circle shows goes up, its turning sphere in the middle.)
  */
 function Mechanism() {
   const { t } = useI18n();
@@ -229,11 +229,11 @@ function Mechanism() {
       visual={
         // The frame of the piece (4:5) at the top; under its corner, the room of the circle: the circle is 36 % of the width
         // and the piece ends at 95 % of its frame (its cut-out keeps a margin), so 25:39 lets it end just above the circle.
-        <div data-innovation-visual className="relative mx-auto aspect-[25/39] w-full max-w-[24rem]">
+        <div data-innovation-visual className="relative mx-auto aspect-[4/5] w-full max-w-[24rem]">
           {/* Its chain cut at the top of its photo (27/11/2026: never faded): the frame starts at the top edge of the section (over
               its padding, py-20 / lg:py-24 of Feature), so that the chain leaves the section there, at its fine line; it still ends
               where it ended (taller by as much), the piece just above the circle. */}
-          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className={"absolute inset-x-0 block " + (view && isCutTop(view) ? "-top-20 lg:-top-24" : "top-0 aspect-[4/5]")}>
+          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className={"absolute inset-x-0 block " + (view && isCutTop(view) ? "-top-20 lg:-top-24" : "inset-y-0")}>
             {view && isCutTop(view) ? (
               <>
                 <span aria-hidden="true" className="block aspect-[4/5]" />
@@ -246,10 +246,12 @@ function Mechanism() {
               <MediaView item={piece.cover} alt={piece.title} fit="contain" sizes="(max-width: 1023px) 80vw, 24rem" />
             )}
           </Link>
-          {/* Its sphere that turns, in a circle at the corner of the piece, where it always was. */}
+          {/* Its sphere that turns, in a circle set on the corner of the piece, where it always was (back there on 27/11/2026: Yoni
+              wanted only what the circle shows moved). Inside it, the film goes up: its turning sphere in the middle, whole, filling it,
+              no black band at the top (the sphere is at 60 % of the height of its square: drawn 1.25 times from there, 9.5 % higher). */}
           <div data-innovation-loupe className="absolute -end-2 bottom-0 w-[36%] max-w-40 sm:-end-6">
             <div className="relative aspect-square overflow-hidden rounded-full border border-rose-light/40 bg-ink-soft shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
-              <video ref={videoRef} poster={sphere.poster} style={posterBehind(sphere.poster, "cover")} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full object-cover" />
+              <video ref={videoRef} poster={sphere.poster} style={posterBehind(sphere.poster, "cover")} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full origin-[50%_60%] -translate-y-[9.5%] scale-[1.25] object-cover" />
             </div>
           </div>
         </div>

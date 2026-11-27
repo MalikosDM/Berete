@@ -4,6 +4,7 @@ import type { Piece } from "@/data/types";
 import { SIGNATURE_PIECES } from "@/data/pieces";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
+import { KeepCase } from "@/lib/pieceName";
 
 /**
  * Every creation of a list (All, a collection, a sub-category) in a grid of cards all of the same size (Yoni, 23/11/2026:
@@ -28,7 +29,7 @@ export default function PieceGrid({ pieces }: { pieces: Piece[]; showType?: bool
             </span>
             {/* Its whole name, never cut (24/11/2026). */}
             <span data-card-title data-piece-name className="title-caps mt-4 block text-base leading-[1.25] tracking-[0.06em] text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]">
-              {p.title}
+              <KeepCase title={p.title} />
             </span>
             <CardLine piece={p} who={madeFor(cat, p)} />
             <span data-enter-world data-cta className="card-enter mt-auto pt-1 text-white group-hover:text-rose-light">

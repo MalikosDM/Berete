@@ -281,6 +281,8 @@ export const nl: Messages = {
     behindCreation: "Achter de creatie",
     watchMakingOf: "Bekijk het maakproces",
     accompanyingChains: "De bijbehorende kettingen",
+    accompanyingTennisChain: "De bijbehorende tennisketting",
+    discoverStuttgartRing: "Ontdek de kampioensring van Stuttgart",
     discoverHisWorld: "Ontdek zijn wereld",
     cubanSection: "Ontdek de Cubaanse ketting",
     makingEyebrow: "Van visie tot werkelijkheid",

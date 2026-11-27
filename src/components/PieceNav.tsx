@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import type { Piece } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
+import { KeepCase } from "@/lib/pieceName";
 
 /*
  * From one universe to the next (Yoni, 27/11/2026, his video on the Butterfly pendant): in the opening of every piece, a
@@ -309,7 +310,7 @@ export default function PieceNav({ slug }: { slug: string }) {
           }
         >
           <span className="block text-[0.6875rem] font-semibold uppercase tracking-[0.24em] text-rose-light">{back ? t.piece.navPrev : t.piece.navNext}</span>
-          <span className="title-caps mt-1.5 block text-[0.9375rem] leading-snug tracking-[0.06em] text-white [text-wrap:balance]">{piece.title}</span>
+          <span className="title-caps mt-1.5 block text-[0.9375rem] leading-snug tracking-[0.06em] text-white [text-wrap:balance]"><KeepCase title={piece.title} /></span>
         </span>
       </Link>
     );

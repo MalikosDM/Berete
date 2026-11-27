@@ -5,6 +5,7 @@ import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { usePieceModels } from "@/lib/models";
 import { CardLine, EnterWorld } from "@/components/PieceGrid";
+import { KeepCase } from "@/lib/pieceName";
 
 type Props = { piece: Piece; eager?: boolean; priority?: boolean; showType?: boolean; className?: string; compact?: boolean };
 
@@ -34,7 +35,7 @@ export default function PieceCard({ piece, eager = false, priority = false, clas
           ) : null}
         </span>
         <span className="mt-3 block">
-          <span data-piece-name className="title-caps block text-base leading-snug tracking-[0.05em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]">{piece.title}</span>
+          <span data-piece-name className="title-caps block text-base leading-snug tracking-[0.05em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]"><KeepCase title={piece.title} /></span>
           <CardLine piece={piece} who={madeFor(cat, piece)} />
           {/* The signature button of every piece. */}
           <span data-enter-world data-cta className="card-enter text-rose-light group-hover:text-white">
@@ -60,7 +61,7 @@ export default function PieceCard({ piece, eager = false, priority = false, clas
         ) : null}
       </span>
       <span className="mt-4 block">
-        <span data-piece-name className="title-caps block text-base tracking-[0.06em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]">{piece.title}</span>
+        <span data-piece-name className="title-caps block text-base tracking-[0.06em] break-words text-white [text-wrap:balance] transition-colors duration-500 group-hover:text-rose-light lg:text-[1.0625rem]"><KeepCase title={piece.title} /></span>
         <CardLine piece={piece} who={madeFor(cat, piece)} />
         {/* The signature button of every piece. */}
         <span data-enter-world data-cta className="card-enter text-white group-hover:text-rose-light">

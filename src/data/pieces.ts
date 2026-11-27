@@ -459,7 +459,8 @@ const SITE_PIECES: Piece[] = [
   piece({
     slug: "kevin-schade-dragon-ball-pendant",
     // The name of the client out of the title (Yoni, 26/11/2026): « Created Exclusively for Kevin Schade », lower on the page.
-    title: "Dragon Ball Pendant",
+    // « GENKI DAMA », the name Yoni gives it (27/11/2026), everywhere; its address kept.
+    title: "Genki Dama",
     type: "pendant",
     // Yoni's definitive texts (26/11/2026): its vision, its composition in two columns, the weights and carats beneath. Its line:
     // the last words of its vision (said once on its page).
@@ -724,11 +725,12 @@ const SITE_PIECES: Piece[] = [
     slug: "angelo-stiller-as-pendant",
     title: "Angelo Stiller — AS Pendant",
     type: "pendant",
-    line: "Two initials in a shield, with the BRT mark on the back.",
-    story:
-      "His initials A and S, drawn into a shield and set with baguette and round diamonds. The back carries the BRT mark in rose gold. It hangs from a diamond tennis chain.",
+    // Yoni's texts (27/11/2026): its vision, its composition (the pendant and its tennis chain apart), three details beside their
+    // close-ups (the invisible-set baguettes, the AS monogram, the pointed silhouette).
+    line: "From a shared victory to a personal signature.",
+    ...yoniTexts("angelo-stiller-as-pendant", ["p08", "p07", "p01"].map((f) => yoni("angelo-stiller-as-pendant", f))),
     people: ["angelo-stiller"],
-    theme: { preset: "stuttgart", mark: "AS" },
+    theme: { preset: "as-signature" },
     ...sorted("angelo-stiller-as-pendant", [
       yoni("angelo-stiller-as-pendant", "p11", at("AS pendant, front view")),
       yoni("angelo-stiller-as-pendant", "p07", at("Angelo Stiller's AS pendant on a diamond tennis chain")),
@@ -739,12 +741,6 @@ const SITE_PIECES: Piece[] = [
       yoni("angelo-stiller-as-pendant", "p10", at("AS pendant, side view", "In profile")),
       yoni("angelo-stiller-as-pendant", "p04", BAIL()),
     ]),
-    specs: [
-      ["Type", "Pendant on a tennis chain"],
-      ["Motif", "The initials AS in a shield"],
-      ["Signature", "BRT mark in rose gold, on the back"],
-    ],
-    seen: "White gold · baguette diamonds in a herringbone, round diamonds",
     making: {
       raw: raw("angelo-stiller-as-pendant", "p12"),
       // The seats cut, no stone yet (18/v04): the preparation of the setting (confirmed by Yoni, 21/11/2026).
@@ -781,11 +777,13 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "deniz-undav-l-pendant",
-    title: "Deniz Undav — L Pendant",
+    // « AngeL Pendant », its A and its L in capitals, as Yoni wants it (27/11/2026).
+    title: "Deniz Undav — AngeL Pendant",
     type: "pendant",
-    line: "A letter in diamonds, an angel in rose gold.",
-    story:
-      "A tall letter L paved with white diamonds, with a cherub in rose gold resting in its corner. Its bail is set with diamonds too, and the back is engraved with a pattern of interlaced circles and the BRT mark in rose gold.",
+    // Yoni's texts (27/11/2026): its vision, its composition, five details beside their close-ups (the volume of the L, the mosaic,
+    // the angel against it, the back and its emblem, the two golds together). Its meaning stays discreet: nothing more is said.
+    line: "An initial. An angel. A meaning beyond words.",
+    ...yoniTexts("deniz-undav-l-pendant", ["p03", "p06", "p07", "p01", "p09"].map((f) => yoni("deniz-undav-l-pendant", f))),
     people: ["deniz-undav"],
     // 23/11/2026 (Yoni): the sky, for the meaning of its angel (no more cathedral).
     theme: { preset: "ciel", mark: "L" },
@@ -794,12 +792,6 @@ const SITE_PIECES: Piece[] = [
     // Never an image made by AI (Yoni, 25/11/2026: "ce n'est pas ma pièce"): the real photo of the whole L first, the one that
     // shows its illusion best (a flat L that looks in relief, like cards set off one from the other).
     ...sorted("deniz-undav-l-pendant", [], firsts("deniz-undav-l-pendant", ["p10", "p08", "p04", "p07", "p09", "p03", "p06", "p05", "p01", "p02"])),
-    specs: [
-      ["Type", "Pendant"],
-      ["Motif", "The letter L and a cherub"],
-      ["Signature", "BRT mark on the back"],
-    ],
-    seen: "White gold, rose gold cherub · round diamonds in pavé",
     making: {
       raw: raw("deniz-undav-l-pendant", "v01-2s"),
       setting: yoni("deniz-undav-l-pendant", "v01-15_4s", SET()),

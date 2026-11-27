@@ -206,5 +206,36 @@
    "alt": "A man fastens a diamond chain around Noah Okafor's neck in a hotel suite",
    "onBlack": false
   }
+ },
+ "angelFilm": {
+  "type": "video",
+  "src": "/media/yoni-2711/angel-film/angel-pendant.0927b88847.mp4",
+  "mobile": "/media/yoni-2711/angel-film/angel-pendant-mobile.0927b88847.mp4",
+  "poster": "/media/yoni-2711/angel-film/angel-pendant-poster.0927b88847.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 24.76,
+  "audio": true,
+  "alt": "Film of the AngeL Pendant: the L set with diamonds and its rose-gold angel, close-ups of the pavé and of the angel, the engraved back with the BRT mark, the pendant in a gloved hand, then the Berete Jewellers card",
+  "onBlack": false
+ },
+ "worn": {
+  "angelUndav": {
+   "type": "image",
+   "src": "/media/yoni-2711/worn/angel-undav.34a7a5bbd2.webp",
+   "width": 1290,
+   "height": 1597,
+   "alt": "Deniz Undav in a white VfB Stuttgart hoodie, wearing the AngeL Pendant and holding the DFB-Pokal trophy",
+   "onBlack": false
+  },
+  "jlCuban": {
+   "type": "image",
+   "src": "/media/yoni-2711/worn/jl-cuban.34a7a5bbd2.webp",
+   "width": 1290,
+   "height": 1597,
+   "alt": "The JL pendant worn on the 14 mm Cuban chain, with a winner's medal, by a man in sunglasses and a VfB Stuttgart blazer",
+   "caption": "JL + 14 mm Cuban",
+   "onBlack": false
+  }
  }
 }

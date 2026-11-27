@@ -276,6 +276,8 @@ export const ar: Messages = {
     behindCreation: "وراء الإبداع",
     watchMakingOf: "شاهد مراحل الصنع",
     accompanyingChains: "السلاسل المرافقة",
+    accompanyingTennisChain: "سلسلة التنس المرافقة",
+    discoverStuttgartRing: "اكتشف خاتم بطولة شتوتغارت",
     discoverHisWorld: "اكتشفوا عالمه",
     cubanSection: "اكتشفوا السلسلة الكوبية",
     makingEyebrow: "من الرؤية إلى الواقع",

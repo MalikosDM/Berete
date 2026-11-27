@@ -37,7 +37,8 @@ test("a computer: the light follows the mouse over the lines, with inertia; a re
   // No name BERETE any more, anywhere.
   await expect(page.locator(".u-brand, .brand-mark, [data-brand-mark]")).toHaveCount(0);
   let s = await state(page, ".universe [data-monogram]");
-  expect(s.lines).toBeGreaterThanOrEqual(0.04);
+  // Fainter behind the pieces since 27/11/2026 (Yoni: the monogram more discreet in the universes).
+  expect(s.lines).toBeGreaterThanOrEqual(0.02);
   expect(s.lines).toBeLessThanOrEqual(0.06);
   expect(s.follow).toBe(true);
   // Large, in the middle of the screen.
@@ -105,5 +106,5 @@ test("« reduce motion »: the monogram stays still, without light", async ({ pa
   expect(s.follow).toBe(false);
   expect(s.glowShown).toBe(false);
   expect(s.shift).toEqual({ x: 0, y: 0 });
-  expect(s.lines).toBeGreaterThan(0.03);
+  expect(s.lines).toBeGreaterThan(0.02);
 });

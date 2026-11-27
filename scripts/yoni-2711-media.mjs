@@ -12,9 +12,17 @@
  *   - Noah Okafor, the reveal of his jersey pendant in Dubai (WhatsApp, 27/11/2026): the film whole (48.9 s, 720 x 1280, with
  *     music, never shortened), a close portrait, the four of them on the sofa (cropped a little tighter, the four whole) and
  *     the fitting of the chain.
+ *   - Deniz Undav, the film of the AngeL Pendant (shared iCloud album of Yoni « Video AngeL pendant », 27/11/2026: one item,
+ *     downloaded in its original quality, "EAZY_Jewelry Craftsmanship_20241223 109215 L吊坠__Final cut 成品视频1080p_25FPS.mp4",
+ *     1080 x 1920 H.264, 25 im/s, 24.76 s, 55.4 MB, with music): the film whole, never shortened. Looked at frame by frame
+ *     (27/11/2026): real footage of the finished pendant (macro shots of the pavé, the rose-gold angel, the engraved back with
+ *     the BRT mark, the pendant in a gloved hand); its last 1.8 s (23.0 s to the end) are a card with the BRT logo on black.
+ *   - Two photos where the pieces are worn (WhatsApp of Yoni, 27/11/2026, copied with clear names into worn/): Deniz Undav
+ *     wearing the AngeL Pendant, the DFB-Pokal in his arms; the JL pendant worn on the 14 mm Cuban chain (Yoni: « JL + 14 mm
+ *     Cuban »). Both 1290 x 1597, whole (no border to remove): their page copy already is the whole photo, so no loupe copy.
  *
  * Read first from "$BERETE_DISK/Berete - Dossiers icloud/00 Contexte Yoni/Yoni 27-11/" when that folder exists, else from
- * .local/yoni-2711/ (same layout: icloud-inter-film/, icloud-inter-livraison/, okafor-dubai/; the originals never go in
+ * .local/yoni-2711/ (same layout: icloud-inter-film/, icloud-inter-livraison/, okafor-dubai/, inter/, angel-film/, worn/; the originals never go in
  * Git and are never modified). Written for the web with a version (a fingerprint of the files of the group) in every name:
  *   public/media/yoni-2711/<group>/<name>.<v>.mp4          film for computers (H.264, up to 1080 x 1920, 4.5 Mbit/s at most)
  *   public/media/yoni-2711/<group>/<name>-mobile.<v>.mp4   its copy for phones (720 x 1280, 1.5 Mbit/s at most)
@@ -24,7 +32,7 @@
  * and src/data/yoni2711.generated.json (MediaItem of src/data/types.ts; a film also has `mobile`, as FeatureFilmData).
  *
  *   node scripts/yoni-2711-media.mjs
- *   node scripts/yoni-2711-media.mjs --only=inter-film,inter-handover,inter-photos,okafor-dubai
+ *   node scripts/yoni-2711-media.mjs --only=inter-film,inter-handover,inter-photos,inter,okafor-dubai,angel-film,worn
  *
  * The films keep their sound track (music): the site never plays a film with its sound before a click.
  */
@@ -65,6 +73,12 @@ const INTER_HANDOVER = join(SRC, "icloud-inter-livraison", "inter-milan-handover
 const INTER_EXTRA = {
   yoni: join(SRC, "inter", "yoni-thuram-arnautovic-milan.jpeg"),
   photo2: join(SRC, "inter", "photo-2-champion-trophee.jpeg"),
+};
+/** The film of the AngeL Pendant (album « Video AngeL pendant »), and the two photos where the pieces are worn. */
+const ANGEL_FILM = join(SRC, "angel-film", "angel-pendant-film-original.mp4");
+const WORN = {
+  angelUndav: join(SRC, "worn", "angel-pendant-porte-undav-dfb.jpeg"),
+  jlCuban: join(SRC, "worn", "jl-pendant-cuban-14mm-porte.jpeg"),
 };
 const OKAFOR = {
   film: join(SRC, "okafor-dubai", "okafor-dubai-reveal-film.mp4"),
@@ -135,6 +149,7 @@ const POSTERS = {
   interHandoverFull: 20.0, // a player shows his ring, the man in the beige suit points at it
   interHandoverEdit: 36.87, // smiles, the box open
   okafor: 32.0, // Noah Okafor, arms crossed, wearing the pendant
+  angel: 9.1, // the L whole and its rose-gold angel, sharp, from the front (mean luminance 0.30)
 };
 
 /** The group photo of Okafor: the part kept, [x, y, w, h] in fractions (the empty top trimmed; the legs touch the sides and the bottom). */
@@ -153,7 +168,13 @@ const ALT = {
   okaforFitting: "A man fastens a diamond chain around Noah Okafor's neck in a hotel suite",
   interYoni: "Yoni Berete with Marko Arnautović and Marcus Thuram in front of the Inter backdrop in Milan, the case of the ring in his hands",
   interPhoto2: "An Inter player in a black-and-blue jacket and a Campione cap, his hand on his face, the Serie A trophy before him",
+  angelFilm:
+    "Film of the AngeL Pendant: the L set with diamonds and its rose-gold angel, close-ups of the pavé and of the angel, the engraved back with the BRT mark, the pendant in a gloved hand, then the Berete Jewellers card",
+  wornAngelUndav: "Deniz Undav in a white VfB Stuttgart hoodie, wearing the AngeL Pendant and holding the DFB-Pokal trophy",
+  wornJlCuban: "The JL pendant worn on the 14 mm Cuban chain, with a winner's medal, by a man in sunglasses and a VfB Stuttgart blazer",
 };
+/** The captions of Yoni, word for word. */
+const CAPTION = { jlCuban: "JL + 14 mm Cuban" };
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { encoding: "utf8", maxBuffer: 1 << 26 });
@@ -178,7 +199,8 @@ function encodeArgs(info, copy, audio) {
   const short = Math.min(info.width, info.height, copy.short);
   const rate = copy.maxrate(short);
   return {
-    vf: [fit(copy.short, copy.long), ...(info.fps > FILM.maxFps + 0.5 ? ["fps=" + FILM.maxFps] : []), "format=yuv420p"].join(","),
+    // setparams: a film without colour tags (the AngeL film) keeps BT.709 on its frames, else the encoder writes them unknown.
+    vf: [fit(copy.short, copy.long), ...(info.fps > FILM.maxFps + 0.5 ? ["fps=" + FILM.maxFps] : []), "format=yuv420p", "setparams=colorspace=bt709:color_primaries=bt709:color_trc=bt709"].join(","),
     out: [
       "-c:v", "libx264", "-preset", "slow", "-profile:v", "high", "-crf", String(copy.crf), "-maxrate", rate + "k", "-bufsize", rate * 2 + "k",
       "-g", String(fps * 2), "-keyint_min", String(fps), "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
@@ -295,10 +317,10 @@ async function group(key, make) {
     const p = probe(join(dir, name + "." + v + ".mp4"));
     return { type: "video", src: at(name, "mp4"), mobile: at(name + "-mobile", "mp4"), poster: at(name + "-poster", "webp"), width: p.width, height: p.height, duration: Math.round(p.duration * 100) / 100, audio: p.hasAudio, ...extra, onBlack: false };
   };
-  const photoItem = (m, alt) => {
+  const photoItem = (m, alt, extra) => {
     const src = at(m.name, "webp");
     if (m.zoom) loupes.set(src, { src: base + m.name + "." + v + ".loupe.webp", ...m.zoom });
-    return { type: "image", src, width: m.width, height: m.height, alt, onBlack: false };
+    return { type: "image", src, width: m.width, height: m.height, alt, ...extra, onBlack: false };
   };
   const json = describe({ filmItem, photoItem });
   const size = files.reduce((s, f) => s + readFileSync(join(dir, f.replace(/^([^.]+)\./, "$1." + v + "."))).length, 0);
@@ -392,6 +414,25 @@ const GROUPS = {
         },
       });
     }),
+  "angel-film": async () =>
+    need(ANGEL_FILM) &&
+    group("angel-film", async (tmp) => {
+      const f = wholeFilm(ANGEL_FILM, tmp, "angel-pendant", POSTERS.angel);
+      await writePoster(f.poster);
+      return ({ filmItem }) => ({ angelFilm: filmItem("angel-pendant", { alt: ALT.angelFilm }) });
+    }),
+  worn: async () =>
+    need(...Object.values(WORN)) &&
+    group("worn", async (tmp) => {
+      const angel = await photo(WORN.angelUndav, tmp, "angel-undav");
+      const jl = await photo(WORN.jlCuban, tmp, "jl-cuban");
+      return ({ photoItem }) => ({
+        worn: {
+          angelUndav: photoItem(angel, ALT.wornAngelUndav),
+          jlCuban: photoItem(jl, ALT.wornJlCuban, { caption: CAPTION.jlCuban }),
+        },
+      });
+    }),
 };
 
 console.log("Yoni 27/11: " + SRC);
@@ -416,7 +457,7 @@ for (const [key, makeGroup] of Object.entries(GROUPS)) {
   for (const [k, value] of made.loupes) loupes.set(k, value);
   prefixes.push(made.prefix);
 }
-const ORDER = ["interFilm", "interHandoverFull", "interHandoverEdit", "interPhotos", "okaforReveal"];
+const ORDER = ["interFilm", "interHandoverFull", "interHandoverEdit", "interPhotos", "okaforReveal", "angelFilm", "worn"];
 await writeFile(DATA, JSON.stringify(Object.fromEntries(ORDER.filter((k) => data[k]).map((k) => [k, data[k]])), null, 1) + "\n");
 console.log("  = src/data/yoni2711.generated.json");
 if (prefixes.length) await saveLoupes(loupes, prefixes);

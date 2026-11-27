@@ -170,6 +170,32 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « retours de Yoni du 27/11 après-midi, partie A » (avant The Private Atelier) — état au 27/11/2026
+- [x] **La Vision toujours en 2e** sur chaque page de pièce : ouverture → The Vision Behind the Creation → Every Angle → le reste
+      (`PAGE_ORDER` / `DEFAULT_ORDER` de `src/data/yoni2711.ts` ; OKA, maillot, T9 changés). Test sur toutes les pages publiées.
+- [x] **Genki Dama** (adresse `kevin-schade-dragon-ball-pendant` gardée) : nom de la pièce partout (6 langues), sous le titre « The
+      Energy of All » en italique, un filet, « A one-of-one creation for Kevin Schade » (`HERO_LINES`) ; sphère remontée de 15 % de
+      la hauteur de l'univers (`drop` de `genkidama-v1` : -0,05 / -0,10, `scripts/universe-media.mjs` et `universes.generated.json`).
+- [x] **Inter** : son nom et tous les titres de ses sections en or jaune (dégradé, `index.css`, bloc de fin exclu). Photo 2 sans
+      filigrane : **fichier `photo-2-v2.jpeg` pas encore là** (photo actuelle gardée) ; il faudra l'accord du photographe.
+- [x] **AngeL Pendant** (Deniz Undav, adresse gardée) : « AngeL » garde son A et son L partout, même dans les titres en capitales
+      (`KeepCase` de `src/lib/pieceName.tsx` : le nom du joueur en capitales, la suite telle quelle) ; plus de halo sombre derrière
+      le L sur son ciel (`.piece-calm` coupé quand l'univers est « ciel ») ; film de l'album iCloud (`angelFilm`, original 1080p
+      dans `.local/yoni-2711/angel-film/`, `node scripts/yoni-2711-media.mjs --only=angel-film,worn`) ; textes mot pour mot
+      (`tests/fixtures/yoni-2711b.json`) ; Every Angle p10, p08, p05, p04 ; détails p03, p06, p07, p01, p09 ; « Created exclusively for
+      Deniz Undav » dans The Berete Circle avec la photo où il le porte (`CIRCLE_MADE_FOR`, `YONI_MEDIA.worn.angelUndav`).
+- [x] **AS Pendant** (Angelo Stiller) : univers fait en code « The Signature » (`as-signature`, `src/components/universe/AsSignature.tsx`,
+      `tests/universes2711b.spec.ts`) ; textes mot pour mot ; composition en deux groupes (pendentif, chaîne : un libellé en
+      capitales sans valeur = titre de groupe, `RichRows` de `PiecePage.tsx`) ; « The Accompanying Tennis Chain » (p03, p02, p04, jamais
+      dans Every Angle : `CHAIN_PHOTOS`) ; « From a Shared Victory to a Personal Creation » + lien vers la bague de Stuttgart (`AS_VICTORY`).
+- [x] **JL** : la photo portée avec la cubaine 14 mm en tête de ses photos portées, légende « JL + 14 mm Cuban » (6 langues).
+- [x] **Accueil, le rond du mécanisme** : la pièce et le rond remis à leur place d'avant le 27/11 (cadre 4:5, rond sur le coin) ;
+      dans le rond seulement, la vidéo remontée (1,25 fois depuis la sphère, 9,5 % plus haut : la boule au centre, plus de noir en haut).
+- Tests : `tests/retours2711b.spec.ts`, `tests/home2711.spec.ts` (rond), `tests/universes2711b.spec.ts`. Captures avant / après :
+  `~/Downloads/_verif-private-atelier/retours-a/{avant,apres}/` (accueil, Genki Dama, Inter, AngeL, AS, JL ; 1440, 1920, iPhone).
+- [ ] Malik : `.local/yoni-2711/inter/photo-2-v2.jpeg` (la photo du joueur assis avec les trophées, version entière). Yoni : accord du
+      photographe pour retirer le filigrane ; valider l'univers « The Signature » et les traductions des nouveaux textes.
+
 ## Passe « corrections après les contenus de Yoni » (prompt de corrections du 27/11 après-midi) — état au 27/11/2026
 - [x] **Maillot d'Okafor — The Moment of Reveal** : le film de Dubaï entier (48,9 s, vertical, image d'attente tirée du film, bouton
       lecture, jamais de son seul), dessous le portrait et la photo de groupe (recadrée en haut seulement : les quatre entiers ;

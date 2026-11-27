@@ -176,6 +176,7 @@ export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdr
 export const CODE_SCENES = {
   "trophy-room": { name: "La salle des trophées : socle en marbre noir, lumière chaude du haut, lignes d'un terrain de nuit" },
   "octagon-gallery": { name: "La galerie octogonale : arches de pierre noire, lumière froide à gauche, rose à droite, sol miroir" },
+  "as-signature": { name: "La signature : étude architecturale en diamants (chevrons des baguettes et silhouette en pointe, en traits de lumière)" },
 } as const;
 export type CodeSceneKind = keyof typeof CODE_SCENES;
 export const isCodeScene = (value: unknown): value is CodeSceneKind => typeof value === "string" && Object.prototype.hasOwnProperty.call(CODE_SCENES, value);
@@ -399,6 +400,16 @@ THEME_PRESETS["trophy-room"] = {
 THEME_PRESETS["octagon-gallery"] = {
   name: "La galerie octogonale : arches de pierre noire, lumière froide et rose, sol miroir (Noah Okafor, pendentif octogone)",
   theme: { base: "#050506", tint: "#121016", glow: "#f2dcd2", texture: "grain", light: "halo", font: "stade", backdrop: "octagon-gallery", entrance: "tunnel", effects: ["dust", "glints", "jewel-sheen"], mark: "" },
+};
+// 27/11/2026 (Yoni, of Angelo Stiller's AS pendant: « THE SIGNATURE — An Architectural Study in Diamonds »): his personal
+// creation, no stadium, no celebration. Drawn in code (src/components/universe/AsSignature.tsx): a dark room of architecture
+// made from the pendant itself — the crossed pattern of its invisible-set baguettes as a wall of hairlines and facets lit
+// softly from above, a baguette catching the light now and then; its pointed silhouette as nested fine bevels around the
+// piece; the lines of a study (its axis, the X of its point). White and silver light, a touch of rose gold at one point.
+// The former world stays (stuttgart).
+THEME_PRESETS["as-signature"] = {
+  name: "La signature : étude architecturale en diamants (Angelo Stiller, pendentif AS)",
+  theme: { base: "#050506", tint: "#111113", glow: "#ecebe8", texture: "grain", light: "halo", font: "etoile", backdrop: "as-signature", entrance: "glint", effects: ["dust", "jewel-sheen"], mark: "" },
 };
 
 export const DEFAULT_PRESET = "maison";

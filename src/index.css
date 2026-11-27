@@ -2715,6 +2715,16 @@ html[lang="ar"] [data-piece] [data-u-title] {
   text-shadow: none;
   filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.7)) drop-shadow(0 0 24px rgb(0 0 0 / 0.7));
 }
+/* The Inter ring (Yoni, 27/11/2026): « Campione » and every title of the sections of its page in yellow gold, the theme of the
+   victory; the same gold for its name and its titles, bright on the dark (the closing block keeps the titles of the house). */
+[data-piece="campione-d-italia-2023-2024"] :is([data-u-title], [data-piece-section]:not([data-piece-section="end"]) h2) {
+  background: linear-gradient(180deg, #fff1bf 0%, #f3d27a 34%, #dcae4a 55%, #f6dc8e 76%, #e2b65a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.55)) drop-shadow(0 0 18px rgb(0 0 0 / 0.55));
+}
 /* Pearly, like a wing. */
 [data-font="aerien"] [data-u-title] {
   background: linear-gradient(100deg, #ffffff 0%, #f4e2ff 30%, #ffe4f2 55%, #fff4dc 80%, #ffffff 100%);
@@ -3271,6 +3281,10 @@ html[lang="ar"] [data-piece] [data-u-title] {
    around it, softened where the piece is. */
 .piece-calm {
   background: radial-gradient(closest-side, rgba(5, 5, 5, 0.62), rgba(5, 5, 5, 0.32) 55%, transparent 100%) center / 96% 92% no-repeat;
+}
+/* The AngeL pendant on its sky (Yoni, 27/11/2026): no dark contour around the L, the sky right up to the piece. */
+:root:has(.universe[data-backdrop="ciel"]) .piece-calm {
+  background: none;
 }
 
 /* The Genkidama on a phone (Yoni, 23/11/2026): the sphere of energy higher, above the pendant, as on a computer. */

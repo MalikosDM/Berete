@@ -84,6 +84,8 @@ function allowedButtons(t: Messages): Set<string> {
     t.piece.watchMakingOf,
     t.piece.discoverHisWorld,
     t.piece.viewAllMoments,
+    // The way from the AS Pendant to the ring of Stuttgart (27/11/2026).
+    t.piece.discoverStuttgartRing,
     // A button that opens photos, and the way from a trunk to its piece (24/11/2026).
     t.boxes.discoverPhotos,
     t.boxes.discoverPiece,

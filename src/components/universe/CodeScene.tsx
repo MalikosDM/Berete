@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import type { CodeSceneKind } from "@/data/themes";
+import { SignatureStudyStage } from "./AsSignature";
 import { OctagonGalleryStage } from "./OctagonGallery";
 import { TrophyRoomNear, TrophyRoomStage } from "./TrophyRoom";
 
@@ -8,7 +9,8 @@ import { TrophyRoomNear, TrophyRoomStage } from "./TrophyRoom";
  * piece. The page measures where the jewel really is — the box of its main view, the image drawn inside it, and the visible
  * part of that image (its opaque pixels) — and gives the world its heart (--s-x, --s-y: the centre of the jewel, in the
  * coordinates of the stage), its scale (--s-u: a hundredth of the box of the jewel), the foot of the jewel (--s-top, where the
- * plinth begins) and its width (--s-pw, the plinth), at every size, again when the window or the jewel changes.
+ * plinth begins) and its width (--s-pw, the plinth), at every size, again when the window or the jewel changes; and the visible
+ * height of the jewel (--s-j, a hundredth of it: the unit of a world drawn to the measure of the jewel itself, The Signature).
  *   - The depth: on a computer the planes answer the mouse, the far ones less and the other way, the jewel and its plinth
  *     a little with it ([data-depth] of src/index.css); on a phone they drift slowly by themselves (CSS, scenes.css).
  *   - Nothing runs while the opening is off screen (data-scene-idle) or the tab hidden, nothing moves with "reduce motion".
@@ -97,6 +99,7 @@ function placeUnder(universe: HTMLElement, cover: HTMLElement): () => void {
     let jy = (box.y0 + box.y1) / 2;
     let foot = box.y1 - bh * 0.06;
     let jw = (box.x1 - box.x0) * 0.6;
+    let jh = bh * 0.8;
     const view = mainView(cover);
     if (view) {
       const { frame, img } = view;
@@ -112,11 +115,13 @@ function placeUnder(universe: HTMLElement, cover: HTMLElement): () => void {
       jy = top + ch * v.cy;
       foot = top + ch * v.y1;
       jw = cw * (v.x1 - v.x0);
+      jh = ch * (v.y1 - v.y0);
     }
     const pw = Math.min(bh * 0.95, Math.max(bh * 0.38, jw * 1.1));
     universe.style.setProperty("--s-x", jx.toFixed(1) + "px");
     universe.style.setProperty("--s-y", jy.toFixed(1) + "px");
     universe.style.setProperty("--s-u", (bh / 100).toFixed(3) + "px");
+    universe.style.setProperty("--s-j", (jh / 100).toFixed(3) + "px");
     // The plinth: its top face (9 % of its width) under the foot of the jewel, the jewel standing on its middle.
     universe.style.setProperty("--s-top", (foot - pw * 0.05).toFixed(1) + "px");
     universe.style.setProperty("--s-pw", pw.toFixed(1) + "px");
@@ -148,7 +153,7 @@ function placeUnder(universe: HTMLElement, cover: HTMLElement): () => void {
     mo.disconnect();
     cover.removeEventListener("load", place, true);
     universe.removeAttribute("data-scene-placed");
-    for (const name of ["--s-x", "--s-y", "--s-u", "--s-top", "--s-pw", "--u-at-x", "--u-at-y"]) universe.style.removeProperty(name);
+    for (const name of ["--s-x", "--s-y", "--s-u", "--s-j", "--s-top", "--s-pw", "--u-at-x", "--u-at-y"]) universe.style.removeProperty(name);
   };
 }
 
@@ -234,7 +239,7 @@ export function SceneStage({ kind, still }: { kind: CodeSceneKind; still: boolea
 
   return (
     <div ref={ref} className="u-scene" data-scene={kind}>
-      {kind === "trophy-room" ? <TrophyRoomStage /> : <OctagonGalleryStage />}
+      {kind === "trophy-room" ? <TrophyRoomStage /> : kind === "as-signature" ? <SignatureStudyStage /> : <OctagonGalleryStage />}
     </div>
   );
 }

@@ -298,6 +298,8 @@ export const en = {
     behindCreation: "Behind the Creation",
     watchMakingOf: "Watch the Making Of",
     accompanyingChains: "The Accompanying Chains",
+    accompanyingTennisChain: "The Accompanying Tennis Chain",
+    discoverStuttgartRing: "Discover the Stuttgart Championship Ring",
     discoverHisWorld: "Discover His World",
     cubanSection: "Discover the Cuban Chain",
     makingEyebrow: "From Vision to Reality",
