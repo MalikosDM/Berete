@@ -73,7 +73,7 @@ async function details(page: Page, key: string) {
 const order = (page: Page) => page.locator("[data-piece-section]").evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-section")));
 
 test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
-  test("Dragon Ball: title without the client, vision, composition in two columns, its figures beneath, no Art of Detail", async ({ page }) => {
+  test("Dragon Ball: title without the client, vision, composition in two columns, its figures beneath, its details", async ({ page }) => {
     await open(page, PIECES.db);
     await expect(page.locator("#piece-title")).toHaveText("Dragon Ball Pendant");
     await expect(page.locator("[data-piece]")).toHaveAttribute("data-font", "pinceau");
@@ -82,7 +82,8 @@ test.describe("Yoni's definitive contents (26-27/11/2026)", () => {
     await composition(page, "db-composition", "", ["Created Exclusively for Kevin Schade."]);
     await expect(page.locator("#made-for-title")).toHaveText(/^Created Exclusively for Kevin Schade$/i);
     await expect(page.locator("[data-composition-rows]")).toHaveCount(2);
-    await expect(page.locator("[data-magazine-block]")).toHaveCount(0);
+    // Its details back after its composition (27/11/2026, tests/corrections2711.spec.ts).
+    await expect(page.locator("[data-magazine-block]")).toHaveCount(4);
     await expect(page.locator(".universe")).toHaveAttribute("data-free", "");
   });
 

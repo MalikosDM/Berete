@@ -237,6 +237,11 @@ export const ar: Messages = {
     showView: (view: string) => "عرض منظر " + view,
     viewOf: (n: number, total: number) => "المنظر " + n + " من " + total,
     viewsLabel: "مناظر القطعة",
+    navLabel: "إبداعات أخرى",
+    navPrev: "الإبداع السابق",
+    navNext: "الإبداع التالي",
+    prevCreation: (name: string) => "الإبداع السابق: " + name,
+    nextCreation: (name: string) => "الإبداع التالي: " + name,
     viewAlt: (title: string, view: string) => title + "، منظر " + view,
     sketchAlt: (title: string) => "يد يوني بيريتي ترسم المخطط الأول لقطعة " + title,
     steps: {

@@ -106,7 +106,7 @@ export default function MagazineGallery({
             </div>
           ) : null}
           {mag.blocks.length > 0 ? (
-            <ol className="mt-10 flex flex-col gap-12 lg:mt-12 lg:gap-16">
+            <ol className="mt-10 flex flex-col gap-10 lg:mt-12 lg:gap-12">
               {mag.blocks.map((b, i) => {
                 // The photo against the edge of the page and its sentence right beside it (the air on the other side): the photo
                 // on the left first, right under the title, then on the right (26/11/2026: the text first left the top left of
@@ -114,24 +114,25 @@ export default function MagazineGallery({
                 const flip = i % 2 === 1;
                 // The close-ups a little larger, the words larger, more air between them (Yoni, 26/11/2026); the strongest moment
                 // (the mechanism of the Inter ring) larger still.
-                const photoCols = b.big ? "sm:col-span-6 lg:col-span-6 " : "sm:col-span-5 lg:col-span-5 ";
+                // (27/11/2026: the close-ups larger again, the words centred on their height, less air between the blocks.)
+                const photoCols = b.big ? "sm:col-span-7 lg:col-span-7 " : "sm:col-span-6 lg:col-span-6 ";
                 return (
-                  <li key={b.item.src} data-magazine-block={i + 1} data-big={b.big ? "" : undefined} data-angle={mag.overview.length + i + 1} className="grid items-center gap-6 sm:grid-cols-12 sm:gap-10 lg:gap-16">
+                  <li key={b.item.src} data-magazine-block={i + 1} data-big={b.big ? "" : undefined} data-angle={mag.overview.length + i + 1} className="grid items-center gap-6 sm:grid-cols-12 sm:gap-10 lg:gap-12">
                     <button
                       type="button"
                       onClick={(e) => show(b.item, e)}
                       data-magazine-photo
-                      className={"group relative block aspect-[4/5] cursor-zoom-in overflow-hidden bg-ink sm:w-full " + (b.big ? "w-full " : "w-3/4 ") + photoCols + (flip ? "justify-self-end sm:order-2 " + (b.big ? "sm:col-start-7" : "sm:col-start-8") : "sm:order-1 sm:col-start-1")}
+                      className={"group relative block aspect-[4/5] cursor-zoom-in overflow-hidden bg-ink sm:w-full " + (b.big ? "w-full " : "w-3/4 ") + photoCols + (flip ? "justify-self-end sm:order-2 " + (b.big ? "sm:col-start-6" : "sm:col-start-7") : "sm:order-1 sm:col-start-1")}
                       aria-label={t.gallery.open(nameOf(b.item))}
                     >
                       <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
-                        <MediaView item={b.item} alt={nameOf(b.item)} fit={b.item.onBlack !== false ? "contain" : "cover"} sizes={b.big ? "(max-width: 639px) 92vw, (max-width: 1023px) 48vw, 38rem" : "(max-width: 639px) 75vw, (max-width: 1023px) 40vw, 31rem"} frame={4 / 5} />
+                        <MediaView item={b.item} alt={nameOf(b.item)} fit={b.item.onBlack !== false ? "contain" : "cover"} sizes={b.big ? "(max-width: 639px) 92vw, (max-width: 1023px) 56vw, 44rem" : "(max-width: 639px) 75vw, (max-width: 1023px) 48vw, 38rem"} frame={4 / 5} />
                       </span>
                       <span className="absolute end-3 bottom-3 hidden size-10 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-0 transition-opacity group-hover:opacity-100 lg:inline-flex">
                         <ZoomIn className="size-4" aria-hidden="true" />
                       </span>
                     </button>
-                    <div data-magazine-text className={"sm:col-span-6 lg:col-span-5 " + (flip ? "sm:order-1 sm:col-start-1 sm:justify-self-end lg:col-start-2" : "sm:order-2 " + (b.big ? "sm:col-start-7 lg:col-start-7" : "sm:col-start-7 lg:col-start-7"))}>
+                    <div data-magazine-text className={"self-center " + (b.big ? "sm:col-span-5 " : "sm:col-span-6 lg:col-span-5 ") + (flip ? "sm:order-1 sm:col-start-1 sm:justify-self-end " + (b.big ? "" : "lg:col-start-2") : "sm:order-2 " + (b.big ? "sm:col-start-8" : "sm:col-start-7 lg:col-start-8"))}>
                       {b.texts.map((x, k) => (
                         <div key={k} className={k > 0 ? "mt-6" : ""}>
                           {x.title ? <h3 className="title-caps t-sub leading-tight tracking-[0.08em] text-white">{x.title}</h3> : null}

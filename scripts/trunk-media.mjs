@@ -24,12 +24,14 @@
  *   npm run trunks                                   (every box)
  *   npm run trunks -- --only=sirius,the-hand-cube    (some boxes, by their address; the others stay as they are)
  *
- * BERETE_DISK gives another disk.
+ * BERETE_DISK gives another disk. The two glass displays are first set on the staging of the reference by
+ * scripts/trunk-staging.py (python3 with OpenCV; STAGED below).
  */
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -102,12 +104,20 @@ const BASES = {
   "tulips-on-tour": { zone: [0.13, 0.865, 0.735, 0.81], top: 0.45 },
   "dragon-ball-trunk": { zone: [0.195, 0.805, 0.84, 0.9], top: 0.215 },
   "the-hand-cube": { zone: [0.225, 0.775, 0.765, 0.83], top: 0.27 },
-  "dfb-pokal-2025-display": { zone: [0.195, 0.8, 0.81, 0.87], top: 0.32 },
-  "world-cup-display": { zone: [0.165, 0.83, 0.78, 0.85], top: 0.29 },
+  // The two glass displays stand on the staging of the reference (STAGED below): their base is the plinth of the reference.
+  "dfb-pokal-2025-display": { zone: [0.13, 0.855, 0.745, 0.83], top: 0.24 },
+  "world-cup-display": { zone: [0.13, 0.855, 0.745, 0.83], top: 0.24 },
   "brt-coral-case": { zone: [0.095, 0.9, 0.74, 0.86], top: 0.33 },
 };
 /** The reference (the Butterfly Trunk): the share of the square its base takes, the height of its plateau, the centre. */
 const REFERENCE = "butterfly-trunk";
+/*
+ * The two glass displays (Yoni, 27/11/2026): rendered with a camera at eye level, their plinth seen edge on, no crop could
+ * give them the plinth of the others (it stayed wider, flatter and lower). Their four files are first set on the real staging
+ * of the reference (its closed image: its marble plinth, its wall, its golden light; the display moved onto it, its glass and
+ * its films kept: scripts/trunk-staging.py), in a temporary folder of the Mac, then made like every box.
+ */
+const STAGED = new Set(["dfb-pokal-2025-display", "world-cup-display"]);
 /** The least room above a box (a share of the square). */
 const HEADROOM = 0.05;
 
@@ -218,18 +228,29 @@ for (const box of BOXES) {
   const tmp = join(OUT, "." + box.slug + ".tmp");
   await rm(tmp, { recursive: true, force: true });
   await mkdir(tmp, { recursive: true });
-  const src = join(SETS[box.set], box.film);
+  let src = join(SETS[box.set], box.film);
+  // A glass display: its files on the staging of the reference first (a temporary folder, removed below).
+  const staged = STAGED.has(box.slug) ? await mkdtemp(join(tmpdir(), "berete-staging-")) : null;
+  if (staged) {
+    const r = spawnSync("python3", ["-I", join(ROOT, "scripts", "trunk-staging.py"), box.slug, src, join(SETS[refBox.set], refBox.film), staged], { stdio: ["ignore", "inherit", "inherit"] });
+    if (r.status !== 0) throw new Error("scripts/trunk-staging.py failed for " + box.slug);
+    src = staged;
+  }
   // Its frame: its base measured, set against the base of the reference (the v2 boxes keep their whole square).
   let frame = { x: 0, y: 0, size: 1 };
   let marble = null;
   if (BASES[box.slug]) {
     marble = await measureBase(join(src, "closed.jpg"), BASES[box.slug].zone);
+    // A glass display stands on the plinth of the reference, pixel for pixel: it takes its measure, not a new one (the edge of
+    // this plinth is soft enough for the refinement to fall a little elsewhere on a resampled copy).
+    if (staged) marble = reference;
     frame = frameOf(marble, reference, BASES[box.slug].top);
     if (frame.lowered) console.log("  ! " + box.slug + ": zoom lowered so that the whole box stays in the square (its base " + Math.round((marble.width / frame.size) * 100) + " % of the square instead of " + Math.round(reference.width * 100) + " %)");
   }
   for (const state of ["closed", "open"]) await writeSquare(join(src, state + ".jpg"), tmp, state, frame);
   const openingDuration = writeFilm(join(src, "ouverture.mp4"), join(tmp, "opening.mp4"), frame);
   const closingDuration = writeFilm(join(src, "fermeture.mp4"), join(tmp, "closing.mp4"), frame);
+  if (staged) await rm(staged, { recursive: true, force: true });
   // Its professional photos, for its gallery.
   const photos = [];
   for (const file of proPhotos(box.pro)) {
@@ -271,6 +292,8 @@ for (const box of BOXES) {
     // The base measured on its closed image, and the square kept of its images and films (shares of the original square):
     // the places of its light and of its piece (src/data/trunks.ts) follow the same frame.
     ...(marble ? { marble: round(marble), frame: round({ x: frame.x, y: frame.y, size: frame.size }) } : {}),
+    // On the staging of the reference (its images and films are the display set on the plinth of the reference).
+    ...(staged ? { staged: REFERENCE } : {}),
   };
   if (photos.length > 0) entry.photos = photos.map(({ name, zoom: _zoom, ...p }) => ({ src: base + "/" + versioned(name, v), ...p }));
   for (const p of photos) if (p.zoom) loupes.set(base + "/" + versioned(p.name, v), { src: base + "/" + versioned(p.name.replace(/\.webp$/, ".loupe.webp"), v), ...p.zoom });

@@ -1,106 +1,109 @@
 {
  "vfb-stuttgart-dfb-pokal-2025": {
   "kind": "cutout",
-  "src": "/media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-1600.d0629b02a5.webp",
-  "srcSet": "/media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-480.d0629b02a5.webp 480w, /media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-960.d0629b02a5.webp 960w, /media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-1600.d0629b02a5.webp 1600w",
+  "src": "/media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-1600.d279a94160.webp",
+  "srcSet": "/media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-480.d279a94160.webp 480w, /media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-960.d279a94160.webp 960w, /media/cutouts/vfb-stuttgart-dfb-pokal-2025/p13-1600.d279a94160.webp 1600w",
   "width": 1600,
   "height": 1667,
   "box": [
    0.0469,
-   0.045,
+   0.046,
    0.9063,
-   0.909
+   0.908
   ]
  },
  "campione-d-italia-2023-2024": {
   "kind": "cutout",
-  "src": "/media/cutouts/campione-d-italia-2023-2024/p08-1600.832e45bd14.webp",
-  "srcSet": "/media/cutouts/campione-d-italia-2023-2024/p08-480.832e45bd14.webp 480w, /media/cutouts/campione-d-italia-2023-2024/p08-960.832e45bd14.webp 960w, /media/cutouts/campione-d-italia-2023-2024/p08-1600.832e45bd14.webp 1600w",
+  "src": "/media/cutouts/campione-d-italia-2023-2024/p08-1600.d4bbb2b1fc.webp",
+  "srcSet": "/media/cutouts/campione-d-italia-2023-2024/p08-480.d4bbb2b1fc.webp 480w, /media/cutouts/campione-d-italia-2023-2024/p08-960.d4bbb2b1fc.webp 960w, /media/cutouts/campione-d-italia-2023-2024/p08-1600.d4bbb2b1fc.webp 1600w",
   "width": 1600,
-  "height": 1586,
+  "height": 1542,
   "box": [
    0.0469,
-   0.0462,
+   0.0476,
    0.9073,
-   0.9076
+   0.9049
   ]
  },
  "kevin-schade-dragon-ball-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/kevin-schade-dragon-ball-pendant/p19-1600.5bb0eb5ca8.webp",
-  "srcSet": "/media/cutouts/kevin-schade-dragon-ball-pendant/p19-480.5bb0eb5ca8.webp 480w, /media/cutouts/kevin-schade-dragon-ball-pendant/p19-960.5bb0eb5ca8.webp 960w, /media/cutouts/kevin-schade-dragon-ball-pendant/p19-1600.5bb0eb5ca8.webp 1600w",
+  "src": "/media/cutouts/kevin-schade-dragon-ball-pendant/p19-1600.b83dbbe1c5.webp",
+  "srcSet": "/media/cutouts/kevin-schade-dragon-ball-pendant/p19-480.b83dbbe1c5.webp 480w, /media/cutouts/kevin-schade-dragon-ball-pendant/p19-960.b83dbbe1c5.webp 960w, /media/cutouts/kevin-schade-dragon-ball-pendant/p19-1600.b83dbbe1c5.webp 1600w",
   "width": 1600,
   "height": 2498,
   "box": [
-   0.1229,
-   0.0287,
-   0.7646,
-   0.9233
-  ]
+   0.0792,
+   0,
+   0.8427,
+   0.952
+  ],
+  "cut": "top"
  },
  "kenan-yildiz-celebration-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/kenan-yildiz-celebration-pendant/p07-1593.fd2ee6514b.webp",
-  "srcSet": "/media/cutouts/kenan-yildiz-celebration-pendant/p07-480.fd2ee6514b.webp 480w, /media/cutouts/kenan-yildiz-celebration-pendant/p07-960.fd2ee6514b.webp 960w, /media/cutouts/kenan-yildiz-celebration-pendant/p07-1593.fd2ee6514b.webp 1593w",
-  "width": 1593,
+  "src": "/media/cutouts/kenan-yildiz-celebration-pendant/p07-1592.ef7870f278.webp",
+  "srcSet": "/media/cutouts/kenan-yildiz-celebration-pendant/p07-480.ef7870f278.webp 480w, /media/cutouts/kenan-yildiz-celebration-pendant/p07-960.ef7870f278.webp 960w, /media/cutouts/kenan-yildiz-celebration-pendant/p07-1592.ef7870f278.webp 1592w",
+  "width": 1592,
   "height": 2122,
   "box": [
    0.0604,
    0.0453,
    0.8792,
-   0.9085
+   0.9086
   ]
  },
  "noah-okafor-jersey-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/noah-okafor-jersey-pendant/p20-1600.ba4ec53ea1.webp",
-  "srcSet": "/media/cutouts/noah-okafor-jersey-pendant/p20-480.ba4ec53ea1.webp 480w, /media/cutouts/noah-okafor-jersey-pendant/p20-960.ba4ec53ea1.webp 960w, /media/cutouts/noah-okafor-jersey-pendant/p20-1600.ba4ec53ea1.webp 1600w",
+  "src": "/media/cutouts/noah-okafor-jersey-pendant/p20-1600.c18b0f9987.webp",
+  "srcSet": "/media/cutouts/noah-okafor-jersey-pendant/p20-480.c18b0f9987.webp 480w, /media/cutouts/noah-okafor-jersey-pendant/p20-960.c18b0f9987.webp 960w, /media/cutouts/noah-okafor-jersey-pendant/p20-1600.c18b0f9987.webp 1600w",
   "width": 1600,
   "height": 2635,
   "box": [
-   0.0813,
-   0.0291,
-   0.8385,
-   0.9235
-  ]
+   0.0802,
+   0,
+   0.8396,
+   0.9526
+  ],
+  "cut": "top"
  },
  "noah-okafor-oka-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/noah-okafor-oka-pendant/p17-1600.de0118cd02.webp",
-  "srcSet": "/media/cutouts/noah-okafor-oka-pendant/p17-480.de0118cd02.webp 480w, /media/cutouts/noah-okafor-oka-pendant/p17-960.de0118cd02.webp 960w, /media/cutouts/noah-okafor-oka-pendant/p17-1600.de0118cd02.webp 1600w",
+  "src": "/media/cutouts/noah-okafor-oka-pendant/p17-1600.88998ec314.webp",
+  "srcSet": "/media/cutouts/noah-okafor-oka-pendant/p17-480.88998ec314.webp 480w, /media/cutouts/noah-okafor-oka-pendant/p17-960.88998ec314.webp 960w, /media/cutouts/noah-okafor-oka-pendant/p17-1600.88998ec314.webp 1600w",
   "width": 1600,
-  "height": 1459,
+  "height": 1387,
   "box": [
    0.0458,
-   0.0777,
+   0,
    0.9094,
-   0.8731
-  ]
+   0.9483
+  ],
+  "cut": "top"
  },
  "noah-okafor-octagon-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/noah-okafor-octagon-pendant/p09-1600.1e8c1758ba.webp",
-  "srcSet": "/media/cutouts/noah-okafor-octagon-pendant/p09-480.1e8c1758ba.webp 480w, /media/cutouts/noah-okafor-octagon-pendant/p09-960.1e8c1758ba.webp 960w, /media/cutouts/noah-okafor-octagon-pendant/p09-1600.1e8c1758ba.webp 1600w",
+  "src": "/media/cutouts/noah-okafor-octagon-pendant/p09-1600.42ae10d8f7.webp",
+  "srcSet": "/media/cutouts/noah-okafor-octagon-pendant/p09-480.42ae10d8f7.webp 480w, /media/cutouts/noah-okafor-octagon-pendant/p09-960.42ae10d8f7.webp 960w, /media/cutouts/noah-okafor-octagon-pendant/p09-1600.42ae10d8f7.webp 1600w",
   "width": 1600,
-  "height": 2445,
+  "height": 2444,
   "box": [
    0.0708,
    0.0457,
    0.8594,
-   0.9087
+   0.908
   ]
  },
  "marcus-thuram-t-serpent-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/marcus-thuram-t-serpent-pendant/p08-1600.ba79d77e5f.webp",
-  "srcSet": "/media/cutouts/marcus-thuram-t-serpent-pendant/p08-480.ba79d77e5f.webp 480w, /media/cutouts/marcus-thuram-t-serpent-pendant/p08-960.ba79d77e5f.webp 960w, /media/cutouts/marcus-thuram-t-serpent-pendant/p08-1600.ba79d77e5f.webp 1600w",
+  "src": "/media/cutouts/marcus-thuram-t-serpent-pendant/p08-1600.6920677c93.webp",
+  "srcSet": "/media/cutouts/marcus-thuram-t-serpent-pendant/p08-480.6920677c93.webp 480w, /media/cutouts/marcus-thuram-t-serpent-pendant/p08-960.6920677c93.webp 960w, /media/cutouts/marcus-thuram-t-serpent-pendant/p08-1600.6920677c93.webp 1600w",
   "width": 1600,
-  "height": 2609,
+  "height": 2611,
   "box": [
-   0.075,
-   0.046,
-   0.851,
-   0.9086
+   0.074,
+   0.0453,
+   0.8521,
+   0.9094
   ]
  },
  "marcus-thuram-thorned-t-pendant": {
@@ -117,67 +120,69 @@
  },
  "angelo-stiller-as-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/angelo-stiller-as-pendant/p11-1600.d44d6db0ea.webp",
-  "srcSet": "/media/cutouts/angelo-stiller-as-pendant/p11-480.d44d6db0ea.webp 480w, /media/cutouts/angelo-stiller-as-pendant/p11-960.d44d6db0ea.webp 960w, /media/cutouts/angelo-stiller-as-pendant/p11-1600.d44d6db0ea.webp 1600w",
+  "src": "/media/cutouts/angelo-stiller-as-pendant/p11-1600.b6dd8e679f.webp",
+  "srcSet": "/media/cutouts/angelo-stiller-as-pendant/p11-480.b6dd8e679f.webp 480w, /media/cutouts/angelo-stiller-as-pendant/p11-960.b6dd8e679f.webp 960w, /media/cutouts/angelo-stiller-as-pendant/p11-1600.b6dd8e679f.webp 1600w",
   "width": 1600,
-  "height": 2626,
+  "height": 2627,
   "box": [
-   0.076,
-   0.0463,
-   0.8479,
-   0.9079
+   0.075,
+   0.0457,
+   0.85,
+   0.9086
   ]
  },
  "jamie-leweling-jl-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/jamie-leweling-jl-pendant/front-1600.645bf6528c.webp",
-  "srcSet": "/media/cutouts/jamie-leweling-jl-pendant/front-480.645bf6528c.webp 480w, /media/cutouts/jamie-leweling-jl-pendant/front-960.645bf6528c.webp 960w, /media/cutouts/jamie-leweling-jl-pendant/front-1600.645bf6528c.webp 1600w",
+  "src": "/media/cutouts/jamie-leweling-jl-pendant/front-1600.b4add36107.webp",
+  "srcSet": "/media/cutouts/jamie-leweling-jl-pendant/front-480.b4add36107.webp 480w, /media/cutouts/jamie-leweling-jl-pendant/front-960.b4add36107.webp 960w, /media/cutouts/jamie-leweling-jl-pendant/front-1600.b4add36107.webp 1600w",
   "width": 1600,
   "height": 1528,
   "box": [
    0.0448,
-   0.048,
+   0.0491,
    0.9094,
-   0.904
+   0.9029
   ]
  },
  "deniz-undav-l-pendant": {
-  "kind": "photo",
-  "src": "/media/hd/deniz-undav-l-pendant/p10.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/deniz-undav-l-pendant/p10-1600.f4e2679397.webp",
+  "srcSet": "/media/cutouts/deniz-undav-l-pendant/p10-480.f4e2679397.webp 480w, /media/cutouts/deniz-undav-l-pendant/p10-960.f4e2679397.webp 960w, /media/cutouts/deniz-undav-l-pendant/p10-1600.f4e2679397.webp 1600w",
+  "width": 1600,
+  "height": 2782,
   "box": [
-   0.17,
-   0.05,
-   0.6675,
-   0.8383
+   0.0792,
+   0.0455,
+   0.8417,
+   0.9089
   ]
  },
  "samuel-ballet-jesus-piece": {
   "kind": "cutout",
-  "src": "/media/cutouts/samuel-ballet-jesus-piece/s02-1127.08e43c4da8.webp",
-  "srcSet": "/media/cutouts/samuel-ballet-jesus-piece/s02-480.08e43c4da8.webp 480w, /media/cutouts/samuel-ballet-jesus-piece/s02-960.08e43c4da8.webp 960w, /media/cutouts/samuel-ballet-jesus-piece/s02-1127.08e43c4da8.webp 1127w",
-  "width": 1127,
+  "src": "/media/cutouts/samuel-ballet-jesus-piece/s02-1126.172cce9d1e.webp",
+  "srcSet": "/media/cutouts/samuel-ballet-jesus-piece/s02-480.172cce9d1e.webp 480w, /media/cutouts/samuel-ballet-jesus-piece/s02-960.172cce9d1e.webp 960w, /media/cutouts/samuel-ballet-jesus-piece/s02-1126.172cce9d1e.webp 1126w",
+  "width": 1126,
   "height": 2037,
   "box": [
-   0.0844,
-   0.0455,
-   0.8313,
-   0.9089
+   0.0833,
+   0.0489,
+   0.8323,
+   0.905
   ]
  },
  "malik-tillman-cross-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/malik-tillman-cross-pendant/p17-1600.ce622e8d06.webp",
-  "srcSet": "/media/cutouts/malik-tillman-cross-pendant/p17-480.ce622e8d06.webp 480w, /media/cutouts/malik-tillman-cross-pendant/p17-960.ce622e8d06.webp 960w, /media/cutouts/malik-tillman-cross-pendant/p17-1600.ce622e8d06.webp 1600w",
+  "src": "/media/cutouts/malik-tillman-cross-pendant/p17-1600.12da926ff9.webp",
+  "srcSet": "/media/cutouts/malik-tillman-cross-pendant/p17-480.12da926ff9.webp 480w, /media/cutouts/malik-tillman-cross-pendant/p17-960.12da926ff9.webp 960w, /media/cutouts/malik-tillman-cross-pendant/p17-1600.12da926ff9.webp 1600w",
   "width": 1600,
-  "height": 2389,
+  "height": 2174,
   "box": [
-   0.0438,
-   0.0293,
-   0.9167,
-   0.9226
-  ]
+   0.0646,
+   0,
+   0.8677,
+   0.9525
+  ],
+  "cut": "top"
  },
  "malik-tillman-tm-pendant": {
   "kind": "photo",
@@ -192,85 +197,89 @@
   ]
  },
  "tanguy-nianzou-fam-medallion": {
-  "kind": "photo",
-  "src": "/media/pieces/tanguy-nianzou-fam-medallion/cover.webp",
-  "width": 604,
-  "height": 768,
+  "kind": "cutout",
+  "src": "/media/cutouts/tanguy-nianzou-fam-medallion/cover-315.016de1b26b.webp",
+  "srcSet": "/media/cutouts/tanguy-nianzou-fam-medallion/cover-315.016de1b26b.webp 315w",
+  "width": 315,
+  "height": 501,
   "box": [
+   0.0762,
    0,
-   0,
-   1,
-   1
-  ]
+   0.8476,
+   0.9521
+  ],
+  "cut": "top"
  },
  "eljero-elia-clover-medallion": {
-  "kind": "photo",
-  "src": "/media/stories/eljero-elia/04.webp",
-  "width": 1080,
-  "height": 1920,
+  "kind": "cutout",
+  "src": "/media/cutouts/eljero-elia-clover-medallion/s04-791.6111d4bb90.webp",
+  "srcSet": "/media/cutouts/eljero-elia-clover-medallion/s04-480.6111d4bb90.webp 480w, /media/cutouts/eljero-elia-clover-medallion/s04-791.6111d4bb90.webp 791w",
+  "width": 791,
+  "height": 2297,
   "box": [
-   0.2725,
-   0.0408,
-   0.465,
-   0.9437
+   0.1327,
+   0.0453,
+   0.7358,
+   0.909
   ]
  },
  "lois-openda-script-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/lois-openda-script-pendant/p21-1600.ca085f331b.webp",
-  "srcSet": "/media/cutouts/lois-openda-script-pendant/p21-480.ca085f331b.webp 480w, /media/cutouts/lois-openda-script-pendant/p21-960.ca085f331b.webp 960w, /media/cutouts/lois-openda-script-pendant/p21-1600.ca085f331b.webp 1600w",
+  "src": "/media/cutouts/lois-openda-script-pendant/p21-1600.8d4432cb43.webp",
+  "srcSet": "/media/cutouts/lois-openda-script-pendant/p21-480.8d4432cb43.webp 480w, /media/cutouts/lois-openda-script-pendant/p21-960.8d4432cb43.webp 960w, /media/cutouts/lois-openda-script-pendant/p21-1600.8d4432cb43.webp 1600w",
   "width": 1600,
   "height": 1124,
   "box": [
    0.0458,
-   0.0652,
+   0.0653,
    0.9083,
-   0.8696
+   0.8709
   ]
  },
  "the-hand": {
   "kind": "cutout",
-  "src": "/media/cutouts/the-hand/p07-1191.88e05bc50e.webp",
-  "srcSet": "/media/cutouts/the-hand/p07-480.88e05bc50e.webp 480w, /media/cutouts/the-hand/p07-960.88e05bc50e.webp 960w, /media/cutouts/the-hand/p07-1191.88e05bc50e.webp 1191w",
-  "width": 1191,
-  "height": 2869,
+  "src": "/media/cutouts/the-hand/p07-1190.3e3ef0d0cc.webp",
+  "srcSet": "/media/cutouts/the-hand/p07-480.3e3ef0d0cc.webp 480w, /media/cutouts/the-hand/p07-960.3e3ef0d0cc.webp 960w, /media/cutouts/the-hand/p07-1190.3e3ef0d0cc.webp 1190w",
+  "width": 1190,
+  "height": 2868,
   "box": [
-   0.1104,
-   0.0454,
+   0.1094,
+   0.0458,
    0.7792,
-   0.9092
+   0.9088
   ]
  },
  "tulips-on-tour-medallion": {
   "kind": "cutout",
-  "src": "/media/cutouts/tulips-on-tour-medallion/p21-1600.89fe58fa22.webp",
-  "srcSet": "/media/cutouts/tulips-on-tour-medallion/p21-480.89fe58fa22.webp 480w, /media/cutouts/tulips-on-tour-medallion/p21-960.89fe58fa22.webp 960w, /media/cutouts/tulips-on-tour-medallion/p21-1600.89fe58fa22.webp 1600w",
+  "src": "/media/cutouts/tulips-on-tour-medallion/p21-1600.5168a044cb.webp",
+  "srcSet": "/media/cutouts/tulips-on-tour-medallion/p21-480.5168a044cb.webp 480w, /media/cutouts/tulips-on-tour-medallion/p21-960.5168a044cb.webp 960w, /media/cutouts/tulips-on-tour-medallion/p21-1600.5168a044cb.webp 1600w",
   "width": 1600,
-  "height": 2356,
+  "height": 2354,
   "box": [
-   0.0667,
-   0.0453,
-   0.8667,
-   0.9094
+   0.0677,
+   0.046,
+   0.8656,
+   0.9087
   ]
  },
  "michy-batshuayi-butterfly-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/michy-batshuayi-butterfly-pendant/p54-1600.22488c5b79.webp",
-  "srcSet": "/media/cutouts/michy-batshuayi-butterfly-pendant/p54-480.22488c5b79.webp 480w, /media/cutouts/michy-batshuayi-butterfly-pendant/p54-960.22488c5b79.webp 960w, /media/cutouts/michy-batshuayi-butterfly-pendant/p54-1600.22488c5b79.webp 1600w",
+  "src": "/media/cutouts/michy-batshuayi-butterfly-pendant/p54-1600.944d6ca4ce.webp",
+  "srcSet": "/media/cutouts/michy-batshuayi-butterfly-pendant/p54-480.944d6ca4ce.webp 480w, /media/cutouts/michy-batshuayi-butterfly-pendant/p54-960.944d6ca4ce.webp 960w, /media/cutouts/michy-batshuayi-butterfly-pendant/p54-1600.944d6ca4ce.webp 1600w",
   "width": 1600,
-  "height": 2159,
+  "height": 1822,
   "box": [
-   0.0625,
-   0.0664,
-   0.874,
-   0.888
-  ]
+   0.0542,
+   0,
+   0.8906,
+   0.9524
+  ],
+  "cut": "top"
  },
  "butterfly-chain": {
   "kind": "cutout",
-  "src": "/media/cutouts/butterfly-chain/p60-1600.50fcfe318f.webp",
-  "srcSet": "/media/cutouts/butterfly-chain/p60-480.50fcfe318f.webp 480w, /media/cutouts/butterfly-chain/p60-960.50fcfe318f.webp 960w, /media/cutouts/butterfly-chain/p60-1600.50fcfe318f.webp 1600w",
+  "src": "/media/cutouts/butterfly-chain/p60-1600.af1e342b25.webp",
+  "srcSet": "/media/cutouts/butterfly-chain/p60-480.af1e342b25.webp 480w, /media/cutouts/butterfly-chain/p60-960.af1e342b25.webp 960w, /media/cutouts/butterfly-chain/p60-1600.af1e342b25.webp 1600w",
   "width": 1600,
   "height": 1285,
   "box": [
@@ -282,41 +291,42 @@
  },
  "marcus-thuram-ruby-t-necklace": {
   "kind": "cutout",
-  "src": "/media/cutouts/marcus-thuram-ruby-t-necklace/p01-1600.33859f27ab.webp",
-  "srcSet": "/media/cutouts/marcus-thuram-ruby-t-necklace/p01-480.33859f27ab.webp 480w, /media/cutouts/marcus-thuram-ruby-t-necklace/p01-960.33859f27ab.webp 960w, /media/cutouts/marcus-thuram-ruby-t-necklace/p01-1600.33859f27ab.webp 1600w",
+  "src": "/media/cutouts/marcus-thuram-ruby-t-necklace/p01-1600.e9ead45e5a.webp",
+  "srcSet": "/media/cutouts/marcus-thuram-ruby-t-necklace/p01-480.e9ead45e5a.webp 480w, /media/cutouts/marcus-thuram-ruby-t-necklace/p01-960.e9ead45e5a.webp 960w, /media/cutouts/marcus-thuram-ruby-t-necklace/p01-1600.e9ead45e5a.webp 1600w",
   "width": 1600,
-  "height": 2400,
+  "height": 2398,
   "box": [
    0.0688,
-   0.0458,
+   0.0452,
    0.8615,
-   0.9083
+   0.909
   ]
  },
  "the-safi-link": {
   "kind": "cutout",
-  "src": "/media/cutouts/the-safi-link/p07-1600.760361111d.webp",
-  "srcSet": "/media/cutouts/the-safi-link/p07-480.760361111d.webp 480w, /media/cutouts/the-safi-link/p07-960.760361111d.webp 960w, /media/cutouts/the-safi-link/p07-1600.760361111d.webp 1600w",
+  "src": "/media/cutouts/the-safi-link/p07-1600.0a37120428.webp",
+  "srcSet": "/media/cutouts/the-safi-link/p07-480.0a37120428.webp 480w, /media/cutouts/the-safi-link/p07-960.0a37120428.webp 960w, /media/cutouts/the-safi-link/p07-1600.0a37120428.webp 1600w",
   "width": 1600,
-  "height": 1760,
+  "height": 1563,
   "box": [
-   0.051,
-   0.0871,
-   0.8979,
-   0.8674
-  ]
+   0.0479,
+   0,
+   0.9052,
+   0.952
+  ],
+  "cut": "top"
  },
  "sirius": {
   "kind": "cutout",
-  "src": "/media/cutouts/sirius/p28-1600.3f6c97c364.webp",
-  "srcSet": "/media/cutouts/sirius/p28-480.3f6c97c364.webp 480w, /media/cutouts/sirius/p28-960.3f6c97c364.webp 960w, /media/cutouts/sirius/p28-1600.3f6c97c364.webp 1600w",
+  "src": "/media/cutouts/sirius/p28-1600.131bbf7a86.webp",
+  "srcSet": "/media/cutouts/sirius/p28-480.131bbf7a86.webp 480w, /media/cutouts/sirius/p28-960.131bbf7a86.webp 960w, /media/cutouts/sirius/p28-1600.131bbf7a86.webp 1600w",
   "width": 1600,
-  "height": 1199,
+  "height": 1197,
   "box": [
    0.0458,
-   0.0612,
-   0.9094,
-   0.8776
+   0.0613,
+   0.9083,
+   0.8788
   ]
  },
  "marcus-thuram-skeleton-watch": {
@@ -357,185 +367,199 @@
  },
  "ampersand-initials-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/ampersand-initials-pendant/p07-1600.e907016983.webp",
-  "srcSet": "/media/cutouts/ampersand-initials-pendant/p07-480.e907016983.webp 480w, /media/cutouts/ampersand-initials-pendant/p07-960.e907016983.webp 960w, /media/cutouts/ampersand-initials-pendant/p07-1600.e907016983.webp 1600w",
+  "src": "/media/cutouts/ampersand-initials-pendant/p07-1600.25ccdbcb8c.webp",
+  "srcSet": "/media/cutouts/ampersand-initials-pendant/p07-480.25ccdbcb8c.webp 480w, /media/cutouts/ampersand-initials-pendant/p07-960.25ccdbcb8c.webp 960w, /media/cutouts/ampersand-initials-pendant/p07-1600.25ccdbcb8c.webp 1600w",
   "width": 1600,
-  "height": 1892,
+  "height": 1510,
   "box": [
-   0.0313,
-   0.0291,
-   0.9323,
-   0.9233
-  ]
+   0.0458,
+   0,
+   0.9083,
+   0.9514
+  ],
+  "cut": "top"
  },
  "thorns-and-roses-crucifix": {
   "kind": "cutout",
-  "src": "/media/cutouts/thorns-and-roses-crucifix/p05-1600.004002f018.webp",
-  "srcSet": "/media/cutouts/thorns-and-roses-crucifix/p05-480.004002f018.webp 480w, /media/cutouts/thorns-and-roses-crucifix/p05-960.004002f018.webp 960w, /media/cutouts/thorns-and-roses-crucifix/p05-1600.004002f018.webp 1600w",
+  "src": "/media/cutouts/thorns-and-roses-crucifix/p05-1600.7539c07cb7.webp",
+  "srcSet": "/media/cutouts/thorns-and-roses-crucifix/p05-480.7539c07cb7.webp 480w, /media/cutouts/thorns-and-roses-crucifix/p05-960.7539c07cb7.webp 960w, /media/cutouts/thorns-and-roses-crucifix/p05-1600.7539c07cb7.webp 1600w",
   "width": 1600,
-  "height": 2791,
+  "height": 2788,
   "box": [
    0.0802,
-   0.0466,
+   0.0454,
    0.8406,
-   0.9081
+   0.9091
   ]
  },
  "baguette-cross-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/baguette-cross-pendant/p12-1600.185a12a5c9.webp",
-  "srcSet": "/media/cutouts/baguette-cross-pendant/p12-480.185a12a5c9.webp 480w, /media/cutouts/baguette-cross-pendant/p12-960.185a12a5c9.webp 960w, /media/cutouts/baguette-cross-pendant/p12-1600.185a12a5c9.webp 1600w",
+  "src": "/media/cutouts/baguette-cross-pendant/p12-1600.215069efef.webp",
+  "srcSet": "/media/cutouts/baguette-cross-pendant/p12-480.215069efef.webp 480w, /media/cutouts/baguette-cross-pendant/p12-960.215069efef.webp 960w, /media/cutouts/baguette-cross-pendant/p12-1600.215069efef.webp 1600w",
   "width": 1600,
-  "height": 2463,
+  "height": 2468,
   "box": [
-   0.0729,
-   0.046,
-   0.8542,
-   0.9087
+   0.0708,
+   0.0459,
+   0.8563,
+   0.9082
   ]
  },
  "crown-of-thorns-jesus-piece": {
   "kind": "cutout",
-  "src": "/media/cutouts/crown-of-thorns-jesus-piece/p12-1600.8fdd97b242.webp",
-  "srcSet": "/media/cutouts/crown-of-thorns-jesus-piece/p12-480.8fdd97b242.webp 480w, /media/cutouts/crown-of-thorns-jesus-piece/p12-960.8fdd97b242.webp 960w, /media/cutouts/crown-of-thorns-jesus-piece/p12-1600.8fdd97b242.webp 1600w",
+  "src": "/media/cutouts/crown-of-thorns-jesus-piece/p12-1600.02c7166ddf.webp",
+  "srcSet": "/media/cutouts/crown-of-thorns-jesus-piece/p12-480.02c7166ddf.webp 480w, /media/cutouts/crown-of-thorns-jesus-piece/p12-960.02c7166ddf.webp 960w, /media/cutouts/crown-of-thorns-jesus-piece/p12-1600.02c7166ddf.webp 1600w",
   "width": 1600,
-  "height": 2915,
+  "height": 2921,
   "box": [
    0.0844,
-   0.0457,
+   0.0456,
    0.8313,
-   0.9085
+   0.9082
   ]
  },
  "panther-champion-pendant": {
-  "kind": "photo",
-  "src": "/media/hd/panther-champion-pendant/p10.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/panther-champion-pendant/p10-1600.b72e9367af.webp",
+  "srcSet": "/media/cutouts/panther-champion-pendant/p10-480.b72e9367af.webp 480w, /media/cutouts/panther-champion-pendant/p10-960.b72e9367af.webp 960w, /media/cutouts/panther-champion-pendant/p10-1600.b72e9367af.webp 1600w",
+  "width": 1600,
+  "height": 1735,
   "box": [
-   0.06,
-   0.1,
-   0.85,
-   0.63
+   0.05,
+   0.0451,
+   0.9,
+   0.9097
   ]
  },
  "celestial-initial-medallion": {
   "kind": "cutout",
-  "src": "/media/cutouts/celestial-initial-medallion/p07-1600.298488f9e5.webp",
-  "srcSet": "/media/cutouts/celestial-initial-medallion/p07-480.298488f9e5.webp 480w, /media/cutouts/celestial-initial-medallion/p07-960.298488f9e5.webp 960w, /media/cutouts/celestial-initial-medallion/p07-1600.298488f9e5.webp 1600w",
+  "src": "/media/cutouts/celestial-initial-medallion/p07-1600.477c5e03d1.webp",
+  "srcSet": "/media/cutouts/celestial-initial-medallion/p07-480.477c5e03d1.webp 480w, /media/cutouts/celestial-initial-medallion/p07-960.477c5e03d1.webp 960w, /media/cutouts/celestial-initial-medallion/p07-1600.477c5e03d1.webp 1600w",
   "width": 1600,
-  "height": 2162,
+  "height": 2161,
   "box": [
    0.0625,
    0.0463,
    0.876,
-   0.9082
+   0.9075
   ]
  },
  "jesus-piece-red-flowers": {
-  "kind": "photo",
-  "src": "/media/hd/jesus-piece-red-flowers/p06.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/jesus-piece-red-flowers/p06-1600.fcc25d88c7.webp",
+  "srcSet": "/media/cutouts/jesus-piece-red-flowers/p06-480.fcc25d88c7.webp 480w, /media/cutouts/jesus-piece-red-flowers/p06-960.fcc25d88c7.webp 960w, /media/cutouts/jesus-piece-red-flowers/p06-1600.fcc25d88c7.webp 1600w",
+  "width": 1600,
+  "height": 1992,
   "box": [
-   0.1,
-   0.12,
-   0.8,
-   0.64
+   0.0573,
+   0.046,
+   0.8833,
+   0.9063
   ]
  },
  "brt-flower-chain": {
   "kind": "cutout",
-  "src": "/media/cutouts/brt-flower-chain/s29-1600.f93f7cf6ef.webp",
-  "srcSet": "/media/cutouts/brt-flower-chain/s29-480.f93f7cf6ef.webp 480w, /media/cutouts/brt-flower-chain/s29-960.f93f7cf6ef.webp 960w, /media/cutouts/brt-flower-chain/s29-1600.f93f7cf6ef.webp 1600w",
+  "src": "/media/cutouts/brt-flower-chain/s29-1600.4912f445d9.webp",
+  "srcSet": "/media/cutouts/brt-flower-chain/s29-480.4912f445d9.webp 480w, /media/cutouts/brt-flower-chain/s29-960.4912f445d9.webp 960w, /media/cutouts/brt-flower-chain/s29-1600.4912f445d9.webp 1600w",
   "width": 1600,
-  "height": 1172,
+  "height": 1015,
   "box": [
    0.0458,
-   0.0868,
+   0,
    0.9083,
-   0.8506
-  ]
+   0.9278
+  ],
+  "cut": "top"
  },
  "baguette-cuban-chain": {
-  "kind": "photo",
-  "src": "/media/hd/baguette-cuban-chain/p05.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/baguette-cuban-chain/p05-1600.19fd75b1c7.webp",
+  "srcSet": "/media/cutouts/baguette-cuban-chain/p05-480.19fd75b1c7.webp 480w, /media/cutouts/baguette-cuban-chain/p05-960.19fd75b1c7.webp 960w, /media/cutouts/baguette-cuban-chain/p05-1600.19fd75b1c7.webp 1600w",
+  "width": 1600,
+  "height": 902,
   "box": [
+   0.0458,
    0,
-   0.1367,
-   0.9475,
-   0.4833
-  ]
+   0.9083,
+   0.9187
+  ],
+  "cut": "top"
  },
  "rose-iced-cuban-chain": {
-  "kind": "photo",
-  "src": "/media/hd/rose-iced-cuban-chain/p02.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/rose-iced-cuban-chain/p02-1600.0a5b368888.webp",
+  "srcSet": "/media/cutouts/rose-iced-cuban-chain/p02-480.0a5b368888.webp 480w, /media/cutouts/rose-iced-cuban-chain/p02-960.0a5b368888.webp 960w, /media/cutouts/rose-iced-cuban-chain/p02-1600.0a5b368888.webp 1600w",
+  "width": 1600,
+  "height": 868,
   "box": [
-   0.0275,
-   0.26,
-   0.9475,
-   0.3967
-  ]
+   0.0458,
+   0,
+   0.9083,
+   0.9155
+  ],
+  "cut": "top"
  },
  "wide-rose-iced-cuban-chain": {
-  "kind": "photo",
-  "src": "/media/hd/wide-rose-iced-cuban-chain/p01.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/wide-rose-iced-cuban-chain/p01-1600.d38627e63e.webp",
+  "srcSet": "/media/cutouts/wide-rose-iced-cuban-chain/p01-480.d38627e63e.webp 480w, /media/cutouts/wide-rose-iced-cuban-chain/p01-960.d38627e63e.webp 960w, /media/cutouts/wide-rose-iced-cuban-chain/p01-1600.d38627e63e.webp 1600w",
+  "width": 1600,
+  "height": 1249,
   "box": [
+   0.0458,
    0,
-   0.0633,
-   0.865,
-   0.555
-  ]
+   0.9083,
+   0.9399
+  ],
+  "cut": "top"
  },
  "white-iced-cuban-chain": {
   "kind": "cutout",
-  "src": "/media/cutouts/white-iced-cuban-chain/p02-1600.c3aa85e2c0.webp",
-  "srcSet": "/media/cutouts/white-iced-cuban-chain/p02-480.c3aa85e2c0.webp 480w, /media/cutouts/white-iced-cuban-chain/p02-960.c3aa85e2c0.webp 960w, /media/cutouts/white-iced-cuban-chain/p02-1600.c3aa85e2c0.webp 1600w",
+  "src": "/media/cutouts/white-iced-cuban-chain/p02-1600.e48ee6623f.webp",
+  "srcSet": "/media/cutouts/white-iced-cuban-chain/p02-480.e48ee6623f.webp 480w, /media/cutouts/white-iced-cuban-chain/p02-960.e48ee6623f.webp 960w, /media/cutouts/white-iced-cuban-chain/p02-1600.e48ee6623f.webp 1600w",
   "width": 1600,
-  "height": 1205,
+  "height": 1065,
   "box": [
    0.0458,
-   0.0484,
+   0,
    0.9083,
-   0.8921
-  ]
+   0.9327
+  ],
+  "cut": "top"
  },
  "pear-link-chain": {
-  "kind": "photo",
-  "src": "/media/extra/pear-link-chain/front.82dacd43e4.webp",
-  "width": 1351,
-  "height": 1600,
+  "kind": "cutout",
+  "src": "/media/cutouts/pear-link-chain/p01-1600.5a802ca5b8.webp",
+  "srcSet": "/media/cutouts/pear-link-chain/p01-480.5a802ca5b8.webp 480w, /media/cutouts/pear-link-chain/p01-960.5a802ca5b8.webp 960w, /media/cutouts/pear-link-chain/p01-1600.5a802ca5b8.webp 1600w",
+  "width": 1600,
+  "height": 1330,
   "box": [
-   0.08,
-   0.1118,
-   0.845,
-   0.5253
-  ]
+   0.0469,
+   0,
+   0.9083,
+   0.9449
+  ],
+  "cut": "top"
  },
  "oval-eternity-band": {
-  "kind": "photo",
-  "src": "/media/hd/oval-eternity-band/p02.webp",
-  "width": 1440,
-  "height": 2160,
+  "kind": "cutout",
+  "src": "/media/cutouts/oval-eternity-band/p02-1600.dedd324b7f.webp",
+  "srcSet": "/media/cutouts/oval-eternity-band/p02-480.dedd324b7f.webp 480w, /media/cutouts/oval-eternity-band/p02-960.dedd324b7f.webp 960w, /media/cutouts/oval-eternity-band/p02-1600.dedd324b7f.webp 1600w",
+  "width": 1600,
+  "height": 1618,
   "box": [
-   0.13,
-   0.21,
-   0.74,
-   0.52
+   0.0469,
+   0.0463,
+   0.9063,
+   0.9083
   ]
  },
  "bosnia-and-herzegovina-world-cup-2026-ring": {
   "kind": "cutout",
-  "src": "/media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-1600.b9b85c012a.webp",
-  "srcSet": "/media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-480.b9b85c012a.webp 480w, /media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-960.b9b85c012a.webp 960w, /media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-1600.b9b85c012a.webp 1600w",
+  "src": "/media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-1600.efc8eae088.webp",
+  "srcSet": "/media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-480.efc8eae088.webp 480w, /media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-960.efc8eae088.webp 960w, /media/cutouts/bosnia-and-herzegovina-world-cup-2026-ring/b04497-1600.efc8eae088.webp 1600w",
   "width": 1600,
-  "height": 1426,
+  "height": 1427,
   "box": [
    0.0458,
    0.0514,

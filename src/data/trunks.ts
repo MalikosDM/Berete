@@ -30,6 +30,11 @@ export type TrunkOpening = {
    */
   marble?: { left: number; right: number; top: number; width: number; center: number };
   frame?: { x: number; y: number; size: number };
+  /**
+   * The two glass displays (27/11/2026): set on the staging of the reference (its address), scripts/trunk-staging.py; their
+   * images and films are then in the square of the reference (and so are their places below).
+   */
+  staged?: string;
 };
 
 const OPENINGS = generated.trunks as Record<string, TrunkOpening>;
@@ -47,9 +52,11 @@ const PLACES: Record<string, { light: [number, number]; float?: [number, number,
   "the-hand-cube": { light: [0.5, 0.53], float: [0.5, 0.38, 0.34] },
   sirius: { light: [0.49, 0.55], float: [0.5, 0.32, 0.38] },
   "tulips-on-tour": { light: [0.53, 0.55], float: [0.5, 0.32, 0.36] },
-  // The two displays: the ring on its cushion, under the raised glass; it rises a little above it.
-  "dfb-pokal-2025-display": { light: [0.49, 0.42], float: [0.5, 0.28, 0.27] },
-  "world-cup-display": { light: [0.5, 0.36], float: [0.5, 0.27, 0.26] },
+  // The two displays: the ring on its cushion, under the raised glass; it rises a little above it. Since 27/11/2026 they
+  // stand on the staging of the Butterfly Trunk (scripts/trunk-staging.py): their places are in its square (the display
+  // moved and scaled onto its plinth: the same places on the display as before).
+  "dfb-pokal-2025-display": { light: [0.481, 0.384], float: [0.492, 0.226, 0.304] },
+  "world-cup-display": { light: [0.494, 0.41], float: [0.494, 0.318, 0.267] },
   "brt-coral-case": { light: [0.5, 0.57] },
   // Its new images (24/11/2026, the same trunk as the Butterfly, the photo in its lid): the octagon pendant lies in the middle
   // of its compartments, among the tennis chains; it rises from there.

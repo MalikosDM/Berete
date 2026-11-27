@@ -14,6 +14,12 @@ import type { Piece } from "./types.js";
  */
 export type FeatureFilmData = { video: string; mobile?: string; poster: string; width: number; height: number; audio?: boolean; start?: number };
 
+/**
+ * The second a film of the finished piece plays from (and loops back to) on its page, past its opening on black (27/11/2026:
+ * never a dark film beside « The Vision »): the pendant of Kenan Yildiz, the jersey of Noah Okafor.
+ */
+export const PLAY_FROM: Record<string, number> = { "kenan-yildiz-celebration-pendant": 4, "noah-okafor-jersey-pendant": 1.9 };
+
 /** The film of each piece, by its key in mechanisms.generated.json; "film": the finished piece, "mechanism": how it moves. */
 export const FEATURE_FILMS: Record<string, { key: string; kind: "film" | "mechanism" }> = {
   "kevin-schade-dragon-ball-pendant": { key: "dragon-ball-hero", kind: "film" },

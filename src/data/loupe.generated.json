@@ -3594,23 +3594,23 @@
   "width": 3200,
   "height": 2133
  },
- "/media/trunks/dfb-pokal-2025-display/photo-01.30cc46b6f3.webp": {
-  "src": "/media/trunks/dfb-pokal-2025-display/photo-01.30cc46b6f3.loupe.webp",
+ "/media/trunks/dfb-pokal-2025-display/photo-01.1eb2d7a877.webp": {
+  "src": "/media/trunks/dfb-pokal-2025-display/photo-01.1eb2d7a877.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/dfb-pokal-2025-display/photo-02.30cc46b6f3.webp": {
-  "src": "/media/trunks/dfb-pokal-2025-display/photo-02.30cc46b6f3.loupe.webp",
+ "/media/trunks/dfb-pokal-2025-display/photo-02.1eb2d7a877.webp": {
+  "src": "/media/trunks/dfb-pokal-2025-display/photo-02.1eb2d7a877.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/dfb-pokal-2025-display/photo-03.30cc46b6f3.webp": {
-  "src": "/media/trunks/dfb-pokal-2025-display/photo-03.30cc46b6f3.loupe.webp",
+ "/media/trunks/dfb-pokal-2025-display/photo-03.1eb2d7a877.webp": {
+  "src": "/media/trunks/dfb-pokal-2025-display/photo-03.1eb2d7a877.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/dfb-pokal-2025-display/photo-04.30cc46b6f3.webp": {
-  "src": "/media/trunks/dfb-pokal-2025-display/photo-04.30cc46b6f3.loupe.webp",
+ "/media/trunks/dfb-pokal-2025-display/photo-04.1eb2d7a877.webp": {
+  "src": "/media/trunks/dfb-pokal-2025-display/photo-04.1eb2d7a877.loupe.webp",
   "width": 2133,
   "height": 3200
  },
@@ -3749,28 +3749,28 @@
   "width": 3200,
   "height": 2133
  },
- "/media/trunks/world-cup-display/photo-01.8619b105d6.webp": {
-  "src": "/media/trunks/world-cup-display/photo-01.8619b105d6.loupe.webp",
+ "/media/trunks/world-cup-display/photo-01.e0e8b7a7ef.webp": {
+  "src": "/media/trunks/world-cup-display/photo-01.e0e8b7a7ef.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/world-cup-display/photo-02.8619b105d6.webp": {
-  "src": "/media/trunks/world-cup-display/photo-02.8619b105d6.loupe.webp",
+ "/media/trunks/world-cup-display/photo-02.e0e8b7a7ef.webp": {
+  "src": "/media/trunks/world-cup-display/photo-02.e0e8b7a7ef.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/world-cup-display/photo-03.8619b105d6.webp": {
-  "src": "/media/trunks/world-cup-display/photo-03.8619b105d6.loupe.webp",
+ "/media/trunks/world-cup-display/photo-03.e0e8b7a7ef.webp": {
+  "src": "/media/trunks/world-cup-display/photo-03.e0e8b7a7ef.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/world-cup-display/photo-04.8619b105d6.webp": {
-  "src": "/media/trunks/world-cup-display/photo-04.8619b105d6.loupe.webp",
+ "/media/trunks/world-cup-display/photo-04.e0e8b7a7ef.webp": {
+  "src": "/media/trunks/world-cup-display/photo-04.e0e8b7a7ef.loupe.webp",
   "width": 2133,
   "height": 3200
  },
- "/media/trunks/world-cup-display/photo-05.8619b105d6.webp": {
-  "src": "/media/trunks/world-cup-display/photo-05.8619b105d6.loupe.webp",
+ "/media/trunks/world-cup-display/photo-05.e0e8b7a7ef.webp": {
+  "src": "/media/trunks/world-cup-display/photo-05.e0e8b7a7ef.loupe.webp",
   "width": 2133,
   "height": 3200
  },
@@ -3843,5 +3843,30 @@
   "src": "/media/yoni-2711/inter-photos/ring-to-camera.5f77a42897.loupe.webp",
   "width": 1800,
   "height": 3200
+ },
+ "/media/yoni-2711/inter/champion-trophy.4c6fde279e.webp": {
+  "src": "/media/yoni-2711/inter/champion-trophy.4c6fde279e.loupe.webp",
+  "width": 1290,
+  "height": 2796
+ },
+ "/media/yoni-2711/inter/yoni-thuram-arnautovic.4c6fde279e.webp": {
+  "src": "/media/yoni-2711/inter/yoni-thuram-arnautovic.4c6fde279e.loupe.webp",
+  "width": 2017,
+  "height": 3200
+ },
+ "/media/yoni-2711/okafor-dubai/fitting.cdd72514ba.webp": {
+  "src": "/media/yoni-2711/okafor-dubai/fitting.cdd72514ba.loupe.webp",
+  "width": 2134,
+  "height": 3200
+ },
+ "/media/yoni-2711/okafor-dubai/group.cdd72514ba.webp": {
+  "src": "/media/yoni-2711/okafor-dubai/group.cdd72514ba.loupe.webp",
+  "width": 2667,
+  "height": 3200
+ },
+ "/media/yoni-2711/okafor-dubai/portrait.cdd72514ba.webp": {
+  "src": "/media/yoni-2711/okafor-dubai/portrait.cdd72514ba.loupe.webp",
+  "width": 1320,
+  "height": 2868
  }
 }

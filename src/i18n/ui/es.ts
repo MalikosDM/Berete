@@ -244,6 +244,11 @@ export const es: Messages = {
     showView: (view: string) => "Ver la vista " + view,
     viewOf: (n: number, total: number) => "Vista " + n + " de " + total,
     viewsLabel: "Las vistas de la pieza",
+    navLabel: "Otras creaciones",
+    navPrev: "Creación anterior",
+    navNext: "Creación siguiente",
+    prevCreation: (name: string) => "Creación anterior: " + name,
+    nextCreation: (name: string) => "Creación siguiente: " + name,
     viewAlt: (title: string, view: string) => title + ", vista " + view,
     sketchAlt: (title: string) => "La mano de Yoni Berete dibujando el primer boceto de " + title,
     steps: {

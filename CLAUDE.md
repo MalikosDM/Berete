@@ -170,6 +170,44 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « corrections après les contenus de Yoni » (prompt de corrections du 27/11 après-midi) — état au 27/11/2026
+- [x] **Maillot d'Okafor — The Moment of Reveal** : le film de Dubaï entier (48,9 s, vertical, image d'attente tirée du film, bouton
+      lecture, jamais de son seul), dessous le portrait et la photo de groupe (recadrée en haut seulement : les quatre entiers ;
+      côte à côte sur ordinateur, à faire glisser sur iPhone), l'essayage seul dans « See More » ; plus aucune autre photo à leur place.
+      Fichiers : `.local/yoni-2711/okafor-dubai/` (noms clairs), `node scripts/yoni-2711-media.mjs --only=okafor-dubai`.
+- [x] **Images d'attente jamais noires** (`scripts/film-posters.mjs`, `posterAt` de `scripts/film-media.mjs`, lu aussi par
+      `import-media`) : Kenan (13,3 s, les mains croisées de près), maillot (2,4 s, l'écusson suisse), VfB (16,5 s, la bague entière,
+      plus l'écrin), croix de Tillman (10 s). Les films de Kenan et du maillot jouent depuis la fin de leur noir (`PLAY_FROM` de
+      `src/data/featureFilms.ts`). Test : luminance moyenne ≥ 0,15 pour l'image du premier film de chaque page.
+- [x] **Phrases d'accroche, de fin, sous-titres** (`.piece-lead` de `src/index.css` : Cormorant italique 500, 24–28 px, blanc) ; notes
+      du maillot (Motif…) à la taille du texte.
+- [x] **Dragon Ball : The Art of Detail revenu** (après la composition) : les 4 phrases validées du texte du 23/11 (git ec2d9c67), chacune
+      à côté de son gros plan (p09 la sphère, p14 Goku, p16 les sept boules, p11 les tailles tournées), leurs traductions d'alors.
+- [x] **T9 : The Evolution of a Signature** en frise sobre (5 noms sur un filet, le T9 seul illustré). Étapes encore sans photo, à
+      faire confirmer par Yoni : 1 The Original T, 2 The T with a Sculpted Hand, 3 The T with a Rose-Gold Hand, 4 The T with a Rose-Gold
+      Hand and Thorns (le T à épines du site n'a qu'une image IA et une photo sans main visible ; le T-Monster est retiré).
+- [x] **Octogone** : Every Angle p09, p10, p05, p07 (le buste p01 tout noir retiré) ; chaînes : 4 puis See More ; lumière blanche / rose
+      de la galerie renforcée. **VfB** : « DFB-Pokal » jamais coupé dans le titre (mot à trait d'union gardé entier). **The Art of
+      Detail** partout : gros plans plus grands, texte centré sur sa photo, moins d'air entre les blocs. **Inter** : la photo de Yoni
+      avec Thuram et Arnautović à côté de l'histoire (loupe), la « photo 2 » en tête des champions (`--only=inter`, `.local/yoni-2711/inter/`).
+- [x] **Accueil sur iPhone** : l'écrin remplit le haut de l'écran sous l'en-tête, entier ; la section aussi haute que son contenu.
+- [x] **Détourages au niveau studio** (depuis les photos HD du disque ; `scripts/cutouts.py` : bords recalculés sur fond sombre, plus
+      aucun liseré ni halo ; plus aucun fondu : une chaîne est entière ou coupée net en haut, `cut: { top }` remplace `fade`, dessinée
+      depuis le haut de l'ouverture ; options `peel`, `drop`, `harden`, `edge`, `keepEdge`, `--preview`) : 18 pièces détourées pour la
+      première fois (dont le pendentif L, la panthère, la Red Flowers, Oval Eternity, le trèfle, les cubaines, Infinity, FAM sans son image
+      IA), 63 vues refaites, 29 ajoutées ; 38 pièces publiées sur 43 s'ouvrent sur un détourage (les 5 autres n'ont que des images IA ou
+      portées : T à épines, TM, 3 montres). Non détourables sans inventer : bague NZ (gants), chevalière (main), JACK, JC, 999 (photos
+      coupées). `tests/cutouts2711.spec.ts` + `tests/cutout-metrics.ts` (sur gris clair, gris moyen et l'univers : liseré sombre < 8 %
+      du bord, voile < 1,5 %, aucun fondu) ; planches `~/Downloads/_verif-corrections-27-11/detourages/`.
+- [x] **Écrins uniformes** : DFB-Pokal 2025 Display et World Cup Display (caméra à hauteur d'yeux, socle vu de face) posés sur la
+      vraie mise en scène du Butterfly (`scripts/trunk-staging.py` appelé par `scripts/trunk-media.mjs`, `STAGED`, `staged` des données) :
+      même socle, même lumière, au pixel près ; vitrine détourée net ; les films gardent leurs raccords. Dragon Ball et The Hand (caméra
+      basse aussi) : à passer de même si Yoni le souhaite.
+- [x] **D'un univers à l'autre** (`src/components/PieceNav.tsx`) : flèches fines sur les côtés (nom au survol, ← → du clavier quand
+      l'ouverture est à l'écran), sur iPhone deux boutons en bas et le glissement ; l'ordre des Créations, en boucle ; fondu (View
+      Transitions, sinon fondu court ; instantané avec « réduire les animations »), sans recharger. `tests/piecenav2711.spec.ts`.
+- Tests : `tests/corrections2711.spec.ts` (ordinateur, iPhone).
+
 ## Passe « contenus définitifs de Yoni (26-27/11) : 9 pages de pièces, accueil, Atelier, écrins, typographie » — état au 27/11/2026
 - [x] **Textes de Yoni mot pour mot** (`src/data/yoni2711.ts`, recopiés par script depuis le prompt de Malik ; les blocs tels quels dans
       `tests/fixtures/yoni-2711.json`, que `tests/contenus2711.spec.ts` compare à la page, caractère par caractère) : « The Vision

@@ -32,6 +32,7 @@ import { join, resolve } from "node:path";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { SPECIAL_PROJECT } from "../src/data/pieces";
 import { THEME_FONTS } from "../src/data/themes";
+import THUMBS from "../src/data/thumbs.generated.json" with { type: "json" };
 import { PAGE_ORDER } from "../src/data/yoni2711";
 import { publishedPress } from "../src/data/press";
 import { en } from "../src/i18n/ui/en";
@@ -447,9 +448,11 @@ async function thumbnails(page: Page, path: string, size: string) {
     };
     const bg = 10 / 255;
     const band = 6;
+    // A chain cut at the top (27/11/2026: never a fade) starts at the top edge of its card: that edge is its chain, not a frame.
+    const cutTop = (THUMBS as Record<string, { cut?: string } | undefined>)[slug]?.cut === "top";
     let sum = 0;
     let count = 0;
-    for (let y = 0; y < info.height; y++)
+    for (let y = cutTop ? band : 0; y < info.height; y++)
       for (let x = 0; x < info.width; x++) {
         if (x >= band && x < info.width - band && y >= band && y < info.height - band) continue;
         sum += lum(x, y);

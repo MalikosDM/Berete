@@ -61,6 +61,11 @@ const INTER_HANDOVER = join(SRC, "icloud-inter-livraison", "inter-milan-handover
  *   "WhatsApp Image 2026-11-27 at 00.49.17.jpeg"    -> okafor-dubai-group-four.jpeg      (3071 x 4606: the four, arms crossed)
  *   "WhatsApp Image 2026-11-27 at 00.34.33 (1).jpeg" -> okafor-dubai-fitting-chain.jpeg  (3414 x 5120: the chain fastened)
  */
+/** The two photos of Yoni for the Inter page (27/11/2026), with clear names in inter/. */
+const INTER_EXTRA = {
+  yoni: join(SRC, "inter", "yoni-thuram-arnautovic-milan.jpeg"),
+  photo2: join(SRC, "inter", "photo-2-champion-trophee.jpeg"),
+};
 const OKAFOR = {
   film: join(SRC, "okafor-dubai", "okafor-dubai-reveal-film.mp4"),
   portrait: join(SRC, "okafor-dubai", "okafor-dubai-portrait-pendant.jpeg"),
@@ -133,7 +138,8 @@ const POSTERS = {
 };
 
 /** The group photo of Okafor: the part kept, [x, y, w, h] in fractions (the empty top trimmed; the legs touch the sides and the bottom). */
-const GROUP_CROP = [0, 0.15, 1, 0.85];
+// The four men whole (their legs and shoes reach the bottom and the sides of the photo): only the empty wall above them goes.
+const GROUP_CROP = [0, 0.2, 1, 1];
 
 const ALT = {
   interFilm:
@@ -145,6 +151,8 @@ const ALT = {
   okaforPortrait: "Noah Okafor holds the jersey pendant he wears, set with diamonds, on its chain",
   okaforGroup: "Four men in a hotel suite in Dubai, three seated on a sofa with their arms crossed and one standing behind them; the man in the middle wears the jersey pendant",
   okaforFitting: "A man fastens a diamond chain around Noah Okafor's neck in a hotel suite",
+  interYoni: "Yoni Berete with Marko Arnautović and Marcus Thuram in front of the Inter backdrop in Milan, the case of the ring in his hands",
+  interPhoto2: "An Inter player in a black-and-blue jacket and a Campione cap, his hand on his face, the Serie A trophy before him",
 };
 
 function run(cmd, args) {
@@ -343,10 +351,27 @@ const GROUPS = {
         interPhotos: {
           // Not in the two albums (27/11/2026): Yoni with Marcus Thuram and Marko Arnautović in front of the Inter wall, and
           // the player in a black-and-blue Inter jacket with his hand on his face. Asked to Malik.
-          yoniWithPlayers: null,
-          photo2: null,
+          yoniWithPlayers: data.interPhotos?.yoniWithPlayers ?? null,
+          photo2: data.interPhotos?.photo2 ?? null,
           firstFour: made.firstFour.map(([m, alt]) => photoItem(m, alt)),
           rest: made.rest.map(([m, alt]) => photoItem(m, alt)),
+        },
+      });
+    }),
+  // The two photos of Yoni sent on WhatsApp (27/11/2026), copied with clear names into inter/: Yoni Berete with Marcus Thuram and
+  // Marko Arnautović in front of the Inter wall, with the case (beside « The Story Behind the Ring »); « photo 2 », the player in
+  // an Inter jacket and a « Campione » cap, his hand on his face, the trophy before him (among the four photos of the hand-over).
+  inter: async () =>
+    need(INTER_EXTRA.yoni, INTER_EXTRA.photo2) &&
+    group("inter", async (tmp) => {
+      // The three men whole, without the empty wall above them.
+      const yoni = await photo(INTER_EXTRA.yoni, tmp, "yoni-thuram-arnautovic", [0, 0.26, 1, 0.985]);
+      const p2 = await photo(INTER_EXTRA.photo2, tmp, "champion-trophy");
+      return ({ photoItem }) => ({
+        interPhotos: {
+          ...(data.interPhotos ?? {}),
+          yoniWithPlayers: photoItem(yoni, ALT.interYoni),
+          photo2: photoItem(p2, ALT.interPhoto2),
         },
       });
     }),

@@ -31,6 +31,14 @@ export const YONI: Record<string, Texts> = {
       ["", "⸻"],
       ["", "Created Exclusively for Kevin Schade."],
     ],
+    // Its details, the validated sentences of Yoni's text of 23/11/2026 (git ec2d9c67), each beside its close-up (27/11/2026:
+    // « The Art of Detail » back, nothing rewritten): the sphere and its cuts, Goku, the seven Dragon Balls, the cuts turned.
+    details: [
+      ["", "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings."],
+      ["", "Beneath the sphere stands Goku, the conduit rather than the source."],
+      ["", "Surrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope."],
+      ["", "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible."],
+    ],
   },
   "vfb-stuttgart-dfb-pokal-2025": {
     story: [
@@ -269,6 +277,8 @@ export const DEFAULT_ORDER: PageSection[] = ["vision", "angles", "details", "mod
  * Angle, the vision, its composition, its details, the evolution of the T, The Berete Circle, the Atelier.
  */
 export const PAGE_ORDER: Record<string, PageSection[]> = {
+  // Its details back between its composition and the rest (27/11/2026).
+  "kevin-schade-dragon-ball-pendant": ["vision", "angles", "composition", "details", "model3d", "created-for", "trunk", "atelier", "press"],
   "campione-d-italia-2023-2024": ["vision", "angles", "composition", "details", "model3d", "story-ring", "champions", "presentation", "atelier", "press"],
   "noah-okafor-oka-pendant": ["angles", "vision", "composition", "details", "model3d", "worn-with", "created-for", "atelier", "press"],
   "noah-okafor-jersey-pendant": ["vision", "composition", "details", "model3d", "worn-with", "reveal", "created-for", "atelier", "press"],

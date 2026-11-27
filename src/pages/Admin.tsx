@@ -1258,7 +1258,7 @@ function CutoutsTab({ token, onExpired }: { token: string; onExpired: () => void
                       </div>
                       <p className="text-base text-bone">
                         {KIND_NAMES[v.kind]} · {v.id}
-                        {v.fade ? <span className="text-mist"> · fondu {v.fade.map((f) => ({ top: "en haut", bottom: "en bas", left: "à gauche", right: "à droite" })[f] ?? f).join(", ")}</span> : null}
+                        {v.cut ? <span className="text-mist"> · coupé net {v.cut.map((f) => ({ top: "en haut", bottom: "en bas", left: "à gauche", right: "à droite" })[f] ?? f).join(", ")}</span> : null}
                       </p>
                       {v.note ? <p className="text-base text-mist">{v.note}</p> : null}
                       <button type="button" disabled={busy === slug + "/" + v.id} onClick={() => exclude(slug, v.id, !out)} className={(out ? btnMain : btn) + " w-full justify-center"}>

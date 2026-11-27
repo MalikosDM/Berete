@@ -27,7 +27,8 @@
  * folder: the folder of the piece itself (scripts/hd-media.mjs). A piece of the drafts (unpublished) gets the light copy
  * only. start: the second where a film begins, by kind, when its first seconds must not be shown. poster: the frame used
  * as its image by default (1 to 6), when the one found by the numbers (the sharpest well-lit) is not the best one to the
- * eye (all were looked at on 19/11/2026); the admin can choose another.
+ * eye (all were looked at on 19/11/2026); the admin can choose another. posterAt: the second of the source where its image is
+ * taken instead (27/11/2026: a sharp, bright image of the finished piece; scripts/film-posters.mjs, scripts/import-media.mjs).
  */
 export const FILMS = [
   /* ---------- Pieces of the site ---------- */
@@ -44,18 +45,21 @@ export const FILMS = [
   { slug: "campione-d-italia-2023-2024", folder: "25", making: "25/v02", reveal: "25/v01", poster: { making: 6 } },
   { slug: "marcus-thuram-ruby-t-necklace", folder: "26", making: "26/v02", reveal: "26/v01" },
   { slug: "marcus-thuram-t-serpent-pendant", folder: "27", making: "08/v14", reveal: "27/v02" },
-  { slug: "vfb-stuttgart-dfb-pokal-2025", folder: "29", making: "08/v05", reveal: "29/v01" },
+  // Its image: the ring whole with its crest, at 16.5 s (its film opens on its display and a photo of a player).
+  { slug: "vfb-stuttgart-dfb-pokal-2025", folder: "29", making: "08/v05", reveal: "29/v01", posterAt: { reveal: 16.5 } },
   // Its image: the baguettes being set (the sharpest frame by the numbers is a blurred polishing wheel).
   { slug: "noah-okafor-oka-pendant", folder: "34", making: "34/v02", reveal: "34/v03", poster: { making: 4 } },
   { slug: "samuel-ballet-jesus-piece", making: "08/v21" },
   // The finished piece only (no film of their fabrication was sent).
   // Its whole pendant as its image (26/11/2026: an elegant image before it plays).
-  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01", poster: { reveal: 6 } },
+  // Its image: the crossed hands close and lit, at 13.3 s (27/11/2026: never a dark frame; scripts/film-posters.mjs).
+  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01", posterAt: { reveal: 13.3 } },
   { slug: "the-hand", folder: "12", reveal: "12/v01" },
   // The pendant of Michy Batshuayi (its chain is a piece of its own since 22/11/2026).
   { slug: "michy-batshuayi-butterfly-pendant", folder: "23", reveal: "23/v04" },
   // The short edit of the finished pendant (32/v02 is the film of its delivery: the trunk, Noah Okafor and his friends).
-  { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v03" },
+  // Its image: the Swiss emblem lit among the diamonds, at 2.4 s (its film opens on black).
+  { slug: "noah-okafor-jersey-pendant", folder: "32", reveal: "32/v03", posterAt: { reveal: 2.4 } },
 
   /* ---------- The pieces published on 20/11/2026 (the drafts of 19/11) ---------- */
   // The fabrication of the chain (the video of its Fabrication/ folder): no film of the finished chain.

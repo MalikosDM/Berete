@@ -184,6 +184,32 @@ test("the 9 trunks of the v3, frame by frame: no jump inside their films, the cl
   }
 });
 
+// One staging (Yoni, 27/11/2026): the two glass displays, rendered at eye level (their plinth seen edge on), stand on the real
+// staging of the reference (scripts/trunk-staging.py): its frame exactly, and its plinth and wall pixel for pixel around them.
+test("the two glass displays stand on the plinth of the reference: its frame, its marble, its wall", async () => {
+  test.skip(!!process.env.BASE_URL && /vercel\.app/.test(process.env.BASE_URL), "the files of the repository (checked before they go online)");
+  const { default: sharp } = await import("sharp");
+  const reference = trunkOf("butterfly-trunk")!;
+  /** A region of a closed image (shares of the square), in grey, at 720 px. */
+  const region = (trunk: NonNullable<ReturnType<typeof trunkOf>>, [x0, y0, x1, y1]: number[]) =>
+    sharp("public" + trunkImage(trunk, "closed", 720, "webp"))
+      .extract({ left: Math.round(x0! * 720), top: Math.round(y0! * 720), width: Math.round((x1! - x0!) * 720), height: Math.round((y1! - y0!) * 720) })
+      .greyscale()
+      .raw()
+      .toBuffer();
+  for (const slug of ["dfb-pokal-2025-display", "world-cup-display"]) {
+    const trunk = trunkOf(slug)!;
+    expect(trunk.staged, slug).toBe("butterfly-trunk");
+    expect(trunk.frame, slug).toEqual(reference.frame);
+    expect(trunk.marble, slug).toEqual(reference.marble);
+    // The side of the plinth under the display, its two ends, the wall in the two upper corners: those of the reference.
+    for (const zone of [[0.3, 0.835, 0.7, 0.86], [0.14, 0.7, 0.18, 0.76], [0.82, 0.7, 0.86, 0.76], [0.02, 0.05, 0.14, 0.5], [0.86, 0.05, 0.98, 0.5]]) {
+      const [a, b] = await Promise.all([region(trunk, zone), region(reference, zone)]);
+      expect(gap(a, b), slug + " " + zone.join(",")).toBeLessThan(3);
+    }
+  }
+});
+
 test("the page: every box closed, in the same square, aligned (three on a row on a computer, one on a phone)", async ({ page }, info) => {
   const phone = phoneOf(info);
   await skipIntro(page);

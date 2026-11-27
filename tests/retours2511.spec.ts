@@ -144,12 +144,13 @@ test("the L of Deniz Undav: no image made by AI anywhere", async ({ page }, info
   const html = await page.content();
   expect(html).not.toContain("/media/extra/deniz-undav-l-pendant/");
   expect(html).not.toContain("/media/cutouts/deniz-undav-l-pendant/studio");
-  // It opens on its real photo of the whole L, its edges faded into the black.
-  await expect(page.locator("[data-opening-fade] img").first()).toHaveAttribute("src", /\/media\/hd\/deniz-undav-l-pendant\/p10/);
+  // It opens on its real photo of the whole L.
+  // (Since 27/11/2026 cut out of its real photo p10: never a rectangle of photo on its sky.)
+  await expect(page.locator("[data-piece-cover] [data-showcase] img").first()).toHaveAttribute("src", /\/media\/cutouts\/deniz-undav-l-pendant\/p10-/);
   await shot(page, info.project.name + "-retours2511-pendentif-L");
   await page.goto("/creations/pendants", { waitUntil: "load" });
   const card = page.locator("[data-piece-card='deniz-undav-l-pendant'] img").first();
-  await expect(card).toHaveAttribute("src", /\/media\/hd\/deniz-undav-l-pendant\/p10/);
+  await expect(card).toHaveAttribute("src", /\/media\/(cutouts|hd)\/deniz-undav-l-pendant\/p10/);
 });
 
 test("the blue Genkidama (26/11/2026): the sphere right above the piece, at the top of the page", async ({ page }, info) => {

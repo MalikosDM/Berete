@@ -9,7 +9,7 @@ import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
 import { media } from "@/data/catalogue";
 import { HOUSE_PIECE, MECHANISM_PIECE } from "@/data/homeTexts";
 import pages from "@/data/pages.generated.json" with { type: "json" };
-import { cutoutSrc, cutoutSrcSet, resolveShowcase } from "@/data/showcase";
+import { cutoutSrc, cutoutSrcSet, isCutTop, resolveShowcase } from "@/data/showcase";
 import { yoni } from "@/data/sources";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import { publishedPress } from "@/data/press";
@@ -230,9 +230,18 @@ function Mechanism() {
         // The frame of the piece (4:5) at the top; under its corner, the room of the circle: the circle is 36 % of the width
         // and the piece ends at 95 % of its frame (its cut-out keeps a margin), so 25:39 lets it end just above the circle.
         <div data-innovation-visual className="relative mx-auto aspect-[25/39] w-full max-w-[24rem]">
-          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className="absolute inset-x-0 top-0 block aspect-[4/5]">
+          {/* Its chain cut at the top of its photo (27/11/2026: never faded): the frame starts at the top edge of the section (over
+              its padding, py-20 / lg:py-24 of Feature), so that the chain leaves the section there, at its fine line; it still ends
+              where it ended (taller by as much), the piece just above the circle. */}
+          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className={"absolute inset-x-0 block " + (view && isCutTop(view) ? "-top-20 lg:-top-24" : "top-0 aspect-[4/5]")}>
+            {view && isCutTop(view) ? (
+              <>
+                <span aria-hidden="true" className="block aspect-[4/5]" />
+                <span aria-hidden="true" className="block h-20 lg:h-24" />
+              </>
+            ) : null}
             {view ? (
-              <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 1023px) 80vw, 24rem" alt={piece.title} width={view.width} height={view.height} loading="lazy" decoding="async" draggable={false} data-innovation-photo className="h-full w-full object-contain" />
+              <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 1023px) 80vw, 24rem" alt={piece.title} width={view.width} height={view.height} loading="lazy" decoding="async" draggable={false} data-innovation-photo data-cut-top={isCutTop(view) ? "" : undefined} className={"h-full w-full object-contain" + (isCutTop(view) ? " absolute inset-0 object-top" : "")} />
             ) : (
               <MediaView item={piece.cover} alt={piece.title} fit="contain" sizes="(max-width: 1023px) 80vw, 24rem" />
             )}

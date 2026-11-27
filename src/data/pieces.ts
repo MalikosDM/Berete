@@ -464,7 +464,7 @@ const SITE_PIECES: Piece[] = [
     // Yoni's definitive texts (26/11/2026): its vision, its composition in two columns, the weights and carats beneath. Its line:
     // the last words of its vision (said once on its page).
     line: "Every stone, every setting, every movement has a purpose.",
-    ...yoniTexts("kevin-schade-dragon-ball-pendant"),
+    ...yoniTexts("kevin-schade-dragon-ball-pendant", ["p09", "p14", "p16", "p11"].map((f) => yoni("kevin-schade-dragon-ball-pendant", f))),
     people: ["kevin-schade"],
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.

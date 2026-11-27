@@ -226,7 +226,8 @@ test("the studio photos first, the L cut out cleanly; Marcus Thuram with Kanye W
   expect(first("sirius")).toMatch(/\/p27\./);
   // The L on the site: its real photo, in the sky (25/11/2026).
   await open(page, "/pieces/deniz-undav-l-pendant");
-  await expect(page.locator("[data-opening-fade] img").first()).toHaveAttribute("src", /\/media\/hd\/deniz-undav-l-pendant\/p10/);
+  // (Since 27/11/2026 cut out of its real photo p10: never a rectangle of photo on its sky.)
+  await expect(page.locator("[data-piece-cover] [data-showcase] img").first()).toHaveAttribute("src", /\/media\/cutouts\/deniz-undav-l-pendant\/p10-/);
   await page.waitForTimeout(1200);
   await page.screenshot({ path: shotPath(info, "yoni2311d-l-ange-ciel") });
   // Marcus Thuram with Kanye West, on his profile only.

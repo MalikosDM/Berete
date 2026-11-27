@@ -5,8 +5,9 @@
  *   - its cut-out of the opening (transparent, scripts/cutouts.mjs) when it has one: where the jewel is, read on its alpha;
  *   - else its cover photo, whose edges fade into the page: where the jewel is, read against the background of the photo
  *     (its border), or given by hand in BOX when a reflection or a stand would count as the jewel.
- * Written to src/data/thumbs.generated.json ({ slug: { kind, src, srcSet?, width, height, box: [x, y, w, h] } }, the box in
- * shares of the image), read by src/components/PieceThumb.tsx.
+ * Written to src/data/thumbs.generated.json ({ slug: { kind, src, srcSet?, width, height, box: [x, y, w, h], cut? } }, the box in
+ * shares of the image; cut: "top" when the chain of the cut-out is cut at the top of its image), read by
+ * src/components/PieceThumb.tsx.
  *
  *   npx tsx scripts/thumbs.ts
  */
@@ -16,7 +17,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { publicCatalogue } from "../src/data/relations";
-import { cutoutSrc, resolveShowcase } from "../src/data/showcase";
+import { cutoutSrc, isCutTop, resolveShowcase } from "../src/data/showcase";
 
 const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const OUT = join(ROOT, "src", "data", "thumbs.generated.json");
@@ -86,7 +87,10 @@ for (const piece of cat.pieces) {
       srcSet: v.widths.map((x) => cutoutSrc(piece.slug, v, x) + " " + x + "w").join(", "),
       width: v.width,
       height: v.height,
-      box: round(BOX[piece.slug] ?? (await alphaBox(join(ROOT, "public", src)))),
+      // (A cut-out holds its jewel alone: the boxes by hand are for the photos, their reflection and their floor.)
+      box: round(await alphaBox(join(ROOT, "public", src))),
+      // Its chain cut at the top of the image (27/11/2026): the card puts that border at its own top edge.
+      ...(isCutTop(v) ? { cut: "top" } : {}),
     };
   } else {
     const c = piece.cover;

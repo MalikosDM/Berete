@@ -36,7 +36,8 @@ const HD_DIR = join(DISK, "Berete - Dossiers icloud");
 const YONI_DIR = join(HD_DIR, "00 Contexte Yoni");
 const STORIES_DIR = join(DISK, "Berete - Stories");
 const WA_DIR = process.env.BERETE_WA_DIR ?? join(homedir(), "Desktop", "Yoni envoie whatsapp");
-const WORK = join(ROOT, ".local", "cutouts");
+// The working photos and masks (BERETE_CUTOUTS_WORK: another folder, a temporary one when the Mac is short of room).
+const WORK = process.env.BERETE_CUTOUTS_WORK ?? join(ROOT, ".local", "cutouts");
 const TOOL = join(ROOT, ".local", "bin", "cutout-mask");
 const OUT = join(ROOT, "public", "media", "cutouts");
 const DATA = join(ROOT, "src", "data", "cutouts.generated.json");
@@ -46,6 +47,10 @@ const args = process.argv.slice(2);
 const FORCE = args.includes("--force");
 const onlyArg = args.find((a) => a.startsWith("--only="));
 const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
+// --preview=<folder>: the views of --only written there (one 1600 px WebP each, <folder>/<slug>/<id>.webp) to look at them;
+// public/media/cutouts and the list are left as they are.
+const previewArg = args.find((a) => a.startsWith("--preview="));
+const PREVIEW = previewArg ? previewArg.slice(10) : null;
 
 /*
  * The views of each piece, the main one first: "hd:<folder>/<photo>" (an HD photo of Yoni), "yoni:<path>" (a file of
@@ -63,9 +68,19 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
  *   on a side). floor: the line where it stands on a mirror (a fraction of the height, or [x, y] points): below goes.
  * - neutral: a white-metal jewel on skin (a watch on a wrist), kept by its neutral light, the skin left out. seed: [x, y]
  *   (fractions of the photo, after the crop): only the part of the jewel at that point (a watch, not the chain beside it).
- * - keepEdge: a jewel that touches the edge of its photo keeps its sharp cut (no fade). fade: { top: 0.1 }: a fade asked
- *   on that side, over that fraction of the jewel (ends of a chain blurred behind the neck of a bust). fadeAt: [[x, y, r]]
- *   a fade around a point (fractions of the photo): the end of a bracelet that goes into the shadow.
+ * - A jewel that leaves its photo (a chain going up) is cut clean at the border of the image, flush with it (no margin on that
+ *   side; listed in `cut` of the list: the page puts that border at the edge of its frame). Never a fade (27/11/2026: a chain
+ *   that dissolves into transparency looks badly cut on any background). cut: { top: 0.3 }: the line (a fraction of the height
+ *   of the photo) above which everything goes, the image starting exactly there: the ends of a chain behind the neck of a bust,
+ *   or a chain that leaves the photo on its sides, cut below that place so that only the top is cut. keepEdge: true, or the
+ *   sides ["right"]: a jewel that only touches the edge of its photo there keeps its margin (not a cut). fadeAt: [[x, y, r]]
+ *   a tiny fade around a point (fractions of the photo): where a ring touches its mirror.
+ * - The edge on a dark background is redrawn from the jewel next to it (scripts/cutouts.py, defringe; edge: its width in
+ *   pixels of a 3600 px photo, 9 by default; defringe: false to keep the edge as it is): never a dark rim or a halo. peel: a
+ *   light level (or [level, depth]): the flat black regions no lighter than the background by that much that reach the outside
+ *   go (black stains stuck under a jewel). drop: boxes [x0, y0, x1, y1] or polygons [[x, y], ...] (fractions of the photo)
+ *   where nothing is the jewel (a part of the piece seen behind it, joined to it). harden: a soft outline made crisp (a part
+ *   out of focus, a dim link kept by its light half transparent): true, or the half width of the ramp around 0.5.
  * - level (on black): the least light kept, so that a dim surface in the shadow does not stay as a grey smudge. clear: a
  *   light level: the black seen through the gaps of a chain, filled by macOS, cleared (a jewel without black parts).
  *   near (mode "luma"): the colour of a half-transparent edge taken from the jewel next to it, not brightened. holes: a
@@ -76,27 +91,35 @@ const ONLY = onlyArg ? new Set(onlyArg.slice(7).split(",")) : null;
  * background (control sheets in verification/cutouts/) the evening of 23/11/2026.
  */
 const VIEWS = {
+  // Since 27/11/2026 no view fades any more (a chain that dissolves looks badly cut on any background): a chain leaving its photo
+  // is cut clean at the border of the image (cut), the line chosen below the place where its strands leave the photo or go
+  // behind the neck of the bust, so that only the top is cut; the page puts that border at the top of its frame.
   "kevin-schade-dragon-ball-pendant": [
-    { id: "p19", kind: "face", from: "hd:13/p19" },
-    { id: "p18", kind: "detail", from: "hd:13/p18" },
-    { id: "p06", kind: "back", from: "hd:13/p06" },
+    // Its chain leaves the photo at the top (cut there); the black seen through the openings of the coils cleared.
+    { id: "p19", kind: "face", from: "hd:13/p19", clear: 0.05 },
+    // Its bail touches the top of the photo.
+    { id: "p18", kind: "detail", from: "hd:13/p18", clear: 0.05 },
+    // Its chain leaves the photo at the top and on the right: cut under the clasp.
+    { id: "p06", kind: "back", from: "hd:13/p06", clear: 0.05, cut: { top: 0.1 } },
   ],
   // Since 22/11/2026 the pendant (alone, then on its chain) and the chain alone are two pieces.
   // The pendant on its chain, on the black bust, first (asked by Yoni, 23/11/2026: the hero of its page and of the home
   // page); its photo is the largest there is of it (2160 x 3240, p53 is the same shot). The two ends of the chain go behind
-  // the neck of the bust, out of focus: they fade out instead of ending in ragged pieces.
+  // the neck of the bust: cut below that place.
   // p68, the pendant alone: from its photo at full resolution (cropped on the pendant), so that its 1600 px file comes
   // from a cutout twice as large.
   "michy-batshuayi-butterfly-pendant": [
-    { id: "p54", kind: "face", from: "hd:23/p54", mode: "luma", fade: { top: 0.12 } },
+    { id: "p54", kind: "face", from: "hd:23/p54", mode: "luma", cut: { top: 0.26 } },
     { id: "p68", kind: "detail", from: "hd:23/p68", crop: [0, 0.2, 1, 0.88] },
   ],
   "butterfly-chain": [{ id: "p60", kind: "face", from: "hd:23/p60", mode: "luma" }],
   // The rings whole (23/11/2026, the bottom of their band was cut): only photos where the whole ring is inside the frame
   // (p40, p43, p15, p11 left it, or lost their band in the shadow). p54 stands on a mirror (cut where it stands); the ring
-  // open on its trophy (p04) lies beside its pendant: cropped on it.
+  // open on its trophy (p04) lies beside its pendant: cropped on it. The black stones of the bezel (as dark as the background)
+  // kept whole (holes); the face view cut along the bottom of its bezel (floor): below, the shank in the shadow and out of focus
+  // came out in torn black pieces.
   "campione-d-italia-2023-2024": [
-    { id: "p08", kind: "face", from: "hd:25/p8", ring: true, solo: true },
+    { id: "p08", kind: "face", from: "hd:25/p8", ring: true, solo: true, holes: 0.004, floor: [[0, 0.44], [0.16, 0.45], [0.19, 0.49], [0.23, 0.517], [0.28, 0.54], [0.33, 0.555], [0.45, 0.561], [0.55, 0.562], [0.63, 0.557], [0.68, 0.551], [0.73, 0.536], [0.77, 0.514], [0.81, 0.484], [0.85, 0.45], [1, 0.44]] },
     { id: "p13", kind: "profile", from: "hd:25/p13", ring: true, solo: true, fill: true },
     { id: "p54", kind: "profile", from: "hd:25/p54", ring: true, solo: true, fill: true, fadeAt: [[0.186, 0.6, 0.012], [0.197, 0.601, 0.012]], floor: [[0, 0.6], [0.2, 0.607], [0.3, 0.616], [0.45, 0.626], [0.58, 0.63], [0.68, 0.624], [0.78, 0.612], [0.9, 0.6], [1, 0.6]] },
     // Under the end of its band, a white piece of what lies beside it (cut along the rounded end of the band).
@@ -104,16 +127,22 @@ const VIEWS = {
     { id: "p44", kind: "detail", from: "hd:25/p44", level: 0.12 },
   ],
   // The ring with its crest first (macOS lifts the front ring only: whole). Its sides with the names: the inside of the
-  // band, a mirror of the black background, kept (fill). The other photos (p17, p16, p14, p11, p06) leave the ring on the
+  // band, a mirror of the black background, kept (fill), its outline made convex only below its row of stars (from 42 % of
+  // its height: from 33 %, the black of the background under the overhanging stars stayed stuck to its side). The polished
+  // outside of the band mirrors the black studio: that black is metal, kept. The other photos (p17, p16, p14, p11, p06) leave the ring on the
   // right: not used.
   "vfb-stuttgart-dfb-pokal-2025": [
     { id: "p13", kind: "face", from: "hd:29/p13", level: 0.12 },
-    { id: "p12", kind: "profile", from: "hd:29/p12", ring: true, solo: true, fill: 0.33 },
-    { id: "p18", kind: "profile", from: "hd:29/p18", ring: true, solo: true, fill: 0.33 },
+    { id: "p12", kind: "profile", from: "hd:29/p12", ring: true, solo: true, fill: 0.42 },
+    { id: "p18", kind: "profile", from: "hd:29/p18", ring: true, solo: true, fill: 0.42 },
   ],
-  // The oval eternity band (folder 10): not cut out since the evening of 23/11/2026. The back of its band, dark and out of
-  // focus, melts into the black background on its three photos (inside dark and torn standing and from the side, a lumpy
-  // dark outline lying down): it opens on its photo until a studio photo.
+  // The oval eternity band (folder 10), cut out at last (27/11/2026): standing on its mirror, cut where it stands (floor),
+  // the inside of its band kept open, its back in the shadow redrawn by the light of the stones.
+  "oval-eternity-band": [
+    { id: "p02", kind: "face", from: "hd:10/p2", ring: true, solo: true, floor: 0.705 },
+    { id: "p01", kind: "profile", from: "hd:10/p1", ring: true, solo: true, fill: true, floor: 0.505 },
+    { id: "p03", kind: "detail", from: "hd:10/p3", ring: true, solo: true, floor: 0.7 },
+  ],
   // Retouched on black by Yoni (23/11/2026): cropped around the ring (small in its photo) for a larger cutout. The dark
   // inside of the band and its black enamel kept whole (fill).
   "bosnia-and-herzegovina-world-cup-2026-ring": [
@@ -123,27 +152,28 @@ const VIEWS = {
     { id: "b04506", kind: "profile", from: "yoni:Bague Bosnie (retouche fond noir)/bosnie-04506-fond-noir.jpg", ring: true, solo: true, fill: true, crop: [0.15, 0.15, 0.9, 0.85] },
   ],
   "noah-okafor-jersey-pendant": [
+    // Its chain leaves the photo at the top (cut there).
     { id: "p20", kind: "face", from: "hd:32/p20", mode: "luma" },
-    // Its back: the chain fades at the top (not on the right, where the jersey only touches the edge), the dark stones of
-    // its hem kept (holes), the black of the bust under it left out (level).
-    { id: "p06", kind: "back", from: "hd:32/p06", mode: "luma", near: true, keepEdge: true, fade: { top: 0.16 }, holes: 0.01, level: 0.12 },
-    // On the bust: the ends of the chain go behind its neck, blurred: faded instead of torn pieces.
-    { id: "p02", kind: "worn", from: "hd:32/p2", mode: "luma", near: true, fade: { top: 0.14 } },
+    // Its back: the chain leaves the top (cut there; the jersey only touches the right edge: its margin kept), the dark stones
+    // of its hem kept (holes), the black of the bust under it left out (level).
+    { id: "p06", kind: "back", from: "hd:32/p06", mode: "luma", near: true, keepEdge: ["right"], holes: 0.01, level: 0.12 },
+    // On the bust: the ends of the chain go behind its neck: cut below.
+    { id: "p02", kind: "worn", from: "hd:32/p2", mode: "luma", near: true, cut: { top: 0.11 } },
   ],
-  // p17 shows the whole plate (its right side only touches the edge of the photo: kept sharp, the chain faded at the top).
+  // p17 shows the whole plate (its right side only touches the edge of the photo: its margin kept; the chain leaves the top).
   // p05 is not cut out: its "O" and its "A" leave the photo, half of the plate dissolved.
-  "noah-okafor-oka-pendant": [{ id: "p17", kind: "face", from: "hd:34/p17", keepEdge: true, fade: { top: 0.16 } }],
+  "noah-okafor-oka-pendant": [{ id: "p17", kind: "face", from: "hd:34/p17", keepEdge: ["right"] }],
   "noah-okafor-octagon-pendant": [
     { id: "p09", kind: "face", from: "hd:17/p9" },
     { id: "p10", kind: "back", from: "hd:17/p10" },
-    { id: "p02", kind: "detail", from: "hd:17/p2" },
     { id: "p01", kind: "worn", from: "hd:17/p1", mode: "luma", near: true, holes: 0.004 },
+    // p02 no more (27/11/2026): its double tennis chain crosses the whole photo above the bail, it can only be cut on three sides.
   ],
   "kenan-yildiz-celebration-pendant": [
     { id: "p07", kind: "face", from: "hd:11/p7" },
     { id: "p06", kind: "profile", from: "hd:11/p6" },
     { id: "p04", kind: "detail", from: "hd:11/p4", level: 0.1 },
-    { id: "p02", kind: "profile", from: "hd:11/p2" },
+    { id: "p02", kind: "profile", from: "hd:11/p2", harden: true },
   ],
   // Its other whole photo stands on a mirror (the reflection would float under the jewel): one view.
   "marcus-thuram-t-serpent-pendant": [{ id: "p08", kind: "face", from: "hd:27/p8", solo: true }],
@@ -152,13 +182,14 @@ const VIEWS = {
     // in the opening of the R goes (largest).
     { id: "p11", kind: "face", from: "hd:18/p11", clear: 0.12, largest: true },
     { id: "p10", kind: "back", from: "hd:18/p10", clear: 0.12 },
-    { id: "p07", kind: "detail", from: "hd:18/p7" },
-    // p03 (on the bust) is not cut out: the top of the bust stays in grey around the chain.
+    // p03 (on the bust) is not cut out: the top of the bust stays in grey around the chain. p07 no more (27/11/2026): its tennis
+    // chain crosses the whole photo above the bail, it can only be cut on three sides.
   ],
   "malik-tillman-cross-pendant": [
-    // The black between the round stones of its border cleared. Not cut out: p03 (its right arm leaves the photo, blurred,
-    // dissolved in grey) and p06 (on the bust: its chain in scattered pieces, plates of the bust around it).
-    { id: "p17", kind: "face", from: "hd:21/p17", clear: 0.06 },
+    // The black between the round stones of its border cleared; its chain crosses the photo at the top (cut under the place
+    // where it leaves the sides). Not cut out: p03 (its right arm leaves the photo, blurred) and p06 (on the bust: its chain in
+    // scattered pieces, plates of the bust around it).
+    { id: "p17", kind: "face", from: "hd:21/p17", clear: 0.06, cut: { top: 0.09 } },
   ],
   // Its photos lying down stand on a mirror: the hand upright only.
   "the-hand": [
@@ -170,22 +201,25 @@ const VIEWS = {
     { id: "p06", kind: "back", from: "hd:24/p6" },
   ],
   // The whole necklace first (asked by Yoni, 20/11/2026), the T and its drop beside it. Its red pear-shaped stone is as
-  // dark as the velvet: kept (stones).
+  // dark as the velvet: kept (stones). The links of the necklace, dim by their light, made crisp (harden: they stayed half
+  // transparent); the edge of the drop redrawn wider (edge).
   "marcus-thuram-ruby-t-necklace": [
-    { id: "p01", kind: "face", from: "hd:26/p1", mode: "luma", stones: true },
-    { id: "p02", kind: "detail", from: "hd:26/p2", stones: true, clear: 0.06 },
-    { id: "p12", kind: "detail", from: "hd:26/p12", stones: true },
+    { id: "p01", kind: "face", from: "hd:26/p1", mode: "luma", stones: true, harden: true },
+    { id: "p02", kind: "detail", from: "hd:26/p2", stones: true, clear: 0.06, cut: { top: 0.07 } },
+    { id: "p12", kind: "detail", from: "hd:26/p12", stones: true, edge: 14 },
   ],
   "the-safi-link": [
-    // On the bust: the colour of its edges taken from the chain itself (it came out pale, as if half transparent), its ends
-    // behind the neck faded.
-    { id: "p07", kind: "face", from: "hd:16/p7", mode: "luma", near: true, fade: { top: 0.2 } },
-    { id: "p05", kind: "profile", from: "hd:16/p5", mode: "luma", near: true, fade: { top: 0.25 } },
-    { id: "p02", kind: "detail", from: "hd:16/p2" },
+    // On the bust: the colour of its edges taken from the chain itself, its ends behind the neck cut below that place.
+    { id: "p07", kind: "face", from: "hd:16/p7", mode: "luma", near: true, cut: { top: 0.29 } },
+    { id: "p05", kind: "profile", from: "hd:16/p5", mode: "luma", near: true, cut: { top: 0.3 } },
+    // The dark shadow on the velvet under its flower (it stayed stuck under its walls as black stains) cut along the bottom of
+    // the walls of its petals (floor, traced on the photo brightened, 27/11/2026).
+    { id: "p02", kind: "detail", from: "hd:16/p2", floor: [[0, 0.56], [0.12, 0.565], [0.16, 0.58], [0.2, 0.61], [0.24, 0.665], [0.3, 0.685], [0.34, 0.705], [0.36, 0.73], [0.47, 0.738], [0.52, 0.748], [0.57, 0.748], [0.6, 0.735], [0.65, 0.72], [0.69, 0.705], [0.75, 0.7], [0.8, 0.64], [0.85, 0.53], [0.88, 0.46], [1, 0.44]] },
   ],
   // The pieces published on 20/11/2026: their photos of the whole jewel on plain black (the chains are all on a bust).
   // On black glass, the reflection under the jewel goes (solo).
-  "ampersand-initials-pendant": [{ id: "p07", kind: "face", from: "hd:04/p7" }],
+  // Its Cuban chain leaves the photo at the top and on the right: cut at the top of its bail.
+  "ampersand-initials-pendant": [{ id: "p07", kind: "face", from: "hd:04/p7", cut: { top: 0.22 } }],
   "thorns-and-roses-crucifix": [
     // Cut right under its last baguettes (a black strip of the mirror stayed under it).
     { id: "p05", kind: "face", from: "hd:05/p5", solo: true, floor: 0.8945 },
@@ -197,8 +231,6 @@ const VIEWS = {
   "baguette-cross-pendant": [{ id: "p12", kind: "face", from: "hd:06/p12", clear: 0.1, largest: true }],
   // "Bouzou" (folder 14), the pendant of Loïs Openda (21/11/2026).
   "lois-openda-script-pendant": [{ id: "p21", kind: "face", from: "hd:14/p21", solo: true }],
-  // The panther stands on a mirror that the cutout keeps (a reflection stuck to the jewel): it opens on its photo. Here,
-  // the reflection under the front view is cut where it stands (floor).
   "crown-of-thorns-jesus-piece": [
     // Its lowest stones touch their reflection: cut along them, the black between them cleared.
     { id: "p12", kind: "face", from: "hd:15/p12", solo: true, clear: 0.06, floor: [[0, 0.95], [0.55, 0.95], [0.65, 0.941], [0.7, 0.934], [0.72, 0.93], [0.735, 0.93], [0.7475, 0.9365], [0.76, 0.93], [0.78, 0.926], [1, 0.926]] },
@@ -210,59 +242,107 @@ const VIEWS = {
     { id: "p07", kind: "face", from: "hd:22/p7", solo: true },
     { id: "p16", kind: "profile", from: "hd:22/p16" },
   ],
-  // The pieces without a clean photo of the jewel alone: the studio image sent by Yoni (23/11/2026). Their old cutout from
-  // a story (615 and 753 px: the bail of the T washed out, a halo around the TM) is no longer made.
+  // The panther of Lasana Keita (folder 19), cut out at last (27/11/2026): standing on a mirror, cut where it stands (floor).
+  "panther-champion-pendant": [
+    { id: "p10", kind: "face", from: "hd:19/p10", solo: true, floor: 0.7 },
+    { id: "p09", kind: "back", from: "hd:19/p9", solo: true, floor: 0.8 },
+  ],
+  // The L of Deniz Undav (folder 38), cut out at last (27/11/2026): macOS lifts its cherub only, so the whole jewel is kept by
+  // its light (whole, the least light 0.1: a faint thread of the backdrop above it stayed), the dark stones of the underside of
+  // its foot kept whole (holes). Its back: the back of the cherub, dark behind the L, peeking out as a loose crescent, left out
+  // (drop, along the edge of the L).
+  "deniz-undav-l-pendant": [
+    { id: "p10", kind: "face", from: "hd:38/p10", whole: true, solo: true, level: 0.1, holes: 0.003 },
+    { id: "p02", kind: "back", from: "hd:38/p2", whole: true, solo: true, level: 0.1, drop: [[[0.785, 0.66], [0.774, 0.7], [0.748, 0.8], [0.724, 0.89], [0.716, 0.92], [1, 0.92], [1, 0.66]]] },
+  ],
+  // The Jesus piece with its crown of red flowers (folder 20), on a light mirror: by the outline of macOS on the photo; the dark
+  // rail of its stand under it cut along the bottom of its pavé (floor).
+  "jesus-piece-red-flowers": [
+    { id: "p06", kind: "face", from: "hd:20/p6", solo: true, floor: [[0, 0.85], [0.4, 0.842], [0.5, 0.83], [0.6, 0.818], [0.7, 0.806], [0.8, 0.792], [0.88, 0.782], [0.92, 0.776], [1, 0.77]] },
+    { id: "p05", kind: "back", from: "hd:20/p5", solo: true },
+  ],
+  // The same piece, under the name it had before Yoni removed it (19/11/2026, unpublished): the same photos.
+  "marcus-thuram-jesus-piece": [
+    { id: "p06", kind: "face", from: "hd:20/p6", solo: true, floor: [[0, 0.85], [0.4, 0.842], [0.5, 0.83], [0.6, 0.818], [0.7, 0.806], [0.8, 0.792], [0.88, 0.782], [0.92, 0.776], [1, 0.77]] },
+    { id: "p05", kind: "back", from: "hd:20/p5", solo: true },
+  ],
+  // The pieces without a clean photo of the jewel alone: the studio image sent by Yoni (23/11/2026), made by AI: never shown
+  // as the piece (src/data/showcase.ts, isAiView), kept for the admin only.
   "marcus-thuram-thorned-t-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-thorned-t-pendant-studio-ia.jpg" }],
   // Its real studio photos on black (WhatsApp, 23/11/2026; they replace its studio image): the front view first (the left
-  // corner of the J touches the edge of the photo: its cut kept sharp, a fade would dissolve the J), then the pendant
-  // turned to the left (black all around it).
+  // corner of the J touches the edge of the photo: its cut kept sharp, its margin kept), then the pendant turned to the left.
   "jamie-leweling-jl-pendant": [
     { id: "front", kind: "face", from: "wa:WhatsApp Image 2026-11-23 at 09.50.36.jpeg", solo: true, keepEdge: true, note: "le coin gauche du J touche le bord de la photo (coupé net)" },
     { id: "left", kind: "profile", from: "wa:WhatsApp Image 2026-11-23 at 09.50.35.jpeg", solo: true, clear: 0.05 },
   ],
-  // The L of Deniz Undav: its cutout made by hand (transparent PNG, 23/11/2026), kept as it is. Its HD photos (folder 38)
-  // are no longer cut out: the dark underside and sides of the L melt into the black background (a black block under the
-  // front view, pieces of background stuck to p08 and p02).
-  // The L of Deniz Undav: not cut out (25/11/2026). Its image made by AI is gone (Yoni: "ce n'est pas ma pièce"); its real
-  // photo p10 cut out loses either the L (the cherub alone) or the shadows of the cherub (by its light): it opens on its photo,
-  // whole, its edges faded into the black.
   // Its back (story 06) is not cut out: the dark side of the plate along its bottom edge comes out ragged and speckled.
   "samuel-ballet-jesus-piece": [{ id: "s02", kind: "face", from: "/media/stories/samuel-ballet/02.webp" }],
   "malik-tillman-tm-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/malik-tillman-tm-pendant-studio-ia.jpg" }],
-  "tanguy-nianzou-fam-medallion": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/tanguy-nianzou-fam-medallion-studio-ia.jpg" }],
-  // The clover of Eljero Elia: not cut out since the evening of 23/11/2026. Its two stories (689 and 488 px) left a dark
-  // smudge inside the bail and a ragged edge on its side: it opens on its photo until a studio photo.
+  // The FAM medallion: its real photo (the cover of its page: on its Cuban chain against a blue wall), the chain cut above
+  // its bail; its studio image made by AI kept for the admin only.
+  "tanguy-nianzou-fam-medallion": [
+    { id: "cover", kind: "face", from: "/media/pieces/tanguy-nianzou-fam-medallion/cover.webp", solo: true, cut: { top: 0.25 } },
+    { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/tanguy-nianzou-fam-medallion-studio-ia.jpg" },
+  ],
+  // The clover of Eljero Elia (stories 04 and 05, 27/11/2026): the front and the side.
+  "eljero-elia-clover-medallion": [
+    { id: "s04", kind: "face", from: "story:26/4", solo: true },
+    { id: "s05", kind: "profile", from: "story:26/5", solo: true },
+  ],
   // Its HD photos (folder 37, 20/11/2026): the plate alone first (asked by Yoni, 23/11/2026: the piece alone in hero; p28
-  // is its only photo of the whole plate face on), the chain and its plate on the bust (by its light), its back.
+  // is its only photo of the whole plate face on), the chain and its plate on the bust (by its light).
   // 24/11/2026 (Yoni): the plate straightened (it leaned to the left by 1.1°), its back no more (the page stays on Sirius).
   sirius: [
     { id: "p28", kind: "face", from: "hd:37/p28", clear: 0.06, rotate: 1.12 },
-    { id: "p27", kind: "worn", from: "hd:37/p27", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
+    { id: "p27", kind: "worn", from: "hd:37/p27", mode: "luma", solo: true, near: true, cut: { top: 0.22 } },
   ],
   // BRT Flowers, one sheet (24/11/2026): its chain alone, whole, from the front on the bust (folder 37, the chain of Sirius).
-  "brt-flower-chain": [{ id: "s29", kind: "face", from: "hd:37/p29", mode: "luma", solo: true, near: true, fade: { top: 0.15 } }],
-  // The Infinity Link (24/11/2026) is not cut out: its only photo (a phone, 720 px) has a grey wall and marble around the bust,
-  // which stay as a pale wash; it opens on its photo until a studio photo on black.
+  "brt-flower-chain": [{ id: "s29", kind: "face", from: "hd:37/p29", mode: "luma", solo: true, near: true, cut: { top: 0.29 } }],
+  // The chains on a bust (27/11/2026): by their light, their ends behind the neck cut below that place.
+  "baguette-cuban-chain": [
+    { id: "p05", kind: "face", from: "hd:30/p5", mode: "luma", solo: true, near: true, cut: { top: 0.3 } },
+    { id: "p03", kind: "profile", from: "hd:30/p3", mode: "luma", solo: true, near: true, cut: { top: 0.31 } },
+  ],
+  "rose-iced-cuban-chain": [
+    { id: "p02", kind: "face", from: "hd:01/p2", mode: "luma", solo: true, near: true, cut: { top: 0.31 } },
+    { id: "p01", kind: "profile", from: "hd:01/p1", mode: "luma", solo: true, near: true, cut: { top: 0.36 } },
+  ],
+  "wide-rose-iced-cuban-chain": [
+    { id: "p01", kind: "face", from: "hd:02/p1", mode: "luma", solo: true, near: true, cut: { top: 0.22 } },
+    { id: "p06", kind: "back", from: "hd:02/p6", mode: "luma", solo: true, near: true, cut: { top: 0.19 } },
+  ],
+  "two-tone-iced-cuban-chain": [{ id: "p08", kind: "face", from: "hd:31/p8", mode: "luma", solo: true, near: true, cut: { top: 0.26 } }],
+  // The Infinity Link (folder 09): on a dark grey velvet bust, by its light above the velvet (level), the lit edges of the
+  // shoulders of the bust left out (drop), its ends behind the neck cut.
+  "pear-link-chain": [{ id: "p01", kind: "face", from: "hd:09/p1", mode: "luma", solo: true, near: true, level: 0.28, cut: { top: 0.255 }, drop: [[0, 0.2, 0.24, 1], [0.765, 0.2, 1, 1]] }],
+  // The same chain under the address it had for a day (unpublished): the same photo.
+  "infinity-link-chain": [{ id: "p01", kind: "face", from: "hd:09/p1", mode: "luma", solo: true, near: true, level: 0.28, cut: { top: 0.255 }, drop: [[0, 0.2, 0.24, 1], [0.765, 0.2, 1, 1]] }],
+  "cross-infinity-chain": [{ id: "p09", kind: "face", from: "hd:07/p9", mode: "luma", solo: true, near: true, cut: { top: 0.33 } }],
   // The chains published on 24/11/2026, whole from the front on the bust.
   "two-row-tennis-chain": [
-    { id: "p04", kind: "face", from: "hd:03/p4", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
-    { id: "p01", kind: "face", from: "hd:03/p1", mode: "luma", solo: true, near: true, fade: { top: 0.15 } },
+    { id: "p04", kind: "face", from: "hd:03/p4", mode: "luma", solo: true, near: true, cut: { top: 0.24 } },
+    { id: "p01", kind: "face", from: "hd:03/p1", mode: "luma", solo: true, near: true, cut: { top: 0.28 } },
   ],
-  "white-iced-cuban-chain": [{ id: "p02", kind: "face", from: "hd:33/p2", mode: "luma", solo: true, near: true, crop: [0, 0.215, 1, 0.74], fade: { top: 0.12 } }],
+  "white-iced-cuban-chain": [{ id: "p02", kind: "face", from: "hd:33/p2", mode: "luma", solo: true, near: true, crop: [0, 0.215, 1, 0.74], cut: { top: 0.11 } }],
   // The Inter Milan pendant (the top of the Inter ring on a chain, WhatsApp 23/11/2026): on black, by its light; its chain
-  // leaves the photo at the top (faded).
-  "campione-d-italia-pendant": [{ id: "black", kind: "face", from: "wa:WhatsApp Image 2026-11-23 at 09.43.30.jpeg", mode: "luma", near: true, holes: 0.003 }],
-  // The studio images sent by Yoni the evening of 23/11/2026 (00 Contexte Yoni/Pieces sans photo pro (IA)/), on black:
-  // the three watches, the twisted chain of Kevin Schade, the FAM medallion of Tanguy Nianzou. They replace the cutouts
-  // made from stories (the square watch of Tajon Buchanan, 464 px; the skeleton watch of Marcus Thuram, 610 px, its
-  // bracelet ragged where it went behind a cushion).
-  // Tajon Buchanan: its bracelet goes into the shadow at both ends: faded there; its dim reflections on the black kept out
-  // (level).
+  // leaves the photo at the top (cut there).
+  // Its photo sent on WhatsApp can no longer be read on the Mac (27/11/2026): the copy of the site (900 px, the same photo).
+  "campione-d-italia-pendant": [{ id: "black", kind: "face", from: "/media/extra/campione-d-italia-pendant/black.6ee0e75501.webp", mode: "luma", near: true, holes: 0.003 }],
+  // The pieces removed by Yoni (19/11/2026, unpublished), cut out all the same (27/11/2026) from the only photos there are.
+  // Their chains cut at the top (JACK: above the horns of its head, where its chain leaves the photo on the right too; the
+  // Flâneur: at its bail). The JC and the 999 are cut by their photo (the C on the right; the 999 on three sides): kept with
+  // their margin, not clean (never shown). Not cut out: the NZ ring (held between gloved fingers that fill its band) and the
+  // signet ring (on a hand, the skin and the sleeve around it): no clean outline without inventing.
+  "tanguy-nianzou-nz-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/tanguy-nianzou-nz-pendant/cover.webp", solo: true, cut: { top: 0.25 } }],
+  "jeff-chabot-jc-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/jeff-chabot-jc-pendant/cover.webp", solo: true, clean: false, keepEdge: ["right"], note: "le C sort de la photo à droite" }],
+  "sidney-eweka-999-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/sidney-eweka-999-pendant/cover.webp", solo: true, clean: false, keepEdge: ["left", "right", "bottom"], note: "le 999 sort de la photo à gauche, à droite et en bas" }],
+  "jack-nameplate-pendant": [{ id: "cover", kind: "face", from: "/media/pieces/jack-nameplate-pendant/cover.webp", solo: true, cut: { top: 0.43 }, clean: false, note: "photo floue de 634 px (story) : le bord sombre de la banderole reste en liseré, jamais montré" }],
+  "flaneur-medallion": [{ id: "cover", kind: "face", from: "/media/pieces/flaneur-medallion/cover.webp", solo: true, cut: { top: 0.1 } }],
+  // The studio images sent by Yoni the evening of 23/11/2026 (00 Contexte Yoni/Pieces sans photo pro (IA)/), made by AI: never
+  // shown as the piece, kept for the admin only.
   "tajon-buchanan-iced-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/tajon-buchanan-iced-watch-studio-ia.jpg", level: 0.12, fadeAt: [[0.87, 0.31, 0.07], [0.715, 0.775, 0.06]] }],
-  // Marcus Thuram: its bracelet leaves the image at the top and at the bottom (faded).
   "marcus-thuram-skeleton-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-skeleton-watch-studio-ia.jpg" }],
   "radja-nainggolan-iced-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/radja-nainggolan-iced-watch-studio-ia.jpg" }],
-  // The twisted chain: the black seen between its links cleared (macOS fills it); its two ends leave the image (faded).
   "kevin-schade-twisted-chain": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/kevin-schade-twisted-chain-studio-ia.jpg", clear: 0.06 }],
   // BRT Flower (folder 36): its chain leaves the photo on three sides and its ends come out torn: it opens on its photo.
 };
@@ -423,21 +503,46 @@ for (const [slug, views] of Object.entries(VIEWS)) {
   if (ONLY && !ONLY.has(slug)) continue;
   console.log(slug);
   const jobs = [];
+  let unreadable = null;
   for (const view of views) {
-    const job = await prepare(slug, view);
+    let job;
+    try {
+      job = await prepare(slug, view);
+    } catch (e) {
+      unreadable = view.id + ": " + (e instanceof Error ? e.message : String(e));
+      break;
+    }
     if (job) jobs.push({ view, ...job });
     else console.warn("  ! " + view.id + ": no subject found by macOS, view left out");
+  }
+  // A photo that cannot be read (the disk, a file the Mac does not let us open): the piece keeps its cut-outs as they are.
+  if (unreadable) {
+    console.warn("  ! " + unreadable + " (its cut-outs are left as they are)");
+    continue;
   }
   const jobFile = join(WORK, slug, "jobs.json");
   await writeFile(
     jobFile,
     JSON.stringify(
-      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null, neutral: !!view.neutral, seed: view.seed ?? null, keepEdge: !!view.keepEdge, fade: view.fade ?? null, near: !!view.near, fadeAt: view.fadeAt ?? null, clear: view.clear ?? null, holes: view.holes ?? null, largest: !!view.largest })),
+      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null, neutral: !!view.neutral, seed: view.seed ?? null, keepEdge: view.keepEdge ?? false, cut: view.cut ?? null, near: !!view.near, fadeAt: view.fadeAt ?? null, clear: view.clear ?? null, holes: view.holes ?? null, largest: !!view.largest, peel: view.peel ?? null, edge: view.edge ?? null, defringe: view.defringe ?? true, drop: view.drop ?? null, harden: view.harden ?? null })),
     ),
   );
   const py = spawnSync("python3", [join(ROOT, "scripts", "cutouts.py"), jobFile], { encoding: "utf8", maxBuffer: 1 << 24 });
   if (py.status !== 0) throw new Error(py.stderr);
   const reports = py.stdout.trim().split("\n").map((l) => JSON.parse(l));
+  if (PREVIEW) {
+    await mkdir(join(PREVIEW, slug), { recursive: true });
+    for (const [i, job] of jobs.entries()) {
+      const r = reports[i];
+      if (r.error) console.warn("  ! " + job.view.id + ": " + r.error);
+      else {
+        await sharp(job.out).resize({ width: Math.min(1600, r.width), kernel: "lanczos3" }).webp({ quality: 88, alphaQuality: 100, effort: 4 }).toFile(join(PREVIEW, slug, job.view.id + ".webp"));
+        await rm(job.out, { force: true });
+        console.log("  " + job.view.id + " " + r.width + "x" + r.height + (r.cut.length ? " cut " + r.cut.join(",") : "") + (r.onEdge.length ? " ON EDGE " + r.onEdge.join(",") : ""));
+      }
+    }
+    continue;
+  }
   const outDir = join(OUT, slug);
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
@@ -458,13 +563,15 @@ for (const [slug, views] of Object.entries(VIEWS)) {
       files.push(file);
     }
     const version = await versionFiles(files);
+    // The cut-out at full size is only a step (tens of megabytes): gone once its files are written.
+    await rm(job.out, { force: true });
     const top = uniq[uniq.length - 1];
     const notes = [];
     if (r.onEdge.length) notes.push("touche le bord (" + r.onEdge.join(", ") + ")");
     if (r.haze > 0.35) notes.push("contour vaporeux à vérifier");
     // A ring never leaves its photo: cut by its edge, it is not shown.
-    const cutRing = (job.view.ring || job.view.whole) && r.fade.length > 0;
-    if (cutRing) notes.push((job.view.ring ? "la bague" : "le bijou") + " touche le bord de la photo (" + r.fade.join(", ") + ")");
+    const cutRing = (job.view.ring || job.view.whole) && r.cut.length > 0;
+    if (cutRing) notes.push((job.view.ring ? "la bague" : "le bijou") + " touche le bord de la photo (" + r.cut.join(", ") + ")");
     if (job.view.note) notes.push(job.view.note);
     const refused = REFUSED[slug + "/" + job.view.id];
     if (refused) notes.push(refused);
@@ -475,15 +582,18 @@ for (const [slug, views] of Object.entries(VIEWS)) {
       height: Math.round((top * r.height) / r.width),
       widths: uniq,
       version,
-      fade: r.fade.length ? r.fade : null,
+      cut: r.cut.length ? r.cut : null,
       clean: r.onEdge.length === 0 && r.haze <= 0.35 && !refused && !cutRing && job.view.clean !== false,
       source: job.source,
       note: notes.join(" ; "),
     });
-    console.log("  " + job.view.id + " " + r.width + "x" + r.height + (r.fade.length ? " fade " + r.fade.join(",") : "") + (r.onEdge.length ? " ON EDGE " + r.onEdge.join(",") : "") + " haze " + r.haze + (r.dark ? "" : " (light background)"));
+    console.log("  " + job.view.id + " " + r.width + "x" + r.height + (r.cut.length ? " cut " + r.cut.join(",") : "") + (r.onEdge.length ? " ON EDGE " + r.onEdge.join(",") : "") + " haze " + r.haze + (r.dark ? "" : " (light background)"));
   }
   data.views[slug] = list;
+  // Written after each piece: an interrupted run never leaves the list behind the files.
+  if (!ONLY || ONLY.size > 1) await writeFile(DATA, JSON.stringify(data, null, 1) + "\n");
 }
+if (PREVIEW) process.exit(0);
 // Pieces no longer listed lose their cutouts (and their folder).
 for (const slug of Object.keys(data.views)) if (!VIEWS[slug]) delete data.views[slug];
 for (const d of await readdir(OUT)) {

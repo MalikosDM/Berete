@@ -104,7 +104,7 @@ test("Dragon Ball: its main view much larger and whole; its film after the openi
   const vp = page.viewportSize()!;
   // (Since 25/11/2026 under the sphere of the Genkidama v2: large, lower, the sphere above it.)
   expect(box.height / vp.height, "its height on the screen").toBeGreaterThan(phone ? 0.3 : 0.5);
-  expect(box.top).toBeGreaterThanOrEqual(0);
+  expect(box.top).toBeGreaterThanOrEqual(-0.5);
   expect(box.top + box.height).toBeLessThanOrEqual(vp.height + 1);
   expect(box.left).toBeGreaterThanOrEqual(0);
   expect(box.left + box.width).toBeLessThanOrEqual(vp.width + 1);

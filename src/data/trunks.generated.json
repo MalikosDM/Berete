@@ -256,50 +256,51 @@
   "dfb-pokal-2025-display": {
    "base": "/media/trunks/dfb-pokal-2025-display",
    "set": "v3",
-   "version": "30cc46b6f3",
+   "version": "1eb2d7a877",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/dfb-pokal-2025-display/opening.30cc46b6f3.mp4",
-   "closing": "/media/trunks/dfb-pokal-2025-display/closing.30cc46b6f3.mp4",
+   "opening": "/media/trunks/dfb-pokal-2025-display/opening.1eb2d7a877.mp4",
+   "closing": "/media/trunks/dfb-pokal-2025-display/closing.1eb2d7a877.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
    "marble": {
-    "left": 0.195,
-    "right": 0.8,
-    "top": 0.8086,
-    "width": 0.605,
-    "center": 0.4975
+    "left": 0.13,
+    "right": 0.8604,
+    "top": 0.745,
+    "width": 0.7304,
+    "center": 0.4952
    },
    "frame": {
-    "x": 0.0833,
-    "y": 0.1915,
-    "size": 0.8284
+    "x": -0.0048,
+    "y": 0,
+    "size": 1
    },
+   "staged": "butterfly-trunk",
    "photos": [
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-01.30cc46b6f3.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-01.1eb2d7a877.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-face"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-02.30cc46b6f3.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-02.1eb2d7a877.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-3-4"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-03.30cc46b6f3.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-03.1eb2d7a877.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-ouverte-dessus"
     },
     {
-     "src": "/media/trunks/dfb-pokal-2025-display/photo-04.30cc46b6f3.webp",
+     "src": "/media/trunks/dfb-pokal-2025-display/photo-04.1eb2d7a877.webp",
      "width": 1067,
      "height": 1600,
      "file": "04-dos-texte"
@@ -309,56 +310,57 @@
   "world-cup-display": {
    "base": "/media/trunks/world-cup-display",
    "set": "v3",
-   "version": "8619b105d6",
+   "version": "e0e8b7a7ef",
    "widths": [
     720,
     1080,
     1440
    ],
    "size": 1440,
-   "opening": "/media/trunks/world-cup-display/opening.8619b105d6.mp4",
-   "closing": "/media/trunks/world-cup-display/closing.8619b105d6.mp4",
+   "opening": "/media/trunks/world-cup-display/opening.e0e8b7a7ef.mp4",
+   "closing": "/media/trunks/world-cup-display/closing.e0e8b7a7ef.mp4",
    "duration": 6.04,
    "closingDuration": 6.04,
    "marble": {
-    "left": 0.165,
-    "right": 0.83,
-    "top": 0.7832,
-    "width": 0.665,
-    "center": 0.4975
+    "left": 0.13,
+    "right": 0.8604,
+    "top": 0.745,
+    "width": 0.7304,
+    "center": 0.4952
    },
    "frame": {
-    "x": 0.0422,
-    "y": 0.1049,
-    "size": 0.9105
+    "x": -0.0048,
+    "y": 0,
+    "size": 1
    },
+   "staged": "butterfly-trunk",
    "photos": [
     {
-     "src": "/media/trunks/world-cup-display/photo-01.8619b105d6.webp",
+     "src": "/media/trunks/world-cup-display/photo-01.e0e8b7a7ef.webp",
      "width": 1067,
      "height": 1600,
      "file": "01-face-texte"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-02.8619b105d6.webp",
+     "src": "/media/trunks/world-cup-display/photo-02.e0e8b7a7ef.webp",
      "width": 1067,
      "height": 1600,
      "file": "02-3-4"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-03.8619b105d6.webp",
+     "src": "/media/trunks/world-cup-display/photo-03.e0e8b7a7ef.webp",
      "width": 1067,
      "height": 1600,
      "file": "03-cote-drapeau"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-04.8619b105d6.webp",
+     "src": "/media/trunks/world-cup-display/photo-04.e0e8b7a7ef.webp",
      "width": 1067,
      "height": 1600,
      "file": "04-haute"
     },
     {
-     "src": "/media/trunks/world-cup-display/photo-05.8619b105d6.webp",
+     "src": "/media/trunks/world-cup-display/photo-05.e0e8b7a7ef.webp",
      "width": 1067,
      "height": 1600,
      "file": "05-les-quatre"

@@ -255,6 +255,12 @@ export const en = {
     showView: (view: string) => "Show the " + view + " view",
     viewOf: (n: number, total: number) => "View " + n + " of " + total,
     viewsLabel: "The views of the piece",
+    /** From one universe to the next, in the order of The Creations (src/components/PieceNav.tsx, Yoni 27/11/2026). */
+    navLabel: "Other creations",
+    navPrev: "Previous creation",
+    navNext: "Next creation",
+    prevCreation: (name: string) => "Previous creation: " + name,
+    nextCreation: (name: string) => "Next creation: " + name,
     viewAlt: (title: string, view: string) => title + ", " + view + " view",
     /** Text of the first sketch of a piece (step "Sketch"). */
     sketchAlt: (title: string) => "Yoni Berete's hand drawing the first sketch of " + title,

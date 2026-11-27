@@ -851,10 +851,15 @@ html.lenis body {
 }
 
 /* The watermark: a glyph or a number, very large, in the depth. */
-/* A view shown very large (Showcase "xl"): its chain fades out at the top of the box, under the menu (the jewel stays whole). */
-.sv-xl {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
-  mask-image: linear-gradient(to bottom, transparent 8.5%, #000 15%);
+/* A view cut at the top of its image (src/components/Showcase.tsx, 27/11/2026): its chain leaves the photo, cut clean, never
+   faded; the image is drawn from the top of its frame, which reaches the top of the opening, so the chain leaves the screen
+   there. The effect of its universe on the jewel follows it. */
+[data-cut-top] > img {
+  object-position: 50% 0;
+}
+[data-cut-top] > :is(.u-jewel, .u-jewel-halo) {
+  -webkit-mask-position: 50% 0;
+  mask-position: 50% 0;
 }
 .u-mark {
   inset: auto;
@@ -3402,13 +3407,28 @@ html[lang="ar"] [data-piece] [data-u-title] {
   bottom: calc(50cqh - min(100cqh, 100cqw / var(--r)) / 2);
 }
 @media (max-aspect-ratio: 1/1) {
-  /* A screen held upright (25/11/2026): the photo of the two cases is wider than high, its words go under it, on the black,
-     never over the cases. */
+  /* A screen held upright: the photo of the two cases (wider than high) fills the top of the screen right under the header,
+     whole and centred, as on a computer (27/11/2026: no more black void above it); its words under it, on the black, then the
+     page goes on (the section as high as what it holds, never a screen of black). */
+  [data-home-photo] {
+    height: auto;
+    min-height: 0;
+    padding-bottom: 6.5rem;
+  }
+  .home-photo-frame {
+    flex: none;
+    width: 100%;
+    aspect-ratio: var(--rm);
+  }
   .home-photo-box {
-    top: calc(50% - 3rem);
+    top: 0;
+    left: 0;
+    translate: none;
+    width: 100%;
+    height: 100%;
   }
   .home-photo-caption {
-    top: calc(50cqh - 3rem + min(100cqh, 100cqw / var(--rm)) / 2 + 0.75rem);
+    top: calc(100% + 0.75rem);
     bottom: auto;
   }
 }
@@ -3959,4 +3979,17 @@ html[lang="ar"] [data-piece] [data-u-title] {
   .piece-text {
     font-size: 1.125rem;
   }
+}
+
+/* The first and last words of a text of Yoni (« Some victories deserve more than a memory. »), the subtitles of his sections
+   (« A Victory Shared. A Legacy Created. ») (27/11/2026: « des textes plus lisibles »): never smaller than the text beside them —
+   the serif of the house, in italic, larger (24 px on a phone, up to 28 px on a computer), white on the dark. */
+.piece-lead {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 1.9vw, 1.875rem);
+  line-height: 1.28;
+  color: var(--color-white);
+  text-wrap: balance;
 }

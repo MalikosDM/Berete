@@ -1,6 +1,7 @@
 // The audit of the site of 24/11/2026 at 23 h (14 points): nothing that looks unfinished or made in two different places.
 // Computers (Chromium 1440 × 900, Safari 1280 × 800) and the iPhone. Silent (tests/fixtures.ts).
 import sharp from "sharp";
+import THUMBS from "../src/data/thumbs.generated.json" with { type: "json" };
 import { expect, test } from "./fixtures";
 import { skipIntro } from "./helpers";
 
@@ -44,7 +45,9 @@ test("3. every thumbnail on the same black: no edge, the jewel at the same share
     const lum = (x: number, y: number) => (0.2126 * data[(y * im.width + x) * 3]! + 0.7152 * data[(y * im.width + x) * 3 + 1]! + 0.0722 * data[(y * im.width + x) * 3 + 2]!) / 255;
     let sum = 0;
     let count = 0;
-    for (let y = 0; y < im.height; y++)
+    // A chain cut at the top (27/11/2026: never a fade) starts at the top edge of its card: that edge is its chain, not a frame.
+    const cutTop = (THUMBS as Record<string, { cut?: string } | undefined>)[slug ?? ""]?.cut === "top";
+    for (let y = cutTop ? 6 : 0; y < im.height; y++)
       for (let x = 0; x < im.width; x++) {
         if (x >= 6 && y >= 6 && x < im.width - 6 && y < im.height - 6) continue;
         sum += lum(x, y);

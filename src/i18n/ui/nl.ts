@@ -242,6 +242,11 @@ export const nl: Messages = {
     showView: (view: string) => "Toon het aanzicht: " + view,
     viewOf: (n: number, total: number) => "Aanzicht " + n + " van " + total,
     viewsLabel: "De aanzichten van het stuk",
+    navLabel: "Andere creaties",
+    navPrev: "Vorige creatie",
+    navNext: "Volgende creatie",
+    prevCreation: (name: string) => "Vorige creatie: " + name,
+    nextCreation: (name: string) => "Volgende creatie: " + name,
     viewAlt: (title: string, view: string) => title + ", aanzicht: " + view,
     sketchAlt: (title: string) => "De hand van Yoni Berete tekent de eerste schets van " + title,
     steps: {

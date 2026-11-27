@@ -61,7 +61,9 @@ test("home: one photo of the Sirius trunk full screen, its signature in the blac
     await expect.poll(() => photo.evaluate((i) => (i as HTMLImageElement).currentSrc)).toMatch(/\/media\/pages\/hero-(desktop|phone)-\d+\.[0-9a-f]{10}\.(avif|webp)$/);
     const box = (await page.locator("[data-home-photo]").boundingBox())!;
     const view = page.viewportSize()!;
-    expect(box.height).toBeGreaterThanOrEqual(view.height - 1);
+    // Full screen on a computer; on a screen held upright (27/11/2026) the photo fills the top under the header, the page goes on.
+    if (view.width >= view.height) expect(box.height).toBeGreaterThanOrEqual(view.height - 1);
+    else expect((await page.locator("[data-home-photo-box]").boundingBox())!.width).toBeGreaterThan(view.width * 0.95);
     // The signature on one line, small, on the floor of the photo, at its foot (24/11/2026: the photo whole under the header).
     const line = (await page.locator("[data-home-tagline]").boundingBox())!;
     expect(line.height).toBeLessThan(40);
@@ -144,7 +146,8 @@ test("the magnifying glass: none over the page; a photo opened large zooms where
   // The opening: a click (a touch) opens the jewel large too.
   await page.evaluate(() => window.scrollTo(0, 0));
   const opening = desktop(info.project.name) ? page.locator("[data-piece-cover] [data-showcase-view][data-place='0']") : page.locator("[data-piece-cover] [data-showcase-open='0']");
-  await opening.click({ position: desktop(info.project.name) ? undefined : undefined });
+  // (The jewel drifts slowly with its world: never still to the pixel.)
+  await opening.click({ force: true });
   await expect(page.locator("[data-lightbox]")).toBeVisible();
   await page.keyboard.press("Escape");
   // A film opened large has no magnifying glass.

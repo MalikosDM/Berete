@@ -18,7 +18,7 @@ import { filmTime, resolveAtelier, upNextOrder } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
-import { resolveShowcase } from "@/data/showcase";
+import { wholeView } from "@/data/showcase";
 import { trunkOf } from "@/data/trunks";
 import type { Box } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
@@ -285,10 +285,11 @@ export function Boxes() {
   const { t } = useI18n();
   const cat = useCatalogue();
   const all = cat.boxes;
-  /** The piece of a box, cut out of its photo, when it is known and on the site. */
+  /** The piece of a box, cut out of its photo, when it is known and on the site: a whole view of it when it has one (it rises
+   * out of its trunk: a chain cut by its photo would show its cut in mid-air). */
   const pieceOf = (box: Box): TrunkPiece | null => {
     const piece = box.pieceSlug ? cat.pieces.find((p) => p.slug === box.pieceSlug && p.published !== false) : undefined;
-    return piece ? { slug: piece.slug, title: piece.title, view: resolveShowcase(piece.slug, piece.showcase).views[0] ?? null } : null;
+    return piece ? { slug: piece.slug, title: piece.title, view: wholeView(piece.slug, piece.showcase) } : null;
   };
   const { hash } = useLocation();
   // From the page of a piece (/boxes#box-<address>): its box, in view.

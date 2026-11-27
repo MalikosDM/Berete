@@ -834,7 +834,7 @@ async function filmCopy(src, out, info, { short, long, crf, maxrate, audio, star
   return probe(out);
 }
 
-async function film(src, base, { kind, light, label, pick, sharpPhone = false, start = 0 }) {
+async function film(src, base, { kind, light, label, pick, sharpPhone = false, start = 0, posterAt }) {
   const info = await probe(src);
   const shortSide = Math.min(info.width, info.height);
   // The finished piece opens the page of the piece: on a phone it keeps 720p when the film has it.
@@ -856,7 +856,14 @@ async function film(src, base, { kind, light, label, pick, sharpPhone = false, s
     scores.push(stats.sharpness * Math.min(1, Math.max(0.15, (light - 18) / 50)));
     posters.push(webPath(out));
   }
-  const poster = pick >= 1 && pick <= posters.length ? pick - 1 : scores.indexOf(Math.max(...scores));
+  // Its image chosen by eye at a second of the source (`posterAt` of scripts/film-media.mjs): added last and chosen.
+  if (typeof posterAt === "number") {
+    const out = base + "-poster.webp";
+    const vf = "scale=w='trunc(iw*min(1," + FILM.posterLong + "/max(iw,ih))/2)*2':h=-2:flags=lanczos";
+    await produce(out, src, "film-poster:" + posterAt.toFixed(2) + ":" + vf, ["-ss", posterAt.toFixed(2), "-i", src, "-frames:v", "1", "-vf", vf, "-c:v", "libwebp", "-quality", "82"]);
+    posters.push(webPath(out));
+  }
+  const poster = typeof posterAt === "number" ? posters.length - 1 : pick >= 1 && pick <= posters.length ? pick - 1 : scores.indexOf(Math.max(...scores));
   return {
     src: webPath(desktop ? base + ".mp4" : base + ".m.mp4"),
     mobile: webPath(base + ".m.mp4"),
@@ -893,9 +900,10 @@ async function importFilms() {
     for (const [kind, { file, label }] of Object.entries(found)) {
       const light = entry.draft === true;
       const pick = entry.poster?.[kind];
+      const posterAt = entry.posterAt?.[kind];
       const sharpPhone = kind === "reveal" && !light;
       const start = entry.start?.[kind] ?? 0;
-      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { kind, light, label, pick, sharpPhone, start })));
+      jobs.push(async () => ((out[entry.slug] ??= {})[kind] = await film(file, join(MEDIA, "films", entry.slug, kind), { kind, light, label, pick, sharpPhone, start, posterAt })));
     }
   }
   await pool(jobs, Math.max(1, Math.floor(cpus().length / 4)), (go) => go());

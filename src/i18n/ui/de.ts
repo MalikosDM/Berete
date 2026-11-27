@@ -253,6 +253,11 @@ export const de: Messages = {
     showView: (view: string) => "Ansicht anzeigen: " + view,
     viewOf: (n: number, total: number) => "Ansicht " + n + " von " + total,
     viewsLabel: "Die Ansichten des Stücks",
+    navLabel: "Weitere Kreationen",
+    navPrev: "Vorherige Kreation",
+    navNext: "Nächste Kreation",
+    prevCreation: (name: string) => "Vorherige Kreation: " + name,
+    nextCreation: (name: string) => "Nächste Kreation: " + name,
     viewAlt: (title: string, view: string) => title + ", Ansicht: " + view,
     sketchAlt: (title: string) => "Die Hand von Yoni Berete zeichnet die erste Skizze von " + title,
     steps: {

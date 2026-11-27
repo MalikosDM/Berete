@@ -26,7 +26,7 @@ function Decor({ id, frame }: { id: string; frame: number }) {
   return <img src={src} alt="" aria-hidden="true" loading="lazy" decoding="async" data-thumb-decor={id} className="thumb-decor absolute inset-0 h-full w-full object-cover" style={{ objectPosition: x.toFixed(1) + "% 0%" }} />;
 }
 
-type Thumb = { kind: "cutout" | "photo"; src: string; srcSet?: string; width: number; height: number; box: number[] };
+type Thumb = { kind: "cutout" | "photo"; src: string; srcSet?: string; width: number; height: number; box: number[]; cut?: "top" };
 const THUMBS = thumbs as Record<string, Thumb>;
 
 /**
@@ -35,6 +35,11 @@ const THUMBS = thumbs as Record<string, Thumb>;
  */
 const HEIGHT = 0.65;
 const WIDTH = 0.94;
+/**
+ * A cut-out whose chain is cut at the top of its image (27/11/2026: a chain never fades): that border on the top edge of the
+ * frame, so that the chain leaves the card there; the jewel down to this share of its height.
+ */
+const HEIGHT_CUT = 0.72;
 
 /**
  * The jewel of a card, on the same black as every other (25/11/2026): its cut-out (transparent, a soft shadow) or its photo
@@ -55,10 +60,12 @@ export default function PieceThumb({ piece, sizes, frame = 4 / 5, eager = false,
   const [bx = 0, by = 0, bw = 1, bh = 1] = th.box;
   const ratio = th.width / th.height;
   const H = 1 / frame;
+  const cutTop = th.kind === "cutout" && th.cut === "top";
   // The width of the image, in widths of the frame, so that the jewel takes HEIGHT of its height (WIDTH of its width at most).
-  const iw = Math.min((HEIGHT * H * ratio) / bh, WIDTH / bw);
+  const iw = Math.min(((cutTop ? HEIGHT_CUT : HEIGHT) * H * ratio) / bh, WIDTH / bw);
   const left = 0.5 - (bx + bw / 2) * iw;
-  const top = H / 2 - ((by + bh / 2) * iw) / ratio;
+  // Cut at the top: the top of the image (the cut) on the top edge of the frame.
+  const top = cutTop ? -(by * iw) / ratio : H / 2 - ((by + bh / 2) * iw) / ratio;
   const img = (style: CSSProperties) => (
     <Img
       src={th.src}
@@ -78,7 +85,7 @@ export default function PieceThumb({ piece, sizes, frame = 4 / 5, eager = false,
   const decor = THUMB_DECOR[piece.slug];
   if (th.kind === "cutout") {
     return (
-      <span data-thumb="cutout" className="absolute inset-0">
+      <span data-thumb="cutout" data-thumb-cut={cutTop ? "top" : undefined} className="absolute inset-0 overflow-hidden">
         {decor ? <Decor id={decor} frame={frame} /> : null}
         {img({ width: iw * 100 + "%", left: left * 100 + "%", top: (top / H) * 100 + "%" })}
       </span>

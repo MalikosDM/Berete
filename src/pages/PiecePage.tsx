@@ -12,8 +12,9 @@ import PieceCard from "@/components/PieceCard";
 import Piece3D from "@/components/Piece3D";
 import Reveal from "@/components/Reveal";
 import Showcase from "@/components/Showcase";
+import PieceNav from "@/components/PieceNav";
 import { FilmFrame } from "@/components/FeatureFilm";
-import { featureFilmOf, type FeatureFilmData } from "@/data/featureFilms";
+import { featureFilmOf, PLAY_FROM, type FeatureFilmData } from "@/data/featureFilms";
 import { CIRCLE_PHOTO, DEFAULT_ORDER, INTER_BEHIND, INTER_STORY, JERSEY_REVEAL, PAGE_ORDER, PRESENTATION_FIRST, T_EVOLUTION, WORN_ON_NAME, YONI, type PageSection } from "@/data/yoni2711";
 import { filmData, YONI_MEDIA } from "@/data/yoniMedia";
 import { EXPLAIN } from "@/data/magazine";
@@ -44,6 +45,12 @@ import NotFound from "@/pages/NotFound";
 import { pressDate } from "@/pages/Press";
 
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
+
+/** A title whose names never break at their hyphen (« DFB-Pokal », 27/11/2026): each hyphenated word held together. */
+function unbroken(title: string): ReactNode {
+  const parts = title.split(/(\S+-\S+)/);
+  return parts.length === 1 ? title : parts.map((p, i) => (/\S+-\S+/.test(p) ? <span key={i} className="whitespace-nowrap">{p}</span> : p));
+}
 
 /** The soft outline of a photo as its mask, placed as the photo is (whole, centred in its box). */
 function outlineMask(src: string): CSSProperties {
@@ -112,7 +119,7 @@ export default function PiecePage() {
       : { data: feature.film, title: t.feature.mechanism, label: t.feature.crossLabel, text: t.feature.crossText }
     : reveal
       ? {
-          data: { video: reveal.film.src, mobile: reveal.film.mobile, poster: reveal.poster, width: reveal.film.width, height: reveal.film.height, audio: reveal.film.audio },
+          data: { video: reveal.film.src, mobile: reveal.film.mobile, poster: reveal.poster, width: reveal.film.width, height: reveal.film.height, audio: reveal.film.audio, start: PLAY_FROM[piece.slug] },
           title: t.films.pieceSection,
           label: t.films.intro(piece.title),
         }
@@ -178,9 +185,8 @@ export default function PiecePage() {
   const shownFilm = yoniFilm ? { data: yoniFilm, title: t.films.pieceSection, label: t.films.intro(piece.title) } : film;
   // Its composition: the rows by their English label too (a label in capitals: Yoni's composition, src/data/yoni2711.ts).
   const compositionRows = specs.map((s) => ({ ...s, en: s.row ?? s.label }));
-  // « Created Exclusively for Kevin Schade. » closes its composition and opens the section right after it: said once.
-  const next = order[order.indexOf("composition") + 1];
-  const hideClosing = next === "created-for" && showsPerson;
+  // « Created Exclusively for Kevin Schade. » closes its composition and titles the section of the one it was made for: said once.
+  const hideClosing = order.includes("created-for") && showsPerson;
   const people3 = named && people.length > 0 ? people : [];
 
   const sections: Partial<Record<PageSection, ReactNode>> = {
@@ -281,7 +287,7 @@ export default function PiecePage() {
     "story-ring": <StoryRing />,
     champions: <Champions people={people3} worn={worn} title={piece.title} />,
     // The jersey of Noah Okafor: its reveal in Dubai (Yoni, 27/11/2026).
-    reveal: <MomentOfReveal worn={worn} title={piece.title} />,
+    reveal: <MomentOfReveal title={piece.title} />,
     // Marcus Thuram's T, from the first to the T9 (Yoni, 27/11/2026).
     evolution: <Evolution piece={piece} />,
     // 7. The Trunk: all its photos, whole; the way to it on the page of the trunks when it opens there.
@@ -382,6 +388,8 @@ export default function PiecePage() {
             <Showcase slug={piece.slug} title={piece.title} views={opening.views} jewel={jewel} large={opening.large} xl={opening.xl} />
           )}
         </div>
+        {/* The piece before and the piece after, straight from one universe to the next (src/components/PieceNav.tsx). */}
+        <PieceNav slug={piece.slug} />
         {/* Its words, discreet (Yoni, 20/11/2026), so that the jewel shines: one small label (its collection), its name, its
             sentence, then the two buttons of the house. */}
         <div data-piece-intro className="w-full px-5 pt-5 pb-8 sm:px-8 lg:order-1 lg:col-span-5 lg:pt-0 lg:pr-0 lg:pb-12 lg:pl-12 xl:col-span-4">
@@ -391,7 +399,7 @@ export default function PiecePage() {
                 {collectionName}
               </Link>
               <h1 id="piece-title" data-u-title className="title-caps mt-2 leading-[1.15] tracking-[0.08em] break-words text-white [text-wrap:balance]">
-                {piece.title}
+                {unbroken(piece.title)}
               </h1>
               {/* For whom, when no one can be shown below (a private collector): a fine line under its name, never a section. */}
               {!showsPerson && !signature ? <p data-made-for-line className="mt-2 text-base text-mist">{t.common.madeFor(who, piece.type)}</p> : null}
@@ -459,6 +467,7 @@ export default function PiecePage() {
 function WornAs({ piece, photos, anchor, title, words: withWords = true }: { piece: Piece; photos: MediaItem[]; anchor: string; title: string; words?: boolean }) {
   const { t } = useI18n();
   const [open, setOpen] = useState<number | null>(null);
+  const [expanded, setExpanded] = useState(false);
   // On Yoni's pages its words are already told in the details (the tennis chains of the octagon): its photos only.
   const words = withWords ? storyBlocks(piece.story).filter((b) => b.kind === "paragraph") : [];
   return (
@@ -467,8 +476,9 @@ function WornAs({ piece, photos, anchor, title, words: withWords = true }: { pie
       {words.map((w, i) => (
         <p key={i} className="mt-4 max-w-2xl text-base leading-relaxed text-bone">{w.text}</p>
       ))}
-      <ul className={"mt-8 grid grid-cols-2 gap-3 sm:gap-5 " + (photos.length > 2 ? "lg:grid-cols-4" : "max-w-2xl")}>
-        {photos.map((m, i) => (
+      {/* Four first, the others behind See More (27/11/2026: never one photo alone on a second row). */}
+      <ul data-worn-as-photos className={"mt-8 grid grid-cols-2 gap-3 sm:gap-5 " + (photos.length > 2 ? "lg:grid-cols-4" : "max-w-2xl")}>
+        {(expanded ? photos : photos.slice(0, 4)).map((m, i) => (
           <li key={m.src}>
             <button type="button" onClick={() => setOpen(i)} className="block w-full cursor-zoom-in" aria-label={t.gallery.open(m.alt ?? piece.title)}>
               <span className="block aspect-[4/5] overflow-hidden bg-ink">
@@ -478,6 +488,13 @@ function WornAs({ piece, photos, anchor, title, words: withWords = true }: { pie
           </li>
         ))}
       </ul>
+      {!expanded && photos.length > 4 ? (
+        <div className="mt-8 flex justify-center">
+          <button type="button" onClick={() => setExpanded(true)} data-worn-as-more data-cta className="btn-primary">
+            {t.gallery.more(photos.length - 4)}
+          </button>
+        </div>
+      ) : null}
       {open !== null ? createPortal(<Lightbox items={photos} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}
     </section>
   );
@@ -516,13 +533,13 @@ function StoryText({ blocks, lead = "", closing = false }: { blocks: StoryBlock[
         // closing; the paragraphs between in the reading type of the pages of the pieces (larger, a little bolder).
         if (i === first && lead && b.text.trim() === lead.trim())
           return (
-            <p key={i} data-story-paragraph={numbers[i]} data-story-lead className="mt-5 font-display t-lead italic leading-[1.25] text-white [text-wrap:balance]">
+            <p key={i} data-story-paragraph={numbers[i]} data-story-lead className="piece-lead mt-5">
               {b.text}
             </p>
           );
         if (closing && i === last && i !== first && b.text.length <= 110)
           return (
-            <p key={i} data-story-paragraph={numbers[i]} data-story-closing className="mt-8 max-w-2xl border-t border-white/12 pt-6 font-display t-sub italic leading-[1.3] text-white [text-wrap:balance]">
+            <p key={i} data-story-paragraph={numbers[i]} data-story-closing className="piece-lead mt-8 max-w-2xl border-t border-white/12 pt-6">
               {b.text}
             </p>
           );
@@ -663,7 +680,7 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
     <section aria-labelledby="sheet-title" data-composition data-composition-rich data-piece-section="composition" className="wrap border-t border-white/10 py-16 lg:py-24">
       <h2 id="sheet-title" className="title-caps tracking-[0.12em] t-title ">{t.piece.sheet}</h2>
       {intro.map((p, i) => (
-        <p key={i} data-composition-intro className="mt-6 max-w-2xl font-display t-lead italic leading-[1.3] text-white [text-wrap:balance]">{p.text}</p>
+        <p key={i} data-composition-intro className="piece-lead mt-6 max-w-2xl">{p.text}</p>
       ))}
       {figures.length > 0 ? (
         <dl data-composition-figures className={"mt-12 grid gap-y-10 gap-x-12 " + (figures.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2 lg:max-w-3xl")}>
@@ -687,7 +704,7 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
         p.kind === "rule" ? (
           <hr key={i} data-composition-rule className="mt-12 border-0 border-t border-white/15" />
         ) : p.kind === "closing" ? (
-          <p key={i} data-composition-closing className="mt-10 font-display t-sub italic text-white">{p.text}</p>
+          <p key={i} data-composition-closing className="piece-lead mt-10">{p.text}</p>
         ) : p.kind === "grid" ? (
           <dl key={i} data-composition-rows className="mt-12 grid gap-x-16 gap-y-10 sm:grid-cols-2 lg:max-w-5xl">
             {p.rows.map((r) => (
@@ -702,8 +719,8 @@ function Composition({ rows, hideClosing }: { rows: (Spec & { en: string })[]; h
       {notes.length > 0 ? (
         <ul data-composition-notes className="mt-14 flex max-w-3xl flex-col gap-2 border-t border-white/12 pt-6">
           {notes.map((r) => (
-            <li key={r.en} className="text-base leading-relaxed text-mist">
-              <span className="text-bone">{r.label}</span> — {r.value}
+            <li key={r.en} className="piece-text">
+              <span className="text-white">{r.label}</span> — {r.value}
             </li>
           ))}
         </ul>
@@ -797,7 +814,7 @@ function StoryRing() {
         ) : null}
         <div className={photo ? "lg:col-span-6 lg:col-start-7" : "max-w-3xl"}>
           <h2 id="story-ring-title" className="title-caps tracking-[0.12em] t-title">{tc(INTER_STORY.title)}</h2>
-          <p data-story-lead className="mt-5 font-display t-lead italic leading-[1.25] text-white">{tc(INTER_STORY.lead)}</p>
+          <p data-story-lead className="piece-lead mt-5">{tc(INTER_STORY.lead)}</p>
           {INTER_STORY.paragraphs.map((x) => (
             <p key={x} className="piece-text mt-5">{tc(x)}</p>
           ))}
@@ -839,13 +856,15 @@ function Champions({ people, worn, title }: { people: Person[]; worn: MediaItem[
 }
 
 /** The Moment of Reveal (Yoni, 27/11/2026): the film of the hand-over in Dubai, whole, beside its words; two photos under it. */
-function MomentOfReveal({ worn, title }: { worn: MediaItem[]; title: string }) {
+function MomentOfReveal({ title }: { title: string }) {
   const { t } = useI18n();
   const tc = useContentText();
   const r = YONI_MEDIA.okaforReveal;
   const film = filmData(r?.film);
+  // Its two photos of the hand-over (the portrait, the four arms crossed), then the fitting in the fold-out gallery only (27/11/2026):
+  // never another photo in their place.
   const first = [r?.portrait, r?.group].filter((m): m is MediaItem => Boolean(m?.src));
-  const more = [r?.fitting, ...worn].filter((m): m is MediaItem => Boolean(m?.src));
+  const more = [r?.fitting].filter((m): m is MediaItem => Boolean(m?.src));
   return (
     <section aria-labelledby="reveal-title" data-reveal data-piece-section="reveal" className="wrap border-t border-white/10 py-16 lg:py-20">
       <div className="grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
@@ -857,7 +876,7 @@ function MomentOfReveal({ worn, title }: { worn: MediaItem[]; title: string }) {
         <div className={film ? "lg:col-span-6" : "lg:col-span-8"}>
           <h2 id="reveal-title" className="title-caps tracking-[0.12em] t-title">{tc(JERSEY_REVEAL.title)}</h2>
           {JERSEY_REVEAL.paragraphs.map((x, i) => (
-            <p key={x} className={i === JERSEY_REVEAL.paragraphs.length - 1 ? "mt-8 border-t border-white/12 pt-6 font-display t-sub italic text-white" : "piece-text mt-5"}>
+            <p key={x} className={i === JERSEY_REVEAL.paragraphs.length - 1 ? "piece-lead mt-8 border-t border-white/12 pt-6" : "piece-text mt-5"}>
               {tc(x)}
             </p>
           ))}
@@ -876,26 +895,33 @@ function Evolution({ piece }: { piece: Piece }) {
   const tc = useContentText();
   // The T9 by another photo of it whole on black than the first of Every Angle (never the same photo twice on the page).
   const t9 = piece.gallery.find((m) => fileBase(m.src) === "p18") ?? piece.cover;
-  const known: Record<number, MediaItem | undefined> = { 4: t9.src ? t9 : undefined };
+  const last = T_EVOLUTION.steps.length - 1;
   return (
     <section aria-labelledby="evolution-title" data-evolution data-piece-section="evolution" className="wrap border-t border-white/10 py-16 lg:py-20">
       <h2 id="evolution-title" className="title-caps tracking-[0.12em] t-title">{tc(T_EVOLUTION.title)}</h2>
       <p className="piece-text mt-5 max-w-2xl">{tc(T_EVOLUTION.intro)}</p>
-      <ol className="mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-5 lg:overflow-visible">
-        {T_EVOLUTION.steps.map((step, i) => {
-          const photo = known[i];
-          return (
-            <li key={step} data-evolution-step={i + 1} data-current={photo ? "" : undefined} className="w-[62%] shrink-0 snap-start sm:w-[40%] lg:w-auto">
-              <span className="block aspect-[4/5] overflow-hidden border border-white/10 bg-ink/60">
-                {photo ? <MediaView item={photo} alt={photo.alt ?? piece.title} fit="contain" sizes="(max-width: 1023px) 62vw, 15rem" /> : <span aria-hidden="true" className="flex h-full items-center justify-center font-display text-5xl text-white/15">{i + 1}</span>}
-              </span>
-              <p className="mt-3 text-base leading-snug text-bone">
+      {/* A sober frieze (27/11/2026): the five names of Yoni on one fine line, the T9 alone illustrated at its place; a step gets a
+          photo only when it is sure (none yet: their names wait for Yoni). */}
+      <div className="mt-12 grid items-end gap-10 lg:grid-cols-12">
+        <ol className="relative grid gap-6 sm:grid-cols-5 sm:gap-4 lg:col-span-9">
+          <span aria-hidden="true" className="rule-rose absolute top-[0.4375rem] right-0 left-0 hidden opacity-60 sm:block" />
+          {T_EVOLUTION.steps.map((step, i) => (
+            <li key={step} data-evolution-step={i + 1} data-current={i === last ? "" : undefined} className="relative flex gap-3 sm:block">
+              <span aria-hidden="true" className={"relative mt-1.5 block size-3.5 shrink-0 rounded-full border sm:mt-0 " + (i === last ? "border-rose-light bg-rose-light" : "border-rose-light/70 bg-ink")} />
+              <p className="piece-text sm:mt-5">
                 <span className="text-rose-light">{i + 1}.</span> {tc(step)}
               </p>
             </li>
-          );
-        })}
-      </ol>
+          ))}
+        </ol>
+        {t9.src ? (
+          <figure data-evolution-photo className="mx-auto w-48 sm:w-56 lg:col-span-3 lg:w-full lg:max-w-[15rem]">
+            <span className="block aspect-[4/5] overflow-hidden bg-ink">
+              <MediaView item={t9} alt={t9.alt ?? piece.title} fit="contain" sizes="15rem" />
+            </span>
+          </figure>
+        ) : null}
+      </div>
     </section>
   );
 }

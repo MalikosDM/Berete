@@ -106,7 +106,8 @@ test("the heroes asked by Yoni, and the covers", async ({ page }, info) => {
   await expect(page.locator("[data-piece-cover] [data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p28");
   await open(page, "/pieces/marcus-thuram-t-serpent-pendant");
   // Its cover is p08 (the cards); on its page, each photo once.
-  await expect(page.locator("[data-every-angle] img[src*='t-serpent-pendant/p08.']")).toHaveCount(await page.locator("[data-piece-cover] [data-showcase-view='p08']").count() ? 0 : 1);
+  // (Yoni, 26-27/11/2026: Every Angle opens on the T9 whole from the front, p08, even when the opening shows it too.)
+  await expect(page.locator("[data-every-angle] img[src*='t-serpent-pendant/p08.']")).toHaveCount(1);
   await page.screenshot({ path: shotPath(info, "yoni2311b-t-serpent") });
 });
 

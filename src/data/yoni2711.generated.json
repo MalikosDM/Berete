@@ -36,8 +36,22 @@
   "onBlack": false
  },
  "interPhotos": {
-  "yoniWithPlayers": null,
-  "photo2": null,
+  "yoniWithPlayers": {
+   "type": "image",
+   "src": "/media/yoni-2711/inter/yoni-thuram-arnautovic.4c6fde279e.webp",
+   "width": 1008,
+   "height": 1600,
+   "alt": "Yoni Berete with Marko Arnautović and Marcus Thuram in front of the Inter backdrop in Milan, the case of the ring in his hands",
+   "onBlack": false
+  },
+  "photo2": {
+   "type": "image",
+   "src": "/media/yoni-2711/inter/champion-trophy.4c6fde279e.webp",
+   "width": 738,
+   "height": 1600,
+   "alt": "An Inter player in a black-and-blue jacket and a Campione cap, his hand on his face, the Serie A trophy before him",
+   "onBlack": false
+  },
   "firstFour": [
    {
     "type": "image",
@@ -154,5 +168,43 @@
     "onBlack": false
    }
   ]
+ },
+ "okaforReveal": {
+  "film": {
+   "type": "video",
+   "src": "/media/yoni-2711/okafor-dubai/reveal.cdd72514ba.mp4",
+   "mobile": "/media/yoni-2711/okafor-dubai/reveal-mobile.cdd72514ba.mp4",
+   "poster": "/media/yoni-2711/okafor-dubai/reveal-poster.cdd72514ba.webp",
+   "width": 720,
+   "height": 1280,
+   "duration": 48.92,
+   "audio": true,
+   "alt": "The reveal of Noah Okafor's jersey pendant in Dubai: the arrival at night, the setting of the stones, the pendant taken from its case and worn",
+   "onBlack": false
+  },
+  "portrait": {
+   "type": "image",
+   "src": "/media/yoni-2711/okafor-dubai/portrait.cdd72514ba.webp",
+   "width": 736,
+   "height": 1600,
+   "alt": "Noah Okafor holds the jersey pendant he wears, set with diamonds, on its chain",
+   "onBlack": false
+  },
+  "group": {
+   "type": "image",
+   "src": "/media/yoni-2711/okafor-dubai/group.cdd72514ba.webp",
+   "width": 1333,
+   "height": 1600,
+   "alt": "Four men in a hotel suite in Dubai, three seated on a sofa with their arms crossed and one standing behind them; the man in the middle wears the jersey pendant",
+   "onBlack": false
+  },
+  "fitting": {
+   "type": "image",
+   "src": "/media/yoni-2711/okafor-dubai/fitting.cdd72514ba.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "A man fastens a diamond chain around Noah Okafor's neck in a hotel suite",
+   "onBlack": false
+  }
  }
 }

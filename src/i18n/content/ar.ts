@@ -990,6 +990,11 @@ const content: Record<string, string> = {
   "Iced Signet Ring": "خاتم ختم مرصع بالكامل",
   "Snowflake Pendant": "قلادة ندفة الثلج",
   "Twisted Link Chain": "سلسلة الحلقات المجدولة",
+  // The details of the Dragon Ball pendant back (27/11/2026): its validated sentences of 23/11, translated then.
+  "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings.": "في مركزها، تتكوّن كرة الطاقة من عدة قطعات للألماس؛ المستديرة والزمردية والأميرية، مرصّعة بتقنيات مختلفة: الترصيع الكلاسيكي والمحاط والقنوي والمعكوس.",
+  "Beneath the sphere stands Goku, the conduit rather than the source.": "تحت الكرة يقف غوكو، الناقل لا المصدر.",
+  "Surrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope.": "ومن حوله تُكمل كرات التنين السبع هذا العالم — رموزاً للتوازن والقدر والأمل المشترك.",
+  "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible.": "كل قطعة وكل اتجاه يمثّل شكلاً مختلفاً من أشكال الحياة يسهم بطاقته.\nوحتى الأحجار المرصّعة بشكل معكوس، الموضوعة رأساً على عقب، تعكس القوى الخفية التي تعطي دون أن تُرى.",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

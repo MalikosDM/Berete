@@ -11,50 +11,49 @@
      960,
      1600
     ],
-    "fade": [
+    "version": "b83dbbe1c5",
+    "cut": [
      "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 19.jpg",
-    "note": "",
-    "version": "5bb0eb5ca8"
+    "note": ""
    },
    {
     "id": "p18",
     "kind": "detail",
     "width": 1600,
-    "height": 2324,
+    "height": 2325,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": [
+    "version": "e99827e4b6",
+    "cut": [
      "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 18.jpg",
-    "note": "",
-    "version": "1a82496f8c"
+    "note": ""
    },
    {
     "id": "p06",
     "kind": "back",
     "width": 1600,
-    "height": 2570,
+    "height": 2486,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": [
-     "top",
-     "right"
+    "version": "ec7f42a32a",
+    "cut": [
+     "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/13 Pendentif sculpte or jaune et rose/13 Pendentif sculpte or jaune et rose - 06.jpg",
-    "note": "",
-    "version": "b1c4265c1e"
+    "note": ""
    }
   ],
   "michy-batshuayi-butterfly-pendant": [
@@ -62,14 +61,16 @@
     "id": "p54",
     "kind": "face",
     "width": 1600,
-    "height": 2159,
+    "height": 1822,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "22488c5b79",
-    "fade": null,
+    "version": "944d6ca4ce",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 54.jpg",
     "note": ""
@@ -78,14 +79,14 @@
     "id": "p68",
     "kind": "detail",
     "width": 1600,
-    "height": 1550,
+    "height": 1551,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "58975e2bc3",
-    "fade": null,
+    "version": "88a4e47a62",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 68.jpg",
     "note": ""
@@ -102,11 +103,11 @@
      960,
      1600
     ],
-    "fade": null,
+    "version": "af1e342b25",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/23 Chaine or rose/23 Chaine or rose - 60.jpg",
-    "note": "",
-    "version": "50fcfe318f"
+    "note": ""
    }
   ],
   "campione-d-italia-2023-2024": [
@@ -114,14 +115,14 @@
     "id": "p08",
     "kind": "face",
     "width": 1600,
-    "height": 1586,
+    "height": 1542,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "832e45bd14",
-    "fade": null,
+    "version": "d4bbb2b1fc",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 08.jpg",
     "note": ""
@@ -130,14 +131,14 @@
     "id": "p13",
     "kind": "profile",
     "width": 1600,
-    "height": 1782,
+    "height": 1749,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "cbf543bb9a",
-    "fade": null,
+    "version": "63bed040c2",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 13.jpg",
     "note": ""
@@ -152,8 +153,8 @@
      960,
      1600
     ],
-    "version": "d50e1dac16",
-    "fade": null,
+    "version": "f0a323f3d3",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 54.jpg",
     "note": ""
@@ -162,14 +163,14 @@
     "id": "p04",
     "kind": "detail",
     "width": 1135,
-    "height": 1048,
+    "height": 1047,
     "widths": [
      480,
      960,
      1135
     ],
-    "version": "478c5b5446",
-    "fade": null,
+    "version": "e049d543b4",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 04.jpg",
     "note": ""
@@ -184,8 +185,8 @@
      960,
      1600
     ],
-    "version": "c5566efe4a",
-    "fade": null,
+    "version": "73a000a8f1",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/25 Pendentif Inter Milan/25 Pendentif Inter Milan - 44.jpg",
     "note": ""
@@ -202,8 +203,8 @@
      960,
      1600
     ],
-    "version": "d0629b02a5",
-    "fade": null,
+    "version": "d279a94160",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 13.jpg",
     "note": ""
@@ -218,8 +219,8 @@
      960,
      1600
     ],
-    "version": "e3abe350ad",
-    "fade": null,
+    "version": "dc6cbe06a0",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 12.jpg",
     "note": ""
@@ -234,8 +235,8 @@
      960,
      1600
     ],
-    "version": "8e4f73a928",
-    "fade": null,
+    "version": "8e7791c41e",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/29 Bagues VfB Stuttgart/29 Bagues VfB Stuttgart - 18.jpg",
     "note": ""
@@ -252,8 +253,8 @@
      960,
      1600
     ],
-    "version": "ba4ec53ea1",
-    "fade": [
+    "version": "c18b0f9987",
+    "cut": [
      "top"
     ],
     "clean": true,
@@ -264,14 +265,16 @@
     "id": "p06",
     "kind": "back",
     "width": 1600,
-    "height": 2287,
+    "height": 2183,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "2e8ec12ef9",
-    "fade": null,
+    "version": "d2bb701237",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/32 Pendentif or rose ecusson/32 Pendentif or rose ecusson - 06.jpg",
     "note": ""
@@ -280,14 +283,16 @@
     "id": "p02",
     "kind": "worn",
     "width": 1600,
-    "height": 2915,
+    "height": 2612,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "27514945b3",
-    "fade": null,
+    "version": "4dfa5fcc82",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/32 Pendentif or rose ecusson/32 Pendentif or rose ecusson - 02.jpg",
     "note": ""
@@ -298,14 +303,16 @@
     "id": "p17",
     "kind": "face",
     "width": 1600,
-    "height": 1459,
+    "height": 1387,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "de0118cd02",
-    "fade": null,
+    "version": "88998ec314",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/34 Chaine cubaine glacee (2)/34 Chaine cubaine glacee (2) - 17.jpg",
     "note": ""
@@ -316,14 +323,14 @@
     "id": "p09",
     "kind": "face",
     "width": 1600,
-    "height": 2445,
+    "height": 2444,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "1e8c1758ba",
-    "fade": null,
+    "version": "42ae10d8f7",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 09.jpg",
     "note": ""
@@ -338,30 +345,10 @@
      960,
      1600
     ],
-    "version": "88ec236c14",
-    "fade": null,
+    "version": "3da2485bdd",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 10.jpg",
-    "note": ""
-   },
-   {
-    "id": "p02",
-    "kind": "detail",
-    "width": 1600,
-    "height": 2333,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "version": "d10385d3a1",
-    "fade": [
-     "top",
-     "left",
-     "right"
-    ],
-    "clean": true,
-    "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 02.jpg",
     "note": ""
    },
    {
@@ -374,8 +361,8 @@
      960,
      1600
     ],
-    "version": "d570f642e2",
-    "fade": null,
+    "version": "2289410bae",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/17 Pendentif lettre N/17 Pendentif lettre N - 01.jpg",
     "note": ""
@@ -385,15 +372,15 @@
    {
     "id": "p07",
     "kind": "face",
-    "width": 1593,
+    "width": 1592,
     "height": 2122,
     "widths": [
      480,
      960,
-     1593
+     1592
     ],
-    "version": "fd2ee6514b",
-    "fade": null,
+    "version": "ef7870f278",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 07.jpg",
     "note": ""
@@ -402,14 +389,14 @@
     "id": "p06",
     "kind": "profile",
     "width": 1600,
-    "height": 1893,
+    "height": 1895,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "b66dc7c9f7",
-    "fade": null,
+    "version": "296178df7d",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 06.jpg",
     "note": ""
@@ -417,15 +404,15 @@
    {
     "id": "p04",
     "kind": "detail",
-    "width": 1547,
+    "width": 1546,
     "height": 2114,
     "widths": [
      480,
      960,
-     1547
+     1546
     ],
-    "version": "a1f3c89617",
-    "fade": null,
+    "version": "8ef4b18e9a",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 04.jpg",
     "note": ""
@@ -433,15 +420,15 @@
    {
     "id": "p02",
     "kind": "profile",
-    "width": 1066,
-    "height": 2473,
+    "width": 1062,
+    "height": 2468,
     "widths": [
      480,
      960,
-     1066
+     1062
     ],
-    "version": "1ac5b8d9e4",
-    "fade": null,
+    "version": "6151642817",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/11 Pendentif mains glacees/11 Pendentif mains glacees - 02.jpg",
     "note": ""
@@ -452,17 +439,17 @@
     "id": "p08",
     "kind": "face",
     "width": 1600,
-    "height": 2609,
+    "height": 2611,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": null,
+    "version": "6920677c93",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/27 Pendentif croix/27 Pendentif croix - 08.jpg",
-    "note": "",
-    "version": "ba79d77e5f"
+    "note": ""
    }
   ],
   "angelo-stiller-as-pendant": [
@@ -470,14 +457,14 @@
     "id": "p11",
     "kind": "face",
     "width": 1600,
-    "height": 2626,
+    "height": 2627,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "d44d6db0ea",
-    "fade": null,
+    "version": "b6dd8e679f",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 11.jpg",
     "note": ""
@@ -486,36 +473,16 @@
     "id": "p10",
     "kind": "back",
     "width": 1600,
-    "height": 2966,
+    "height": 2968,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "9b5a37a246",
-    "fade": null,
+    "version": "e06b133736",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 10.jpg",
-    "note": ""
-   },
-   {
-    "id": "p07",
-    "kind": "detail",
-    "width": 1600,
-    "height": 2344,
-    "widths": [
-     480,
-     960,
-     1600
-    ],
-    "version": "04c958653b",
-    "fade": [
-     "top",
-     "left",
-     "right"
-    ],
-    "clean": true,
-    "source": "Dossiers icloud/18 Pendentif lettre R baguettes/18 Pendentif lettre R baguettes - 07.jpg",
     "note": ""
    }
   ],
@@ -524,17 +491,15 @@
     "id": "p17",
     "kind": "face",
     "width": 1600,
-    "height": 2389,
+    "height": 2174,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "ce622e8d06",
-    "fade": [
-     "top",
-     "left",
-     "right"
+    "version": "12da926ff9",
+    "cut": [
+     "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/21 Collier croix perles/21 Collier croix perles - 17.jpg",
@@ -545,34 +510,34 @@
    {
     "id": "p07",
     "kind": "face",
-    "width": 1191,
-    "height": 2869,
+    "width": 1190,
+    "height": 2868,
     "widths": [
      480,
      960,
-     1191
+     1190
     ],
-    "fade": null,
+    "version": "3e3ef0d0cc",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/12 Pendentif main OK or rose/12 Pendentif main OK or rose - 07.jpg",
-    "note": "",
-    "version": "88e05bc50e"
+    "note": ""
    },
    {
     "id": "p04",
     "kind": "detail",
-    "width": 1341,
-    "height": 3234,
+    "width": 1340,
+    "height": 3231,
     "widths": [
      480,
      960,
-     1341
+     1340
     ],
-    "fade": null,
+    "version": "598002763c",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/12 Pendentif main OK or rose/12 Pendentif main OK or rose - 04.jpg",
-    "note": "",
-    "version": "12d3ade453"
+    "note": ""
    }
   ],
   "tulips-on-tour-medallion": [
@@ -580,33 +545,33 @@
     "id": "p21",
     "kind": "face",
     "width": 1600,
-    "height": 2356,
+    "height": 2354,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": null,
+    "version": "5168a044cb",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/24 Bague rubis et baguettes/24 Bague rubis et baguettes - 21.jpg",
-    "note": "",
-    "version": "89fe58fa22"
+    "note": ""
    },
    {
     "id": "p06",
     "kind": "back",
     "width": 1600,
-    "height": 2284,
+    "height": 2286,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": null,
+    "version": "3c853e7544",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/24 Bague rubis et baguettes/24 Bague rubis et baguettes - 06.jpg",
-    "note": "",
-    "version": "3b32a2abed"
+    "note": ""
    }
   ],
   "marcus-thuram-ruby-t-necklace": [
@@ -614,14 +579,14 @@
     "id": "p01",
     "kind": "face",
     "width": 1600,
-    "height": 2400,
+    "height": 2398,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "33859f27ab",
-    "fade": null,
+    "version": "e9ead45e5a",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 01.jpg",
     "note": ""
@@ -630,16 +595,15 @@
     "id": "p02",
     "kind": "detail",
     "width": 1600,
-    "height": 2402,
+    "height": 2489,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "41f016da0d",
-    "fade": [
-     "top",
-     "left"
+    "version": "e513262b25",
+    "cut": [
+     "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/26 Chaine maillons croix/26 Chaine maillons croix - 02.jpg",
@@ -655,8 +619,8 @@
      960,
      1600
     ],
-    "version": "2107d0a086",
-    "fade": [
+    "version": "0cf7717323",
+    "cut": [
      "top"
     ],
     "clean": true,
@@ -669,14 +633,16 @@
     "id": "p07",
     "kind": "face",
     "width": 1600,
-    "height": 1760,
+    "height": 1563,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "760361111d",
-    "fade": null,
+    "version": "0a37120428",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 07.jpg",
     "note": ""
@@ -685,14 +651,16 @@
     "id": "p05",
     "kind": "profile",
     "width": 1600,
-    "height": 1740,
+    "height": 1503,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "eec7aef72c",
-    "fade": null,
+    "version": "b69c62f8f9",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 05.jpg",
     "note": ""
@@ -701,14 +669,14 @@
     "id": "p02",
     "kind": "detail",
     "width": 1600,
-    "height": 1549,
+    "height": 1527,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "f02ca83b8e",
-    "fade": null,
+    "version": "7b4efc0d56",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/16 Chaine fleurs or rose/16 Chaine fleurs or rose - 02.jpg",
     "note": ""
@@ -719,14 +687,14 @@
     "id": "studio",
     "kind": "face",
     "width": 1600,
-    "height": 2402,
+    "height": 2403,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "5249a83c4f",
-    "fade": null,
+    "version": "954b9d22dc",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/marcus-thuram-thorned-t-pendant-studio-ia.jpg",
     "note": ""
@@ -736,15 +704,15 @@
    {
     "id": "s02",
     "kind": "face",
-    "width": 1127,
+    "width": 1126,
     "height": 2037,
     "widths": [
      480,
      960,
-     1127
+     1126
     ],
-    "version": "08e43c4da8",
-    "fade": null,
+    "version": "172cce9d1e",
+    "cut": null,
     "clean": true,
     "source": "site /media/stories/samuel-ballet/02.webp",
     "note": ""
@@ -755,14 +723,14 @@
     "id": "studio",
     "kind": "face",
     "width": 1600,
-    "height": 2295,
+    "height": 2294,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "c756a5561c",
-    "fade": null,
+    "version": "7307cd39c0",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/malik-tillman-tm-pendant-studio-ia.jpg",
     "note": ""
@@ -770,17 +738,33 @@
   ],
   "tanguy-nianzou-fam-medallion": [
    {
+    "id": "cover",
+    "kind": "face",
+    "width": 315,
+    "height": 501,
+    "widths": [
+     315
+    ],
+    "version": "016de1b26b",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "site /media/pieces/tanguy-nianzou-fam-medallion/cover.webp",
+    "note": ""
+   },
+   {
     "id": "studio",
     "kind": "face",
     "width": 1600,
-    "height": 2308,
+    "height": 2310,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "5a74ea6b41",
-    "fade": [
+    "version": "98f37d6046",
+    "cut": [
      "top"
     ],
     "clean": true,
@@ -793,14 +777,14 @@
     "id": "p28",
     "kind": "face",
     "width": 1600,
-    "height": 1199,
+    "height": 1197,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "3f6c97c364",
-    "fade": null,
+    "version": "131bbf7a86",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 28.jpg",
     "note": ""
@@ -809,14 +793,16 @@
     "id": "p27",
     "kind": "worn",
     "width": 1600,
-    "height": 1802,
+    "height": 1619,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "4a462fae37",
-    "fade": null,
+    "version": "5b20d46f69",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 27.jpg",
     "note": ""
@@ -827,21 +813,19 @@
     "id": "p07",
     "kind": "face",
     "width": 1600,
-    "height": 1892,
+    "height": 1510,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": [
-     "top",
-     "left",
-     "right"
+    "version": "25ccdbcb8c",
+    "cut": [
+     "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/04 Pendentif initiales DE/04 Pendentif initiales DE - 07.jpg",
-    "note": "",
-    "version": "e907016983"
+    "note": ""
    }
   ],
   "thorns-and-roses-crucifix": [
@@ -849,14 +833,14 @@
     "id": "p05",
     "kind": "face",
     "width": 1600,
-    "height": 2791,
+    "height": 2788,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "004002f018",
-    "fade": null,
+    "version": "7539c07cb7",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/05 Pendentif croix Christ or rose/05 Pendentif croix Christ or rose - 05.jpg",
     "note": ""
@@ -865,14 +849,14 @@
     "id": "p06",
     "kind": "back",
     "width": 1600,
-    "height": 2784,
+    "height": 2781,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "ba60f2b5d7",
-    "fade": null,
+    "version": "65c5646ad1",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/05 Pendentif croix Christ or rose/05 Pendentif croix Christ or rose - 06.jpg",
     "note": ""
@@ -883,14 +867,14 @@
     "id": "p12",
     "kind": "face",
     "width": 1600,
-    "height": 2463,
+    "height": 2468,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "185a12a5c9",
-    "fade": null,
+    "version": "215069efef",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/06 Croix baguettes/06 Croix baguettes - 12.jpg",
     "note": ""
@@ -901,14 +885,14 @@
     "id": "p12",
     "kind": "face",
     "width": 1600,
-    "height": 2915,
+    "height": 2921,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "8fdd97b242",
-    "fade": null,
+    "version": "02c7166ddf",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 12.jpg",
     "note": ""
@@ -917,14 +901,14 @@
     "id": "p11",
     "kind": "profile",
     "width": 1600,
-    "height": 2980,
+    "height": 2981,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "c44eff3d16",
-    "fade": null,
+    "version": "7aaa5cd5d0",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 11.jpg",
     "note": ""
@@ -933,14 +917,14 @@
     "id": "p18",
     "kind": "back",
     "width": 1600,
-    "height": 2984,
+    "height": 2991,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "33ceb6d32e",
-    "fade": null,
+    "version": "6b87e5154b",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/15 Bracelet or rose BRT a pics/15 Bracelet or rose BRT a pics - 18.jpg",
     "note": ""
@@ -951,17 +935,17 @@
     "id": "p07",
     "kind": "face",
     "width": 1600,
-    "height": 2162,
+    "height": 2161,
     "widths": [
      480,
      960,
      1600
     ],
-    "fade": null,
+    "version": "477c5e03d1",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/22 Medaille gravee Nathalie Jose/22 Medaille gravee Nathalie Jose - 07.jpg",
-    "note": "",
-    "version": "298488f9e5"
+    "note": ""
    },
    {
     "id": "p16",
@@ -973,11 +957,11 @@
      960,
      1600
     ],
-    "fade": null,
+    "version": "5146c12fea",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/22 Medaille gravee Nathalie Jose/22 Medaille gravee Nathalie Jose - 16.jpg",
-    "note": "",
-    "version": "0d2a57ce0e"
+    "note": ""
    }
   ],
   "lois-openda-script-pendant": [
@@ -991,11 +975,11 @@
      960,
      1600
     ],
-    "fade": null,
+    "version": "8d4432cb43",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/14 Pendentif nom en lettres/14 Pendentif nom en lettres - 21.jpg",
-    "note": "",
-    "version": "ca085f331b"
+    "note": ""
    }
   ],
   "bosnia-and-herzegovina-world-cup-2026-ring": [
@@ -1003,14 +987,14 @@
     "id": "b04497",
     "kind": "face",
     "width": 1600,
-    "height": 1426,
+    "height": 1427,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "b9b85c012a",
-    "fade": null,
+    "version": "efc8eae088",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Bague Bosnie (retouche fond noir)/bosnie-04497-fond-noir.jpg",
     "note": ""
@@ -1019,14 +1003,14 @@
     "id": "b04504",
     "kind": "profile",
     "width": 1600,
-    "height": 1759,
+    "height": 1761,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "23ba8e3fd4",
-    "fade": null,
+    "version": "995993c0e2",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Bague Bosnie (retouche fond noir)/bosnie-04504-fond-noir.jpg",
     "note": ""
@@ -1035,14 +1019,14 @@
     "id": "b04470",
     "kind": "detail",
     "width": 1600,
-    "height": 1715,
+    "height": 1716,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "525fb1053e",
-    "fade": null,
+    "version": "7b86240a24",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Bague Bosnie (retouche fond noir)/bosnie-04470-fond-noir.jpg",
     "note": ""
@@ -1051,14 +1035,14 @@
     "id": "b04506",
     "kind": "profile",
     "width": 1600,
-    "height": 1616,
+    "height": 1619,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "82557acfcf",
-    "fade": null,
+    "version": "c5f8f99c67",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Bague Bosnie (retouche fond noir)/bosnie-04506-fond-noir.jpg",
     "note": ""
@@ -1075,8 +1059,8 @@
      960,
      1600
     ],
-    "version": "645bf6528c",
-    "fade": null,
+    "version": "b4add36107",
+    "cut": null,
     "clean": true,
     "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.50.36.jpeg",
     "note": "le coin gauche du J touche le bord de la photo (coupé net)"
@@ -1085,14 +1069,14 @@
     "id": "left",
     "kind": "profile",
     "width": 1600,
-    "height": 1423,
+    "height": 1422,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "21c241bf27",
-    "fade": null,
+    "version": "670f92ecaa",
+    "cut": null,
     "clean": true,
     "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.50.35.jpeg",
     "note": ""
@@ -1102,18 +1086,18 @@
    {
     "id": "black",
     "kind": "face",
-    "width": 953,
-    "height": 1105,
+    "width": 649,
+    "height": 855,
     "widths": [
      480,
-     953
+     649
     ],
-    "version": "1137215c96",
-    "fade": [
+    "version": "78e44a6024",
+    "cut": [
      "top"
     ],
     "clean": true,
-    "source": "WhatsApp/WhatsApp Image 2026-11-23 at 09.43.30.jpeg",
+    "source": "site /media/extra/campione-d-italia-pendant/black.6ee0e75501.webp",
     "note": ""
    }
   ],
@@ -1128,8 +1112,8 @@
      960,
      1600
     ],
-    "version": "3f3cf90c84",
-    "fade": null,
+    "version": "e875f8e5ec",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/tajon-buchanan-iced-watch-studio-ia.jpg",
     "note": ""
@@ -1140,14 +1124,14 @@
     "id": "studio",
     "kind": "face",
     "width": 1600,
-    "height": 2036,
+    "height": 2037,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "04d67b154d",
-    "fade": [
+    "version": "67786bd90a",
+    "cut": [
      "top",
      "bottom",
      "right"
@@ -1168,8 +1152,8 @@
      960,
      1600
     ],
-    "version": "aef246ebaa",
-    "fade": null,
+    "version": "18e56864ea",
+    "cut": null,
     "clean": true,
     "source": "Dossiers icloud/00 Contexte Yoni/Pieces sans photo pro (IA)/radja-nainggolan-iced-watch-studio-ia.jpg",
     "note": ""
@@ -1180,14 +1164,14 @@
     "id": "studio",
     "kind": "face",
     "width": 1600,
-    "height": 1927,
+    "height": 1926,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "02280405db",
-    "fade": [
+    "version": "0cbc757c13",
+    "cut": [
      "left",
      "right"
     ],
@@ -1201,14 +1185,16 @@
     "id": "s29",
     "kind": "face",
     "width": 1600,
-    "height": 1172,
+    "height": 1015,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "f93f7cf6ef",
-    "fade": null,
+    "version": "4912f445d9",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/37 Chaine Sirius/37 Chaine Sirius - 29.jpg",
     "note": ""
@@ -1219,14 +1205,16 @@
     "id": "p04",
     "kind": "face",
     "width": 1600,
-    "height": 1619,
+    "height": 1455,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "cc0ab7aff5",
-    "fade": null,
+    "version": "bbb965e5a6",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/03 Chaine tennis 2 rangs/03 Chaine tennis 2 rangs - 04.jpg",
     "note": ""
@@ -1235,14 +1223,16 @@
     "id": "p01",
     "kind": "face",
     "width": 1600,
-    "height": 1382,
+    "height": 1213,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "dc7bb4727b",
-    "fade": null,
+    "version": "946e38ced3",
+    "cut": [
+     "top"
+    ],
     "clean": true,
     "source": "Dossiers icloud/03 Chaine tennis 2 rangs/03 Chaine tennis 2 rangs - 01.jpg",
     "note": ""
@@ -1253,18 +1243,522 @@
     "id": "p02",
     "kind": "face",
     "width": 1600,
-    "height": 1205,
+    "height": 1065,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "c3aa85e2c0",
-    "fade": [
+    "version": "e48ee6623f",
+    "cut": [
      "top"
     ],
     "clean": true,
     "source": "Dossiers icloud/33 Chaine cubaine glacee/33 Chaine cubaine glacee - 02.jpg",
+    "note": ""
+   }
+  ],
+  "oval-eternity-band": [
+   {
+    "id": "p02",
+    "kind": "face",
+    "width": 1600,
+    "height": 1618,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "dedd324b7f",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/10 Bague eternity diamants ovales/10 Bague eternity diamants ovales - 02.jpg",
+    "note": ""
+   },
+   {
+    "id": "p01",
+    "kind": "profile",
+    "width": 1600,
+    "height": 633,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "badab4304f",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/10 Bague eternity diamants ovales/10 Bague eternity diamants ovales - 01.jpg",
+    "note": ""
+   },
+   {
+    "id": "p03",
+    "kind": "detail",
+    "width": 1546,
+    "height": 1929,
+    "widths": [
+     480,
+     960,
+     1546
+    ],
+    "version": "ad027a9625",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/10 Bague eternity diamants ovales/10 Bague eternity diamants ovales - 03.jpg",
+    "note": ""
+   }
+  ],
+  "panther-champion-pendant": [
+   {
+    "id": "p10",
+    "kind": "face",
+    "width": 1600,
+    "height": 1735,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "b72e9367af",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/19 Pendentif tete animal/19 Pendentif tete animal - 10.jpg",
+    "note": ""
+   },
+   {
+    "id": "p09",
+    "kind": "back",
+    "width": 1600,
+    "height": 1943,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "7d5865818b",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/19 Pendentif tete animal/19 Pendentif tete animal - 09.jpg",
+    "note": ""
+   }
+  ],
+  "deniz-undav-l-pendant": [
+   {
+    "id": "p10",
+    "kind": "face",
+    "width": 1600,
+    "height": 2782,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "f4e2679397",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 10.jpg",
+    "note": ""
+   },
+   {
+    "id": "p02",
+    "kind": "back",
+    "width": 1600,
+    "height": 2816,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "873560d851",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 02.jpg",
+    "note": ""
+   }
+  ],
+  "jesus-piece-red-flowers": [
+   {
+    "id": "p06",
+    "kind": "face",
+    "width": 1600,
+    "height": 1992,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "fcc25d88c7",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/20 Pendentif rubis or rose/20 Pendentif rubis or rose - 06.jpg",
+    "note": ""
+   },
+   {
+    "id": "p05",
+    "kind": "back",
+    "width": 1600,
+    "height": 2223,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "e8218ef526",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/20 Pendentif rubis or rose/20 Pendentif rubis or rose - 05.jpg",
+    "note": ""
+   }
+  ],
+  "marcus-thuram-jesus-piece": [
+   {
+    "id": "p06",
+    "kind": "face",
+    "width": 1600,
+    "height": 1992,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "fcc25d88c7",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/20 Pendentif rubis or rose/20 Pendentif rubis or rose - 06.jpg",
+    "note": ""
+   },
+   {
+    "id": "p05",
+    "kind": "back",
+    "width": 1600,
+    "height": 2223,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "e8218ef526",
+    "cut": null,
+    "clean": true,
+    "source": "Dossiers icloud/20 Pendentif rubis or rose/20 Pendentif rubis or rose - 05.jpg",
+    "note": ""
+   }
+  ],
+  "eljero-elia-clover-medallion": [
+   {
+    "id": "s04",
+    "kind": "face",
+    "width": 791,
+    "height": 2297,
+    "widths": [
+     480,
+     791
+    ],
+    "version": "6111d4bb90",
+    "cut": null,
+    "clean": true,
+    "source": "Stories/26 Eljero Elia/26 Eljero Elia - 04.jpg",
+    "note": ""
+   },
+   {
+    "id": "s05",
+    "kind": "profile",
+    "width": 559,
+    "height": 2156,
+    "widths": [
+     480,
+     559
+    ],
+    "version": "1515042921",
+    "cut": null,
+    "clean": true,
+    "source": "Stories/26 Eljero Elia/26 Eljero Elia - 05.jpg",
+    "note": ""
+   }
+  ],
+  "baguette-cuban-chain": [
+   {
+    "id": "p05",
+    "kind": "face",
+    "width": 1600,
+    "height": 902,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "19fd75b1c7",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/30 Chaine cubaine baguettes/30 Chaine cubaine baguettes - 05.jpg",
+    "note": ""
+   },
+   {
+    "id": "p03",
+    "kind": "profile",
+    "width": 1486,
+    "height": 801,
+    "widths": [
+     480,
+     960,
+     1486
+    ],
+    "version": "43496158b0",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/30 Chaine cubaine baguettes/30 Chaine cubaine baguettes - 03.jpg",
+    "note": ""
+   }
+  ],
+  "rose-iced-cuban-chain": [
+   {
+    "id": "p02",
+    "kind": "face",
+    "width": 1600,
+    "height": 868,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "0a5b368888",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/01 Chaine cubaine glacee or rose/01 Chaine cubaine glacee or rose - 02.jpg",
+    "note": ""
+   },
+   {
+    "id": "p01",
+    "kind": "profile",
+    "width": 1600,
+    "height": 952,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "d8b9330bd9",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/01 Chaine cubaine glacee or rose/01 Chaine cubaine glacee or rose - 01.jpg",
+    "note": ""
+   }
+  ],
+  "wide-rose-iced-cuban-chain": [
+   {
+    "id": "p01",
+    "kind": "face",
+    "width": 1600,
+    "height": 1249,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "d38627e63e",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/02 Chaine cubaine glacee or rose (shooting 2)/02 Chaine cubaine glacee or rose (shooting 2) - 01.jpg",
+    "note": ""
+   },
+   {
+    "id": "p06",
+    "kind": "back",
+    "width": 1600,
+    "height": 1157,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "10bcb9d72b",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/02 Chaine cubaine glacee or rose (shooting 2)/02 Chaine cubaine glacee or rose (shooting 2) - 06.jpg",
+    "note": ""
+   }
+  ],
+  "two-tone-iced-cuban-chain": [
+   {
+    "id": "p08",
+    "kind": "face",
+    "width": 1600,
+    "height": 1542,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "3e904318ab",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/31 Bracelet tennis baguettes or rose/31 Bracelet tennis baguettes or rose - 08.jpg",
+    "note": ""
+   }
+  ],
+  "pear-link-chain": [
+   {
+    "id": "p01",
+    "kind": "face",
+    "width": 1600,
+    "height": 1330,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "5a802ca5b8",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/09 Chaine diamants/09 Chaine diamants - 01.jpg",
+    "note": ""
+   }
+  ],
+  "infinity-link-chain": [
+   {
+    "id": "p01",
+    "kind": "face",
+    "width": 1600,
+    "height": 1330,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "5a802ca5b8",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/09 Chaine diamants/09 Chaine diamants - 01.jpg",
+    "note": ""
+   }
+  ],
+  "cross-infinity-chain": [
+   {
+    "id": "p09",
+    "kind": "face",
+    "width": 1600,
+    "height": 932,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "753858be5f",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "Dossiers icloud/07 Collier or rose fermoir croix/07 Collier or rose fermoir croix - 09.jpg",
+    "note": ""
+   }
+  ],
+  "tanguy-nianzou-nz-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 670,
+    "height": 817,
+    "widths": [
+     480,
+     670
+    ],
+    "version": "dece65b31b",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "site /media/pieces/tanguy-nianzou-nz-pendant/cover.webp",
+    "note": ""
+   }
+  ],
+  "jeff-chabot-jc-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 451,
+    "height": 761,
+    "widths": [
+     451
+    ],
+    "version": "ff66caa39f",
+    "cut": [
+     "top"
+    ],
+    "clean": false,
+    "source": "site /media/pieces/jeff-chabot-jc-pendant/cover.webp",
+    "note": "le C sort de la photo à droite"
+   }
+  ],
+  "sidney-eweka-999-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 1188,
+    "height": 917,
+    "widths": [
+     480,
+     960,
+     1188
+    ],
+    "version": "710ce4c68b",
+    "cut": null,
+    "clean": false,
+    "source": "site /media/pieces/sidney-eweka-999-pendant/cover.webp",
+    "note": "le 999 sort de la photo à gauche, à droite et en bas"
+   }
+  ],
+  "jack-nameplate-pendant": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 566,
+    "height": 263,
+    "widths": [
+     480,
+     566
+    ],
+    "version": "689b3a9a93",
+    "cut": [
+     "top"
+    ],
+    "clean": false,
+    "source": "site /media/pieces/jack-nameplate-pendant/cover.webp",
+    "note": "photo floue de 634 px (story) : le bord sombre de la banderole reste en liseré, jamais montré"
+   }
+  ],
+  "flaneur-medallion": [
+   {
+    "id": "cover",
+    "kind": "face",
+    "width": 471,
+    "height": 572,
+    "widths": [
+     471
+    ],
+    "version": "cc9f8c7423",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": "site /media/pieces/flaneur-medallion/cover.webp",
     "note": ""
    }
   ]

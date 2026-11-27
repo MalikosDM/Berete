@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import Lightbox from "@/components/Lightbox";
 import JewelFx, { jewelSource } from "@/components/universe/JewelFx";
-import { cutoutLargest, cutoutSrcSet, type CutoutView } from "@/data/showcase";
+import { cutoutLargest, cutoutSrcSet, isCutTop, type CutoutView } from "@/data/showcase";
 import type { JewelEffect } from "@/data/themes";
 import { useI18n } from "@/i18n";
 
@@ -25,10 +25,15 @@ const SINGLE = { x: 0, y: 0, s: 0.86, d: 12 };
 // A piece shown large (PieceShowcase.size): its main view takes the whole box (the views around stay at their places, behind).
 const MAIN_LARGE = { ...MAIN, s: 0.9 };
 const SINGLE_LARGE = { ...SINGLE, s: 0.94 };
-// "xl" (Dragon Ball with its chain, Yoni 23/11/2026): a fifth larger again, a little higher; its chain leaves the top of the
-// box under the menu, faded (.sv-xl), the jewel itself whole above the bottom of the screen.
-// Smaller since 24/11/2026 (the whole piece in the first screen of a laptop).
+// "xl" (Dragon Ball with its chain, Yoni 23/11/2026): a fifth larger again, a little higher, the jewel itself whole above the
+// bottom of the screen. Smaller since 24/11/2026 (the whole piece in the first screen of a laptop).
 const SINGLE_XL = { x: 0, y: -0.02, s: 1.04, d: 12 };
+// A view cut at the top of its image (its chain leaves the photo, 27/11/2026: never faded any more): its frame reaches the top of
+// the opening (over the room left for the menu: pt-20 / desk:pt-28 of [data-piece-cover], src/pages/PiecePage.tsx) and the
+// image is drawn from there ([data-cut-top], src/index.css), so that its chain leaves the screen at the top, cut clean. Scaled
+// from the top: the cut stays on the edge.
+const CUT = { s: 0.94, sLarge: 0.98, sXl: 1 };
+const LIFT = "-top-20 desk:-top-28";
 // Each one stays inside the box: |x| and |y| at most (1 - s) / 2.
 const AROUND = [
   { x: -0.37, y: 0.33, s: 0.26, d: 7 },
@@ -53,6 +58,8 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
   const [order, setOrder] = useState(() => views.map((_, i) => i));
   const [slide, setSlide] = useState(0);
   const multi = views.length > 1;
+  // One view alone, cut at the top of its image (its chain leaves the photo): drawn from the top of the opening.
+  const cutTop = !multi && views[0] ? isCutTop(views[0]) : false;
   const kindName = (v: CutoutView) => t.piece.views[v.kind];
 
   // A new piece (or other views from the admin): the main view in the middle again.
@@ -143,7 +150,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
   );
   // The jewel and the effect of its world on it, in one frame (isolated: the halo stays behind it).
   const framed = (v: CutoutView, main: boolean, sizes: string) => (
-    <span className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
+    <span data-cut-top={!multi && isCutTop(v) ? "" : undefined} className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
       {img(v, main, sizes)}
       {jewel ? <JewelFx kind={jewel} /> : null}
     </span>
@@ -155,6 +162,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       data-showcase={multi ? "multi" : "single"}
       data-showcase-large={large ? "" : undefined}
       data-showcase-xl={xl && !multi ? "" : undefined}
+      data-showcase-cut={cutTop ? "top" : undefined}
       className="relative h-full w-full"
     >
       {/* Computer: the views in depth */}
@@ -164,7 +172,8 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
           const spot = !multi ? (xl ? SINGLE_XL : large ? SINGLE_LARGE : SINGLE) : place === 0 ? (large ? MAIN_LARGE : MAIN) : AROUND[(place - 1) % AROUND.length]!;
           const main = place === 0;
           const style = {
-            transform: "translate(" + spot.x * 100 + "%, " + spot.y * 100 + "%) scale(" + spot.s + ")",
+            transform: cutTop ? "scale(" + (xl ? CUT.sXl : large ? CUT.sLarge : CUT.s) + ")" : "translate(" + spot.x * 100 + "%, " + spot.y * 100 + "%) scale(" + spot.s + ")",
+            transformOrigin: cutTop ? "50% 0" : undefined,
             zIndex: main ? 3 : 2 - Math.min(place, 2) / 10,
             "--d": spot.d + "px",
             "--i": place,
@@ -179,7 +188,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
               onClick={() => (main ? setOpened(viewIndex) : bring(place))}
               style={style}
               // Among several views, only the middle of the main one opens it (the small views around it stay within reach).
-              className={"sv-view absolute inset-0 " + (main ? (multi ? "pointer-events-none" : "cursor-zoom-in") : "cursor-pointer") + (main && xl && !multi ? " sv-xl" : "")}
+              className={"sv-view absolute " + (cutTop ? "inset-x-0 bottom-0 " + LIFT + " " : "inset-0 ") + (main ? (multi ? "pointer-events-none" : "cursor-zoom-in") : "cursor-pointer")}
             >
               {main && multi ? <span aria-hidden="true" className="pointer-events-auto absolute inset-[16%] z-10 cursor-zoom-in" /> : null}
               <span className="sv-par block h-full w-full">
@@ -191,7 +200,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       </div>
 
       {/* Phone: a swipe from one view to the next */}
-      <div className="absolute inset-0 lg:hidden">
+      <div className={"absolute lg:hidden " + (cutTop ? "inset-x-0 bottom-0 " + LIFT : "inset-0")}>
         <div
           ref={trackRef}
           onScroll={multi ? onScroll : undefined}

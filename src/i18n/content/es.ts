@@ -984,6 +984,11 @@ const content: Record<string, string> = {
   "Iced Signet Ring": "Sello cuajado de diamantes",
   "Snowflake Pendant": "Colgante copo de nieve",
   "Twisted Link Chain": "Cadena de eslabones torsionados",
+  // The details of the Dragon Ball pendant back (27/11/2026): its validated sentences of 23/11, translated then.
+  "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings.": "En su centro, la esfera de energía se compone de múltiples tallas de diamante; redonda, esmeralda y princesa, engastadas mediante diferentes técnicas: engaste clásico, en bisel, en carril e invertido.",
+  "Beneath the sphere stands Goku, the conduit rather than the source.": "Bajo la esfera se alza Goku, el conducto más que la fuente.",
+  "Surrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope.": "A su alrededor, las siete Bolas de Dragón completan el universo — símbolos de equilibrio, destino y esperanza colectiva.",
+  "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible.": "Cada talla, cada orientación, representa una forma de vida diferente que aporta su energía.\nIncluso las piedras de engaste invertido, colocadas boca abajo, reflejan las fuerzas invisibles que dan sin ser vistas.",
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

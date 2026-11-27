@@ -151,26 +151,27 @@ function Paints({ id }: { id: string }) {
   return (
     <defs>
       {/* Left cold white, right warm rose, the middle (the top of an arch) in the dark. */}
+      {/* (27/11/2026: the white of the O and the rose of the N read more clearly, never as a flat colour.) */}
       <linearGradient id={id + "-sheen"} x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0" stopColor="rgb(228 233 240)" stopOpacity="0.13" />
-        <stop offset="0.22" stopColor="rgb(228 233 240)" stopOpacity="0.03" />
+        <stop offset="0" stopColor="rgb(232 240 252)" stopOpacity="0.22" />
+        <stop offset="0.24" stopColor="rgb(232 240 252)" stopOpacity="0.06" />
         <stop offset="0.5" stopColor="rgb(228 233 240)" stopOpacity="0" />
-        <stop offset="0.78" stopColor="rgb(242 188 166)" stopOpacity="0.03" />
-        <stop offset="1" stopColor="rgb(242 188 166)" stopOpacity="0.15" />
+        <stop offset="0.76" stopColor="rgb(240 172 150)" stopOpacity="0.07" />
+        <stop offset="1" stopColor="rgb(240 172 150)" stopOpacity="0.25" />
       </linearGradient>
       <linearGradient id={id + "-side"} x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0" stopColor="rgb(228 233 240)" stopOpacity="0.34" />
-        <stop offset="0.2" stopColor="rgb(228 233 240)" stopOpacity="0.1" />
+        <stop offset="0" stopColor="rgb(232 240 252)" stopOpacity="0.5" />
+        <stop offset="0.22" stopColor="rgb(232 240 252)" stopOpacity="0.16" />
         <stop offset="0.5" stopColor="rgb(214 200 196)" stopOpacity="0.015" />
-        <stop offset="0.8" stopColor="rgb(242 188 166)" stopOpacity="0.11" />
-        <stop offset="1" stopColor="rgb(242 188 166)" stopOpacity="0.38" />
+        <stop offset="0.78" stopColor="rgb(240 172 150)" stopOpacity="0.18" />
+        <stop offset="1" stopColor="rgb(240 172 150)" stopOpacity="0.55" />
       </linearGradient>
       <linearGradient id={id + "-rim"} x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0" stopColor="rgb(236 240 246)" stopOpacity="0.95" />
-        <stop offset="0.26" stopColor="rgb(236 240 246)" stopOpacity="0.5" />
-        <stop offset="0.5" stopColor="rgb(226 210 204)" stopOpacity="0.14" />
-        <stop offset="0.74" stopColor="rgb(246 194 172)" stopOpacity="0.55" />
-        <stop offset="1" stopColor="rgb(246 194 172)" stopOpacity="0.95" />
+        <stop offset="0" stopColor="rgb(238 244 252)" stopOpacity="1" />
+        <stop offset="0.28" stopColor="rgb(238 244 252)" stopOpacity="0.6" />
+        <stop offset="0.5" stopColor="rgb(226 210 204)" stopOpacity="0.12" />
+        <stop offset="0.72" stopColor="rgb(244 178 154)" stopOpacity="0.65" />
+        <stop offset="1" stopColor="rgb(244 178 154)" stopOpacity="1" />
       </linearGradient>
       <linearGradient id={id + "-fade-g"} gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="10" y2="130">
         <stop offset="0" stopColor="#fff" />
@@ -201,11 +202,11 @@ function Ground({ id }: { id: string }) {
           <stop offset="1" stopColor="#040405" />
         </linearGradient>
         <radialGradient id={id + "-pool-c"} cx="-46" cy="30" r="80" gradientTransform="translate(-46 30) scale(1 0.28) translate(46 -30)" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="rgb(228 233 240)" stopOpacity="0.15" />
+          <stop offset="0" stopColor="rgb(232 240 252)" stopOpacity="0.24" />
           <stop offset="1" stopColor="rgb(228 233 240)" stopOpacity="0" />
         </radialGradient>
         <radialGradient id={id + "-pool-r"} cx="46" cy="30" r="80" gradientTransform="translate(46 30) scale(1 0.28) translate(-46 -30)" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="rgb(242 188 166)" stopOpacity="0.16" />
+          <stop offset="0" stopColor="rgb(240 172 150)" stopOpacity="0.26" />
           <stop offset="1" stopColor="rgb(242 188 166)" stopOpacity="0" />
         </radialGradient>
       </defs>
@@ -226,14 +227,14 @@ function Beams({ id }: { id: string }) {
       <defs>
         <linearGradient id={id + "-beam-c"} gradientUnits="userSpaceOnUse" x1="-330" y1="-96" x2="70" y2="20">
           <stop offset="0" stopColor="rgb(236 240 246)" stopOpacity="0" />
-          <stop offset="0.55" stopColor="rgb(236 240 246)" stopOpacity="0.07" />
-          <stop offset="0.8" stopColor="rgb(236 240 246)" stopOpacity="0.1" />
+          <stop offset="0.55" stopColor="rgb(232 240 252)" stopOpacity="0.11" />
+          <stop offset="0.8" stopColor="rgb(232 240 252)" stopOpacity="0.16" />
           <stop offset="1" stopColor="rgb(236 240 246)" stopOpacity="0" />
         </linearGradient>
         <linearGradient id={id + "-beam-r"} gradientUnits="userSpaceOnUse" x1="330" y1="-96" x2="-70" y2="20">
           <stop offset="0" stopColor="rgb(246 194 172)" stopOpacity="0" />
-          <stop offset="0.55" stopColor="rgb(246 194 172)" stopOpacity="0.08" />
-          <stop offset="0.8" stopColor="rgb(246 194 172)" stopOpacity="0.11" />
+          <stop offset="0.55" stopColor="rgb(240 172 150)" stopOpacity="0.13" />
+          <stop offset="0.8" stopColor="rgb(240 172 150)" stopOpacity="0.18" />
           <stop offset="1" stopColor="rgb(246 194 172)" stopOpacity="0" />
         </linearGradient>
         <radialGradient id={id + "-meet"} cx="0" cy="0" r="78" gradientUnits="userSpaceOnUse">

@@ -36,7 +36,14 @@ export const MAX_BLOCKS = 5;
 /** The photos of the details and their sentences, piece by piece (each photo looked at, each sentence taken as written). */
 export const EXPLAIN: Record<string, Explain[]> = {
   // The details of Yoni's texts (26-27/11/2026, src/data/yoni2711.ts), each beside the close-up that shows it (looked at photo by
-  // photo). The Dragon Ball pendant and the pendant of Kenan Yildiz have none: their vision stays whole beside their film.
+  // photo). The Dragon Ball pendant: its validated sentences of 23/11 back (27/11/2026), the sphere and its cuts, Goku lifting it,
+  // the seven Dragon Balls, the cuts turned every way.
+  "kevin-schade-dragon-ball-pendant": [
+    { photo: "p09", texts: [{ detail: 0 }] },
+    { photo: "p14", texts: [{ detail: 1 }] },
+    { photo: "p16", texts: [{ detail: 2 }] },
+    { photo: "p11", texts: [{ detail: 3 }] },
+  ],
   // The stars and diamonds around the crest, the stripes, the tricolour and its inscriptions, TIKUS and the 9 of Marcus Thuram's
   // ring, the Serie A emblem and its 20, the crown worn as a pendant beside the opened ring and its trophy (the strongest).
   "campione-d-italia-2023-2024": [
@@ -155,13 +162,14 @@ export const OVERVIEW: Record<string, string[]> = {
   // « Every Angle » of Yoni's pages (26-27/11/2026): four photos chosen first, the whole piece from the front always first (even
   // when the opening shows it too), then See More. The jersey pendant of Noah Okafor has none (its page goes from its vision to
   // its details): its other photos come after its details.
-  "kevin-schade-dragon-ball-pendant": ["p18", "p20", "p09", "p06"],
+  "kevin-schade-dragon-ball-pendant": ["p18", "p20", "p08", "p06"],
   "vfb-stuttgart-dfb-pokal-2025": ["p17", "p16", "p19", "p22"],
   "campione-d-italia-2023-2024": ["p55", "p01", "p06", "p41"],
   "kenan-yildiz-celebration-pendant": ["p07", "p06", "p02", "p03"],
   "noah-okafor-oka-pendant": ["p05", "p08", "p07", "p14"],
   "noah-okafor-jersey-pendant": [],
-  "noah-okafor-octagon-pendant": ["p09", "p01", "p10", "p05"],
+  // (27/11/2026: its bust p01, all black in a small frame, gives its place to the N and its pears.)
+  "noah-okafor-octagon-pendant": ["p09", "p10", "p05", "p07"],
   // Its front, three-quarters for the relief, its back, the macro of its scales and its ruby.
   "marcus-thuram-t-serpent-pendant": ["p08", "p17", "p04", "p01"],
 };
