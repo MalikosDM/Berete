@@ -8,6 +8,7 @@
  *   public/media/brand/monogram.<v>.svg   the BRT and the diamond alone, in fine lines (the monogram in the background of the
  *                                         pages, src/components/Monogram.tsx)
  * and src/data/brand.generated.json (their addresses). <v>: a fingerprint of the file, so no cache keeps an old one.
+ * Also src/data/monogram-lines.generated.json: the lines of the monogram one by one (the intro of the house draws them).
  *
  *   npm run brand
  */
@@ -50,9 +51,26 @@ for (const old of await readdir(DIR)) if (/^(wordmark|berete|logo-sharp|monogram
   if (!svg.includes("stroke-width:0.6")) throw new Error("logo.svg: its style .st0 was not found");
   const v = createHash("sha256").update(svg).digest("hex").slice(0, 10);
   await writeFile(join(DIR, "monogram." + v + ".svg"), svg);
-  const [, , w, h] = box.split(" ").map(Number);
+  const [x0, y0, w, h] = box.split(" ").map(Number);
   out.monogram = { src: "/media/brand/monogram." + v + ".svg", ratio: Math.round((w / h) * 1000) / 1000 };
   console.log("  + public/media/brand/monogram." + v + ".svg");
+  // Its lines one by one, for the intro of the house (src/components/Preloader.tsx, 27/11/2026: the monogram draws itself):
+  // every closed line of the drawings that start inside the frame of the monogram (the letters of the name start below it),
+  // each its own path, so each one is drawn from its start to its end; the outline of each drawing (the diamond, B, R, T)
+  // first, then the lines inside them (the facets of the diamond), a line without length left out.
+  const drawings = [];
+  for (const [, d] of logo.matchAll(/<path[^>]*?class="st0"[^>]*?\sd="([^"]+)"/g)) {
+    const start = d.match(/^\s*M\s*(-?[\d.]+)[\s,]+(-?[\d.]+)/);
+    if (!start || Number(start[1]) < x0 || Number(start[1]) > x0 + w || Number(start[2]) < y0 || Number(start[2]) > y0 + h) continue;
+    if (/m/.test(d)) throw new Error("logo.svg: a relative move in the monogram, its lines cannot be split");
+    const parts = d.replace(/\s+/g, " ").trim().split(/(?=M)/).map((part) => part.trim());
+    // Without length: every point of the line is its start (M x,y then segments that never leave it).
+    drawings.push(parts.filter((part) => new Set(part.match(/-?\d*\.?\d+/g)).size > 2));
+  }
+  const lines = [...drawings.map((parts) => parts[0]), ...drawings.flatMap((parts) => parts.slice(1))].filter(Boolean);
+  if (lines.length === 0) throw new Error("logo.svg: no line of the monogram found");
+  await writeFile(join(ROOT, "src", "data", "monogram-lines.generated.json"), JSON.stringify({ viewBox: box, outlines: drawings.length, lines }, null, 1) + "\n");
+  console.log("  = src/data/monogram-lines.generated.json (" + lines.length + " lines)");
 }
 for (const [name, box] of Object.entries(FRAMES)) {
   // Only the letters of the name: the diamond and BRT are drawn above y 360 (outside the frame), cut by the viewBox.

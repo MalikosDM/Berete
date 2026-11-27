@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* The worlds of the pieces drawn in code (src/components/universe/CodeScene.tsx). */
+@import "./components/universe/scenes.css";
 
 /* Build outputs are not sources: never scan them for classes. */
 @source not "../dist";
@@ -56,6 +58,13 @@
   /* The Arabic pages add Amiri and IBM Plex Sans Arabic (below, html[lang="ar"]). */
   --font-display: "Cormorant Garamond", "Cormorant Fallback", "Times New Roman", ui-serif, Georgia, serif;
   --font-sans: "Manrope", "Manrope Fallback", ui-sans-serif, system-ui, sans-serif;
+
+  /* Every weight of the site one step heavier (Yoni, 26/11/2026: « tous les textes sont très très fins »): light 400, normal 500,
+     medium 600, semibold 700 — still minimal, read at a glance. */
+  --font-weight-light: 400;
+  --font-weight-normal: 500;
+  --font-weight-medium: 600;
+  --font-weight-semibold: 700;
 
   --animate-sheen: sheen 7s ease-in-out infinite;
   --animate-draw: draw 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
@@ -213,7 +222,7 @@ input[type="radio"] {
 
 @utility title-caps {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.16em;
   line-height: 1.1;
@@ -240,7 +249,7 @@ input[type="radio"] {
 @utility eyebrow {
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.26em;
   color: var(--color-rose-light);
@@ -267,7 +276,7 @@ input[type="radio"] {
   color: var(--color-white);
   font-family: var(--font-sans);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -293,7 +302,7 @@ input[type="radio"] {
   color: var(--color-white);
   font-family: var(--font-sans);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -340,6 +349,7 @@ input[type="radio"] {
     color: var(--color-white);
     font-family: var(--font-sans);
     font-size: 1rem;
+    font-weight: 500;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -408,8 +418,97 @@ html.lenis body {
  * moves is a transform or an opacity, and nothing moves when the visitor asks for reduced motion.
  */
 
-/* The title fonts of the universes are no longer loaded (24/11/2026): every title is in the font of the house. Their files stay
-   in public/fonts/universe (THEME_FONTS of src/data/themes.ts), never served by a page. */
+/* Back on 26/11/2026 (Yoni: « chaque univers garde sa typographie propre », the title of the piece only). */
+/* The title fonts of the universes (free licence, OFL: public/fonts/universe/LICENSES.txt), loaded only by the page
+   that uses one (and announced early by its <link rel="preload">). */
+@font-face {
+  font-family: "Shojumaru";
+  src: url("/fonts/universe/shojumaru-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Italiana";
+  src: url("/fonts/universe/italiana-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Cinzel";
+  src: url("/fonts/universe/cinzel-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Grenze Gotisch";
+  src: url("/fonts/universe/grenze-gotisch-latin-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Big Shoulders Display";
+  src: url("/fonts/universe/big-shoulders-display-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Pirata One";
+  src: url("/fonts/universe/pirata-one-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Marcellus SC";
+  src: url("/fonts/universe/marcellus-sc-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Bodoni Moda";
+  src: url("/fonts/universe/bodoni-moda-latin-500-italic.woff2") format("woff2");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Michroma";
+  src: url("/fonts/universe/michroma-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Poiret One";
+  src: url("/fonts/universe/poiret-one-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("/fonts/universe/fraunces-latin-600-italic.woff2") format("woff2");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Syncopate";
+  src: url("/fonts/universe/syncopate-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Tenor Sans";
+  src: url("/fonts/universe/tenor-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+/* The watermark 力 ("power") of the energy universe, in a Japanese brush. */
+@font-face {
+  font-family: "Universe Brush";
+  src: url("/fonts/universe/yuji-boku-115-400-normal.woff2") format("woff2");
+  unicode-range: U+529B;
+  font-display: swap;
+}
+
 
 .universe {
   /* Where the piece is: the right of a computer screen (the left in Arabic), the top of a phone. */
@@ -2587,7 +2686,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 
 [data-piece] [data-u-title] {
   font-family: var(--u-font-family, var(--font-display));
-  font-weight: var(--u-font-weight, 300);
+  font-weight: var(--u-font-weight, 400);
   font-style: var(--u-font-style, normal);
   text-transform: var(--u-font-case, uppercase);
   letter-spacing: var(--u-font-tracking, 0.06em);
@@ -2597,7 +2696,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 }
 html[lang="ar"] [data-piece] [data-u-title] {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 500;
   font-style: normal;
   letter-spacing: 0;
   font-size: clamp(1.5rem, 2vw, 2.125rem);
@@ -3367,6 +3466,19 @@ html[lang="ar"] [data-piece] [data-u-title] {
 .monogram[data-lit] .monogram-glow {
   opacity: 0.2;
 }
+/* Behind a piece, its world first (Yoni, 26/11/2026: the large lettering and the drawn diamond less visible): fainter lines, a
+   softer light. */
+.universe-stage > .monogram .monogram-lines {
+  opacity: 0.028;
+}
+.universe-stage > .monogram[data-lit] .monogram-glow {
+  opacity: 0.1;
+}
+/* The Art of Detail of the Inter ring: its night of celebration stays, quieter behind the words. */
+[data-piece="campione-d-italia-2023-2024"] [data-piece-section="details"] {
+  /* the whole width of the screen, never a panel */
+  border-image: linear-gradient(rgb(3 5 11 / 0.55) 0 0) fill 0 / / 0 100vmax;
+}
 .monogram-light {
   position: absolute;
   inset: 0;
@@ -3460,7 +3572,7 @@ html[lang="ar"] [data-piece] [data-u-title] {
   min-height: 3rem;
   font-family: var(--font-sans);
   font-size: 1rem;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -3564,6 +3676,15 @@ html[lang="ar"] [data-piece] [data-u-title] {
   object-fit: cover;
   object-position: 50% 50%;
   transform: none;
+}
+/* An image on black placed freely (the blue Genkidama, 26/11/2026): its edges fade into the black of the page (its sphere, cut by the
+   top of the image, melts into the dark instead of stopping on a line). */
+.universe[data-free] .u-backdrop img,
+.universe[data-free] .u-depth {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 82%, transparent 100%), linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 16%, #000 82%, transparent 100%), linear-gradient(to right, transparent 0, #000 10%, #000 90%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 /* The flat image drawn 3 % larger, as its depth is (its edges never show when the planes move): no jump from one to the other. */
 .universe[data-anchored] .u-backdrop img {
@@ -3721,6 +3842,17 @@ html[lang="ar"] [data-piece] [data-u-title] {
   top: 0;
   background: #000;
 }
+/* "Up next" on a phone (27/11/2026): under the film (its top: the top of the film plus its height), the room scrolls down to
+   it; on a computer it stands beside the film, in the right column of the room. */
+@media (max-width: 1023.98px) {
+  .atelier-room .ar-side {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: calc(7.5rem + min(calc(100vw - 2rem), calc((100svh - 9.5rem) * var(--fr, 0.5625))) / var(--fr, 0.5625) + 2rem);
+    padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
+  }
+}
 
 /* Room above the piece for what its world holds there (the sphere of the Genkidama v2, 25/11/2026): the jewel stands lower in
    the opening, right under the sphere. */
@@ -3749,3 +3881,82 @@ html[lang="ar"] [data-piece] [data-u-title] {
 @keyframes viewer-prompt-hand { 0%, 100% { transform: translateX(-6px) rotate(-8deg); } 50% { transform: translateX(6px) rotate(8deg); } }
 @keyframes viewer-prompt-out { to { opacity: 0; visibility: hidden; } }
 @media (prefers-reduced-motion: reduce) { .viewer-prompt-hand { animation: none; } }
+
+/* The intro of the house (src/components/Preloader.tsx, Yoni 26/11/2026: "my logo that loads"): on black, the monogram BRT and
+   its diamond draw themselves in fine lines of rose gold, a soft light lifts them, three points of the diamond twinkle once.
+   Never with « reduce motion » (no intro at all; and, if ever shown, its lines drawn and still). */
+.preloader-mark {
+  width: min(58vw, 15rem);
+  animation: preloader-glow 0.9s ease-out 1.15s both;
+}
+.preloader-line {
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 1;
+  animation-name: preloader-draw;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  animation-fill-mode: forwards;
+}
+.preloader-spark {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 250 245 / 0.95) 0%, rgb(232 180 160 / 0.5) 38%, transparent 70%);
+  opacity: 0;
+  animation: preloader-twinkle 0.7s ease-in-out both;
+}
+@keyframes preloader-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes preloader-glow {
+  from {
+    filter: drop-shadow(0 0 0 rgb(232 180 160 / 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 9px rgb(232 180 160 / 0.32));
+  }
+  to {
+    filter: drop-shadow(0 0 3px rgb(232 180 160 / 0.14));
+  }
+}
+@keyframes preloader-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preloader-mark,
+  .preloader-line,
+  .preloader-spark {
+    animation: none;
+  }
+  .preloader-line {
+    stroke-dashoffset: 0;
+  }
+}
+
+
+/* ---------- The text beside each piece (Yoni, 26/11/2026: « plus lisible, un peu plus grand et un peu plus gras ») ----------
+   The vision beside its film, the words beside the close-ups, the composition: 17 px on a phone and on a computer, in the
+   heavier weight of the house, with air between the lines (the scale of the house: 17 px at most for a text). */
+.piece-text {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.75;
+  color: var(--color-bone);
+}
+@media (min-width: 1024px) {
+  .piece-text {
+    font-size: 1.125rem;
+  }
+}

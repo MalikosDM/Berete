@@ -31,6 +31,7 @@
     "vps": "bash deploy/vps.sh",
     "brand": "node scripts/brand-media.mjs",
     "mechanisms": "node scripts/mechanism-media.mjs",
+    "atelier-chapters": "node scripts/atelier-chapters.mjs",
     "extra-media": "node scripts/extra-media.mjs",
     "page-media": "node scripts/page-media.mjs",
     "thumbs": "tsx scripts/thumbs.ts && tsx scripts/angle-views.ts",

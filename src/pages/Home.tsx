@@ -6,17 +6,18 @@ import PieceCard from "@/components/PieceCard";
 import PieceThumb from "@/components/PieceThumb";
 import Reveal from "@/components/Reveal";
 import ScrollVideo, { type ScrollStep } from "@/components/ScrollVideo";
-import { defaultCatalogue, media } from "@/data/catalogue";
-import { storyLines } from "@/data/featureFilms";
+import { media } from "@/data/catalogue";
+import { HOUSE_PIECE, MECHANISM_PIECE } from "@/data/homeTexts";
 import pages from "@/data/pages.generated.json" with { type: "json" };
 import { cutoutSrc, cutoutSrcSet, resolveShowcase } from "@/data/showcase";
 import { yoni } from "@/data/sources";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import { publishedPress } from "@/data/press";
 import type { Piece } from "@/data/types";
-import { Link, useI18n } from "@/i18n";
+import { Link, useI18n, useLocale } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
+import { homeText, useHomeTexts } from "@/lib/homeTexts";
 import { waLink } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
@@ -26,10 +27,13 @@ import { useWhatsAppMessage } from "@/lib/whatsapp";
  * photo, what Berete does. Then, smaller: who Berete is, beside one piece; the Dragon Ball pendant and its sphere that turns
  * (an invitation into its world, not an explanation); the great commissions (Inter Milan, VfB Stuttgart); a balanced
  * selection, the Safi Link first; the press.
+ * (Yoni, 26/11/2026: no more empty space on the sides) Each section with one piece sets it on one side, in turn left and
+ * right, and beside it its words: its title, a short text about the piece (src/data/homeTexts.ts: the line of the piece, or
+ * the text written in the admin), its way in. On a phone, the piece and then its words, one under the other.
  */
 
-/** The piece of the opening: the Butterfly pendant, cut out of its photo, alone on black (without its purple forest). */
-const HERO_PIECE = "michy-batshuayi-butterfly-pendant";
+/** The piece of the house: the Butterfly pendant (src/data/homeTexts.ts). */
+const HERO_PIECE = HOUSE_PIECE;
 /**
  * Its photo (Yoni, 23/11/2026): the pendant on its chain, on the black bust ("chain", by default); "wing", the close-up of a
  * wing, may take its place at the top of the page one day.
@@ -37,11 +41,9 @@ const HERO_PIECE = "michy-batshuayi-butterfly-pendant";
 const HERO_PHOTOS = { chain: ["michy-batshuayi-butterfly-chain", "p54"], wing: ["michy-batshuayi-butterfly-chain", "p75"] } as const;
 const HERO_PHOTO: keyof typeof HERO_PHOTOS = "chain";
 /** The innovation: the Dragon Ball pendant and its Spirit Bomb that turns. */
-const INNOVATION = "kevin-schade-dragon-ball-pendant";
+const INNOVATION = MECHANISM_PIECE;
 /** A balanced selection (not only football): two pendants, two chains, two rings, in turn. */
 const SELECTION = ["the-safi-link", "the-hand", "oval-eternity-band", "tulips-on-tour-medallion", "butterfly-chain", "bosnia-and-herzegovina-world-cup-2026-ring"];
-/** The words of the Dragon Ball pendant on the home page: one sentence of its story (Yoni, 24/11/2026). */
-const DRAGON_BALL_LINE = ["But to us, energy was never meant to remain still"];
 
 /** Scrolls smoothly to an element (through Lenis when it runs). */
 function scrollToId(id: string) {
@@ -96,52 +98,77 @@ function HeroPhoto() {
   );
 }
 
+type Side = "start" | "end";
+
 /**
- * One section of the home page, as a magazine does it (24/11/2026, "comme chez Rolex"): one subject, its picture, its name,
- * one short sentence, one way in; centred, nothing beside it that competes with it.
+ * One section of the home page with one piece (Yoni, 26/11/2026: "the jewel on the right or on the left, and the descriptive
+ * writing beside it, instead of empty space here and there"): the piece on one side, in turn left and right ("start" / "end":
+ * mirrored in Arabic), its words on the other — its title, a line of the house when there is one, the name of the piece when
+ * the title is not it, its short text (src/data/homeTexts.ts) and its way in. On a phone: the piece, then its words, centred.
  */
-function Story({ id, data, visual, title, text, link, heading = "h2", children, attrs, linkAttrs }: { id: string; data: string; visual: ReactNode; title: string; text?: string; link?: { to: string; label: string; external?: boolean }; heading?: "h1" | "h2"; children?: ReactNode; attrs?: Record<string, string>; linkAttrs?: Record<string, string> }) {
+function Feature({ id, data, side, visual, title, heading = "h2", lead, name, block, text, link, attrs, linkAttrs }: { id: string; data: string; side: Side; visual: ReactNode; title: string; heading?: "h1" | "h2"; lead?: string; name?: string; block: string; text: string; link?: { to: string; label: string }; attrs?: Record<string, string>; linkAttrs?: Record<string, string> }) {
   const H = heading;
   return (
-    <section id={id} aria-labelledby={id + "-title"} data-home-story={data} {...attrs} className="scroll-mt-0 border-t border-white/10">
-      <div className="wrap flex flex-col items-center py-20 text-center lg:py-28">
-        <Reveal className="w-full">{visual}</Reveal>
-        <H id={id + "-title"} className={"title-caps tracking-[0.12em] mt-10 max-w-3xl text-white [text-wrap:balance] lg:mt-12 " + (heading === "h1" ? "t-hero" : "t-title")}>
-          {title}
-        </H>
-        {text ? <p className="mt-5 max-w-xl text-base leading-relaxed text-bone lg:text-[1rem]">{text}</p> : null}
-        {children}
-        {link ? (
-          link.external ? (
-            <a href={link.to} target="_blank" rel="noreferrer" data-cta {...linkAttrs} className="btn-secondary mt-7">
-              {link.label} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
-            </a>
-          ) : (
+    <section id={id} aria-labelledby={id + "-title"} data-home-story={data} data-home-side={side} {...attrs} className="scroll-mt-0 border-t border-white/10">
+      <div className="wrap grid items-center gap-y-10 py-20 lg:grid-cols-2 lg:gap-x-16 lg:py-24 xl:gap-x-24">
+        {/* The piece against the inner side of its half, toward its words (the empty space, if any, at the edges of the page). */}
+        <Reveal className={"w-full " + (side === "end" ? "lg:order-2 lg:*:ms-0 lg:*:me-auto" : "lg:*:ms-auto lg:*:me-0")}>{visual}</Reveal>
+        <div data-home-words className={"flex w-full max-w-xl flex-col items-center justify-self-center text-center lg:max-w-[30rem] lg:items-start lg:text-start " + (side === "end" ? "lg:justify-self-end" : "lg:justify-self-start")}>
+          <H id={id + "-title"} className={"title-caps tracking-[0.12em] text-white [text-wrap:balance] " + (heading === "h1" ? "t-hero" : "t-title")}>
+            {title}
+          </H>
+          {lead ? <p className="mt-5 text-base leading-relaxed text-bone">{lead}</p> : null}
+          {name ? (
+            <>
+              <span aria-hidden="true" className="bg-rose-gold mt-8 block h-px w-12" />
+              <p data-home-piece-name className="title-caps mt-6 text-base tracking-[0.08em] text-white [text-wrap:balance] lg:text-[1.0625rem]">
+                {name}
+              </p>
+            </>
+          ) : null}
+          {text ? (
+            <p data-home-text={block} className={(name ? "mt-3" : "mt-5") + " text-base leading-relaxed text-bone [text-wrap:pretty]"}>
+              {text}
+            </p>
+          ) : null}
+          {link ? (
             <Link to={link.to} data-cta {...linkAttrs} className="btn-secondary mt-7">
               {link.label} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
             </Link>
-          )
-        ) : null}
+          ) : null}
+        </div>
       </div>
     </section>
   );
+}
+
+/** The text beside a piece: the one written in the admin for this block, else the line of the piece, in the page's language. */
+function useBlockText(): (block: string, piece: Piece | undefined) => string {
+  const texts = useHomeTexts();
+  const locale = useLocale();
+  return (block, piece) => homeText(texts, block, locale, piece?.line);
 }
 
 /** The house: who Berete is, in one sentence, with one piece on black (the Butterfly on its chain, on the black bust). */
 function House() {
   const { t } = useI18n();
   const cat = useCatalogue();
+  const textOf = useBlockText();
   const piece = cat.pieces.find((p) => p.slug === HERO_PIECE);
   const [dir, file] = HERO_PHOTOS[HERO_PHOTO];
   const photo = yoni(dir, file, { alt: piece?.title ?? "" });
   const shown = photo ?? piece?.cover;
   return (
-    <Story
+    <Feature
       id="home-next"
       data="house"
+      side="start"
       heading="h1"
       title={t.home.hook}
-      text={t.home.who}
+      lead={t.home.who}
+      name={piece?.title}
+      block="house"
+      text={textOf("house", piece)}
       link={{ to: "/creations", label: t.common.allCreations }}
       visual={
         shown && piece ? (
@@ -156,12 +183,14 @@ function House() {
 
 /**
  * The Mechanism (Yoni, 24/11/2026: "the immersive part is not for the home page" — its film stays on its own page): the Dragon
- * Ball pendant and, set on it, a circle where only its sphere turns, in a loop, silent, while it is on screen. Its name, one
- * sentence of its story, "Enter the World".
+ * Ball pendant and, under its corner, a circle where only its sphere turns, in a loop, silent, while it is on screen. Its name,
+ * its short text, "Enter the World". (Yoni, 26/11/2026: "the magnifying glass stays exactly where it is, the image goes up, so
+ * the whole piece is seen with its ball": the piece stands above the circle, never under it — its lowest Dragon Ball whole.)
  */
 function Mechanism() {
   const { t } = useI18n();
   const cat = useCatalogue();
+  const textOf = useBlockText();
   const piece = cat.pieces.find((p) => p.slug === INNOVATION);
   const videoRef = useRef<HTMLVideoElement>(null);
   const sphere = pages.sphere;
@@ -185,27 +214,31 @@ function Mechanism() {
   }, [sphere.video]);
   if (!piece) return null;
   const view = resolveShowcase(piece.slug, piece.showcase).views[0];
-  const line = storyLines(piece, defaultCatalogue.pieces.find((p) => p.slug === INNOVATION), DRAGON_BALL_LINE)[0];
   return (
-    <Story
+    <Feature
       id="innovation"
       data="mechanism"
+      side="end"
       attrs={{ "data-home-innovation": "" }}
       linkAttrs={{ "data-innovation-link": "" }}
       title={t.feature.mechanism}
-      text={line}
+      name={piece.title}
+      block="mechanism"
+      text={textOf("mechanism", piece)}
       link={{ to: "/pieces/" + piece.slug, label: t.common.enterWorld }}
       visual={
-        <div className="relative mx-auto aspect-[4/5] w-full max-w-[24rem]">
-          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" className="block h-full w-full">
+        // The frame of the piece (4:5) at the top; under its corner, the room of the circle: the circle is 36 % of the width
+        // and the piece ends at 95 % of its frame (its cut-out keeps a margin), so 25:39 lets it end just above the circle.
+        <div data-innovation-visual className="relative mx-auto aspect-[25/39] w-full max-w-[24rem]">
+          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className="absolute inset-x-0 top-0 block aspect-[4/5]">
             {view ? (
               <img src={cutoutSrc(piece.slug, view, view.widths[1] ?? view.widths[0]!)} srcSet={cutoutSrcSet(piece.slug, view)} sizes="(max-width: 1023px) 80vw, 24rem" alt={piece.title} width={view.width} height={view.height} loading="lazy" decoding="async" draggable={false} data-innovation-photo className="h-full w-full object-contain" />
             ) : (
               <MediaView item={piece.cover} alt={piece.title} fit="contain" sizes="(max-width: 1023px) 80vw, 24rem" />
             )}
           </Link>
-          {/* Its sphere that turns, in a circle set on the piece's frame. */}
-          <div className="absolute -end-2 bottom-0 w-[36%] max-w-40 sm:-end-6">
+          {/* Its sphere that turns, in a circle at the corner of the piece, where it always was. */}
+          <div data-innovation-loupe className="absolute -end-2 bottom-0 w-[36%] max-w-40 sm:-end-6">
             <div className="relative aspect-square overflow-hidden rounded-full border border-rose-light/40 bg-ink-soft shadow-[0_18px_50px_rgba(0,0,0,0.6)]">
               <video ref={videoRef} poster={sphere.poster} style={posterBehind(sphere.poster, "cover")} muted loop playsInline preload="none" aria-label={t.home.innovation.film} data-sphere-film className="h-full w-full object-cover" />
             </div>
@@ -220,14 +253,19 @@ function Mechanism() {
 function Commission({ slug, index }: { slug: string; index: number }) {
   const { t } = useI18n();
   const cat = useCatalogue();
+  const textOf = useBlockText();
   const piece = cat.pieces.find((p) => p.slug === slug);
   if (!piece) return null;
+  const block = "ring-" + slug;
   return (
-    <Story
+    <Feature
       id={"commission-" + index}
-      data={"ring-" + slug}
+      data={block}
+      // After the house (left) and The Mechanism (right): the first ring on the left, the second on the right.
+      side={index % 2 === 1 ? "start" : "end"}
       title={piece.title}
-      text={piece.line || undefined}
+      block={block}
+      text={textOf(block, piece)}
       link={{ to: "/pieces/" + piece.slug, label: t.common.enterWorld }}
       visual={
         <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-special-ring={piece.slug} data-thumb-frame className="relative mx-auto block aspect-[4/3] w-full max-w-[34rem] overflow-hidden">

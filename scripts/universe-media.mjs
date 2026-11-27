@@ -90,6 +90,10 @@ const BACKDROPS = [
     mobile: [0.5, 0.5],
     core: [0.5, 0.148, 0.15],
     mobileCore: [0.5, 0.223, 0.26],
+    // Back on the pendant on 26/11/2026 (the choice of Yoni's wife): placed freely, its sphere above the piece and a little lower
+    // in the frame (src/components/Universe.tsx), its edges fading into the black.
+    free: true,
+    drop: [0.1, 0.05],
   },
 ];
 
@@ -408,7 +412,7 @@ async function backdropFiles(b) {
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
     // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below, free: b.free, drop: b.drop };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;
@@ -468,7 +472,7 @@ if (meta) {
       crop = { left: Math.min(width - w, Math.max(0, fx * width - w / 2)), top: Math.min(height - h, Math.max(0, fy * height - MOBILE_AT_Y * h)), w, h };
     }
     Object.assign(e, { name: b.name, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, crop) });
-    for (const k of ["core", "mobileCore", "moon", "mobileMoon", "spots", "regions", "below"]) if (b[k] !== undefined) e[k] = b[k];
+    for (const k of ["core", "mobileCore", "moon", "mobileMoon", "spots", "regions", "below", "free", "drop"]) if (b[k] !== undefined) e[k] = b[k];
   }
 }
 for (const b of meta ? [] : BACKDROPS) if (!only || only.includes(b.id) || SEQUENCES.some((q) => only.includes(q.id) && q.frames.includes(b.id))) backdrops[b.id] = await backdrop(b);

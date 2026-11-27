@@ -23,7 +23,9 @@ test("a piece: one small label, its name in the font of the house, the two butto
   const order = await page.locator("[data-piece-section]").evaluateAll((els) => els.map((el) => el.getAttribute("data-piece-section")));
   expect(order[0]).toBe("opening");
   expect(order.at(-1)).toBe("end");
-  expect(order.indexOf("story")).toBeLessThan(order.indexOf("created-for"));
+  // Its vision beside its film, before the champions with their rings (Yoni's order, 26/11/2026).
+  expect(Math.max(order.indexOf("story"), order.indexOf("film"))).toBeGreaterThan(0);
+  expect(Math.max(order.indexOf("story"), order.indexOf("film"))).toBeLessThan(order.indexOf("champions"));
   // One single end block, no stories on a piece page.
   await expect(page.locator("[data-piece-section='end']")).toHaveCount(1);
   await expect(page.locator("[data-seen-in-stories]")).toHaveCount(0);
@@ -35,13 +37,12 @@ test("one piece = one page: the top of the Inter ring, the chains of the octagon
   await skipIntro(page);
   await page.goto("/pieces/campione-d-italia-pendant");
   await expect(page).toHaveURL(/\/pieces\/campione-d-italia-2023-2024/);
-  const pendant = page.locator("#worn-as-pendant");
-  await expect(pendant).toBeVisible();
-  await expect(pendant.getByRole("heading", { name: "Worn as a Pendant" })).toBeVisible();
-  await expect(pendant.locator("li")).toHaveCount(2);
+  // Its crown worn as a pendant is told once, in its details (« 06 — Beyond the Ring », Yoni 26/11/2026): no section apart.
+  await expect(page.locator("#worn-as-pendant")).toHaveCount(0);
+  await expect(page.locator("[data-magazine-block][data-big] h3")).toHaveText(/Beyond the Ring/i);
   await page.goto("/pieces/two-row-tennis-chain");
   await expect(page).toHaveURL(/\/pieces\/noah-okafor-octagon-pendant/);
-  await expect(page.locator("#its-chain").getByRole("heading", { name: "Its Chain" })).toBeVisible();
+  await expect(page.locator("#its-chain").getByRole("heading", { name: "The Accompanying Chains" })).toBeVisible();
   await page.goto("/pieces/cross-infinity-chain");
   await expect(page).toHaveURL(/\/pieces\/lois-openda-script-pendant/);
   await expect(page.locator("#its-chain")).toBeVisible();
@@ -90,11 +91,15 @@ test("the names: Losene Keita, the pieces without « — Pendant », in French t
   await page.goto("/fr/pieces/kevin-schade-dragon-ball-pendant");
   await expect(page.locator("[data-made-for] h2")).toHaveText(/Créé exclusivement pour Kevin Schade/);
   const fr = await page.locator("main").innerText();
-  expect(fr).toContain("Genkidama");
+  // Yoni's text (26/11/2026) says « Genki Dama »; « Spirit Bomb » is « Genkidama » in French.
+  expect(fr).toContain("Genki Dama");
   expect(fr).not.toContain("Spirit Bomb");
   expect(fr).not.toMatch(/tons? or /i);
   await page.goto("/fr/pieces/campione-d-italia-2023-2024");
-  await expect(page.locator("[data-made-for] h2")).toHaveText(/Créée exclusivement pour l’Inter Milan/);
+  // « In the Hands of the Champions » (Yoni, 26/11/2026) in place of « Created exclusively for Inter Milan ».
+  await expect(page.locator("[data-champions] h2")).toHaveText(/Entre les mains des champions/);
+  await page.goto("/fr/pieces/vfb-stuttgart-dfb-pokal-2025");
+  await expect(page.locator("[data-made-for] h2")).toHaveText(/Créée exclusivement pour le VfB Stuttgart|Créée exclusivement pour VfB Stuttgart/);
 });
 
 test("The Bespoke Journey: six steps everywhere, each image leads where more is seen, one version of the payment", async ({ page }, info) => {

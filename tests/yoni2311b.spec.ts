@@ -151,9 +151,9 @@ test("the Inter pendant, JL in its real photos, every gallery on black with its 
   // The Inter pendant is the top of the ring, on its page since 24/11/2026 ("Portée en pendentif"), its old address leads there.
   await open(page, "/fr/pieces/campione-d-italia-pendant");
   await expect(page).toHaveURL(/\/fr\/pieces\/campione-d-italia-2023-2024/);
-  await expect(page.locator("#worn-as-pendant")).toBeVisible();
-  await expect(page.locator("#worn-as-pendant h2")).toHaveText(/Portée en pendentif/i);
-  await expect(page.locator('[data-made-for] a[href="/fr/players/inter-milan"]').first()).toBeVisible();
+  // Told once in its details since 26/11/2026 (« 06 — Beyond the Ring »), under « In the Hands of the Champions » the club.
+  await expect(page.locator("[data-magazine-block][data-big]")).toBeVisible();
+  await expect(page.locator('[data-champions] a[href="/fr/players/inter-milan"]').first()).toBeVisible();
   await page.screenshot({ path: shotPath(info, "yoni2311b-pendentif-inter") });
   await open(page, "/pieces/jamie-leweling-jl-pendant");
   await expect(page.locator("[data-angle='1'] img").first()).toHaveAttribute("src", new RegExp("/media/extra/jamie-leweling-jl-pendant/front" + V));
@@ -166,10 +166,10 @@ test("the Inter pendant, JL in its real photos, every gallery on black with its 
     // (Leave each page once its own scripts have loaded: Safari reports an import cut short by leaving as an error.)
     await page.waitForTimeout(1200);
   }
-  // The two watches now open on their jewel alone.
+  // The two watches: since 26/11/2026 their real photo opens their page (their cut-out was of an image made by AI).
   for (const slug of ["marcus-thuram-skeleton-watch", "tajon-buchanan-iced-watch"]) {
     await open(page, "/pieces/" + slug);
-    await expect(page.locator("[data-piece-cover] [data-showcase]"), slug).toHaveCount(1);
+    await expect(page.locator("[data-piece-cover] img[src*='studio']"), slug).toHaveCount(0);
     await page.waitForTimeout(1200);
   }
   expect(problems.errors).toEqual([]);
@@ -196,6 +196,9 @@ test("Jesus Pieces, the press, the trunks, the house", async ({ page }, info) =>
   await page.screenshot({ path: shotPath(info, "yoni2311b-ecrins") });
   // The Campione case waits for its v3 files (off the page of the trunks): its real photos on the page of the ring.
   await open(page, "/pieces/campione-d-italia-2023-2024");
+  // « The Art of Presentation » (26/11/2026): four chosen first, the others behind See More.
+  await expect(page.locator("[data-custom-box='campione-d-italia-case'] [data-box-section-photo]")).toHaveCount(4);
+  await page.locator("[data-custom-box='campione-d-italia-case'] [data-box-more]").click();
   await expect(page.locator("[data-custom-box='campione-d-italia-case'] [data-box-section-photo]")).toHaveCount(10);
   // The house: the photos of Yoni in his chapters (24/11/2026: five of his WhatsApp photos, none of a jewel).
   await open(page, "/about");

@@ -284,7 +284,16 @@ export const en = {
     seenInStories: "Seen in our stories",
     wornOn: "Worn on",
     itsPendant: "Its pendant",
-    story: "Behind the Creation",
+    story: "The Vision Behind the Creation",
+    /** Yoni's pages (26-27/11/2026): the sections of the Inter ring, the way to the Atelier, the chains, The Berete Circle. */
+    champions: "In the Hands of the Champions",
+    viewAllMoments: "View All Moments",
+    presentation: "The Art of Presentation",
+    behindCreation: "Behind the Creation",
+    watchMakingOf: "Watch the Making Of",
+    accompanyingChains: "The Accompanying Chains",
+    discoverHisWorld: "Discover His World",
+    cubanSection: "Discover the Cuban Chain",
     makingEyebrow: "From Vision to Reality",
     makingTitle: "The Making of a Masterpiece",
     thisPiece: "This piece",
@@ -784,6 +793,10 @@ export const en = {
     intro: (title: string) => "The film of " + title,
     skip: "See the piece",
     watch: "Watch the film",
+    /** "Up next" in the atelier of The Atelier (src/components/AtelierRoom.tsx, 27/11/2026). */
+    upNext: "Up next",
+    nextFilm: "Next film",
+    duration: (time: string) => "Duration " + time,
   },
 };
 

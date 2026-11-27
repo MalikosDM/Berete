@@ -9,6 +9,7 @@
 // 6. Jesus Pieces: an entry of the menu, under The Creations.
 // Screenshots go to verification/making/.
 import { mkdirSync } from "node:fs";
+import { YONI } from "../src/data/yoni2711";
 import { expect, test, type Page } from "./fixtures";
 import { AMATEUR_FILMS } from "../src/data/angles";
 import { defaultCatalogue } from "../src/data/catalogue";
@@ -68,7 +69,12 @@ for (const slug of PAGES) {
     if (await more.count()) await more.click();
     // (25/11/2026: the photos of the whole, then the details beside their words, then See more: every photo of the page.)
     const types = await page.locator("[data-angle]").evaluateAll((els) => els.map((e) => e.querySelector("video")?.getAttribute("src") ?? e.querySelector("video source")?.getAttribute("src") ?? ""));
-    expect(types.length).toBe(photos.length);
+    // (Yoni's pages, 26-27/11/2026: Every Angle may open on the photo of the opening, a detail on a photo of its chain, the crown
+    // of the Inter ring worn as a pendant among its photos.)
+    if (YONI[slug]) {
+      expect(types.length).toBeGreaterThanOrEqual(photos.length);
+      expect(types.length).toBeLessThanOrEqual(photos.length + 6);
+    } else expect(types.length).toBe(photos.length);
 
     // "The Making of a Masterpiece": not on the page of the piece any more (24/11/2026), a way to The Atelier.
     const steps = makingSteps(piece, boxOf(slug));

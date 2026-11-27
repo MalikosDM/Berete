@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { useBrandWatermark } from "@/lib/brandmark";
 import { createPortal } from "react-dom";
-import { BACKDROPS, THEME_FONTS, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
+import { BACKDROPS, THEME_FONTS, isCodeScene, type BackdropSpot, type ResolvedTheme, type ThemeFontSpec } from "@/data/themes";
 import Monogram from "@/components/Monogram";
+import { SceneNear, SceneStage } from "@/components/universe/CodeScene";
 import { afterLoad } from "@/lib/idle";
 
 /*
@@ -111,9 +112,9 @@ const isBrush = (mark: string) => [...mark].some((c) => (c.codePointAt(0) ?? 0) 
 
 /** The CSS variables and attributes of a universe, for the page that holds it (its title takes the typography). */
 export function universeProps(theme: ResolvedTheme): { style: CSSProperties; "data-font": string } {
-  // One typography for every title of the site (24/11/2026: the universe carries the piece, never the font): the font of the
-  // house, whatever the universe asks.
-  const f = THEME_FONTS.maison as ThemeFontSpec;
+  // The title of the piece in the typography of its universe (Yoni, 26/11/2026: « ça ajoute à l'univers »: Dragon Ball, the
+  // gothic of Stuttgart, the gold of the champions…); every other title stays in the font of the house.
+  const f = (THEME_FONTS[theme.font] ?? THEME_FONTS.maison) as ThemeFontSpec;
   const style = {
     "--u-base": theme.base,
     "--u-tint": theme.tint,
@@ -125,7 +126,7 @@ export function universeProps(theme: ResolvedTheme): { style: CSSProperties; "da
     "--u-font-tracking": f.tracking,
     "--u-font-scale": String(f.scale),
   } as CSSProperties;
-  return { style, "data-font": "maison" };
+  return { style, "data-font": theme.font };
 }
 
 /**
@@ -180,7 +181,9 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
   const [impact, setImpact] = useState<{ x: number; y: number; key: number } | null>(null);
   const effects = theme.effects;
   const backdrop = theme.backdrop ? BACKDROPS[theme.backdrop] : undefined;
-  const uploaded = theme.backdrop && !backdrop ? theme.backdrop : "";
+  // A world drawn in code (27/11/2026): no image, its planes under the piece (src/components/universe/CodeScene.tsx).
+  const scene = isCodeScene(theme.backdrop) ? theme.backdrop : null;
+  const uploaded = theme.backdrop && !backdrop && !scene ? theme.backdrop : "";
   // A sequence (the night of Losene Keita): its images one after the other, each with its own lights; else the image.
   const sequence = backdrop?.sequence?.filter((id) => BACKDROPS[id]) ?? null;
   const frames = sequence ? sequence.map((id) => ({ id, b: BACKDROPS[id]! })) : backdrop ? [{ id: theme.backdrop, b: backdrop }] : [];
@@ -270,6 +273,19 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
       const sphere = tall ? backdrop.mobileCore : backdrop.core;
       let w: number;
       let top: number;
+      if (backdrop.free) {
+        // An image on black (the blue Genkidama, 26/11/2026): its sphere right above the piece, the image moved to the right with
+        // it and a little down so that the whole sphere shows under the menu; its edges fade into the black of the page.
+        const drop = (tall ? backdrop.drop?.[1] : backdrop.drop?.[0]) ?? 0;
+        w = base;
+        el.style.setProperty("--u-img-w", w.toFixed(1) + "px");
+        el.style.setProperty("--u-img-l", (px - a * w).toFixed(1) + "px");
+        el.style.setProperty("--u-img-t", (drop * sh).toFixed(1) + "px");
+        el.style.setProperty("--u-img-ratio", String(ratio));
+        el.setAttribute("data-anchored", tall ? "tall" : "wide");
+        el.setAttribute("data-free", "");
+        return;
+      }
       if (backdrop.below && sphere) {
         // The sphere of the Genkidama v2 stands right above the piece: the bottom of the sphere on the top of the piece, at every
         // size (its centre and radius: shares of the height and of the width of the image).
@@ -300,6 +316,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
       ro.disconnect();
       portrait.removeEventListener("change", place);
       el.removeAttribute("data-anchored");
+      el.removeAttribute("data-free");
     };
   }, [preview, fixed, backdrop]);
 
@@ -482,6 +499,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     >
       <div className="universe-stage">
         <div className="u-base" />
+        {scene ? <SceneStage kind={scene} still={preview || fixed} /> : null}
         {frames.length > 0 ? (
           frames.map(({ id, b }, i) =>
             i === 0 || allFrames ? (
@@ -605,6 +623,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           </span>
         </div>
       </div>
+      {/* The plinth of a world drawn in code: out of the stage, it scrolls with the piece. */}
+      {scene ? <SceneNear kind={scene} /> : null}
       {impact && typeof document !== "undefined"
         ? createPortal(<span key={impact.key} aria-hidden="true" className="u-impact" style={{ left: impact.x, top: impact.y, "--u-glow": theme.glow } as CSSProperties} />, document.body)
         : null}

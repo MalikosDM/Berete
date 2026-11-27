@@ -3,7 +3,8 @@ import { useLocation, useSearchParams } from "react-router";
 import { createPortal } from "react-dom";
 import { ArrowRight, Play } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
-import AtelierRoom from "@/components/AtelierRoom";
+import AtelierChapters from "@/components/AtelierChapters";
+import AtelierRoom, { type UpNextFilm } from "@/components/AtelierRoom";
 import { posterWidth } from "@/components/AtelierPassage";
 import BrandIcon from "@/components/BrandIcon";
 import { onTrunksPage } from "@/components/BoxSection";
@@ -13,13 +14,13 @@ import Mechanisms from "@/components/Mechanisms";
 import PageIntro from "@/components/PageIntro";
 import Reveal from "@/components/Reveal";
 import TrunkReveal, { type TrunkPiece } from "@/components/TrunkReveal";
-import { filmTime, resolveAtelier } from "@/data/atelier";
+import { filmTime, resolveAtelier, upNextOrder } from "@/data/atelier";
 import { completeMakingOf, makingSteps } from "@/data/making";
 import { media } from "@/data/catalogue";
 import { BOXES, FEATURED_BOX } from "@/data/pieces";
 import { resolveShowcase } from "@/data/showcase";
 import { trunkOf } from "@/data/trunks";
-import type { Box, MediaItem } from "@/data/types";
+import type { Box } from "@/data/types";
 import { Link, useI18n, useMadeFor } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
@@ -31,25 +32,12 @@ const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.75)]";
 /** The place of each box of the catalogue on the page of the trunks. */
 const BOX_ORDER = new Map(BOXES.map((b, i) => [b.slug, i]));
 
-/**
- * The copies of a large photo of The Atelier (scripts/import-media.mjs, 25/11/2026): 640 and 1080 px (scripts/media-sizes.mjs),
- * 1440 and 2160 px, and the photo itself (2880 px at most): sharp across a Retina screen, light on a phone.
- */
-function wideSrcSet(src: string, width: number | undefined): string | undefined {
-  if (!width || !src.endsWith(".webp")) return undefined;
-  const copies = [...[640, 1080].filter((w) => width >= w * 1.25), ...[1440, 2160].filter((w) => width >= w * 1.1)];
-  return [...copies.map((w) => src.replace(/\.webp$/, ".w" + w + ".webp") + " " + w + "w"), src + " " + width + "w"].join(", ");
-}
-
 export default function Atelier() {
   const { t } = useI18n();
-  /* The atelier photos, in the order of their numbers (warm black and white from the import). */
-  const STEPS = t.atelier.steps;
   const root = useRef<HTMLDivElement>(null);
   // The opening film: a horizontal shot of a piece assembled at the bench (Yoni's films, scripts/hd-media.mjs), in the
   // warm black and white of the atelier; the earlier vertical film when it is missing.
   const setting = media.hd?.["atelier"]?.["v12"] ?? media.videos["atelier/setting"];
-  const photos: MediaItem[] = media.groups["atelier"] ?? [];
 
   // The steps arrive as the page scrolls, still (24/11/2026: only slow fades, no wipe nor parallax).
 
@@ -81,38 +69,8 @@ export default function Atelier() {
         </div>
       </section>
 
-      <section aria-labelledby="atelier-steps" className="relative">
-        <h2 id="atelier-steps" className="sr-only uppercase">
-          {t.atelier.making}
-        </h2>
-        {photos.map((photo, i) => {
-          const step = STEPS[i] ?? { title: t.atelier.step(i + 1), text: "" };
-          return (
-            <article key={photo.src} className="sticky top-0 h-svh w-full overflow-hidden bg-ink" style={{ zIndex: i + 1 }}>
-              <div data-mask className="absolute inset-0 overflow-hidden">
-                <Img
-                  src={photo.src}
-                  srcSet={wideSrcSet(photo.src, photo.width)}
-                  sizes={"(max-aspect-ratio: " + (photo.width ?? 3) + "/" + (photo.height ?? 4) + ") " + Math.round(((photo.width ?? 3) / (photo.height ?? 4)) * 100) + "vh, 100vw"}
-                  alt={t.atelier.stepAlt(step.title)}
-                  width={photo.width}
-                  height={photo.height}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover"
-                />
-                <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink via-ink/55 to-ink/10" />
-              </div>
-              <div className="wrap relative z-10 flex h-full flex-col justify-end pb-28 md:pb-20">
-                <span aria-hidden="true" className="text-rose-gold block font-display text-3xl font-light md:text-4xl">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className={"title-caps mt-3 t-lead text-white " + shadow}>{step.title}</h3>
-                <div className="rule-rose my-4 max-w-[12rem]" aria-hidden="true" />
-                <p className={"max-w-xl text-base text-bone lg:text-[1rem] " + shadow}>{step.text}</p>
-              </div>
-            </article>
-          );
-        })}
-      </section>
+      {/* The chapters, as filmed moments of the making-of films of the house (27/11/2026: no more still photos). */}
+      <AtelierChapters />
 
       <Mechanisms />
 
@@ -171,6 +129,19 @@ function AtelierFilms() {
     setOpenSlug(asked);
   }
   const open = openSlug ? (films.find((f) => f.piece.slug === openSlug) ?? null) : null;
+  // "Up next" beside the film (27/11/2026): the other making-of films, the closest first (same person, same category, same
+  // collection, then the others); one chosen plays in the same room.
+  const upNext: UpNextFilm[] = open
+    ? upNextOrder(
+        open.piece,
+        films.map((f) => f.piece),
+      ).flatMap((piece) => {
+        const f = films.find((x) => x.piece.slug === piece.slug);
+        if (!f) return [];
+        const { making, poster } = f.atelier;
+        return [{ slug: piece.slug, title: piece.title, poster, srcSet: poster ? srcSetOf(poster, posterWidth(making.width, making.height)) : undefined, duration: making.duration }];
+      })
+    : [];
   useEffect(() => {
     if (!askedPiece) return;
     const el = document.getElementById("atelier-making-of");
@@ -234,7 +205,7 @@ function AtelierFilms() {
           ))}
         </ul>
       </div>
-      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} type={open.piece.type} slug={open.piece.slug} atelier={open.atelier} world onClose={() => setOpenSlug(null)} /> : null}
+      {open ? <AtelierRoom title={open.piece.title} madeFor={madeFor(cat, open.piece)} type={open.piece.type} slug={open.piece.slug} atelier={open.atelier} world upNext={upNext} onPick={setOpenSlug} onClose={() => setOpenSlug(null)} /> : null}
     </section>
   );
 }

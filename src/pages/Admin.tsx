@@ -10,6 +10,7 @@ import { HOUSE_PHOTO_PLACES } from "@/data/house";
 import { cleanShowcase, CUTOUTS, cutoutSrc, resolveShowcase, SHOWCASE_BY_DEFAULT, type CutoutView, type PieceShowcase } from "@/data/showcase";
 import {
   BACKDROPS,
+  CODE_SCENES,
   cleanTheme,
   EFFECT_NAMES,
   ENTRANCE_NAMES,
@@ -29,6 +30,7 @@ import { PIECE_TYPES, type Angle, type MediaItem, type PieceAngles, type Transla
 import { bundleOf, loadLocale, LOCALE_INFO, useI18n } from "@/i18n";
 import { Detail3D } from "@/viewer";
 import Access from "@/pages/admin/Access";
+import HomeTexts from "@/pages/admin/HomeTexts";
 import Clients from "@/pages/admin/Clients";
 import Models3D from "@/pages/admin/Models3D";
 import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
@@ -42,7 +44,7 @@ import { HAS_SERVER } from "@/lib/site";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "access" | "messages" | "3d" | "clients" | "house" | "cutouts";
+type Tab = Kind | "access" | "messages" | "3d" | "clients" | "house" | "cutouts" | "home";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -167,6 +169,8 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "people", label: KINDS.people.label },
   { key: "boxes", label: KINDS.boxes.label },
   { key: "cutouts", label: "Détourages" },
+  // The texts beside the pieces of the home page (Yoni, 26/11/2026): src/pages/admin/HomeTexts.tsx.
+  { key: "home", label: "Textes de l'accueil" },
   { key: "house", label: "La Maison" },
   { key: "messages", label: "Messages" },
 ];
@@ -790,7 +794,7 @@ function ThemeField({ token, label, value, onChange }: { token: string; label: s
   const [replay, setReplay] = useState(0);
   const set = (patch: Partial<PieceTheme>) => onChange({ ...(value ?? { preset: resolved.preset }), ...patch });
   const font = THEME_FONTS[resolved.font] as ThemeFontSpec;
-  const uploaded = resolved.backdrop && !BACKDROPS[resolved.backdrop] ? resolved.backdrop : "";
+  const uploaded = resolved.backdrop && !BACKDROPS[resolved.backdrop] && !(resolved.backdrop in CODE_SCENES) ? resolved.backdrop : "";
   const colours: [keyof PieceTheme & ("base" | "tint" | "glow"), string][] = [
     ["base", "Fond (presque noir)"],
     ["tint", "Couleur de l'univers"],
@@ -839,6 +843,9 @@ function ThemeField({ token, label, value, onChange }: { token: string; label: s
           Fond
           <select value={uploaded ? "__image" : resolved.backdrop} onChange={(e) => e.target.value !== "__image" && set({ backdrop: e.target.value })} className={inputCls}>
             <option value="">Composition (lumière, matière, particules)</option>
+            {Object.entries(CODE_SCENES).map(([key, d]) => (
+              <option key={key} value={key}>Décor dessiné : {d.name}</option>
+            ))}
             {Object.entries(BACKDROPS).map(([key, b]) => (
               <option key={key} value={key}>Fond IA : {b.name}</option>
             ))}
@@ -1565,7 +1572,7 @@ export default function Admin() {
                 Choisissez le mot de passe d'accès privé <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
               </button>
             ) : null}
-            {tab === "access" ? <Access token={token} onExpired={logout} onState={setAccess} /> : tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+            {tab === "access" ? <Access token={token} onExpired={logout} onState={setAccess} /> : tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "home" ? <HomeTexts token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
           </>
         )}
       </main>

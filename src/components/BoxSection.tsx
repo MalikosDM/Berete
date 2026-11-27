@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Lightbox from "@/components/Lightbox";
 import { MediaView } from "@/components/Media";
 import Reveal from "@/components/Reveal";
+import { fileBase } from "@/data/pageMedia";
 import { onTrunksPage as onPage } from "@/data/trunks";
 import type { Box } from "@/data/types";
 import { Link, useI18n } from "@/i18n";
@@ -19,10 +20,17 @@ export const onTrunksPage = (box: Box): boolean => onPage(box.slug);
  * click opens them full screen); the way to the page of the trunks when it is there, where it opens in its film. A trunk
  * still waiting for its film (the trunks of Keita and of Malik Tillman) is shown here only.
  */
-export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: string; id: string }) {
+export default function BoxSection({ boxes, title, id, first }: { boxes: Box[]; title: string; id: string; first?: string[] }) {
   const { t } = useI18n();
   const [open, setOpen] = useState<{ box: number; photo: number } | null>(null);
-  const shown = boxes.filter((b) => b.images.length > 0);
+  const [expanded, setExpanded] = useState(false);
+  // « The Art of Presentation » (Yoni, 26/11/2026): a few photos chosen first (`first`, by file), the others behind See More.
+  const ordered = (b: Box) => {
+    if (!first) return b.images;
+    const chosen = first.map((f) => b.images.find((m) => fileBase(m.src) === f)).filter((m): m is Box["images"][number] => Boolean(m));
+    return [...chosen, ...b.images.filter((m) => !chosen.includes(m))];
+  };
+  const shown = boxes.filter((b) => b.images.length > 0).map((b) => ({ ...b, images: ordered(b) }));
   if (shown.length === 0) return null;
   const current = open ? shown[open.box] : undefined;
   return (
@@ -35,7 +43,7 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
           {shown.length > 1 || title !== box.name ? <h3 className="title-caps t-sub tracking-[0.1em] text-white">{box.name}</h3> : null}
           {box.description ? <p className="mt-3 max-w-3xl text-base text-bone">{box.description}</p> : null}
           <ul className="mt-6 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-            {box.images.map((m, i) => (
+            {(first && !expanded ? box.images.slice(0, first.length) : box.images).map((m, i) => (
               <li key={m.src}>
                 <Reveal soft>
                   <button
@@ -52,8 +60,15 @@ export default function BoxSection({ boxes, title, id }: { boxes: Box[]; title: 
               </li>
             ))}
           </ul>
-          {onTrunksPage(box) ? (
-            <Link to={"/boxes#box-" + box.slug} data-box-section-link={box.slug} data-cta className="btn-secondary mt-6">
+          {first && !expanded && box.images.length > first.length ? (
+            <div className="mt-8 flex justify-center">
+              <button type="button" onClick={() => setExpanded(true)} data-box-more data-cta className="btn-primary">
+                {t.gallery.more(box.images.length - first.length)}
+              </button>
+            </div>
+          ) : null}
+          {onTrunksPage(box) || first ? (
+            <Link to={onTrunksPage(box) ? "/boxes#box-" + box.slug : "/boxes"} data-box-section-link={box.slug} data-cta className="btn-secondary mt-6">
               {t.nav.boxes} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
               <span className="sr-only"> · {box.name}</span>
             </Link>

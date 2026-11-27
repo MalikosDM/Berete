@@ -180,7 +180,8 @@ for (const slug of CAPSULES) {
     // The film of the finished piece (24/11/2026, right after the opening): it plays by itself on screen, silent, and pauses
     // off screen. No film: no section.
     const film = page.locator("[data-feature-film]");
-    if (featureFilmOf(slug) || resolveReveal(slug, piece.atelier)) {
+    // (The Inter ring: the final film of Yoni, 26/11/2026, src/data/yoniMedia.ts.)
+    if (featureFilmOf(slug) || resolveReveal(slug, piece.atelier) || slug === "campione-d-italia-2023-2024") {
       await film.locator("[data-feature-frame]").evaluate((el) => el.scrollIntoView({ block: "center" }));
       const video = film.locator("[data-feature-video]");
       await expect.poll(() => playing(video), { timeout: 30_000 }).toBe(true);

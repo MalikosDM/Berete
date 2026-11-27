@@ -310,6 +310,6 @@ test("admin: the NZ Travel Case kept, unpublished; the size of the piece in the 
   await page.screenshot({ path: DIR + "/admin-ecrin-nz.jpg", type: "jpeg", quality: 70 });
   await page.getByRole("tab", { name: "Pièces" }).click();
   await page.locator("[data-admin-row='" + DRAGON + "'] button[aria-label='Modifier']").click();
-  // Larger still since the evening of 23/11/2026 (its chain leaving the top, on a computer).
-  await expect(page.locator("[data-showcase-size='large']")).toBeChecked();
+  // Very large on the blue Genkidama (Yoni, 26/11/2026: its chain leaving the top, on a computer).
+  await expect(page.locator("[data-showcase-size='xl']")).toBeChecked();
 });

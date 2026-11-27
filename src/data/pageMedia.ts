@@ -119,6 +119,7 @@ export function pieceMediaOf(
   const taken = new Set([...openingSources(piece, opening), ...(box?.images.map((m) => m.src) ?? []), ...partPhotos.map((m) => m.src)]);
   const wornSrcs = wornSet(raw ?? piece);
   // The order of the admin, when Yoni gave one (src/data/magazine.ts adminOrdered), is kept as it is.
+  // (A piece whose only photo is its opening, or worn — a watch on the wrist —: no Every Angle, never the same photo twice.)
   const kept = uniqueMedia(anglePhotos(piece, false, wornSrcs).filter((m) => !sameFilm(m, film?.source, film?.files)), taken);
   const angles = ordered ? kept : diverseFirst(kept, sameViewsOf(piece.slug));
   const worn = uniqueMedia(

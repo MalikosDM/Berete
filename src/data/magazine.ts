@@ -16,63 +16,81 @@
 import { fileBase } from "./pageMedia.js";
 import { storyBlocks, type StoryBlock } from "./story.js";
 import type { MediaItem, Piece } from "./types.js";
+import { YONI } from "./yoni2711.js";
 
 /** A sentence of the house: a paragraph of the story (counted among the paragraphs, from 0), or some of its sentences; or a detail. */
 export type TextRef = { story: number; sentences?: number[] } | { detail: number };
 
 /** A photo of a detail (its file in the folder of the piece: "p09") and the words beside it. */
-export type Explain = { photo: string; texts: TextRef[] };
+export type Explain = {
+  /** Its file in the folder of the piece ("p09"), or in the folder of another piece ("baguette-cuban-chain/p06": its chain). */
+  photo: string;
+  texts: TextRef[];
+  /** The strongest moment of the section (the mechanism of the Inter ring): its photo larger. */
+  big?: boolean;
+};
 
 /** At most five photos with their paragraph: no endless page (25/11/2026). */
 export const MAX_BLOCKS = 5;
 
 /** The photos of the details and their sentences, piece by piece (each photo looked at, each sentence taken as written). */
 export const EXPLAIN: Record<string, Explain[]> = {
-  // The sphere of its many cuts, the stones turned every way, Goku beneath the sphere, the seven Dragon Balls.
-  "kevin-schade-dragon-ball-pendant": [
-    { photo: "p09", texts: [{ story: 3 }] },
-    { photo: "p11", texts: [{ story: 6 }] },
-    { photo: "p14", texts: [{ story: 7, sentences: [0] }] },
-    { photo: "p16", texts: [{ story: 7, sentences: [1] }] },
-  ],
-  // The details of the ring, each with the photo that shows it (their titles and texts, as written for "The Art of Detail").
+  // The details of Yoni's texts (26-27/11/2026, src/data/yoni2711.ts), each beside the close-up that shows it (looked at photo by
+  // photo). The Dragon Ball pendant and the pendant of Kenan Yildiz have none: their vision stays whole beside their film.
+  // The stars and diamonds around the crest, the stripes, the tricolour and its inscriptions, TIKUS and the 9 of Marcus Thuram's
+  // ring, the Serie A emblem and its 20, the crown worn as a pendant beside the opened ring and its trophy (the strongest).
   "campione-d-italia-2023-2024": [
-    { photo: "p52", texts: [{ detail: 1 }] },
-    { photo: "p53", texts: [{ detail: 2 }] },
-    { photo: "p12", texts: [{ detail: 3 }, { detail: 4 }] },
-    { photo: "p15", texts: [{ detail: 5 }] },
-    { photo: "p43", texts: [{ detail: 7 }] },
+    { photo: "p52", texts: [{ detail: 0 }] },
+    { photo: "p53", texts: [{ detail: 1 }] },
+    { photo: "p12", texts: [{ detail: 2 }] },
+    { photo: "p50", texts: [{ detail: 3 }] },
+    { photo: "p15", texts: [{ detail: 4 }] },
+    { photo: "p45", texts: [{ detail: 5 }], big: true },
   ],
-  // The Swiss cross, the Nigerian sleeve, OKA 4 on the back, the crown of the four siblings, the triangle-cut stones.
+  // The celebration, the Swiss emblem and the Nigerian flag, the stripes, OKA 4, the crown, the settings of the arms and sleeves,
+  // the Safi Link, the pendant on its bust as a trophy.
   "noah-okafor-jersey-pendant": [
-    { photo: "p18", texts: [{ story: 1, sentences: [0] }] },
-    { photo: "p15", texts: [{ story: 1, sentences: [1] }] },
-    { photo: "p07", texts: [{ story: 3, sentences: [0] }] },
-    { photo: "p04", texts: [{ story: 3, sentences: [1] }] },
-    { photo: "p13", texts: [{ story: 2, sentences: [2] }] },
+    { photo: "p16", texts: [{ detail: 0 }] },
+    { photo: "p17", texts: [{ detail: 1 }] },
+    { photo: "p15", texts: [{ detail: 2 }] },
+    { photo: "p09", texts: [{ detail: 3 }] },
+    { photo: "p04", texts: [{ detail: 4 }] },
+    { photo: "p11", texts: [{ detail: 5 }] },
+    { photo: "p03", texts: [{ detail: 6 }] },
+    { photo: "p02", texts: [{ detail: 7 }] },
   ],
-  // The camouflage of rose gold, the baguettes and their round edge, the two maps, the football on the K.
+  // The camouflage on the O, the two maps, the football, the settings of the O and the K, the links of its two-tone Cuban.
   "noah-okafor-oka-pendant": [
-    { photo: "p06", texts: [{ story: 1 }] },
-    { photo: "p16", texts: [{ story: 2, sentences: [0] }] },
-    { photo: "p04", texts: [{ story: 3, sentences: [0] }] },
-    { photo: "p03", texts: [{ story: 3, sentences: [1] }] },
+    { photo: "p06", texts: [{ detail: 0 }] },
+    { photo: "p04", texts: [{ detail: 1 }] },
+    { photo: "p03", texts: [{ detail: 2 }] },
+    { photo: "p09", texts: [{ detail: 3 }] },
+    { photo: "baguette-cuban-chain/p06", texts: [{ detail: 4 }] },
+  ],
+  // The O of white gold, the N of rose gold, the two golds together, the double row of its tennis chain.
+  "noah-okafor-octagon-pendant": [
+    { photo: "p03", texts: [{ detail: 0 }] },
+    { photo: "p04", texts: [{ detail: 1 }] },
+    { photo: "p06", texts: [{ detail: 2 }] },
+    { photo: "two-row-tennis-chain/p03", texts: [{ detail: 3 }] },
   ],
   // The panther, jaws open, claws polished black, on its belt; the story of the night stays at the top.
   "panther-champion-pendant": [{ photo: "p05", texts: [{ story: 0 }] }],
   // The back of the cross and its BRT mark.
   "malik-tillman-cross-pendant": [{ photo: "p03", texts: [{ story: 0, sentences: [1] }] }],
-  // The crest framed by its shield-cut red stones, the cup under the top, the name and number of a player.
+  // The jersey of a player's ring (his name and number), the crest in its shield of red stones, the cup under the crown.
   "vfb-stuttgart-dfb-pokal-2025": [
-    { photo: "p20", texts: [{ story: 1 }] },
-    { photo: "p14", texts: [{ story: 2 }] },
-    { photo: "p11", texts: [{ story: 3 }] },
+    { photo: "p11", texts: [{ detail: 0 }] },
+    { photo: "p20", texts: [{ detail: 1 }] },
+    { photo: "p14", texts: [{ detail: 2 }] },
   ],
-  // The serpent coiled around the T, its scales pear by pear, its head of a red stone.
+  // The mosaic of the T, the Float Setting at its edges, the Serpent Bezel Setting of the 9, the ruby eye, the T and the 9.
   "marcus-thuram-t-serpent-pendant": [
-    { photo: "p12", texts: [{ story: 1 }] },
-    { photo: "p06", texts: [{ story: 2 }] },
-    { photo: "p02", texts: [{ story: 3 }] },
+    { photo: "p14", texts: [{ detail: 0 }] },
+    { photo: "p16", texts: [{ detail: 1 }] },
+    { photo: "p06", texts: [{ detail: 2 }] },
+    { photo: "p02", texts: [{ detail: 3 }] },
+    { photo: "p12", texts: [{ detail: 4 }] },
   ],
   // The back and its BRT mark in rose gold, the bail on its tennis chain.
   "angelo-stiller-as-pendant": [
@@ -134,9 +152,18 @@ export const EXPLAIN: Record<string, Explain[]> = {
  * profile): only these, in this order.
  */
 export const OVERVIEW: Record<string, string[]> = {
-  "kevin-schade-dragon-ball-pendant": ["p18", "p20", "p06"],
-  // p05, written as a profile, is a close-up of the edge of the T: only its two whole views (p18 is p17 again).
-  "marcus-thuram-t-serpent-pendant": ["p17", "p10"],
+  // « Every Angle » of Yoni's pages (26-27/11/2026): four photos chosen first, the whole piece from the front always first (even
+  // when the opening shows it too), then See More. The jersey pendant of Noah Okafor has none (its page goes from its vision to
+  // its details): its other photos come after its details.
+  "kevin-schade-dragon-ball-pendant": ["p18", "p20", "p09", "p06"],
+  "vfb-stuttgart-dfb-pokal-2025": ["p17", "p16", "p19", "p22"],
+  "campione-d-italia-2023-2024": ["p55", "p01", "p06", "p41"],
+  "kenan-yildiz-celebration-pendant": ["p07", "p06", "p02", "p03"],
+  "noah-okafor-oka-pendant": ["p05", "p08", "p07", "p14"],
+  "noah-okafor-jersey-pendant": [],
+  "noah-okafor-octagon-pendant": ["p09", "p01", "p10", "p05"],
+  // Its front, three-quarters for the relief, its back, the macro of its scales and its ruby.
+  "marcus-thuram-t-serpent-pendant": ["p08", "p17", "p04", "p01"],
 };
 
 /** The sentences of a paragraph (as the browser cuts them in the language of the page). */
@@ -152,7 +179,7 @@ const paragraphsOf = (story: string) => storyBlocks(story).filter((b) => b.kind 
 /** The views of a photo that show the piece whole (src/data/views.ts). */
 const WHOLE = new Set(["front", "whole", "angle", "side", "back", "bust"]);
 
-export type MagazineBlock = { item: MediaItem; texts: { title?: string; text: string }[] };
+export type MagazineBlock = { item: MediaItem; texts: { title?: string; text: string }[]; big?: boolean };
 
 export type Magazine = {
   /** The four photos of the whole piece. */
@@ -183,15 +210,24 @@ export function adminOrdered(own: Pick<Piece, "gallery"> | undefined, catalogue:
  * photos and films in the order of the page (each once: src/data/pageMedia.ts); `english` its texts in English (to know how
  * the house cut them into sentences); `ordered`: the order of the admin, kept as it is.
  */
-export function magazineOf(piece: Pick<Piece, "slug" | "story" | "details">, english: Pick<Piece, "story" | "details"> | undefined, items: MediaItem[], { lang = "en", ordered = false, sameViews = [] as string[][] } = {}): Magazine {
+export function magazineOf(
+  piece: Pick<Piece, "slug" | "story" | "details">,
+  english: Pick<Piece, "story" | "details"> | undefined,
+  items: MediaItem[],
+  { lang = "en", ordered = false, sameViews = [] as string[][], extra = [] as MediaItem[] } = {},
+): Magazine {
   const paragraphs = paragraphsOf(piece.story);
   const source = english ? paragraphsOf(english.story) : paragraphs;
-  const byFile = new Map(items.map((m) => [fileBase(m.src), m]));
+  // Its photos by file; `extra`: photos it may still show beside a detail or first in Every Angle (the photos of its opening, a
+  // photo of its chain in the folder of the chain), by file and by "folder/file".
+  const folderFile = (m: MediaItem) => (m.src.split("/").slice(-2, -1)[0] ?? "") + "/" + fileBase(m.src);
+  const byFile = new Map<string, MediaItem>([...extra.flatMap((m) => [[fileBase(m.src), m], [folderFile(m), m]] as [string, MediaItem][]), ...items.map((m) => [fileBase(m.src), m] as [string, MediaItem])]);
   // The sentences taken, paragraph by paragraph ("all": the whole paragraph).
   const taken = new Map<number, Set<number> | "all">();
   const usedDetails = new Set<number>();
   const blocks: MagazineBlock[] = [];
-  const wanted = (EXPLAIN[piece.slug] ?? []).filter((e) => byFile.has(e.photo)).slice(0, MAX_BLOCKS);
+  // At most five sentences of its story beside photos; every detail of Yoni beside its photo.
+  const wanted = (EXPLAIN[piece.slug] ?? []).filter((e) => byFile.has(e.photo)).slice(0, Math.max(MAX_BLOCKS, piece.details.length));
   // The story at the top always keeps a paragraph of its own: never all of it beside the photos.
   const storyRefs = wanted.flatMap((e) => e.texts).filter((r): r is { story: number; sentences?: number[] } => "story" in r);
   const whole = new Set(storyRefs.filter((r) => !r.sentences).map((r) => r.story));
@@ -227,7 +263,7 @@ export function magazineOf(piece: Pick<Piece, "slug" | "story" | "details">, eng
         texts.push({ text: p });
       }
     }
-    if (texts.length > 0) blocks.push({ item: byFile.get(e.photo)!, texts });
+    if (texts.length > 0) blocks.push({ item: byFile.get(e.photo)!, texts, ...(e.big ? { big: true } : {}) });
   }
   // A paragraph given whole beside one photo, and some of its sentences beside another: the whole wins, the other goes.
   for (const b of blocks) b.texts = b.texts.filter((t, i, all) => all.findIndex((x) => x.text === t.text) === i);
@@ -268,7 +304,13 @@ export function magazineOf(piece: Pick<Piece, "slug" | "story" | "details">, eng
     if (v !== undefined) seenViews.add(v);
     overview.push(m);
   };
-  if (ordered) {
+  if (OVERVIEW[piece.slug] && YONI[piece.slug]) {
+    // Yoni's choice (26-27/11/2026) wins over every order: his four photos, from its photos or from its opening.
+    for (const name of OVERVIEW[piece.slug]!) {
+      const m = pool.find((x) => fileBase(x.src) === name) ?? (inBlocks.has(byFile.get(name)?.src ?? "") ? undefined : byFile.get(name));
+      if (m && !overview.includes(m)) overview.push(m);
+    }
+  } else if (ordered) {
     overview.push(...pool.slice(0, 4));
   } else if (OVERVIEW[piece.slug]) {
     for (const name of OVERVIEW[piece.slug]!) add(pool.find((m) => fileBase(m.src) === name));

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import Logo from "@/components/Logo";
+import { useEffect, useState, type CSSProperties } from "react";
+import monogram from "@/data/monogram-lines.generated.json" with { type: "json" };
 import { prefersReducedMotion } from "@/lib/gsap";
 
 const KEY = "bj-intro-seen";
@@ -16,64 +16,106 @@ function introDone(): undefined {
   return undefined;
 }
 
-const LINES = [
-  "M14 4 H50",
-  "M14 4 L2 16",
-  "M50 4 L62 16",
-  "M2 16 H62",
-  "M14 4 L22 16 L32 4 L42 16 L50 4",
-  "M2 16 L32 46 L62 16",
-  "M22 16 L32 46 L42 16",
+/**
+ * Whether this page load opens on the intro: the first page of a visit, without « reduce motion ». Decided once per load (the
+ * effect may run twice in development), and never again once the intro has played.
+ */
+let first: boolean | null = null;
+let played = false;
+function firstOfVisit(): boolean {
+  if (played) return false;
+  if (first !== null) return first;
+  if (prefersReducedMotion()) return (first = false);
+  try {
+    if (sessionStorage.getItem(KEY)) return (first = false);
+    sessionStorage.setItem(KEY, "1");
+  } catch {
+    return (first = false);
+  }
+  return (first = true);
+}
+
+/** When the intro starts to leave, and when it is gone (ms): shorter than before 27/11/2026 (2.6 s, then 3.3 s). */
+const LEAVE = 1900;
+const GONE = 2500;
+/** Each line draws itself in DRAW s: the outlines (the diamond, B, R, T) first, then the facets inside the diamond. */
+const DRAW = 0.8;
+const delayOf = (i: number) => (i < monogram.outlines ? i * 0.06 : 0.3 + (i - monogram.outlines) * 0.025);
+/** Three points of the diamond (its crown and its girdle, in % of the monogram, as in src/components/Monogram.tsx). */
+const SPARKS: [number, number][] = [
+  [53.5, 11.1],
+  [78.2, 25.1],
+  [98.6, 26.8],
 ];
 
+/**
+ * The intro of the house, on the first page of a visit (Yoni, 26/11/2026: "my logo that loads"): on black, the monogram BRT and
+ * its diamond draw themselves in fine lines of rose gold (the lines of the logo, src/data/monogram-lines.generated.json, npm run
+ * brand), the three points of the diamond twinkle once, and the whole fades away. Short (gone in 2.5 s), and gone at once on
+ * the first gesture (a click, a key, the wheel, a touch). Never with « reduce motion » (nothing moves: the page shows at once).
+ */
 export default function Preloader() {
   const [state, setState] = useState<"off" | "on" | "leaving">("off");
 
   useEffect(() => {
-    if (prefersReducedMotion()) return introDone();
-    try {
-      if (sessionStorage.getItem(KEY)) return introDone();
-      sessionStorage.setItem(KEY, "1");
-    } catch {
-      return introDone();
-    }
+    if (!firstOfVisit()) return introDone();
     // First visit of the session: the intro starts on the next frame.
-    const id = window.requestAnimationFrame(() => setState("on"));
+    const id = window.requestAnimationFrame(() => {
+      played = true;
+      setState("on");
+    });
     return () => window.cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {
     if (state !== "on") return undefined;
-    const a = window.setTimeout(() => {
+    const leave = () => {
       setState("leaving");
       introDone();
-    }, 2600);
-    const b = window.setTimeout(() => setState("off"), 3300);
+    };
+    const a = window.setTimeout(leave, LEAVE);
+    const gestures = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
+    for (const g of gestures) window.addEventListener(g, leave, { passive: true, once: true });
     return () => {
       window.clearTimeout(a);
-      window.clearTimeout(b);
+      for (const g of gestures) window.removeEventListener(g, leave);
     };
+  }, [state]);
+
+  useEffect(() => {
+    if (state !== "leaving") return undefined;
+    const b = window.setTimeout(() => setState("off"), GONE - LEAVE);
+    return () => window.clearTimeout(b);
   }, [state]);
 
   if (state === "off") return null;
 
+  const [x, y, w, h] = monogram.viewBox.split(" ").map(Number) as [number, number, number, number];
   return (
     <div
       aria-hidden="true"
-      className={"fixed inset-0 z-[100] flex flex-col items-center justify-center gap-8 bg-ink transition-opacity duration-700 " + (state === "leaving" ? "pointer-events-none opacity-0" : "opacity-100")}
+      data-preloader
+      className={"fixed inset-0 z-[100] flex items-center justify-center bg-ink transition-opacity duration-[600ms] ease-out " + (state === "leaving" ? "pointer-events-none opacity-0" : "opacity-100")}
     >
-      <svg viewBox="0 0 64 48" className="h-20 w-28 text-rose-light" fill="none" stroke="currentColor" strokeWidth="0.8" strokeLinejoin="round" strokeLinecap="round">
-        {LINES.map((d, i) => (
-          <path
-            key={d}
-            d={d}
-            pathLength={1}
-            className="animate-[diamond-draw_0.5s_ease-out_forwards] [stroke-dasharray:1] [stroke-dashoffset:1]"
-            style={{ animationDelay: i * 0.18 + "s" }}
-          />
+      <div className="preloader-mark relative" style={{ aspectRatio: w / h } as CSSProperties}>
+        <svg viewBox={monogram.viewBox} className="block h-full w-full overflow-visible" fill="none" strokeWidth={0.9} strokeLinejoin="round">
+          <defs>
+            <linearGradient id="preloader-rose-gold" gradientUnits="userSpaceOnUse" x1={x} y1={y} x2={x + w} y2={y + h}>
+              <stop offset="0" stopColor="#9C5B4F" />
+              <stop offset="0.5" stopColor="#E8B4A0" />
+              <stop offset="1" stopColor="#B76E79" />
+            </linearGradient>
+          </defs>
+          <g stroke="url(#preloader-rose-gold)">
+            {monogram.lines.map((d, i) => (
+              <path key={i} d={d} pathLength={1} data-preloader-line className="preloader-line" style={{ animationDuration: DRAW + "s", animationDelay: delayOf(i).toFixed(3) + "s" }} />
+            ))}
+          </g>
+        </svg>
+        {SPARKS.map(([sx, sy], i) => (
+          <span key={i} className="preloader-spark" style={{ left: sx + "%", top: sy + "%", animationDelay: 1.25 + i * 0.12 + "s" }} />
         ))}
-      </svg>
-      <Logo position="center" className="h-16 w-64 opacity-0 animate-[logo-in_0.8s_ease-out_1.4s_forwards]" />
+      </div>
     </div>
   );
 }

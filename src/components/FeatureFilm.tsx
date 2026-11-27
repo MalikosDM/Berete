@@ -38,13 +38,16 @@ export default function FeatureFilm({ film, id, anchor, label, eyebrow, title, c
  * under it, its bar to pull forward or back (25/11/2026). `tall`: the most it may take of the height of the screen ("min(74svh,
  * 40rem" without its closing bracket: the width of the page finishes it).
  */
-export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = "" }: { film: FeatureFilmData; label: string; tall?: string; className?: string }) {
+export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = "", manual = false }: { film: FeatureFilmData; label: string; tall?: string; className?: string; manual?: boolean }) {
   const { t } = useI18n();
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [src, setSrc] = useState<string | undefined>(undefined);
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
+  // A film told as a moment (a hand-over, a reveal: Yoni, 26-27/11/2026) never starts by itself: its poster and a play button;
+  // pressed, it plays from its start, with its sound (the visitor asked for it).
+  const [started, setStarted] = useState(false);
   const still = useRef(false);
 
   useEffect(() => {
@@ -67,7 +70,7 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
     const seen = new IntersectionObserver(
       ([e]) => {
         if (!e) return;
-        if (e.isIntersecting && !still.current) {
+        if (e.isIntersecting && !still.current && !manual) {
           setSrc(file);
           void video.play().catch(() => undefined);
         } else if (!e.isIntersecting) video.pause();
@@ -80,12 +83,12 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
       near.disconnect();
       seen.disconnect();
     };
-  }, [film.video, film.mobile]);
+  }, [film.video, film.mobile, manual]);
 
   // Its file just given: it starts if it is on screen.
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !src || still.current) return;
+    if (!video || !src || still.current || (manual && !started)) return;
     const r = frameRef.current?.getBoundingClientRect();
     if (r && r.bottom > 0 && r.top < window.innerHeight) void video.play().catch(() => undefined);
   }, [src]);
@@ -98,9 +101,20 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
     setMuted(next);
     if (!next) void video.play().catch(() => undefined);
   };
+  const start = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    setStarted(true);
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    if (!src) setSrc(phone && film.mobile ? film.mobile : film.video);
+    video.muted = false;
+    setMuted(false);
+    void video.play().catch(() => undefined);
+  };
   const togglePlay = () => {
     const video = videoRef.current;
     if (!video) return;
+    if (manual && !started) return start();
     if (!src) setSrc(film.video);
     if (video.paused) void video.play().catch(() => undefined);
     else video.pause();
@@ -136,7 +150,7 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
           src={src}
           poster={film.poster}
           muted={muted}
-          loop={!film.start}
+          loop={!film.start && !manual}
           playsInline
           preload="none"
           aria-label={label}
@@ -156,6 +170,13 @@ export function FilmFrame({ film, label, tall = "min(74svh, 40rem", className = 
           className="h-full w-full cursor-pointer object-contain"
           style={posterBehind(film.poster)}
         />
+        {manual && !started ? (
+          <button type="button" onClick={start} data-film-start aria-label={t.feature.play + " · " + label} className="group absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/45 via-transparent to-transparent">
+            <span className="inline-flex size-20 items-center justify-center rounded-full border border-rose-light/70 bg-ink/55 text-white backdrop-blur-sm transition-colors duration-500 group-hover:border-rose-light group-hover:text-rose-light lg:size-[4.5rem]">
+              <Play className="size-6 translate-x-0.5" aria-hidden="true" />
+            </span>
+          </button>
+        ) : null}
         {/* The buttons never wider than the frame: on a very narrow frame they go on two lines rather than being cut. */}
         <div className="absolute end-2.5 bottom-2.5 flex max-w-[calc(100%-1.25rem)] flex-wrap justify-end gap-1.5">
           <button type="button" onClick={togglePlay} data-feature-play aria-label={playing ? t.feature.pause : t.feature.play} className={btn}>

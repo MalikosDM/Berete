@@ -218,12 +218,12 @@
     },
     {
       "source": "/pieces/campione-d-italia-pendant",
-      "destination": "https://beretejewellers.com/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "destination": "https://beretejewellers.com/pieces/campione-d-italia-2023-2024#piece-details",
       "statusCode": 301
     },
     {
       "source": "/:lang(fr|es|de|nl|ar)/pieces/campione-d-italia-pendant",
-      "destination": "https://beretejewellers.com/:lang/pieces/campione-d-italia-2023-2024#worn-as-pendant",
+      "destination": "https://beretejewellers.com/:lang/pieces/campione-d-italia-2023-2024#piece-details",
       "statusCode": 301
     },
     {

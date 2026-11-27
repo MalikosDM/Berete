@@ -170,6 +170,53 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « contenus définitifs de Yoni (26-27/11) : 9 pages de pièces, accueil, Atelier, écrins, typographie » — état au 27/11/2026
+- [x] **Textes de Yoni mot pour mot** (`src/data/yoni2711.ts`, recopiés par script depuis le prompt de Malik ; les blocs tels quels dans
+      `tests/fixtures/yoni-2711.json`, que `tests/contenus2711.spec.ts` compare à la page, caractère par caractère) : « The Vision
+      Behind the Creation » (le titre du bloc film + texte partout, 6 langues), « Composition & Craftsmanship » (dans `specs` : un
+      libellé en capitales = ligne de Yoni ; ses 3 premiers chiffres en grand, le reste en deux colonnes, « ⸻ » = filet, libellé vide =
+      phrase libre, libellé en minuscules = note en petit), « The Art of Detail » (`details`, chacun à côté de son gros plan choisi
+      photo par photo, `EXPLAIN` de `src/data/magazine.ts` ; une photo peut venir du dossier de sa chaîne : `baguette-cuban-chain/p06`).
+      Pièces : Dragon Ball, VfB, Inter, Kenan (vision seule), OKA, maillot et octogone d'Okafor, T9. Traductions fidèles dans
+      `src/i18n/content/<lang>.ts` (anciens textes supprimés ; « Spirit Bomb » = « Genkidama » en français) ; à faire relire, surtout l'arabe.
+- [x] **Ordre de chaque page** (`PAGE_ORDER` de `src/data/yoni2711.ts`, `src/pages/PiecePage.tsx` rendu par sections) : Inter (vision →
+      Every Angle → composition → détails → The Story Behind the Ring → In the Hands of the Champions → The Art of Presentation →
+      Behind the Creation → presse), OKA (Every Angle d'abord, la carte « Worn on / The Two-Tone Baguette Cuban »), maillot (pas
+      d'Every Angle : ses autres photos après les détails ; The Moment of Reveal), octogone (The Accompanying Chains, The Berete Circle
+      avec la photo de Noah et de l'écrin), T9 (The Evolution of a Signature : seule l'étape 5 a sa photo, les 4 autres attendent Yoni).
+      Every Angle partout : 4 photos choisies (`OVERVIEW`, la pièce entière de face d'abord, même si l'ouverture la montre), See More
+      juste dessous. Lien vers l'Atelier : « Watch the Making Of ». « Discover His World » pour un joueur.
+- [x] **Titres sans le client** : « Dragon Ball Pendant », « Twisted Link Chain », « Snowflake Pendant », « Iced Signet Ring » ;
+      « Marcus Thuram — T9 Pendant » (adresse `marcus-thuram-t-serpent-pendant` gardée). L'ancienne adresse du pendentif Inter mène à
+      `#piece-details` (le 06 « Beyond the Ring »).
+- [x] **Typographie** : tout un cran plus épais (`--font-weight-*` de `src/index.css` : light 400, normal 500, medium 600, semibold 700 ;
+      corps 500) ; le texte à côté des pièces en `.piece-text` (17 px, 500) ; **titre de la pièce dans la police de son univers**
+      (retour des `@font-face` et de `universeProps`, `npm run audit:coherence` l'admet sur `[data-u-title]`) : Dragon Ball pinceau,
+      Stuttgart gothique, Inter en lettres or (Cinzel). Monogramme BRT plus discret derrière les pièces.
+- [x] **Films** : Inter = film final de Yoni (album iCloud, original 4K HEVC → 1080p/720p, `scripts/yoni-2711-media.mjs`,
+      `src/data/yoni2711.generated.json`, `src/data/yoniMedia.ts`) ; remise aux joueurs : le film complet (49,8 s, déjà un montage :
+      le 60-90 s demandé est impossible), un montage de 29 s gardé à côté ; films de moment = `FilmFrame manual` (image + bouton,
+      jamais de lecture seule). Les albums ne contenaient aucune photo : 14 images nettes tirées du film 4K dans « View All Moments ».
+- [x] **Univers** : Dragon Ball revenu au Genkidama bleu (`genkidama-v1`, `free` + `drop` : la sphère au-dessus de la pièce, l'image
+      suit la pièce vers la droite, bords fondus ; pièce « xl ») ; **The Trophy Room** (maillot) et **The Octagon Gallery** (octogone)
+      faits en code (`src/components/universe/{CodeScene,TrophyRoom,OctagonGallery}.tsx`, `scenes.css`, `tests/universes2711.spec.ts`).
+- [x] **Plus aucune image IA présentée comme une pièce** : couvertures, galeries et détourages tirés de « Pieces sans photo pro (IA) »
+      retirés (TM, Thorned T, FAM, 3 montres, chaîne torsadée : `isAiView` de `src/data/showcase.ts`, `withStudio` neutralisé, vignettes
+      refaites ; une montre dont les seules photos sont l’ouverture et des photos portées n’a plus d’Every Angle).
+- [x] **Accueil** : chargement = le monogramme BRT qui se dessine (`Preloader.tsx`, 2,5 s au plus) ; blocs pièce d'un côté / texte de
+      l'autre en alternance (`Feature` de `Home.tsx`), texte = la phrase de la pièce sauf texte écrit dans l'admin (onglet « Textes de
+      l'accueil », `ServerSetting` `home.texts`) ; l'image du mécanisme remontée (la pièce entière au-dessus du rond, `tests/home2711.spec.ts`).
+- [x] **Atelier** : les chapitres en vrais moments filmés en boucle, muets (`scripts/atelier-chapters.mjs`, `public/media/atelier-chapters/`) ;
+      dans la fenêtre de l'atelier « Up next » (même personne, même catégorie…), à la fin « Enter the World » ou « Next film »
+      (`tests/atelier2711.spec.ts`).
+- [ ] **Malik** : copier les 4 fichiers de Dubaï (vidéo 00.30.56, photos 00.34.33, 00.34.33 (1), 00.49.17) dans
+      `.local/yoni-2711/okafor-dubai/` (macOS bloque leur lecture depuis Téléchargements) puis `node scripts/yoni-2711-media.mjs
+      --only=okafor-dubai` ; enregistrer depuis WhatsApp la photo de Yoni avec Thuram et Arnautović et la « photo 2 » (absentes des albums).
+- [ ] **Écrins (C)** : uniformiser le socle et le détourage de l'écrin de Stuttgart demande les originaux du disque externe (non branché).
+- [ ] Yoni : valider le Genkidama bleu, The Trophy Room, The Octagon Gallery, le film complet de la remise Inter (ou le montage de 29 s),
+      les 4 étapes du T sans photo, les images tirées du film de remise ; un original HD du film de Dubaï (copie WhatsApp 720p) ;
+      les 3D possibles dans le film de Dubaï (vers 8–11 s, 34–36 s) et le film Inter (gros plans 4–21 s).
+
 ## Passe « moteur 3D : corriger ce qui est faux, mode simple, parité iJewel » (retour de Malik du 26/11) — état au 27/11/2026
 - [x] **Pierres noires : deux causes trouvées et mesurées** (mode mesure du laboratoire, `?gemDebug=1|2` : rayons sortis,
       rebonds, lumière trouvée) : 1) les fichiers allégés gardent les positions en entiers de 16 bits, three-mesh-bvh les recopiait

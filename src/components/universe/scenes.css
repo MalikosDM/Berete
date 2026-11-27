@@ -1,0 +1,278 @@
+/*
+ * ---------- The worlds drawn in code (27/11/2026: src/components/universe/CodeScene.tsx, TrophyRoom.tsx, OctagonGallery.tsx) ----------
+ * No image: planes of SVG and CSS light placed under the piece. The page writes on the universe where the jewel is (--s-x,
+ * --s-y, in the coordinates of the stage), its scale (--s-u: a hundredth of the box of the jewel), where its plinth begins
+ * (--s-top) and how wide it is (--s-pw); the values below only hold the first paint, before it measures. Every motion is a
+ * transform or an opacity (light on a phone), paused off screen and deep in the page, none with "reduce motion".
+ */
+
+.universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+  /* A phone: the jewel at the top of the screen. */
+  --s-x: 50cqw;
+  --s-y: calc(5rem + (62cqh - 5rem) / 2);
+  --s-u: calc((62cqh - 5rem) / 100);
+  --s-pw: calc(var(--s-u) * 56);
+  --s-top: calc(var(--s-y) + var(--s-u) * 38);
+}
+@media (min-width: 64rem) {
+  .universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+    --s-x: 70.8cqw;
+    --s-y: calc(7rem + (min(100cqh, 60rem) - 10rem) / 2);
+    --s-u: calc((min(100cqh, 60rem) - 10rem) / 100);
+  }
+  [dir="rtl"] .universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+    --s-x: 29.2cqw;
+  }
+}
+@media (min-width: 80rem) {
+  .universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+    --s-x: 66.67cqw;
+  }
+  [dir="rtl"] .universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+    --s-x: 33.33cqw;
+  }
+}
+/* The small window of the admin: the world in the middle of its frame. */
+.universe[data-preview]:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) {
+  --s-x: 50cqw;
+  --s-y: 46cqh;
+  --s-u: 0.8cqh;
+}
+/* The camera of an entrance (the dolly of the tunnel, the zoom of every world) moves towards the jewel. */
+.universe:is([data-backdrop="trophy-room"], [data-backdrop="octagon-gallery"]) .universe-stage {
+  transform-origin: var(--s-x) var(--s-y);
+}
+
+/* The world in the stage: it goes back into the depth once the opening has passed, as an image would. */
+.u-scene {
+  overflow: hidden;
+  opacity: calc(1 - var(--u-scroll) * 0.62);
+  transform: translate3d(0, calc(var(--u-scroll) * -2.5%), 0) scale(calc(1 + var(--u-scroll) * 0.05));
+  transform-origin: var(--s-x) 40%;
+}
+/* A plane of the world: a little larger than the screen (its edges never show when it moves), drifting slowly by itself,
+   following the mouse by its own amount (CodeScene.tsx writes its translate). */
+.u-scene .s-plane {
+  position: absolute;
+  inset: -32px;
+  overflow: hidden;
+  will-change: transform;
+  transform-origin: calc(var(--s-x) + 32px) calc(var(--s-y) + 32px);
+  animation: s-drift 26s ease-in-out infinite alternate;
+}
+.u-scene .s-plane[data-plane="mid"] {
+  animation-duration: 31s;
+  animation-delay: -9s;
+}
+.u-scene .s-plane[data-plane="near"],
+.u-scene .s-plane[data-plane="floor"] {
+  animation-duration: 23s;
+  animation-delay: -4s;
+}
+@keyframes s-drift {
+  0% {
+    transform: translate3d(calc(var(--drift) * -1px), calc(var(--drift) * 0.5px), 0) scale(1);
+  }
+  35% {
+    transform: translate3d(calc(var(--drift) * 0.5px), calc(var(--drift) * -0.6px), 0) scale(calc(1 + var(--drift) * 0.0011));
+  }
+  70% {
+    transform: translate3d(calc(var(--drift) * 1px), calc(var(--drift) * 0.35px), 0) scale(calc(1 + var(--drift) * 0.0006));
+  }
+  100% {
+    transform: translate3d(calc(var(--drift) * -0.3px), calc(var(--drift) * -0.5px), 0) scale(calc(1 + var(--drift) * 0.0017));
+  }
+}
+/* The drawing of a plane: its heart (0, 0 of its box) on the jewel, 100 units the height of the box of the jewel. */
+.u-scene .s-art {
+  position: absolute;
+  left: calc(var(--s-x) + 32px - var(--s-u) * 330);
+  top: calc(var(--s-y) + 32px - var(--s-u) * 210);
+  width: calc(var(--s-u) * 660);
+  height: calc(var(--s-u) * 450);
+  max-width: none;
+  overflow: visible;
+}
+/* The heart of the world, for the checks: never seen. */
+.u-scene .s-focus {
+  position: absolute;
+  inset: auto;
+  left: var(--s-x);
+  top: var(--s-y);
+  width: 2px;
+  height: 2px;
+  margin: -1px 0 0 -1px;
+  visibility: hidden;
+  pointer-events: none;
+}
+.u-scene .s-plane > i {
+  position: absolute;
+  display: block;
+}
+
+/* ---------- The trophy room ---------- */
+
+/* The haze: soft veils of warm light in the dark air. */
+.u-scene .s-haze {
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(224 214 200 / var(--a)), rgb(224 214 200 / calc(var(--a) * 0.4)) 55%, transparent);
+  animation: s-haze var(--t) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -11s);
+}
+@keyframes s-haze {
+  from {
+    transform: translate3d(-4%, 1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, -2%, 0) scale(1.06);
+  }
+}
+/* A thin ray of a stadium light, from above the screen, sweeping a few degrees. */
+.u-scene .s-ray {
+  transform-origin: 50% 0;
+  translate: -50% 0;
+  rotate: var(--r);
+  animation: s-sweep var(--t) ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -8s);
+}
+.u-scene .s-ray svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+@keyframes s-sweep {
+  from {
+    transform: rotate(-1.7deg);
+  }
+  to {
+    transform: rotate(1.7deg);
+  }
+}
+/* The lines of the pitch fade out under the plinth: never behind the texts that come below the opening on a tall screen. */
+.u-scene .s-plane[data-plane="floor"] {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--s-top) + 40px), transparent calc(var(--s-top) + 210px));
+  mask-image: linear-gradient(to bottom, #000 calc(var(--s-top) + 40px), transparent calc(var(--s-top) + 210px));
+}
+@media (max-width: 1023px) {
+  .u-scene .s-ray:not([data-phone]) {
+    display: none;
+  }
+}
+/* The red of Switzerland and the green of Nigeria: a faint light on the far borders of the room, never a flat colour. */
+.u-scene[data-scene="trophy-room"]::before,
+.u-scene[data-scene="trophy-room"]::after {
+  content: "";
+  position: absolute;
+  top: 6%;
+  bottom: 10%;
+  width: min(10vw, 140px);
+  pointer-events: none;
+}
+.u-scene[data-scene="trophy-room"]::before {
+  left: 0;
+  background: radial-gradient(100% 50% at 0% 50%, rgb(226 52 40 / 0.075), rgb(226 52 40 / 0.02) 45%, transparent 75%);
+  box-shadow: inset 1px 0 0 rgb(226 52 40 / 0.07);
+}
+.u-scene[data-scene="trophy-room"]::after {
+  right: 0;
+  background: radial-gradient(100% 50% at 100% 50%, rgb(28 170 104 / 0.07), rgb(28 170 104 / 0.02) 45%, transparent 75%);
+  box-shadow: inset -1px 0 0 rgb(28 170 104 / 0.07);
+}
+
+/* The plinth and its light: out of the stage (they scroll with the piece), under the whole page, over the room. */
+.u-scene-near {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  container-type: size;
+  pointer-events: none;
+}
+.universe[data-preview] .u-scene-near {
+  height: 100%;
+  overflow: hidden;
+}
+.u-scene-near .s-near {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+.u-scene-near .s-near > i {
+  position: absolute;
+  display: block;
+}
+.u-scene-near svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* One warm light from above, falling on the plinth: it breathes, barely. */
+.u-scene-near .s-cone {
+  left: calc(var(--s-x) - var(--s-pw) * 0.62);
+  width: calc(var(--s-pw) * 1.24);
+  top: calc(var(--s-y) - var(--s-u) * 190);
+  height: calc(var(--s-top) - var(--s-y) + var(--s-u) * 190 + var(--s-pw) * 0.05);
+  mix-blend-mode: screen;
+  animation: s-breathe 9s ease-in-out infinite alternate;
+}
+@keyframes s-breathe {
+  from {
+    opacity: 0.82;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* The plinth: as wide as the jewel, its top face under the foot of the jewel. */
+.u-scene-near .s-plinth {
+  left: calc(var(--s-x) - var(--s-pw) / 2);
+  top: var(--s-top);
+  width: var(--s-pw);
+  aspect-ratio: 1 / 3;
+}
+/* The entrance: the plinth comes with the world, the spotlight switches on over it. */
+[data-entering] .u-scene-near {
+  animation: s-near-in 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+@keyframes s-near-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+[data-entering] [data-entrance="spotlight"] .u-scene-near .s-cone {
+  animation: s-cone-on 1.2s steps(1, end) both;
+}
+@keyframes s-cone-on {
+  0% {
+    opacity: 0;
+  }
+  22% {
+    opacity: 0.55;
+  }
+  32% {
+    opacity: 0.15;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Off screen and deep in the page the world rests. */
+.universe:is([data-scene-idle], [data-deep]) :is(.s-plane, .s-haze, .s-ray, .s-cone) {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .u-scene .s-plane,
+  .u-scene .s-haze,
+  .u-scene .s-ray,
+  .u-scene-near,
+  .u-scene-near .s-cone {
+    animation: none !important;
+  }
+}

@@ -11,7 +11,6 @@ import { defaultCatalogue } from "../src/data/catalogue";
 import { publicCatalogue } from "../src/data/relations";
 
 const desktop = (name: string) => name === "desktop" || name === "safari";
-const phone = (name: string) => name.startsWith("iphone");
 const cat = publicCatalogue(defaultCatalogue);
 const HAS_SERVER = !/vercel\.app/.test(process.env.BASE_URL ?? "");
 
@@ -101,8 +100,10 @@ test("home: the Dragon Ball pendant beside a circle where its sphere turns by it
     await expect.poll(() => sphere.evaluate((v) => !(v as HTMLVideoElement).paused && (v as HTMLVideoElement).currentTime > 0), { timeout: 15_000 }).toBe(true);
     expect(await sphere.evaluate((v) => (v as HTMLVideoElement).muted && (v as HTMLVideoElement).loop)).toBe(true);
     await expect(section.locator("h2")).toHaveText(lang ? "Le mécanisme" : "The Mechanism");
-    await expect(section.locator("p")).toHaveCount(1);
-    await expect(section.locator("p")).toHaveText(lang ? "Mais pour nous, l’énergie n’a jamais été faite pour rester immobile." : "But to us, energy was never meant to remain still.");
+    // Since 27/11/2026 (Yoni): beside the piece, its name and its short text (the line of the piece or the text of the admin,
+    // src/data/homeTexts.ts; tests/home2711.spec.ts).
+    await expect(section.locator("[data-home-piece-name]")).toHaveCount(1);
+    await expect(section.locator('[data-home-text="mechanism"]')).not.toBeEmpty();
     await expect(section.locator("[data-innovation-link]")).toHaveAttribute("href", lang + "/pieces/kevin-schade-dragon-ball-pendant");
     await page.waitForTimeout(600);
     if (!lang) await page.screenshot({ path: shotPath(info, "yoni2411-accueil-dragon-ball"), type: "jpeg", quality: 70 });
@@ -193,7 +194,7 @@ test("every piece: the same order; its film plays by itself, whole in the screen
         expect(f.width).toBeLessThanOrEqual(view.width);
         const video = page.locator("[data-feature-video]");
         await expect.poll(() => video.evaluate((v) => !(v as HTMLVideoElement).paused && (v as HTMLVideoElement).currentTime > 0), { timeout: 20_000 }).toBe(true);
-        expect(await video.evaluate((v) => (v as HTMLVideoElement).muted && (v as HTMLVideoElement).loop)).toBe(true);
+        expect(await video.evaluate((v) => (v as HTMLVideoElement).muted && ((v as HTMLVideoElement).loop || Boolean((v as HTMLVideoElement).dataset.start)))).toBe(true);
         if (slug === pieces[0] && !lang) await page.screenshot({ path: shotPath(info, "yoni2411-piece-film"), type: "jpeg", quality: 70 });
       }
       // Four photos, then See more.
@@ -232,10 +233,11 @@ test("every piece: the same order; its film plays by itself, whole in the screen
   expect(problems.errors).toEqual([]);
 });
 
-test("no 3D animation shown as the finished piece: the Inter ring has no such film; the Dragon Ball pendant shows its hero film", async ({ page }) => {
+test("no 3D animation shown as the finished piece: the Inter ring shows the final film of Yoni (26/11/2026), never its 3D film 25/v01; the Dragon Ball pendant shows its hero film", async ({ page }) => {
   await open(page, "/pieces/campione-d-italia-2023-2024");
   await settled(page);
-  await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+  await expect(page.locator("[data-piece-spread] [data-feature-video]")).toHaveAttribute("poster", /\/yoni-2711\/inter-film\//);
+  await expect(page.locator("video[src*='/films/campione-d-italia-2023-2024/reveal']")).toHaveCount(0);
   await open(page, "/pieces/kevin-schade-dragon-ball-pendant");
   await settled(page);
   await page.locator("[data-feature-film]").scrollIntoViewIfNeeded();
@@ -369,8 +371,9 @@ test("the Circle: its title on one small line, four athletes on a row; Inter and
     await page.waitForTimeout(1200);
     await page.screenshot({ path: shotPath(info, "yoni2411-univers-" + backdrop), type: "jpeg", quality: 72 });
   }
-  // Yoni with the players and their rings, in "Worn by".
+  // Yoni with the players and their rings: « In the Hands of the Champions » (26/11/2026), four first, then View All Moments.
   await open(page, "/pieces/campione-d-italia-2023-2024");
-  await expect(page.locator("[data-worn-by] img[src*='/extra/campione-d-italia-2023-2024/dumfries.'], [data-worn-by] img[src*='/stories/inter-squad/03.']")).toHaveCount(phone(info.project.name) ? 2 : 2);
+  await page.locator("[data-champions] [data-photo-more-button]").click();
+  await expect(page.locator("[data-champions] img[src*='/extra/campione-d-italia-2023-2024/dumfries.'], [data-champions] img[src*='/stories/inter-squad/03.']")).toHaveCount(2);
   expect(problems.errors).toEqual([]);
 });

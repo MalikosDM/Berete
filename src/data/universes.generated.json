@@ -271,7 +271,12 @@
    "depth": {
     "d": "9e15732667",
     "m": "665302ef41"
-   }
+   },
+   "free": true,
+   "drop": [
+    0.1,
+    0.05
+   ]
   },
   "arene": {
    "name": "Arène de combat, projecteur doré (Losene Keita)",

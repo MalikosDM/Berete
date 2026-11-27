@@ -13,6 +13,7 @@ import type { PieceDetailPoints } from "./details3d.js";
 import type { PieceShowcase } from "./showcase.js";
 import type { PieceTheme } from "./themes.js";
 import { trunkPhotos } from "./trunks.js";
+import { YONI } from "./yoni2711.js";
 import type { Box, Making, MakingKey, MediaItem, Piece, PieceType, Press } from "./types.js";
 
 /**
@@ -128,7 +129,8 @@ export const RENAMED_PIECES: Record<string, string> = {
   // BRT Flowers is one chain in two widths (Yoni, 24/11/2026): the twisted chain of Kevin Schade is this sheet.
   "kevin-schade-twisted-chain": "brt-flower-chain",
   // The top of the Inter ring is on the page of the ring since 24/11/2026: its address leads to "Worn as a Pendant".
-  [INTER_PENDANT]: "campione-d-italia-2023-2024#worn-as-pendant",
+  // Its crown worn as a pendant, told in its details since 26/11/2026 (« 06 — Beyond the Ring »).
+  [INTER_PENDANT]: "campione-d-italia-2023-2024#piece-details",
   // The Infinity Link, back on the site without the name under which it was removed (24/11/2026).
   "infinity-link-chain": "pear-link-chain",
   "marcus-thuram-infinity-chain": "pear-link-chain",
@@ -215,6 +217,16 @@ function piece(p: PieceInput): Piece {
 const at = (alt: string, caption?: string): Partial<MediaItem> => (caption ? { alt, caption } : { alt });
 
 /**
+ * The definitive texts of Yoni (26-27/11/2026, src/data/yoni2711.ts), word for word: the paragraphs of « The Vision Behind the
+ * Creation », « Composition & Craftsmanship », and « The Art of Detail », each detail with the photo that shows it (looked at
+ * photo by photo; a photo of its chain may come from the folder of the chain).
+ */
+function yoniTexts(slug: string, photos: Maybe[] = []): Pick<PieceInput, "story" | "specs" | "details"> {
+  const y = YONI[slug]!;
+  return { story: y.story.join("\n\n"), specs: y.specs ?? [], details: (y.details ?? []).map(([title, text], i) => [title, text, photos[i] ?? null]) };
+}
+
+/**
  * The professional photos of a box (00 Contexte Yoni/Boites (photos pro), scripts/trunk-media.mjs), in their order, each
  * with its texts (what the photo shows).
  */
@@ -289,9 +301,10 @@ function firsts(dir: string, files: string[]): string[] {
  * Its studio photo first (Yoni, 23/11/2026, 00 Contexte Yoni/Pieces sans photo pro (IA)/, scripts/extra-media.mjs): the
  * cover and the first photo of "Every Angle", the photos it had after it (its worn ones go to "Worn by").
  */
-function withStudio(slug: string, alt: string, s: { cover: Maybe; gallery: Maybe[] }): { cover: Maybe; gallery: Maybe[] } {
-  const studio = extra(slug, "studio", at(alt));
-  return studio ? { cover: studio, gallery: [studio, s.cover, ...s.gallery] } : s;
+function withStudio(_slug: string, _alt: string, s: { cover: Maybe; gallery: Maybe[] }): { cover: Maybe; gallery: Maybe[] } {
+  // Since 26/11/2026 (Yoni: « aucune image IA présentée comme une vraie pièce »), the studio images made by AI are no longer shown:
+  // the real photos of the piece only, its cover first among them.
+  return { cover: s.cover, gallery: [s.cover, ...s.gallery] };
 }
 
 function sorted(dir: string, own: Maybe[], files?: string[]): { cover: Maybe; gallery: Maybe[] } {
@@ -353,18 +366,10 @@ const SITE_PIECES: Piece[] = [
     slug: VFB,
     title: "VfB Stuttgart — DFB-Pokal 2025 Ring",
     type: "ring",
-    line: "The top lifts off and reveals the trophy.",
-    // In four parts (22–23/11/2026): the inspiration, the design, the technique, the details; only the facts already known
-    // (the red stones around the crest are cut as shields, not pears).
-    story:
-      "## Winners of the 2025 DFB-Pokal\n\n" +
-      "A championship ring for the VfB Stuttgart squad that won the 2025 DFB-Pokal.\n\n" +
-      "## The Crest at the Centre\n\n" +
-      "At its heart, the enamelled club crest, framed by red stones cut in the shape of a shield.\n\n" +
-      "## A Top That Lifts Off\n\n" +
-      "The top is removable: lifted, it uncovers a sculpted cup, and the side of the ring carries the DFB-Pokal engraving.\n\n" +
-      "## One Ring per Player\n\n" +
-      "Every ring carries the name and number of the player who wears it.",
+    // Yoni's definitive texts (26/11/2026): its vision, three details beside their close-ups (the jersey of a player's ring, the
+    // crest in its shield of red stones, the cup under the crown), its composition.
+    line: "Some victories deserve more than a memory.",
+    ...yoniTexts(VFB, [V("p11", {}), V("p20", {}), V("p14", {})]),
     people: ["deniz-undav", "angelo-stiller", "jamie-leweling", "maximilian-mittelstaedt", "chris-fuehrich", "atakan-karazor", "vfb-stuttgart"],
     client: "VfB Stuttgart",
     theme: { preset: "victoire-rouge" },
@@ -375,13 +380,6 @@ const SITE_PIECES: Piece[] = [
     ...sorted(VFB, [vfb.front, vfb.open, vfb.cup, vfb.engraving, vfb.profile, vfb.crest, vfb.undav, vfb.stiller, vfb.mittelstaedt, vfb.karazor, vfb.squad], firsts(VFB, ["p13", "p17", "p20", "p18", "p06", "p11", "p12", "p22", "p01", "p14", "p15", "p16", "p21", "p19", "p08", "p04", "p05"])),
     handover: [vfb.presentation, vfb.showcase, vfb.shown, st("collectors", 41, at("VfB Stuttgart players with the ring", "The squad and its ring"))],
     press: [{ outlet: "Bild", title: "The VfB champions receive their rings", url: null, image: vfbPhotos[10]?.src ?? null }],
-    specs: [
-      ["Type", "Championship ring"],
-      ["Top", "Removable, reveals the trophy"],
-      ["Personalisation", "Name and number of each player"],
-      ["Series", "Created for the squad"],
-    ],
-    seen: "Rose and white gold · round diamonds in pavé, baguettes, triangle-cut stones, red stones; an enamelled crest",
     featured: true,
     boxSlug: "dfb-pokal-2025-display",
     making: { raw: raw(VFB, "08-v05-6s"), setting: yoni(VFB, "08-v05-19s", SET()), polishing: yoni(VFB, "08-v05-4_6s", POLISH()), delivery: vfb.presentation },
@@ -390,18 +388,11 @@ const SITE_PIECES: Piece[] = [
     slug: INTER,
     title: "Inter Milan — Campione d'Italia Ring",
     type: "ring",
-    line: "Twenty stars for twenty titles.",
-    // In four parts (22–23/11/2026), from the facts of its details only; the 20 is polished rose gold, not set.
-    story:
-      "## The Twentieth Title\n\n" +
-      "After Inter Milan's twentieth league title, a ring was made for every player of the squad.\n\n" +
-      "## The Club, Detail by Detail\n\n" +
-      "The emblem is set in diamonds on a deep blue ground, inside a band of stars, circled by the black and blue stripes of the shirt. On the sides: Forza Inter above the Italian flag, the Serie A logo with its 20, and the words Inter Milan Campione d'Italia.\n\n" +
-      "## The Hidden Cup\n\n" +
-      "Six months of work went into the ring. Its top lifts off onto a sculpted cup hidden beneath, and can be worn on its own as a pendant.\n\n" +
-      "## One Star for Each Title\n\n" +
-      "Twenty stars and twenty diamonds, one of each for every title, and the 20 itself in polished rose gold.\n\n" +
-      "> Twenty titles, one number.",
+    // Yoni's definitive texts (26/11/2026): its vision, its composition, six details beside their close-ups (« Six Months of
+    // Craftsmanship » removed): the stars and diamonds around the crest, the stripes, the tricolour, TIKUS and the 9 of Marcus
+    // Thuram's ring, the 20, the crown worn as a pendant over the hidden trophy.
+    line: "Twenty titles. One historic moment.",
+    ...yoniTexts(INTER, [inter.emblem, inter.stars, inter.flag, I("p50", {}), inter.serieA, I("p45", {})]),
     people: ["inter-milan", "marcus-thuram"],
     client: "Inter Milan",
     theme: { preset: "victoire-nuit" },
@@ -430,25 +421,6 @@ const SITE_PIECES: Piece[] = [
       { outlet: "FCInterNews", title: "A ring to celebrate: a special gift for the Inter players", url: null, image: null },
       { outlet: "SPORTbible", title: "Football fans debate replacing winner medals with rings", url: null, image: null },
     ],
-    specs: [
-      ["Type", "Championship ring"],
-      ["Motif", "The club emblem and the number 20"],
-      ["Top", "Removable, can be worn as a pendant"],
-      ["Series", "Created for the whole squad"],
-    ],
-    // What the jeweller told about the ring (meeting of 9 November 2026), each detail with the photo that shows it.
-    details: [
-      ["Six Months of Craftsmanship", "The ring took six months of work.", null],
-      ["Twenty stars, twenty diamonds", "One star and one diamond for each of the club's twenty league titles.", inter.emblem],
-      ["The colours of the shirt", "Black, blue, black, blue: the stripes of the Inter shirt run all around the emblem.", inter.stars],
-      ["The Italian flag", "The green, white and red of the Italian flag, on the side of the ring.", inter.flag],
-      ["Forza Inter", "Above the flag, the cry of the supporters: Forza Inter.", inter.flag],
-      ["The Serie A logo", "The logo of the Serie A, with the number 20 added to it.", inter.serieA],
-      ["Campione d'Italia", "Inter Milan Campione d'Italia, written around the ring.", inter.side],
-      ["The Secret Within", "The top lifts off and reveals the cup hidden underneath.", inter.cup],
-      ["Beyond a Ring", "The top can also be worn on its own, as a pendant.", inter.pendant],
-    ],
-    seen: "White gold, rose gold stars and 20 · round diamonds in pavé, baguettes; blue, green and red enamel",
     boxSlug: "campione-d-italia-case",
     // setting2: baguettes set on its side (08/v25, the same session as 08/v24 and 08/v26: confirmed by Yoni, 21/11/2026).
     making: { raw: raw(INTER, "v02-14_6s"), setting: yoni(INTER, "v02-27_4s", SET()), setting2: yoni(INTER, "08-v25-3s", { ...at("Baguettes set on the side of the ring", "In the setting"), onBlack: false }), polishing: yoni(INTER, "v02-34_4s", POLISH()), delivery: inter.case },
@@ -470,7 +442,7 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "marcus-thuram-signet-ring",
-    title: "Marcus Thuram — Iced Signet Ring",
+    title: "Iced Signet Ring",
     type: "ring",
     line: "A signet ring with no metal left to see.",
     story: "A broad signet ring, set with diamonds over its whole surface, shown on the hand of the man who wears it.",
@@ -486,38 +458,29 @@ const SITE_PIECES: Piece[] = [
   /* Pendants */
   piece({
     slug: "kevin-schade-dragon-ball-pendant",
-    title: "Kevin Schade — Dragon Ball Pendant",
+    // The name of the client out of the title (Yoni, 26/11/2026): « Created Exclusively for Kevin Schade », lower on the page.
+    title: "Dragon Ball Pendant",
     type: "pendant",
-    // The official text of Yoni (23/11/2026), word for word (only the spaces before ";" and "," removed, a full stop added at
-    // its end), after the challenge of Kevin Schade, under its title ("## "); the two sentences of the sphere that turns kept
-    // after the cuts of its diamonds; its last words set apart as a closing quote ("> "), and its line (src/data/story.ts).
-    line: "Not power taken, but power entrusted.",
-    story:
-      "## The Vision Behind the Creation\n\n" +
-      "A lifelong admirer of Dragon Ball Z, Kevin Schade challenged Berete to create an extraordinary, never-before-seen piece inspired by Goku and his iconic Genki Dama — a technique Kevin himself had celebrated on the football pitch.\n\n" +
-      "In the Dragon Ball universe, the Genki Dama (Spirit Bomb) is not born from force, but from unity.\nIt is an energy sphere formed by gathering life force from every living being; humans, animals, nature, and worlds beyond.\n\n" +
-      "This philosophy guided the creation of this piece.\n\n" +
-      "At its center, the energy sphere is composed of multiple diamond cuts; round, emerald, and princess, set through different techniques: classic, bezel, channel, and reverse settings.\n\n" +
-      "But to us, energy was never meant to remain still.\n\n" +
-      "We therefore engineered the diamond-set Spirit Bomb to rotate, bringing movement to the very heart of the creation.\n\n" +
-      "Each cut, each orientation, represents a different form of life contributing its energy.\nEven the reverse-set stones placed upside down reflect the unseen forces that give without being visible.\n\n" +
-      "Beneath the sphere stands Goku, the conduit rather than the source.\nSurrounding him are the seven Dragon Balls, completing the universe — symbols of balance, destiny, and collective hope.\n\n" +
-      "Crafted in precious metals and diamonds, this piece translates a universal story into high jewellery:\nnot power taken, but power entrusted.\n\n" +
-      "A tribute to imagination, craftsmanship, and the legacy of Akira Toriyama, whose universe taught generations that true strength is never singular.\n\n" +
-      "> Not power taken, but power entrusted.",
+    // Yoni's definitive texts (26/11/2026): its vision, its composition in two columns, the weights and carats beneath. Its line:
+    // the last words of its vision (said once on its page).
+    line: "Every stone, every setting, every movement has a purpose.",
+    ...yoniTexts("kevin-schade-dragon-ball-pendant"),
     people: ["kevin-schade"],
     // Its own world inside the universe "Énergie" (20/11/2026): black, the sphere of light of the Genkidama, the light
     // rising to it (the chain of Kevin Schade keeps the universe as it is). Nothing official of Dragon Ball.
     // The Genkidama v2 (25/11/2026): the energy rises from the canyon to the sphere, lightning now and then in the clouds, embers
     // from the fires.
-    theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama", effects: ["genkidama", "lightning", "embers", "impact"] },
+    // Back to the blue Genkidama on 26/11/2026 (the choice of Yoni's wife; the v2 of the canyon kept: backdrop "genkidama"): its
+    // sphere above the piece, a little lower in the frame, the image moved to the right with the piece.
+    theme: { preset: "energie", base: "#020407", tint: "#061624", glow: "#bfe6ff", backdrop: "genkidama-v1", effects: ["genkidama", "impact"] },
     // Its main view much larger at the opening (feedback of Yoni, 21/11/2026), whole, on a computer and on a phone.
     // 23/11/2026 (Yoni): the view with its chain alone and larger at the opening; its back no longer first (at the end of
     // its photos).
     // 23/11/2026 evening (Yoni: « la photo avec la chaîne est trop petite ») : on a computer larger still ("xl"), its chain
     // leaving the top of the screen, faded; on a phone it already fills the frame.
     // Under the sphere of the Genkidama v2 (25/11/2026): large, no longer very large, so that the sphere shows above it.
-    showcase: { size: "large", mode: "single", views: ["p19"] },
+    // Much larger on the blue Genkidama (Yoni, 26/11/2026): very large again, its chain leaving the top of the screen, faded.
+    showcase: { size: "xl", mode: "single", views: ["p19"] },
     // Its edit 13/v01 opens on its 3D model: a making-of (in The Atelier), never its finished piece (Yoni, 24/11/2026); the
     // film of its finished piece is its hero film (src/data/featureFilms.ts).
     atelier: { reveal: null },
@@ -532,13 +495,6 @@ const SITE_PIECES: Piece[] = [
       yoni("kevin-schade-dragon-ball-pendant", "p20", at("The pendant on its chain, on a black bust")),
       st("kevin-schade", 22, at("Film of the pendant turning in a gloved hand")),
     ]),
-    // Only what the text of Yoni says (22/11/2026); what the photos seemed to show is no longer written.
-    specs: [
-      ["Motif", "Goku and the Spirit Bomb, surrounded by the seven Dragon Balls"],
-      ["Spirit Bomb", "Rotating, diamond-set"],
-      ["Diamond cuts", "Round, emerald, princess"],
-      ["Settings", "Classic, bezel, channel, reverse"],
-    ],
     boxSlug: "dragon-ball-trunk",
     making: {
       sketch: st("kevin-schade", 8, at("The first hand drawing of the Dragon Ball pendant", "The Original Vision")),
@@ -553,9 +509,9 @@ const SITE_PIECES: Piece[] = [
     slug: "kenan-yildiz-celebration-pendant",
     title: "Kenan Yildiz — Celebration Pendant",
     type: "pendant",
-    line: "His celebration, crossed in diamonds.",
-    story:
-      "Two hands crossed in the gesture of his goal celebration, sculpted in volume and paved with white diamonds, with baguette-cut stones at the cuffs. A round medallion sits on the bail.",
+    // Yoni's definitive text (26/11/2026).
+    line: "A signature celebration. Immortalised in diamonds.",
+    story: YONI["kenan-yildiz-celebration-pendant"]!.story.join("\n\n"),
     people: ["kenan-yildiz"],
     // Its stadium darkened by Yoni (23/11/2026); the piece larger (Yoni: at least 30 % larger).
     theme: { preset: "bianconero" },
@@ -580,22 +536,13 @@ const SITE_PIECES: Piece[] = [
     slug: "noah-okafor-jersey-pendant",
     title: "Noah Okafor — Jersey Pendant",
     type: "pendant",
-    // What Yoni told of it (22–23/11/2026), in four parts: Oka4, the crown of the four siblings, the two flags, the chain that
-    // becomes the Safi Link.
-    line: "His celebration, his family and his two flags, set in diamonds.",
-    story:
-      "## Half Swiss, Half Nigerian\n\n" +
-      "Noah Okafor is half Swiss, half Nigerian. His pendant carries both, in the pose of his goal celebration: a jersey, arms crossed.\n\n" +
-      "## Two Flags on One Jersey\n\n" +
-      "The Swiss emblem sits on the chest, a white cross on a shield of red stones. The flag of Nigeria circles the sleeve, and the three stripes of the jersey take up its colours.\n\n" +
-      "## A Chain That Becomes the Safi Link\n\n" +
-      "The chain detaches and clips into the pendant. Removed, it closes with a connecting piece and becomes a chain of its own: the Safi Link. Decorative details, down to the triangle-cut stones of the base, are there to show the craft.\n\n" +
-      "## Oka4\n\n" +
-      "On the back, OKA and the number 4: read aloud, Oka4 becomes Okafor. Above the 4, a crown for the four Okafor siblings.\n\n" +
-      "> Two flags, four siblings, one name.",
+    // Yoni's definitive texts (27/11/2026): its vision, its composition and his descriptive lines, eight details beside their
+    // close-ups (the celebration, the two flags, the stripes, OKA 4, the crown, the settings, the Safi Link, on its bust).
+    line: "His celebration. His roots. His legacy.",
+    ...yoniTexts("noah-okafor-jersey-pendant", ["p16", "p17", "p15", "p09", "p04", "p11", "p03", "p02"].map((f) => yoni("noah-okafor-jersey-pendant", f))),
     people: ["noah-okafor"],
     // Its own world since 23/11/2026 (Yoni): spotlights in the colours of Nigeria and Switzerland.
-    theme: { preset: "okafor-jersey" },
+    theme: { preset: "trophy-room" },
     // The jersey with its chain as the hero (Yoni, 23/11/2026).
     showcase: { size: "large", views: ["p20", "p06", "p02"] },
     ...sorted("noah-okafor-jersey-pendant", [
@@ -610,29 +557,16 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-jersey-pendant", "p01", { ...at("Noah Okafor wearing the pendant", "Worn by Noah Okafor"), onBlack: false }),
       // Not the story 11 (the same edit as its film v01, a duplicate).
     ], firsts("noah-okafor-jersey-pendant", ["p20", "p16", "p02", "p17", "v01", "p10", "p18", "p15", "p11", "p13", "p12", "p03", "p06", "p09", "p07", "p05", "p04", "p01"])),
-    specs: [
-      ["Type", "Pendant"],
-      ["Motif", "His goal celebration: a jersey, arms crossed"],
-      ["Chain", "Detachable, worn on its own as the Safi Link"],
-    ],
-    seen: "White and rose gold · round diamonds in pavé, pear, marquise, baguette and triangle-cut diamonds; green and red stones",
     making: { raw: raw("noah-okafor-jersey-pendant", "p21"), setting: yoni("noah-okafor-jersey-pendant", "v02-21_2s", SET()), delivery: yoni("noah-okafor-jersey-pendant", "v02-12_2s", IN_TRUNK()) },
   }),
   piece({
     slug: "noah-okafor-oka-pendant",
     title: "Noah Okafor — OKA Nameplate Pendant",
     type: "pendant",
-    // Its first piece with Berete; the camouflage of a friend's Swiss military service hides two maps (Yoni, 22–23/11/2026).
-    line: "His first piece with Berete: two maps hidden in a camouflage.",
-    story:
-      "## A Friend's Military Service\n\n" +
-      "The first piece Noah Okafor created with Berete. Its idea came from a friend's Swiss military service.\n\n" +
-      "## Three Letters in Camouflage\n\n" +
-      "The letters OKA are set in white diamonds and crossed by patches of polished rose gold, drawn like a camouflage.\n\n" +
-      "## Gold Over Diamonds\n\n" +
-      "Baguettes fill the letters and round diamonds edge them, down to their flanks, beneath raised patches of rose gold. The pendant hangs from a Cuban chain of white and rose gold links, lined with baguettes.\n\n" +
-      "## Two Maps and a Ball\n\n" +
-      "Within the camouflage hide the map of Switzerland and the map of Nigeria, side by side. On the K, a small football in rose gold, for the game.",
+    // Yoni's definitive texts (27/11/2026): its vision, its composition (the pendant and its chain apart), five details beside
+    // their close-ups (the camouflage, the two maps, the football, the settings, the two-tone Cuban: a photo of the chain).
+    line: "His name. His origins. His game.",
+    ...yoniTexts("noah-okafor-oka-pendant", [...["p06", "p04", "p03", "p09"].map((f) => yoni("noah-okafor-oka-pendant", f)), yoni("baguette-cuban-chain", "p06")]),
     people: ["noah-okafor"],
     // Its own world since 23/11/2026 (Yoni): a camouflage in rose gold over the lines of a map.
     theme: { preset: "okafor-oka" },
@@ -648,22 +582,18 @@ const SITE_PIECES: Piece[] = [
       yoni("noah-okafor-oka-pendant", "p02", { ...at("The OKA pendant worn on a white jersey"), onBlack: false }),
       yoni("noah-okafor-oka-pendant", "p18", { ...at("The OKA pendant presented in its box"), onBlack: false }),
     ]),
-    specs: [
-      ["Type", "Nameplate pendant"],
-      ["Motif", "The letters OKA in camouflage, and a football"],
-    ],
-    seen: "White and rose gold · round diamonds, baguettes",
     making: { raw: raw("noah-okafor-oka-pendant", "v02-19_8s"), setting: yoni("noah-okafor-oka-pendant", "v02-31_9s", SET()), polishing: yoni("noah-okafor-oka-pendant", "v02-42_4s", POLISH()), delivery: yoni("noah-okafor-oka-pendant", "p18", IN_BOX()) },
   }),
   piece({
     slug: "noah-okafor-octagon-pendant",
     title: "Noah Okafor — Octagon Pendant",
     type: "pendant",
-    line: "An octagon of baguettes, worn on tennis chains.",
-    story:
-      "An octagonal pendant built from baguette-cut diamonds, crossed by lines of rose gold and set with pear-shaped stones. It is worn over several tennis chains, which came in a trunk with a photograph set in its lid.",
+    // Yoni's definitive texts (27/11/2026): its vision, its composition, four details beside their close-ups (the O, the N, the
+    // two golds, the tennis chains: a photo of the chain).
+    line: "Two letters. One identity.",
+    ...yoniTexts("noah-okafor-octagon-pendant", [...["p03", "p04", "p06"].map((f) => yoni("noah-okafor-octagon-pendant", f)), yoni("two-row-tennis-chain", "p03")]),
     people: ["noah-okafor"],
-    theme: { preset: "tunnel" },
+    theme: { preset: "octagon-gallery" },
     ...sorted("noah-okafor-octagon-pendant", [
       yoni("noah-okafor-octagon-pendant", "p09", at("Noah Okafor's octagon pendant of baguette diamonds")),
       yoni("noah-okafor-octagon-pendant", "p02", at("The octagon pendant on its tennis chain")),
@@ -675,11 +605,6 @@ const SITE_PIECES: Piece[] = [
       st("noah-okafor-ii", 3, at("Film of the trunk and the tennis chains inside", "The trunk")),
       st("noah-okafor-ii", 5, at("The pendant and its trunk on a counter")),
     ]),
-    specs: [
-      ["Type", "Pendant with tennis chains"],
-      ["Shape", "Octagon"],
-    ],
-    seen: "White and rose gold · baguette diamonds in a herringbone, round and pear-shaped diamonds",
     boxSlug: "okafor-trunk",
     making: {
       raw: raw("noah-okafor-octagon-pendant", "v02-13s"),
@@ -691,19 +616,13 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "marcus-thuram-t-serpent-pendant",
-    title: "Marcus Thuram — T-Serpent Pendant",
+    // T9 (Yoni, 27/11/2026): its name everywhere; its address kept.
+    title: "Marcus Thuram — T9 Pendant",
     type: "pendant",
-    // T9 (Yoni, 22–23/11/2026): the serpent of Inter draws his 9; its scales, a setting invented by the house.
-    line: "T for Thuram, and a serpent that draws his 9.",
-    story:
-      "## One T After Another\n\n" +
-      "Marcus Thuram has created several T's with Berete, each more evolved than the one before. This one carries his number and his club.\n\n" +
-      "## T9\n\n" +
-      "A gothic T of white diamonds and baguettes, and a rose gold serpent coiled around it into a 9: his number at Inter, a club whose mascot is the serpent.\n\n" +
-      "## A Setting Invented for the Scales\n\n" +
-      "The scales are a setting invented by Berete: pear-shaped diamonds, each in its own rose gold setting, laid one over the next along the body.\n\n" +
-      "## The Head of the Serpent\n\n" +
-      "Its head is a large red pear-shaped stone, resting against the letter.",
+    // Yoni's definitive texts (27/11/2026): its vision, its composition, five details beside their close-ups (the mosaic of the T,
+    // the Float Setting, the Serpent Bezel Setting, the ruby eye, the T and the 9).
+    line: "An evolving signature. A new identity.",
+    ...yoniTexts("marcus-thuram-t-serpent-pendant", ["p14", "p16", "p06", "p02", "p12"].map((f) => yoni("marcus-thuram-t-serpent-pendant", f))),
     people: ["marcus-thuram"],
     theme: { preset: "serpent", mark: "T" },
     // Its front view as the cover of its world in the gallery (Yoni, 23/11/2026).
@@ -718,12 +637,6 @@ const SITE_PIECES: Piece[] = [
       yoni("marcus-thuram-t-serpent-pendant", "p18", at("The T-Serpent pendant on black")),
       yoni("marcus-thuram-t-serpent-pendant", "v01", at("Details of the T-Serpent pendant")),
     ], lead("marcus-thuram-t-serpent-pendant", "p08")),
-    specs: [
-      ["Type", "Pendant"],
-      ["Motif", "A gothic T and a serpent that draws a 9"],
-      ["Settings", "Pear-shaped scales, in a setting invented by the house"],
-    ],
-    seen: "White and rose gold · round diamonds in pavé, baguettes, triangle, pear and marquise diamonds, a large red pear-shaped stone",
     making: {
       raw: yoni("marcus-thuram-t-serpent-pendant", "08-p02", { ...at("The T-Serpent pendant before the setting", "This piece, before the setting"), onBlack: false }),
       setting: yoni("marcus-thuram-t-serpent-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
@@ -759,10 +672,9 @@ const SITE_PIECES: Piece[] = [
     story: "A dripping T paved with white diamonds, wound with branches of rose gold thorns from top to bottom.",
     people: ["marcus-thuram"],
     theme: { preset: "roses", tint: "#2a1216", font: "gothique", mark: "T" },
-    // Its studio image first (Yoni, 23/11/2026), its older photos after it.
-    cover: extra("marcus-thuram-thorned-t-pendant", "studio", at("Marcus Thuram's T pendant wound with rose gold thorns")),
+    // Its real photo only (26/11/2026: its studio image, made by AI, no longer shown).
+    cover: still("pieces/marcus-thuram-thorned-t-pendant/cover", { ...at("Marcus Thuram's T pendant wound with rose gold thorns"), onBlack: false }),
     gallery: [
-      extra("marcus-thuram-thorned-t-pendant", "studio", at("Marcus Thuram's T pendant wound with rose gold thorns")),
       still("pieces/marcus-thuram-thorned-t-pendant/cover", { ...at("Marcus Thuram's T pendant wound with rose gold thorns"), onBlack: false }),
       st("thuram-ss23", 5, at("Film of the thorned T pendant")),
     ],
@@ -795,7 +707,7 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "marcus-thuram-snowflake-pendant",
-    title: "Marcus Thuram — Snowflake Pendant",
+    title: "Snowflake Pendant",
     type: "pendant",
     line: "A snowflake that fills the palm.",
     story: "A six-branched snowflake, its facets paved with white diamonds, large enough to fill the palm of the hand.",
@@ -965,10 +877,9 @@ const SITE_PIECES: Piece[] = [
     story: "His initials in gothic letters, the T set over the M, both set with diamonds. It is worn on a diamond-set Cuban chain in rose gold.",
     people: ["malik-tillman"],
     theme: { preset: "facettes", tint: "#2a1a16", glow: "#e8b4a0", font: "gothique", mark: "TM" },
-    // Its studio image first (Yoni, 23/11/2026), its older photos after it.
-    cover: extra("malik-tillman-tm-pendant", "studio", at("Malik Tillman's TM pendant")),
+    // Its real photo only (26/11/2026: its studio image, made by AI, no longer shown).
+    cover: still("pieces/malik-tillman-tm-pendant/cover", { ...at("Malik Tillman's TM pendant"), onBlack: false }),
     gallery: [
-      extra("malik-tillman-tm-pendant", "studio", at("Malik Tillman's TM pendant")),
       still("pieces/malik-tillman-tm-pendant/cover", { ...at("Malik Tillman's TM pendant"), onBlack: false }),
       st("malik-tillman-ii", 4, at("The TM pendant held up in the light")),
       st("malik-tillman-ii", 1, at("Post about Malik Tillman's TM pendant")),
@@ -1328,7 +1239,7 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "kevin-schade-twisted-chain",
-    title: "Kevin Schade — Twisted Link Chain",
+    title: "Twisted Link Chain",
     type: "chain",
     line: "Twisted links, set with diamond flowers.",
     story: "Twisted links all in rose gold, with diamond flowers set along the whole chain.",

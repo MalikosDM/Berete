@@ -1,0 +1,158 @@
+{
+ "interFilm": {
+  "type": "video",
+  "src": "/media/yoni-2711/inter-film/presentation.1712c62d4e.mp4",
+  "mobile": "/media/yoni-2711/inter-film/presentation-mobile.1712c62d4e.mp4",
+  "poster": "/media/yoni-2711/inter-film/presentation-poster.1712c62d4e.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 42.67,
+  "audio": true,
+  "alt": "Presentation film of the Inter Milan Campione d'Italia ring: the ring on black with its details labelled (twenty diamonds and twenty stars, the Italian flag, the name and number of the player), its top worn as a pendant, then Inter players celebrating the twentieth title",
+  "onBlack": false
+ },
+ "interHandoverFull": {
+  "type": "video",
+  "src": "/media/yoni-2711/inter-handover/handover.f6d5c2768b.mp4",
+  "mobile": "/media/yoni-2711/inter-handover/handover-mobile.f6d5c2768b.mp4",
+  "poster": "/media/yoni-2711/inter-handover/handover-poster.f6d5c2768b.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 49.77,
+  "audio": true,
+  "alt": "Film of the handover of the Campione d'Italia rings at the Inter Milan training centre: a man in a beige suit and black gloves hands the boxes to the players in front of the Inter backdrop; they open them and put on their rings",
+  "onBlack": false
+ },
+ "interHandoverEdit": {
+  "type": "video",
+  "src": "/media/yoni-2711/inter-handover/highlights.f6d5c2768b.mp4",
+  "mobile": "/media/yoni-2711/inter-handover/highlights-mobile.f6d5c2768b.mp4",
+  "poster": "/media/yoni-2711/inter-handover/highlights-poster.f6d5c2768b.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 29.08,
+  "audio": true,
+  "alt": "The handover of the Campione d'Italia rings at the Inter Milan training centre: the players receive their boxes, open them and put on their rings",
+  "onBlack": false
+ },
+ "interPhotos": {
+  "yoniWithPlayers": null,
+  "photo2": null,
+  "firstFour": [
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-shown.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit and black gloves points at the ring an Inter player in a black T-shirt has just put on; both smile in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/box-open-smiles.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit holds a ring box while a player in a white T-shirt shows his open box with the ring inside; both smile in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/box-opened.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "An Inter player in a denim jacket and a black cap opens the box of his ring, beside a man in a beige suit and black gloves",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-on-finger.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "The Campione d'Italia ring on a finger, against black",
+    "onBlack": false
+   }
+  ],
+  "rest": [
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/box-received.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit and black gloves and a player in a black tracksuit hold the box of the ring together, in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/embrace.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A player in a black T-shirt embraces a man in a beige suit, in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-put-on.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit and black gloves puts the ring on the finger of a player in a black T-shirt",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/laughter.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit laughs with a seated man in a black hoodie",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/embrace-young-player.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit embraces a young man in a white T-shirt",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-looked-at.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a dark shirt looks at the ring in his open box, beside a man in a beige suit holding the box of the rings",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/handshake.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit and a player in a white T-shirt shake hands in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-in-box.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A Campione d'Italia ring in its open black box; the BRT mark, a name and the number 23 are printed inside",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/box-held.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit and black gloves holds a Berete Jewellers box in front of the Inter backdrop",
+    "onBlack": false
+   },
+   {
+    "type": "image",
+    "src": "/media/yoni-2711/inter-photos/ring-to-camera.5f77a42897.webp",
+    "width": 900,
+    "height": 1600,
+    "alt": "A man in a beige suit holds out his hand to the camera, the Campione d'Italia ring on his finger",
+    "onBlack": false
+   }
+  ]
+ }
+}

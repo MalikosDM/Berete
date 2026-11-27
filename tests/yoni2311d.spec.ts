@@ -122,8 +122,10 @@ test("the Dragon Ball pendant: its sphere turning in a circle on the home page; 
     }).toPass({ timeout: 20_000 });
     await expect(video).toHaveAttribute("src", new RegExp("^/media/pages/dragon-ball-sphere" + V + "mp4$"), { timeout: 15_000 });
     await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
-    expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop }))).toEqual({ muted: true, loop: true });
-    await expect(section).toContainText(lang ? "Mais pour nous, l’énergie n’a jamais été faite pour rester immobile." : "But to us, energy was never meant to remain still.");
+    // (A film that fades in from black loops back past its black: `data-start`, never `loop`.)
+  expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop || Boolean((v as HTMLVideoElement).dataset.start) }))).toEqual({ muted: true, loop: true });
+    // Since 27/11/2026 (Yoni): its short text beside it (src/data/homeTexts.ts; tests/home2711.spec.ts).
+    await expect(section.locator('[data-home-text="mechanism"]')).not.toBeEmpty();
     await expect(section.locator("a[data-innovation-link]")).toHaveAttribute("href", lang + "/pieces/kevin-schade-dragon-ball-pendant");
     await page.waitForTimeout(500);
     if (!lang) await page.screenshot({ path: shotPath(info, "yoni2311d-accueil-film") });
@@ -140,7 +142,7 @@ test("the Dragon Ball pendant: its sphere turning in a circle on the home page; 
   // Its film silent, in a loop, its sound and full screen at buttons.
   const video = top.locator("[data-feature-video]");
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).currentTime), { timeout: 20_000 }).toBeGreaterThan(0.3);
-  expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop }))).toEqual({ muted: true, loop: true });
+  expect(await video.evaluate((v) => ({ muted: (v as HTMLVideoElement).muted, loop: (v as HTMLVideoElement).loop || Boolean((v as HTMLVideoElement).dataset.start) }))).toEqual({ muted: true, loop: true });
   await expect(top.locator("[data-feature-fullscreen]")).toBeVisible();
   await top.locator("[data-feature-sound]").click();
   await expect.poll(() => video.evaluate((v) => (v as HTMLVideoElement).muted)).toBe(false);
@@ -204,16 +206,14 @@ test("the worlds: the sky of the L, the victory of Inter and of VfB (the squad b
 
 test("the studio photos first, the L cut out cleanly; Marcus Thuram with Kanye West on his profile; the galleries open on their best photos", async ({ page }, info) => {
   const problems = watch(page);
-  // Data: their studio photo first in "Every Angle", their worn ones in "Worn by".
-  // (The twisted chain of Kevin Schade is BRT Flowers since 24/11/2026: its own photos of the chain on black first.)
-  // (The L of Deniz Undav: no image made by AI since 25/11/2026, its real photo p10: tests/retours2511.spec.ts.)
-  for (const slug of ["radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion"]) {
+  // Since 26/11/2026 (Yoni: « aucune image IA présentée comme une vraie pièce »): their real photo first, never their studio image
+  // made by AI, in their cover, their gallery and their opening.
+  for (const slug of ["radja-nainggolan-iced-watch", "tajon-buchanan-iced-watch", "marcus-thuram-skeleton-watch", "tanguy-nianzou-fam-medallion", "malik-tillman-tm-pendant", "marcus-thuram-thorned-t-pendant"]) {
     const piece = cat.pieces.find((p) => p.slug === slug)!;
-    expect(piece.cover.src, slug).toMatch(new RegExp("^/media/extra/" + slug + "/studio" + V + "webp$"));
+    expect(piece.cover.src, slug).not.toMatch(/studio/);
+    expect(piece.gallery.some((m) => m.src.includes("/studio")), slug).toBe(false);
     const shown = resolveShowcase(slug, piece.showcase);
-    const items = anglePhotos(piece, shown.mode === "photo", wornSet(piece));
-    expect(items[0]!.src, slug).toBe(piece.cover.src);
-    expect(shown.mode, slug).not.toBe("photo");
+    expect(shown.views.some((v) => /studio/.test(v.id)), slug).toBe(false);
   }
   // The order of a few galleries (the whole piece first).
   const first = (slug: string) => {

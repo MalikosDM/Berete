@@ -99,7 +99,7 @@ export type ThemeFontSpec = {
 };
 
 export const THEME_FONTS = {
-  maison: { name: "La Maison (Cormorant, la police du site)", family: null, file: null, weight: 300, caps: true, tracking: "0.06em", scale: 1 },
+  maison: { name: "La Maison (Cormorant, la police du site)", family: null, file: null, weight: 400, caps: true, tracking: "0.06em", scale: 1 },
   pinceau: { name: "Pinceau japonais (Shojumaru)", family: "Shojumaru", file: "shojumaru-latin-400-normal", weight: 400, caps: true, tracking: "0.03em", scale: 0.8 },
   aerien: { name: "Fine et aérienne (Italiana)", family: "Italiana", file: "italiana-latin-400-normal", weight: 400, caps: true, tracking: "0.1em", scale: 1 },
   trophee: { name: "Gravée, trophée (Cinzel)", family: "Cinzel", file: "cinzel-latin-600-normal", weight: 600, caps: true, tracking: "0.07em", scale: 0.86 },
@@ -135,6 +135,10 @@ export type Backdrop = {
    */
   anchor?: [number, number];
   mobileAnchor?: [number, number];
+  /** An image on black placed freely (its sphere above the piece, never held by the edges of the screen; its edges fade). */
+  free?: boolean;
+  /** With `free`: how far the image comes down from the top, as a share of the height of the screen (computer, phone). */
+  drop?: [number, number];
   /** The share of the height of the opening kept free above the piece, for what the image holds there (the sphere): computer, phone. */
   below?: [number, number];
   /** Its depth maps (scripts/universe-depth.py): their versions, computer (d) and phone (m), "<id>-depth.<v>.webp". */
@@ -164,6 +168,17 @@ export type Backdrop = {
 /** One light of an AI background (scripts/universe-media.mjs; the meaning of its numbers by kind: src/components/Universe.tsx). */
 export type BackdropSpot = { k: string; tone?: string; seq?: boolean; i?: number; d?: number[]; m?: number[] };
 export const BACKDROPS = universes.backdrops as unknown as Record<string, Backdrop>;
+
+/**
+ * The decors drawn in code (27/11/2026): no image at all, layers of light, haze and stone drawn by the page itself
+ * (src/components/universe/CodeScene.tsx), locked on the piece at every size. A backdrop of a theme may name one of them.
+ */
+export const CODE_SCENES = {
+  "trophy-room": { name: "La salle des trophées : socle en marbre noir, lumière chaude du haut, lignes d'un terrain de nuit" },
+  "octagon-gallery": { name: "La galerie octogonale : arches de pierre noire, lumière froide à gauche, rose à droite, sol miroir" },
+} as const;
+export type CodeSceneKind = keyof typeof CODE_SCENES;
+export const isCodeScene = (value: unknown): value is CodeSceneKind => typeof value === "string" && Object.prototype.hasOwnProperty.call(CODE_SCENES, value);
 
 /**
  * The victory of Inter Milan and of VfB Stuttgart. Since 24/11/2026 (Yoni: the first two were too alike and too close, the
@@ -370,6 +385,21 @@ THEME_PRESETS.n14 = {
   name: "Constellation N14 (N14)",
   theme: { base: "#05040a", tint: "#2a1820", glow: "#f2c2b0", texture: "grain", light: "halo", font: "etoile", backdrop: "n14", entrance: "stars", effects: ["dust", "scene", "jewel-sparkle"], mark: "" },
 };
+// 27/11/2026 (Yoni, of the jersey pendant: « Faut trouver un autre thème »): two worlds of Noah Okafor drawn in code, no image
+// (CODE_SCENES, src/components/universe/CodeScene.tsx). The jersey, arms crossed, shown as a personal trophy: a very dark
+// trophy room, the piece on a black marble plinth under one warm light from above, thin stadium rays in the haze, the white
+// lines of a night pitch on the floor fading into the black; the red of Switzerland and the green of Nigeria only as a faint
+// edge light. The octagon (an O in white gold, an N in rose gold): an enfilade of octagonal arches in polished black stone,
+// cold white light on the left, rose on the right, meeting on the piece, a black mirror floor. The former worlds stay
+// (okafor-jersey, tunnel).
+THEME_PRESETS["trophy-room"] = {
+  name: "La salle des trophées : socle en marbre noir, lumière chaude du haut, terrain de nuit (Noah Okafor, pendentif maillot)",
+  theme: { base: "#050404", tint: "#15100c", glow: "#ffd3a2", texture: "grain", light: "spotlight", font: "stade", backdrop: "trophy-room", entrance: "spotlight", effects: ["beam-dust", "glints", "jewel-warm"], mark: "" },
+};
+THEME_PRESETS["octagon-gallery"] = {
+  name: "La galerie octogonale : arches de pierre noire, lumière froide et rose, sol miroir (Noah Okafor, pendentif octogone)",
+  theme: { base: "#050506", tint: "#121016", glow: "#f2dcd2", texture: "grain", light: "halo", font: "stade", backdrop: "octagon-gallery", entrance: "tunnel", effects: ["dust", "glints", "jewel-sheen"], mark: "" },
+};
 
 export const DEFAULT_PRESET = "maison";
 
@@ -456,7 +486,7 @@ const pick = <T extends string>(value: unknown, allowed: readonly T[], fallback:
 const color = (value: unknown, fallback: string) => (typeof value === "string" && HEX.test(value) ? value.toLowerCase() : fallback);
 const isFont = (value: unknown): value is ThemeFont => typeof value === "string" && value in THEME_FONTS;
 /** An AI background of the house, or an image of the site (an address of /media/). */
-const isBackdrop = (value: unknown): value is string => typeof value === "string" && (value === "" || value in BACKDROPS || /^\/media\/[\w./-]+\.(webp|jpe?g|png|avif)$/i.test(value));
+const isBackdrop = (value: unknown): value is string => typeof value === "string" && (value === "" || value in BACKDROPS || isCodeScene(value) || /^\/media\/[\w./-]+\.(webp|jpe?g|png|avif)$/i.test(value));
 const effectsOf = (value: unknown): ThemeEffect[] | null =>
   Array.isArray(value) ? [...new Set(value.filter((x): x is ThemeEffect => typeof x === "string" && (THEME_EFFECTS as readonly string[]).includes(x)))] : null;
 const markOf = (value: unknown): string | null => (typeof value === "string" ? [...value.trim()].slice(0, 4).join("") : null);
@@ -506,8 +536,8 @@ export function cleanTheme(value: unknown): PieceTheme | null {
 }
 
 /** The file of the title font of a universe, to load it early (its <link rel="preload">), or null. */
-export function titleFontFile(_theme: ResolvedTheme): string | null {
-  // Every title is in the font of the house since 24/11/2026: no other font to load.
-  const file = (THEME_FONTS.maison as ThemeFontSpec).file;
+export function titleFontFile(theme: ResolvedTheme): string | null {
+  // The title of a piece in the typography of its universe again (Yoni, 26/11/2026): its font loaded with the page.
+  const file = (THEME_FONTS[theme.font] as ThemeFontSpec | undefined)?.file ?? null;
   return file ? "/fonts/universe/" + file + ".woff2" : null;
 }

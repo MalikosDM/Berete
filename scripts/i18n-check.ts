@@ -11,6 +11,7 @@ import { defaultCatalogue } from "../src/data/catalogue.js";
 import { publicCatalogue } from "../src/data/relations.js";
 import seo from "../src/extensions/seo/seo.json" with { type: "json" };
 import { catalogueTexts } from "../src/i18n/content.js";
+import { SECTION_TEXTS } from "../src/data/yoni2711.js";
 import ar from "../src/i18n/content/ar.js";
 import de from "../src/i18n/content/de.js";
 import es from "../src/i18n/content/es.js";
@@ -27,8 +28,10 @@ const OWN_SCRIPT = new Set(["ar"]);
 
 // The texts the visitors see (published pieces) must be translated; the translations of an unpublished piece are kept
 // (it may be published again) without being required.
-const texts = catalogueTexts(publicCatalogue(defaultCatalogue));
-const allTexts = catalogueTexts(defaultCatalogue);
+// The sections of Yoni's pages that are not in a piece (src/data/yoni2711.ts) are texts of the catalogue too.
+const withSections = (c: { text: string[]; name: string[] }) => ({ ...c, text: [...new Set([...c.text, ...SECTION_TEXTS])] });
+const texts = withSections(catalogueTexts(publicCatalogue(defaultCatalogue)));
+const allTexts = withSections(catalogueTexts(defaultCatalogue));
 const pages = Object.entries((seo as { pages: Record<string, { title?: string; description?: string; robots?: string }> }).pages)
   .filter(([path, page]) => !path.includes(":") && !path.includes("*") && path !== "/admin" && (page.title || page.description))
   .map(([path, page]) => ({ path, title: page.title ?? "", description: page.description ?? "" }));

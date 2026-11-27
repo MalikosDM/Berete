@@ -7,6 +7,7 @@
  * default its own) or none, and the image shown before it plays. A piece without a making-of has no atelier: its page
  * shows no passage and the page The Atelier leaves it out.
  */
+import { SUBCATEGORIES } from "./collections.js";
 import { media } from "./sources.js";
 
 export const FILM_KINDS = ["making", "reveal"] as const;
@@ -78,6 +79,31 @@ export function resolveAtelier(slug: string, atelier: PieceAtelier | null | unde
   // The same film for both (a piece whose only film is the edit of its finished piece, shown in its atelier): played once.
   const reveal = pick("reveal");
   return { making, reveal: reveal && reveal.source !== making.source ? reveal : null, poster: atelier?.poster || making.posters[making.poster] || making.posters[0] || "" };
+}
+
+/**
+ * "Up next" in the atelier of The Atelier (27/11/2026, as on YouTube): the other making-of films after the one watched, the
+ * closest first: a piece of the same person (the same player or club; his own pieces before a piece of a whole team), then
+ * of the same category (Jesus Pieces, Cross…), then of the same collection (pendants, chains, rings…), then the others; in
+ * the order of the page within each.
+ */
+export function upNextOrder<T extends { slug: string; type: string; people: string[] }>(current: T, films: T[]): T[] {
+  const people = new Set(current.people);
+  const groups = SUBCATEGORIES.filter((s) => s.pieces.includes(current.slug));
+  const rank = (p: T) => {
+    if (p.people.some((x) => people.has(x))) return 0;
+    if (groups.some((g) => g.pieces.includes(p.slug))) return 1;
+    if (p.type === current.type) return 2;
+    return 3;
+  };
+  return films
+    .filter((p) => p.slug !== current.slug)
+    .map((p, i) => {
+      const r = rank(p);
+      return { p, i, r, size: r === 0 ? p.people.length : 0 };
+    })
+    .sort((a, b) => a.r - b.r || a.size - b.size || a.i - b.i)
+    .map((x) => x.p);
 }
 
 /** "0:48", "1:05". */

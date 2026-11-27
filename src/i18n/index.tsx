@@ -91,6 +91,20 @@ export function useI18n(): I18n {
   }, [locale, v]);
 }
 
+/**
+ * A text of the catalogue that is not in a piece (a section of Yoni's pages: src/data/yoni2711.ts) in the language of the page:
+ * its translation in content/<lang>.ts, keyed by the English text, else the English text.
+ */
+export function useContentText(): (english: string) => string {
+  const locale = useLocale();
+  const v = useBundleVersion();
+  return useMemo(() => {
+    const dict = bundleOf(locale).content;
+    return (english: string) => dict[english] ?? english;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- v: a language has just been loaded
+  }, [locale, v]);
+}
+
 /** The name and the introduction of a collection ("pendants") in this language, the English ones for a collection unknown to it. */
 export function collectionWords(t: Messages, slug: string, fallback: { name: string; intro: string }): { name: string; intro: string } {
   const items = t.collections.items as Record<string, { name: string; intro: string } | undefined>;

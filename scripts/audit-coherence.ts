@@ -31,6 +31,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { defaultCatalogue } from "../src/data/catalogue";
 import { SPECIAL_PROJECT } from "../src/data/pieces";
+import { THEME_FONTS } from "../src/data/themes";
+import { PAGE_ORDER } from "../src/data/yoni2711";
 import { publishedPress } from "../src/data/press";
 import { en } from "../src/i18n/ui/en";
 import { fr } from "../src/i18n/ui/fr";
@@ -77,6 +79,10 @@ function allowedButtons(t: Messages): Set<string> {
     t.common.seeMore,
     t.films.enter,
     t.home.discoverMore,
+    // Yoni's pages (26-27/11/2026): the way to the making-of, the world of a player, every moment of a hand-over.
+    t.piece.watchMakingOf,
+    t.piece.discoverHisWorld,
+    t.piece.viewAllMoments,
     // A button that opens photos, and the way from a trunk to its piece (24/11/2026).
     t.boxes.discoverPhotos,
     t.boxes.discoverPiece,
@@ -99,7 +105,7 @@ const FORMER: Record<string, { text: string; exact?: boolean; pieces?: boolean }
   es: ["Bajo los focos", "Contacto privado", "Correspondencia privada", "Crear su propio estuche", "Descubra las creaciones", "Descubrir el Círculo", "Descubrir el detalle", "Descubrir la obra maestra", "Dragon Ball, en movimiento", "Empezar por WhatsApp", "Encargos históricos", "Encargue su Estuche Signature", "Encargue su propia creación", "Explorar el Portfolio", "Explorar su universo", "Inicie una conversación privada", "La cruz que gira", "La revelación final", "Más allá de este universo", "Más del Portfolio", "Quiero esta pieza", "Solicite una llamada privada", "Su próxima creación", "Ver todas las creaciones", "Ver todos los estuches", "Vista en nuestras historias", "¿Quiere la suya? WhatsApp"].map((text) => ({ text })),
   de: ["Alle Etuis ansehen", "Alle Kreationen ansehen", "Auf WhatsApp starten", "Das Detail entdecken", "Das Kreuz, das sich dreht", "Das Meisterwerk entdecken", "Das Portfolio entdecken", "Das Schmuckstück entdecken", "Den Kreis entdecken", "Die Kreationen entdecken", "Die Momente entdecken", "Die große Enthüllung", "Dragon Ball in Bewegung", "Ein privates Gespräch beginnen", "Historische Auftragswerke", "Ich möchte dieses Stück", "Ihr Signature-Etui in Auftrag geben", "Ihr Unikat in Auftrag geben", "Ihr eigenes Etui gestalten", "Ihr eigenes Stück? WhatsApp", "Ihre Kreation gestalten", "Ihre nächste Kreation", "Im Rampenlicht", "Mehr aus dem Portfolio", "Private Anfragen", "Private Korrespondenz", "Privater Rückruf", "Weitere Welten", "Zu sehen in unseren Storys"].map((text) => ({ text })),
   nl: ["Alle creaties bekijken", "Begin een privégesprek", "Begin via WhatsApp", "Bekijk alle etuis", "De grote onthulling", "Dragon Ball in beweging", "Het kruis dat draait", "Historische opdrachten", "Ik wil dit stuk", "In de schijnwerpers", "Meer uit het portfolio", "Ontdek de Kring", "Ontdek de creaties", "Ontdek het detail", "Ontdek het juweel", "Ontdek het meesterwerk", "Ontwerp uw Signature-koffer", "Ontwerp uw eigen creatie", "Persoonlijk contact", "Persoonlijke correspondentie", "Te zien in onze stories", "Uw eigen juweel? WhatsApp", "Uw eigen koffer ontwerpen", "Uw volgende creatie", "Verken het portfolio", "Verken zijn wereld", "Voorbij dit universum", "Vraag een persoonlijk gesprek aan"].map((text) => ({ text })),
-  ar: ["Dragon Ball في حركة", "أريد هذه القطعة", "إبداعات تاريخية", "إبداعكم القادم", "ابدؤوا عبر WhatsApp", "ابدؤوا محادثة خاصة", "استكشفوا عالمه", "استكشفوا معرض الأعمال", "اطلبوا إبداعكم الخاص", "اطلبوا صندوق Signature الخاص بكم", "اطلبوا مكالمة خاصة", "اكتشف القطعة", "اكتشفوا الإبداعات", "اكتشفوا التحفة", "اكتشفوا التفصيل", "اكتشفوا دائرة Berete", "الاستفسارات الخاصة", "الصليب الذي يدور", "المزيد من معرض الأعمال", "تحت الأضواء", "ترغبون في قطعتكم؟ WhatsApp", "شاهد كل العلب", "صمّم صندوقك الخاص", "ظهرت في قصصنا", "عرض كل الإبداعات", "لحظة الكشف", "ما وراء هذا العالم", "مراسلة خاصة"].map((text) => ({ text })),
+  ar: ["Dragon Ball في حركة", "أريد هذه القطعة", "إبداعات تاريخية", "إبداعكم القادم", "ابدؤوا عبر WhatsApp", "ابدؤوا محادثة خاصة", "استكشفوا عالمه", "استكشفوا معرض الأعمال", "اطلبوا إبداعكم الخاص", "اطلبوا صندوق Signature الخاص بكم", "اطلبوا مكالمة خاصة", "اكتشف القطعة", "اكتشفوا الإبداعات", "اكتشفوا التحفة", "اكتشفوا التفصيل", "اكتشفوا دائرة Berete", "الاستفسارات الخاصة", "الصليب الذي يدور", "المزيد من معرض الأعمال", "تحت الأضواء", "ترغبون في قطعتكم؟ WhatsApp", "شاهد كل العلب", "صمّم صندوقك الخاص", "ظهرت في قصصنا", "عرض كل الإبداعات", "ما وراء هذا العالم", "مراسلة خاصة"].map((text) => ({ text })),
 };
 for (const [l, film, moments] of [
   ["en", "The Film", "The Moments"],
@@ -242,7 +248,8 @@ async function inspect(page: Page, phone: boolean): Promise<Found> {
       const own = ownText(el);
       if (!own || !visible(el)) continue;
       const family = firstFamily(el);
-      if (!["Cormorant Garamond", "Manrope"].includes(family)) fonts.add(family + " · " + own.slice(0, 40));
+      // The title of a piece keeps the typography of its universe (Yoni, 26/11/2026): the only other font of a page.
+      if (!["Cormorant Garamond", "Manrope"].includes(family) && !el.closest("[data-u-title]")) fonts.add(family + " · " + own.slice(0, 40));
       allText.push(own);
       const px = parseFloat(getComputedStyle(el).fontSize);
       const tag = el.tagName.toLowerCase();
@@ -493,7 +500,7 @@ async function sitemapRedirects(list: string[]) {
 // Since 25/11/2026 a magazine: the film and the story side by side right after the opening (one section, "film", or "story"
 // for a piece without a film), then the photos of the whole ("angles"), the details beside their words ("details").
 const ORDER: Record<string, number> = { opening: 0, film: 1, story: 1, angles: 2, details: 2.5, "worn-as": 3.2, composition: 4, "created-for": 5, trunk: 6, atelier: 7, press: 7.5, end: 8 };
-const ALLOWED_FONTS = new Set(["Cormorant Garamond", "Manrope", "Cormorant Fallback", "Manrope Fallback", "Amiri", "IBM Plex Sans Arabic"]);
+const ALLOWED_FONTS = new Set(["Cormorant Garamond", "Manrope", "Cormorant Fallback", "Manrope Fallback", "Amiri", "IBM Plex Sans Arabic", ...Object.values(THEME_FONTS).map((f) => f.family).filter((f): f is string => Boolean(f))]);
 
 /** The English texts of each address (the English page), to find a sentence left untranslated. */
 const englishTexts = new Map<string, Set<string>>();
@@ -544,7 +551,10 @@ async function check(page: Page, path: string, lang: string, size: string, phone
   // The thumbnails of the pieces (English pages of one size: the same everywhere): no visible edge, the jewel at its share.
   if (lang === "en" && size === THUMB_SIZE) await thumbnails(page, path, size);
   if (onPiece) {
-    const ranks = f.order.map((s) => ORDER[s] ?? -1);
+    // Yoni's pages have their own order (src/data/yoni2711.ts): the opening first, its sections in that order, the end last.
+    const own = PAGE_ORDER[path.replace(/^\/(fr|es|de|nl|ar)(?=\/)/, "").replace(/^\/pieces\//, "")];
+    const rankOf = (sec: string) => (own ? (sec === "opening" ? -1 : sec === "end" ? 99 : own.indexOf(sec === "film" || sec === "story" ? "vision" : sec === "trunk" && own.includes("presentation") ? "presentation" : sec === "worn-as" ? "part" : sec)) : (ORDER[sec] ?? -1));
+    const ranks = f.order.map(rankOf);
     const sorted = ranks.every((r, i) => i === 0 || r >= ranks[i - 1]!);
     // (Since 25/11/2026 « Created exclusively for » is a section only when it has someone or something to show.)
     const missing = ["opening", "end"].filter((s) => !f.order.includes(s));

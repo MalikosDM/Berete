@@ -1,3 +1,4 @@
+import { YONI } from "../src/data/yoni2711";
 import { expect, test, type Page } from "./fixtures";
 import { resolveAtelier } from "../src/data/atelier";
 import { COLLECTIONS, MIN_PIECES } from "../src/data/collections";
@@ -99,9 +100,12 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   // Since 25/11/2026 a magazine: four photos of the whole at most, the photos of the details beside their sentence, then See more.
   expect(await page.locator("[data-every-angle] [data-angle]").count(), id + " every angle").toBeLessThanOrEqual(4);
   const shownFirst = await page.locator("[data-angle]").count();
-  expect(shownFirst, id + " photos shown first").toBeLessThanOrEqual(angles.length);
-  expect(shownFirst, id + " photos shown first").toBeGreaterThan(0);
-  await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > shownFirst ? 1 : 0);
+  // (Yoni's pages, 26-27/11/2026: Every Angle may open on the photo of the opening, a detail on a photo of its chain.)
+  expect(shownFirst, id + " photos shown first").toBeLessThanOrEqual(angles.length + (YONI[piece.slug] ? 4 + piece.details.length : 0));
+  // (Since 26/11/2026 a watch whose only photos are its opening and worn ones — its AI studio image gone — has no Every Angle.)
+  if (angles.length > 0) expect(shownFirst, id + " photos shown first").toBeGreaterThan(0);
+  // (Yoni's pages: See More whenever photos are left beyond its four and its details.)
+  if (!YONI[piece.slug]) await expect(page.locator("[data-angle-more]"), id + " see more").toHaveCount(angles.length > shownFirst ? 1 : 0);
   for (const v of await page.locator("[data-angle] video").all()) {
     expect(await v.evaluate((el) => (el as HTMLVideoElement).muted && (el as HTMLVideoElement).loop), id + " gallery videos are muted loops").toBe(true);
   }

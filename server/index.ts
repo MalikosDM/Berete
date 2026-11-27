@@ -15,6 +15,7 @@ import { resumeJobs } from "./models/jobs.js";
 import { models } from "./routes/models.js";
 import { modelExtras } from "./routes/model-extras.js";
 import { hdri } from "./routes/hdri.js";
+import { homeTexts } from "./routes/home-texts.js";
 import { shares } from "./routes/shares.js";
 import { vip } from "./routes/vip.js";
 import { loadSecret } from "./secret.js";
@@ -48,6 +49,8 @@ app.use(shares);
 // The lightings uploaded in the 3D editor (/api/admin/hdri, their files at /hdri/custom/<file>): server/routes/hdri.ts.
 app.use(hdri);
 app.use("/api", vip);
+// The texts beside the pieces of the home page (before the routes of the site: /admin/:kind would take /admin/home-texts).
+app.use("/api", homeTexts);
 app.use("/api", site);
 // « Imaginez votre création » (Private Enquiries): a first image of the idea of the visitor, made by OpenAI (server/imagine.ts).
 app.use("/api", imagine);

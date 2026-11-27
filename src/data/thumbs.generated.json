@@ -104,16 +104,15 @@
   ]
  },
  "marcus-thuram-thorned-t-pendant": {
-  "kind": "cutout",
-  "src": "/media/cutouts/marcus-thuram-thorned-t-pendant/studio-1600.5249a83c4f.webp",
-  "srcSet": "/media/cutouts/marcus-thuram-thorned-t-pendant/studio-480.5249a83c4f.webp 480w, /media/cutouts/marcus-thuram-thorned-t-pendant/studio-960.5249a83c4f.webp 960w, /media/cutouts/marcus-thuram-thorned-t-pendant/studio-1600.5249a83c4f.webp 1600w",
-  "width": 1600,
-  "height": 2402,
+  "kind": "photo",
+  "src": "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp",
+  "width": 634,
+  "height": 844,
   "box": [
-   0.0688,
-   0.0458,
-   0.8625,
-   0.9063
+   0.055,
+   0,
+   0.8425,
+   0.9568
   ]
  },
  "angelo-stiller-as-pendant": {
@@ -181,29 +180,27 @@
   ]
  },
  "malik-tillman-tm-pendant": {
-  "kind": "cutout",
-  "src": "/media/cutouts/malik-tillman-tm-pendant/studio-1600.c756a5561c.webp",
-  "srcSet": "/media/cutouts/malik-tillman-tm-pendant/studio-480.c756a5561c.webp 480w, /media/cutouts/malik-tillman-tm-pendant/studio-960.c756a5561c.webp 960w, /media/cutouts/malik-tillman-tm-pendant/studio-1600.c756a5561c.webp 1600w",
-  "width": 1600,
-  "height": 2295,
+  "kind": "photo",
+  "src": "/media/pieces/malik-tillman-tm-pendant/cover.webp",
+  "width": 1080,
+  "height": 1796,
   "box": [
-   0.0656,
-   0.0458,
-   0.8677,
-   0.9085
+   0.05,
+   0,
+   0.95,
+   1
   ]
  },
  "tanguy-nianzou-fam-medallion": {
-  "kind": "cutout",
-  "src": "/media/cutouts/tanguy-nianzou-fam-medallion/studio-1600.5a74ea6b41.webp",
-  "srcSet": "/media/cutouts/tanguy-nianzou-fam-medallion/studio-480.5a74ea6b41.webp 480w, /media/cutouts/tanguy-nianzou-fam-medallion/studio-960.5a74ea6b41.webp 960w, /media/cutouts/tanguy-nianzou-fam-medallion/studio-1600.5a74ea6b41.webp 1600w",
-  "width": 1600,
-  "height": 2308,
+  "kind": "photo",
+  "src": "/media/pieces/tanguy-nianzou-fam-medallion/cover.webp",
+  "width": 604,
+  "height": 768,
   "box": [
-   0.1042,
-   0.0296,
-   0.824,
-   0.9213
+   0,
+   0,
+   1,
+   1
   ]
  },
  "eljero-elia-clover-medallion": {
@@ -323,42 +320,39 @@
   ]
  },
  "marcus-thuram-skeleton-watch": {
-  "kind": "cutout",
-  "src": "/media/cutouts/marcus-thuram-skeleton-watch/studio-1600.04d67b154d.webp",
-  "srcSet": "/media/cutouts/marcus-thuram-skeleton-watch/studio-480.04d67b154d.webp 480w, /media/cutouts/marcus-thuram-skeleton-watch/studio-960.04d67b154d.webp 960w, /media/cutouts/marcus-thuram-skeleton-watch/studio-1600.04d67b154d.webp 1600w",
-  "width": 1600,
-  "height": 2036,
+  "kind": "photo",
+  "src": "/media/pieces/marcus-thuram-skeleton-watch/cover.webp",
+  "width": 1068,
+  "height": 1016,
   "box": [
-   0.0635,
-   0.0311,
-   0.9031,
-   0.9378
+   0,
+   0.0026,
+   1,
+   0.9974
   ]
  },
  "tajon-buchanan-iced-watch": {
-  "kind": "cutout",
-  "src": "/media/cutouts/tajon-buchanan-iced-watch/studio-1600.3f3cf90c84.webp",
-  "srcSet": "/media/cutouts/tajon-buchanan-iced-watch/studio-480.3f3cf90c84.webp 480w, /media/cutouts/tajon-buchanan-iced-watch/studio-960.3f3cf90c84.webp 960w, /media/cutouts/tajon-buchanan-iced-watch/studio-1600.3f3cf90c84.webp 1600w",
-  "width": 1600,
-  "height": 2251,
+  "kind": "photo",
+  "src": "/media/pieces/tajon-buchanan-iced-watch/cover.webp",
+  "width": 662,
+  "height": 844,
   "box": [
-   0.0646,
-   0.0452,
-   0.8698,
-   0.909
+   0,
+   0,
+   1,
+   1
   ]
  },
  "radja-nainggolan-iced-watch": {
-  "kind": "cutout",
-  "src": "/media/cutouts/radja-nainggolan-iced-watch/studio-1600.aef246ebaa.webp",
-  "srcSet": "/media/cutouts/radja-nainggolan-iced-watch/studio-480.aef246ebaa.webp 480w, /media/cutouts/radja-nainggolan-iced-watch/studio-960.aef246ebaa.webp 960w, /media/cutouts/radja-nainggolan-iced-watch/studio-1600.aef246ebaa.webp 1600w",
-  "width": 1600,
-  "height": 2242,
+  "kind": "photo",
+  "src": "/media/pieces/radja-nainggolan-iced-watch/cover.webp",
+  "width": 504,
+  "height": 460,
   "box": [
-   0.0635,
-   0.0454,
-   0.8729,
-   0.9093
+   0,
+   0,
+   1,
+   1
   ]
  },
  "ampersand-initials-pendant": {

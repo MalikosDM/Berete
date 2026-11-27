@@ -18,12 +18,32 @@ import { Detail3D, type DetailMark } from "@/viewer";
  * shows beside it, the photo and the text changing sides from one to the next (src/data/magazine.ts); then "See more" for the
  * others. Every photo opens full screen, where the magnifying glass lives (src/components/Lightbox.tsx).
  */
-export default function MagazineGallery({ piece, english, items: given, ordered, model, sameViews }: { piece: Piece; english?: Piece; items: MediaItem[]; ordered: boolean; model: PublicModel | null; sameViews: string[][] }) {
+export default function MagazineGallery({
+  piece,
+  english,
+  items: given,
+  ordered,
+  model,
+  sameViews,
+  extra = [],
+  part = "both",
+}: {
+  piece: Piece;
+  english?: Piece;
+  items: MediaItem[];
+  ordered: boolean;
+  model: PublicModel | null;
+  sameViews: string[][];
+  /** Photos it may still show beside a detail or first in Every Angle (its opening, a photo of its chain): src/data/magazine.ts. */
+  extra?: MediaItem[];
+  /** Its two sections may stand apart on the page (Yoni's order of 26-27/11/2026): "angles", "details", or both together. */
+  part?: "angles" | "details" | "both";
+}) {
   const { t, locale } = useI18n();
   const [open, setOpen] = useState<number | null>(null);
   const [expanded, setExpanded] = useState(false);
   const items = ordered ? given : strongestFirst(given);
-  const mag = magazineOf(piece, english, items, { lang: locale, ordered, sameViews });
+  const mag = magazineOf(piece, english, items, { lang: locale, ordered, sameViews, extra });
   const all = [...mag.overview, ...mag.blocks.map((b) => b.item), ...mag.rest];
   if (all.length === 0) return null;
   // Only the captions Yoni wrote in the admin are shown (under the photo and full screen); the others stay in the alt texts.
@@ -56,18 +76,22 @@ export default function MagazineGallery({ piece, english, items: given, ordered,
     </div>
   ) : null;
 
+  // See More right under the four photos of Every Angle (Yoni, 26/11/2026); a page without Every Angle: after its details.
+  const showAngles = part !== "details" && mag.overview.length > 0;
+  const showDetails = part !== "angles" && hasDetails;
+  const moreInAngles = mag.overview.length > 0;
   return (
     <>
-      {mag.overview.length > 0 ? (
+      {showAngles ? (
         <section aria-labelledby="every-angle" data-every-angle data-piece-section="angles" className="wrap py-16 lg:py-20">
           <h2 id="every-angle" className="title-caps tracking-[0.12em] t-title ">
             {t.gallery.everyAngle}
           </h2>
           <Grid items={mag.overview} first={1} onOpen={show} nameOf={nameOf} captionOf={captionShown} />
-          {!hasDetails ? more : null}
+          {more}
         </section>
       ) : null}
-      {hasDetails ? (
+      {showDetails ? (
         <section aria-labelledby="details-title" data-magazine data-details={piece.details.length > 0 ? "" : undefined} data-piece-section="details" className="wrap border-t border-white/10 py-16 lg:py-20">
           <h2 id="details-title" className="title-caps tracking-[0.12em] t-title ">
             {t.piece.details}
@@ -88,27 +112,30 @@ export default function MagazineGallery({ piece, english, items: given, ordered,
                 // on the left first, right under the title, then on the right (26/11/2026: the text first left the top left of
                 // the section empty, and each text floated far from its photo). On a phone, the photo on the left then on the right.
                 const flip = i % 2 === 1;
+                // The close-ups a little larger, the words larger, more air between them (Yoni, 26/11/2026); the strongest moment
+                // (the mechanism of the Inter ring) larger still.
+                const photoCols = b.big ? "sm:col-span-6 lg:col-span-6 " : "sm:col-span-5 lg:col-span-5 ";
                 return (
-                  <li key={b.item.src} data-magazine-block={i + 1} data-angle={mag.overview.length + i + 1} className="grid items-center gap-6 sm:grid-cols-12 sm:gap-8 lg:gap-12">
+                  <li key={b.item.src} data-magazine-block={i + 1} data-big={b.big ? "" : undefined} data-angle={mag.overview.length + i + 1} className="grid items-center gap-6 sm:grid-cols-12 sm:gap-10 lg:gap-16">
                     <button
                       type="button"
                       onClick={(e) => show(b.item, e)}
                       data-magazine-photo
-                      className={"group relative block aspect-[4/5] w-2/3 cursor-zoom-in overflow-hidden bg-ink sm:col-span-5 sm:w-full lg:col-span-4 " + (flip ? "justify-self-end sm:order-2 sm:col-start-8 lg:col-start-9" : "sm:order-1 sm:col-start-1")}
+                      className={"group relative block aspect-[4/5] cursor-zoom-in overflow-hidden bg-ink sm:w-full " + (b.big ? "w-full " : "w-3/4 ") + photoCols + (flip ? "justify-self-end sm:order-2 " + (b.big ? "sm:col-start-7" : "sm:col-start-8") : "sm:order-1 sm:col-start-1")}
                       aria-label={t.gallery.open(nameOf(b.item))}
                     >
                       <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
-                        <MediaView item={b.item} alt={nameOf(b.item)} sizes="(max-width: 639px) 66vw, (max-width: 1023px) 40vw, 25rem" frame={4 / 5} />
+                        <MediaView item={b.item} alt={nameOf(b.item)} fit={b.item.onBlack !== false ? "contain" : "cover"} sizes={b.big ? "(max-width: 639px) 92vw, (max-width: 1023px) 48vw, 38rem" : "(max-width: 639px) 75vw, (max-width: 1023px) 40vw, 31rem"} frame={4 / 5} />
                       </span>
                       <span className="absolute end-3 bottom-3 hidden size-10 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-0 transition-opacity group-hover:opacity-100 lg:inline-flex">
                         <ZoomIn className="size-4" aria-hidden="true" />
                       </span>
                     </button>
-                    <div data-magazine-text className={"sm:col-span-7 lg:col-span-6 " + (flip ? "sm:order-1 sm:col-start-1 sm:justify-self-end lg:col-start-3 lg:pe-4" : "sm:order-2 sm:col-start-6 lg:col-start-5 lg:ps-4")}>
+                    <div data-magazine-text className={"sm:col-span-6 lg:col-span-5 " + (flip ? "sm:order-1 sm:col-start-1 sm:justify-self-end lg:col-start-2" : "sm:order-2 " + (b.big ? "sm:col-start-7 lg:col-start-7" : "sm:col-start-7 lg:col-start-7"))}>
                       {b.texts.map((x, k) => (
                         <div key={k} className={k > 0 ? "mt-6" : ""}>
                           {x.title ? <h3 className="title-caps t-sub leading-tight tracking-[0.08em] text-white">{x.title}</h3> : null}
-                          <p className={"text-base leading-relaxed whitespace-pre-line text-bone " + (x.title ? "mt-2" : "")}>{x.text}</p>
+                          <p className={"piece-text whitespace-pre-line " + (x.title ? "mt-3" : "")}>{x.text}</p>
                         </div>
                       ))}
                     </div>
@@ -138,7 +165,7 @@ export default function MagazineGallery({ piece, english, items: given, ordered,
               })}
             </ul>
           ) : null}
-          {more}
+          {moreInAngles ? null : more}
         </section>
       ) : null}
       {open !== null ? createPortal(<Lightbox items={viewed} index={open} onIndex={setOpen} onClose={() => setOpen(null)} />, document.body) : null}

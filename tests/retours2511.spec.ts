@@ -26,10 +26,11 @@ async function piece(page: Page, slug: string, prefix = "") {
 test("a magazine: the film and the story side by side, four photos of the whole, the details beside their sentence", async ({ page }, info) => {
   const problems = watch(page);
   const phone = info.project.name === "iphone";
-  await piece(page, "kevin-schade-dragon-ball-pendant");
+  // (The VfB ring: Yoni's vision beside its film, three details beside their close-ups, 26/11/2026.)
+  await piece(page, "vfb-stuttgart-dfb-pokal-2025");
   const spread = page.locator("[data-piece-spread]");
   await expect(spread.locator("[data-feature-frame]")).toBeVisible();
-  await expect(spread.locator("h2#piece-story-title")).toHaveText(/Behind the Creation/i);
+  await expect(spread.locator("h2#piece-story-title")).toHaveText(/^The Vision Behind the Creation$/i);
   await expect(spread.locator("[data-story-paragraph]").first()).toBeVisible();
   const film = await spread.locator("[data-feature-frame]").boundingBox();
   const story = await spread.locator("[data-piece-story]").boundingBox();
@@ -151,11 +152,12 @@ test("the L of Deniz Undav: no image made by AI anywhere", async ({ page }, info
   await expect(card).toHaveAttribute("src", /\/media\/hd\/deniz-undav-l-pendant\/p10/);
 });
 
-test("the Genkidama v2: the sphere right above the piece, at the top of the page", async ({ page }, info) => {
+test("the blue Genkidama (26/11/2026): the sphere right above the piece, at the top of the page", async ({ page }, info) => {
   await piece(page, "kevin-schade-dragon-ball-pendant");
   const u = page.locator(".universe");
   await expect(u).toHaveAttribute("data-anchored", /wide|tall/);
-  await expect(page.locator(".u-backdrop img").first()).toHaveAttribute("src", new RegExp("genkidama-1600\\." + BACKDROPS.genkidama!.version));
+  await expect(u).toHaveAttribute("data-free", "");
+  await expect(page.locator(".u-backdrop img").first()).toHaveAttribute("src", new RegExp("genkidama-v1-(m-)?\\d+\\." + BACKDROPS["genkidama-v1"]!.version));
   // The bottom of the sphere at the top of the piece (a few points), its centre on the axis of the piece.
   const m = await page.evaluate(() => {
     const core = document.querySelector(".u-genki-core")!.getBoundingClientRect();

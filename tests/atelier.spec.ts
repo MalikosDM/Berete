@@ -50,7 +50,7 @@ for (const slug of PIECES) {
     await expect(page.locator("[data-atelier-passage], [data-atelier-preview], [data-making], [data-atelier-video]")).toHaveCount(0);
     const way = page.locator("[data-enter-atelier]");
     await way.scrollIntoViewIfNeeded();
-    await expect(way.locator("[data-enter-atelier-link]")).toHaveText(/Entrer dans l’atelier/);
+    await expect(way.locator("[data-enter-atelier-link]")).toHaveText(/Voir la fabrication/);
     const link = way.locator("[data-enter-atelier-link]");
     await expect(link).toHaveAttribute("href", "/fr/atelier?piece=" + slug);
     await page.waitForTimeout(600);

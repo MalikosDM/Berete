@@ -49,7 +49,8 @@ export const FILMS = [
   { slug: "noah-okafor-oka-pendant", folder: "34", making: "34/v02", reveal: "34/v03", poster: { making: 4 } },
   { slug: "samuel-ballet-jesus-piece", making: "08/v21" },
   // The finished piece only (no film of their fabrication was sent).
-  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01" },
+  // Its whole pendant as its image (26/11/2026: an elegant image before it plays).
+  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01", poster: { reveal: 6 } },
   { slug: "the-hand", folder: "12", reveal: "12/v01" },
   // The pendant of Michy Batshuayi (its chain is a piece of its own since 22/11/2026).
   { slug: "michy-batshuayi-butterfly-pendant", folder: "23", reveal: "23/v04" },

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
-import { ArrowRight, LoaderCircle, Maximize, Minimize, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowRight, LoaderCircle, Maximize, Minimize, Pause, Play, RotateCcw, SkipForward, Volume2, VolumeX, X } from "lucide-react";
 import { posterBehind } from "@/components/Media";
 import { media } from "@/data/catalogue";
 import { makingSteps } from "@/data/making";
@@ -21,7 +21,14 @@ import { getLenis, useReducedMotion } from "@/lib/gsap";
  * - Phones: the lighter copy of each film (or a computer asking to save data, a slow connection).
  * Every text and button sits on a dark band (readable over any frame); nothing moves when the visitor asks for reduced
  * motion, apart from the film itself.
+ * On the page The Atelier (27/11/2026, as on YouTube): "Up next", the other making-of films beside the film (under it on a
+ * phone), the closest first (src/data/atelier.ts, upNextOrder); one of them plays in the same room. At the end of a film,
+ * "Enter the World" (the page of its finished piece) and "Next film" (the first of the list): the visitor never leaves the
+ * site, from the atelier to another making-of, then to a finished piece.
  */
+
+/** One film of "Up next": its piece, its image, its length. */
+export type UpNextFilm = { slug: string; title: string; poster: string; srcSet?: string; duration: number };
 
 type Props = {
   title: string;
@@ -33,12 +40,15 @@ type Props = {
   atelier: ResolvedAtelier;
   /** The page The Atelier: a link "Enter the World" leads to the page of the piece. */
   world?: boolean;
+  /** The other making-of films, the closest first ("Up next"); one chosen plays in this room (onPick). */
+  upNext?: UpNextFilm[];
+  onPick?: (slug: string) => void;
   onClose: () => void;
 };
 
 const posterOf = (film: Film) => film.posters[film.poster] ?? film.posters[0] ?? "";
 
-export default function AtelierRoom({ title, madeFor, type, slug, atelier, world = false, onClose }: Props) {
+export default function AtelierRoom({ title, madeFor, type, slug, atelier, world = false, upNext = [], onPick, onClose }: Props) {
   const { t } = useI18n();
   const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -52,6 +62,17 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
   const [waiting, setWaiting] = useState(true);
   const [interlude, setInterlude] = useState(false);
   const [ended, setEnded] = useState(false);
+  // Another film chosen in "Up next": the same room starts again with it, from its making-of.
+  const [shownSlug, setShownSlug] = useState(slug);
+  if (shownSlug !== slug) {
+    setShownSlug(slug);
+    setKind("making");
+    setEnded(false);
+    setInterlude(false);
+    setTime(0);
+  }
+  const next = onPick ? upNext[0] : undefined;
+  const endRef = useRef<HTMLDivElement>(null);
   const film = kind === "reveal" && atelier.reveal ? atelier.reveal : atelier.making;
   const poster = kind === "making" ? atelier.poster : posterOf(film);
   const src = light ? film.mobile : film.src;
@@ -74,8 +95,13 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
     onCloseRef.current = onClose;
   }, [onClose]);
   useEffect(() => {
-    // Once (a second run of the effect in development would add a second step).
-    if ((window.history.state as { atelier?: string } | null)?.atelier !== slug) window.history.pushState({ ...(window.history.state as object | null), atelier: slug }, "");
+    // Once (a second run of the effect in development would add a second step); another film of "Up next" takes the place of
+    // the one before (one step for the whole visit of the room).
+    const state = window.history.state as { atelier?: string } | null;
+    if (state?.atelier !== slug) {
+      if (state?.atelier) window.history.replaceState({ ...state, atelier: slug }, "");
+      else window.history.pushState({ ...state, atelier: slug }, "");
+    }
     pushed.current = true;
     const onPop = () => {
       pushed.current = false;
@@ -152,11 +178,21 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
     } else setKind(next);
   };
   const replay = () => choose("making");
+  /** Another film of "Up next", in this room; the focus on its play button (the list may change under the pointer). */
+  const pick = (next: string) => {
+    onPick?.(next);
+    playRef.current?.focus({ preventScroll: true });
+  };
   const onChapter = (e: ReactMouseEvent<HTMLButtonElement>) => choose(e.currentTarget.dataset.chapter === "reveal" ? "reveal" : "making");
   const onEnded = () => {
     if (kind === "making" && atelier.reveal) setInterlude(true);
     else setEnded(true);
   };
+
+  // The end of a film: the focus on its first choice (a keyboard goes on from there).
+  useEffect(() => {
+    if (ended) endRef.current?.querySelector<HTMLElement>("a[href], button")?.focus({ preventScroll: true });
+  }, [ended]);
 
   // Escape leaves, wherever the focus is (a click on the film leaves it on the page).
   useEffect(() => {
@@ -189,6 +225,9 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
   if (atelier.reveal) chapters.push({ kind: "reveal", name: t.films.reveal, film: atelier.reveal });
   const duration = film.duration || 1;
   const frame = { "--fa": film.width + " / " + film.height, "--fr": String(film.width / film.height), "--fh": "min(76svh, calc(50vw * " + film.height + " / " + film.width + "))" } as CSSProperties;
+  const wide = film.width > film.height;
+  const list = !!onPick && upNext.length > 0;
+  const endBtn = "inline-flex min-h-12 flex-1 items-center justify-center gap-3 border px-4 py-3 text-center text-base leading-tight font-normal uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]";
   const btn = "inline-flex size-12 shrink-0 items-center justify-center rounded-full border border-white/35 bg-black/45 text-white backdrop-blur-sm transition-colors hover:border-rose-light hover:text-rose-light";
 
   const room = (
@@ -202,7 +241,7 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
       data-lenis-prevent
       onKeyDown={onKeyDown}
       style={frame}
-      className="atelier-room fixed inset-0 z-[95] overflow-hidden bg-[#0b0806] text-white"
+      className="atelier-room fixed inset-0 z-[95] overflow-x-hidden overflow-y-auto overscroll-contain bg-[#0b0806] text-white lg:overflow-hidden"
     >
       {/* The room: a photo of the bench in the dark, the lamp, the wood, the grain */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0">
@@ -303,26 +342,39 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
               </div>
             ) : null}
             {ended ? (
-              <div data-atelier-end className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/85 px-6">
-                <p className="title-caps mb-4 text-center t-lead tracking-[0.12em] text-white">{title}</p>
-                <button type="button" onClick={replay} className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 border border-white/40 px-7 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
-                  <RotateCcw className="size-5" aria-hidden="true" /> {t.films.replay}
+              // The end of the film: its two ways on (27/11/2026): the page of its finished piece, the next making-of; "Watch again"
+              // small under them. A film wider than tall (short on a phone): the two side by side, without the name.
+              <div ref={endRef} data-atelier-end className="absolute inset-0 flex flex-col items-center justify-center gap-3 overflow-y-auto bg-black/85 px-4 py-4">
+                {wide ? null : <p className="title-caps mb-2 text-center t-lead tracking-[0.12em] text-white">{title}</p>}
+                <div className={"flex w-full gap-3 " + (wide ? "max-w-md flex-row" : "max-w-xs flex-col")}>
+                  {world ? (
+                    <Link to={"/pieces/" + slug} replace data-atelier-end-world className={endBtn + " border-rose-light/70 hover:bg-rose-light/10"}>
+                      {t.common.enterWorld} <ArrowRight className="size-5 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
+                    </Link>
+                  ) : (
+                    <button type="button" onClick={close} className={endBtn + " border-rose-light/55"}>
+                      {t.films.leave}
+                    </button>
+                  )}
+                  {next ? (
+                    <button type="button" onClick={() => pick(next.slug)} data-atelier-next={next.slug} className={endBtn + " border-white/40"}>
+                      <SkipForward className="size-5 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
+                      <span className="flex flex-col items-center">
+                        {t.films.nextFilm}
+                        {wide ? <span className="sr-only">{" · " + next.title}</span> : <span className="mt-1 text-base normal-case tracking-normal text-mist lg:text-[0.8125rem]">{next.title}</span>}
+                      </span>
+                    </button>
+                  ) : null}
+                </div>
+                <button type="button" onClick={replay} data-atelier-replay className="inline-flex min-h-12 items-center gap-2 px-3 text-base text-mist transition-colors hover:text-rose-light lg:min-h-10 lg:text-[0.8125rem]">
+                  <RotateCcw className="size-4" aria-hidden="true" /> {t.films.replay}
                 </button>
-                {world ? (
-                  <Link to={"/pieces/" + slug} replace className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 border border-rose-light/55 px-7 text-base font-normal uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
-                    {t.common.enterWorld} <ArrowRight className="size-5 rtl:-scale-x-100" aria-hidden="true" />
-                  </Link>
-                ) : (
-                  <button type="button" onClick={close} className="inline-flex min-h-12 w-full max-w-xs items-center justify-center gap-3 border border-rose-light/55 px-7 text-base font-normal uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
-                    {t.films.leave}
-                  </button>
-                )}
               </div>
             ) : null}
           </div>
 
           {/* The controls, on a dark band at the foot of the film */}
-          <div className="absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-black/90 via-black/60 to-transparent px-4 pt-12 pb-[max(1rem,env(safe-area-inset-bottom))] lg:px-5 lg:pb-4">
+          <div className={"absolute inset-x-0 bottom-0 z-10 bg-linear-to-t from-black/90 via-black/60 to-transparent px-4 pt-12 pb-[max(1rem,env(safe-area-inset-bottom))] lg:px-5 lg:pb-4 " + (ended ? "hidden" : "")}>
             <div className="mb-2 flex gap-2 lg:hidden">
               {chapters.length > 1
                 ? chapters.map((c) => (
@@ -380,15 +432,55 @@ export default function AtelierRoom({ title, madeFor, type, slug, atelier, world
           </div>
         </div>
 
-        {/* Leave (computers) */}
-        <div className="hidden self-start justify-self-end pt-8 lg:block">
-          <button type="button" onClick={close} data-atelier-close className="inline-flex min-h-12 items-center gap-3 border border-white/35 bg-black/40 px-5 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
-            <X className="size-5" aria-hidden="true" /> {t.films.leave}
-          </button>
-          {world ? (
-            <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-3 flex min-h-12 items-center justify-end gap-2 text-base font-medium uppercase tracking-[0.12em] text-white hover:text-rose-light">
-              {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
-            </Link>
+        {/* Leave (computers), then "Up next": beside the film on a computer, under it on a phone (the room scrolls down to it). */}
+        <div className={"ar-side lg:flex lg:h-full lg:min-h-0 lg:flex-col lg:items-end lg:self-stretch lg:justify-self-end lg:py-8 " + (list ? "" : "hidden")}>
+          <div className="hidden lg:flex lg:flex-col lg:items-end">
+            <button type="button" onClick={close} data-atelier-close className="inline-flex min-h-12 items-center gap-3 border border-white/35 bg-black/40 px-5 text-base font-medium uppercase tracking-[0.12em] text-white transition-colors hover:border-rose-light hover:text-rose-light lg:min-h-11 lg:text-[0.75rem]">
+              <X className="size-5" aria-hidden="true" /> {t.films.leave}
+            </button>
+            {world ? (
+              <Link to={"/pieces/" + slug} replace data-atelier-world className="mt-3 flex min-h-12 items-center justify-end gap-2 text-base font-medium uppercase tracking-[0.12em] text-white hover:text-rose-light">
+                {t.common.enterWorld} <ArrowRight className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+              </Link>
+            ) : null}
+          </div>
+          {list ? (
+            <nav aria-labelledby="atelier-upnext-title" data-atelier-upnext className="w-full lg:mt-6 lg:flex lg:min-h-0 lg:w-[21rem] lg:flex-1 lg:flex-col">
+              <h3 id="atelier-upnext-title" className="eyebrow [text-shadow:0_2px_18px_rgba(0,0,0,0.9)]">
+                {t.films.upNext}
+              </h3>
+              <ol className="mt-3 border-t border-white/15 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pe-2">
+                {upNext.map((f) => (
+                  <li key={f.slug} className="border-b border-white/10">
+                    <button type="button" onClick={() => pick(f.slug)} data-upnext={f.slug} className="group flex min-h-12 w-full items-center gap-4 py-3 text-start transition-colors">
+                      <span className="relative block aspect-[4/5] w-20 shrink-0 overflow-hidden border border-white/10 bg-black lg:w-16">
+                        {f.poster ? (
+                          <img
+                            src={f.poster}
+                            srcSet={f.srcSet}
+                            sizes="(max-width: 1023px) 80px, 64px"
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+                          />
+                        ) : null}
+                        <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center bg-black/25 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <Play className="size-5 translate-x-px fill-current text-white" />
+                        </span>
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="title-caps block text-base leading-snug tracking-[0.08em] break-words text-white transition-colors group-hover:text-rose-light">{f.title}</span>
+                        <span className="mt-1 block text-base text-mist tabular-nums lg:text-[0.8125rem]">
+                          <span className="sr-only">{t.films.duration(filmTime(f.duration))}</span>
+                          <span aria-hidden="true">{filmTime(f.duration)}</span>
+                        </span>
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </nav>
           ) : null}
         </div>
       </div>

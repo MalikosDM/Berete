@@ -1,0 +1,54 @@
+[
+ {
+  "key": "01-birth-of-form",
+  "video": "/media/atelier-chapters/01-birth-of-form.867583099f.mp4",
+  "mobile": "/media/atelier-chapters/01-birth-of-form-mobile.867583099f.mp4",
+  "poster": "/media/atelier-chapters/01-birth-of-form-poster.867583099f.webp",
+  "posterMobile": "/media/atelier-chapters/01-birth-of-form-poster-mobile.867583099f.webp",
+  "width": 1080,
+  "height": 720,
+  "mobileWidth": 720,
+  "mobileHeight": 1280,
+  "duration": 4.07,
+  "source": "noah-okafor-octagon-pendant/making 10.62–14.7 s"
+ },
+ {
+  "key": "02-precision",
+  "video": "/media/atelier-chapters/02-precision.45ed43a8c6.mp4",
+  "mobile": "/media/atelier-chapters/02-precision-mobile.45ed43a8c6.mp4",
+  "poster": "/media/atelier-chapters/02-precision-poster.45ed43a8c6.webp",
+  "posterMobile": "/media/atelier-chapters/02-precision-poster-mobile.45ed43a8c6.webp",
+  "width": 1080,
+  "height": 720,
+  "mobileWidth": 720,
+  "mobileHeight": 1280,
+  "duration": 5.36,
+  "source": "brt-flower-chain/making 4.2–9.56 s"
+ },
+ {
+  "key": "03-brilliance",
+  "video": "/media/atelier-chapters/03-brilliance.8800e9d835.mp4",
+  "mobile": "/media/atelier-chapters/03-brilliance-mobile.8800e9d835.mp4",
+  "poster": "/media/atelier-chapters/03-brilliance-poster.8800e9d835.webp",
+  "posterMobile": "/media/atelier-chapters/03-brilliance-poster-mobile.8800e9d835.webp",
+  "width": 1080,
+  "height": 720,
+  "mobileWidth": 720,
+  "mobileHeight": 1280,
+  "duration": 5.84,
+  "source": "brt-flower-chain/making 21.76–27.6 s"
+ },
+ {
+  "key": "04-refinement",
+  "video": "/media/atelier-chapters/04-refinement.f836eb1cd8.mp4",
+  "mobile": "/media/atelier-chapters/04-refinement-mobile.f836eb1cd8.mp4",
+  "poster": "/media/atelier-chapters/04-refinement-poster.f836eb1cd8.webp",
+  "posterMobile": "/media/atelier-chapters/04-refinement-poster-mobile.f836eb1cd8.webp",
+  "width": 1080,
+  "height": 720,
+  "mobileWidth": 720,
+  "mobileHeight": 1280,
+  "duration": 4.2,
+  "source": "vfb-stuttgart-dfb-pokal-2025/making 21.64–25.85 s"
+ }
+]
