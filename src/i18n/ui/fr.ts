@@ -5,6 +5,8 @@
 import { plural, type PluralForms } from "../format";
 import type { Messages } from "./en";
 import { fr as house } from "../house/fr";
+import { fr as privateAtelier } from "../atelier/fr";
+import { fr as studio } from "../studio/fr";
 
 const n = (count: number, forms: PluralForms) => plural("fr-FR", count, forms);
 
@@ -497,6 +499,10 @@ export const fr: Messages = {
   },
 
   house,
+  /** The Private Atelier, the space of the clients (src/i18n/atelier). */
+  privateAtelier,
+  /** The AI Creation Studio (src/i18n/studio). */
+  studio,
 
   contact: {
     eyebrow: "Contact privé",

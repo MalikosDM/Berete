@@ -102,7 +102,8 @@ test("every photo of every piece is listed; no text; a few short captions, trans
 });
 
 /** Six pieces, the Inter ring, chains, a watch, a Jesus piece with its films from the stories. */
-const PAGES = ["campione-d-italia-2023-2024", "michy-batshuayi-butterfly-pendant", "sirius", "marcus-thuram-skeleton-watch", "kevin-schade-dragon-ball-pendant", "samuel-ballet-jesus-piece"];
+// (The watch of Marcus Thuram has no Every Angle since 27/11/2026: its only photos are its opening and the photos where it is worn.)
+const PAGES = ["campione-d-italia-2023-2024", "michy-batshuayi-butterfly-pendant", "sirius", "noah-okafor-oka-pendant", "kevin-schade-dragon-ball-pendant", "samuel-ballet-jesus-piece"];
 
 for (const slug of PAGES) {
   test("Every Angle on " + slug + ": a gallery, at most a short caption, readable", async ({ page }, info) => {
@@ -147,7 +148,9 @@ for (const slug of PAGES) {
       await more.scrollIntoViewIfNeeded();
       await shot(page, info.project.name + "-" + slug + "-2-voir-plus");
       await more.click();
-      await expect(all).toHaveCount(photos.length);
+      // (Since 27/11/2026 Every Angle may also show the photo of its opening or of its chain, chosen first: src/data/magazine.ts.)
+      await expect.poll(() => all.count()).toBeGreaterThanOrEqual(photos.length);
+      expect(await all.count()).toBeLessThanOrEqual(photos.length + 3);
     } else await expect(more).toHaveCount(0);
     // A film keeps its place, silent.
     for (const v of await section.locator("[data-angle-type='video'] video").all()) {

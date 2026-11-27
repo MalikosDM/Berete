@@ -26,6 +26,12 @@ const Embed3D = lazyPart(() => import("@/pages/Embed3D"));
 // A share link sealed on the admin's device (/s/<token>): decrypted in the browser of the client.
 const SealedView = lazyPart(() => import("@/pages/SealedView"));
 const Vip = lazyPart(() => import("@/pages/Vip"));
+// The Private Atelier (27/11/2026): the invitation, the sign-in link, a project of the client (src/pages/atelier/).
+const ClientInvite = lazyPart(() => import("@/pages/atelier/ClientInvite"));
+const ClientSignin = lazyPart(() => import("@/pages/atelier/ClientSignin"));
+const ClientProject = lazyPart(() => import("@/pages/atelier/ClientProject"));
+// The AI Creation Studio (Phase 2, 27/11/2026): « Create your own piece », and a studio reached again by its private link.
+const Studio = lazyPart(() => import("@/pages/Studio"));
 // The 3D lab (pictures of the editor, comparisons of the diamonds): on the Mac only, never in the built site.
 const Lab3D = import.meta.env.DEV ? lazyPart(() => import("@/pages/Lab3D")) : null;
 
@@ -65,6 +71,11 @@ function pages(prefix: string) {
       {/* The private space of the clients: their pieces in 3D. */}
       <Route path="vip" element={<Suspense fallback={null}><Vip /></Suspense>} />
       <Route path="vip/:token" element={<Suspense fallback={null}><Vip /></Suspense>} />
+      <Route path="vip/invite/:token" element={<Suspense fallback={null}><ClientInvite /></Suspense>} />
+      <Route path="vip/signin/:token" element={<Suspense fallback={null}><ClientSignin /></Suspense>} />
+      <Route path="vip/project/:id" element={<Suspense fallback={null}><ClientProject /></Suspense>} />
+      <Route path="create" element={<Suspense fallback={null}><Studio /></Suspense>} />
+      <Route path="create/:token" element={<Suspense fallback={null}><Studio /></Suspense>} />
       <Route path="*" element={<NotFound />} key={prefix + "*"} />
     </>
   );
@@ -86,16 +97,15 @@ function PrivateApp() {
   const viewLink = <Suspense fallback={null}><ViewLink /></Suspense>;
   const sealed = <Suspense fallback={null}><SealedView /></Suspense>;
   const embed = <Suspense fallback={null}><Embed3D /></Suspense>;
-  const vip = (
+  const alone = (page: ReactNode) => (
     <div className="min-h-svh bg-ink" data-private-page>
       <header className="flex justify-center px-5 pt-8">
         <Logo variant="full" position="center" className="h-12 w-48 sm:h-14 sm:w-56" />
       </header>
-      <Suspense fallback={null}>
-        <Vip />
-      </Suspense>
+      <Suspense fallback={null}>{page}</Suspense>
     </div>
   );
+  const vip = alone(<Vip />);
   return (
     <Routes>
       {["", ...LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((l) => l + "/")].map((prefix) => (
@@ -105,6 +115,9 @@ function PrivateApp() {
           <Route path={prefix + "s/:token"} element={sealed} />
           <Route path={prefix + "vip"} element={vip} />
           <Route path={prefix + "vip/:token"} element={vip} />
+          <Route path={prefix + "vip/invite/:token"} element={alone(<ClientInvite />)} />
+          <Route path={prefix + "vip/signin/:token"} element={alone(<ClientSignin />)} />
+          <Route path={prefix + "vip/project/:id"} element={alone(<ClientProject />)} />
         </Fragment>
       ))}
       <Route path="*" element={<Elsewhere />} />

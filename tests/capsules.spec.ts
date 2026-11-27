@@ -87,9 +87,10 @@ for (const slug of ENTERED) {
   });
 }
 
-test("a piece without a film (the Safi Link; the Inter ring, whose film was a 3D render) has no film section; asked for less motion, no film by itself", async ({ page }) => {
+test("a piece without a film (the Safi Link) has no film section; asked for less motion, no film by itself", async ({ page }) => {
   await skipIntro(page, { films: false });
-  for (const without of ["the-safi-link", INTER]) {
+  // (The Inter ring has the final film of Yoni since 26/11/2026: tests/contenus2711.spec.ts.)
+  for (const without of ["the-safi-link"]) {
     await page.goto("/fr/pieces/" + without);
     await ready(page);
     await expect(page.locator("[data-feature-film]")).toHaveCount(0);
@@ -137,11 +138,12 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   await skipIntro(page);
   await page.goto("/pieces/kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
   const universe = page.locator("article[data-piece] .universe");
-  await expect(universe).toHaveAttribute("data-backdrop", "genkidama");
+  // (The blue Genkidama of before since 26/11/2026, « genkidama-v1 »: the choice of Yoni's wife.)
+  await expect(universe).toHaveAttribute("data-backdrop", "genkidama-v1");
   await ready(page);
   await expect
     .poll(() => page.locator(".u-backdrop img").evaluate((i) => ((i as HTMLImageElement).complete ? (i as HTMLImageElement).currentSrc : "")))
-    .toMatch(new RegExp("/media/universes/genkidama" + (phone ? "-m-\\d+" : "-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"));
+    .toMatch(new RegExp("/media/universes/genkidama-v1" + (phone ? "-m-\\d+" : "-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"));
   // The glow on the sphere, breathing; the sphere at the top of the screen, in the middle of the image.
   const glow = page.locator("article[data-piece] .u-genki-glow");
   await expect(glow).toBeVisible();
@@ -168,7 +170,7 @@ test("Dragon Ball: black, the sphere of the Genkidama breathing, the light risin
   await page.goto("/players/kevin-schade?story=kevin-schade&piece=kevin-schade-dragon-ball-pendant", { waitUntil: "load" });
   const story = page.locator("[role='dialog'][data-story-world='kevin-schade-dragon-ball-pendant']");
   await expect(story).toBeVisible();
-  await expect(story.locator(".universe[data-fixed]")).toHaveAttribute("data-backdrop", "genkidama");
+  await expect(story.locator(".universe[data-fixed]")).toHaveAttribute("data-backdrop", "genkidama-v1");
   await expect(story.locator(".u-fx")).toHaveAttribute("data-running", "", { timeout: 10_000 });
   await page.waitForTimeout(1500);
   await shot(page, info.project.name + "-genkidama-story");

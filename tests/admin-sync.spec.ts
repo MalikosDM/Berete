@@ -3,13 +3,15 @@
 // (its API, as the admin page does), the site is checked, then the setting is put back as it was — whatever happens.
 // ADMIN_PASSWORD (typed in the Terminal, never written anywhere) gives the session; without it the test is skipped. Online,
 // ACCESS_PASSWORD enters the site under construction (tests/fixtures.ts). Desktop only (one change at a time on the base).
+import { EXPLAIN } from "../src/data/magazine";
 import { expect, test, type APIRequestContext, type Page } from "./fixtures";
 import { skipIntro } from "./helpers";
 
 type Media = { type: string; src: string; [k: string]: unknown };
 type Row = { id: string; slug: string; title: string; line: string; gallery: Media[]; angles: Record<string, { title: string; text: string }>; [k: string]: unknown };
 
-const SLUG = "noah-okafor-octagon-pendant";
+// A page whose photos follow the admin (Yoni's pages of 26-27/11/2026 open on the four photos he chose: src/data/magazine.ts).
+const SLUG = "sirius";
 
 test.describe.configure({ mode: "serial" });
 test.skip(!process.env.ADMIN_PASSWORD, "ADMIN_PASSWORD (the password of the admin) is needed");
@@ -65,7 +67,15 @@ test("the order and the choice of the photos of a piece follow the admin", async
   const token = await session(request);
   const row = (await pieces(request, token)).find((p) => p.slug === SLUG)!;
   const original = structuredClone(row);
-  const photos = row.gallery.filter((m) => m.type === "image");
+  // (A photo shown beside a detail stays there, src/data/magazine.ts; a photo of the same view as its opening is never shown:
+  // the photos of Every Angle as the page shows them now.)
+  const details = new Set((EXPLAIN[SLUG] ?? []).map((e) => e.photo));
+  await open(page, "/pieces/" + SLUG);
+  await page.locator("[data-every-angle] [data-angle] img").first().waitFor();
+  if (await page.locator("[data-angle-more]").count()) await page.locator("[data-angle-more]").click();
+  await page.waitForTimeout(800);
+  const onPage = new Set((await page.locator("[data-every-angle] [data-angle] img, [data-angle] img").evaluateAll((els) => els.map((e) => e.getAttribute("src") ?? ""))).map(base));
+  const photos = row.gallery.filter((m) => m.type === "image" && !details.has(base(m.src)) && onPage.has(base(m.src)));
   // A photo of the end put first (its order), another one removed (its choice).
   const first = photos[photos.length - 1]!;
   const removed = photos[photos.length - 2]!;
@@ -78,9 +88,10 @@ test("the order and the choice of the photos of a piece follow the admin", async
     if (await more.count()) await more.click();
     const shown = await page.locator("[data-angle] img, [data-magazine-photo] img").evaluateAll((els) => els.map((e) => (e as HTMLImageElement).currentSrc || (e as HTMLImageElement).src));
     expect(shown.map(base), "the photo removed in the admin").not.toContain(base(removed.src));
-    // Its first photo of the whole is the one put first (unless the opening already shows it).
-    const firstShown = await page.locator("[data-every-angle] [data-angle='1'] img").first().getAttribute("src");
-    expect(base(firstShown ?? ""), "the order of the admin").toBe(base(first.src));
+    // The one put first leads the photos of the whole (after its main photo, when the page opens on it: src/data/magazine.ts).
+    await page.locator("[data-every-angle] [data-angle] img").first().waitFor();
+    const lead = (await page.locator("[data-every-angle] [data-angle] img").evaluateAll((els) => els.slice(0, 2).map((e) => e.getAttribute("src") ?? ""))).map(base);
+    expect(lead, "the order of the admin").toContain(base(first.src));
   } finally {
     await put(request, token, original);
   }

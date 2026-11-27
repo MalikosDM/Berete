@@ -10,6 +10,7 @@ import { useCatalogue } from "@/lib/catalogue";
 import { waLink } from "@/lib/site";
 import { getLenis } from "@/lib/gsap";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
+import { useAtelierPublic } from "@/lib/atelierPublic";
 
 /** sub: a sub-category, under its collection (Jesus Pieces under Pendants). */
 type NavLinkItem = { label: string; to: string; sub?: boolean };
@@ -27,6 +28,8 @@ function linkClass({ isActive }: { isActive: boolean }): string {
 
 export default function Navbar() {
   const { t } = useI18n();
+  const atelier = useAtelierPublic();
+  const clientAccess = atelier.server && atelier.clientAccess;
   const waMessage = useWhatsAppMessage();
   const cat = useCatalogue();
   const CREATION_LINKS: NavLinkItem[] = [
@@ -109,6 +112,12 @@ export default function Navbar() {
         </Link>
 
         <div className="relative z-10 flex items-center gap-2 sm:gap-3">
+          {/* « Client Access » (Yoni, 27/11/2026): discreet, the way to The Private Atelier (with the server, its switch on). */}
+          {clientAccess ? (
+            <Link to="/vip" data-client-access className="hidden min-h-10 items-center px-1 text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-mist transition-colors hover:text-rose-light lg:inline-flex">
+              {t.privateAtelier.nav}
+            </Link>
+          ) : null}
           <LanguageMenu className="hidden md:block" />
           <a
             href={waLink(waMessage)}
@@ -216,6 +225,11 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+          {clientAccess ? (
+            <Link to="/vip" data-client-access-mobile className="mt-6 inline-flex min-h-12 items-center text-base font-medium uppercase tracking-[0.16em] text-bone hover:text-rose-light">
+              {t.privateAtelier.nav}
+            </Link>
+          ) : null}
           <div className="rule-rose my-10" />
           <p className="eyebrow mb-2">{t.language.label}</p>
           <LanguageLinks />

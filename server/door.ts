@@ -4,7 +4,7 @@
  * « Private access » that opens one password field. In French when the browser is in French, else in English. Nothing of
  * the site (no piece, no text, no link inside): its files are its own (public/soon, npm run soon).
  * Two variants with the same look: the door of the admin (/admin, its password, in French) and of the client space (/vip,
- * the access code of a client).
+ * sign-in of a client of The Private Atelier: his e-mail and password, his second factor, a sign-in link, or an older access code).
  */
 import "./globals.js";
 import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from "../src/lib/site.js";
@@ -22,10 +22,24 @@ const WORDS = {
     enter: "Enter",
     wrong: "Incorrect password.",
     tooMany: "Too many attempts. Please try again in a minute.",
-    client: "Client space",
+    client: "Client access",
     code: "Access code",
     wrongCode: "This code is not recognised.",
     failed: "Something went wrong. Please try again.",
+    email: "E-mail",
+    signIn: "Sign in",
+    wrongSignIn: "E-mail or password not recognised.",
+    paused: "Your access is paused. Please contact BERETE.",
+    twoFactor: "Enter the 6-digit code",
+    twoFactorEmail: "We sent a code to your e-mail.",
+    twoFactorApp: "Open your authenticator app.",
+    confirm: "Confirm",
+    wrongCodeShort: "This code is not right.",
+    expired: "This step has expired. Please sign in again.",
+    magic: "E-mail me a sign-in link",
+    magicSent: "If this e-mail has an access, a sign-in link is on its way.",
+    useCode: "I have an access code",
+    usePassword: "Sign in with my e-mail",
   },
   fr: {
     title: "Berete Jewellers — Bientôt disponible",
@@ -36,10 +50,24 @@ const WORDS = {
     enter: "Entrer",
     wrong: "Mot de passe incorrect.",
     tooMany: "Trop d'essais. Réessayez dans une minute.",
-    client: "Espace client",
+    client: "Accès client",
     code: "Code d'accès",
     wrongCode: "Ce code n'est pas reconnu.",
     failed: "Une erreur est survenue. Réessayez.",
+    email: "E-mail",
+    signIn: "Se connecter",
+    wrongSignIn: "E-mail ou mot de passe non reconnu.",
+    paused: "Votre accès est suspendu. Contactez BERETE.",
+    twoFactor: "Saisissez le code à 6 chiffres",
+    twoFactorEmail: "Nous avons envoyé un code à votre e-mail.",
+    twoFactorApp: "Ouvrez votre application d'authentification.",
+    confirm: "Confirmer",
+    wrongCodeShort: "Ce code n'est pas le bon.",
+    expired: "Cette étape a expiré. Reconnectez-vous.",
+    magic: "Recevoir un lien de connexion par e-mail",
+    magicSent: "Si cet e-mail a un accès, un lien de connexion vous attend.",
+    useCode: "J'ai un code d'accès",
+    usePassword: "Me connecter avec mon e-mail",
   },
 } as const;
 
@@ -94,6 +122,12 @@ button:hover,button:focus-visible{border-color:var(--rose);color:var(--rose);out
 button[disabled]{opacity:.6;cursor:default}
 .msg{min-height:24px;margin:6px 0 0;color:var(--rose);font-size:1rem}
 .panel{width:100%;max-width:420px;margin-top:40px}
+#signin,#code,#door{flex-direction:column;align-items:stretch}#signin label,#code label,#door label{flex:0 0 auto}
+.note{margin:0;color:var(--mist);font-size:1rem}
+.links{display:flex;flex-direction:column;align-items:center;gap:2px;margin:18px 0 0}
+button.link{min-height:44px;padding:0 6px;border:0;color:rgb(244 242 239 / .62);font-size:.9375rem;letter-spacing:.04em;text-transform:none}
+button.link:hover,button.link:focus-visible{color:var(--rose)}
+[hidden]{display:none!important}
 .panel .eyebrow{margin:0 0 6px;font-size:1rem;font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--rose)}
 :focus-visible{outline:1px solid var(--rose);outline-offset:4px}
 @media (min-width:1024px){.soon,.panel .eyebrow{font-size:.75rem;letter-spacing:.3em}summary{font-size:.75rem;letter-spacing:.24em}.ig,input,.msg{font-size:.9375rem}button{min-height:44px;font-size:.75rem;letter-spacing:.2em}}
@@ -108,6 +142,27 @@ function script(mode: "admin" | "vip", w: (typeof WORDS)[DoorLang]): string {
       ? `fetch("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:f.password.value})}).then(function(r){return r.json().then(function(j){if(r.ok&&j.token){try{sessionStorage.setItem("bj-admin-token",j.token)}catch(e){}location.reload();return}fail(j.error||${JSON.stringify(w.wrong)})})})`
       : `fetch("/api/vip/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:f.code.value})}).then(function(r){return r.json().then(function(j){if(j.state==="ok"){location.reload();return}fail(${JSON.stringify(w.wrongCode)})})})`;
   return `<script>(function(){var f=document.getElementById("door"),m=document.getElementById("msg"),b=f.querySelector("button");function fail(t){m.textContent=t;b.disabled=false}f.addEventListener("submit",function(e){e.preventDefault();m.textContent="";b.disabled=true;${call}.catch(function(){fail(${JSON.stringify(w.failed)})})})})();</script>`;
+}
+
+/** The script of the client door: sign in, second factor, sign-in link, older access code; then the page again (now open). */
+function clientScript(w: (typeof WORDS)[DoorLang]): string {
+  const J = (v: string) => JSON.stringify(v);
+  return `<script>(function(){var $=function(i){return document.getElementById(i)},s=$("signin"),c=$("code"),d=$("door"),m=$("msg"),ch="";
+function post(u,b){return fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}).then(function(r){return r.json()})}
+function busy(f,on){var b=f.querySelector("button");if(b)b.disabled=on}
+function fail(f,t){m.textContent=t;busy(f,false)}
+s.addEventListener("submit",function(e){e.preventDefault();m.textContent="";busy(s,true);post("/api/vip/atelier/signin",{email:s.email.value,password:s.password.value}).then(function(j){
+if(j.state==="ok"){location.reload();return}
+if(j.state==="code"){ch=j.challenge;s.hidden=true;c.hidden=false;$("codenote").textContent=j.via==="totp"?${J(w.twoFactorApp)}:${J(w.twoFactorEmail)};c.code.focus();busy(s,false);return}
+fail(s,j.state==="paused"?${J(w.paused)}:j.state==="wait"?${J(w.tooMany)}:${J(w.wrongSignIn)})}).catch(function(){fail(s,${J(w.failed)})})});
+c.addEventListener("submit",function(e){e.preventDefault();m.textContent="";busy(c,true);post("/api/vip/atelier/signin/code",{challenge:ch,code:c.code.value}).then(function(j){
+if(j.state==="ok"){location.reload();return}
+if(j.state==="expired"){c.hidden=true;s.hidden=false;fail(c,${J(w.expired)});return}
+fail(c,j.state==="wait"?${J(w.tooMany)}:${J(w.wrongCodeShort)})}).catch(function(){fail(c,${J(w.failed)})})});
+d.addEventListener("submit",function(e){e.preventDefault();m.textContent="";busy(d,true);post("/api/vip/login",{code:d.code.value}).then(function(j){if(j.state==="ok"){location.reload();return}fail(d,${J(w.wrongCode)})}).catch(function(){fail(d,${J(w.failed)})})});
+$("magic").addEventListener("click",function(){if(!s.email.value){s.email.focus();return}m.textContent="";post("/api/vip/atelier/magic",{email:s.email.value}).then(function(j){m.textContent=j.state==="wait"?${J(w.tooMany)}:${J(w.magicSent)}}).catch(function(){m.textContent=${J(w.failed)}})});
+$("legacy").addEventListener("click",function(){var l=d.hidden;d.hidden=!l;s.hidden=l;c.hidden=true;this.textContent=l?${J(w.usePassword)}:${J(w.useCode)};m.textContent=""});
+})();</script>`;
 }
 
 export function doorPage(opts: { lang: DoorLang; mode: DoorMode; next?: string; message?: DoorMessage; origin: string }): string {
@@ -125,6 +180,21 @@ export function doorPage(opts: { lang: DoorLang; mode: DoorMode; next?: string; 
       `<label><span class="sr">${w.password}</span><input type="password" name="password" autocomplete="current-password" placeholder="${w.password}" required${message ? " autofocus" : ""}></label>` +
       `<button type="submit">${w.enter}</button></form>` +
       `<p class="msg" id="msg" role="alert">${message}</p></details></footer>`;
+  } else if (opts.mode === "vip") {
+    // The Private Atelier (27/11/2026): his e-mail and password, then his second factor if he chose one; a sign-in link by
+    // e-mail; the access code of the older client spaces.
+    body =
+      `<main>${brand}<div class="panel"><p class="eyebrow">${w.client}</p>` +
+      `<form id="signin"><label><span class="sr">${w.email}</span><input type="email" name="email" autocomplete="username" placeholder="${w.email}" required autofocus></label>` +
+      `<label><span class="sr">${w.password}</span><input type="password" name="password" autocomplete="current-password" placeholder="${w.password}" required></label>` +
+      `<button type="submit">${w.signIn}</button></form>` +
+      `<form id="code" hidden><p class="note" id="codenote"></p><label><span class="sr">${w.twoFactor}</span><input type="text" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="${w.twoFactor}" required></label>` +
+      `<button type="submit">${w.confirm}</button></form>` +
+      `<form id="door" hidden><label><span class="sr">${w.code}</span><input type="text" name="code" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="${w.code}" required></label>` +
+      `<button type="submit">${w.enter}</button></form>` +
+      `<p class="msg" id="msg" role="alert"></p>` +
+      `<p class="links"><button type="button" class="link" id="magic">${w.magic}</button><button type="button" class="link" id="legacy">${w.useCode}</button></p></div></main>` +
+      clientScript(w);
   } else {
     const admin = opts.mode === "admin";
     const field = admin

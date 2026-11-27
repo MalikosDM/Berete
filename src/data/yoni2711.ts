@@ -386,6 +386,33 @@ export const AS_VICTORY = {
 /** Yoni's caption of the JL pendant worn on its Cuban chain (27/11/2026, src/data/yoni2711.generated.json). */
 export const JL_CUBAN_CAPTION = "JL + 14 mm Cuban";
 
+/**
+ * The Private Atelier on the site (Yoni, 27/11/2026, word for word): its section in The Bespoke Journey, then a short
+ * explanation of the whole journey (each step shown only when it really works: the AI studio and the online payment follow
+ * their switches in the admin), and « Beyond the Creation » on the home page.
+ */
+export const PRIVATE_ATELIER = {
+  title: "THE PRIVATE ATELIER",
+  lead: "Your vision. Your creation. Every step of the journey.",
+  paragraphs: [
+    "Every BERETE creation is personal. We believe the experience of bringing it to life should be just as extraordinary.",
+    "Through our exclusive Private Atelier, clients will be able to explore their jewellery in 3D, discover different material combinations, approve their final design and quotation, and securely confirm their commission online.",
+    "As their creation comes to life, they can follow its progress through our workshops, receiving personal updates, exclusive photographs and behind-the-scenes moments.",
+  ],
+  closing: "An experience as personal as the creation itself.",
+} as const;
+
+/** The steps of the journey under it (our short words, not Yoni's): `when` = the switch it waits for. */
+export const PRIVATE_JOURNEY: { key: string; title: string; text: string; when?: "aiStudio" | "payment" }[] = [
+  { key: "inspiration", title: "Inspiration", text: "Explore your first ideas with our AI Creation Studio.", when: "aiStudio" },
+  { key: "design", title: "Professional 3D design", text: "Your piece designed by BERETE, to explore in 3D in your Private Atelier." },
+  { key: "validation", title: "Validation", text: "Approve your final design and your quotation." },
+  { key: "payment", title: "Secure payment", text: "Confirm your commission online.", when: "payment" },
+  { key: "follow", title: "Follow-up", text: "Follow every step of the making, with photographs and films from our workshops." },
+];
+
+export const BEYOND_CREATION = { title: "BEYOND THE CREATION", text: "An exclusive journey into the making of your jewellery." } as const;
+
 /** The texts of these sections, to translate in every language (scripts/i18n-check.ts). */
 export const SECTION_TEXTS: string[] = [
   INTER_STORY.title,
@@ -402,4 +429,11 @@ export const SECTION_TEXTS: string[] = [
   AS_VICTORY.text,
   ...Object.values(HERO_LINES).flatMap((h) => [h.tagline, h.dedication]),
   JL_CUBAN_CAPTION,
+  PRIVATE_ATELIER.title,
+  PRIVATE_ATELIER.lead,
+  ...PRIVATE_ATELIER.paragraphs,
+  PRIVATE_ATELIER.closing,
+  ...PRIVATE_JOURNEY.flatMap((j) => [j.title, j.text]),
+  BEYOND_CREATION.title,
+  BEYOND_CREATION.text,
 ];

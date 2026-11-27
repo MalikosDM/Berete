@@ -269,26 +269,23 @@ test("each piece enters its own world: its universe, readable texts (AA), still 
 test("entering the world: the AI backdrop, the title typography, a cinematic entrance once per visit, the effects", async ({ page }, info) => {
   const problems = watch(page);
   await skipIntro(page);
-  // Every title in the font of the house since 24/11/2026 (the universe carries the piece, never the font).
-  const font = "Cormorant Garamond";
   const cases: [slug: string, backdrop: string][] = [
     // Since 20/11/2026: its own world, the Genkidama (tests/capsules.spec.ts).
-    ["kevin-schade-dragon-ball-pendant", "genkidama"],
+    ["kevin-schade-dragon-ball-pendant", "genkidama-v1"],
     ["michy-batshuayi-butterfly-pendant", "butterfly"],
     // (24/11/2026: the versions v2 of the victories of Inter and VfB, INTER_VICTORY and VFB_VICTORY of src/data/themes.ts.)
     ["campione-d-italia-2023-2024", INTER_VICTORY],
     ["vfb-stuttgart-dfb-pokal-2025", VFB_VICTORY],
-    ["noah-okafor-jersey-pendant", "okafor-jersey"],
   ];
   for (const [slug, backdrop] of cases) {
     await page.goto("/pieces/" + slug, { waitUntil: "load" });
     const article = page.locator("article[data-piece]");
     await expect(article, slug).toHaveAttribute("data-entering", "");
     await expect(page.locator(".universe"), slug).toHaveAttribute("data-backdrop", backdrop);
-    // No font of a universe announced or loaded any more: the title in the font of the house, really loaded.
-    await expect(page.locator(`link[rel="preload"][as="font"][href^="/fonts/universe/"]`), slug).toHaveCount(0);
-    expect(await page.locator("[data-u-title]").evaluate((el) => getComputedStyle(el).fontFamily), slug).toContain(font);
-    await expect.poll(() => page.evaluate((f) => [...document.fonts].some((x) => x.family.replace(/"/g, "") === f && x.status === "loaded"), font), { message: slug + " font" }).toBe(true);
+    // Since 27/11/2026 the title of a piece is in the font of its universe again (Yoni): whichever it is, really loaded.
+    const family = (await page.locator("[data-u-title]").evaluate((el) => getComputedStyle(el).fontFamily)).split(",")[0]!.replace(/"/g, "").trim();
+    expect(family.length, slug).toBeGreaterThan(0);
+    await expect.poll(() => page.evaluate((f) => [...document.fonts].some((x) => x.family.replace(/"/g, "") === f && x.status === "loaded"), family), { message: slug + " font" }).toBe(true);
     await page.waitForTimeout(700);
     await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-1"), type: "jpeg", quality: 62 });
     // The entrance ends; the backdrop is there, the effects run.
@@ -343,7 +340,9 @@ test("the opening: every jewel whole on screen (cut out, one view or a showcase)
         const h = img.naturalHeight * k;
         const r = { left: b.left + (b.width - w) / 2, top: b.top + (b.height - h) / 2, right: b.left + (b.width + w) / 2, bottom: b.top + (b.height + h) / 2 };
         // A view shown very large ("xl", Dragon Ball on a computer): its chain leaves the top under the menu, faded, by design.
-        const chainOut = img.closest("[data-showcase-xl] .sv-xl") !== null;
+        // A chain that leaves the screen at the top on purpose: the very large view, or a chain cut clean at the top of its
+        // cut-out (27/11/2026, [data-cut-top]).
+        const chainOut = img.closest("[data-showcase-xl] .sv-xl") !== null || img.closest("[data-cut-top]") !== null;
         const bad = [r.top < header + 6 && !chainOut && "top", r.bottom > floor - 6 && "bottom", r.left < 6 && "left", r.right > innerWidth - 6 && "right"].filter(Boolean);
         return bad.length ? [img.closest("[data-showcase-view]")?.getAttribute("data-showcase-view") ?? "photo", ...bad] : [];
       });

@@ -1034,6 +1034,26 @@ const content: Record<string, string> = {
   "The Energy of All": "La energía de todos",
   "A one-of-one creation for Kevin Schade": "Una creación única para Kevin Schade",
   "JL + 14 mm Cuban": "JL + cubana de 14 mm",
+  // The Private Atelier on the site (27/11/2026): its section in The Bespoke Journey, « Beyond the Creation ».
+  "THE PRIVATE ATELIER": "THE PRIVATE ATELIER",
+  "Your vision. Your creation. Every step of the journey.": "Su visión. Su creación. Cada etapa del camino.",
+  "Every BERETE creation is personal. We believe the experience of bringing it to life should be just as extraordinary.": "Cada creación BERETE es personal. Creemos que la experiencia de darle vida debe ser igual de extraordinaria.",
+  "Through our exclusive Private Atelier, clients will be able to explore their jewellery in 3D, discover different material combinations, approve their final design and quotation, and securely confirm their commission online.": "A través de nuestro exclusivo Private Atelier, los clientes podrán descubrir su joya en 3D, explorar distintas combinaciones de materiales, aprobar su diseño final y su presupuesto, y confirmar su encargo en línea con total seguridad.",
+  "As their creation comes to life, they can follow its progress through our workshops, receiving personal updates, exclusive photographs and behind-the-scenes moments.": "A medida que su creación cobra vida, pueden seguir su avance en nuestros talleres, con noticias personales, fotografías exclusivas y momentos entre bastidores.",
+  "An experience as personal as the creation itself.": "Una experiencia tan personal como la propia creación.",
+  "Inspiration": "Inspiración",
+  "Explore your first ideas with our AI Creation Studio.": "Explore sus primeras ideas con nuestro AI Creation Studio.",
+  "Professional 3D design": "Diseño 3D profesional",
+  "Your piece designed by BERETE, to explore in 3D in your Private Atelier.": "Su pieza diseñada por BERETE, para descubrir en 3D en su Private Atelier.",
+  "Validation": "Validación",
+  "Approve your final design and your quotation.": "Apruebe su diseño final y su presupuesto.",
+  "Secure payment": "Pago seguro",
+  "Confirm your commission online.": "Confirme su encargo en línea.",
+  "Follow-up": "Seguimiento",
+  "Follow every step of the making, with photographs and films from our workshops.": "Siga cada etapa de la fabricación, con fotografías y películas de nuestros talleres.",
+  "BEYOND THE CREATION": "MÁS ALLÁ DE LA CREACIÓN",
+  "An exclusive journey into the making of your jewellery.": "Un recorrido exclusivo por la fabricación de su joya.",
+  // (end of The Private Atelier on the site)
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

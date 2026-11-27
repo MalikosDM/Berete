@@ -14,11 +14,13 @@ import { yoni } from "@/data/sources";
 import { SPECIAL_PROJECT } from "@/data/pieces";
 import { publishedPress } from "@/data/press";
 import type { Piece } from "@/data/types";
-import { Link, useI18n, useLocale } from "@/i18n";
+import { Link, useContentText, useI18n, useLocale } from "@/i18n";
 import { useCatalogue } from "@/lib/catalogue";
 import { getLenis } from "@/lib/gsap";
 import { homeText, useHomeTexts } from "@/lib/homeTexts";
 import { waLink } from "@/lib/site";
+import { useAtelierPublic } from "@/lib/atelierPublic";
+import { BEYOND_CREATION, PRIVATE_ATELIER } from "@/data/yoni2711";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /*
@@ -340,6 +342,27 @@ function PressBand() {
   );
 }
 
+/**
+ * « Beyond the Creation » (Yoni, 27/11/2026): a discreet introduction to The Private Atelier, the way to its section of The
+ * Bespoke Journey. Shown with the server, when Berete leaves the texts of the site on.
+ */
+function Beyond() {
+  const tc = useContentText();
+  const pub = useAtelierPublic();
+  if (!pub.server || !pub.siteTexts) return null;
+  return (
+    <section aria-labelledby="home-beyond-title" data-home-beyond className="border-t border-white/10">
+      <div className="wrap flex flex-col items-center py-14 text-center lg:py-16">
+        <h2 id="home-beyond-title" className="title-caps tracking-[0.12em] t-sub text-white">{tc(BEYOND_CREATION.title)}</h2>
+        <p className="piece-lead mt-4 max-w-xl">{tc(BEYOND_CREATION.text)}</p>
+        <Link to="/process#private-atelier" data-cta data-home-beyond-link className="btn-secondary mt-6">
+          {tc(PRIVATE_ATELIER.title)} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
+        </Link>
+      </div>
+    </section>
+  );
+}
+
 /** The last section: the invitation to begin, as on every page (its two buttons). */
 function Begin() {
   const { t } = useI18n();
@@ -404,6 +427,7 @@ export default function Home() {
       ))}
       <Selection />
       <PressBand />
+      <Beyond />
       <Begin />
     </>
   );

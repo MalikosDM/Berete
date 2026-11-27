@@ -32,6 +32,8 @@ import { Detail3D } from "@/viewer";
 import Access from "@/pages/admin/Access";
 import HomeTexts from "@/pages/admin/HomeTexts";
 import Clients from "@/pages/admin/Clients";
+import PrivateAtelier from "./admin/atelier/PrivateAtelier";
+import StudioRequests from "./admin/StudioRequests";
 import Models3D from "@/pages/admin/Models3D";
 import { adminCall, btn, btnMain, iconBtn, inputCls, readyModels, type ModelSummary } from "@/pages/admin/ui";
 import { HAS_SERVER } from "@/lib/site";
@@ -44,7 +46,7 @@ import { HAS_SERVER } from "@/lib/site";
 
 type Rec = Record<string, unknown> & { id?: string };
 type Kind = "stories" | "people" | "pieces" | "boxes";
-type Tab = Kind | "access" | "messages" | "3d" | "clients" | "house" | "cutouts" | "home";
+type Tab = Kind | "access" | "messages" | "3d" | "clients" | "house" | "cutouts" | "home" | "atelier" | "studio";
 
 type Field =
   | { key: string; label: string; type: "text" | "textarea" | "number" | "checkbox" | "slugs" }
@@ -164,6 +166,8 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "access", label: "Accès au site" },
   { key: "pieces", label: KINDS.pieces.label },
   { key: "3d", label: "Modèles 3D" },
+  // The Private Atelier (27/11/2026): the commissions of the clients, end to end (src/pages/admin/atelier/).
+  { key: "atelier", label: "Private Atelier" },
   { key: "clients", label: "Clients VIP" },
   // « Stories » removed from the admin (Yoni, 25/11/2026): the stories are no longer shown on the site.
   { key: "people", label: KINDS.people.label },
@@ -173,6 +177,8 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "home", label: "Textes de l'accueil" },
   { key: "house", label: "La Maison" },
   { key: "messages", label: "Messages" },
+  // The AI Creation Studio (Phase 2, 27/11/2026): its requests and its cost (src/pages/admin/StudioRequests.tsx).
+  { key: "studio", label: "AI Studio" },
 ];
 
 /* The open tab, kept for the visit (a reload stays on it). */
@@ -1572,7 +1578,7 @@ export default function Admin() {
                 Choisissez le mot de passe d'accès privé <ArrowRight className="size-4 shrink-0" aria-hidden="true" />
               </button>
             ) : null}
-            {tab === "access" ? <Access token={token} onExpired={logout} onState={setAccess} /> : tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "home" ? <HomeTexts token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
+            {tab === "access" ? <Access token={token} onExpired={logout} onState={setAccess} /> : tab === "messages" ? <Messages token={token} onExpired={logout} /> : tab === "house" ? <HouseTab token={token} onExpired={logout} /> : tab === "home" ? <HomeTexts token={token} onExpired={logout} /> : tab === "cutouts" ? <CutoutsTab token={token} onExpired={logout} /> : tab === "3d" ? <Models3D token={token} onExpired={logout} /> : tab === "clients" ? <Clients token={token} onExpired={logout} /> : tab === "atelier" ? <PrivateAtelier token={token} onExpired={logout} /> : tab === "studio" ? <StudioRequests token={token} onExpired={logout} /> : <Section key={tab} kind={tab} token={token} onExpired={logout} />}
           </>
         )}
       </main>

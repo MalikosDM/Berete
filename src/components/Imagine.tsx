@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { ArrowDown, Check, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
-import { useI18n } from "@/i18n";
+import { ArrowDown, ArrowRight, Check, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
+import { Link, useI18n } from "@/i18n";
 import { IMAGINE, type ImagineError } from "@/i18n/imagine";
 import { getLenis } from "@/lib/gsap";
 import { HAS_SERVER } from "@/lib/site";
@@ -37,11 +37,13 @@ function bringIntoView(el: HTMLElement | null): void {
  * first image of it (server/imagine.ts, OpenAI); « Contacter la maison pour finaliser » then puts the idea and the image
  * in the private correspondence below (`onFinalise`), which the visitor sends himself. Shown only when the server says
  * the service is on (GET /api/imagine/status): without the server (Vercel), without its key or when the server does not
- * answer, nothing at all.
+ * answer, nothing at all. Once the AI Creation Studio is open (GET /api/studio/status, Phase 2, 27/11/2026), a short invitation
+ * to the studio (/create) takes its place.
  */
 export default function Imagine({ onFinalise }: { onFinalise: (message: string, file: File) => void }) {
-  const { locale } = useI18n();
+  const { locale, t } = useI18n();
   const s = IMAGINE[locale];
+  const [studioOpen, setStudioOpen] = useState(false);
   const fieldId = useId();
   const countId = useId();
   const problemId = useId();
@@ -62,6 +64,10 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
     fetch("/api/imagine/status", { headers: { Accept: "application/json" }, signal: controller.signal })
       .then((res) => (res.ok ? (res.json() as Promise<unknown>) : null))
       .then((body) => setEnabled(typeof body === "object" && body !== null && (body as { enabled?: unknown }).enabled === true))
+      .catch(() => undefined);
+    fetch("/api/studio/status", { headers: { Accept: "application/json" }, signal: controller.signal })
+      .then((res) => (res.ok ? (res.json() as Promise<unknown>) : null))
+      .then((body) => setStudioOpen(typeof body === "object" && body !== null && (body as { open?: unknown }).open === true))
       .catch(() => undefined);
     return () => controller.abort();
   }, []);
@@ -137,6 +143,26 @@ export default function Imagine({ onFinalise }: { onFinalise: (message: string, 
     onFinalise(s.messageIntro + "\n\n" + proposal.idea, proposal.file);
     setAttached(true);
   };
+
+  if (studioOpen) {
+    return (
+      <section aria-labelledby="studio-teaser-title" data-studio-teaser className="bg-ink pb-12 lg:pb-16">
+        <div className="wrap">
+          <div className="max-w-3xl border border-white/15 p-6 sm:p-10">
+            <h2 id="studio-teaser-title" className="title-caps t-sub tracking-[0.12em] text-balance break-words">
+              {t.studio.teaserTitle}
+            </h2>
+            <p className="mt-4 text-base text-mist">{t.studio.teaserText}</p>
+            <Link to="/create" className="btn-primary mt-8">
+              <Sparkles className="size-5 shrink-0" aria-hidden="true" />
+              {t.studio.teaserCta}
+              <ArrowRight className="size-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!enabled) return null;
 

@@ -18,37 +18,37 @@ datasource db {
 /// { "fr": { "title": "..." }, "ar": {...} } (Translations, src/data/types.ts).
 
 model Story {
-  id         String   @id @default(cuid())
-  slug       String   @unique
-  title      String
-  cover      String   @default("")
-  media      Json     @default("[]")
-  people     String[] @default([])
-  pieceSlug  String?
-  articleUrl String?
-  translations Json   @default("{}")
-  seedHash   String?
-  sortOrder  Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  title        String
+  cover        String   @default("")
+  media        Json     @default("[]")
+  people       String[] @default([])
+  pieceSlug    String?
+  articleUrl   String?
+  translations Json     @default("{}")
+  seedHash     String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Person {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  name      String
-  kind      String   @default("player")
-  number    Int?
-  club      String?
-  portrait  String?
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  kind         String   @default("player")
+  number       Int?
+  club         String?
+  portrait     String?
   /// Instagram username, without the @.
-  instagram String?
-  bio       String   @default("")
-  translations Json   @default("{}")
-  seedHash  String?
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  instagram    String?
+  bio          String   @default("")
+  translations Json     @default("{}")
+  seedHash     String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Piece {
@@ -86,7 +86,7 @@ model Piece {
   angles       Json     @default("{}")
   /// Photos or videos of the steps of "How it was made" (Making, src/data/types.ts).
   making       Json     @default("{}")
-  translations Json   @default("{}")
+  translations Json     @default("{}")
   seedHash     String?
   sortOrder    Int      @default(0)
   createdAt    DateTime @default(now())
@@ -94,19 +94,19 @@ model Piece {
 }
 
 model Box {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  name        String
-  description String   @default("")
-  images      Json     @default("[]")
-  pieceSlug   String?
+  id           String   @id @default(cuid())
+  slug         String   @unique
+  name         String
+  description  String   @default("")
+  images       Json     @default("[]")
+  pieceSlug    String?
   /// Shown on the site (an unpublished box is kept for the admin, shown nowhere).
-  published   Boolean  @default(true)
-  translations Json   @default("{}")
-  seedHash    String?
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  published    Boolean  @default(true)
+  translations Json     @default("{}")
+  seedHash     String?
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 /// The personal photos of Yoni on the page The House, one per place ("portrait", "citation-1", "chapitre-03"...:
@@ -180,26 +180,27 @@ model CallbackRequest {
 /// stats: ModelStats, layers: LayerInfo[] (server/models/pipeline/index.ts).
 /// settings: ModelSettings (src/data/models.ts): role of each layer, metals, view.
 model Model3D {
-  id         String     @id @default(cuid())
+  id         String          @id @default(cuid())
   name       String
   sourceName String
   sourceKind String
-  status     String     @default("queued")
-  progress   Int        @default(0)
-  step       String     @default("")
+  status     String          @default("queued")
+  progress   Int             @default(0)
+  step       String          @default("")
   error      String?
-  sizes      Json       @default("{}")
-  stats      Json       @default("{}")
-  layers     Json       @default("[]")
-  settings   Json       @default("{}")
-  hasPoster  Boolean    @default(false)
+  sizes      Json            @default("{}")
+  stats      Json            @default("{}")
+  layers     Json            @default("[]")
+  settings   Json            @default("{}")
+  hasPoster  Boolean         @default(false)
   /// The piece whose page shows this model ("Explore in 3D").
   pieceSlug  String?
   links      ViewLink[]
   clients    ClientModel[]
   shares     SealedShare[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  versions   DesignVersion[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 }
 
 /// A private link sent to a client instead of a link to another viewer: /view/<token>.
@@ -252,22 +253,37 @@ model LayerMemory {
 /// of the atelier. He enters with his personal link (/vip/<token>) or with his
 /// access code; the code is kept only as a keyed fingerprint (codeKey).
 model Client {
-  id          String             @id @default(cuid())
-  name        String
-  email       String?
-  phone       String?
-  token       String             @unique
-  codeKey     String             @unique
-  lastSeenAt  DateTime?
+  id            String             @id @default(cuid())
+  name          String
+  email         String?
+  phone         String?
+  token         String             @unique
+  codeKey       String             @unique
+  lastSeenAt    DateTime?
   /// The step of his piece among the six of "The Bespoke Journey" (0 The Private Consultation … 5 Final Payment &
   /// Presentation); 6: every step done, the piece handed over.
-  stage       Int                @default(0)
+  stage         Int                @default(0)
   /// The day his piece should be finished (a day, no time), null while not said.
-  estimatedAt DateTime?          @db.Date
-  models      ClientModel[]
-  dateChanges ClientDateChange[]
-  updates     ClientUpdate[]
-  createdAt   DateTime           @default(now())
+  estimatedAt   DateTime?          @db.Date
+  models        ClientModel[]
+  dateChanges   ClientDateChange[]
+  updates       ClientUpdate[]
+  createdAt     DateTime           @default(now())
+  /// The Private Atelier (27/11/2026): his access created from his invitation (the e-mail he signs in with, lower case; his
+  /// password as a fingerprint), his second factor ("" none, "email" a code by e-mail, "totp" an authenticator app, its secret
+  /// sealed with the secret of the server), his access open or cut by Berete.
+  loginEmail    String?            @unique
+  passwordHash  String?
+  activatedAt   DateTime?
+  twoFactor     String             @default("")
+  totpSecret    String?
+  totpPending   String?
+  totpLastStep  Int?
+  accessEnabled Boolean            @default(true)
+  invites       ClientInvite[]
+  sessions      ClientSession[]
+  codes         ClientCode[]
+  projects      Project[]
 }
 
 /// Each change of the estimated date of a client (the old date, the new one, when): the client sees the last one.
@@ -292,8 +308,13 @@ model ClientUpdate {
   date      DateTime           @db.Date
   files     ClientUpdateFile[]
   createdAt DateTime           @default(now())
+  /// The journal of a project of The Private Atelier (27/11/2026): its project, and a draft until Berete publishes it.
+  projectId String?
+  project   Project?           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  draft     Boolean            @default(false)
 
   @@index([clientId])
+  @@index([projectId])
 }
 
 /// A photo or a video of a news. The file lives in the storage (server/models/storage.ts, clientFiles):
@@ -332,4 +353,367 @@ model ClientModel {
 model ServerSetting {
   key   String @id
   value String
+}
+
+/**
+ * ---------- The Private Atelier (Yoni, 27/11/2026): the client's private space for real commissions ----------
+ */
+
+/// An invitation sent by Berete from the admin: a link used once, that expires (7 days by default). Only the fingerprint of
+/// its token is kept (the token is in the e-mail and nowhere else).
+model ClientInvite {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tokenKey  String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([clientId])
+}
+
+/// A session of a client on a device (revocable from the admin or by the client): the cookie carries its id, signed.
+model ClientSession {
+  id         String    @id @default(cuid())
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  ip         String    @default("")
+  userAgent  String    @default("")
+  createdAt  DateTime  @default(now())
+  lastSeenAt DateTime  @default(now())
+  expiresAt  DateTime
+  revokedAt  DateTime?
+
+  @@index([clientId])
+}
+
+/// A one-time code or link sent by e-mail: the second factor of a sign-in ("2fa"), a sign-in link ("magic"). Kept as a keyed
+/// fingerprint; 5 tries at most; 10 minutes (codes) or 15 minutes (links).
+model ClientCode {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  purpose   String
+  codeKey   String    @unique
+  attempts  Int       @default(0)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([clientId])
+}
+
+/// The log of the sign-ins: who (or which e-mail), what (signin, signin-failed, code-failed, signout, invite-used, magic,
+/// session-revoked, access-cut…), from where.
+model ClientLogin {
+  id        String   @id @default(cuid())
+  clientId  String?
+  email     String   @default("")
+  event     String
+  ip        String   @default("")
+  userAgent String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+  @@index([createdAt])
+}
+
+/// A commission of a client: its design versions, its quotations, its payments, its making, its journal, its messages.
+model Project {
+  id              String           @id @default(cuid())
+  clientId        String
+  client          Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title           String
+  /// The currency of the project: "EUR" (Yoni's quotations), a field for later.
+  currency        String           @default("EUR")
+  /// The professional design fee already paid at the start (1 000 € by default), deducted from the final price; its day and
+  /// its means (written by Berete).
+  designFeeCents  Int              @default(100000)
+  designFeePaidAt DateTime?        @db.Date
+  designFeeMethod String           @default("")
+  /// The metals and stones Berete allows the client to preview on his design (keys of METALS / stone colours).
+  allowedMetals   Json             @default("[]")
+  allowedStones   Json             @default("[]")
+  /// The step of its making among the ten of the journey (0 Design Approved … 9 Delivered); -1 before the order.
+  step            Int              @default(-1)
+  /// The estimated delivery: a day or a window, shown only when Berete writes it.
+  deliveryFrom    DateTime?        @db.Date
+  deliveryTo      DateTime?        @db.Date
+  /// Berete accepted the order (then the making may start once the funds are confirmed).
+  orderAcceptedAt DateTime?
+  productionAt    DateTime?
+  archivedAt      DateTime?
+  versions        DesignVersion[]
+  changeRequests  ChangeRequest[]
+  approvals       DesignApproval[]
+  quotes          Quote[]
+  payments        Payment[]
+  steps           ProjectStep[]
+  messages        ProjectMessage[]
+  events          ProjectEvent[]
+  updates         ClientUpdate[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([clientId])
+}
+
+/// A version of the 3D design: « Design v3 — 12 Dec 2026 », with what changed; a draft until Berete publishes it.
+model DesignVersion {
+  id          String           @id @default(cuid())
+  projectId   String
+  project     Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  number      Int
+  modelId     String?
+  model       Model3D?         @relation(fields: [modelId], references: [id], onDelete: SetNull)
+  changes     String           @default("")
+  publishedAt DateTime?
+  approvals   DesignApproval[]
+  requests    ChangeRequest[]
+  createdAt   DateTime         @default(now())
+
+  @@unique([projectId, number])
+}
+
+/// A change asked by the client on a version: his words and, if he placed it, a point on the 3D (x, y, z of the model).
+model ChangeRequest {
+  id        String        @id @default(cuid())
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versionId String
+  version   DesignVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  comment   String
+  point     Json?
+  createdAt DateTime      @default(now())
+
+  @@index([projectId])
+}
+
+/// The client approved a version as his final design: when, from which account, address and device.
+model DesignApproval {
+  id        String        @id @default(cuid())
+  projectId String
+  project   Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versionId String
+  version   DesignVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  clientId  String
+  email     String        @default("")
+  ip        String        @default("")
+  userAgent String        @default("")
+  createdAt DateTime      @default(now())
+
+  @@index([projectId])
+}
+
+/// A quotation: the version it prices, the materials agreed, the price and its fees, the lead time, the schedule, Berete's
+/// commercial terms as they were when sent. Draft → sent (frozen as a PDF and its SHA-256) → accepted, or superseded by a newer one.
+model Quote {
+  id            String    @id @default(cuid())
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  number        Int
+  versionId     String?
+  status        String    @default("draft")
+  materials     String    @default("")
+  priceCents    Int       @default(0)
+  feesCents     Int       @default(0)
+  feesLabel     String    @default("")
+  leadTime      String    @default("")
+  schedule      String    @default("")
+  terms         String    @default("")
+  pdfSha256     String?
+  sentAt        DateTime?
+  acceptedAt    DateTime?
+  acceptedEmail String    @default("")
+  acceptedIp    String    @default("")
+  acceptedUa    String    @default("")
+  supersededAt  DateTime?
+  payments      Payment[]
+  createdAt     DateTime  @default(now())
+
+  @@unique([projectId, number])
+}
+
+/// A payment of a project, by Stripe (hosted page): its share (deposit = 50 %, full = everything left, balance = the rest), the
+/// amount computed by the server, its state, confirmed only by the signed notification of Stripe; its receipt (PDF).
+model Payment {
+  id            String    @id @default(cuid())
+  projectId     String
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  quoteId       String
+  quote         Quote     @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  kind          String
+  amountCents   Int
+  currency      String    @default("EUR")
+  status        String    @default("pending")
+  stripeSession String?   @unique
+  stripeIntent  String?
+  method        String    @default("")
+  paidAt        DateTime?
+  receiptNumber String?   @unique
+  receiptSha256 String?
+  createdAt     DateTime  @default(now())
+
+  @@index([projectId])
+}
+
+/// Each notification of Stripe processed once (its id), whatever the number of times it comes.
+model StripeEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
+}
+
+/// A step of the making (0 Design Approved … 9 Delivered): its state and its last update.
+model ProjectStep {
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  step      Int
+  state     String   @default("pending")
+  note      String   @default("")
+  updatedAt DateTime @updatedAt
+
+  @@id([projectId, step])
+}
+
+/// A message of a project, from the client or from Berete, with its attachments (photos, PDF).
+model ProjectMessage {
+  id        String               @id @default(cuid())
+  projectId String
+  project   Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  author    String
+  body      String               @default("")
+  readAt    DateTime?
+  files     ProjectMessageFile[]
+  createdAt DateTime             @default(now())
+
+  @@index([projectId])
+}
+
+model ProjectMessageFile {
+  id        String         @id @default(cuid())
+  messageId String
+  message   ProjectMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  kind      String
+  mime      String
+  ext       String
+  name      String
+  size      Int
+  createdAt DateTime       @default(now())
+
+  @@index([messageId])
+}
+
+/// The decisions and the history of a project (design approved, quotation sent / accepted / superseded, payment confirmed,
+/// order accepted, step reached…), shown in its messages at their date; and the log of who did what (actor).
+model ProjectEvent {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  kind      String
+  actor     String
+  data      Json     @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+}
+
+/// Who did what in the admin and in the client spaces, and when (the journal of Berete).
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String
+  action    String
+  target    String   @default("")
+  data      Json     @default("{}")
+  ip        String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/// The e-mails the site sends (invitations, codes, notifications, receipts): kept when there is no mailbox (development:
+/// the e-mail is "caught" here), and as a trace once sent.
+model OutboxEmail {
+  id        String    @id @default(cuid())
+  to        String
+  subject   String
+  text      String
+  kind      String    @default("")
+  sentAt    DateTime?
+  error     String?
+  createdAt DateTime  @default(now())
+
+  @@index([createdAt])
+}
+
+/**
+ * ---------- The AI Creation Studio (Phase 2, 27/11/2026): « Create your own piece » ----------
+ */
+
+/// A studio of a visitor, without an account: reached again by its private link (only the fingerprint of its token is kept)
+/// or sent by e-mail. Its concepts, the references he gave, his requests to Berete.
+model AiStudio {
+  id         String        @id @default(cuid())
+  tokenKey   String        @unique
+  email      String?
+  concepts   AiConcept[]
+  references AiReference[]
+  requests   AiRequest[]
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+/// A concept made by the AI (an inspiration, never a piece of Berete): its words, its variation, kept or not, its cost.
+model AiConcept {
+  id         String   @id @default(cuid())
+  studioId   String
+  studio     AiStudio @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  prompt     String
+  variant    String   @default("")
+  ext        String   @default("jpg")
+  kept       Boolean  @default(false)
+  costCents  Int      @default(0)
+  model      String   @default("")
+  visitorKey String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([studioId])
+  @@index([createdAt])
+  @@index([visitorKey, createdAt])
+}
+
+/// A photo of inspiration given by the visitor.
+model AiReference {
+  id        String   @id @default(cuid())
+  studioId  String
+  studio    AiStudio @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  name      String
+  mime      String
+  ext       String
+  size      Int
+  createdAt DateTime @default(now())
+
+  @@index([studioId])
+}
+
+/// A request of consultation sent from the studio, with its concepts and references: it may become a client and his project
+/// in one click (clientId, projectId).
+model AiRequest {
+  id           String   @id @default(cuid())
+  studioId     String
+  studio       AiStudio @relation(fields: [studioId], references: [id], onDelete: Cascade)
+  name         String
+  email        String
+  phone        String   @default("")
+  message      String   @default("")
+  conceptIds   Json     @default("[]")
+  referenceIds Json     @default("[]")
+  status       String   @default("new")
+  clientId     String?
+  projectId    String?
+  language     String   @default("en")
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
 }

@@ -35,7 +35,9 @@ test("every film from its original: 1080p on a computer, a light copy on a phone
       // Web compression: a computer at most 4.5 Mbit/s (+ its sound); a phone 1.2 (a making-of) or 1.5 (the finished piece).
       expect(rate(film.src, film.duration), id + " computer").toBeLessThan(4.9);
       expect(rate(film.mobile, film.duration), id + " phone").toBeLessThan(kind === "reveal" ? 1.75 : 1.4);
-      expect(film.posters.length, id).toBe(6);
+      // Six images taken from the film; a seventh chosen by eye when the first ones are dark (27/11/2026, scripts/film-posters.mjs).
+      expect(film.posters.length, id).toBeGreaterThanOrEqual(6);
+      expect(film.posters.length, id).toBeLessThanOrEqual(7);
     }
   }
   // Only web copies (H.264 MP4, WebP images): an original (ProRes .mov) never goes in the site nor in Git.
@@ -88,6 +90,9 @@ for (const slug of CAPSULES) {
       if (isHd(slug, "reveal")) expect(state.short).toBe(phone ? 720 : 1080);
       await page.waitForTimeout(500);
       await shot(page, name + "-1-film");
+    } else if (slug === "campione-d-italia-2023-2024") {
+      // The Inter ring: the final film of Yoni since 26/11/2026 (src/data/yoniMedia.ts), never its 3D render of before.
+      await expect(page.locator("[data-feature-video]").first()).toHaveAttribute("poster", /\/yoni-2711\/inter-film\//);
     } else await expect(page.locator("[data-feature-film]")).toHaveCount(0);
     // Down the whole page: no other film of the piece is asked for (its making-of lives in The Atelier).
     const height = await page.evaluate(() => document.documentElement.scrollHeight);

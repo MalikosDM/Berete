@@ -170,6 +170,58 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « The Private Atelier » (cahier des charges de Yoni du 27/11, partie B) — état au 27/11/2026
+- **Serveur** (`server/atelier/`, `server/routes/atelier-client.ts`, `server/routes/atelier-admin.ts`, migration
+  `20261127180000_private_atelier`) : invitation à usage unique qui expire (7 jours, réglable), accès créé par le client (mot de
+  passe solide : 12 caractères, 2 sortes, jamais l'e-mail dedans), deuxième facteur (code par e-mail ou application TOTP, secret
+  scellé avec le secret du serveur), lien de connexion par e-mail, sessions en base révocables (client, admin ; toutes à la coupure de
+  l'accès), journal des connexions, limites d'essais. Projets : versions 3D (« Design v3 — 12 Dec 2026 », brouillon puis publiée,
+  figée), demandes de modification (commentaire + point 3D), validation (date, compte, IP, appareil), devis figé en PDF + SHA-256
+  à l'envoi (bloqué tant que les conditions commerciales de Yoni ne sont pas écrites dans l'admin ; un nouveau devis remplace
+  l'ancien, « superseded », et demande une nouvelle acceptation), paiement Stripe hébergé (montants calculés par le serveur :
+  acompte = 50 % du total moins les 1 000 € de design et ce qui est déjà payé ; « PAY 100% » = tout le reste ; solde ensuite),
+  confirmé UNIQUEMENT par le webhook signé, traité une fois (`StripeEvent`), reçu PDF + e-mail, équipe prévenue ; fabrication
+  autorisée seulement commande acceptée ET acompte reçu ; 10 étapes ; journal de l'atelier (les nouvelles du client, `projectId`,
+  brouillon/publié) ; messages avec pièces jointes (photos, PDF, vérifiées par leurs premiers octets) ; décisions dans le fil ;
+  notifications par e-mail sans rien de sensible (`OutboxEmail` : sans boîte e-mail, l'e-mail est gardé là, lisible dans l'admin) ;
+  fichiers par adresses signées qui expirent, liées au client qui les lit ; journal de qui a fait quoi (`AuditLog`).
+- **Porte du site en construction** : `/vip` sans session montre la connexion client (e-mail, mot de passe, code ; lien par e-mail ;
+  ancien code d'accès), `/vip/invite/<jeton>` et `/vip/signin/<jeton>` s'ouvrent seuls quand le jeton est valide,
+  `/vip/project/<id>` pour le client connecté ; `/api/stripe/webhook` ouvert (sa signature fait foi).
+- **Stripe** : `npm run vps -- set STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PUBLISHABLE_KEY` (valeurs tapées masquées) ;
+  webhook à déclarer : `https://beretejewellers.com/api/stripe/webhook` (checkout.session.completed, .async_payment_succeeded,
+  .async_payment_failed, .expired). Sans les trois clés : paiement caché, « Contact BERETE to confirm your commission ». Tests en
+  local avec un faux Stripe (`tests/support/fake-stripe.mjs`, `STRIPE_API_HOST`, refusé avec une clé live).
+- **Site** : section « THE PRIVATE ATELIER » de Yoni mot pour mot dans The Bespoke Journey (`/process#private-atelier`) + le parcours
+  en 5 étapes (l'IA et le paiement seulement quand leur interrupteur est allumé et qu'ils marchent), « BEYOND THE CREATION » sur
+  l'accueil, « Client Access » discret dans le menu et le pied de page ; interrupteurs dans l'admin (`/api/atelier/public`).
+- **Espace du client** (`src/pages/Vip.tsx`, `src/pages/atelier/`, `src/components/atelier/`, `src/lib/atelier.ts`, mots dans
+  `src/i18n/atelier/*.ts`, 6 langues) : connexion (e-mail, mot de passe, code ; lien par e-mail ; ancien code d'accès gardé), invitation
+  (mot de passe + proposition du 2e facteur, QR de l'application), tableau des commandes, sécurité (`/vip?tab=security` : 2e facteur,
+  mot de passe, appareils, connexions), page projet : Design (versions, 3D, métaux autorisés, comparer deux versions, demander une
+  modification avec un point posé sur la 3D, APPROVE FINAL DESIGN), Quotation (ACCEPT QUOTATION, PDF et empreinte, devis remplacés),
+  Payment (PAY 50% DEPOSIT / PAY 100% / solde, montants exacts, retour de Stripe), Making (10 étapes), Journal (loupe), Messages.
+- **Admin** « Private Atelier » (`src/pages/admin/atelier/`, en français) : tableau de bord, clients (invitation, couper / rendre l'accès,
+  appareils, connexions), projet (réglages, versions, devis, paiements, commande, fabrication, journal, messages, prévenir le client,
+  aperçu vu par le client, journal des actions), réglages (conditions commerciales de Yoni, interrupteurs, moyens de paiement, durée
+  des invitations, limites de l'AI Studio, clés et adresse du webhook, besoins de WhatsApp Business), e-mails envoyés.
+- **AI Creation Studio** (phase 2, `/create`, `server/routes/studio.ts`, `server/atelier/ai.ts`, `src/components/studio/`, admin
+  « AI Studio ») : l'idée, des photos d'inspiration, des concepts (autre interprétation, or jaune / blanc / rose, plus affirmé, plus fin,
+  plus géométrique, plus organique), favoris, lien privé (copie ou e-mail), envoi à Berete → la demande arrive dans l'admin et devient
+  un client et son projet en un clic. Message de Yoni affiché, chaque image marquée « AI concept · for inspiration ». Interrupteur éteint
+  par défaut ; limites par visiteur et par jour ; coût estimé suivi. Tests : `tests/studio.spec.ts` (faux OpenAI `tests/support/fake-openai.mjs`).
+- **Phase 3** : métaux autorisés par Berete sur la 3D du client faits ; les pierres ne peuvent pas encore être limitées par le visualiseur
+  (à faire), variantes supplémentaires du design = de nouvelles versions publiées par Berete.
+- Tests : `.local/scripts/atelier-smoke.mjs` (43 contrôles par l'API), `tests/private-atelier.spec.ts` (parcours complet avec le faux
+  Stripe, ordinateur et iPhone : réussi), `tests/private-atelier-online.spec.ts` (en ligne sans clés). Captures :
+  `~/Downloads/_verif-private-atelier/{client,admin,studio,parcours,en-ligne}/`.
+- [ ] **Malik** : créer le compte Stripe de la société de Yoni ; me donner les clés de TEST (pk_test, sk_test) pour un essai avec une
+  vraie carte de test ; puis les vraies clés avec `npm run vps -- set STRIPE_SECRET_KEY STRIPE_WEBHOOK_SECRET STRIPE_PUBLISHABLE_KEY` et
+  déclarer le webhook ; régler la boîte e-mail (`set SMTP_USER SMTP_PASS ALERT_TO`) : sans elle les e-mails restent dans l'admin.
+- [ ] **Yoni** : ses conditions commerciales et son échéancier (admin → Private Atelier → Réglages) ; dire si l'acompte se calcule bien
+  ainsi (50 % du prix total, les 1 000 € de design comptés dedans).
+
+
 ## Passe « retours de Yoni du 27/11 après-midi, partie A » (avant The Private Atelier) — état au 27/11/2026
 - [x] **La Vision toujours en 2e** sur chaque page de pièce : ouverture → The Vision Behind the Creation → Every Angle → le reste
       (`PAGE_ORDER` / `DEFAULT_ORDER` de `src/data/yoni2711.ts` ; OKA, maillot, T9 changés). Test sur toutes les pages publiées.

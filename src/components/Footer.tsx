@@ -98,7 +98,7 @@ export default function Footer() {
               {HAS_SERVER ? (
                 <li>
                   <Link to="/vip" className={linkCls} data-vip-link>
-                    {t.vip.footerLink}
+                    {t.privateAtelier.nav}
                   </Link>
                 </li>
               ) : null}

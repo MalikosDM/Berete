@@ -6,6 +6,8 @@
  */
 import { plural } from "../format";
 import { en as house } from "../house/en";
+import { en as privateAtelier } from "../atelier/en";
+import { en as studio } from "../studio/en";
 
 const n = (count: number, one: string, other: string) => plural("en", count, { one, other });
 
@@ -512,6 +514,10 @@ export const en = {
 
   /** The story of Yoni Berete, founder of the house (src/i18n/house/en.ts). */
   house,
+  /** The Private Atelier, the space of the clients (src/i18n/atelier). */
+  privateAtelier,
+  /** The AI Creation Studio (src/i18n/studio). */
+  studio,
 
   contact: {
     eyebrow: "Private Enquiries",

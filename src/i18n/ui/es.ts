@@ -5,6 +5,8 @@
 import { plural } from "../format";
 import type { Messages } from "./en";
 import { es as house } from "../house/es";
+import { es as privateAtelier } from "../atelier/es";
+import { es as studio } from "../studio/es";
 
 const n = (count: number, one: string, other: string) => plural("es-ES", count, { one, other });
 
@@ -486,6 +488,10 @@ export const es: Messages = {
   },
 
   house,
+  /** The Private Atelier, the space of the clients (src/i18n/atelier). */
+  privateAtelier,
+  /** The AI Creation Studio (src/i18n/studio). */
+  studio,
 
   contact: {
     eyebrow: "Contacto privado",

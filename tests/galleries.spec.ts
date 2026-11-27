@@ -123,7 +123,9 @@ for (const slug of PAGES) {
     expect(await tiles.count()).toBeLessThanOrEqual(angles.length);
     const more = page.locator("[data-angle-more]");
     if (await more.count()) await more.click();
-    await expect(tiles).toHaveCount(angles.length);
+    // (Since 27/11/2026 Every Angle may also show the photo of its opening or of its chain, chosen first: src/data/magazine.ts.)
+    await expect.poll(() => tiles.count()).toBeGreaterThanOrEqual(angles.length);
+    expect(await tiles.count()).toBeLessThanOrEqual(angles.length + 3);
     // Each photo loads as the visitor comes near it (its small copy), each film shows its image; each has its text.
     for (const tile of await tiles.all()) {
       await tile.scrollIntoViewIfNeeded();
@@ -146,7 +148,7 @@ for (const slug of PAGES) {
     await tiles.first().locator("button").click();
     const dialog = page.locator("[role=dialog][data-lenis-prevent]");
     await expect(dialog).toBeVisible();
-    await expect(dialog).toContainText(String(angles.length).padStart(2, "0"));
+    await expect(dialog).toContainText("/" + String(await tiles.count()).padStart(2, "0"));
     await page.keyboard.press("Escape");
     // Every film is a silent loop that plays only on screen.
     for (const v of await page.locator("[data-angle] video").all()) {

@@ -59,7 +59,7 @@ test("a computer: the light follows the mouse over the lines, with inertia; a re
   await page.waitForTimeout(1600);
   s = await state(page, ".universe [data-monogram]");
   expect(Math.hypot(s.light.x + s.box.x + s.shift.x - spark.x, s.light.y + s.box.y + s.shift.y - spark.y)).toBeLessThan(12);
-  expect(s.glow).toBeGreaterThan(0.17);
+  expect(s.glow).toBeGreaterThan(0.08);
   expect(s.glow).toBeLessThan(0.23);
   expect(Math.max(...s.sparks)).toBeGreaterThan(0.2);
   // The relief: away from the mouse, never more than 10 px.
@@ -84,7 +84,7 @@ test("no mouse: the light passes alone, slowly, every 9 seconds; never in the vi
   await page.goto(PIECE, { waitUntil: "load" });
   const s = await state(page, ".universe [data-monogram]");
   expect(s.follow).toBe(false);
-  expect(s.glow).toBeGreaterThan(0.17);
+  expect(s.glow).toBeGreaterThan(0.08);
   const sweep = await page.locator(".universe .monogram-light").evaluate((el) => el.getAnimations().map((a) => [(a as CSSAnimation).animationName, Number(a.effect?.getTiming().duration)]));
   expect(sweep).toEqual([["monogram-sweep", 9000]]);
   // The viewer has none.

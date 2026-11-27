@@ -17,6 +17,8 @@ test.beforeEach(async ({ page }) => {
 // The Atelier). Its new sections: tests/yoni2311.spec.ts.
 
 test("Inter ring: created exclusively for Inter Milan, a historic commission, Marcus Thuram linked, the details open their photos", async ({ page }, info) => {
+  // Superseded on 26/11/2026 by Yoni's definitive Inter page (its own words, the champions, its case): tests/contenus2711.spec.ts.
+  test.skip(true, "the Inter page of before 26/11/2026: tests/contenus2711.spec.ts");
   const problems = watch(page);
   await page.goto("/pieces/" + INTER, { waitUntil: "load" });
   await page.waitForTimeout(1500);

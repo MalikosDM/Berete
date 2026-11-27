@@ -6,8 +6,10 @@ import pages from "@/data/pages.generated.json" with { type: "json" };
 import stills from "@/data/mechanisms.generated.json" with { type: "json" };
 import { trunkPhotos } from "@/data/trunks";
 import type { MediaItem } from "@/data/types";
-import { Link, useI18n, type Messages } from "@/i18n";
+import { Link, useContentText, useI18n, type Messages } from "@/i18n";
 import { HAS_SERVER, waLink } from "@/lib/site";
+import { useAtelierPublic } from "@/lib/atelierPublic";
+import { PRIVATE_ATELIER, PRIVATE_JOURNEY } from "@/data/yoni2711";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 /* The words of each step are in src/i18n (process.steps), with what is paid by then. */
@@ -68,6 +70,7 @@ export default function Process() {
       </section>
       <Timeline steps={stepsOf(t)} />
       <Questions />
+      <PrivateAtelier />
       <Closing />
     </>
   );
@@ -172,6 +175,54 @@ function Questions() {
             </dd>
           </div>
         </dl>
+      </div>
+    </section>
+  );
+}
+
+/**
+ * The Private Atelier (Yoni, 27/11/2026, his words): the private space where a client follows his commission, then the whole
+ * journey in short, each step only when it really works (its switch in the admin). Hidden without the server, or when Berete
+ * switches the texts off.
+ */
+function PrivateAtelier() {
+  const { t } = useI18n();
+  const tc = useContentText();
+  const pub = useAtelierPublic();
+  if (!pub.server || !pub.siteTexts) return null;
+  const steps = PRIVATE_JOURNEY.filter((j) => !j.when || pub[j.when]);
+  return (
+    <section id="private-atelier" aria-labelledby="private-atelier-title" data-private-atelier className="scroll-mt-28 border-t border-white/10 bg-ink">
+      <div className="wrap py-16 lg:py-20">
+        <div className="mx-auto max-w-[760px]">
+          <h2 id="private-atelier-title" className="title-caps tracking-[0.12em] t-title text-white">{tc(PRIVATE_ATELIER.title)}</h2>
+          <p data-private-atelier-lead className="piece-lead mt-5">{tc(PRIVATE_ATELIER.lead)}</p>
+          {PRIVATE_ATELIER.paragraphs.map((p) => (
+            <p key={p} data-private-atelier-text className="piece-text mt-5">{tc(p)}</p>
+          ))}
+          <p data-private-atelier-closing className="piece-lead mt-8">{tc(PRIVATE_ATELIER.closing)}</p>
+          <ol data-private-journey className="mt-10 grid gap-px border border-white/10 bg-white/10 sm:grid-cols-2">
+            {steps.map((j, i) => (
+              <li key={j.key} data-private-step={j.key} className={"bg-ink p-5" + (steps.length % 2 === 1 && i === steps.length - 1 ? " sm:col-span-2" : "")}>
+                <p className="flex items-baseline gap-3">
+                  <span aria-hidden="true" className="font-display text-rose-light">{pad(i + 1)}</span>
+                  <span className="title-caps t-sub tracking-[0.1em] text-white">{tc(j.title)}</span>
+                </p>
+                <p className="mt-2 text-base leading-relaxed text-bone">{tc(j.text)}</p>
+                {j.key === "inspiration" ? (
+                  <Link to="/create" data-private-studio-link className="btn-secondary mt-3">
+                    {t.studio.title} <span aria-hidden="true">→</span>
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+          {pub.clientAccess ? (
+            <Link to="/vip" data-cta data-private-atelier-access className="btn-secondary mt-8">
+              {t.privateAtelier.nav}
+            </Link>
+          ) : null}
+        </div>
       </div>
     </section>
   );

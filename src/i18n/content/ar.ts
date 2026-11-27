@@ -1040,6 +1040,26 @@ const content: Record<string, string> = {
   "The Energy of All": "طاقة الجميع",
   "A one-of-one creation for Kevin Schade": "إبداع فريد لكيفن شاده",
   "JL + 14 mm Cuban": "JL + سلسلة كوبية 14 مم",
+  // The Private Atelier on the site (27/11/2026): its section in The Bespoke Journey, « Beyond the Creation ».
+  "THE PRIVATE ATELIER": "THE PRIVATE ATELIER",
+  "Your vision. Your creation. Every step of the journey.": "رؤيتك. إبداعك. كل خطوة في الرحلة.",
+  "Every BERETE creation is personal. We believe the experience of bringing it to life should be just as extraordinary.": "كل إبداع من BERETE شخصي. ونؤمن بأن تجربة ولادته يجب أن تكون استثنائية بالقدر نفسه.",
+  "Through our exclusive Private Atelier, clients will be able to explore their jewellery in 3D, discover different material combinations, approve their final design and quotation, and securely confirm their commission online.": "من خلال Private Atelier الحصري، سيتمكن عملاؤنا من استكشاف مجوهراتهم بتقنية ثلاثية الأبعاد، واكتشاف تركيبات مختلفة من المواد، والموافقة على تصميمهم النهائي وعرض السعر، وتأكيد طلبهم عبر الإنترنت بأمان.",
+  "As their creation comes to life, they can follow its progress through our workshops, receiving personal updates, exclusive photographs and behind-the-scenes moments.": "وبينما يكتسب إبداعهم الحياة، يمكنهم متابعة تقدّمه في ورشنا، مع أخبار شخصية وصور حصرية ولحظات من وراء الكواليس.",
+  "An experience as personal as the creation itself.": "تجربة شخصية بقدر الإبداع نفسه.",
+  "Inspiration": "الإلهام",
+  "Explore your first ideas with our AI Creation Studio.": "استكشف أفكارك الأولى مع AI Creation Studio.",
+  "Professional 3D design": "تصميم احترافي ثلاثي الأبعاد",
+  "Your piece designed by BERETE, to explore in 3D in your Private Atelier.": "قطعتك بتصميم BERETE، لتكتشفها بتقنية ثلاثية الأبعاد في Private Atelier الخاص بك.",
+  "Validation": "الموافقة",
+  "Approve your final design and your quotation.": "وافق على تصميمك النهائي وعرض السعر.",
+  "Secure payment": "دفع آمن",
+  "Confirm your commission online.": "أكّد طلبك عبر الإنترنت.",
+  "Follow-up": "المتابعة",
+  "Follow every step of the making, with photographs and films from our workshops.": "تابع كل مرحلة من مراحل الصنع، مع صور وأفلام من ورشنا.",
+  "BEYOND THE CREATION": "ما وراء الإبداع",
+  "An exclusive journey into the making of your jewellery.": "رحلة حصرية إلى قلب صناعة مجوهراتك.",
+  // (end of The Private Atelier on the site)
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

@@ -1034,6 +1034,26 @@ const content: Record<string, string> = {
   "The Energy of All": "De energie van allen",
   "A one-of-one creation for Kevin Schade": "Een unieke creatie voor Kevin Schade",
   "JL + 14 mm Cuban": "JL + 14 mm Cuban",
+  // The Private Atelier on the site (27/11/2026): its section in The Bespoke Journey, « Beyond the Creation ».
+  "THE PRIVATE ATELIER": "THE PRIVATE ATELIER",
+  "Your vision. Your creation. Every step of the journey.": "Uw visie. Uw creatie. Elke stap van de reis.",
+  "Every BERETE creation is personal. We believe the experience of bringing it to life should be just as extraordinary.": "Elke BERETE-creatie is persoonlijk. Wij vinden dat de ervaring van haar ontstaan even buitengewoon moet zijn.",
+  "Through our exclusive Private Atelier, clients will be able to explore their jewellery in 3D, discover different material combinations, approve their final design and quotation, and securely confirm their commission online.": "Via ons exclusieve Private Atelier kunnen klanten hun juweel in 3D ontdekken, verschillende materiaalcombinaties verkennen, hun definitieve ontwerp en offerte goedkeuren en hun opdracht veilig online bevestigen.",
+  "As their creation comes to life, they can follow its progress through our workshops, receiving personal updates, exclusive photographs and behind-the-scenes moments.": "Terwijl hun creatie tot leven komt, volgen zij de voortgang in onze ateliers, met persoonlijke berichten, exclusieve foto's en momenten achter de schermen.",
+  "An experience as personal as the creation itself.": "Een ervaring even persoonlijk als de creatie zelf.",
+  "Inspiration": "Inspiratie",
+  "Explore your first ideas with our AI Creation Studio.": "Verken uw eerste ideeën met onze AI Creation Studio.",
+  "Professional 3D design": "Professioneel 3D-ontwerp",
+  "Your piece designed by BERETE, to explore in 3D in your Private Atelier.": "Uw stuk ontworpen door BERETE, in 3D te ontdekken in uw Private Atelier.",
+  "Validation": "Goedkeuring",
+  "Approve your final design and your quotation.": "Keur uw definitieve ontwerp en uw offerte goed.",
+  "Secure payment": "Veilige betaling",
+  "Confirm your commission online.": "Bevestig uw opdracht online.",
+  "Follow-up": "Opvolging",
+  "Follow every step of the making, with photographs and films from our workshops.": "Volg elke stap van de vervaardiging, met foto's en films uit onze ateliers.",
+  "BEYOND THE CREATION": "VOORBIJ DE CREATIE",
+  "An exclusive journey into the making of your jewellery.": "Een exclusieve reis door de vervaardiging van uw juweel.",
+  // (end of The Private Atelier on the site)
 };
 
 // The texts of the photos of "Every Angle" (src/data/angles.ts), in their own file.

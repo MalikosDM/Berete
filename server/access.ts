@@ -32,6 +32,8 @@ import { prisma } from "./db.js";
 import { doorLang, doorPage, type DoorMessage, type DoorMode } from "./door.js";
 import { shareExists } from "./routes/shares.js";
 import { sessionClient } from "./routes/vip.js";
+import { currentClient } from "./atelier/auth.js";
+import { keyOf } from "./atelier/crypto.js";
 import { serverSecret } from "./secret.js";
 import { EMBED_PAGE, limiter, LOCAL, visitor } from "./security.js";
 
@@ -103,7 +105,12 @@ function sendPrivateShell(req: Request, res: Response, shell: string, pass: (req
  * The API open to everyone: the checks, the private access, the admin, the client space, the 3D links (signed files), a
  * sealed share link (what its page needs to decrypt, and the ciphertext).
  */
-const OPEN_API = /^\/api\/(?:health$|access$|admin\/|vip\/|view\/|s\/[A-Za-z0-9_-]+(?:\/blob)?$|models\/[A-Za-z0-9_-]+\/files\/)/;
+const OPEN_API = /^\/api\/(?:health$|access$|admin\/|vip\/|view\/|s\/[A-Za-z0-9_-]+(?:\/blob)?$|models\/[A-Za-z0-9_-]+\/files\/|stripe\/webhook$)/;
+/**
+ * The pages of The Private Atelier (27/11/2026): an invitation and a sign-in link (their token valid), a project (the client
+ * signed in), alone like the client space.
+ */
+const CLIENT_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?vip\/(invite|signin|project)\/([A-Za-z0-9_-]+)\/?$/;
 /** The private pages, in every language: a 3D link, a sealed share link, the client space (with his link, or once entered). */
 const PRIVATE_PAGE = /^\/(?:(?:fr|es|de|nl|ar)\/)?(view|vip|s)(?:\/([A-Za-z0-9_-]+))?\/?$/;
 /**
@@ -139,6 +146,22 @@ function sendDoor(req: Request, res: Response, mode: DoorMode, status: number, m
     return;
   }
   res.end(doorPage({ lang: doorLang(req.headers["accept-language"]), mode, message, next: next ?? safeNext(req.originalUrl), origin: originOf(req) }));
+}
+
+/** An invitation not used and not expired, a sign-in link not used, or a project of the client signed in. */
+async function validClientPage(req: Request, kind: string, token: string): Promise<boolean> {
+  if (kind === "project") {
+    const c = await currentClient(req);
+    if (!c || !/^[a-z0-9]{10,40}$/i.test(token)) return false;
+    return (await prisma.project.findFirst({ where: { id: token, clientId: c.clientId }, select: { id: true } })) !== null;
+  }
+  if (!/^[A-Za-z0-9_-]{30,80}$/.test(token)) return false;
+  if (kind === "invite") {
+    const inv = await prisma.clientInvite.findUnique({ where: { tokenKey: keyOf("invite", token) }, select: { usedAt: true, expiresAt: true } });
+    return inv !== null && !inv.usedAt && inv.expiresAt.getTime() > Date.now();
+  }
+  const code = await prisma.clientCode.findUnique({ where: { codeKey: keyOf("magic", token) }, select: { usedAt: true, expiresAt: true } });
+  return code !== null && !code.usedAt && code.expiresAt.getTime() > Date.now();
 }
 
 async function validPrivateToken(kind: string, token: string): Promise<boolean> {
@@ -192,10 +215,17 @@ export function gate(dist: string): RequestHandler {
     if (hasAccess(req)) return next();
     if (req.method !== "GET" && req.method !== "HEAD") return sendDoor(req, res, "soon", 403);
     if (/^\/admin\/?$/.test(p)) return sendDoor(req, res, "admin", 200);
-    const page = PRIVATE_PAGE.exec(p);
+    const client = CLIENT_PAGE.exec(p);
+    const page = client ? ([p, "vip", ""] as const) : PRIVATE_PAGE.exec(p);
     if (page) {
       const [, kind = "", token = ""] = page;
-      const open = token ? validPrivateToken(kind, token) : Promise.resolve(kind === "vip" && sessionClient(req) !== null);
+      const open = client
+        ? validClientPage(req, client[1] ?? "", client[2] ?? "")
+        : token
+          ? validPrivateToken(kind, token)
+          : kind === "vip"
+            ? (async () => sessionClient(req) !== null || (await currentClient(req)) !== null)()
+            : Promise.resolve(false);
       void open.then(
         (ok) => {
           if (!ok) return sendDoor(req, res, kind === "vip" && !token ? "vip" : "soon", 200);

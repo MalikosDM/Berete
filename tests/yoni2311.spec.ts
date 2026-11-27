@@ -164,8 +164,8 @@ test("capsule: the piece at once, no film of a 3D render, the magnifying glass, 
   await expect(lb.locator("[data-zoom-out]")).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(lb).toHaveCount(0);
-  // No film section (its film was a 3D render), no "Watch the film".
-  await expect(page.locator("[data-feature-film]")).toHaveCount(0);
+  // Its film since 26/11/2026: the final film of Yoni (its 3D render of before never comes back), no "Watch the film".
+  await expect(page.locator("[data-feature-video]").first()).toHaveAttribute("poster", /\/yoni-2711\/inter-film\//);
   await expect(page.locator("[data-watch-film]")).toHaveCount(0);
   // Its press: the Daily Mail.
   await expect(page.locator('[data-piece-press] a[href*="dailymail.co.uk"]')).toHaveCount(1);
@@ -186,9 +186,11 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   expect(await page.locator(".universe").getAttribute("aria-hidden")).toBe("true");
   // Noah Okafor: two new worlds.
   await open(page, "/pieces/noah-okafor-jersey-pendant");
-  await expect.poll(backdrop).toContain("/media/universes/okafor-jersey-");
+  // (Its jersey in The Trophy Room since 27/11/2026, a universe drawn in code: tests/universes2711.spec.ts.)
+  await expect(page.locator(".universe")).toHaveAttribute("data-backdrop", "trophy-room");
   await expect(page.locator('[data-worn-with="the-safi-link"]')).toBeVisible();
-  await expect(page.locator("main")).toContainText("Oka4");
+  // (Yoni's own words since 26/11/2026: « OKA 4 ».)
+  await expect(page.locator("main")).toContainText("OKA 4");
   await open(page, "/pieces/the-safi-link");
   await expect(page.locator('[data-worn-with="noah-okafor-jersey-pendant"]')).toBeVisible();
   await open(page, "/pieces/noah-okafor-oka-pendant");
@@ -206,10 +208,11 @@ test("capsules: worlds, watermark, Ruby T all black, Dragon Ball, studio photos,
   await expect(page.locator("[data-showcase-view]").first()).toHaveAttribute("data-showcase-view", "p19");
   const first = await page.locator("[data-angle='1'] img").first().getAttribute("src");
   expect(first).not.toContain("p06");
-  if (phone) expect(await page.locator(".u-backdrop").first().evaluate((el) => getComputedStyle(el).translate)).toMatch(/^0px -\d/);
+  // (The blue Genkidama since 26/11/2026 is placed by its own drop above the piece: tests/retours2711b.spec.ts.)
   await page.screenshot({ path: shotPath(info, "yoni2311-dragonball") });
-  // The studio images: the cover and the first photo of JL, TM and the thorned T.
-  for (const slug of ["jamie-leweling-jl-pendant", "malik-tillman-tm-pendant", "marcus-thuram-thorned-t-pendant"]) {
+  // The studio image of JL (its real photos). (The images of TM and of the thorned T were AI images: removed on 27/11/2026,
+  // never an AI image shown as a piece.)
+  for (const slug of ["jamie-leweling-jl-pendant"]) {
     await open(page, "/pieces/" + slug);
     const src = await page.locator("[data-angle='1'] img").first().getAttribute("src");
     // (JL in its real professional photos since the second call of 23/11/2026: its front view.)

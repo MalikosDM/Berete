@@ -28,6 +28,9 @@ import { serverSecret } from "../secret.js";
 import { limiter } from "../security.js";
 import { publicModel } from "./models.js";
 import { requireAdmin } from "./site.js";
+import { event, notifyClient } from "../atelier/project.js";
+import { atelierFiles } from "../atelier/pdf.js";
+import { currentClient } from "../atelier/auth.js";
 
 export const vip = Router();
 
@@ -36,14 +39,14 @@ const SESSION_DAYS = 30;
 /** Letters and digits that cannot be confused (no 0/O, 1/I/L). */
 const ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
 
-function newCode(): string {
+export function newCode(): string {
   let code = "";
   for (let i = 0; i < 8; i++) code += ALPHABET[randomInt(ALPHABET.length)];
   return code.slice(0, 4) + "-" + code.slice(4);
 }
 
 /** The fingerprint kept in the base: the code itself is shown once, never stored. */
-function codeKey(code: string): string {
+export function codeKey(code: string): string {
   const clean = code.toUpperCase().replace(/[^0-9A-Z]/g, "");
   return createHmac("sha256", serverSecret()).update("vip-code:" + clean).digest("base64url");
 }
@@ -114,7 +117,8 @@ vip.get("/vip/me", async (req, res) => {
         where: { id },
         include: {
           models: { include: { model: true }, orderBy: { createdAt: "desc" } },
-          updates: { include: { files: { orderBy: { position: "asc" } } }, orderBy: [{ date: "desc" }, { createdAt: "desc" }] },
+          // The news of the older space (the journal of a project of The Private Atelier lives in its project; a draft never shows).
+          updates: { where: { draft: false, projectId: null }, include: { files: { orderBy: { position: "asc" } } }, orderBy: [{ date: "desc" }, { createdAt: "desc" }] },
           dateChanges: { orderBy: { createdAt: "desc" }, take: 1 },
         },
       })
@@ -181,12 +185,15 @@ function updateView(u: UpdateRow, admin: boolean) {
 
 vip.get("/vip/files/:id", async (req, res) => {
   const id = String(req.params.id);
-  const file = /^[a-z0-9]{10,40}$/i.test(id) ? await prisma.clientUpdateFile.findUnique({ where: { id }, include: { update: { select: { clientId: true } } } }) : null;
+  const file = /^[a-z0-9]{10,40}$/i.test(id) ? await prisma.clientUpdateFile.findUnique({ where: { id }, include: { update: { select: { clientId: true, draft: true } } } }) : null;
   const exp = Number(req.query.exp ?? -1);
   const sig = String(req.query.sig ?? "");
   const expected = Number.isInteger(exp) && exp > Date.now() / 1000 ? adminFileSig(id, exp) : "";
   const admin = expected !== "" && sig.length === expected.length && timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
-  const found = file && (admin || sessionClient(req) === file.update.clientId) ? clientFiles.file(file.update.clientId, file.id, file.ext) : null;
+  // His own file: the session of the older space, or his session of The Private Atelier (the journal of his project).
+  // (A page of the journal still a draft: the admin only.)
+  const mine = file && !file.update.draft ? sessionClient(req) === file.update.clientId || (await currentClient(req))?.clientId === file.update.clientId : false;
+  const found = file && (admin || mine) ? clientFiles.file(file.update.clientId, file.id, file.ext) : null;
   // Someone else's file, or none: the same answer (nothing says that it exists).
   if (!file || !found) {
     res.setHeader("Cache-Control", "no-store");
@@ -304,8 +311,11 @@ vip.post("/admin/clients/:id/code", requireAdmin, async (req, res) => {
 vip.delete("/admin/clients/:id", requireAdmin, async (req, res) => {
   const id = String(req.params.id);
   const done = await prisma.client.delete({ where: { id } }).catch(() => null);
-  // With the photos and videos of his news.
-  if (done) clientFiles.removeClient(id);
+  // With the photos and videos of his news, and the files of his projects (quotations, receipts, attachments).
+  if (done) {
+    clientFiles.removeClient(id);
+    atelierFiles.removeClient(id);
+  }
   res.json({ ok: true });
 });
 
@@ -324,7 +334,8 @@ async function trackingOf(id: string) {
     where: { id },
     include: {
       dateChanges: { orderBy: { createdAt: "desc" } },
-      updates: { include: { files: { orderBy: { position: "asc" } } }, orderBy: [{ date: "desc" }, { createdAt: "desc" }] },
+      // The news of the older space (the journal of a project lives in its project, src/pages/admin/atelier/).
+      updates: { where: { projectId: null }, include: { files: { orderBy: { position: "asc" } } }, orderBy: [{ date: "desc" }, { createdAt: "desc" }] },
     },
   });
   if (!c) return null;
@@ -461,6 +472,9 @@ vip.put("/admin/clients/:id/uploads/:uploadId", requireAdmin, express.raw({ type
 const UpdateIn = z.object({
   note: z.string().trim().max(2000).default(""),
   date: z.string().max(10).optional(),
+  /** The Private Atelier: the project whose journal it is, and a draft until Berete publishes it. */
+  projectId: z.string().max(40).nullable().optional(),
+  draft: z.boolean().optional(),
   files: z
     .array(
       z.object({
@@ -500,9 +514,17 @@ vip.post("/admin/clients/:id/updates", requireAdmin, async (req, res) => {
     }
     files.push({ uploadId: f.uploadId, name: f.name, size: f.size, width: f.width ?? null, height: f.height ?? null, ...type });
   }
+  const project = body.data.projectId ? await prisma.project.findFirst({ where: { id: body.data.projectId, clientId }, select: { id: true } }) : null;
+  if (body.data.projectId && !project) {
+    drop();
+    res.status(404).json({ error: "Projet introuvable." });
+    return;
+  }
   const update = await prisma.clientUpdate.create({
     data: {
       clientId,
+      projectId: project?.id ?? null,
+      draft: Boolean(project && body.data.draft),
       note: body.data.note,
       date,
       files: { create: files.map((f, position) => ({ position, kind: f.kind, mime: f.mime, ext: f.ext, name: f.name, size: f.size, width: f.width, height: f.height })) },
@@ -516,6 +538,11 @@ vip.post("/admin/clients/:id/updates", requireAdmin, async (req, res) => {
     update.files.forEach((row) => clientFiles.remove(clientId, row.id, row.ext));
     drop();
     throw error;
+  }
+  // A page of the journal of a project, published at once: the client is told.
+  if (project && !update.draft) {
+    await event(project.id, "journal", "admin", { updateId: update.id });
+    await notifyClient(project.id, "A new update from the workshop is waiting for you");
   }
   res.status(201).json(updateView(update, true));
 });

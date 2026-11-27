@@ -55,6 +55,10 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
       ALERT_TO: ${ALERT_TO:-}
       ALERT_FROM: ${ALERT_FROM:-}
+      # The payments of The Private Atelier (Stripe, server/atelier/stripe.ts): the payment stays hidden while one is missing.
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
       # A big 3D file (several hundred MB) is processed in its own process, with room enough.
       NODE_OPTIONS: --max-old-space-size=4096
     volumes:

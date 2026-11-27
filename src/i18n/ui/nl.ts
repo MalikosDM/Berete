@@ -5,6 +5,8 @@
 import { plural } from "../format";
 import type { Messages } from "./en";
 import { nl as house } from "../house/nl";
+import { nl as privateAtelier } from "../atelier/nl";
+import { nl as studio } from "../studio/nl";
 
 const n = (count: number, one: string, other: string) => plural("nl-NL", count, { one, other });
 
@@ -484,6 +486,10 @@ export const nl: Messages = {
   },
 
   house,
+  /** The Private Atelier, the space of the clients (src/i18n/atelier). */
+  privateAtelier,
+  /** The AI Creation Studio (src/i18n/studio). */
+  studio,
 
   contact: {
     eyebrow: "Persoonlijk contact",

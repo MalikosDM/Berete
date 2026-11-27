@@ -52,6 +52,7 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   server: {
     // The API (server/index.ts) runs on 3001 in development: npm run dev:server
-    proxy: { "/api": "http://localhost:3001" },
+    // The API of the server (npm run dev:server); API_PORT for a second server beside the first (the tests of a pass).
+    proxy: { "/api": "http://localhost:" + (process.env.API_PORT ?? "3001") },
   },
 }));

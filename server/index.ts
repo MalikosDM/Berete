@@ -18,6 +18,9 @@ import { hdri } from "./routes/hdri.js";
 import { homeTexts } from "./routes/home-texts.js";
 import { shares } from "./routes/shares.js";
 import { vip } from "./routes/vip.js";
+import { atelierClient, stripeWebhook } from "./routes/atelier-client.js";
+import { atelierAdmin } from "./routes/atelier-admin.js";
+import { studio } from "./routes/studio.js";
 import { loadSecret } from "./secret.js";
 import { protect } from "./security.js";
 import { requireAdmin, site } from "./routes/site.js";
@@ -33,9 +36,15 @@ app.use(gate(dist));
 // Pages, code and API answers travel compressed (about 5 times lighter); photos and videos already are.
 app.use(compression());
 // The private correspondence of the contact page carries its photos (up to 6, made lighter in the browser): its own limit.
+// The notification of Stripe is read as it came (its signature covers its exact bytes): before any other reading.
+app.use("/api/stripe/webhook", express.raw({ type: () => true, limit: "1mb" }));
+app.use(stripeWebhook);
 const smallJson = express.json({ limit: "2mb" });
 const contactJson = express.json({ limit: "34mb" });
-app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact" ? contactJson : smallJson)(req, res, next));
+// The messages of The Private Atelier carry their attachments (photos, PDF: 4 of 10 MB at most).
+const messageJson = express.json({ limit: "60mb" });
+const MESSAGES = /^\/api\/(?:vip\/atelier|admin\/atelier)\/projects\/[a-z0-9]+\/messages$/i;
+app.use((req, res, next) => (req.method === "POST" && req.path === "/api/contact" ? contactJson : req.method === "POST" && MESSAGES.test(req.path) ? messageJson : smallJson)(req, res, next));
 
 // The private access of the site under construction (the form of « Coming soon ») and its settings in the admin (before
 // the routes of the site: /admin/:kind would take /admin/access).
@@ -49,6 +58,11 @@ app.use(shares);
 // The lightings uploaded in the 3D editor (/api/admin/hdri, their files at /hdri/custom/<file>): server/routes/hdri.ts.
 app.use(hdri);
 app.use("/api", vip);
+// The Private Atelier (27/11/2026): the client's space for his commissions, and its admin (server/routes/atelier-*.ts).
+app.use("/api", atelierClient);
+app.use("/api", atelierAdmin);
+// The AI Creation Studio (Phase 2, 27/11/2026): « Create your own piece » (server/routes/studio.ts).
+app.use("/api", studio);
 // The texts beside the pieces of the home page (before the routes of the site: /admin/:kind would take /admin/home-texts).
 app.use("/api", homeTexts);
 app.use("/api", site);
@@ -77,7 +91,7 @@ function cacheFor(file: string): string {
 
 // A private link to a 3D model (/view/<token>) and the client space (/vip, /vip/<token>), in every
 // language: the empty page of the app, which asks the API. Never indexed.
-app.get(/^\/(?:(?:fr|es|de|nl|ar)\/)?(?:view\/[A-Za-z0-9_-]+|vip(?:\/[A-Za-z0-9_-]+)?)\/?$/, (_req, res, next) => {
+app.get(/^\/(?:(?:fr|es|de|nl|ar)\/)?(?:view\/[A-Za-z0-9_-]+|vip(?:\/[A-Za-z0-9_-]+)?|vip\/(?:invite|signin|project)\/[A-Za-z0-9_-]+|create(?:\/[A-Za-z0-9_-]+)?)\/?$/, (_req, res, next) => {
   const shell = path.join(dist, "app.html");
   fs.stat(shell, (error) => (error ? next() : res.sendFile(shell, { headers: { "Cache-Control": PAGE_CACHE, "X-Robots-Tag": "noindex, nofollow" } })));
 });
