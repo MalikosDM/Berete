@@ -161,7 +161,8 @@ test("the Inter pendant, JL in its real photos, every gallery on black with its 
   await expect(page.locator("main img[src*='studio']")).toHaveCount(0);
   await expect(page.locator("[data-worn-by]")).toBeVisible();
   // Worn photos are out of "Every Angle", in "Worn by".
-  for (const slug of ["kenan-yildiz-celebration-pendant", "eljero-elia-clover-medallion", "samuel-ballet-jesus-piece", "tajon-buchanan-iced-watch", "kevin-schade-twisted-chain", "michy-batshuayi-butterfly-pendant"]) {
+  // (Samuel Ballet's Jesus Piece: Yoni's order of 28/11/2026 ends with his circle, no section of the photos where it is worn.)
+  for (const slug of ["kenan-yildiz-celebration-pendant", "eljero-elia-clover-medallion", "tajon-buchanan-iced-watch", "kevin-schade-twisted-chain", "michy-batshuayi-butterfly-pendant"]) {
     await open(page, "/pieces/" + slug);
     await expect(page.locator("[data-worn-by]"), slug).toBeVisible();
     // (Leave each page once its own scripts have loaded: Safari reports an import cut short by leaving as an error.)

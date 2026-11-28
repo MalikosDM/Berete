@@ -84,7 +84,8 @@ test("each universe: its pieces, its image in two versions, its effects and the 
       const theme = resolveTheme(piece!.theme);
       expect(theme.preset, slug).toBe(u.preset);
       expect(theme.backdrop, slug).toBe(u.backdrop);
-      expect(theme.effects.some((e) => e.startsWith("jewel-")), slug + ": an effect on the piece").toBe(true);
+      // (28/11/2026, Yoni: no green halo around the clover any more: its piece alone, without an effect on it.)
+      if (slug !== "eljero-elia-clover-medallion") expect(theme.effects.some((e) => e.startsWith("jewel-")), slug + ": an effect on the piece").toBe(true);
     }
   }
 });
@@ -111,8 +112,8 @@ for (const u of UNIVERSES) {
     const effects = ((await world.getAttribute("data-effects")) ?? "").split(" ");
     if (effects.some((e) => !["scene", "smoke", "smoke-rise", "rain"].includes(e) && !e.startsWith("jewel-"))) await expect(world.locator("canvas.u-fx")).toHaveAttribute("data-running", "");
     if (effects.includes("scene")) expect(await world.locator(".u-spot:visible").count(), "lights of the image").toBeGreaterThan(0);
-    const jewel = effects.find((e) => e.startsWith("jewel-"))!;
-    await expect(page.locator("[data-piece-cover] .u-jewel[data-jewel='" + jewel + "']:visible").first()).toBeAttached();
+    const jewel = effects.find((e) => e.startsWith("jewel-"));
+    if (jewel) await expect(page.locator("[data-piece-cover] .u-jewel[data-jewel='" + jewel + "']:visible").first()).toBeAttached();
     await page.waitForTimeout(1500);
     // The texts readable: the title on its ground, and the words of the menu of a computer.
     const title = page.locator("h1#piece-title");

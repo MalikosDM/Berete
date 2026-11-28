@@ -170,6 +170,38 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « vitesse, retours de Yoni du 28/11, défauts de l'audit du 27/11 » — état au 28/11/2026
+- [x] **A. Vitesse** (`docs/vitesse-28-11.md`, chiffres avant / après mesurés en ligne ; scripts `.local/scripts/speed-*.mjs`) :
+      le serveur, la porte, le cache n'étaient pas en cause. Corrigé : le monogramme d'arrivée écrit dans la page (`index.html`,
+      `scripts/intro-markup.mjs`) et retiré dès que la page est prête (1,2 s au plus) ; entrées des univers à 55 % ; molette directe
+      (Lenis `smoothWheel: false`) ; la photo du téléphone plus téléchargée sur ordinateur (`<picture>` de `Showcase.tsx`) ; films des
+      écrins et de l'Atelier chargés au moment de les voir ; photo d'une pièce préchargée au survol (`src/lib/prefetch.ts`). Arrivée
+      3,4 → 1,7 s (fibre), 3,6 → 2,0 s (4G) ; `tests/perf.spec.ts` (local et en ligne). **Piège** : les images de l'ouverture sont dans un
+      `<picture>` : une règle CSS `> img` ne les touche plus (corrigé le 28/11 : chaînes coupées recentrées, entrées des bijoux, reflet
+      de JewelFx) ; écrire `img` en descendant ou `> picture > img`.
+- [x] **B. Retours de Yoni** : Inter revenu au premier or (titre et titres des sections) ; VfB sur iPhone avec l'ancien stade vertical
+      (`mobileFrom` d'un fond, `universe-media.mjs`) ; N14 : deux constellations à gauche (traits `link` des `spots`) ; **Samuel Ballet** et
+      **MT — NEXUS CROSS** (adresse `malik-tillman-cross-pendant` gardée) : textes mot pour mot (`src/data/yoni2711.ts`,
+      `tests/fixtures/yoni-2811.json`), ordre de Yoni, films des albums iCloud (originaux 4K dans `.local/yoni-2811/`, `balletFilm`,
+      `tillmanFilm`, `jerseyFilm` de `scripts/yoni-2711-media.mjs`, `YONI_FILMS` de `src/data/yoniMedia.ts`), photos de Ballet tirées
+      de son film 4K (`balletStills`, 12 vues, aucune répétée entre Every Angle et les détails), boucle muette de la croix qui tourne
+      dans le coin du détail 02 (`tillmanSpin`, `loops` de `MagazineGallery`), « His first BERETE pendant » vers le TM
+      (`CIRCLE_EARLIER`) ; maillot d'Okafor : nouveau film (joué depuis 4,75 s) ; FAM : 12 photos de Yoni (`.local/yoni-2811/fam/`,
+      `scripts/yoni-2811-media.mjs`), détourage, Every Angle, détails, 2 photos portées, story « You won bro » retirée.
+- [x] **C. Défauts** : AngeL (dessous et bord gauche éclaircis), trèfle sans halo vert, TM et Thorned T détourés (capture Instagram
+      retirée), montre de Thuram détourée, **Tajon et Radja** : vraie photo nette dans un cadre fin (`FRAMED_OPENINGS` de `PiecePage`),
+      Bosnie 4 vues différentes, Oval Eternity seule et Every Angle, **D&E et OKA** : pendentif seul détouré avec sa bélière (vue
+      `alone`), Sirius sur sa plaque entière ; pages joueurs équilibrées (à côté du portrait : le nom, puis les noms de ses pièces) ;
+      **Every Angle** partout 4 photos de même taille, moins de 4 = même taille, centrées ; films : jamais un écrin en premier (VfB joué
+      depuis 6,55 s, Openda 3,6 s, affiche de Tulips refaite) ; tous les noms de pièces en capitales, le tiret long dans la police de la
+      maison (`data-title-dash`) ; composition cachée tant qu'elle n'a ni poids d'or ni carats (sauf composition de Yoni) ; « Your vision.
+      Your universe. » : pièces liées (même joueur, club, famille, voisines), jamais la pièce de la page (`similarPieces`) ; Kenan : son
+      selfie en petit. `tests/retours2811.spec.ts` (toutes les pages : bijou entier à 1440, 1920 et iPhone ; Every Angle ; films ;
+      textes mot pour mot…). Captures avant / après : `~/Downloads/_verif-28-11/<point>/{avant,apres}/`.
+- [ ] **Chaînes** (Baguette Cuban, White Iced, Rose 14 et 20 mm, Infinity Link, Safi Link, BRT Flowers) : aucune vraie photo de la chaîne
+      entière (toutes sur buste) : elles restent coupées net en haut, la coupe cachée au bord de l'écran / sous le menu. Yoni : une photo
+      de chaque chaîne posée entière, fermoir visible. Aussi : les originaux HD des photos de Ballet (aujourd'hui tirées du film).
+
 ## Passe « The Private Atelier » (cahier des charges de Yoni du 27/11, partie B) — état au 27/11/2026
 - **Serveur** (`server/atelier/`, `server/routes/atelier-client.ts`, `server/routes/atelier-admin.ts`, migration
   `20261127180000_private_atelier`) : invitation à usage unique qui expire (7 jours, réglable), accès créé par le client (mot de

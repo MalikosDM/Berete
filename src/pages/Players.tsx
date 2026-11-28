@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
-import { ArrowLeft, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Play } from "lucide-react";
 import BrandIcon from "@/components/BrandIcon";
 import ContactBlock from "@/components/ContactBlock";
 import { MediaView } from "@/components/Media";
@@ -101,11 +101,13 @@ export function PlayerPage() {
         <Link to="/players" data-cta className="btn-secondary text-bone">
           <ArrowLeft className="size-3.5 rtl:-scale-x-100" aria-hidden="true" /> {t.nav.players}
         </Link>
-        <div className="mt-6 grid items-end gap-8 lg:mt-8 lg:grid-cols-12 lg:gap-14">
+        {/* (28/11/2026: the name alone at the bottom left the right half empty) The portrait and, beside it in the middle of its
+            height, who they are, then the names of their pieces, each a way to its world. */}
+        <div className="mt-6 grid items-center gap-8 lg:mt-8 lg:grid-cols-12 lg:gap-14">
           <div data-player-portrait className="mx-auto w-full max-w-sm lg:col-span-4 lg:max-w-none">
             <PlayerPortrait person={person} big priority sizes="(max-width: 1023px) 92vw, 26rem" className="aspect-[4/5] w-full border border-white/10" />
           </div>
-          <div className="min-w-0 lg:col-span-8 lg:col-start-5 lg:pb-4">
+          <div data-player-intro className="min-w-0 lg:col-span-7 lg:col-start-6">
             {kindLabel ? <p data-player-club className="eyebrow">{kindLabel}</p> : null}
             <SplitHeading as="h1" className="mt-3 t-hero tracking-[0.05em] break-words">
               {person.name}
@@ -121,6 +123,22 @@ export function PlayerPage() {
               <a href={instagram} target="_blank" rel="noreferrer" data-player-instagram className="mt-6 inline-flex min-h-12 w-fit items-center gap-3 text-base font-medium text-white hover:text-rose-light">
                 <BrandIcon name="instagram" className="size-5" /> @{person.instagram}
               </a>
+            ) : null}
+            {pieces.length > 0 ? (
+              <div data-player-summary className="mt-10 max-w-xl border-t border-white/12 pt-7">
+                <p className="eyebrow">{person.kind === "club" ? t.players.clubPieces(pieces.length) : t.players.pieces(pieces.length)}</p>
+                <ul className="mt-3">
+                  {pieces.slice(0, 6).map((p) => (
+                    <li key={p.slug}>
+                      <Link to={"/pieces/" + p.slug} data-player-summary-piece={p.slug} className="group inline-flex min-h-12 items-center gap-3 font-display text-[1.25rem] leading-tight tracking-[0.06em] text-white uppercase hover:text-rose-light">
+                        {/* On his own page, the name of the piece without his name before it. */}
+                        <KeepCase title={p.title.startsWith(person.name + " — ") ? p.title.slice(person.name.length + 3) : p.title} />
+                        <ArrowRight className="size-4 shrink-0 text-rose-light transition-transform group-hover:translate-x-1 rtl:-scale-x-100" aria-hidden="true" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ) : null}
           </div>
         </div>

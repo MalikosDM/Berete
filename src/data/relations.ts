@@ -1,4 +1,5 @@
 /* The links between stories, people and pieces, computed from the catalogue. */
+import { SUBCATEGORIES } from "./collections.js";
 import { extrasOf, media } from "./sources.js";
 import type { Box, Catalogue, MediaItem, Person, Piece, PieceType, Story } from "./types.js";
 
@@ -147,9 +148,24 @@ export function pieceByMedia(cat: Catalogue): Map<string, string> {
 
 /** Other pieces of the same type, the ones made for the same people first. */
 export function similarPieces(cat: Catalogue, piece: Piece, count = 4): Piece[] {
-  const same = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
-  const shared = (p: Piece) => p.people.some((x) => piece.people.includes(x));
-  return [...same.filter(shared), ...same.filter((p) => !shared(p))].slice(0, count);
+  // The pieces related to this one, never itself (28/11/2026: every page showed the same four pendants): made for the same
+  // player or club, then for his club (the players of Stuttgart), then of the same family (the crosses, the names, the Cuban
+  // chains…), then of the same kind from the pieces just after it in the catalogue (each page its own), then the others.
+  const others = cat.pieces.filter((p) => p.slug !== piece.slug);
+  const clubs = new Set(piece.people.flatMap((x) => [x, cat.people.find((q) => q.slug === x)?.club ?? ""]).filter(Boolean));
+  const clubOf = (p: Piece) => p.people.some((x) => clubs.has(x) || clubs.has(cat.people.find((q) => q.slug === x)?.club ?? "-"));
+  const family = new Set(SUBCATEGORIES.filter((c) => c.pieces.includes(piece.slug)).flatMap((c) => c.pieces));
+  const at = Math.max(0, cat.pieces.findIndex((p) => p.slug === piece.slug));
+  const after = [...cat.pieces.slice(at + 1), ...cat.pieces.slice(0, at)].filter((p) => p.slug !== piece.slug);
+  const picked: Piece[] = [];
+  const add = (list: Piece[]) => list.forEach((p) => picked.length < count && !picked.includes(p) && picked.push(p));
+  add(others.filter((p) => p.people.some((x) => piece.people.includes(x))));
+  add(others.filter(clubOf));
+  add(after.filter((p) => family.has(p.slug)));
+  add(after.filter((p) => p.type === piece.type));
+  add(after.filter((p) => p.featured));
+  add(after);
+  return picked;
 }
 
 /** The stories in which the photos or videos of a piece appear, then the stories of its people. */

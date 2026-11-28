@@ -120,10 +120,12 @@ async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   await expect(page.locator("[data-enter-atelier-link]"), id + " the way to its making-of").toHaveCount(steps.length > 0 || film ? 1 : 0);
   if (steps.length > 0 || film) await expect(page.locator("[data-enter-atelier-link]")).toHaveAttribute("href", "/atelier?piece=" + piece.slug);
   for (const slug of piece.people.slice(0, 3)) await expect(page.locator('[data-made-for-person="' + slug + '"]'), id + " made for " + slug).toHaveAttribute("href", "/players/" + slug);
-  const sameType = cat.pieces.filter((p) => p.type === piece.type && p.slug !== piece.slug);
+  // The pieces at the end (28/11/2026): four related pieces (same player or club, same family, same kind…), never itself.
+  const others = cat.pieces.filter((p) => p.slug !== piece.slug);
   const similar = await page.locator("[data-similar] [data-piece-card]").evaluateAll((els) => els.map((e) => e.getAttribute("data-piece-card")));
-  expect(similar.length, id + " similar").toBe(Math.min(4, sameType.length));
-  for (const s of similar) expect(sameType.some((p) => p.slug === s), id + " similar " + s + " is of the same type").toBe(true);
+  expect(similar.length, id + " similar").toBe(Math.min(4, others.length));
+  expect(similar, id + " similar").not.toContain(piece.slug);
+  for (const s of similar) expect(others.some((p) => p.slug === s), id + " similar " + s + " is a published piece").toBe(true);
   if (piece.boxSlug) await expect(page.locator("[data-custom-box]"), id + " custom box").toHaveCount(1);
 }
 

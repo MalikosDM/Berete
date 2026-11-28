@@ -107,8 +107,11 @@ test("4–5. The Berete Circle: one rule for every card; one name for each secti
   if (!phoneOf(info.project.name)) {
     const photo = (await page.locator("[data-player-portrait]").boundingBox())!;
     const name = (await page.locator("[data-player-hero] h1").boundingBox())!;
-    expect(name.x - (photo.x + photo.width)).toBeLessThan(140);
-    expect(Math.abs(name.y + name.height - (photo.y + photo.height))).toBeLessThan(80);
+    // Beside the photo (28/11/2026: in the middle of its height, with the names of its pieces under it, no empty half).
+    expect(name.x - (photo.x + photo.width)).toBeGreaterThan(0);
+    expect(name.x - (photo.x + photo.width)).toBeLessThan(260);
+    const intro = (await page.locator("[data-player-intro]").boundingBox())!;
+    expect(Math.abs(intro.y + intro.height / 2 - (photo.y + photo.height / 2))).toBeLessThan(photo.height * 0.2);
   }
   await page.screenshot({ path: "verification/" + info.project.name + "/audit2411-club.jpg", type: "jpeg", quality: 70 });
   // French: « En images », the trunk of The Hand named like its piece.
