@@ -143,14 +143,15 @@ function Thumbs({ items, label }: { items: Thumb[]; label: string }) {
   if (items.length === 0) return null;
   return (
     <>
-      <ul data-home-thumbs aria-label={label} className="mt-7 grid w-full max-w-[24rem] grid-cols-3 gap-3 text-start">
+      <ul data-home-thumbs aria-label={label} className="mt-7 grid w-full max-w-[24rem] grid-cols-3 gap-3 text-start lg:mt-6">
         {items.map((th, i) => (
           <li key={th.item.src} className="flex min-w-0 flex-col">
             {/* The button and its photo named alike (its description, else its step, else the section): before the photo loads too. */}
-            <button type="button" onClick={() => setOpen(i)} data-home-thumb={th.item.src} aria-label={th.item.alt || th.caption || label} className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink">
+            <button type="button" onClick={() => setOpen(i)} data-home-thumb={th.item.src} aria-label={th.item.alt || th.caption || label} className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden border border-white/10 bg-ink lg:aspect-square">
               <MediaView item={{ ...asPhoto(th.item), onBlack: false }} alt={th.item.alt || th.caption || label} fit="cover" frame={4 / 5} sizes="(max-width: 1023px) 30vw, 8rem" className="transition-transform duration-700 group-hover:scale-[1.03]" />
             </button>
-            {th.caption ? <p className="eyebrow mt-2 leading-snug tracking-[0.16em] text-mist [overflow-wrap:anywhere]">{th.caption}</p> : null}
+            {/* Its step in plain words (a capital label broke inside a word on a phone, « Sculptin-g »). */}
+            {th.caption ? <p className="mt-2 text-base leading-snug text-mist [text-wrap:balance]">{th.caption}</p> : null}
           </li>
         ))}
       </ul>
@@ -196,7 +197,7 @@ function Feature({ id, data, side, visual, title, heading = "h2", lead, name, bl
   return (
     <section id={id} aria-labelledby={id + "-title"} data-home-story={data} data-home-side={side} {...attrs} className="scroll-mt-0 border-t border-white/10">
       {/* One screen at most on a computer (28/11/2026: 1280 × 800 included). */}
-      <div className="wrap py-20 lg:py-16">
+      <div className="wrap py-20 lg:py-14">
         <div className="grid items-center gap-y-10 lg:grid-cols-2 lg:gap-x-16 xl:gap-x-24">
           {/* The piece against the inner side of its half, toward its words (the empty space, if any, at the edges of the page). */}
           <Reveal className={"w-full " + (side === "end" ? "lg:order-2 lg:*:ms-0 lg:*:me-auto" : "lg:*:ms-auto lg:*:me-0")}>{visual}</Reveal>
@@ -207,8 +208,8 @@ function Feature({ id, data, side, visual, title, heading = "h2", lead, name, bl
             {lead ? <p className="mt-5 text-base leading-relaxed text-bone">{lead}</p> : null}
             {name ? (
               <>
-                <span aria-hidden="true" className="bg-rose-gold mt-8 block h-px w-12" />
-                <p data-home-piece-name className="title-caps mt-6 text-base tracking-[0.08em] text-white [text-wrap:balance] lg:text-[1.0625rem]">
+                <span aria-hidden="true" className="bg-rose-gold mt-8 block h-px w-12 lg:mt-6" />
+                <p data-home-piece-name className="title-caps mt-6 text-base lg:mt-4 tracking-[0.08em] text-white [text-wrap:balance] lg:text-[1.0625rem]">
                   {name}
                 </p>
               </>
@@ -225,7 +226,7 @@ function Feature({ id, data, side, visual, title, heading = "h2", lead, name, bl
             ) : null}
             {thumbs}
             {links.length > 0 ? (
-              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-1 lg:justify-start">
+              <div className="mt-7 flex flex-wrap items-center justify-center gap-x-8 gap-y-1 lg:mt-6 lg:justify-start">
                 {links.map((l) => (
                   <Link key={l.to} to={l.to} data-cta {...l.attrs} className="btn-secondary">
                     {l.label} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
@@ -280,6 +281,7 @@ function House() {
       name={piece?.title}
       block="house"
       text={textOf("house", piece)}
+      wide
       more={[t.process.quick.lead]}
       thumbs={<Thumbs items={thread} label={t.process.title} />}
       // One way in per section (24/11/2026): The Bespoke Journey; the photo of the piece leads into its world.
@@ -395,15 +397,15 @@ function Mechanism() {
         // and the piece ends at 95 % of its frame (its cut-out keeps a margin), so 25:39 lets it end just above the circle.
         // (28/11/2026) On a computer smaller when the screen is low, so that the section with the other mechanisms under it
         // stays one screen high.
-        <div data-innovation-visual className="relative mx-auto aspect-[4/5] w-full max-w-[24rem] lg:max-w-[min(21rem,calc((100svh-32rem)*0.8))]">
+        <div data-innovation-visual className="relative mx-auto aspect-[4/5] w-full max-w-[24rem] lg:max-w-[min(21rem,calc((100svh-34rem)*0.8))]">
           {/* Its chain cut at the top of its photo (27/11/2026: never faded): the frame starts at the top edge of the section (over
-              its padding, py-20 / lg:py-16 of Feature), so that the chain leaves the section there, at its fine line; it still ends
+              its padding, py-20 / lg:py-14 of Feature), so that the chain leaves the section there, at its fine line; it still ends
               where it ended (taller by as much), the piece just above the circle. */}
-          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className={"absolute inset-x-0 block " + (view && isCutTop(view) ? "-top-20 lg:-top-16" : "inset-y-0")}>
+          <Link to={"/pieces/" + piece.slug} tabIndex={-1} aria-hidden="true" data-innovation-frame className={"absolute inset-x-0 block " + (view && isCutTop(view) ? "-top-20 lg:-top-14" : "inset-y-0")}>
             {view && isCutTop(view) ? (
               <>
                 <span aria-hidden="true" className="block aspect-[4/5]" />
-                <span aria-hidden="true" className="block h-20 lg:h-16" />
+                <span aria-hidden="true" className="block h-20 lg:h-14" />
               </>
             ) : null}
             {view ? (
