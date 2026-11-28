@@ -193,8 +193,8 @@ test("the worlds: the sky of the L, the victory of Inter and of VfB (the squad b
     await open(page, "/pieces/" + slug);
     await expect(page.locator("article[data-piece]")).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     await expect(page.locator(".universe")).toHaveAttribute("data-universe", preset);
-    // (28/11/2026: on a phone the VfB ring keeps the stadium drawn upright, « vfb-victoire »: mobileFrom of its backdrop.)
-    const shown = phone && file === "vfb-victoire-v2" ? "vfb-victoire" : file;
+    // (28/11/2026: on a phone the VfB ring keeps the stadium drawn upright, « vfb », the stadium at night: mobileFrom of its backdrop.)
+    const shown = phone && file === "vfb-victoire-v2" ? "vfb" : file;
     await expect.poll(backdrop, { timeout: 15_000 }).toMatch(new RegExp("/media/universes/" + shown + "-" + (phone ? "m-" : "")));
     // The piece first: its jewel larger than a third of the frame.
     const jewel = (await page.locator("[data-piece-cover] img:visible").first().boundingBox())!;

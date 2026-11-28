@@ -1100,6 +1100,11 @@ const content: Record<string, string> = {
   "A Symbol of Connection": "رمز للتواصل",
   "Created exclusively for Malik Tillman": "صُنع حصريًا لمالك تيلمان",
   "His first BERETE pendant": "قلادته الأولى من BERETE",
+  // The Thorned T of Marcus Thuram, from its stories (28/11/2026, evening).
+  "Marcus Thuram's Thorned T turned at an angle on black velvet: the dripping T paved with diamonds, wound with rose gold thorns": "قلادة Thorned T لماركوس تورام مائلة على مخمل أسود: حرف T المتقاطر المرصوف بالألماس، تلتف حوله أشواك من الذهب الوردي",
+  "The Thorned T up close: the diamond pavé of the T and the rose gold branches wound around it from top to bottom": "قلادة Thorned T عن قرب: رصف الألماس على حرف T والأغصان من الذهب الوردي الملتفة حوله من الأعلى إلى الأسفل",
+  "The Thorned T on its chain, laid beside the Jesus Piece of Marcus Thuram": "قلادة Thorned T على سلسلتها، موضوعة بجانب قطعة يسوع لماركوس تورام",
+  "Close-up of the foot of the Thorned T: rose gold thorns and a rose wound around the diamond pavé": "لقطة قريبة لأسفل قلادة Thorned T: أشواك ووردة من الذهب الوردي ملتفة حول رصف الألماس",
   // The photos of 28/11/2026: Samuel Ballet's Jesus Piece (from its film in 4K), the FAM medallion.
   "The Samuel Ballet Jesus Piece whole on black velvet: the face set with diamonds, the crown of pear diamonds and the bail": "قطعة يسوع لصامويل باليه كاملة على مخمل أسود: الوجه المرصّع بالألماس، والتاج من الألماس الكمثري، والعروة",
   "The Jesus Piece in three-quarter view: the bail, the crown of pear diamonds and the sculpted face and beard in relief": "قطعة يسوع من زاوية ثلاثة أرباع: العروة، وتاج الألماس الكمثري، والوجه واللحية منحوتان بارزين",

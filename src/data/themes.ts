@@ -137,9 +137,14 @@ export type Backdrop = {
   mobileAnchor?: [number, number];
   /**
    * The phone takes the portrait image of another background (28/11/2026: the VfB victory keeps its wide image on a computer;
-   * on a phone, the vertical one made for it, the fireworks over the stadium, instead of a sky of red smoke).
+   * on a phone, the stadium at night of 21/11 — its roof, its lights, its stands — instead of a sky of red smoke).
    */
   mobileFrom?: string;
+  /**
+   * With `mobileFrom`: where the piece stands in that portrait image (28/11/2026: the VfB ring over the roof and the lights of
+   * the stadium, the stands and the pitch under it, the red smoke kept low behind the words).
+   */
+  mobileFromAnchor?: [number, number];
   /** An image on black placed freely (its sphere above the piece, never held by the edges of the screen; its edges fade). */
   free?: boolean;
   /** With `free`: how far the image comes down from the top, as a share of the height of the screen (computer, phone). */

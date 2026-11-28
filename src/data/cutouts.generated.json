@@ -519,6 +519,22 @@
   ],
   "malik-tillman-cross-pendant": [
    {
+    "id": "alone",
+    "kind": "face",
+    "width": 1600,
+    "height": 2403,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "c76612a601",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/hd/malik-tillman-cross-pendant/p17.loupe.f9c9fbb0f8.webp",
+    "note": ""
+   },
+   {
     "id": "p17",
     "kind": "face",
     "width": 1600,

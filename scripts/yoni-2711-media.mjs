@@ -174,7 +174,7 @@ const STILLS = {
 
 /** The images of the films (seconds): never a black frame. */
 const POSTERS = {
-  interFilm: 1.2, // the ring whole, three quarters, on black glass
+  interFilm: 19, // the ring whole from its side, lit (28/11/2026, evening: 1.2 s was too dark, 42/255)
   interHandoverFull: 20.0, // a player shows his ring, the man in the beige suit points at it
   interHandoverEdit: 36.87, // smiles, the box open
   okafor: 32.0, // Noah Okafor, arms crossed, wearing the pendant

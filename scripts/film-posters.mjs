@@ -70,3 +70,19 @@ for (const [key, at] of Object.entries(MECHANISM_POSTER_AT)) {
   console.log("  " + key + " @" + at + "s -> " + src);
 }
 writeFileSync(mechPath, JSON.stringify(mech, null, 1) + "\n");
+
+// The films of Yoni (scripts/yoni-2711-media.mjs, its POSTERS hold the same seconds): the Inter ring whole, from its side, lit
+// (28/11/2026, evening: its image at 1.2 s was too dark, 42/255).
+export const YONI_POSTER_AT = { interFilm: 19 };
+const yoniPath = join(ROOT, "src", "data", "yoni2711.generated.json");
+const yoniData = JSON.parse(readFileSync(yoniPath, "utf8"));
+for (const [key, at] of Object.entries(YONI_POSTER_AT)) {
+  const f = yoniData[key];
+  if (!f?.src) continue;
+  const video = join(PUBLIC, f.src);
+  const dir = video.slice(0, video.lastIndexOf("/"));
+  const stem = f.src.slice(f.src.lastIndexOf("/") + 1).split(".")[0] + "-frame";
+  f.poster = await poster(video, at, dir, stem);
+  console.log("  " + key + " @" + at + "s -> " + f.poster);
+}
+writeFileSync(yoniPath, JSON.stringify(yoniData, null, 1) + "\n");

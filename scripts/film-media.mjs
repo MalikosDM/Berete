@@ -37,7 +37,8 @@ export const FILMS = [
   { slug: "kevin-schade-dragon-ball-pendant", folder: "13", making: "13/v01", reveal: "13/v01" },
   { slug: "noah-okafor-octagon-pendant", folder: "17", making: "17/v02", reveal: "17/v01" },
   // No studio film of its fabrication: the polishing at the bench, filmed by phone (clean, close).
-  { slug: "angelo-stiller-as-pendant", folder: "18", making: "18/v04", reveal: "18/v01" },
+  // (28/11/2026, evening: the images of these films were too dark, 46–54/255: the pendant whole and lit, measured frame by frame.)
+  { slug: "angelo-stiller-as-pendant", folder: "18", making: "18/v04", reveal: "18/v01", posterAt: { reveal: 25 } },
   { slug: "malik-tillman-cross-pendant", folder: "21", making: "21/v02", reveal: "21/v01" },
   // A horizontal phone video at the bench: the medallion put together, its wheels turning.
   // Its image: the medallion whole from the front, with its bail, on black, at 15.78 s (28/11/2026: its image was the
@@ -55,8 +56,8 @@ export const FILMS = [
   // The finished piece only (no film of their fabrication was sent).
   // Its whole pendant as its image (26/11/2026: an elegant image before it plays).
   // Its image: the crossed hands close and lit, at 13.3 s (27/11/2026: never a dark frame; scripts/film-posters.mjs).
-  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01", posterAt: { reveal: 13.3 } },
-  { slug: "the-hand", folder: "12", reveal: "12/v01" },
+  { slug: "kenan-yildiz-celebration-pendant", folder: "11", reveal: "11/v01", posterAt: { reveal: 6 } },
+  { slug: "the-hand", folder: "12", reveal: "12/v01", posterAt: { reveal: 20.5 } },
   // The pendant of Michy Batshuayi (its chain is a piece of its own since 22/11/2026).
   { slug: "michy-batshuayi-butterfly-pendant", folder: "23", reveal: "23/v04" },
   // The short edit of the finished pendant (32/v02 is the film of its delivery: the trunk, Noah Okafor and his friends).
@@ -67,7 +68,7 @@ export const FILMS = [
   // The fabrication of the chain (the video of its Fabrication/ folder): no film of the finished chain.
   { slug: "rose-iced-cuban-chain", folder: "01", making: "01/f" },
   // Its film opens on a trunk painted with a mural (a famous player): it begins at 7.4 s, on the pendant.
-  { slug: "ampersand-initials-pendant", folder: "04", reveal: "04/v01", start: { reveal: 7.4 } },
+  { slug: "ampersand-initials-pendant", folder: "04", reveal: "04/v01", start: { reveal: 7.4 }, posterAt: { reveal: 9 } },
   { slug: "thorns-and-roses-crucifix", folder: "05", making: "05/v02", reveal: "05/v01" },
   // "Bouzou" (folder 14): the pendant of Loïs Openda (21/11/2026).
   { slug: "lois-openda-script-pendant", folder: "14", reveal: "14/v01" },

@@ -684,8 +684,10 @@ const SITE_PIECES: Piece[] = [
     theme: { preset: "roses", tint: "#2a1216", font: "gothique", mark: "T" },
     // Its real photo only (26/11/2026: its studio image, made by AI, no longer shown).
     cover: still("pieces/marcus-thuram-thorned-t-pendant/cover", { ...at("Marcus Thuram's T pendant wound with rose gold thorns"), onBlack: false }),
+    // (28/11/2026) Four more real views, taken from the two stories that show it (scripts/yoni-2811-media.mjs, thorned-t).
     gallery: [
       still("pieces/marcus-thuram-thorned-t-pendant/cover", { ...at("Marcus Thuram's T pendant wound with rose gold thorns"), onBlack: false }),
+      ...((yoni2811 as { "thorned-t"?: (MediaItem & { kind?: string })[] })["thorned-t"] ?? []).map(({ kind: _k, ...m }) => m),
       st("thuram-ss23", 5, at("Film of the thorned T pendant")),
     ],
     specs: [
@@ -844,6 +846,9 @@ const SITE_PIECES: Piece[] = [
     ...yoniTexts("malik-tillman-cross-pendant", ["p08", "p13", "p11", "p10", "p19", "p14"].map((f) => yoni("malik-tillman-cross-pendant", f))),
     people: ["malik-tillman"],
     theme: { preset: "sacre" },
+    // The cross alone, its diamond-shaped bail whole under the menu (28/11/2026: « The Sculptural Bail »), not on its chain cut
+    // at the top of the screen.
+    showcase: { mode: "single", views: ["alone"], size: "large" },
     ...sorted("malik-tillman-cross-pendant", [
       yoni("malik-tillman-cross-pendant", "p17", at("Malik Tillman's cross pendant on its diamond link chain")),
       yoni("malik-tillman-cross-pendant", "p13", at("The centre of the cross and its monogram", "The centre")),

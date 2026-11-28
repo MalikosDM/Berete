@@ -170,6 +170,25 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « corrections après la passe du 28/11 » (relecture de Malik, 28/11 au soir) — état au 28/11/2026
+- [x] **MT — NEXUS CROSS** : ouverture sur la croix seule, sa bélière en losange entière sous le menu (vue `alone` tirée de p17, la
+      chaîne retirée le long des deux bords hauts de la bélière, `scripts/cutouts.mjs`). Toutes les vues coupées (chaîne qui sort de
+      la photo) un peu plus bas (`LIFT` de `Showcase.tsx`) : leur coupe reste cachée sous le menu, la bélière d'un pendentif sur sa
+      chaîne passe dessous (`BAIL_TOP` de `src/data/showcase.ts`, mesuré sur les détourages : Genki Dama, maillot, FAM, Butterfly).
+- [x] **VfB sur iPhone** : le stade de nuit (`vfb`, toit, projecteurs, tribunes), la pièce devant le toit (`mobileFromAnchor`), la
+      fumée rouge basse derrière les textes ; l'ordinateur ne change pas.
+- [x] **Films** : chaque premier film part d'une image où la pièce se voit (`PLAY_FROM` de `src/data/featureFilms.ts`, mesuré image
+      par image : jamais sous 30/255 ; maillot depuis 5,0 s) ; images d'attente plus claires (Inter 19 s via `YONI_POSTER_AT` de
+      `scripts/film-posters.mjs`, The Hand, AS, Kenan, D&E via `posterAt`).
+- [x] **Montres** : Tajon et Radja ne sont filmées qu'au poignet (bracelet derrière) : pas de détourage possible ; photo plus petite,
+      cadre fin du film. La Skeleton Watch de Thuram vient d'une vraie story (`marcus-thuram/01`, l'écrin de la maison), pas d'IA.
+- [x] **Thorned T** : 4 vraies vues de plus tirées de ses stories (`thorned-t` de `scripts/yoni-2811-media.mjs`) ; plus aucune photo
+      deux fois sur une page (test sur toutes les pages). **Chaînes** : aucune photo de chaîne entière ; le fermoir BRT est le premier
+      gros plan de The Art of Detail (Baguette Cuban p10, White Iced p01). **Inter** : `photo-2-v2.jpeg` toujours absent.
+- Tests : `tests/corrections2811.spec.ts` (1440, 1920, iPhone). Captures : `~/Downloads/_verif-corrections-28-11/<point>/{avant,apres}/`.
+- [ ] Yoni : une photo des montres de Tajon et de Radja seules (sans poignet) ; les chaînes posées entières, fermoir visible ; Malik :
+      `.local/yoni-2711/inter/photo-2-v2.jpeg` (la photo des champions sans filigrane).
+
 ## Passe « vitesse, retours de Yoni du 28/11, défauts de l'audit du 27/11 » — état au 28/11/2026
 - [x] **A. Vitesse** (`docs/vitesse-28-11.md`, chiffres avant / après mesurés en ligne ; scripts `.local/scripts/speed-*.mjs`) :
       le serveur, la porte, le cache n'étaient pas en cause. Corrigé : le monogramme d'arrivée écrit dans la page (`index.html`,

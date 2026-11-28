@@ -216,7 +216,7 @@ const SCENES = [
   scene("inter-victoire-v2", "Victoire, la nuit : toute l'équipe de l'Inter écharpes levées, confettis, feux d'artifice (Inter Milan, v2)", [0.66, 0.5]),
   // On a phone, the vertical image of the first victory (fireworks over the stadium, the team with the cup): Yoni, 28/11/2026, the
   // red smoke of the v2 not right on a phone.
-  scene("vfb-victoire-v2", "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)", [0.66, 0.5], { mobileFrom: "vfb-victoire" }),
+  scene("vfb-victoire-v2", "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)", [0.66, 0.5], { mobileFrom: "vfb", mobileFromAnchor: [0.5, 0.3] }),
   scene("gothique", "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)", [0.6, 0.5]),
 ];
 BACKDROPS.push(...SCENES);
@@ -418,7 +418,7 @@ async function backdropFiles(b) {
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
     // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below, free: b.free, drop: b.drop, mobileFrom: b.mobileFrom };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below, free: b.free, drop: b.drop, mobileFrom: b.mobileFrom, mobileFromAnchor: b.mobileFromAnchor };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;

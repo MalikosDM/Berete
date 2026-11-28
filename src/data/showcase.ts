@@ -67,6 +67,18 @@ export const SHOWCASE_BY_DEFAULT = new Set([
 
 export const MAX_VIEWS = 5;
 
+/**
+ * Where the piece itself begins in a view whose chain leaves its photo at the top (its bail), as a share of the height of the
+ * image (measured on the cut-outs, 28/11/2026): the chain above it may go under the menu, never the bail
+ * (tests/corrections2811.spec.ts). A chain alone (its U) has none.
+ */
+export const BAIL_TOP: Record<string, number> = {
+  "kevin-schade-dragon-ball-pendant/p19": 0.13,
+  "noah-okafor-jersey-pendant/p20": 0.47,
+  "tanguy-nianzou-fam-medallion/f06": 0.175,
+  "michy-batshuayi-butterfly-pendant/p54": 0.46,
+};
+
 export const cutoutSrc = (slug: string, v: CutoutView, w: number) =>
   "/media/cutouts/" + slug + "/" + v.id + "-" + w + (v.version ? "." + v.version : "") + ".webp";
 export const cutoutSrcSet = (slug: string, v: CutoutView) => v.widths.map((w) => cutoutSrc(slug, v, w) + " " + w + "w").join(", ");

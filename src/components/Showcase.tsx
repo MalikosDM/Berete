@@ -36,7 +36,9 @@ const SINGLE_XL = { x: 0, y: -0.02, s: 1.04, d: 12 };
 // image is drawn from there ([data-cut-top], src/index.css), so that its chain leaves the screen at the top, cut clean. Scaled
 // from the top: the cut stays on the edge.
 const CUT = { s: 0.94, sLarge: 0.98, sXl: 1 };
-const LIFT = "-top-20 desk:-top-28";
+// (28/11/2026: a little lower than the very top of the screen, its cut still hidden under the menu, so that the bail of a pendant
+// on its chain sits under the menu, whole: BAIL_TOP of src/data/showcase.ts, tests/corrections2811.spec.ts.)
+const LIFT = "-top-11 desk:-top-24";
 // Each one stays inside the box: |x| and |y| at most (1 - s) / 2.
 const AROUND = [
   { x: -0.37, y: 0.33, s: 0.26, d: 7 },

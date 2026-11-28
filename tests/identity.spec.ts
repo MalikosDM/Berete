@@ -7,7 +7,7 @@ import { HOUSE_PHOTO_PLACES } from "../src/data/house";
 import { NEW_PIECES, REMOVED_PIECES, RENAMED_PIECES } from "../src/data/pieces";
 import { removedPieceTarget } from "../src/data/relations";
 import { CUTOUTS, resolveShowcase } from "../src/data/showcase";
-import { INTER_VICTORY, resolveTheme, VFB_VICTORY } from "../src/data/themes";
+import { BACKDROPS, INTER_VICTORY, resolveTheme, VFB_VICTORY } from "../src/data/themes";
 import { fr as houseFr } from "../src/i18n/house/fr";
 import { getCatalogue, scrollTo, shotPath, skipIntro, watch } from "./helpers";
 
@@ -292,7 +292,8 @@ test("entering the world: the AI backdrop, the title typography, a cinematic ent
     await expect(article, slug).not.toHaveAttribute("data-entering", "", { timeout: 20_000 });
     // Its file: landscape on a computer, the portrait crop on a phone.
     await expect.poll(() => page.locator(".u-backdrop img").evaluate((i: HTMLImageElement) => (i.complete && i.naturalWidth > 0 ? i.currentSrc : "")), { message: slug + " backdrop" }).toMatch(
-      new RegExp("/media/universes/" + backdrop + (info.project.name === "desktop" ? "-\\d+" : "-m-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"),
+      // (A phone may take the portrait image of another background: mobileFrom, the stadium of the VfB ring since 28/11/2026.)
+      new RegExp("/media/universes/" + (info.project.name === "desktop" ? backdrop + "-\\d+" : (BACKDROPS[backdrop]?.mobileFrom ?? backdrop) + "-m-\\d+") + "(\\.[0-9a-f]{10})?\\.(avif|webp)$"),
     );
     await expect(page.locator(".u-fx"), slug).toHaveAttribute("data-running", "", { timeout: 10_000 });
     await page.screenshot({ path: shotPath(info, "entree-" + backdrop + "-2"), type: "jpeg", quality: 62 });

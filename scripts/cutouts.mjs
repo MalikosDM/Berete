@@ -227,6 +227,19 @@ const VIEWS = {
     // The black between the round stones of its border cleared; its chain crosses the photo at the top (cut under the place
     // where it leaves the sides). Not cut out: p03 (its right arm leaves the photo, blurred) and p06 (on the bust: its chain in
     // scattered pieces, plates of the bust around it).
+    // Alone, its diamond-shaped bail whole (28/11/2026: « The Sculptural Bail » passed under the menu, the chain leaving the
+    // screen with it): its chain taken away along the two upper edges of the bail, from the loupe copy of p17 (3200 px). The
+    // opening of its page (src/data/pieces.ts).
+    {
+      id: "alone",
+      kind: "face",
+      from: "/media/hd/malik-tillman-cross-pendant/p17.loupe.f9c9fbb0f8.webp",
+      clear: 0.06,
+      drop: [
+        [[0, 0], [0.497, 0], [0.497, 0.096], [0.35, 0.193], [0.35, 0.27], [0, 0.27]],
+        [[0.497, 0], [1, 0], [1, 0.27], [0.65, 0.27], [0.65, 0.19], [0.497, 0.096]],
+      ],
+    },
     { id: "p17", kind: "face", from: "hd:21/p17", clear: 0.06, cut: { top: 0.09 } },
   ],
   // Its photos lying down stand on a mirror: the hand upright only.

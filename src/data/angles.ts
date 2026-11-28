@@ -79,7 +79,8 @@ export const AMATEUR_FILMS = new Set([
   "/media/hd/panther-champion-pendant/v03.mp4",
   "/media/stories/kevin-schade/22.mp4",
   "/media/stories/noah-okafor-ii/03.mp4",
-  "/media/stories/thuram-ss23/05.mp4",
+  // (28/11/2026, evening: the story of the Thorned T, the T turning on velvet, is no longer one of them: never worn, it showed
+  // under « Created exclusively for » the same image as the first photo of Every Angle; it waits behind See More.)
   "/media/hd/angelo-stiller-as-pendant/v02.mp4",
   "/media/stories/samuel-ballet/05.mp4",
   "/media/stories/samuel-ballet/03.mp4",

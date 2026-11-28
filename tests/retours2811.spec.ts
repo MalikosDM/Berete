@@ -269,8 +269,9 @@ test("a profile: beside the portrait, who they are and the names of their pieces
 test("the universes: VfB vertical on a phone, more constellations on the left of the N14, no green halo on the clover", async ({ page }, info) => {
   await open(page, "vfb-stuttgart-dfb-pokal-2025");
   const img = await page.locator("[data-universe] picture img").first().evaluate((e: HTMLImageElement) => e.currentSrc);
-  // The phone: the stadium of before, drawn upright; the computer: the new one, unchanged.
-  if (phone(info.project.name)) expect(img).toMatch(/vfb-victoire-m-/);
+  // The phone: the stadium at night drawn upright (« vfb », since the evening of 28/11/2026: tests/corrections2811.spec.ts);
+  // the computer: the new one, unchanged.
+  if (phone(info.project.name)) expect(img).toMatch(/\/vfb-m-/);
   else expect(img).toMatch(/vfb-victoire-v2-/);
   await open(page, "celestial-initial-medallion");
   const side = phone(info.project.name) ? "--mx" : "--dx";

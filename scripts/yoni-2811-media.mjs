@@ -13,9 +13,15 @@
  * and src/data/yoni2811.generated.json: { fam: [{ type, src, width, height, alt, kind, onBlack }] } in the order of FAM below
  * (kind: front, threequarter, centre, back, roses, pears, clasp, worn, other; alt: what is seen, in English).
  *
+ *   - the Thorned T Pendant of Marcus Thuram (marcus-thuram-thorned-t-pendant): its only photo was one frame of a story; four
+ *     more real views taken from the two stories that show it (public/media/stories/thuram-ss23/05.mp4, the T turning on
+ *     black velvet, and 03.mp4, the T on its chain beside the Jesus Piece), each frame cropped on the jewel (THORNED_T).
+ *
  *   node scripts/yoni-2811-media.mjs
  *   node scripts/yoni-2811-media.mjs --only=fam
+ *   node scripts/yoni-2811-media.mjs --only=thorned-t
  */
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, rename, rm, writeFile } from "node:fs/promises";
@@ -59,9 +65,32 @@ const FAM = [
   ["fam-12.jpeg", "worn-hand", "worn", "The FAM medallion and the NZ pendant worn over a woven tapestry top, a hand in the foreground"],
 ];
 
+/**
+ * The Thorned T, from the stories (720 x 1280 frames): [story file, second, name, kind, crop [x, y, w, h] in fractions, alt].
+ * Looked at frame by frame on 28/11/2026; never the tag of the story (« @thuram » at the bottom of 03).
+ */
+const STORIES = join(ROOT, "public", "media", "stories");
+const THORNED_T = [
+  ["thuram-ss23/05.mp4", 0.6, "angle", "threequarter", [0.08, 0.1, 0.78, 0.8], "Marcus Thuram's Thorned T turned at an angle on black velvet: the dripping T paved with diamonds, wound with rose gold thorns"],
+  ["thuram-ss23/05.mp4", 11.5, "close", "front", [0.1, 0.1, 0.82, 0.78], "The Thorned T up close: the diamond pavé of the T and the rose gold branches wound around it from top to bottom"],
+  ["thuram-ss23/03.mp4", 3.2, "on-chain", "other", [0.45, 0.0, 0.55, 0.86], "The Thorned T on its chain, laid beside the Jesus Piece of Marcus Thuram"],
+  ["thuram-ss23/05.mp4", 11.5, "thorns", "other", [0.3, 0.48, 0.5, 0.36], "Close-up of the foot of the Thorned T: rose gold thorns and a rose wound around the diamond pavé"],
+];
+
+/** A frame of a video as a PNG (the whole picture, its colours as filmed). */
+function frame(video, at, out) {
+  execFileSync("ffmpeg", ["-v", "error", "-y", "-ss", String(at), "-i", video, "-frames:v", "1", out]);
+  return out;
+}
+
 /** A photo: its page copy (LONG px), its smaller copies, its loupe copy (none when the original is hardly larger). */
-async function photo(input, dir, name) {
-  const img = sharp(input).rotate();
+async function photo(input, dir, name, crop) {
+  let img = sharp(input).rotate();
+  if (crop) {
+    const { width = 0, height = 0 } = await img.metadata();
+    const [x, y, w, h] = crop;
+    img = sharp(await img.extract({ left: Math.round(x * width), top: Math.round(y * height), width: Math.round(w * width), height: Math.round(h * height) }).toBuffer());
+  }
   const out = join(dir, name + ".webp");
   const { width, height } = await img.clone().resize(LONG, LONG, { fit: "inside", kernel: "lanczos3", withoutEnlargement: true }).webp({ quality: 84, effort: 6 }).toFile(out);
   for (const size of SIZES) {
@@ -105,6 +134,16 @@ async function group(key, make) {
 }
 
 const GROUPS = {
+  "thorned-t": async () =>
+    group("thorned-t", async (tmp) => {
+      const made = [];
+      for (const [file, at, name, kind, crop, alt] of THORNED_T) {
+        const png = frame(join(STORIES, file), at, join(tmp, ".frame-" + name + ".png"));
+        made.push([await photo(png, tmp, name, crop), kind, alt]);
+        await rm(png, { force: true });
+      }
+      return made;
+    }),
   fam: async () => {
     const missing = FAM.map(([f]) => join(SRC, "fam", f)).filter((f) => !existsSync(f));
     if (missing.length) {

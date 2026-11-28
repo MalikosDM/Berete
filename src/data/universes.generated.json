@@ -2019,7 +2019,11 @@
    ],
    "portrait": true,
    "version": "91ac804abc",
-   "mobileFrom": "vfb-victoire",
+   "mobileFrom": "vfb",
+   "mobileFromAnchor": [
+    0.5,
+    0.3
+   ],
    "anchor": [
     0.66,
     0.5

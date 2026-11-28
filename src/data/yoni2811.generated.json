@@ -108,5 +108,43 @@
    "kind": "worn",
    "onBlack": false
   }
+ ],
+ "thorned-t": [
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/thorned-t/angle.915fba1669.webp",
+   "width": 562,
+   "height": 1024,
+   "alt": "Marcus Thuram's Thorned T turned at an angle on black velvet: the dripping T paved with diamonds, wound with rose gold thorns",
+   "kind": "threequarter",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/thorned-t/close.915fba1669.webp",
+   "width": 590,
+   "height": 998,
+   "alt": "The Thorned T up close: the diamond pavé of the T and the rose gold branches wound around it from top to bottom",
+   "kind": "front",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/thorned-t/on-chain.915fba1669.webp",
+   "width": 396,
+   "height": 1101,
+   "alt": "The Thorned T on its chain, laid beside the Jesus Piece of Marcus Thuram",
+   "kind": "other",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/thorned-t/thorns.915fba1669.webp",
+   "width": 360,
+   "height": 461,
+   "alt": "Close-up of the foot of the Thorned T: rose gold thorns and a rose wound around the diamond pavé",
+   "kind": "other",
+   "onBlack": false
+  }
  ]
 }

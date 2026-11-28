@@ -20,7 +20,28 @@ export type FeatureFilmData = { video: string; mobile?: string; poster: string; 
  */
 // (28/11/2026: the new film of the jersey is black until 4.7 s; the film of the VfB ring opens on its trunk and the player
 // until 6.5 s, that of Loïs Openda on a black trunk until 2.8 s: each plays from the piece.)
-export const PLAY_FROM: Record<string, number> = { "kenan-yildiz-celebration-pendant": 4, "noah-okafor-jersey-pendant": 4.75, "vfb-stuttgart-dfb-pokal-2025": 6.55, "lois-openda-script-pendant": 3.6 };
+// (28/11/2026, evening: the jersey from 5.0 s, its first image the OKA up close and lit — 4.75 s was still almost black, 47/255.)
+export const PLAY_FROM: Record<string, number> = {
+  "kenan-yildiz-celebration-pendant": 5.7,
+  "noah-okafor-jersey-pendant": 5,
+  "vfb-stuttgart-dfb-pokal-2025": 6.55,
+  "lois-openda-script-pendant": 3.6,
+  // (28/11/2026, evening) Every first film starts on an image where the piece is seen, never on black (measured frame by frame:
+  // its first image ≥ 30/255, tests/corrections2811.spec.ts).
+  "angelo-stiller-as-pendant": 2.9,
+  "baguette-cuban-chain": 5.1,
+  "brt-flower-chain": 1.9,
+  "celestial-initial-medallion": 0.7,
+  "deniz-undav-l-pendant": 0.9,
+  "kevin-schade-dragon-ball-pendant": 2.2,
+  "michy-batshuayi-butterfly-pendant": 4.9,
+  "panther-champion-pendant": 2,
+  "samuel-ballet-jesus-piece": 0.3,
+  "sirius": 0.4,
+  "the-hand": 0.6,
+  "thorns-and-roses-crucifix": 1.3,
+  "tulips-on-tour-medallion": 0.3,
+};
 
 /** The film of each piece, by its key in mechanisms.generated.json; "film": the finished piece, "mechanism": how it moves. */
 export const FEATURE_FILMS: Record<string, { key: string; kind: "film" | "mechanism" }> = {
@@ -41,7 +62,8 @@ const SAME_AS: Record<string, string[]> = {};
 export function featureFilmOf(slug: string): { film: FeatureFilmData; kind: "film" | "mechanism"; same: string[] } | null {
   const entry = FEATURE_FILMS[slug];
   const film = entry ? featureFilm(entry.key) : null;
-  return entry && film ? { film, kind: entry.kind, same: [film.video, ...(SAME_AS[entry.key] ?? [])] } : null;
+  // Its start past its black opening (PLAY_FROM, 28/11/2026) when one is set for the piece.
+  return entry && film ? { film: PLAY_FROM[slug] !== undefined ? { ...film, start: PLAY_FROM[slug] } : film, kind: entry.kind, same: [film.video, ...(SAME_AS[entry.key] ?? [])] } : null;
 }
 
 /**

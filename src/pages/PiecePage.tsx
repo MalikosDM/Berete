@@ -413,9 +413,10 @@ export default function PiecePage() {
                   on the sky): only the jewel and a thin dark edge melting into its world, never the rectangle of the photo. */}
               {FRAMED_OPENINGS.has(piece.slug) && piece.cover.width && piece.cover.height ? (
                 // A real photo on the wrist that no cut-out can keep whole (28/11/2026: the watches of Tajon Buchanan and Radja
-                // Nainggolan): sharp, in a fine frame, never larger than its file, never faded at its edges.
+                // Nainggolan, only ever filmed on the wrist, their bracelet behind it): sharp, never faded at its edges; smaller
+                // since the evening of 28/11, in the same fine frame as the film of the page, never larger than its file.
                 <span className="flex h-full w-full items-center justify-center">
-                  <span data-opening-framed className="relative block max-w-full border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.65)]" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height, height: "min(100%, " + Math.round(piece.cover.height * 1.15) + "px)" }}>
+                  <span data-opening-framed className="relative block max-w-full border border-white/10 bg-black" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height, height: "min(68%, " + piece.cover.height + "px)" }}>
                     <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="cover" priority sizes="(max-width: 1023px) 75vw, 40vw" />
                   </span>
                 </span>

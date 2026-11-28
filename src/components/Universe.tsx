@@ -258,7 +258,7 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
       const tall = portrait.matches;
       const ratio = tall ? 9 / 16 : backdrop.ratio;
       const phoneOf = backdrop.mobileFrom ? (BACKDROPS[backdrop.mobileFrom] ?? backdrop) : backdrop;
-      const [ax, ay] = (tall ? phoneOf.mobileAnchor : backdrop.anchor) ?? (tall ? [0.5, 0.42] : [backdrop.focusX, backdrop.focusY]);
+      const [ax, ay] = (tall ? (backdrop.mobileFrom ? (backdrop.mobileFromAnchor ?? phoneOf.mobileAnchor) : phoneOf.mobileAnchor) : backdrop.anchor) ?? (tall ? [0.5, 0.42] : [backdrop.focusX, backdrop.focusY]);
       const sw = stage.clientWidth;
       const sh = stage.clientHeight;
       const u = el.getBoundingClientRect();

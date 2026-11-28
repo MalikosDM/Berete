@@ -205,6 +205,8 @@ export const OVERVIEW: Record<string, string[]> = {
   // MT — NEXUS CROSS (28/11/2026): the cross from the front, the whole creation with its infinity chain, its centre and the MT,
   // the chain.
   "malik-tillman-cross-pendant": ["p17", "p06", "p15", "p18"],
+  // The Thorned T (28/11/2026): from the front, turned, up close, on its chain (its thorns up close behind See More).
+  "marcus-thuram-thorned-t-pendant": ["cover", "angle", "close", "on-chain"],
   // Samuel Ballet's Jesus Piece: whole from the front, three-quarters (its relief), its crown, its face.
   "samuel-ballet-jesus-piece": ["front", "threequarter", "crown", "face"],
   // The FAM medallion (28/11/2026): its front, three-quarters, its centre, its back.

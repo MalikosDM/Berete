@@ -1094,6 +1094,11 @@ const content: Record<string, string> = {
   "A Symbol of Connection": "Een symbool van verbondenheid",
   "Created exclusively for Malik Tillman": "Exclusief gemaakt voor Malik Tillman",
   "His first BERETE pendant": "Zijn eerste BERETE-hanger",
+  // The Thorned T of Marcus Thuram, from its stories (28/11/2026, evening).
+  "Marcus Thuram's Thorned T turned at an angle on black velvet: the dripping T paved with diamonds, wound with rose gold thorns": "De Thorned T van Marcus Thuram schuin gedraaid op zwart fluweel: de druipende T, gepaveerd met diamanten, omwonden met roségouden doornen",
+  "The Thorned T up close: the diamond pavé of the T and the rose gold branches wound around it from top to bottom": "De Thorned T van dichtbij: het diamantpavé van de T en de roségouden takken die er van boven tot onder omheen kronkelen",
+  "The Thorned T on its chain, laid beside the Jesus Piece of Marcus Thuram": "De Thorned T aan zijn ketting, naast het Jesus Piece van Marcus Thuram gelegd",
+  "Close-up of the foot of the Thorned T: rose gold thorns and a rose wound around the diamond pavé": "Close-up van de voet van de Thorned T: roségouden doornen en een roos rond het diamantpavé gewonden",
   // The photos of 28/11/2026: Samuel Ballet's Jesus Piece (from its film in 4K), the FAM medallion.
   "The Samuel Ballet Jesus Piece whole on black velvet: the face set with diamonds, the crown of pear diamonds and the bail": "Het Jesus Piece van Samuel Ballet in zijn geheel op zwart fluweel: het met diamanten gezette gezicht, de kroon van peervormige diamanten en de hanger-oog",
   "The Jesus Piece in three-quarter view: the bail, the crown of pear diamonds and the sculpted face and beard in relief": "Het Jesus Piece van driekwart: het hanger-oog, de kroon van peervormige diamanten en het gezicht en de baard in reliëf gebeeldhouwd",

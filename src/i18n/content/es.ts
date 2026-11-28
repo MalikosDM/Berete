@@ -1094,6 +1094,11 @@ const content: Record<string, string> = {
   "A Symbol of Connection": "Un símbolo de unión",
   "Created exclusively for Malik Tillman": "Creado en exclusiva para Malik Tillman",
   "His first BERETE pendant": "Su primer colgante BERETE",
+  // The Thorned T of Marcus Thuram, from its stories (28/11/2026, evening).
+  "Marcus Thuram's Thorned T turned at an angle on black velvet: the dripping T paved with diamonds, wound with rose gold thorns": "El Thorned T de Marcus Thuram girado en ángulo sobre terciopelo negro: la T que gotea, pavé de diamantes, rodeada de espinas de oro rosa",
+  "The Thorned T up close: the diamond pavé of the T and the rose gold branches wound around it from top to bottom": "El Thorned T de cerca: el pavé de diamantes de la T y las ramas de oro rosa enroscadas a su alrededor de arriba abajo",
+  "The Thorned T on its chain, laid beside the Jesus Piece of Marcus Thuram": "El Thorned T en su cadena, junto a la Jesus Piece de Marcus Thuram",
+  "Close-up of the foot of the Thorned T: rose gold thorns and a rose wound around the diamond pavé": "Primer plano del pie del Thorned T: espinas y una rosa de oro rosa enroscadas alrededor del pavé de diamantes",
   // The photos of 28/11/2026: Samuel Ballet's Jesus Piece (from its film in 4K), the FAM medallion.
   "The Samuel Ballet Jesus Piece whole on black velvet: the face set with diamonds, the crown of pear diamonds and the bail": "La Jesus Piece de Samuel Ballet entera sobre terciopelo negro: el rostro engastado de diamantes, la corona de diamantes en forma de pera y el asa",
   "The Jesus Piece in three-quarter view: the bail, the crown of pear diamonds and the sculpted face and beard in relief": "La Jesus Piece en vista de tres cuartos: el asa, la corona de diamantes en forma de pera y el rostro y la barba esculpidos en relieve",
