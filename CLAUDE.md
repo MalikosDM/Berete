@@ -200,7 +200,13 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       #0a0a0a ou continus, écrin à ±1 % de sa taille d'avant, image qui remplit la zone ; 1280, 1440, 1920, 2560 × 1440, 2560 × 1080,
       iPhone ; sections, phrases mot pour mot, doublons, The House, boucles). `npm run audit:coherence` accepte `ONLY=home`.
       Captures avant / après : `~/Downloads/_verif-accueil-28-11/{avant,apres}/` (ouverture et page entière, 5 tailles + iPhone),
-      vitesse `vitesse/{avant,apres}-{fibre,4g}.json` (`.local/scripts/speed-home.sh`, `home-shots.mjs`).
+      vitesse `vitesse/{avant,apres}-{fibre,4g}.json` (`.local/scripts/speed-home.sh`, `home-shots.mjs`), planches
+      `planche-ouverture.jpg`, `planche-page-1440x900.jpg`, `planche-page-iphone.jpg` (`.local/scripts/sheets-accueil.py`).
+- Vérifié le 28/11 : en local, `accueil2811` et les anciens tests de l'accueil 79 + 49 réussis (ordinateur, iPhone), audit de
+      l'accueil (6 langues, 4 tailles) sans problème nouveau ; en ligne (commit a2cadfb2) : `accueil2811`, `home2711` (sans son test
+      admin), `yoni2311`, `retours2411`, `coherence2411` réussis (ordinateur, iPhone ; les tests coupés par le Wi-Fi repassés seuls).
+      Vitesse en ligne (première visite) : la photo à 0,81 s sur fibre (0,86 avant), 0,88 s en 4G (0,84) ; les vignettes après
+      l'arrivée. Mot de passe réel remis à l'identique. Mac presque plein (moins de 1 Go) : tests avec 1 ou 2 navigateurs à la fois.
 - [ ] Malik : brancher le disque et relancer `npm run page-media -- --only=home` (photo d'origine 5504 px). Yoni : valider le résumé de
       The House et la phrase du trèfle (« In the film… », texte de sa page) ; une photo du mécanisme OKA en mouvement (aujourd'hui le
       ballon en gros plan) ; une photo du dessus de la bague Inter ouvert sur le trophée sans le pendentif à côté, s'il en a une.
