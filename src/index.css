@@ -2472,7 +2472,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   animation-delay: 0.44s;
 }
 [data-entering][data-entrance="unfold"] .sv-float img {
-  animation-delay: calc(0.44s + var(--i, 0) * 0.11s);
+  animation-delay: calc(0.3s + var(--i, 0) * 0.1s);
 }
 /* Its halo and its glints come with the piece, never in the black before. */
 [data-entering][data-entrance="unfold"] :is(.sv-float, [data-piece-cover]) :is(.u-jewel-halo, .u-jewel) {
@@ -2553,19 +2553,21 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
 }
 /* The views of the showcase arrive one by one (src/components/Showcase.tsx). */
+/* (28/11/2026: the jewel shown within half a second of the arrival, its world going on entering around it; the speed goals of
+   docs/vitesse-28-11.md, tests/perf.spec.ts.) */
 [data-entering] .sv-float img {
-  animation: u-view-in 0.605s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: calc(0.193s + var(--i, 0) * 0.121s);
+  animation: u-view-in 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.08s + var(--i, 0) * 0.1s);
 }
 [data-entering][data-entrance="smoke"] .sv-float img {
-  animation-delay: calc(0.413s + var(--i, 0) * 0.121s);
+  animation-delay: calc(0.18s + var(--i, 0) * 0.1s);
 }
 [data-entering][data-entrance="flash"] .sv-float img {
   animation-name: u-piece-flash;
-  animation-delay: calc(0.099s + var(--i, 0) * 0.121s);
+  animation-delay: calc(0.06s + var(--i, 0) * 0.1s);
 }
 [data-entering][data-entrance="tunnel"] .sv-float img {
-  animation-delay: calc(0.33s + var(--i, 0) * 0.121s);
+  animation-delay: calc(0.15s + var(--i, 0) * 0.1s);
 }
 @keyframes u-view-in {
   from {
