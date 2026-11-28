@@ -99,7 +99,23 @@ export const EXPLAIN: Record<string, Explain[]> = {
   // The panther, jaws open, claws polished black, on its belt; the story of the night stays at the top.
   "panther-champion-pendant": [{ photo: "p05", texts: [{ story: 0 }] }],
   // The back of the cross and its BRT mark.
-  "malik-tillman-cross-pendant": [{ photo: "p03", texts: [{ story: 0, sentences: [1] }] }],
+  // MT — NEXUS CROSS (Yoni, 28/11/2026): each detail beside its close-up (the bezel mosaic, the MT signature, the emerald-cut
+  // frame, the halo, the infinity chain, the bail).
+  // Samuel Ballet's Jesus Piece (28/11/2026): its four details beside the close-ups of its film in 4K.
+  "samuel-ballet-jesus-piece": [
+    { photo: "crown-macro", texts: [{ detail: 0 }] },
+    { photo: "claws", texts: [{ detail: 1 }] },
+    { photo: "face-mosaic", texts: [{ detail: 2 }] },
+    { photo: "crown-face", texts: [{ detail: 3 }] },
+  ],
+  "malik-tillman-cross-pendant": [
+    { photo: "p08", texts: [{ detail: 0 }] },
+    { photo: "p13", texts: [{ detail: 1 }] },
+    { photo: "p11", texts: [{ detail: 2 }] },
+    { photo: "p10", texts: [{ detail: 3 }] },
+    { photo: "p19", texts: [{ detail: 4 }] },
+    { photo: "p14", texts: [{ detail: 5 }] },
+  ],
   // The jersey of a player's ring (his name and number), the crest in its shield of red stones, the cup under the crown.
   "vfb-stuttgart-dfb-pokal-2025": [
     { photo: "p11", texts: [{ detail: 0 }] },
@@ -115,9 +131,13 @@ export const EXPLAIN: Record<string, Explain[]> = {
     { photo: "p12", texts: [{ detail: 4 }] },
   ],
   // The back engraved around the BRT mark.
-  "samuel-ballet-jesus-piece": [{ photo: "06", texts: [{ story: 0, sentences: [1] }] }],
+
   // The polished letters among the roses and their marquise diamonds.
-  "tanguy-nianzou-fam-medallion": [{ photo: "06", texts: [{ story: 0, sentences: [1] }] }],
+  // Its professional photos (28/11/2026): the ribbed edge like a coin, the roses and their marquise diamonds.
+  "tanguy-nianzou-fam-medallion": [
+    { photo: "edge", texts: [{ story: 0, sentences: [0] }] },
+    { photo: "roses", texts: [{ story: 0, sentences: [1] }] },
+  ],
   // The back: the BRT mark and the word Faith.
   "lois-openda-script-pendant": [{ photo: "p12", texts: [{ story: 0, sentences: [1] }] }],
   // The figure in coloured stones among the tulips, the wheel in baguettes raised over the diamonds, the engraved back.
@@ -182,6 +202,18 @@ export const OVERVIEW: Record<string, string[]> = {
   "deniz-undav-l-pendant": ["p10", "p08", "p05", "p04"],
   // The AS Pendant: whole from the front, three-quarters for its construction, the invisible-set baguettes, the round diamonds.
   "angelo-stiller-as-pendant": ["p11", "p10", "p05", "p09"],
+  // MT — NEXUS CROSS (28/11/2026): the cross from the front, the whole creation with its infinity chain, its centre and the MT,
+  // the chain.
+  "malik-tillman-cross-pendant": ["p17", "p06", "p15", "p18"],
+  // Samuel Ballet's Jesus Piece: whole from the front, three-quarters (its relief), its crown, its face.
+  "samuel-ballet-jesus-piece": ["front", "threequarter", "crown", "face"],
+  // The FAM medallion (28/11/2026): its front, three-quarters, its centre, its back.
+  "tanguy-nianzou-fam-medallion": ["front", "three-quarter", "centre", "back"],
+  // The oval eternity band: upright from the front, lying on its side, three-quarters (its BRT mark inside, beside its detail).
+  "oval-eternity-band": ["p02", "p01", "p03"],
+  // The Bosnia ring (28/11/2026: four really different views): its top face on, its side with a name and a number, its back
+  // with a fleur-de-lis, its top from above with First World Cup Game.
+  "bosnia-and-herzegovina-world-cup-2026-ring": ["b04512", "b04506", "b04487", "b04504"],
   // (27/11/2026: its bust p01, all black in a small frame, gives its place to the N and its pears.)
   "noah-okafor-octagon-pendant": ["p09", "p10", "p05", "p07"],
   // Its front, three-quarters for the relief, its back, the macro of its scales and its ruby.

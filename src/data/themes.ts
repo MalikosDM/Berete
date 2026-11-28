@@ -135,6 +135,11 @@ export type Backdrop = {
    */
   anchor?: [number, number];
   mobileAnchor?: [number, number];
+  /**
+   * The phone takes the portrait image of another background (28/11/2026: the VfB victory keeps its wide image on a computer;
+   * on a phone, the vertical one made for it, the fireworks over the stadium, instead of a sky of red smoke).
+   */
+  mobileFrom?: string;
   /** An image on black placed freely (its sphere above the piece, never held by the edges of the screen; its edges fade). */
   free?: boolean;
   /** With `free`: how far the image comes down from the top, as a share of the height of the screen (computer, phone). */
@@ -317,7 +322,8 @@ export const THEME_PRESETS: Record<string, Preset> = {
   },
   emeraude: {
     name: "Jardin émeraude, trèfles et rosée (Eljero Elia)",
-    theme: { base: "#040905", tint: "#10291a", glow: "#5fe0a0", texture: "grain", light: "halo", font: "douce", backdrop: "trefle", entrance: "glint", effects: ["fireflies", "smoke", "dew", "scene", "jewel-halo"], mark: "" },
+    // (Its glowing green halo around the medallion removed on 28/11/2026: the cut-out net, without glow.)
+    theme: { base: "#040905", tint: "#10291a", glow: "#5fe0a0", texture: "grain", light: "halo", font: "douce", backdrop: "trefle", entrance: "glint", effects: ["fireflies", "smoke", "dew", "scene"], mark: "" },
   },
   facettes: {
     name: "Facettes : salle de miroirs, lignes de lumière",

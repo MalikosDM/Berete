@@ -237,5 +237,162 @@
    "caption": "JL + 14 mm Cuban",
    "onBlack": false
   }
- }
+ },
+ "balletFilm": {
+  "type": "video",
+  "src": "/media/yoni-2711/ballet-film/jesus-piece.273a80faa5.mp4",
+  "mobile": "/media/yoni-2711/ballet-film/jesus-piece-mobile.273a80faa5.mp4",
+  "poster": "/media/yoni-2711/ballet-film/jesus-piece-poster.273a80faa5.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 12.96,
+  "audio": true,
+  "alt": "Film of the Samuel Ballet Jesus Piece: the pendant on black velvet, its crown of pear diamonds, its rose-gold face and beard set with diamonds, its bail, then the piece on the Berete Jewellers velvet and the BRT card",
+  "onBlack": false
+ },
+ "tillmanFilm": {
+  "type": "video",
+  "src": "/media/yoni-2711/tillman-film/cross.aec1d62d92.mp4",
+  "mobile": "/media/yoni-2711/tillman-film/cross-mobile.aec1d62d92.mp4",
+  "poster": "/media/yoni-2711/tillman-film/cross-poster.aec1d62d92.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 23.12,
+  "audio": true,
+  "alt": "Film of Malik Tillman's cross pendant: the cross in a gloved hand, its centre disc spinning, the infinity links of its chain, the diamond-shaped bail, the MT disc, the clasp with the rose-gold BRT mark, the engraved back, then the cross whole on black",
+  "onBlack": false
+ },
+ "jerseyFilm": {
+  "type": "video",
+  "src": "/media/yoni-2711/jersey-film/jersey.31c1f48397.mp4",
+  "mobile": "/media/yoni-2711/jersey-film/jersey-mobile.31c1f48397.mp4",
+  "poster": "/media/yoni-2711/jersey-film/jersey-poster.31c1f48397.webp",
+  "width": 1080,
+  "height": 1920,
+  "duration": 23.53,
+  "audio": true,
+  "alt": "Film of Noah Okafor's jersey pendant: the jersey set with diamonds in the dark, the pendant on its chain on a black bust, the green sleeve, the Swiss flag and OKA in close-up, then the jersey turning on black",
+  "onBlack": false
+ },
+ "tillmanSpin": {
+  "type": "video",
+  "src": "/media/yoni-2711/tillman-spin/spin.892c51005f.mp4",
+  "poster": "/media/yoni-2711/tillman-spin/spin-poster.892c51005f.webp",
+  "width": 720,
+  "height": 720,
+  "duration": 3,
+  "audio": false,
+  "alt": "The centre of Malik Tillman's cross: its round disc spinning between the diamond-set arms",
+  "onBlack": false
+ },
+ "balletStills": [
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/front.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The Samuel Ballet Jesus Piece whole on black velvet: the face set with diamonds, the crown of pear diamonds and the bail",
+   "kind": "front",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/threequarter.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The Jesus Piece in three-quarter view: the bail, the crown of pear diamonds and the sculpted face and beard in relief",
+   "kind": "threequarter",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/crown.7b4fb4ea1d.webp",
+   "width": 1600,
+   "height": 853,
+   "alt": "Close-up of the white-gold crown of the Jesus Piece and its pear diamonds",
+   "kind": "crown",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/face.7b4fb4ea1d.webp",
+   "width": 1500,
+   "height": 1600,
+   "alt": "Close-up of the rose-gold face of the Jesus Piece: the eyes, the nose and the beard in a mosaic of diamonds",
+   "kind": "face",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/claws.7b4fb4ea1d.webp",
+   "width": 1328,
+   "height": 1600,
+   "alt": "Macro of the crown of the Jesus Piece: the white-gold claws holding each pear diamond",
+   "kind": "claws",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/crown-face.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The crown of pear diamonds above the face and beard of the Jesus Piece",
+   "kind": "crownface",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/crown-macro.7b4fb4ea1d.webp",
+   "width": 1600,
+   "height": 1144,
+   "alt": "Macro of the crown of the Jesus Piece: thirty-two pear-shaped diamonds in white gold, above the rose-gold face",
+   "kind": "crown",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/face-mosaic.7b4fb4ea1d.webp",
+   "width": 1600,
+   "height": 1453,
+   "alt": "The mosaic of the face of the Jesus Piece: round diamonds of varying sizes around the eyes and the nose",
+   "kind": "face",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/bail-hinge.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The bail of the Jesus Piece and its rose-gold hinge, beside the crown of pear diamonds",
+   "kind": "other",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/sideways.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The Jesus Piece seen sideways: the crown of pear diamonds and the face paved with diamonds",
+   "kind": "other",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/profile.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The Jesus Piece in profile: the relief of the nose and the beard beneath the crown of pear diamonds",
+   "kind": "other",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2711/ballet-stills/on-velvet.7b4fb4ea1d.webp",
+   "width": 900,
+   "height": 1600,
+   "alt": "The Jesus Piece lying on black velvet, seen from above: the bail, the crown and the face set with diamonds",
+   "kind": "other",
+   "onBlack": false
+  }
+ ]
 }

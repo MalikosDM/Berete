@@ -854,7 +854,9 @@ html.lenis body {
 /* A view cut at the top of its image (src/components/Showcase.tsx, 27/11/2026): its chain leaves the photo, cut clean, never
    faded; the image is drawn from the top of its frame, which reaches the top of the opening, so the chain leaves the screen
    there. The effect of its universe on the jewel follows it. */
-[data-cut-top] > img {
+[data-cut-top] > img,
+[data-cut-top] > picture > img {
+  /* (28/11/2026: the photo of a computer and of a phone each in its <picture>: the rule follows the image inside.) */
   object-position: 50% 0;
 }
 [data-cut-top] > :is(.u-jewel, .u-jewel-halo) {
@@ -1542,6 +1544,20 @@ html.lenis body {
 }
 .u-spot[data-kind="star"]::after {
   rotate: 90deg;
+}
+/* A fine line of a constellation between two of its stars (the N14, 28/11/2026): drawn after its stars light up. */
+.u-spot[data-kind="link"] {
+  width: calc(var(--w) * 100%);
+  height: 1px;
+  transform-origin: 0 50%;
+  rotate: calc(var(--a) * 1deg);
+  background: linear-gradient(90deg, rgb(var(--tone) / 0.12), rgb(var(--tone) / 0.5) 18%, rgb(var(--tone) / 0.5) 82%, rgb(var(--tone) / 0.12));
+  box-shadow: 0 0 6px rgb(var(--tone) / 0.35);
+  mix-blend-mode: screen;
+}
+.u-spot[data-kind="link"][data-seq] {
+  opacity: 0;
+  animation: u-star-on 1.4s ease-out calc(0.8s + var(--i) * 0.38s) both;
 }
 .u-spot[data-kind="star"][data-seq] {
   opacity: 0;
@@ -2455,7 +2471,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   animation-duration: 0.715s;
   animation-delay: 0.44s;
 }
-[data-entering][data-entrance="unfold"] .sv-float > img {
+[data-entering][data-entrance="unfold"] .sv-float img {
   animation-delay: calc(0.44s + var(--i, 0) * 0.11s);
 }
 /* Its halo and its glints come with the piece, never in the black before. */
@@ -2537,18 +2553,18 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
 }
 /* The views of the showcase arrive one by one (src/components/Showcase.tsx). */
-[data-entering] .sv-float > img {
+[data-entering] .sv-float img {
   animation: u-view-in 0.605s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   animation-delay: calc(0.193s + var(--i, 0) * 0.121s);
 }
-[data-entering][data-entrance="smoke"] .sv-float > img {
+[data-entering][data-entrance="smoke"] .sv-float img {
   animation-delay: calc(0.413s + var(--i, 0) * 0.121s);
 }
-[data-entering][data-entrance="flash"] .sv-float > img {
+[data-entering][data-entrance="flash"] .sv-float img {
   animation-name: u-piece-flash;
   animation-delay: calc(0.099s + var(--i, 0) * 0.121s);
 }
-[data-entering][data-entrance="tunnel"] .sv-float > img {
+[data-entering][data-entrance="tunnel"] .sv-float img {
   animation-delay: calc(0.33s + var(--i, 0) * 0.121s);
 }
 @keyframes u-view-in {
@@ -2715,10 +2731,11 @@ html[lang="ar"] [data-piece] [data-u-title] {
   text-shadow: none;
   filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.7)) drop-shadow(0 0 24px rgb(0 0 0 / 0.7));
 }
-/* The Inter ring (Yoni, 27/11/2026): « Campione » and every title of the sections of its page in yellow gold, the theme of the
-   victory; the same gold for its name and its titles, bright on the dark (the closing block keeps the titles of the house). */
+/* The Inter ring (Yoni, 27/11/2026): « Campione » and every title of the sections of its page in gold, the theme of the
+   victory (the closing block keeps the titles of the house). 28/11/2026 (Yoni): « le premier gold, pas le deuxième, ça fait très
+   jaune »: the gold of its title of before, the same as « Engraved in gold, like a trophy » above, for its name and its titles. */
 [data-piece="campione-d-italia-2023-2024"] :is([data-u-title], [data-piece-section]:not([data-piece-section="end"]) h2) {
-  background: linear-gradient(180deg, #fff1bf 0%, #f3d27a 34%, #dcae4a 55%, #f6dc8e 76%, #e2b65a 100%);
+  background: linear-gradient(180deg, #fff8e4 0%, #f2dca6 36%, #cfa862 52%, #f7e8c2 70%, #dcb878 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -2762,7 +2779,7 @@ html[lang="ar"] [data-piece] [data-u-title] {
     animation: none !important;
   }
   .sv-float,
-  .sv-float > img {
+  .sv-float img {
     animation: none !important;
   }
   .sv-par {

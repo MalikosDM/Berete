@@ -6,6 +6,7 @@ import { MediaView } from "@/components/Media";
 import { strongestFirst } from "@/components/EveryAngle";
 import { angleOf, ownCaption } from "@/data/angles";
 import { pointsFor } from "@/data/details3d";
+import { fileBase } from "@/data/pageMedia";
 import { magazineOf } from "@/data/magazine";
 import type { PublicModel } from "@/data/models";
 import type { MediaItem, Piece } from "@/data/types";
@@ -27,6 +28,7 @@ export default function MagazineGallery({
   sameViews,
   extra = [],
   part = "both",
+  loops = {},
 }: {
   piece: Piece;
   english?: Piece;
@@ -38,6 +40,9 @@ export default function MagazineGallery({
   extra?: MediaItem[];
   /** Its two sections may stand apart on the page (Yoni's order of 26-27/11/2026): "angles", "details", or both together. */
   part?: "angles" | "details" | "both";
+  /** A short silent loop shown small in the corner of a close-up (by the file of the close-up: the centre of the MT — Nexus
+   *  Cross that spins, 28/11/2026). */
+  loops?: Record<string, MediaItem>;
 }) {
   const { t, locale } = useI18n();
   const [open, setOpen] = useState<number | null>(null);
@@ -128,6 +133,11 @@ export default function MagazineGallery({
                       <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
                         <MediaView item={b.item} alt={nameOf(b.item)} fit={b.item.onBlack !== false ? "contain" : "cover"} sizes={b.big ? "(max-width: 639px) 92vw, (max-width: 1023px) 56vw, 44rem" : "(max-width: 639px) 75vw, (max-width: 1023px) 48vw, 38rem"} frame={4 / 5} />
                       </span>
+                      {loops[fileBase(b.item.src)] ? (
+                        <span data-detail-loop className="absolute start-3 bottom-3 block aspect-square w-[38%] overflow-hidden rounded-full border border-rose-light/40 bg-ink shadow-[0_0_24px_rgba(0,0,0,0.6)]">
+                          <video className="h-full w-full object-cover" src={loops[fileBase(b.item.src)]!.src} poster={loops[fileBase(b.item.src)]!.poster} muted loop playsInline autoPlay preload="metadata" aria-hidden="true" />
+                        </span>
+                      ) : null}
                       <span className="absolute end-3 bottom-3 hidden size-10 items-center justify-center rounded-full border border-white/30 bg-ink/60 text-white opacity-0 transition-opacity group-hover:opacity-100 lg:inline-flex">
                         <ZoomIn className="size-4" aria-hidden="true" />
                       </span>
@@ -178,13 +188,14 @@ export default function MagazineGallery({
 function Grid({ items, first, onOpen, nameOf, captionOf, rest = false }: { items: MediaItem[]; first: number; onOpen: (m: MediaItem, e: { clientX: number; clientY: number }) => void; nameOf: (m: MediaItem) => string; captionOf: (m: MediaItem) => string; rest?: boolean }) {
   const { t } = useI18n();
   return (
-    // Fewer than four photos of the whole: as many columns as photos, never an empty place.
-    <ol data-angle-rest={rest ? "" : undefined} className={"grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:gap-x-5 lg:gap-y-8 " + (rest || items.length >= 4 ? "lg:grid-cols-4 " : items.length === 3 ? "lg:grid-cols-3 " : "lg:grid-cols-2 ") + (rest ? "" : "mt-8 lg:mt-10")}>
+    // Every Angle, on every page the same (28/11/2026): four photos of the same size in a row; fewer than four keep that size,
+    // centred, never larger nor stretched. Behind See More: the grid of four.
+    <ol data-angle-rest={rest ? "" : undefined} className={rest ? "grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-8" : "mt-8 flex flex-wrap justify-center gap-x-3 gap-y-6 sm:gap-x-4 lg:mt-10 lg:gap-x-5 lg:gap-y-8"}>
       {items.map((item, k) => (
-        <li key={item.src} data-angle={first + k} data-angle-type={item.type} className="min-w-0">
+        <li key={item.src} data-angle={first + k} data-angle-type={item.type} className={"min-w-0" + (rest ? "" : " w-[calc((100%-0.75rem)/2)] sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3.75rem)/4)]")}>
           <button type="button" onClick={(e) => onOpen(item, e)} className="group relative block aspect-[4/5] w-full cursor-zoom-in overflow-hidden bg-ink" aria-label={t.gallery.open(nameOf(item))}>
             <span className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90">
-              <MediaView item={item} alt={nameOf(item)} sizes={"(max-width: 1023px) 46vw, " + (rest || items.length >= 4 ? "18rem" : items.length === 3 ? "25rem" : "38rem")} frame={4 / 5} />
+              <MediaView item={item} alt={nameOf(item)} sizes="(max-width: 1023px) 46vw, 18rem" frame={4 / 5} />
             </span>
             {item.type === "video" ? (
               <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-ink/60 px-3 py-1 text-sm text-white">

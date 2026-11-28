@@ -91,7 +91,7 @@ test("the Genki Dama: its name and its words as on Yoni's mock-up, its sphere 15
   await expect(page.locator("[data-piece-name]", { hasText: /^Genki Dama$/ }).first()).toBeVisible();
 });
 
-test("the Inter ring: its name and every title of its sections in yellow gold, readable", async ({ page }) => {
+test("the Inter ring: its name and every title of its sections in the first gold (28/11/2026: never the yellow one), readable", async ({ page }) => {
   await open(page, "campione-d-italia-2023-2024");
   const titles = page.locator("[data-piece-section]:not([data-piece-section='end']) h2, #piece-title");
   const n = await titles.count();
@@ -99,7 +99,8 @@ test("the Inter ring: its name and every title of its sections in yellow gold, r
   for (let i = 0; i < n; i++) {
     const s = await titles.nth(i).evaluate((e) => ({ bg: getComputedStyle(e).backgroundImage, color: getComputedStyle(e).color, text: e.textContent }));
     expect(s.bg, s.text ?? "").toContain("linear-gradient");
-    expect(s.bg).toContain("rgb(220, 174, 74)");
+    expect(s.bg).toContain("rgb(207, 168, 98)");
+    expect(s.bg).not.toContain("rgb(220, 174, 74)");
     expect(s.color).toBe("rgba(0, 0, 0, 0)");
   }
   // The closing block keeps the titles of the house.

@@ -316,6 +316,37 @@
     "clean": true,
     "source": "Dossiers icloud/34 Chaine cubaine glacee (2)/34 Chaine cubaine glacee (2) - 17.jpg",
     "note": ""
+   },
+   {
+    "id": "p18",
+    "kind": "face",
+    "width": 842,
+    "height": 882,
+    "widths": [
+     480,
+     842
+    ],
+    "version": "95e8d59323",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/hd/noah-okafor-oka-pendant/p18.loupe.8ab52ac7cc.webp",
+    "note": ""
+   },
+   {
+    "id": "alone",
+    "kind": "face",
+    "width": 1506,
+    "height": 1010,
+    "widths": [
+     480,
+     960,
+     1506
+    ],
+    "version": "aa63ff5438",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/hd/noah-okafor-oka-pendant/p05.webp",
+    "note": ""
    }
   ],
   "noah-okafor-octagon-pendant": [
@@ -684,6 +715,21 @@
   ],
   "marcus-thuram-thorned-t-pendant": [
    {
+    "id": "v05",
+    "kind": "face",
+    "width": 559,
+    "height": 896,
+    "widths": [
+     480,
+     559
+    ],
+    "version": "405c709118",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/stories/thuram-ss23/05.mp4@8.33",
+    "note": ""
+   },
+   {
     "id": "studio",
     "kind": "face",
     "width": 1600,
@@ -720,6 +766,21 @@
   ],
   "malik-tillman-tm-pendant": [
    {
+    "id": "s05",
+    "kind": "face",
+    "width": 824,
+    "height": 1060,
+    "widths": [
+     480,
+     824
+    ],
+    "version": "299fce2a60",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/stories/malik-tillman-ii/05.loupe.0830ddd49e.webp",
+    "note": ""
+   },
+   {
     "id": "studio",
     "kind": "face",
     "width": 1600,
@@ -737,6 +798,24 @@
    }
   ],
   "tanguy-nianzou-fam-medallion": [
+   {
+    "id": "f06",
+    "kind": "face",
+    "width": 1600,
+    "height": 2201,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "64d1c6c280",
+    "cut": [
+     "top"
+    ],
+    "clean": true,
+    "source": ".local/yoni-2811/fam/fam-06.jpeg",
+    "note": ""
+   },
    {
     "id": "cover",
     "kind": "face",
@@ -810,6 +889,37 @@
   ],
   "ampersand-initials-pendant": [
    {
+    "id": "alone",
+    "kind": "face",
+    "width": 1600,
+    "height": 1574,
+    "widths": [
+     480,
+     960,
+     1600
+    ],
+    "version": "97aa7421d0",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/hd/ampersand-initials-pendant/p07.loupe.6bff1269e3.webp",
+    "note": ""
+   },
+   {
+    "id": "film",
+    "kind": "face",
+    "width": 932,
+    "height": 923,
+    "widths": [
+     480,
+     932
+    ],
+    "version": "dd8e6ce422",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/films/ampersand-initials-pendant/reveal.mp4@1.8",
+    "note": ""
+   },
+   {
     "id": "p07",
     "kind": "face",
     "width": 1600,
@@ -819,12 +929,12 @@
      960,
      1600
     ],
-    "version": "25ccdbcb8c",
+    "version": "e6220174c4",
     "cut": [
      "top"
     ],
     "clean": true,
-    "source": "Dossiers icloud/04 Pendentif initiales DE/04 Pendentif initiales DE - 07.jpg",
+    "source": "site /media/hd/ampersand-initials-pendant/p07.loupe.6bff1269e3.webp",
     "note": ""
    }
   ],
@@ -1121,6 +1231,21 @@
   ],
   "marcus-thuram-skeleton-watch": [
    {
+    "id": "cover",
+    "kind": "face",
+    "width": 617,
+    "height": 808,
+    "widths": [
+     480,
+     617
+    ],
+    "version": "5cb89d5367",
+    "cut": null,
+    "clean": true,
+    "source": "site /media/pieces/marcus-thuram-skeleton-watch/cover.webp",
+    "note": ""
+   },
+   {
     "id": "studio",
     "kind": "face",
     "width": 1600,
@@ -1347,13 +1472,13 @@
     "id": "p10",
     "kind": "face",
     "width": 1600,
-    "height": 2782,
+    "height": 2777,
     "widths": [
      480,
      960,
      1600
     ],
-    "version": "f4e2679397",
+    "version": "9c7e44d3d4",
     "cut": null,
     "clean": true,
     "source": "Dossiers icloud/38 Pendentif L/38 Pendentif L - 10.jpg",

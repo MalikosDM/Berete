@@ -36,6 +36,13 @@ subject lifting (scripts/cutout-mask.swift), a transparent image whose edges fol
   edge_px: the width of that edge (pixels of a 3600 px photo). peel: the flat black regions reaching the outside go (or
   [level, depth]: only near the outside). drop: boxes or polygons of the photo where nothing is the jewel. harden: a soft
   outline made crisp (true: alpha 0.3–0.7 becomes 0–1; a number h: 0.5 ± h).
+- hug: a number of pixels (of a 3600 px photo): the jewel only within that distance of the outline of macOS (a lit backdrop behind
+  it, a grey panel seen between its parts, is not kept as its edge).
+- solid: polygons of the photo known to be the jewel through and through (a face as dark as the background): opaque there.
+- lift: {"areas": [polygons], "amount": a, "soften": px} (28/11/2026): in those areas the darkest tones lifted a little (a black
+  pixel gains a, a pixel lit at 0.5 or more nothing; the colour of the pixel kept, its own hue), and the outline softened there
+  (a Gaussian of soften pixels of a 3600 px photo on the alpha near the outside): a dark face against a bright backdrop no
+  longer reads as a black contour.
 - near: (mode "luma") the colour of a half-transparent edge taken from the jewel next to it, at its own light, instead of
   unpremultiplied against black: the light decides the alpha there, so a dim pixel of metal is dark metal, not half
   background, and dividing it by its alpha drew a pale rim around a chain on a bust.
@@ -207,7 +214,15 @@ def as_is(work):
     return out, {"width": int(out.shape[1]), "height": int(out.shape[0]), "fade": [], "onEdge": [], "haze": round(haze, 3), "dark": True, "bg": 0}
 
 
-def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None, neutral=False, seed=None, keep_edge=False, cut=None, near_colour=False, fade_at=None, clear=None, holes=None, largest=False, peel=None, edge_px=None, defringe_on=True, drop=None, harden=None):
+def polygon_mask(areas, h, w):
+    """Polygons [[x, y], ...] (fractions of the photo) drawn into a mask of the photo."""
+    poly = np.zeros((h, w), np.uint8)
+    for area in areas or []:
+        cv2.fillPoly(poly, [np.array([[round(x * (w - 1)), round(y * (h - 1))] for x, y in area], np.int32)], 1)
+    return poly
+
+
+def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=None, fill=False, level=None, neutral=False, seed=None, keep_edge=False, cut=None, near_colour=False, fade_at=None, clear=None, holes=None, largest=False, peel=None, edge_px=None, defringe_on=True, drop=None, harden=None, solid_areas=None, lift=None, hug=None):
     img = cv2.cvtColor(cv2.imread(work, cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB).astype(np.float32) / 255
     h, w = img.shape[:2]
     m = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
@@ -275,6 +290,11 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         den = cv2.GaussianBlur(bgmask, (0, 0), k)[..., None]
         bg_color = num / np.maximum(den, 1e-4)
 
+    if hug:
+        # Only the light near the outline of macOS (within hug pixels of a 3600 px photo): a lit backdrop behind the jewel (a grey
+        # panel seen between its parts) is not taken for its edge.
+        near_mask = cv2.dilate((m > 0.5).astype(np.uint8), disk(float(hug) * s)).astype(np.float32)
+        alpha = alpha * cv2.GaussianBlur(near_mask, (0, 0), 0.8 * s + 0.3)
     if clear:
         # The black seen through the gaps between the links of a chain (macOS fills them): a pure dark part of the
         # jewel larger than a speck goes, its edge drawn by the light around it.
@@ -409,6 +429,14 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         # what is less goes, over a narrow ramp (still drawn smooth).
         lo, hi = (0.5 - harden, 0.5 + harden) if isinstance(harden, (int, float)) and not isinstance(harden, bool) else (0.3, 0.7)
         alpha = smoothstep(lo, hi, alpha)
+    if solid_areas:
+        # A face of the jewel as dark as the background (its edge ragged): opaque inside the polygons, the floor still applied.
+        inside = cv2.GaussianBlur(polygon_mask(solid_areas, h, w).astype(np.float32), (0, 0), 0.8 * s + 0.3)
+        if floor is not None:
+            pts = [[0, floor], [1, floor]] if isinstance(floor, (int, float)) else sorted(floor)
+            line = np.interp(np.arange(w) / max(w - 1, 1), [p[0] for p in pts], [p[1] for p in pts]) * h
+            inside = inside * np.clip(line[None, :] - np.arange(h, dtype=np.float32)[:, None], 0, 1)
+        alpha = np.maximum(alpha, inside)
     alpha[alpha < 0.02] = 0
 
     # Colours without the background (unpremultiplied against it).
@@ -428,6 +456,33 @@ def cutout(work, mask_path, mode, solo=False, stones=False, ring=False, floor=No
         # The edge redrawn: its colour is the jewel's next to it (never the black behind), its own where it is as bright.
         band, local, t = fix
         fg = np.where(band[..., None], np.clip(local * (1 - t[..., None]) + fg * t[..., None], 0, 1), fg)
+    if solid_areas:
+        # Where the jewel was made opaque, its own colours (the photo), not unmixed against a background it does not show.
+        inside = polygon_mask(solid_areas, h, w) > 0
+        fg = np.where(inside[..., None], img, fg)
+    if lift:
+        # The darkest tones of those areas lifted a little, each pixel keeping its own hue (its colour scaled; a near-black pixel,
+        # whose hue is noise, takes the hue of the jewel around it); a pixel lit at 0.5 or more is untouched (glints, colours).
+        area = cv2.GaussianBlur(polygon_mask(lift.get("areas"), h, w).astype(np.float32), (0, 0), 6 * s + 0.5)
+        amount = float(lift.get("amount", 0.08))
+        y = fg.max(axis=2)
+        gain = amount * (1 - smoothstep(0.0, 0.5, y)) * area
+        k = 4 * s + 0.5
+        hue_num = cv2.GaussianBlur(fg * alpha[..., None], (0, 0), k)
+        hue_den = cv2.GaussianBlur(y * alpha, (0, 0), k)[..., None]
+        hue_local = hue_num / np.maximum(hue_den, 1e-4)
+        own = fg / np.maximum(y, 1e-4)[..., None]
+        hue = np.where((y > 0.06)[..., None], own, hue_local)
+        hue = hue / np.maximum(hue.max(axis=2, keepdims=True), 1e-4)
+        fg = np.clip(fg + gain[..., None] * hue, 0, 1)
+        soften = float(lift.get("soften", 0))
+        if soften > 0:
+            # The outline there softened: the alpha blurred near the outside only (never a veil inside the jewel).
+            outside = (alpha < 0.02).astype(np.uint8)
+            near_out = cv2.distanceTransform(1 - outside, cv2.DIST_L2, 3) <= 2.5 * soften * s
+            soft = cv2.GaussianBlur(alpha, (0, 0), soften * s)
+            w8 = area * near_out
+            alpha = alpha * (1 - w8) + np.minimum(alpha, soft) * w8 if lift.get("inward", True) else alpha * (1 - w8) + soft * w8
 
     # A jewel that leaves the photo (a chain going up, or the line where it was cut: cut) keeps its sharp cut there, flush with
     # the border of the image (no margin on that side): the page puts that border at the edge of its frame. Never a fade.
@@ -485,7 +540,7 @@ def main():
         if job.get("mode") == "png":
             out, report = as_is(job["work"])
         else:
-            out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"), job.get("neutral", False), job.get("seed"), job.get("keepEdge", False), job.get("cut"), job.get("near", False), job.get("fadeAt"), job.get("clear"), job.get("holes"), job.get("largest", False), job.get("peel"), job.get("edge"), job.get("defringe", True), job.get("drop"), job.get("harden"))
+            out, report = cutout(job["work"], job["mask"], job.get("mode", "mask"), job.get("solo", False), job.get("stones", False), job.get("ring", False), job.get("floor"), job.get("fill", False), job.get("level"), job.get("neutral", False), job.get("seed"), job.get("keepEdge", False), job.get("cut"), job.get("near", False), job.get("fadeAt"), job.get("clear"), job.get("holes"), job.get("largest", False), job.get("peel"), job.get("edge"), job.get("defringe", True), job.get("drop"), job.get("harden"), job.get("solid"), job.get("lift"), job.get("hug"))
         if out is not None:
             Image.fromarray((out * 255 + 0.5).astype(np.uint8), "RGBA").save(job["out"], compress_level=3)
         print(json.dumps({"out": job["out"], **report}), flush=True)

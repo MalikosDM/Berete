@@ -60,6 +60,7 @@ const SPOT_PARAMS: Record<string, string[]> = {
   cone: ["x", "y", "w", "h", "a"],
   beam: ["x", "y", "w", "h"],
   rays: ["x", "y", "w", "a"],
+  link: ["x", "y", "w", "a"],
   ripples: ["x", "y", "w", "h"],
   heat: ["x", "y", "w", "h"],
   folds: ["x", "y", "w", "h"],
@@ -122,7 +123,9 @@ export function universeProps(theme: ResolvedTheme): { style: CSSProperties; "da
     "--u-font-family": f.family ? '"' + f.family + '", var(--font-display)' : "var(--font-display)",
     "--u-font-weight": String(f.weight),
     "--u-font-style": f.italic ? "italic" : "normal",
-    "--u-font-case": f.caps ? "uppercase" : "none",
+    // Every name of a piece in capitals, whatever the letters of its universe (28/11/2026: « Rose Cuban Chain 14 mm » beside
+    // « ROSE CUBAN CHAIN 20 MM »); the capitals Yoni wants kept (« AngeL ») stay (src/lib/pieceName.tsx).
+    "--u-font-case": "uppercase",
     "--u-font-tracking": f.tracking,
     "--u-font-scale": String(f.scale),
   } as CSSProperties;
@@ -254,7 +257,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
     const place = () => {
       const tall = portrait.matches;
       const ratio = tall ? 9 / 16 : backdrop.ratio;
-      const [ax, ay] = (tall ? backdrop.mobileAnchor : backdrop.anchor) ?? (tall ? [0.5, 0.42] : [backdrop.focusX, backdrop.focusY]);
+      const phoneOf = backdrop.mobileFrom ? (BACKDROPS[backdrop.mobileFrom] ?? backdrop) : backdrop;
+      const [ax, ay] = (tall ? phoneOf.mobileAnchor : backdrop.anchor) ?? (tall ? [0.5, 0.42] : [backdrop.focusX, backdrop.focusY]);
       const sw = stage.clientWidth;
       const sh = stage.clientHeight;
       const u = el.getBoundingClientRect();
@@ -369,9 +373,11 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
       () => {
         const canvas = depthCanvas.current;
         const tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
-        const id = theme.backdrop;
-        const v = backdrop.version ? "." + backdrop.version : "";
-        const map = depthMap ? (tall ? depthMap.m : depthMap.d) : undefined;
+        const phone = tall && backdrop.mobileFrom && BACKDROPS[backdrop.mobileFrom] ? backdrop.mobileFrom : null;
+        const id = phone ?? theme.backdrop;
+        const of = phone ? BACKDROPS[phone]! : backdrop;
+        const v = of.version ? "." + of.version : "";
+        const map = phone ? of.depth?.m : depthMap ? (tall ? depthMap.m : depthMap.d) : undefined;
         if (!canvas || !map) return css();
         const image = "/media/universes/" + id + (tall ? "-m-1080" : "-1600") + v + ".webp";
         const depthFile = "/media/universes/" + id + (tall ? "-m-depth." : "-depth.") + map + ".webp";
@@ -505,8 +511,8 @@ export default function Universe({ theme, slug, preview = false, fixed = false }
           frames.map(({ id, b }, i) =>
             i === 0 || allFrames ? (
               <picture key={id} className="u-backdrop" data-frame={sequence ? i : undefined} data-frame-id={sequence ? id : undefined} data-on={on(i)}>
-                <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcSet={set(id, b.mobileWidths, "-m-", "avif")} sizes="57vh" />
-                <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(id, b.mobileWidths, "-m-", "webp")} sizes="57vh" />
+                <source media="(max-aspect-ratio: 4/5)" type="image/avif" srcSet={set(b.mobileFrom ?? id, BACKDROPS[b.mobileFrom ?? id]?.mobileWidths ?? b.mobileWidths, "-m-", "avif")} sizes="57vh" />
+                <source media="(max-aspect-ratio: 4/5)" type="image/webp" srcSet={set(b.mobileFrom ?? id, BACKDROPS[b.mobileFrom ?? id]?.mobileWidths ?? b.mobileWidths, "-m-", "webp")} sizes="57vh" />
                 <source type="image/avif" srcSet={set(id, b.widths, "-", "avif")} sizes="145vw" />
                 <img src={file(id, "-", 1600, "webp")} srcSet={set(id, b.widths, "-", "webp")} sizes="145vw" alt="" decoding="async" fetchPriority="low" />
                 {/* The same image drawn in depth, over it, once ready (src/components/universe/depth.ts). */}

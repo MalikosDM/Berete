@@ -16,10 +16,13 @@
  * 4. Each cutout is written in WebP with transparency at 480, 960 and 1600 px (never wider than itself), its version
  *    (the start of a sha256 of its files) in every name so that a redone cutout gets new addresses (the site caches
  *    /media): public/media/cutouts/<slug>/<id>-<w>.<version>.webp, listed in src/data/cutouts.generated.json. The
- *    folder of a piece redone is emptied first; a piece no longer listed loses its folder. The views of the other
+ *    files of a view redone are replaced; a piece no longer listed loses its folder. The views of the other
  *    pieces are left as they are (an old file without version is renamed with its version).
- * The disk must be connected for the HD photos (BERETE_DISK, default "/Volumes/Disque externe"); BERETE_WA_DIR gives
- * another folder for the photos sent on WhatsApp (default: "Yoni envoie whatsapp" on the Desktop).
+ * The HD photos are read from the external disk (BERETE_DISK, default "/Volumes/Disque externe"); BERETE_WA_DIR gives
+ * another folder for the photos sent on WhatsApp (default: "Yoni envoie whatsapp" on the Desktop). Without the disk
+ * (28/11/2026) the script still runs: a view whose original cannot be read is made again from its working photo and mask
+ * of .local/cutouts when they are there, else it keeps its files as they are (never removed); the views read from the
+ * repository ("local:", the photos of the site) are made as usual.
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -56,8 +59,10 @@ const PREVIEW = previewArg ? previewArg.slice(10) : null;
  * The views of each piece, the main one first: "hd:<folder>/<photo>" (an HD photo of Yoni), "yoni:<path>" (a file of
  * "00 Contexte Yoni"), "wa:<file>" (a photo sent on WhatsApp), "story:<folder>/<n>" (a story of "Berete - Stories", its
  * image; "story:25/02@6.75": the image of its film at 6.75 s), "png:<path>" (a file of "00 Contexte Yoni" already cut
- * out by hand, transparent: kept as it is, no mask), or a photo of the site. kind: face, profile, back, detail, worn. A
- * photo sent on WhatsApp or a story is never enlarged.
+ * out by hand, transparent: kept as it is, no mask), "local:<path>" (a file of the repository, an original kept in .local/
+ * that never goes in Git), or a photo of the site ("/media/…"; a film of the site: "/media/…/05.mp4@8.33", its image at
+ * 8.33 s; a loupe copy "….loupe.<v>.webp" is the largest copy of a photo the site has). kind: face, profile, back,
+ * detail, worn. A photo sent on WhatsApp, a story, a local file or a photo of the site is never enlarged.
  * - mode "luma": a jewel on a dark bust (only its light is kept). solo: one object only (a reflection on a mirror under
  *   it goes). stones: a coloured stone as dark as the background is kept. crop: [x0, y0, x1, y1] (fractions of the
  *   photo), when the photo shows something else beside the jewel.
@@ -81,6 +86,14 @@ const PREVIEW = previewArg ? previewArg.slice(10) : null;
  *   go (black stains stuck under a jewel). drop: boxes [x0, y0, x1, y1] or polygons [[x, y], ...] (fractions of the photo)
  *   where nothing is the jewel (a part of the piece seen behind it, joined to it). harden: a soft outline made crisp (a part
  *   out of focus, a dim link kept by its light half transparent): true, or the half width of the ramp around 0.5.
+ * - hug: a number of pixels (of a 3600 px photo): the jewel kept only that close to the outline of macOS (a lit backdrop seen
+ *   between its parts, a grey panel behind it, is not taken for its edge).
+ * - solid: polygons [[x, y], ...] (fractions of the photo) known to be the jewel through and through (a face of it as dark as
+ *   the background, whose edge came out ragged): made opaque there, its colours those of the photo.
+ * - lift: { areas: [polygons], amount, soften } (28/11/2026, the dark underside of the AngeL): in those areas the darkest
+ *   tones are lifted a little (amount: the most added to a black pixel, 0.1 = a tenth of white; a pixel lit at 0.5 or more
+ *   is untouched, so the glints of the stones and the colours stay), and the outline there is softened over soften pixels
+ *   of a 3600 px photo (a dark face against a bright backdrop no longer reads as a black contour).
  * - level (on black): the least light kept, so that a dim surface in the shadow does not stay as a grey smudge. clear: a
  *   light level: the black seen through the gaps of a chain, filled by macOS, cleared (a jewel without black parts).
  *   near (mode "luma"): the colour of a half-transparent edge taken from the jewel next to it, not brightened. holes: a
@@ -161,8 +174,33 @@ const VIEWS = {
     { id: "p02", kind: "worn", from: "hd:32/p2", mode: "luma", near: true, cut: { top: 0.11 } },
   ],
   // p17 shows the whole plate (its right side only touches the edge of the photo: its margin kept; the chain leaves the top).
-  // p05 is not cut out: its "O" and its "A" leave the photo, half of the plate dissolved.
-  "noah-okafor-oka-pendant": [{ id: "p17", kind: "face", from: "hd:34/p17", keepEdge: ["right"] }],
+  // p05 was not cut out (its "O" and its "A" seemed to leave the photo); 28/11/2026: the copy of the site holds the whole plate,
+  // 30 to 40 px from the sides of the photo ("alone" below).
+  // 28/11/2026: the whole piece, its Cuban chain closed (clasp at the top) and its plate, laid in its black case at the reveal
+  // (p18, the largest copy of the site: 3200 px), cropped on the case (the phone held beside it left out: drop).
+  "noah-okafor-oka-pendant": [
+    { id: "p17", kind: "face", from: "hd:34/p17", keepEdge: ["right"] },
+    { id: "p18", kind: "face", from: "/media/hd/noah-okafor-oka-pendant/p18.loupe.8ab52ac7cc.webp", crop: [0.2, 0.345, 0.8, 0.64], drop: [[0, 0, 0.22, 0.035], [0, 0, 0.12, 0.06], [0.86, 0, 1, 0.2]], whole: true, level: 0.1, peel: 0.03 },
+    // 28/11/2026: the pendant alone, whole with its bail, from its studio photo from the front on the bust (p05, the copy of the
+    // site: 1440 px, the plate 1370 px wide), its chain taken away. Its bail is a straight bar of baguettes laid over the chain:
+    // everything beside it down to the gap between the chain and the top of the plate (y 740–750) goes (drop, along the edges
+    // of the bar measured on the photo, a pixel inside them), the bar itself solid along those cuts. Nothing is invented.
+    // (p18, the whole piece in its case, is a phone photo: two links of its chain turned on their edge are pure black there, so
+    // the chain reads as broken in two places at the top.)
+    {
+      id: "alone",
+      kind: "face",
+      from: "/media/hd/noah-okafor-oka-pendant/p05.webp",
+      // (The dark notch of the plate under the bail, around its hinge pin, is kept as the photo shows it: cleared, the bail and
+      // its pin read as loose from the plate.)
+      drop: [
+        [[0, 0], [0.4719, 0], [0.4719, 0.2752], [0.4698, 0.4136], [0, 0.4136]],
+        [[0.5407, 0], [1, 0], [1, 0.4136], [0.54, 0.4136], [0.5407, 0.2752]],
+        [0.47, 0, 0.541, 0.2735],
+      ],
+      solid: [[[0.4719, 0.2757], [0.5407, 0.2757], [0.54, 0.4136], [0.4698, 0.4136]]],
+    },
+  ],
   "noah-okafor-octagon-pendant": [
     { id: "p09", kind: "face", from: "hd:17/p9" },
     { id: "p10", kind: "back", from: "hd:17/p10" },
@@ -218,8 +256,32 @@ const VIEWS = {
   ],
   // The pieces published on 20/11/2026: their photos of the whole jewel on plain black (the chains are all on a bust).
   // On black glass, the reflection under the jewel goes (solo).
-  // Its Cuban chain leaves the photo at the top and on the right: cut at the top of its bail.
-  "ampersand-initials-pendant": [{ id: "p07", kind: "face", from: "hd:04/p7", cut: { top: 0.22 } }],
+  // 28/11/2026 (Yoni: the jewel of the opening whole, never cut by the top of the screen): the pendant alone, whole with its
+  // bail, its chain taken away. Its bail is a straight bar laid over the chain (the links pass behind it): everything beside
+  // the bail down to the gap above its two hinge blocks goes (drop: two polygons along the edges of the bar, measured on the
+  // photo, a pixel inside them; the chain ends 75 px above the blocks), above the bar only the black of the velvet. Nothing is
+  // invented: the bar, its top and the pendant are the photo. "film": the pendant alone on black in its film (1.8 s: the
+  // sharpest frame where it is whole, its bail open), kept as a second view.
+  "ampersand-initials-pendant": [
+    {
+      id: "alone",
+      kind: "face",
+      from: "/media/hd/ampersand-initials-pendant/p07.loupe.6bff1269e3.webp",
+      clear: 0.06,
+      drop: [
+        [[0, 0], [0.4632, 0], [0.4632, 0.2248], [0.4655, 0.3938], [0, 0.3938]],
+        [[0.5429, 0], [1, 0], [1, 0.3938], [0.5452, 0.3938], [0.5429, 0.2248]],
+        [0.46, 0, 0.545, 0.2225],
+      ],
+      // The bar itself solid along those cut edges (the dark gaps between its diamonds next to the cut went transparent).
+      solid: [[[0.4632, 0.2245], [0.5429, 0.2245], [0.5452, 0.4064], [0.4655, 0.4064]]],
+    },
+    { id: "film", kind: "face", from: "/media/films/ampersand-initials-pendant/reveal.mp4@1.8", solo: true },
+    // On its chain (the view of its opening until 28/11/2026): its Cuban chain leaves the photo at the top and on the right, cut at
+    // the top of its bail; the black seen through the openings of its « & », beside its E and under its bail (filled by macOS)
+    // cleared, from the loupe copy of the same photo (3200 px).
+    { id: "p07", kind: "face", from: "/media/hd/ampersand-initials-pendant/p07.loupe.6bff1269e3.webp", cut: { top: 0.22 }, clear: 0.06 },
+  ],
   "thorns-and-roses-crucifix": [
     // Cut right under its last baguettes (a black strip of the mirror stayed under it).
     { id: "p05", kind: "face", from: "hd:05/p5", solo: true, floor: 0.8945 },
@@ -251,8 +313,30 @@ const VIEWS = {
   // its light (whole, the least light 0.1: a faint thread of the backdrop above it stayed), the dark stones of the underside of
   // its foot kept whole (holes). Its back: the back of the cherub, dark behind the L, peeking out as a loose crescent, left out
   // (drop, along the edge of the L).
+  // 28/11/2026: the underside of its foot, the real underside of the L in the shadow (dark pavé), read as a black contour on its
+  // bright sky; its bottom edge came out ragged (its stones as dark as the backdrop). That face made solid down to the true edge
+  // of the foot (floor, measured on the photo), its darkest tones lifted a little and its outline softened (lift), the left side
+  // of the bar too: the diamonds, the rose gold of the cherub and the shadows otherwise as they are.
   "deniz-undav-l-pendant": [
-    { id: "p10", kind: "face", from: "hd:38/p10", whole: true, solo: true, level: 0.1, holes: 0.003 },
+    {
+      id: "p10",
+      kind: "face",
+      from: "hd:38/p10",
+      whole: true,
+      solo: true,
+      level: 0.1,
+      holes: 0.003,
+      floor: [[0, 0.887], [0.18, 0.8869], [0.26, 0.8867], [0.375, 0.8862], [0.525, 0.8856], [0.66, 0.8839], [0.76, 0.8826], [1, 0.8826]],
+      solid: [[[0.184, 0.81], [0.83, 0.81], [0.83, 0.833], [0.751, 0.8875], [0.184, 0.8875]]],
+      lift: {
+        areas: [
+          [[0.184, 0.826], [0.84, 0.826], [0.84, 0.833], [0.755, 0.892], [0.17, 0.892]],
+          [[0.165, 0.3], [0.205, 0.3], [0.205, 0.892], [0.165, 0.892]],
+        ],
+        amount: 0.09,
+        soften: 2,
+      },
+    },
     { id: "p02", kind: "back", from: "hd:38/p2", whole: true, solo: true, level: 0.1, drop: [[[0.785, 0.66], [0.774, 0.7], [0.748, 0.8], [0.724, 0.89], [0.716, 0.92], [1, 0.92], [1, 0.66]]] },
   ],
   // The Jesus piece with its crown of red flowers (folder 20), on a light mirror: by the outline of macOS on the photo; the dark
@@ -268,7 +352,12 @@ const VIEWS = {
   ],
   // The pieces without a clean photo of the jewel alone: the studio image sent by Yoni (23/11/2026), made by AI: never shown
   // as the piece (src/data/showcase.ts, isAiView), kept for the admin only.
-  "marcus-thuram-thorned-t-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-thorned-t-pendant-studio-ia.jpg" }],
+  // 28/11/2026: its real image, the sharpest moment of its film (story 05 of « Thuram SS23 », 8.33 s: the T upright and whole
+  // with its bail, on black cloth); its studio image made by AI kept for the admin only.
+  "marcus-thuram-thorned-t-pendant": [
+    { id: "v05", kind: "face", from: "/media/stories/thuram-ss23/05.mp4@8.33", solo: true },
+    { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-thorned-t-pendant-studio-ia.jpg" },
+  ],
   // Its real studio photos on black (WhatsApp, 23/11/2026; they replace its studio image): the front view first (the left
   // corner of the J touches the edge of the photo: its cut kept sharp, its margin kept), then the pendant turned to the left.
   "jamie-leweling-jl-pendant": [
@@ -277,10 +366,18 @@ const VIEWS = {
   ],
   // Its back (story 06) is not cut out: the dark side of the plate along its bottom edge comes out ragged and speckled.
   "samuel-ballet-jesus-piece": [{ id: "s02", kind: "face", from: "/media/stories/samuel-ballet/02.webp" }],
-  "malik-tillman-tm-pendant": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/malik-tillman-tm-pendant-studio-ia.jpg" }],
+  // 28/11/2026: its real photo, standing on a black mirror (story 05 of « Malik Tillman II », the largest copy of the photo of its
+  // cover: 1290 x 2293), cut where its two feet stand on their reflection (floor); its studio image made by AI kept for the admin.
+  "malik-tillman-tm-pendant": [
+    { id: "s05", kind: "face", from: "/media/stories/malik-tillman-ii/05.loupe.0830ddd49e.webp", solo: true, floor: 0.783, hug: 4 },
+    { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/malik-tillman-tm-pendant-studio-ia.jpg" },
+  ],
   // The FAM medallion: its real photo (the cover of its page: on its Cuban chain against a blue wall), the chain cut above
   // its bail; its studio image made by AI kept for the admin only.
+  // 28/11/2026: its professional photos at last (.local/yoni-2811/fam/, scripts/yoni-2811-media.mjs): the front view on its dark
+  // bust (fam-06), the medallion, its bail and its Cuban chain up to the top of the photo, where the chain is cut clean.
   "tanguy-nianzou-fam-medallion": [
+    { id: "f06", kind: "face", from: "local:.local/yoni-2811/fam/fam-06.jpeg" },
     { id: "cover", kind: "face", from: "/media/pieces/tanguy-nianzou-fam-medallion/cover.webp", solo: true, cut: { top: 0.25 } },
     { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/tanguy-nianzou-fam-medallion-studio-ia.jpg" },
   ],
@@ -341,7 +438,12 @@ const VIEWS = {
   // The studio images sent by Yoni the evening of 23/11/2026 (00 Contexte Yoni/Pieces sans photo pro (IA)/), made by AI: never
   // shown as the piece, kept for the admin only.
   "tajon-buchanan-iced-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/tajon-buchanan-iced-watch-studio-ia.jpg", level: 0.12, fadeAt: [[0.87, 0.31, 0.07], [0.715, 0.775, 0.06]] }],
-  "marcus-thuram-skeleton-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-skeleton-watch-studio-ia.jpg" }],
+  // 28/11/2026: its real photo (its cover: on a black cushion, its Cuban chain and a bangle beside it): the watch alone (seed), its
+  // bracelet down to where it goes round the cushion; its studio image made by AI kept for the admin only.
+  "marcus-thuram-skeleton-watch": [
+    { id: "cover", kind: "face", from: "/media/pieces/marcus-thuram-skeleton-watch/cover.webp", crop: [0.12, 0.17, 0.78, 0.97], solo: true, holes: 0.02, edge: 20 },
+    { id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/marcus-thuram-skeleton-watch-studio-ia.jpg" },
+  ],
   "radja-nainggolan-iced-watch": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/radja-nainggolan-iced-watch-studio-ia.jpg" }],
   "kevin-schade-twisted-chain": [{ id: "studio", kind: "face", from: "yoni:Pieces sans photo pro (IA)/kevin-schade-twisted-chain-studio-ia.jpg", clear: 0.06 }],
   // BRT Flower (folder 36): its chain leaves the photo on three sides and its ends come out torn: it opens on its photo.
@@ -416,13 +518,30 @@ async function workPhoto(file, work, crop) {
   await rm(full, { force: true });
 }
 
-async function prepare(slug, view) {
+/** Whether a source is read from the external disk (or the folder of the photos sent on WhatsApp). */
+const offDisk = (from) => /^(hd|yoni|png|story|wa):/.test(from);
+
+async function prepare(slug, view, old) {
   const dir = join(WORK, slug);
   await mkdir(dir, { recursive: true });
   const work = join(dir, view.id + ".jpg");
   const mask = join(dir, view.id + ".mask.png");
   let source;
-  if (view.from.startsWith("hd:")) {
+  // Without the disk (28/11/2026): its working photo and its mask made before, when they are both there (the same photo
+  // reduced to 3600 px), else the view cannot be made now (its files are kept).
+  if (offDisk(view.from) && !view.from.startsWith("wa:") && !existsSync(HD_DIR)) {
+    if (!view.from.startsWith("png:") && existsSync(work) && existsSync(mask) && !FORCE) {
+      return { work, mask, out: join(dir, view.id + ".cut.png"), mode: view.mode ?? "mask", source: old?.source ?? view.from };
+    }
+    throw new Error("the external disk is not connected");
+  }
+  if (view.from.startsWith("local:")) {
+    // A file of the repository (an original kept in .local/, never in Git), never enlarged.
+    const file = join(ROOT, view.from.slice(6));
+    if (!existsSync(file)) throw new Error("File not found: " + view.from.slice(6));
+    source = view.from.slice(6);
+    if (FORCE || !existsSync(work)) await workPhotoAsIs(file, work, view.crop);
+  } else if (view.from.startsWith("hd:")) {
     const f = await hdFile(view.from.slice(3));
     source = "Dossiers icloud/" + f.label;
     if (FORCE || !existsSync(work)) {
@@ -467,9 +586,21 @@ async function prepare(slug, view) {
       }
     }
   } else {
-    // A photo of the site (a story at 1080 px): never enlarged.
+    // A photo of the site (a story at 1080 px, a loupe copy up to 3200 px): never enlarged. A film of the site: one image of
+    // it ("/media/…/05.mp4@8.33"), at its own size.
     source = "site " + view.from;
-    if (FORCE || !existsSync(work)) await sharp(join(ROOT, "public", view.from)).jpeg({ quality: 97 }).toFile(work);
+    const [path, at] = view.from.split("@");
+    const file = join(ROOT, "public", path);
+    if (!existsSync(file)) throw new Error("File of the site not found: " + path);
+    if (FORCE || !existsSync(work)) {
+      if (at !== undefined) {
+        const still = work.replace(/\.jpg$/, ".still.png");
+        execFileSync("ffmpeg", ["-v", "error", "-y", "-ss", at, "-i", file, "-frames:v", "1", still], { stdio: "ignore" });
+        await workPhotoAsIs(still, work, view.crop);
+        await rm(still, { force: true });
+      } else if (view.crop) await workPhotoAsIs(file, work, view.crop);
+      else await sharp(file).jpeg({ quality: 97 }).toFile(work);
+    }
   }
   if (FORCE || !existsSync(mask)) {
     const r = spawnSync(TOOL, [work, mask], { encoding: "utf8" });
@@ -488,8 +619,7 @@ if (!existsSync(TOOL)) {
   execFileSync("swiftc", ["-O", join(ROOT, "scripts", "cutout-mask.swift"), "-o", TOOL], { stdio: "inherit" });
 }
 if (!existsSync(HD_DIR)) {
-  console.error("The external disk is not connected (" + DISK + "): plug it in, or set BERETE_DISK. Nothing was changed.");
-  process.exit(1);
+  console.warn("The external disk is not connected (" + DISK + "): the views read from it are made from their working photo of .local/cutouts when it is there, else left as they are.");
 }
 
 let data = { views: {} };
@@ -503,28 +633,40 @@ for (const [slug, views] of Object.entries(VIEWS)) {
   if (ONLY && !ONLY.has(slug)) continue;
   console.log(slug);
   const jobs = [];
+  const before = data.views[slug] ?? [];
+  // A view that cannot be made now (its original not readable: the disk, a file the Mac does not let us open) keeps its files
+  // as they are when it has them; without them, the piece keeps all its cut-outs as they are.
+  const kept = new Map();
   let unreadable = null;
   for (const view of views) {
+    const old = before.find((v) => v.id === view.id);
     let job;
     try {
-      job = await prepare(slug, view);
+      job = await prepare(slug, view, old);
     } catch (e) {
-      unreadable = view.id + ": " + (e instanceof Error ? e.message : String(e));
+      const why = view.id + ": " + (e instanceof Error ? e.message : String(e));
+      const files = old ? old.widths.map((w) => join(OUT, slug, old.id + "-" + w + (old.version ? "." + old.version : "") + ".webp")) : [];
+      if (old && files.every((f) => existsSync(f))) {
+        kept.set(view.id, old);
+        console.warn("  = " + why + " (kept as it is)");
+        continue;
+      }
+      unreadable = why;
       break;
     }
     if (job) jobs.push({ view, ...job });
     else console.warn("  ! " + view.id + ": no subject found by macOS, view left out");
   }
-  // A photo that cannot be read (the disk, a file the Mac does not let us open): the piece keeps its cut-outs as they are.
   if (unreadable) {
     console.warn("  ! " + unreadable + " (its cut-outs are left as they are)");
     continue;
   }
+  if (!jobs.length) continue;
   const jobFile = join(WORK, slug, "jobs.json");
   await writeFile(
     jobFile,
     JSON.stringify(
-      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null, neutral: !!view.neutral, seed: view.seed ?? null, keepEdge: view.keepEdge ?? false, cut: view.cut ?? null, near: !!view.near, fadeAt: view.fadeAt ?? null, clear: view.clear ?? null, holes: view.holes ?? null, largest: !!view.largest, peel: view.peel ?? null, edge: view.edge ?? null, defringe: view.defringe ?? true, drop: view.drop ?? null, harden: view.harden ?? null })),
+      jobs.map(({ view, work, mask, out, mode }) => ({ work, mask, out, mode, solo: !!view.solo, stones: !!view.stones, ring: !!(view.ring || view.whole), fill: view.fill ?? false, floor: view.floor ?? null, level: view.level ?? null, neutral: !!view.neutral, seed: view.seed ?? null, keepEdge: view.keepEdge ?? false, cut: view.cut ?? null, near: !!view.near, fadeAt: view.fadeAt ?? null, clear: view.clear ?? null, holes: view.holes ?? null, largest: !!view.largest, peel: view.peel ?? null, edge: view.edge ?? null, defringe: view.defringe ?? true, drop: view.drop ?? null, harden: view.harden ?? null, solid: view.solid ?? null, lift: view.lift ?? null, hug: view.hug ?? null })),
     ),
   );
   const py = spawnSync("python3", [join(ROOT, "scripts", "cutouts.py"), jobFile], { encoding: "utf8", maxBuffer: 1 << 24 });
@@ -544,9 +686,11 @@ for (const [slug, views] of Object.entries(VIEWS)) {
     continue;
   }
   const outDir = join(OUT, slug);
-  await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
-  const list = [];
+  // The files of the views redone go (the views kept keep theirs; the end of the script removes any other file of the folder).
+  const redone = new Set(jobs.map((j) => j.view.id));
+  for (const f of await readdir(outDir)) if (redone.has(f.replace(/-\d+(\.[0-9a-f]{10})?\.webp$/, ""))) await rm(join(outDir, f), { force: true });
+  const made = new Map();
   for (const [i, job] of jobs.entries()) {
     const r = reports[i];
     if (r.error) {
@@ -575,7 +719,7 @@ for (const [slug, views] of Object.entries(VIEWS)) {
     if (job.view.note) notes.push(job.view.note);
     const refused = REFUSED[slug + "/" + job.view.id];
     if (refused) notes.push(refused);
-    list.push({
+    made.set(job.view.id, {
       id: job.view.id,
       kind: job.view.kind,
       width: top,
@@ -589,7 +733,8 @@ for (const [slug, views] of Object.entries(VIEWS)) {
     });
     console.log("  " + job.view.id + " " + r.width + "x" + r.height + (r.cut.length ? " cut " + r.cut.join(",") : "") + (r.onEdge.length ? " ON EDGE " + r.onEdge.join(",") : "") + " haze " + r.haze + (r.dark ? "" : " (light background)"));
   }
-  data.views[slug] = list;
+  // In the order of the list: the views made now, the views kept as they were.
+  data.views[slug] = views.map((v) => made.get(v.id) ?? kept.get(v.id)).filter(Boolean);
   // Written after each piece: an interrupted run never leaves the list behind the files.
   if (!ONLY || ONLY.size > 1) await writeFile(DATA, JSON.stringify(data, null, 1) + "\n");
 }

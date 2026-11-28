@@ -40,7 +40,9 @@ export const FILMS = [
   { slug: "angelo-stiller-as-pendant", folder: "18", making: "18/v04", reveal: "18/v01" },
   { slug: "malik-tillman-cross-pendant", folder: "21", making: "21/v02", reveal: "21/v01" },
   // A horizontal phone video at the bench: the medallion put together, its wheels turning.
-  { slug: "tulips-on-tour-medallion", folder: "24", making: "24/v12", reveal: "24/v01" },
+  // Its image: the medallion whole from the front, with its bail, on black, at 15.78 s (28/11/2026: its image was the
+  // medallion inside its printed « Tulips on Tour » box).
+  { slug: "tulips-on-tour-medallion", folder: "24", making: "24/v12", reveal: "24/v01", posterAt: { reveal: 15.78 } },
   // Its image: the blue logo being set (recognisable at once).
   { slug: "campione-d-italia-2023-2024", folder: "25", making: "25/v02", reveal: "25/v01", poster: { making: 6 } },
   { slug: "marcus-thuram-ruby-t-necklace", folder: "26", making: "26/v02", reveal: "26/v01" },

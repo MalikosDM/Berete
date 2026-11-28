@@ -18,7 +18,9 @@ export type FeatureFilmData = { video: string; mobile?: string; poster: string; 
  * The second a film of the finished piece plays from (and loops back to) on its page, past its opening on black (27/11/2026:
  * never a dark film beside « The Vision »): the pendant of Kenan Yildiz, the jersey of Noah Okafor.
  */
-export const PLAY_FROM: Record<string, number> = { "kenan-yildiz-celebration-pendant": 4, "noah-okafor-jersey-pendant": 1.9 };
+// (28/11/2026: the new film of the jersey is black until 4.7 s; the film of the VfB ring opens on its trunk and the player
+// until 6.5 s, that of Loïs Openda on a black trunk until 2.8 s: each plays from the piece.)
+export const PLAY_FROM: Record<string, number> = { "kenan-yildiz-celebration-pendant": 4, "noah-okafor-jersey-pendant": 4.75, "vfb-stuttgart-dfb-pokal-2025": 6.55, "lois-openda-script-pendant": 3.6 };
 
 /** The film of each piece, by its key in mechanisms.generated.json; "film": the finished piece, "mechanism": how it moves. */
 export const FEATURE_FILMS: Record<string, { key: string; kind: "film" | "mechanism" }> = {

@@ -196,6 +196,10 @@ const SCENES = [
     spots: [
       ...[[0.548, 0.728], [0.613, 0.711], [0.622, 0.669], [0.68, 0.317], [0.629, 0.254], [0.659, 0.263], [0.726, 0.369], [0.712, 0.447], [0.76, 0.632], [0.811, 0.337], [0.822, 0.269], [0.843, 0.233]].map(([x, y], i) => ({ k: "star", tone: "rose", seq: true, d: [x, y, 0.016], i })),
       ...[[0.384, 0.316], [0.383, 0.14], [0.496, 0.229], [0.605, 0.315], [0.606, 0.142]].map(([x, y], i) => ({ k: "star", tone: "rose", seq: true, m: [x, y, 0.045], i })),
+      // Two more constellations on the left of the medallion, in the same style (Yoni, 28/11/2026: "encore un peu plus de ce
+      // côté-là"), and a small one on a phone: their stars, then the fine lines between them (k "link": x, y, length in shares of
+      // the width of the image, angle in degrees).
+      ...[{"k": "star", "tone": "rose", "seq": true, "d": [0.455, 0.215, 0.012], "i": 2}, {"k": "star", "tone": "rose", "seq": true, "d": [0.497, 0.262, 0.012], "i": 2.5}, {"k": "star", "tone": "rose", "seq": true, "d": [0.478, 0.335, 0.012], "i": 3}, {"k": "star", "tone": "rose", "seq": true, "d": [0.512, 0.388, 0.012], "i": 3.5}, {"k": "star", "tone": "rose", "seq": true, "d": [0.43, 0.3, 0.012], "i": 4}, {"k": "link", "tone": "rose", "seq": true, "d": [0.43, 0.3, 0.0536, -62.21], "i": 4.5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.455, 0.215, 0.0495, 31.98], "i": 5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.497, 0.262, 0.0449, 115.0], "i": 5.5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.478, 0.335, 0.0451, 41.02], "i": 6}, {"k": "star", "tone": "rose", "seq": true, "d": [0.42, 0.56, 0.012], "i": 3}, {"k": "star", "tone": "rose", "seq": true, "d": [0.47, 0.6, 0.012], "i": 3.5}, {"k": "star", "tone": "rose", "seq": true, "d": [0.505, 0.66, 0.012], "i": 4}, {"k": "star", "tone": "rose", "seq": true, "d": [0.455, 0.71, 0.012], "i": 4.5}, {"k": "star", "tone": "rose", "seq": true, "d": [0.4, 0.665, 0.012], "i": 5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.42, 0.56, 0.0548, 24.06], "i": 5.5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.47, 0.6, 0.0484, 43.73], "i": 6}, {"k": "link", "tone": "rose", "seq": true, "d": [0.505, 0.66, 0.0573, 150.84], "i": 6.5}, {"k": "link", "tone": "rose", "seq": true, "d": [0.455, 0.71, 0.0605, -155.46], "i": 7}, {"k": "star", "tone": "rose", "seq": true, "m": [0.17, 0.41, 0.035], "i": 2}, {"k": "star", "tone": "rose", "seq": true, "m": [0.225, 0.46, 0.035], "i": 2.5}, {"k": "star", "tone": "rose", "seq": true, "m": [0.19, 0.52, 0.035], "i": 3}, {"k": "star", "tone": "rose", "seq": true, "m": [0.23, 0.58, 0.035], "i": 3.5}, {"k": "link", "tone": "rose", "seq": true, "m": [0.17, 0.41, 0.1045, 58.25], "i": 4}, {"k": "link", "tone": "rose", "seq": true, "m": [0.225, 0.46, 0.1122, 108.17], "i": 4.5}, {"k": "link", "tone": "rose", "seq": true, "m": [0.19, 0.52, 0.1139, 69.44], "i": 5}],
     ],
   }),
   // 23/11/2026 (Yoni, the calls of 22-23/11): the sky for the angel of the L of Deniz Undav (no more cathedral); the
@@ -210,7 +214,9 @@ const SCENES = [
   // scarves held up, confetti and fireworks (Inter); a red sunset, the whole squad lifting the cup, flares, gold and red
   // confetti (VfB). Seen wide, the squad on each side of the ring.
   scene("inter-victoire-v2", "Victoire, la nuit : toute l'équipe de l'Inter écharpes levées, confettis, feux d'artifice (Inter Milan, v2)", [0.66, 0.5]),
-  scene("vfb-victoire-v2", "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)", [0.66, 0.5]),
+  // On a phone, the vertical image of the first victory (fireworks over the stadium, the team with the cup): Yoni, 28/11/2026, the
+  // red smoke of the v2 not right on a phone.
+  scene("vfb-victoire-v2", "Victoire au coucher du soleil : toute l'équipe du VfB soulève la coupe, fumigènes, confettis or et rouges (VfB Stuttgart, v2)", [0.66, 0.5], { mobileFrom: "vfb-victoire" }),
   scene("gothique", "Gothique très sombre : arches noires, fer forgé, bougies rouges (Marcus Thuram, collier T)", [0.6, 0.5]),
 ];
 BACKDROPS.push(...SCENES);
@@ -412,7 +418,7 @@ async function backdropFiles(b) {
     for (const mw of MOBILE_WIDTHS) await write(sharp(src).resize({ width: mw, height: Math.round((mw * 16) / 9), fit: "cover", kernel: "lanczos3" }), join(OUT, b.id + "-m-" + mw));
     console.log("  + " + b.id + " (" + width + " x " + height + ", its own portrait)");
     // portrait: made for a whole phone screen, it also surrounds the stories of its piece (src/components/stories/StoryViewer.tsx).
-    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below, free: b.free, drop: b.drop };
+    return { name: b.name, ratio: Math.round((width / height) * 1000) / 1000, focusX: b.focus[0], focusY: b.focus[1], ...anchors(b, width, height, null), widths: WIDTHS, mobileWidths: MOBILE_WIDTHS, portrait: true, core: b.core, mobileCore: b.mobileCore, moon: b.moon, mobileMoon: b.mobileMoon, spots: b.spots, regions: b.regions, below: b.below, free: b.free, drop: b.drop, mobileFrom: b.mobileFrom };
   }
   // The portrait of the phones: 9:16, the heart of the image a third from the top.
   const [fx, fy] = b.mobile;

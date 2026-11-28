@@ -232,6 +232,62 @@ export const YONI: Record<string, Texts> = {
       ["05 — THE CONTRAST OF MATERIALS", "The brilliance of white-gold diamond mosaic contrasts with the softly sculpted rose-gold angel, bringing together two different artistic expressions."],
     ],
   },
+  // Yoni's texts of 28/11/2026, word for word (tests/fixtures/yoni-2811.json): Samuel Ballet's Jesus Piece and Malik Tillman's
+  // MT — NEXUS CROSS.
+  "samuel-ballet-jesus-piece": {
+    story: [
+      "An icon of hip-hop culture. Reimagined.",
+      "Few pieces of jewellery have become as deeply connected to hip-hop culture as the Jesus Piece.",
+      "Popularized by The Notorious B.I.G., it became a symbol of identity, ambition and personal expression.",
+      "For Samuel Ballet, BERETE set out to reinterpret this cultural icon through its own artistic vision.",
+      "A sculpted rose-gold face, covered in a mosaic of diamonds, is crowned by 32 pear-shaped diamonds set in white gold — creating a striking contrast and giving the iconic silhouette a new dimension.",
+      "A legacy respected. An icon reimagined.",
+    ],
+    specs: [
+      ["GOLD WEIGHT", "90.98 g"],
+      ["VVS DIAMONDS", "29.085 ct"],
+      ["DIAMOND CUTS", "Round · Pear"],
+      ["GOLD COMPOSITION", "White & Rose Gold"],
+      ["SETTING TECHNIQUES", "Mosaic Setting · Claw Setting"],
+      ["SIGNATURE DETAIL", "32 pear-shaped diamonds in the crown."],
+    ],
+    details: [
+      ["01 — THE CROWN OF 32 DIAMONDS", "Thirty-two pear-shaped diamonds form the white-gold crown, giving the creation its distinctive sculptural character."],
+      ["02 — THE PRECISION OF THE CLAWS", "Each pear-shaped diamond is individually secured with carefully executed claws, designed to enhance the appearance of the stones while preserving their distinctive silhouettes."],
+      ["03 — THE DIAMOND MOSAIC", "Round diamonds of varying sizes are arranged across the rose-gold face, following its sculpted contours and creating depth and texture."],
+      ["04 — THE CONTRAST OF GOLD", "The brilliance of the white-gold crown contrasts with the warmth of the rose-gold face, bringing two different sculptural expressions together."],
+    ],
+  },
+  "malik-tillman-cross-pendant": {
+    story: [
+      "A symbol of faith. A vision without boundaries.",
+      "Following his first bespoke creation with BERETE, the original MT pendant, Malik Tillman returned with a new idea: a cross.",
+      "This time, he gave us complete creative freedom, with only one direction — the cross itself.",
+      "We reimagined this timeless symbol through a mosaic of bezel-set diamonds in varying sizes, creating an intricate composition where every stone contributes to the whole.",
+      "Paired with a custom infinity chain, the creation brings together faith, individuality and artistic expression.",
+      "One symbol. Endless possibilities.",
+    ],
+    specs: [
+      ["CREATION", "Cross Pendant & Infinity Chain"],
+      ["GOLD COMPOSITION", "White & Rose Gold"],
+      ["GOLD WEIGHT", "290.56 g"],
+      ["TOTAL DIAMONDS", "100.855 ct"],
+      ["DIAMOND CUTS", "Round · Baguette · Emerald"],
+      ["ROUND DIAMONDS", "53.662 ct"],
+      ["BAGUETTE DIAMONDS", "10.554 ct"],
+      ["EMERALD-CUT DIAMONDS", "36.639 ct"],
+      ["CHAIN LENGTH", "52 cm"],
+      ["SETTING TECHNIQUES", "Bezel Setting · Mosaic Composition · Invisible Setting · Halo Setting · Pavé Setting"],
+    ],
+    details: [
+      ["01 — THE BEZEL MOSAIC", "At the heart of the cross, round diamonds of varying sizes are individually bezel-set and arranged into an intricate mosaic. The combination of different proportions creates a composition of depth and contrast."],
+      ["02 — THE ROTATING MT SIGNATURE", "A circular element at the centre of the cross features Malik Tillman's MT initials, continuing the visual identity established in his first BERETE pendant.\nThe central element is designed to rotate, bringing movement to the creation."],
+      ["03 — THE EMERALD-CUT ARCHITECTURE", "Emerald-cut diamonds form a geometric border around the central mosaic, introducing clean lines and a structured architectural contrast to the round stones."],
+      ["04 — THE DIAMOND HALO", "The outer silhouette is surrounded by larger round diamonds, each framed by a halo of smaller stones.\nThis continuous arrangement gives the cross its distinctive outline and striking visual presence."],
+      ["05 — THE INFINITY CHAIN", "The custom chain is composed of infinity-shaped links, each incorporating a cross motif set with baguette diamonds.\nBetween the infinity links, additional crosses featuring emerald-cut diamonds connect the entire necklace, creating a continuous pattern of interconnected symbols."],
+      ["06 — THE SCULPTURAL BAIL", "The pendant is suspended from a custom, diamond-shaped bail, designed as a rotated square with softly rounded corners.\nIts interior features an intricate geometric composition of invisible-set baguette diamonds, with a cross motif in baguette setting at the centre.\nThe bail is designed as an integral decorative element rather than a conventional pendant attachment."],
+    ],
+  },
   "angelo-stiller-as-pendant": {
     story: [
       "From a shared victory to a personal signature.",
@@ -346,6 +402,8 @@ export const PAGE_ORDER: Record<string, PageSection[]> = {
   // The AngeL Pendant and the AS Pendant (Yoni, 27/11/2026).
   "deniz-undav-l-pendant": ["vision", "angles", "composition", "details", "model3d", "circle", "atelier", "press"],
   "angelo-stiller-as-pendant": ["vision", "angles", "composition", "details", "model3d", "chain", "as-victory", "circle", "atelier", "press"],
+  "samuel-ballet-jesus-piece": ["vision", "angles", "composition", "details", "model3d", "circle", "atelier", "press"],
+  "malik-tillman-cross-pendant": ["vision", "angles", "composition", "details", "model3d", "circle", "atelier", "press"],
 };
 
 /** The four photos of the Inter case shown first in « The Art of Presentation »: its lid, open, the ring in it, its card. */
@@ -360,11 +418,17 @@ export const PRESENTATION_FIRST: Record<string, string[]> = {
 export const CHAIN_PHOTOS: Record<string, string[]> = { "angelo-stiller-as-pendant": ["p03", "p02", "p04"] };
 
 /** The pieces whose Berete Circle says « Created Exclusively for … » (the AngeL Pendant, 27/11/2026). */
-export const CIRCLE_MADE_FOR = new Set(["deniz-undav-l-pendant"]);
+export const CIRCLE_MADE_FOR = new Set(["deniz-undav-l-pendant", "samuel-ballet-jesus-piece", "malik-tillman-cross-pendant"]);
+
+/** From a piece to the one that came before it for the same client (the MT — NEXUS CROSS → his first pendant, the TM). */
+export const CIRCLE_EARLIER: Record<string, string> = { "malik-tillman-cross-pendant": "malik-tillman-tm-pendant" };
+export const EARLIER_LABEL = "His first BERETE pendant";
 
 /** The words under the title of a piece in its universe (Yoni's mock-up for the Genki Dama, 27/11/2026). */
 export const HERO_LINES: Record<string, { tagline: string; dedication: string }> = {
   "kevin-schade-dragon-ball-pendant": { tagline: "The Energy of All", dedication: "A one-of-one creation for Kevin Schade" },
+  // MT — NEXUS CROSS (Yoni, 28/11/2026).
+  "malik-tillman-cross-pendant": { tagline: "A Symbol of Connection", dedication: "Created exclusively for Malik Tillman" },
 };
 
 /** The photo of The Berete Circle on a page (the octagon: Noah Okafor at the counter with its trunk); else his portrait. */
@@ -429,6 +493,7 @@ export const SECTION_TEXTS: string[] = [
   AS_VICTORY.text,
   ...Object.values(HERO_LINES).flatMap((h) => [h.tagline, h.dedication]),
   JL_CUBAN_CAPTION,
+  EARLIER_LABEL,
   PRIVATE_ATELIER.title,
   PRIVATE_ATELIER.lead,
   ...PRIVATE_ATELIER.paragraphs,

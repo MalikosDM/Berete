@@ -1,0 +1,112 @@
+{
+ "fam": [
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/front.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The FAM medallion from the front on a dark bust: a round medallion paved with diamonds inside a fluted rose gold rim, the word FAM in polished rose gold gothic letters among rose gold roses, hanging from a diamond-set bail on a diamond-set Cuban chain",
+   "kind": "front",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/front-bust.c2eba2d91e.webp",
+   "width": 1600,
+   "height": 1600,
+   "alt": "The FAM medallion from the front on a dark leather bust, its diamond-set bail and Cuban chain above it",
+   "kind": "front",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/front-chain.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The FAM medallion hanging from its diamond-set Cuban chain, seen from the front on a dark bust",
+   "kind": "front",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/centre.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The FAM medallion up close from the front: the polished rose gold letters FAM, rose gold roses and marquise-cut diamonds over the diamond pavé, inside its fluted rim",
+   "kind": "centre",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/three-quarter.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The FAM medallion turned to the side on a dark bust, showing the depth of its fluted rose gold rim",
+   "kind": "threequarter",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/angle-chain.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The FAM medallion seen at an angle on a dark bust, its diamond-set Cuban chain rising to the neck",
+   "kind": "threequarter",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/edge.c2eba2d91e.webp",
+   "width": 1066,
+   "height": 1600,
+   "alt": "The edge of the FAM medallion up close: its fluted rose gold rim with a row of round diamonds around it, rose gold roses and marquise-cut diamonds on the face",
+   "kind": "other",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/roses.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "Close-up of the top of the medallion: rose gold roses on a thorned stem with leaves, marquise-cut diamonds in rose gold bezels, the diamond pavé and the polished letters FAM",
+   "kind": "roses",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/back.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The back of the FAM medallion in rose gold, worked in a honeycomb of hexagonal cells around the BRT diamond emblem",
+   "kind": "back",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/clasp.c2eba2d91e.webp",
+   "width": 1067,
+   "height": 1600,
+   "alt": "The box clasp of the diamond-set Cuban chain, engraved with the BRT diamond emblem, reflected in black glass, the back of the medallion behind it",
+   "kind": "clasp",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/worn.c2eba2d91e.webp",
+   "width": 1068,
+   "height": 1600,
+   "alt": "The FAM medallion worn on its diamond-set Cuban chain beside the NZ pendant, over a woven tapestry top",
+   "kind": "worn",
+   "onBlack": false
+  },
+  {
+   "type": "image",
+   "src": "/media/yoni-2811/fam/worn-hand.c2eba2d91e.webp",
+   "width": 1068,
+   "height": 1600,
+   "alt": "The FAM medallion and the NZ pendant worn over a woven tapestry top, a hand in the foreground",
+   "kind": "worn",
+   "onBlack": false
+  }
+ ]
+}

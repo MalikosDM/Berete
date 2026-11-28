@@ -15,8 +15,8 @@ import Showcase from "@/components/Showcase";
 import PieceNav from "@/components/PieceNav";
 import { FilmFrame } from "@/components/FeatureFilm";
 import { featureFilmOf, PLAY_FROM, type FeatureFilmData } from "@/data/featureFilms";
-import { AS_VICTORY, CHAIN_PHOTOS, CIRCLE_MADE_FOR, CIRCLE_PHOTO, DEFAULT_ORDER, HERO_LINES, INTER_BEHIND, INTER_STORY, JERSEY_REVEAL, PAGE_ORDER, PRESENTATION_FIRST, T_EVOLUTION, WORN_ON_NAME, YONI, type PageSection } from "@/data/yoni2711";
-import { filmData, YONI_MEDIA } from "@/data/yoniMedia";
+import { AS_VICTORY, CHAIN_PHOTOS, CIRCLE_EARLIER, CIRCLE_MADE_FOR, CIRCLE_PHOTO, EARLIER_LABEL, DEFAULT_ORDER, HERO_LINES, INTER_BEHIND, INTER_STORY, JERSEY_REVEAL, PAGE_ORDER, PRESENTATION_FIRST, T_EVOLUTION, WORN_ON_NAME, YONI, type PageSection } from "@/data/yoni2711";
+import { filmData, YONI_FILMS, YONI_MEDIA } from "@/data/yoniMedia";
 import { EXPLAIN } from "@/data/magazine";
 import { fileBase } from "@/data/pageMedia";
 import JewelFx from "@/components/universe/JewelFx";
@@ -48,9 +48,24 @@ import { pressDate } from "@/pages/Press";
 const shadow = "[text-shadow:0_2px_30px_rgba(0,0,0,0.8)]";
 
 /** A title whose names never break at their hyphen (« DFB-Pokal », 27/11/2026): each hyphenated word held together. */
+/** The pages whose only photo where the piece is worn is a selfie of a phone (Kenan Yıldız, 28/11/2026): kept, small, until a
+ *  better one comes. */
+const SMALL_WORN = new Set(["kenan-yildiz-celebration-pendant"]);
+
+/** The openings shown as a sharp photo in a fine frame (no clean cut-out possible: the watches on the wrist, 28/11/2026). */
+const FRAMED_OPENINGS = new Set(["tajon-buchanan-iced-watch", "radja-nainggolan-iced-watch"]);
+
 function unbroken(title: string): ReactNode {
-  const parts = title.split(/(\S+-\S+)/);
-  return parts.length === 1 ? title : parts.map((p, i) => (/\S+-\S+/.test(p) ? <span key={i} className="whitespace-nowrap">{p}</span> : p));
+  // The long dash « — » in the letters of the house (28/11/2026: the font of the watches, Michroma, drew it as a short « - »).
+  return title.split(/( — )/).map((chunk, k) =>
+    chunk === " — " ? (
+      <span key={"d" + k} data-title-dash className="font-display font-normal">
+        {" — "}
+      </span>
+    ) : (
+      chunk.split(/(\S+-\S+)/).map((p, i) => (/\S+-\S+/.test(p) ? <span key={k + "-" + i} className="whitespace-nowrap">{p}</span> : p))
+    ),
+  );
 }
 
 /** The soft outline of a photo as its mask, placed as the photo is (whole, centred in its box). */
@@ -186,7 +201,8 @@ export default function PiecePage() {
   const storyTexts = storyBlocks(piece.story).map((b) => b.text.trim());
   const line = piece.line && !storyTexts.some((x) => x.includes(piece.line.trim().replace(/[.!]+$/, ""))) ? piece.line : "";
   // The first film of the page is the finished piece, presented (Yoni, 26/11/2026): the final film of the Inter ring.
-  const yoniFilm = piece.slug === "campione-d-italia-2023-2024" ? filmData(YONI_MEDIA.interFilm) : piece.slug === "deniz-undav-l-pendant" ? filmData(YONI_MEDIA.angelFilm) : null;
+  // (28/11/2026: the films of Yoni's albums for Samuel Ballet's Jesus Piece, the MT — Nexus Cross and the jersey of Noah Okafor.)
+  const yoniFilm = filmData(YONI_FILMS[piece.slug]?.(), PLAY_FROM[piece.slug]);
   const shownFilm = yoniFilm ? { data: yoniFilm, title: t.films.pieceSection, label: t.films.intro(piece.title) } : film;
   // Its composition: the rows by their English label too (a label in capitals: Yoni's composition, src/data/yoni2711.ts).
   const compositionRows = specs.map((s) => ({ ...s, en: s.row ?? s.label }));
@@ -235,7 +251,7 @@ export default function PiecePage() {
     // The Art of Detail: each detail beside the close-up that shows it.
     details: (
       <div id="piece-details" className="scroll-mt-32">
-        <MagazineGallery piece={piece} english={own} items={galleryItems} ordered={ordered} model={model} sameViews={sameViewsOf(piece.slug)} extra={extra} part="details" />
+        <MagazineGallery piece={piece} english={own} items={galleryItems} ordered={ordered} model={model} sameViews={sameViewsOf(piece.slug)} extra={extra} part="details" loops={piece.slug === "malik-tillman-cross-pendant" && YONI_MEDIA.tillmanSpin ? { p13: YONI_MEDIA.tillmanSpin } : undefined} />
       </div>
     ),
     model3d: model ? <Piece3D piece={piece} model={model} /> : null,
@@ -258,7 +274,9 @@ export default function PiecePage() {
     ) : null,
     // 5. Composition & Craftsmanship: only the lines that are filled (the weight of the gold, the carats... come from Yoni, piece
     // by piece: never a figure made up).
-    composition: specs.length > 0 ? <Composition rows={compositionRows} hideClosing={hideClosing} /> : null,
+    // (28/11/2026: a composition that says almost nothing, « Type: Pendant », waits for its figures: Yoni's composition, or at
+    // least the weight of its gold or the carats of its diamonds written in the admin.)
+    composition: specs.length > 0 && (specs.some((s) => isCaps(s.row ?? s.label)) || specs.some((s) => s.value.trim() !== "" && (/^(gold weight|total diamond weight|diamond weight|carats?)$/i.test((s.row ?? s.label).trim()) || /\d\s*(ct|carats?)\b/i.test(s.value)))) ? <Composition rows={compositionRows} hideClosing={hideClosing} /> : null,
     // 6. Created exclusively for…: one section (24/11/2026) for whom it was made and the photos where it is worn; a chain of the
     // house is "A Berete Signature". Shown only when it has someone or something to show (25/11/2026).
     "created-for":
@@ -272,7 +290,7 @@ export default function PiecePage() {
           {/* The photos where it is worn, held, handed over: under the one it was made for (the jersey of Noah Okafor: in its moment
               of reveal, never twice). */}
           {wornShown.length > 0 && !order.includes("reveal") ? (
-            <ul data-worn-by className={"mt-10 grid gap-3 sm:gap-5 " + (wornShown.length > 1 ? "grid-cols-2 lg:grid-cols-4" : "max-w-sm")}>
+            <ul data-worn-by data-small={SMALL_WORN.has(piece.slug) ? "" : undefined} className={"mt-10 grid gap-3 sm:gap-5 " + (wornShown.length > 1 ? "grid-cols-2 lg:grid-cols-4" : SMALL_WORN.has(piece.slug) ? "max-w-[13rem]" : "max-w-sm")}>
               {wornShown.map((m, i) => (
                 <li key={m.src}>
                   <Reveal>
@@ -296,6 +314,7 @@ export default function PiecePage() {
         person={people[0]}
         photo={(piece.slug === "deniz-undav-l-pendant" ? YONI_MEDIA.worn?.angelUndav : undefined) ?? piece.gallery.find((m) => m.src === CIRCLE_PHOTO[piece.slug]) ?? null}
         madeFor={CIRCLE_MADE_FOR.has(piece.slug) ? t.common.madeFor(people[0].name, piece.type) : undefined}
+        earlier={CIRCLE_EARLIER[piece.slug] ? cat.pieces.find((p) => p.slug === CIRCLE_EARLIER[piece.slug]) : undefined}
       />
     ) : null,
     // The tennis chain worn with the AS Pendant (Yoni, 27/11/2026): apart from the pendant, whole then up close, no figure again.
@@ -392,7 +411,15 @@ export default function PiecePage() {
               {/* A photo on black (no clean cut-out of the jewel): whole, its edges faded into the black (25/11/2026). A photo
                   with its soft outline (scripts/opening-masks.mjs, 26/11/2026: the pendant L, whose black showed as a rectangle
                   on the sky): only the jewel and a thin dark edge melting into its world, never the rectangle of the photo. */}
-              {piece.cover.onBlack !== false && piece.cover.width && piece.cover.height ? (
+              {FRAMED_OPENINGS.has(piece.slug) && piece.cover.width && piece.cover.height ? (
+                // A real photo on the wrist that no cut-out can keep whole (28/11/2026: the watches of Tajon Buchanan and Radja
+                // Nainggolan): sharp, in a fine frame, never larger than its file, never faded at its edges.
+                <span className="flex h-full w-full items-center justify-center">
+                  <span data-opening-framed className="relative block max-w-full border border-white/15 shadow-[0_30px_90px_rgba(0,0,0,0.65)]" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height, height: "min(100%, " + Math.round(piece.cover.height * 1.15) + "px)" }}>
+                    <MediaView item={piece.cover} alt={piece.cover.alt ?? piece.title} fit="cover" priority sizes="(max-width: 1023px) 75vw, 40vw" />
+                  </span>
+                </span>
+              ) : piece.cover.onBlack !== false && piece.cover.width && piece.cover.height ? (
                 <span className="flex h-full w-full items-center justify-center">
                   <span className="relative block h-full max-w-full" style={{ aspectRatio: piece.cover.width + " / " + piece.cover.height }}>
                     {/* A soft pool of dark behind the photo: its black melts into the world around it (a light sky, an arena). */}
@@ -790,8 +817,9 @@ function RichRows({ rows, hideClosing }: { rows: (Spec & { en: string })[]; hide
 }
 
 /** The Berete Circle (Yoni, 27/11/2026): the one a piece was made for, his photo with it, « Discover His World ». */
-function CircleSection({ person, photo, madeFor }: { person: Person; photo: MediaItem | null; madeFor?: string }) {
+function CircleSection({ person, photo, madeFor, earlier }: { person: Person; photo: MediaItem | null; madeFor?: string; earlier?: Piece }) {
   const { t } = useI18n();
+  const tc = useContentText();
   const cat = useCatalogue();
   const portrait = portraitOf(cat, person);
   const [open, setOpen] = useState(false);
@@ -810,6 +838,15 @@ function CircleSection({ person, photo, madeFor }: { person: Person; photo: Medi
           <Link to={"/players/" + person.slug} data-cta data-circle-link data-made-for-person={person.slug} className="btn-secondary mt-6">
             {t.piece.discoverHisWorld} <ArrowRight className="size-3.5 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
+          {/* His piece before this one, to see the evolution (the MT — NEXUS CROSS → his first pendant, Yoni 28/11/2026): discreet. */}
+          {earlier ? (
+            <p className="mt-6 text-base text-mist">
+              {tc(EARLIER_LABEL)} —{" "}
+              <Link to={"/pieces/" + earlier.slug} data-circle-earlier className="text-bone underline decoration-rose-light/50 underline-offset-4 transition-colors hover:text-rose-light">
+                <KeepCase title={earlier.title} />
+              </Link>
+            </p>
+          ) : null}
         </div>
       </div>
       {open && item ? createPortal(<Lightbox items={[item]} index={0} onIndex={() => undefined} onClose={() => setOpen(false)} />, document.body) : null}

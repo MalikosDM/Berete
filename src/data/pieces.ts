@@ -15,6 +15,8 @@ import type { PieceTheme } from "./themes.js";
 import { trunkPhotos } from "./trunks.js";
 import { YONI } from "./yoni2711.js";
 import type { Box, Making, MakingKey, MediaItem, Piece, PieceType, Press } from "./types.js";
+import yoni2811 from "./yoni2811.generated.json" with { type: "json" };
+import yoni2711media from "./yoni2711.generated.json" with { type: "json" };
 
 /**
  * The world of the T necklace of Marcus Thuram (23/11/2026): a very dark gothic ("gothique"), or all black, no world at all
@@ -232,6 +234,9 @@ function yoniTexts(slug: string, photos: Maybe[] = []): Pick<PieceInput, "story"
  */
 const proImages = (slug: string, texts: Partial<MediaItem>[]): MediaItem[] =>
   trunkPhotos(slug).map((p, i) => ({ type: "image", src: p.src, width: p.width, height: p.height, onBlack: false, ...texts[i] }));
+
+/** The photos of the FAM medallion sent by Yoni on 28/11/2026 (src/data/yoni2811.generated.json): worn ones go to « Worn by ». */
+const famPhotos: MediaItem[] = (yoni2811.fam as (MediaItem & { kind: string })[]).map(({ kind, ...m }) => ({ ...m, ...(kind === "worn" ? { view: "worn" as const } : {}) }));
 
 /* ---------- Photos of the site folders ---------- */
 
@@ -571,6 +576,10 @@ const SITE_PIECES: Piece[] = [
     people: ["noah-okafor"],
     // Its own world since 23/11/2026 (Yoni): a camouflage in rose gold over the lines of a map.
     theme: { preset: "okafor-oka" },
+    // Its opening whole (28/11/2026: never a chain cut at the top): the pendant alone with its bail, from its studio photo from the
+    // front (scripts/cutouts.mjs, "alone"); "p18", the pendant on its whole chain laid in its case (a phone photo where two links
+    // turned on their edge are pure black: the chain reads as broken), stays in the admin.
+    showcase: { mode: "single", views: ["alone"] },
     ...sorted("noah-okafor-oka-pendant", [
       yoni("noah-okafor-oka-pendant", "p17", at("The OKA nameplate pendant of Noah Okafor on its Cuban chain")),
       yoni("noah-okafor-oka-pendant", "p03", at("Close-up of the rose gold football", "The ball")),
@@ -802,24 +811,20 @@ const SITE_PIECES: Piece[] = [
     slug: "samuel-ballet-jesus-piece",
     title: "Samuel Ballet — Jesus Piece",
     type: "pendant",
-    line: "Rose gold, and a crown of pear-shaped diamonds.",
-    story:
-      "A Jesus piece in rose gold, paved with diamonds and crowned with pear and marquise-cut stones. Its back is engraved with flowers, the BRT mark standing in relief among them. It is worn on a twisted chain set with diamond flowers.",
+    // Yoni's texts (28/11/2026): its vision, its composition, four details beside their close-ups (from its film).
+    line: "An icon of hip-hop culture. Reimagined.",
+    ...yoniTexts("samuel-ballet-jesus-piece"),
     people: ["samuel-ballet"],
     theme: { preset: "sacre", tint: "#2e1a14" },
     cover: st("samuel-ballet", 2, at("Samuel Ballet's Jesus piece in rose gold with a crown of pear diamonds")),
+    // Its photos in 4K, taken from its film (Yoni's album, 28/11/2026: no studio photo of it), then the back and the pendant
+    // worn from the stories (the close-ups of the stories give their place to the 4K ones).
     gallery: [
-      st("samuel-ballet", 5, at("Film of the pendant on its chain of diamond flowers")),
-      st("samuel-ballet", 1, at("Close-up of the face and the crown", "The crown")),
-      st("samuel-ballet", 4, at("The crown of pear-shaped diamonds")),
+      ...((yoni2711media as { balletStills?: MediaItem[] }).balletStills ?? []).map(({ kind: _k, ...m }: MediaItem & { kind?: string }) => m),
       st("samuel-ballet", 6, at("The back of the pendant, engraved with the BRT mark", "The back")),
+      st("samuel-ballet", 5, at("Film of the pendant on its chain of diamond flowers")),
       st("samuel-ballet", 3, at("Film of the pendant being worn", "Worn")),
     ],
-    specs: [
-      ["Type", "Pendant"],
-      ["Signature", "BRT mark on the back"],
-    ],
-    seen: "Rose gold, white gold crown · round diamonds in pavé, pear-shaped diamonds in the crown",
     making: {
       raw: raw("samuel-ballet-jesus-piece", "v21-25_8s"),
       setting: yoni("samuel-ballet-jesus-piece", "v21-6_9s", SET()),
@@ -831,11 +836,12 @@ const SITE_PIECES: Piece[] = [
   }),
   piece({
     slug: "malik-tillman-cross-pendant",
-    title: "Malik Tillman — Cross Pendant",
+    // « MT — NEXUS CROSS », its official name (Yoni, 28/11/2026); « Cross Pendant & Infinity Chain » is only its description, in
+    // its composition. Its address is kept.
+    title: "MT — NEXUS CROSS",
     type: "pendant",
-    line: "A cross in round and baguette diamonds.",
-    story:
-      "A large cross edged with round diamonds in their own settings, its centre filled with baguettes, hanging from a diamond-shaped bail on a chunky diamond link chain. The back is engraved with the BRT mark.",
+    line: "A symbol of faith. A vision without boundaries.",
+    ...yoniTexts("malik-tillman-cross-pendant", ["p08", "p13", "p11", "p10", "p19", "p14"].map((f) => yoni("malik-tillman-cross-pendant", f))),
     people: ["malik-tillman"],
     theme: { preset: "sacre" },
     ...sorted("malik-tillman-cross-pendant", [
@@ -849,12 +855,6 @@ const SITE_PIECES: Piece[] = [
       yoni("malik-tillman-cross-pendant", "p20", { ...at("The 3D design of the cross", "The 3D design"), onBlack: false }),
       yoni("malik-tillman-cross-pendant", "p01", { ...at("The cross pendant, worn"), onBlack: false }),
     ]),
-    specs: [
-      ["Type", "Pendant on a link chain"],
-      ["Motif", "A cross"],
-      ["Signature", "BRT mark on the back"],
-    ],
-    seen: "White gold · round diamonds in halo and bezel settings, a frame of baguettes",
     making: {
       raw: raw("malik-tillman-cross-pendant", "v02-13_5s"),
       setting: yoni("malik-tillman-cross-pendant", "v03", { ...SETTING_FILM(), onBlack: false }),
@@ -874,7 +874,6 @@ const SITE_PIECES: Piece[] = [
     gallery: [
       still("pieces/malik-tillman-tm-pendant/cover", { ...at("Malik Tillman's TM pendant"), onBlack: false }),
       st("malik-tillman-ii", 4, at("The TM pendant held up in the light")),
-      st("malik-tillman-ii", 1, at("Post about Malik Tillman's TM pendant")),
     ],
     specs: [
       ["Type", "Pendant on a Cuban chain"],
@@ -891,20 +890,15 @@ const SITE_PIECES: Piece[] = [
       "A round medallion paved with diamonds, its edge ribbed like a coin. The word FAM stands out in polished letters among rose gold roses, and marquise-cut diamonds are set in the flowers, one for each member of the family. It hangs from a diamond-set Cuban chain.",
     people: ["tanguy-nianzou"],
     theme: { preset: "roses", mark: "FAM" },
-    // Its studio image first (23/11/2026), its photos after it (worn ones in "Worn by").
-    ...withStudio("tanguy-nianzou-fam-medallion", "Tanguy Nianzou's FAM medallion", {
-      cover: still("pieces/tanguy-nianzou-fam-medallion/cover", at("Tanguy Nianzou's FAM medallion on its Cuban chain")),
-      gallery: [
-      st("nz", 6, at("Close-up of the rose gold roses and a marquise diamond", "The roses")),
-      st("nz", 2, at("The FAM medallion and its story: one marquise diamond for each family member")),
-      st("nz", 5, at("Film of the medallion on a bust")),
-    ],
-    }),
+    // Its twelve professional photos (Yoni, 28/11/2026, scripts/yoni-2811-media.mjs): the whole medallion on its bust first, its
+    // close-ups, its back, its clasp, and the two photos where it is worn (in « Worn by »). The capture of a story (« You won
+    // bro ») and the older, softer photos are gone.
+    cover: famPhotos[0]!,
+    gallery: famPhotos.slice(1),
     specs: [
       ["Type", "Medallion pendant on a Cuban chain"],
       ["Motif", "The word FAM among roses"],
     ],
-    seen: "Rose gold · round diamonds in pavé, marquise-cut diamonds in the flowers",
     boxSlug: "nz-travel-case",
   }),
   piece({
@@ -1291,6 +1285,8 @@ const SITE_PIECES: Piece[] = [
       "A chain of twisted links in rose gold, paved with diamonds, with flowers of round diamonds and leaves of marquise-cut diamonds, closed by a clasp signed BRT. It carries a nameplate that spells SIRIUS in baguettes, the two S drawn as dollar signs, framed by a row of diamond flowers, with two horned masks in rose gold at its corners and pear-shaped diamonds on its sides. The back of the plate is engraved with a pattern and the BRT mark. Chain and plate are delivered in the Sirius trunk made for them, on a red lining.",
     // Its Japanese night since 21/11/2026 (the starry sky before).
     theme: { preset: "japon" },
+    // Its opening: the plate whole with its bail (28/11/2026: never its chain cut at the top, as on the bust of p27).
+    showcase: { mode: "single", views: ["p28"] },
     // Its photos in HD (folder 37, 20/11/2026): the chain, the plate, the trunk.
     // The most striking first (23/11/2026): the chain whole, on the bust, then its details; the trunk at the end.
     // 24/11/2026 (Yoni): on Sirius only — no back, no photo of the chain alone (it is BRT Flowers), no trunk without it; its
@@ -1422,6 +1418,8 @@ const COLLECTED: Piece[] = [
     story:
       "Two bold initials joined by an ampersand, paved with diamonds and outlined in polished white gold, with touches of baguettes. The bail is set with baguettes, and the pendant hangs on a wide Cuban chain paved with diamonds.",
     theme: { preset: "facettes" },
+    // Its opening whole (28/11/2026: never a chain cut at the top): the pendant alone with its bail (scripts/cutouts.mjs, "alone").
+    showcase: { mode: "single", views: ["alone"] },
     specs: [
       ["Type", "Pendant"],
       ["Motif", "Two initials and an ampersand"],
@@ -1718,6 +1716,8 @@ const COLLECTED: Piece[] = [
     line: "Oval diamonds, all the way around.",
     story: "An eternity band in white gold, set all around with oval diamonds in claw settings. Inside, the polished band carries the BRT mark.",
     theme: { preset: "facettes", font: "bodoni" },
+    // The band whole, alone in its world (28/11/2026: its side view floated at the bottom of the opening).
+    showcase: { mode: "single", views: ["p02"] },
     specs: [
       ["Type", "Ring"],
       ["Signature", "BRT mark inside"],

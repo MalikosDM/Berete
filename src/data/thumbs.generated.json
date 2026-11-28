@@ -68,17 +68,16 @@
  },
  "noah-okafor-oka-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/noah-okafor-oka-pendant/p17-1600.88998ec314.webp",
-  "srcSet": "/media/cutouts/noah-okafor-oka-pendant/p17-480.88998ec314.webp 480w, /media/cutouts/noah-okafor-oka-pendant/p17-960.88998ec314.webp 960w, /media/cutouts/noah-okafor-oka-pendant/p17-1600.88998ec314.webp 1600w",
-  "width": 1600,
-  "height": 1387,
+  "src": "/media/cutouts/noah-okafor-oka-pendant/alone-1506.aa63ff5438.webp",
+  "srcSet": "/media/cutouts/noah-okafor-oka-pendant/alone-480.aa63ff5438.webp 480w, /media/cutouts/noah-okafor-oka-pendant/alone-960.aa63ff5438.webp 960w, /media/cutouts/noah-okafor-oka-pendant/alone-1506.aa63ff5438.webp 1506w",
+  "width": 1506,
+  "height": 1010,
   "box": [
    0.0458,
-   0,
+   0.0668,
    0.9094,
-   0.9483
-  ],
-  "cut": "top"
+   0.8665
+  ]
  },
  "noah-okafor-octagon-pendant": {
   "kind": "cutout",
@@ -107,15 +106,16 @@
   ]
  },
  "marcus-thuram-thorned-t-pendant": {
-  "kind": "photo",
-  "src": "/media/pieces/marcus-thuram-thorned-t-pendant/cover.webp",
-  "width": 634,
-  "height": 844,
+  "kind": "cutout",
+  "src": "/media/cutouts/marcus-thuram-thorned-t-pendant/v05-559.405c709118.webp",
+  "srcSet": "/media/cutouts/marcus-thuram-thorned-t-pendant/v05-480.405c709118.webp 480w, /media/cutouts/marcus-thuram-thorned-t-pendant/v05-559.405c709118.webp 559w",
+  "width": 559,
+  "height": 896,
   "box": [
-   0.055,
-   0,
-   0.8425,
-   0.9568
+   0.0751,
+   0.0458,
+   0.8515,
+   0.9074
   ]
  },
  "angelo-stiller-as-pendant": {
@@ -146,15 +146,15 @@
  },
  "deniz-undav-l-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/deniz-undav-l-pendant/p10-1600.f4e2679397.webp",
-  "srcSet": "/media/cutouts/deniz-undav-l-pendant/p10-480.f4e2679397.webp 480w, /media/cutouts/deniz-undav-l-pendant/p10-960.f4e2679397.webp 960w, /media/cutouts/deniz-undav-l-pendant/p10-1600.f4e2679397.webp 1600w",
+  "src": "/media/cutouts/deniz-undav-l-pendant/p10-1600.9c7e44d3d4.webp",
+  "srcSet": "/media/cutouts/deniz-undav-l-pendant/p10-480.9c7e44d3d4.webp 480w, /media/cutouts/deniz-undav-l-pendant/p10-960.9c7e44d3d4.webp 960w, /media/cutouts/deniz-undav-l-pendant/p10-1600.9c7e44d3d4.webp 1600w",
   "width": 1600,
-  "height": 2782,
+  "height": 2777,
   "box": [
    0.0792,
-   0.0455,
+   0.0456,
    0.8417,
-   0.9089
+   0.9088
   ]
  },
  "samuel-ballet-jesus-piece": {
@@ -185,28 +185,29 @@
   "cut": "top"
  },
  "malik-tillman-tm-pendant": {
-  "kind": "photo",
-  "src": "/media/pieces/malik-tillman-tm-pendant/cover.webp",
-  "width": 1080,
-  "height": 1796,
+  "kind": "cutout",
+  "src": "/media/cutouts/malik-tillman-tm-pendant/s05-824.299fce2a60.webp",
+  "srcSet": "/media/cutouts/malik-tillman-tm-pendant/s05-480.299fce2a60.webp 480w, /media/cutouts/malik-tillman-tm-pendant/s05-824.299fce2a60.webp 824w",
+  "width": 824,
+  "height": 1060,
   "box": [
-   0.05,
-   0,
-   0.95,
-   1
+   0.0595,
+   0.0462,
+   0.8811,
+   0.9075
   ]
  },
  "tanguy-nianzou-fam-medallion": {
   "kind": "cutout",
-  "src": "/media/cutouts/tanguy-nianzou-fam-medallion/cover-315.016de1b26b.webp",
-  "srcSet": "/media/cutouts/tanguy-nianzou-fam-medallion/cover-315.016de1b26b.webp 315w",
-  "width": 315,
-  "height": 501,
+  "src": "/media/cutouts/tanguy-nianzou-fam-medallion/f06-1600.64d1c6c280.webp",
+  "srcSet": "/media/cutouts/tanguy-nianzou-fam-medallion/f06-480.64d1c6c280.webp 480w, /media/cutouts/tanguy-nianzou-fam-medallion/f06-960.64d1c6c280.webp 960w, /media/cutouts/tanguy-nianzou-fam-medallion/f06-1600.64d1c6c280.webp 1600w",
+  "width": 1600,
+  "height": 2201,
   "box": [
-   0.0762,
+   0.076,
    0,
-   0.8476,
-   0.9521
+   0.8583,
+   0.9523
   ],
   "cut": "top"
  },
@@ -330,15 +331,16 @@
   ]
  },
  "marcus-thuram-skeleton-watch": {
-  "kind": "photo",
-  "src": "/media/pieces/marcus-thuram-skeleton-watch/cover.webp",
-  "width": 1068,
-  "height": 1016,
+  "kind": "cutout",
+  "src": "/media/cutouts/marcus-thuram-skeleton-watch/cover-617.5cb89d5367.webp",
+  "srcSet": "/media/cutouts/marcus-thuram-skeleton-watch/cover-480.5cb89d5367.webp 480w, /media/cutouts/marcus-thuram-skeleton-watch/cover-617.5cb89d5367.webp 617w",
+  "width": 617,
+  "height": 808,
   "box": [
-   0,
-   0.0026,
-   1,
-   0.9974
+   0.06,
+   0.047,
+   0.8784,
+   0.9059
   ]
  },
  "tajon-buchanan-iced-watch": {
@@ -367,17 +369,16 @@
  },
  "ampersand-initials-pendant": {
   "kind": "cutout",
-  "src": "/media/cutouts/ampersand-initials-pendant/p07-1600.25ccdbcb8c.webp",
-  "srcSet": "/media/cutouts/ampersand-initials-pendant/p07-480.25ccdbcb8c.webp 480w, /media/cutouts/ampersand-initials-pendant/p07-960.25ccdbcb8c.webp 960w, /media/cutouts/ampersand-initials-pendant/p07-1600.25ccdbcb8c.webp 1600w",
+  "src": "/media/cutouts/ampersand-initials-pendant/alone-1600.97aa7421d0.webp",
+  "srcSet": "/media/cutouts/ampersand-initials-pendant/alone-480.97aa7421d0.webp 480w, /media/cutouts/ampersand-initials-pendant/alone-960.97aa7421d0.webp 960w, /media/cutouts/ampersand-initials-pendant/alone-1600.97aa7421d0.webp 1600w",
   "width": 1600,
-  "height": 1510,
+  "height": 1574,
   "box": [
    0.0458,
-   0,
+   0.0466,
    0.9083,
-   0.9514
-  ],
-  "cut": "top"
+   0.9068
+  ]
  },
  "thorns-and-roses-crucifix": {
   "kind": "cutout",

@@ -37,7 +37,9 @@ export default function JewelFx({ kind, photo = false }: { kind: JewelEffect; ph
 /** The loaded image of a cut-out jewel becomes the shape of its effect (its parent holds the effect). */
 export function jewelSource(img: HTMLImageElement | null) {
   if (!img) return;
-  const set = () => img.parentElement?.style.setProperty("--jewel-src", 'url("' + (img.currentSrc || img.src) + '")');
+  // (28/11/2026: the image of a computer or of a phone sits in its <picture>: the frame that holds the effect is above it.)
+  const holder = img.parentElement instanceof HTMLPictureElement ? img.parentElement.parentElement : img.parentElement;
+  const set = () => holder?.style.setProperty("--jewel-src", 'url("' + (img.currentSrc || img.src) + '")');
   if (img.complete && img.naturalWidth > 0) set();
   else img.addEventListener("load", set, { once: true });
 }
