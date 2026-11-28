@@ -154,6 +154,7 @@ export const ar: Messages = {
     /** The opening photo of the home page (24/11/2026) and the small link under it. */
     heroAlt: "صندوق سيريوس مفتوحاً: السلسلة وقلادتها في حاملهما، وشعار BRT على الصندوق الأسود",
     discoverMore: "اكتشف المزيد",
+    discoverHouse: "اكتشفوا الدار",
     sketchLabel: "من الرسم الأول إلى القطعة، مع التمرير",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "لا نبدأ مما صُنع من قبل. نبدأ مما يمكن أن يكون.",

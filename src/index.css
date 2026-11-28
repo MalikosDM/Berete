@@ -3420,19 +3420,54 @@ html[lang="ar"] [data-piece] [data-u-title] {
  */
 .home-photo-frame {
   container-type: size;
+  /* The room under the menu: the larger image fills it, nothing goes beyond (28/11/2026). */
+  overflow: hidden;
 }
+/* The box of the original photo: the size and the place it always had (the whole photo in the room, centred). */
 .home-photo-box {
   --ratio: var(--r);
   width: min(100cqw, 100cqh * var(--ratio));
   height: min(100cqh, 100cqw / var(--ratio));
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to top, transparent, #000 9%);
-  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent), linear-gradient(to top, transparent, #000 9%);
-  -webkit-mask-composite: source-in;
-  mask-composite: intersect;
+}
+/* The larger image around it (its ground extended, scripts/hero-extend.py): the original photo exactly on its box. */
+.home-photo-img {
+  position: absolute;
+  left: var(--ix);
+  top: var(--iy);
+  width: var(--iw);
+  height: var(--ih);
+  max-width: none;
+}
+/* Where the original photo touches the edge of the room: under the menu, a few pixels from the black of the menu to the black
+   of the photo (never down to its handle, at 4 % of its height); at the foot, its floor melts into the black of the page under
+   the signature. Over the extended ground they change nothing (it already ends in that black). */
+.home-photo-frame::before,
+.home-photo-frame::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  pointer-events: none;
+}
+.home-photo-frame::before {
+  top: 0;
+  height: 3%;
+  background: linear-gradient(to bottom, var(--color-ink), transparent);
+}
+.home-photo-frame::after {
+  bottom: 0;
+  height: 9%;
+  background: linear-gradient(to top, var(--color-ink), var(--color-ink) 8%, transparent);
 }
 @media (max-aspect-ratio: 1/1) {
   .home-photo-box {
     --ratio: var(--rm);
+  }
+  .home-photo-img {
+    left: var(--ixm);
+    top: var(--iym);
+    width: var(--iwm);
+    height: var(--ihm);
   }
 }
 /* Its signature and "Discover More": at the foot of the box of the photo, on its floor. */
@@ -3441,8 +3476,8 @@ html[lang="ar"] [data-piece] [data-u-title] {
 }
 @media (max-aspect-ratio: 1/1) {
   /* A screen held upright: the photo of the two cases (wider than high) fills the top of the screen right under the header,
-     whole and centred, as on a computer (27/11/2026: no more black void above it); its words under it, on the black, then the
-     page goes on (the section as high as what it holds, never a screen of black). */
+     whole and centred, as on a computer (27/11/2026: no more black void above it); its words under it, on its floor that goes
+     on and melts into the black of the page (28/11/2026), then the page goes on (the section as high as what it holds). */
   [data-home-photo] {
     height: auto;
     min-height: 0;
@@ -3452,6 +3487,17 @@ html[lang="ar"] [data-piece] [data-u-title] {
     flex: none;
     width: 100%;
     aspect-ratio: var(--rm);
+    /* Its floor goes on under it, into the room of its words (the section keeps it within the page); nothing above it (the
+       fine edge of the menu would show its ground). */
+    overflow: visible;
+    clip-path: inset(0 -50vw -50vh -50vw);
+  }
+  .home-photo-frame::after {
+    display: none;
+  }
+  /* On a phone the photo is smaller: its fade from the black of the menu a little longer, down to its handle (at 4.2 %). */
+  .home-photo-frame::before {
+    height: 4.2%;
   }
   .home-photo-box {
     top: 0;

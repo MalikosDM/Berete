@@ -33,8 +33,10 @@ test("home: calm, one piece, the innovation, the commissions, a balanced selecti
   const hero = page.locator("[data-home-story='house']");
   await expect(hero.locator("h1")).toHaveText("We don't begin with what has been done. We begin with what could be.");
   await expect(hero).toContainText("house of bespoke high jewellery");
-  // One subject, one way in (24/11/2026): All Creations.
-  await expect(hero.locator('a[href="/creations"]')).toBeVisible();
+  // One subject, one way in (24/11/2026): All Creations; since 28/11/2026 The Bespoke Journey (the making of the piece beside
+  // it: its sketch, its metal, its setting), All Creations under the selection.
+  await expect(hero.locator('a[href="/process"][data-cta]')).toBeVisible();
+  await expect(page.locator('[data-home-selection] a[href="/creations"]')).toBeVisible();
   // The Butterfly pendant on its chain, on the black bust, large.
   const jewel = hero.locator("[data-hero-piece] img");
   await expect(jewel).toHaveAttribute("src", /^\/media\/hd\/michy-batshuayi-butterfly-chain\/p54(\.w\d+)?\.webp$/);

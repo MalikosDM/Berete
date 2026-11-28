@@ -1,44 +1,50 @@
 {
  "hero-desktop": {
-  "width": 5504,
-  "height": 3072,
+  "width": 4640,
+  "height": 2892,
+  "original": {
+   "x": 720,
+   "y": 392,
+   "width": 3200,
+   "height": 1786
+  },
   "avif": [
    {
-    "w": 1280,
-    "src": "/media/pages/hero-desktop-1280.0a5b02735b.avif"
+    "w": 1856,
+    "src": "/media/pages/hero-desktop-1856.6524f743f9.avif"
    },
    {
-    "w": 1920,
-    "src": "/media/pages/hero-desktop-1920.0a5b02735b.avif"
+    "w": 2784,
+    "src": "/media/pages/hero-desktop-2784.6524f743f9.avif"
    },
    {
-    "w": 2560,
-    "src": "/media/pages/hero-desktop-2560.0a5b02735b.avif"
+    "w": 3712,
+    "src": "/media/pages/hero-desktop-3712.6524f743f9.avif"
    },
    {
-    "w": 3200,
-    "src": "/media/pages/hero-desktop-3200.0a5b02735b.avif"
+    "w": 4640,
+    "src": "/media/pages/hero-desktop-4640.6524f743f9.avif"
    }
   ],
   "webp": [
    {
-    "w": 1280,
-    "src": "/media/pages/hero-desktop-1280.0a5b02735b.webp"
+    "w": 1856,
+    "src": "/media/pages/hero-desktop-1856.6524f743f9.webp"
    },
    {
-    "w": 1920,
-    "src": "/media/pages/hero-desktop-1920.0a5b02735b.webp"
+    "w": 2784,
+    "src": "/media/pages/hero-desktop-2784.6524f743f9.webp"
    },
    {
-    "w": 2560,
-    "src": "/media/pages/hero-desktop-2560.0a5b02735b.webp"
+    "w": 3712,
+    "src": "/media/pages/hero-desktop-3712.6524f743f9.webp"
    },
    {
-    "w": 3200,
-    "src": "/media/pages/hero-desktop-3200.0a5b02735b.webp"
+    "w": 4640,
+    "src": "/media/pages/hero-desktop-4640.6524f743f9.webp"
    }
   ],
-  "src": "/media/pages/hero-desktop-3200.0a5b02735b.webp"
+  "src": "/media/pages/hero-desktop-4640.6524f743f9.webp"
  },
  "journey-consultation": {
   "width": 4176,
@@ -138,44 +144,56 @@
   "src": "/media/pages/journey-cad-776.efa054a27a.webp"
  },
  "hero-phone": {
-  "width": 4568,
-  "height": 3072,
+  "width": 2656,
+  "height": 2892,
+  "original": {
+   "x": 0,
+   "y": 392,
+   "width": 2656,
+   "height": 1786
+  },
   "avif": [
    {
     "w": 720,
-    "src": "/media/pages/hero-phone-720.10b92a2213.avif"
+    "src": "/media/pages/hero-phone-720.6524f743f9.avif"
    },
    {
     "w": 1080,
-    "src": "/media/pages/hero-phone-1080.10b92a2213.avif"
+    "src": "/media/pages/hero-phone-1080.6524f743f9.avif"
    },
    {
     "w": 1440,
-    "src": "/media/pages/hero-phone-1440.10b92a2213.avif"
+    "src": "/media/pages/hero-phone-1440.6524f743f9.avif"
    },
    {
     "w": 1920,
-    "src": "/media/pages/hero-phone-1920.10b92a2213.avif"
+    "src": "/media/pages/hero-phone-1920.6524f743f9.avif"
    }
   ],
   "webp": [
    {
     "w": 720,
-    "src": "/media/pages/hero-phone-720.10b92a2213.webp"
+    "src": "/media/pages/hero-phone-720.6524f743f9.webp"
    },
    {
     "w": 1080,
-    "src": "/media/pages/hero-phone-1080.10b92a2213.webp"
+    "src": "/media/pages/hero-phone-1080.6524f743f9.webp"
    },
    {
     "w": 1440,
-    "src": "/media/pages/hero-phone-1440.10b92a2213.webp"
+    "src": "/media/pages/hero-phone-1440.6524f743f9.webp"
    },
    {
     "w": 1920,
-    "src": "/media/pages/hero-phone-1920.10b92a2213.webp"
+    "src": "/media/pages/hero-phone-1920.6524f743f9.webp"
    }
   ],
-  "src": "/media/pages/hero-phone-1920.10b92a2213.webp"
+  "src": "/media/pages/hero-phone-1920.6524f743f9.webp"
+ },
+ "clover-spin": {
+  "video": "/media/pages/clover-spin.b0a07848d4.mp4",
+  "poster": "/media/pages/clover-spin.b0a07848d4.webp",
+  "width": 400,
+  "height": 400
  }
 }

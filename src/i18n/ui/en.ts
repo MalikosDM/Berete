@@ -170,6 +170,8 @@ export const en = {
     /** The opening photo of the home page (24/11/2026) and the small link under it. */
     heroAlt: "The Sirius trunk open: the chain and its nameplate in their display, the BRT logo on the black trunk",
     discoverMore: "Discover More",
+    /** After Press (28/11/2026): the way from the summary of the story of Yoni to the page The House. */
+    discoverHouse: "Discover the House",
     sketchLabel: "From the first sketch to the jewel, played by scrolling",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "We don't begin with what has been done. We begin with what could be.",

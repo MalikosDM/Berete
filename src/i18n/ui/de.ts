@@ -169,6 +169,7 @@ export const de: Messages = {
     /** The opening photo of the home page (24/11/2026) and the small link under it. */
     heroAlt: "Der geöffnete Sirius-Koffer: die Kette und ihr Anhänger in ihrer Präsentation, das BRT-Logo auf dem schwarzen Koffer",
     discoverMore: "Mehr entdecken",
+    discoverHouse: "Das Haus entdecken",
     sketchLabel: "Von der ersten Skizze zum Schmuckstück, beim Scrollen",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "Wir beginnen nicht mit dem, was schon gemacht wurde. Wir beginnen mit dem, was sein könnte.",

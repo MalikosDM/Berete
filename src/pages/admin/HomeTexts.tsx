@@ -66,6 +66,11 @@ export default function HomeTexts({ token, onExpired }: { token: string; onExpir
   const lines = useMemo(() => {
     const out: Record<string, Partial<Record<HomeLang, string>>> = {};
     for (const block of blocks ?? []) {
+      // A block without a piece (« The House »): its own text by default.
+      if (block.defaults) {
+        out[block.id] = block.defaults;
+        continue;
+      }
       const piece = catalogue.pieces.find((p) => p.slug === block.piece) ?? defaultCatalogue.pieces.find((p) => p.slug === block.piece);
       if (!piece) continue;
       out[block.id] = {};
@@ -114,20 +119,20 @@ export default function HomeTexts({ token, onExpired }: { token: string; onExpir
       <div>
         <h2 className="title-caps text-2xl tracking-[0.12em]">Textes de l'accueil</h2>
         <p className="mt-3 text-base text-bone">
-          Sur l'accueil, chaque pièce est d'un côté et un court texte de l'autre. Sans texte ici, c'est la « Phrase d'accroche » de la pièce (sa page), traduite par le site : elle est écrite en gris dans chaque case. Un texte écrit ici la remplace, dans sa langue seulement. Une ou deux phrases ; jamais un chiffre à faire valider.
+          Sur l'accueil, chaque pièce est d'un côté et un court texte de l'autre. Sans texte ici, c'est la « Phrase d'accroche » de la pièce (sa page), traduite par le site : elle est écrite en gris dans chaque case. Un texte écrit ici la remplace, dans sa langue seulement. Une ou deux phrases ; jamais un chiffre à faire valider. Le dernier bloc, « The House », est le court résumé de l'histoire de Yoni à côté de son portrait (après Press) : par défaut, des phrases de la page The House.
         </p>
       </div>
       {blocks.map((block) => (
         <fieldset key={block.id} className="grid gap-4 border border-white/15 p-5 sm:p-6" data-home-text-block={block.id}>
           <legend className="px-2 text-base text-white">
-            {block.label} <span className="text-bone">— {titleOf(block.piece)}</span>
+            {block.label} {block.piece ? <span className="text-bone">— {titleOf(block.piece)}</span> : null}
           </legend>
           {HOME_LANGS.map((lang) => (
             <label key={lang} className="block text-base text-bone">
               {LANG_NAMES[lang]} ({lang.toUpperCase()})
               <textarea
-                rows={2}
-                maxLength={HOME_TEXT_MAX}
+                rows={block.defaults ? 6 : 2}
+                maxLength={block.max ?? HOME_TEXT_MAX}
                 dir={lang === "ar" ? "rtl" : "ltr"}
                 lang={lang}
                 value={form[block.id]?.[lang] ?? ""}
@@ -148,7 +153,7 @@ export default function HomeTexts({ token, onExpired }: { token: string; onExpir
               className={btn + " justify-self-start"}
               onClick={() => setForm((f) => ({ ...f, [block.id]: Object.fromEntries(HOME_LANGS.map((l) => [l, ""])) as Record<HomeLang, string> }))}
             >
-              Revenir à la phrase de la pièce
+              {block.defaults ? "Revenir au résumé tiré de la page The House" : "Revenir à la phrase de la pièce"}
             </button>
           ) : null}
         </fieldset>

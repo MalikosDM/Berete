@@ -170,6 +170,41 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       vidéos du produit fini des pièces qui n'en ont pas ; la vidéo de The Hand montre un personnage d'anime gravé sur
       l'écrin (droits, comme Dragon Ball).
 
+## Passe « accueil : photo d'ouverture plein écran, sections plus riches, The House » (Yoni et Malik, 28/11) — état au 28/11/2026
+- [x] **Photo d'ouverture sans bord** : l'écrin Sirius garde sa taille et sa place au pixel près (la règle « contain » calculée sur la
+      photo d'origine, `data-home-photo-original`) ; autour, son fond prolongé (`scripts/hero-extend.py`, appelé par
+      `npm run page-media -- --only=home` : chaque ligne continue avec la couleur de son bord + le grain de la photo, le sol continue
+      dessous, coutures fondues seulement sur le fond noir et le sol (jamais l'écrin : la poignée commence à 4,2 %), bord extérieur
+      qui finit exactement en #0a0a0a). Aucune IA, l'écrin intact. L'image agrandie remplit la zone sous le menu (`overflow: hidden`) ;
+      plus de masques sur les côtés : un fondu de 3 % sous le menu (4,2 % sur iPhone, jusqu'à la poignée) et un fondu en bas sous la
+      signature. iPhone : le sol continue sous l'écrin dans la place de la signature et se fond dans le noir. Même poids qu'avant
+      (85 Ko en AVIF à 1440). **Disque débranché le 28/11** : faite depuis la copie 3200 px du site
+      (`HERO_SOURCE=.local/hero-2811/source-3200.webp`) ; à refaire depuis l'original 5504 px quand le disque est branché
+      (`npm run page-media -- --only=home`, rien d'autre à changer).
+- [x] **Sections plus riches** (`src/pages/Home.tsx`, chacune ≤ un écran sur ordinateur, 1280 × 800 compris) : petite rangée de vraies
+      photos au cadre fin (`Thumbs`, plein écran au clic), une phrase de Yoni mot pour mot, un seul lien. **We begin with what could be** :
+      le Butterfly en 3 temps (croquis de la main de Yoni, métal brut p77, sertissage des ailes ; titres des étapes du site) + « From a
+      first sketch to the handover… », lien The Bespoke Journey (la photo mène à la pièce). **The Mechanism** : Dragon Ball et sa sphère,
+      « We therefore engineered the Spirit Bomb to rotate… », puis 5 cartes rondes (`OtherMechanisms`) : VfB (HIDDEN MECHANISM, p14),
+      Inter (MECHANISM, p05), OKA (SPECIAL MECHANISM, p03), MT — NEXUS CROSS (THE ROTATING MT SIGNATURE, boucle de Yoni `tillmanSpin`),
+      trèfle d'Eljero Elia (« In the film, the centre turns under the finger. », boucle `clover-spin` de `page-media --only=loops`) ;
+      boucles muettes, chargées seulement à l'écran, immobiles avec « réduire les animations » ; iPhone : défilement de côté.
+      **Inter** : écrin ouvert p22, remise (photo du film de Yoni), dessus en pendentif p44 + « Born from a special project… ».
+      **VfB** : les bagues au pied de la DFB-Pokal p08, son présentoir, une bague remise p05 + « Created to immortalise… ».
+      The Creations inchangé. Jamais deux fois la même image sur la page (test).
+- [x] **The House après Press** : portrait de Yoni, résumé fait uniquement de phrases des chapitres (`src/data/houseSummary.ts` : la
+      recette chapitre/paragraphe, le prénom devient « il » dès la 2e phrase, le « Because » de la dernière phrase retiré ; le test
+      refait chaque langue depuis `src/i18n/house/<langue>.ts`), « Discover the House » (6 langues). Modifiable dans l'admin
+      (« Textes de l'accueil », bloc « house-summary », 1 200 caractères).
+- Tests : `tests/accueil2811.spec.ts` (bords de l'ouverture : aucune marche > 4 entre deux lignes ou colonnes voisines, bords à ±3 de
+      #0a0a0a ou continus, écrin à ±1 % de sa taille d'avant, image qui remplit la zone ; 1280, 1440, 1920, 2560 × 1440, 2560 × 1080,
+      iPhone ; sections, phrases mot pour mot, doublons, The House, boucles). `npm run audit:coherence` accepte `ONLY=home`.
+      Captures avant / après : `~/Downloads/_verif-accueil-28-11/{avant,apres}/` (ouverture et page entière, 5 tailles + iPhone),
+      vitesse `vitesse/{avant,apres}-{fibre,4g}.json` (`.local/scripts/speed-home.sh`, `home-shots.mjs`).
+- [ ] Malik : brancher le disque et relancer `npm run page-media -- --only=home` (photo d'origine 5504 px). Yoni : valider le résumé de
+      The House et la phrase du trèfle (« In the film… », texte de sa page) ; une photo du mécanisme OKA en mouvement (aujourd'hui le
+      ballon en gros plan) ; une photo du dessus de la bague Inter ouvert sur le trophée sans le pendentif à côté, s'il en a une.
+
 ## Passe « corrections après la passe du 28/11 » (relecture de Malik, 28/11 au soir) — état au 28/11/2026
 - [x] **MT — NEXUS CROSS** : ouverture sur la croix seule, sa bélière en losange entière sous le menu (vue `alone` tirée de p17, la
       chaîne retirée le long des deux bords hauts de la bélière, `scripts/cutouts.mjs`). Toutes les vues coupées (chaîne qui sort de

@@ -4,7 +4,7 @@
  *
  *   npm run audit:coherence                                  (the local site, http://localhost:3001)
  *   BASE_URL=https://berete-nxsp.vercel.app npm run audit:coherence
- *   SIZES=1440x900 LANGS=en,fr ONLY=/pieces npm run audit:coherence     (a part of it)
+ *   SIZES=1440x900 LANGS=en,fr ONLY=/pieces npm run audit:coherence     (a part of it; ONLY=home: the home page alone)
  *
  * It opens every page of the sitemap, in every language of the site, at 1280 × 800, 1440 × 900 and on an iPhone (WebKit,
  * Safari's engine), silent (Chromium --mute-audio, the films' volume at 0 on the iPhone), and reports:
@@ -80,6 +80,8 @@ function allowedButtons(t: Messages): Set<string> {
     t.common.seeMore,
     t.films.enter,
     t.home.discoverMore,
+    // The way from the summary of the story of Yoni on the home page to The House (28/11/2026).
+    t.home.discoverHouse,
     // Yoni's pages (26-27/11/2026): the way to the making-of, the world of a player, every moment of a hand-over.
     t.piece.watchMakingOf,
     t.piece.discoverHisWorld,
@@ -579,7 +581,12 @@ async function pages(): Promise<string[]> {
   const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]!.replace(/^https?:\/\/[^/]+/, "") || "/");
   // The English pages first: the other languages compare their texts with them.
   const lang = (p: string) => /^\/(fr|es|de|nl|ar)(\/|$)/.exec(p)?.[1] ?? "en";
-  return paths.filter((p) => LANGS.includes(lang(p)) && (!ONLY || p.replace(/^\/(fr|es|de|nl|ar)(?=\/|$)/, "").startsWith(ONLY))).sort((a, b) => (lang(a) === "en" ? 0 : 1) - (lang(b) === "en" ? 0 : 1));
+  // ONLY=home: the home page alone, in each language.
+  const pick = (p: string) => {
+    const bare = p.replace(/^\/(fr|es|de|nl|ar)(?=\/|$)/, "");
+    return ONLY === "home" ? bare === "" || bare === "/" : bare.startsWith(ONLY);
+  };
+  return paths.filter((p) => LANGS.includes(lang(p)) && (!ONLY || pick(p))).sort((a, b) => (lang(a) === "en" ? 0 : 1) - (lang(b) === "en" ? 0 : 1));
 }
 
 async function context(browser: Browser, size: string): Promise<BrowserContext> {

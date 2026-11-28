@@ -3,6 +3,7 @@
 // Creation in one screen, the home photo whole under an opaque header, a menu read at once. Silent (tests/fixtures.ts).
 import { expect, test } from "./fixtures";
 import { skipIntro } from "./helpers";
+import pages from "../src/data/pages.generated.json" with { type: "json" };
 
 const fullscreenOf = (page: import("@playwright/test").Page) =>
   page.evaluate(() => {
@@ -156,8 +157,11 @@ test("home: the photo of the Sirius trunk whole, under the header, centred, at e
     expect(box.x + box.width).toBeLessThanOrEqual(vw + 1);
     // Centred in the room under the header.
     expect(Math.abs(box.x + box.width / 2 - vw / 2)).toBeLessThanOrEqual(2);
-    // The photo of the shape of the box (contain): its own ratio.
-    const ratio = await page.locator("[data-home-photo-img]").evaluate((img) => (img as HTMLImageElement).naturalWidth / (img as HTMLImageElement).naturalHeight);
+    // The photo of the shape of the box (contain): its own ratio. (28/11/2026: the image is the photo with its ground extended
+    // around it; the box is the original photo, src/data/pages.generated.json.)
+    const upright = await page.evaluate(() => matchMedia("(max-aspect-ratio: 1/1)").matches);
+    const o = (upright ? pages["hero-phone"] : pages["hero-desktop"]).original;
+    const ratio = o.width / o.height;
     await expect.poll(() => page.locator("[data-home-photo-img]").evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     if (ratio > 0) expect(Math.abs(box.width / box.height - ratio), "the whole photo, never cut").toBeLessThan(0.03);
     await page.screenshot({ path: "verification/" + info.project.name + "/retours2411-accueil-" + w + "x" + h + ".jpg", type: "jpeg", quality: 55 });

@@ -161,6 +161,7 @@ export const es: Messages = {
     /** The opening photo of the home page (24/11/2026) and the small link under it. */
     heroAlt: "El estuche Sirius abierto: la cadena y su colgante en su expositor, el logotipo BRT en el baúl negro",
     discoverMore: "Descubrir más",
+    discoverHouse: "Descubrir la Casa",
     sketchLabel: "Del primer boceto a la joya, al desplazarse",
     /** The home page of 23/11/2026 (Yoni): its hook, who Berete is, the innovation, the selection. */
     hook: "No partimos de lo que ya se ha hecho. Partimos de lo que podría ser.",

@@ -5,7 +5,8 @@
 //   BASE_URL=http://localhost:5392 npx playwright test tests/home2711.spec.ts --project=desktop --project=iphone
 import sharp from "sharp";
 import monogram from "../src/data/monogram-lines.generated.json" with { type: "json" };
-import { HOUSE_PIECE, MECHANISM_PIECE } from "../src/data/homeTexts";
+import { HOME_BLOCKS, HOUSE_PIECE, MECHANISM_PIECE } from "../src/data/homeTexts";
+import pages from "../src/data/pages.generated.json" with { type: "json" };
 import type { Catalogue } from "../src/data/types";
 import { expect, test, type Page } from "./fixtures";
 import { shotPath, skipIntro, watch } from "./helpers";
@@ -150,7 +151,8 @@ test("The Mechanism: the piece and its circle where they were, the sphere turnin
     expect(m.visual.bottom - m.visual.top).toBeLessThanOrEqual(m.viewport - m.header);
     // Inside the circle: the film still covers it whole, its sphere (at 60 % of the height of its square) in the middle.
     expect(m.film.top).toBeLessThanOrEqual(m.loupe.top + 0.5);
-    expect(m.film.bottom).toBeGreaterThanOrEqual(m.loupe.bottom - 0.5);
+    // (Its bottom within the fine border of the circle, 1 px: the smaller picture of 28/11/2026 leaves 0.6 px there.)
+    expect(m.film.bottom).toBeGreaterThanOrEqual(m.loupe.bottom - 1);
     expect(m.film.left).toBeLessThanOrEqual(m.loupe.left + 0.5);
     expect(m.film.right).toBeGreaterThanOrEqual(m.loupe.right - 0.5);
     const sphereY = m.film.top + 0.6 * m.film.height;
@@ -187,14 +189,18 @@ test("the trunk at the top of the page: whole in the room under the header, neve
     const m = await page.evaluate(() => {
       const i = document.querySelector<HTMLImageElement>("[data-home-photo-img]")!;
       const r = document.querySelector("[data-home-photo-box]")!.getBoundingClientRect();
-      return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, ratio: r.width / r.height, natural: i.naturalWidth / i.naturalHeight, header: document.querySelector("header")!.getBoundingClientRect().bottom, vw: window.innerWidth, vh: window.innerHeight };
+      return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, ratio: r.width / r.height, upright: matchMedia("(max-aspect-ratio: 1/1)").matches, loaded: i.naturalWidth > 0, header: document.querySelector("header")!.getBoundingClientRect().bottom, vw: window.innerWidth, vh: window.innerHeight };
     });
+    // (28/11/2026) The image is the photo with its ground extended around it: the box is the original photo.
+    const o = (m.upright ? pages["hero-phone"] : pages["hero-desktop"]).original;
+    const natural = o.width / o.height;
     expect(m.top).toBeGreaterThanOrEqual(m.header - 1);
     expect(m.bottom).toBeLessThanOrEqual(m.vh + 1);
     expect(m.left).toBeGreaterThanOrEqual(-1);
     expect(m.right).toBeLessThanOrEqual(m.vw + 1);
     // Its frame has the shape of the photo: nothing of it is cut.
-    expect(Math.abs(m.ratio / m.natural - 1)).toBeLessThan(0.02);
+    expect(m.loaded).toBe(true);
+    expect(Math.abs(m.ratio / natural - 1)).toBeLessThan(0.02);
     await page.screenshot({ path: shotPath(info, "home2711-trunk" + (size ? "-" + size.width : "")), type: "jpeg", quality: 70 });
   }
 });
@@ -219,7 +225,8 @@ test("the admin: « Textes de l'accueil » writes the text beside a piece, langu
     await expect(field).toBeVisible();
     // Empty: the line of the piece, in grey, in each language.
     if (lines[MECHANISM_PIECE] && !before.texts.mechanism?.en) await expect(page.locator('[data-home-text-field="mechanism:en"]')).toHaveAttribute("placeholder", lines[MECHANISM_PIECE]!);
-    await expect(page.locator("[data-home-text-block] textarea")).toHaveCount(BLOCKS.length * 6);
+    // (Its pieces and, since 28/11/2026, « The House » after Press.)
+    await expect(page.locator("[data-home-text-block] textarea")).toHaveCount(HOME_BLOCKS.length * 6);
     await field.fill(mine);
     await page.locator("[data-home-texts-save]").click();
     await expect(page.getByRole("status")).toContainText("Enregistré");

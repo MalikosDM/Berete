@@ -9,6 +9,7 @@
  * through updates); read by the page from /api/home-texts (server/routes/home-texts.ts). The version without its server
  * (Vercel) shows the lines of the pieces.
  */
+import { HOUSE_SUMMARY } from "./houseSummary.js";
 import { SPECIAL_PROJECT } from "./pieces.js";
 
 export const HOME_LANGS = ["en", "fr", "es", "de", "nl", "ar"] as const;
@@ -24,7 +25,11 @@ export type HomeBlock = {
   /** Its name in the base and on the page (data-home-text). */
   id: string;
   /** The piece it shows (its line is the text by default). */
-  piece: string;
+  piece?: string;
+  /** A block without a piece: its text by default, language by language (« The House », after Press). */
+  defaults?: Partial<Record<HomeLang, string>>;
+  /** Its longest text (HOME_TEXT_MAX by default). */
+  max?: number;
   /** Its name in the admin (French, as the admin). */
   label: string;
 };
@@ -34,6 +39,8 @@ export const HOME_BLOCKS: HomeBlock[] = [
   { id: "house", piece: HOUSE_PIECE, label: "La Maison (en haut de la page)" },
   { id: "mechanism", piece: MECHANISM_PIECE, label: "Le mécanisme" },
   ...SPECIAL_PROJECT.map((r, i) => ({ id: "ring-" + r.slug, piece: r.slug, label: "Grande commande " + (i + 1) })),
+  // (28/11/2026) After Press: a short summary of the story of Yoni (src/data/houseSummary.ts), beside his portrait.
+  { id: "house-summary", defaults: HOUSE_SUMMARY, max: 1200, label: "The House (résumé, après Press)" },
 ];
 
 export const HOME_TEXTS_KEY = "home.texts";
@@ -51,7 +58,7 @@ export function cleanHomeTexts(value: unknown): HomeTexts {
     for (const lang of HOME_LANGS) {
       const text = (given as Record<string, unknown>)[lang];
       if (typeof text !== "string") continue;
-      const clean = text.replace(/\s+/g, " ").trim().slice(0, HOME_TEXT_MAX);
+      const clean = text.replace(/\s+/g, " ").trim().slice(0, block.max ?? HOME_TEXT_MAX);
       if (clean) texts[lang] = clean;
     }
     if (Object.keys(texts).length > 0) out[block.id] = texts;
