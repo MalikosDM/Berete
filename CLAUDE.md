@@ -197,7 +197,11 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       maison (`data-title-dash`) ; composition cachée tant qu'elle n'a ni poids d'or ni carats (sauf composition de Yoni) ; « Your vision.
       Your universe. » : pièces liées (même joueur, club, famille, voisines), jamais la pièce de la page (`similarPieces`) ; Kenan : son
       selfie en petit. `tests/retours2811.spec.ts` (toutes les pages : bijou entier à 1440, 1920 et iPhone ; Every Angle ; films ;
-      textes mot pour mot…). Captures avant / après : `~/Downloads/_verif-28-11/<point>/{avant,apres}/`.
+      textes mot pour mot…). Captures avant / après : `~/Downloads/_verif-28-11/<point>/{avant,apres}/` (planches `planche-1440.jpg`,
+      `planche-iphone.jpg` par point ; `.local/scripts/shots-2811.mjs`, `sheets-2811.py`).
+- Vérifié le 28/11 : en local, battue des pages touchées réussie (ordinateur, iPhone) ; en ligne (commit 2e1b2905) : `retours2811`,
+      `retours2711b`, `home2711` (le rond de l'accueil), `contenus2711`, `corrections2711`, `film-frame`, `universes2711b` 100 réussis,
+      `perf` 7/7 ; mot de passe réel remis à l'identique.
 - [ ] **Chaînes** (Baguette Cuban, White Iced, Rose 14 et 20 mm, Infinity Link, Safi Link, BRT Flowers) : aucune vraie photo de la chaîne
       entière (toutes sur buste) : elles restent coupées net en haut, la coupe cachée au bord de l'écran / sous le menu. Yoni : une photo
       de chaque chaîne posée entière, fermoir visible. Aussi : les originaux HD des photos de Ballet (aujourd'hui tirées du film).
