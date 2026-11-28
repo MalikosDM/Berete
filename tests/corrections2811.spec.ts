@@ -146,7 +146,10 @@ test("3. the first film of every page: its poster and the image it starts on are
     });
     // Its image before it plays (jewels on black: a bright piece on a dark ground) and the image it starts on: never almost
     // black (the jersey measured at 43/255 on the evening of 28/11/2026).
-    if (r.poster < 55 || r.first < 25) wrong.push(p.slug + " " + JSON.stringify(r));
+    // The image it starts on is measured with Chromium (the phone plays the same film, same seconds): WebKit draws a film
+    // read from the live site as black in a canvas (28/11/2026), its posters are measured.
+    const frames = info.project.name === "desktop";
+    if (r.poster < 55 || (frames && r.first < 25)) wrong.push(p.slug + " " + JSON.stringify(r));
   }
   expect(wrong, info.project.name).toEqual([]);
 });

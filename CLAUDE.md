@@ -186,6 +186,8 @@ Ce fichier garde tout le contexte du projet, pour Claude Code et pour Claude (ch
       deux fois sur une page (test sur toutes les pages). **Chaînes** : aucune photo de chaîne entière ; le fermoir BRT est le premier
       gros plan de The Art of Detail (Baguette Cuban p10, White Iced p01). **Inter** : `photo-2-v2.jpeg` toujours absent.
 - Tests : `tests/corrections2811.spec.ts` (1440, 1920, iPhone). Captures : `~/Downloads/_verif-corrections-28-11/<point>/{avant,apres}/`.
+      Vérifié en ligne (commit af2bb435) : `corrections2811`, `retours2811` (ordinateur, iPhone), `perf` 7/7 ; l'image de départ des
+      films est mesurée avec Chromium (WebKit dessine en noir un film lu en ligne dans un canvas) ; mot de passe réel remis.
 - [ ] Yoni : une photo des montres de Tajon et de Radja seules (sans poignet) ; les chaînes posées entières, fermoir visible ; Malik :
       `.local/yoni-2711/inter/photo-2-v2.jpeg` (la photo des champions sans filigrane).
 
