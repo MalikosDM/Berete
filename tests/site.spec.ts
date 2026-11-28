@@ -81,7 +81,8 @@ async function sharpness(page: Page, selector: string): Promise<{ score: number;
 async function checkPieceStructure(page: Page, cat: Catalogue, piece: Piece) {
   const id = piece.slug;
   await expect(page.locator("h1#piece-title"), id).toHaveText(piece.title);
-  const cover = 'section[aria-labelledby="piece-title"] img';
+  // The photo of the opening as it is shown (since 28/11/2026 the layout not shown loads a transparent pixel instead).
+  const cover = 'section[aria-labelledby="piece-title"] img:visible';
   await expect.poll(() => page.locator(cover).first().evaluate((el) => (el as HTMLImageElement).complete && (el as HTMLImageElement).naturalWidth > 0), { message: id + " cover loaded" }).toBe(true);
   const quality = await sharpness(page, cover);
   // (The FAM medallion: its only real photo is 604 px, its AI studio image gone on 27/11/2026: an HD photo is asked of Yoni.)

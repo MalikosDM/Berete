@@ -46,9 +46,10 @@ test("the intro: the monogram BRT draws itself in fine rose gold lines on black,
       const el = document.querySelector("[data-preloader]");
       const now = performance.now();
       if (el && w.__intro.added === undefined) w.__intro.added = now;
-      if (el && el.className.includes("opacity-0") && w.__intro.leaving === undefined) w.__intro.leaving = now;
+      // (Since 28/11/2026 the intro is in the page itself from the first paint, index.html; it leaves with html[data-intro=leaving].)
+      if (el && document.documentElement.getAttribute("data-intro") === "leaving" && w.__intro.leaving === undefined) w.__intro.leaving = now;
       if (!el && w.__intro.added !== undefined && w.__intro.removed === undefined) w.__intro.removed = now;
-    }).observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+    }).observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "data-intro"] });
   });
   await page.goto("/", { waitUntil: "domcontentloaded" });
   const intro = page.locator("[data-preloader]");
@@ -58,14 +59,15 @@ test("the intro: the monogram BRT draws itself in fine rose gold lines on black,
   await expect(intro.locator("[data-preloader-line]")).toHaveCount(monogram.lines.length);
   expect(await intro.locator("linearGradient stop").evaluateAll((s) => s.map((x) => x.getAttribute("stop-color")?.toUpperCase()))).toEqual(["#9C5B4F", "#E8B4A0", "#B76E79"]);
   expect(await intro.locator("g[stroke]").getAttribute("stroke")).toBe("url(#preloader-rose-gold)");
-  // The lines draw themselves: hidden at first, all drawn after about 1.6 s.
-  await expect.poll(() => intro.locator("[data-preloader-line]").evaluateAll((ps) => Math.max(...ps.map((p) => parseFloat(getComputedStyle(p).strokeDashoffset)))), { timeout: 2500, intervals: [100] }).toBeLessThan(0.02);
+  // The lines draw themselves: hidden at first, all drawn within its time (since 28/11/2026: as long as the page gets ready).
+  await expect.poll(() => intro.locator("[data-preloader-line]").evaluateAll((ps) => (ps.length ? Math.max(...ps.map((p) => parseFloat(getComputedStyle(p).strokeDashoffset))) : 0)), { timeout: 1500, intervals: [50] }).toBeLessThan(0.02);
   await page.screenshot({ path: shotPath(info, "home2711-intro"), type: "jpeg", quality: 75 });
   await expect(intro).toHaveCount(0, { timeout: 5000 });
   const times = await page.evaluate(() => (window as unknown as { __intro: { added: number; leaving: number; removed: number } }).__intro);
-  // Before 27/11/2026 it left at 2.6 s and was gone at 3.3 s.
-  expect(times.leaving - times.added).toBeLessThan(2100);
-  expect(times.removed - times.added).toBeLessThan(2800);
+  // Before 27/11/2026 it left at 2.6 s and was gone at 3.3 s; on 27/11 at 1.9 s and 2.5 s; since 28/11 as soon as the page is
+  // ready (1.2 s at most after the page starts).
+  expect(times.leaving - times.added).toBeLessThan(1700);
+  expect(times.removed - times.added).toBeLessThan(2200);
   expect(await page.evaluate(() => document.documentElement.hasAttribute("data-intro"))).toBe(false);
 
   // « Reduce motion »: no intro at all, the page at once (a new tab: a new visit).

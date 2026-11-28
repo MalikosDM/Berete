@@ -8,7 +8,9 @@ export default function SmoothScroll() {
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    const lenis = new Lenis({ lerp: 0.08, smoothWheel: true, syncTouch: false });
+    // The wheel and the trackpad scroll the page directly (28/11/2026: Malik and Yoni found the site hard to move in: the page
+    // kept gliding a second and 300 px after the wheel stopped). Lenis stays for the soft scrolls the pages ask for (scrollTo).
+    const lenis = new Lenis({ smoothWheel: false, syncTouch: false });
     setLenis(lenis);
     lenis.on("scroll", () => ScrollTrigger.update());
     const tick = (time: number) => {

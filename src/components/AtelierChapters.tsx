@@ -55,7 +55,8 @@ export default function AtelierChapters() {
         const bottom = Math.min(r.bottom, vh, next ? next.top : Infinity);
         return visible && bottom - Math.max(r.top, 0) > vh * 0.08;
       });
-      const nowNear = rects.map((r) => r.top < vh * 1.6 && r.bottom > -vh * 0.6);
+      // Loaded when it is about to be seen (28/11/2026: the first clip loaded with the page, 1.1 MB, under the opening film).
+      const nowNear = rects.map((r) => r.top < vh * 1.05 && r.bottom > -vh * 0.6);
       setSeen((prev) => (prev.every((v, i) => v === nowSeen[i]) ? prev : nowSeen));
       setNear((prev) => (prev.every((v, i) => v || !nowNear[i]) ? prev : prev.map((v, i) => v || nowNear[i]!)));
     };

@@ -64,15 +64,18 @@ export default function TrunkReveal({ name, trunk, piece, onOpen }: { slug: stri
   const view = piece?.view ?? null;
   const jewel = Boolean(piece && view);
 
-  // The film of the opening loads once the box comes near the screen.
+  // The film of the opening loads when it may be asked for (28/11/2026: the six boxes of the first screen loaded their films at
+  // once, 4.4 MB): with a mouse, as the pointer comes on the box (or the keyboard on its button); on a phone, once the box is
+  // well in the screen (one box per row).
   useEffect(() => {
     const el = rootRef.current;
     if (!el || loadOpening || typeof IntersectionObserver === "undefined") return undefined;
+    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) return undefined;
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) setLoadOpening(true);
       },
-      { rootMargin: "240px 0px" },
+      { rootMargin: "0px 0px -30% 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -225,7 +228,7 @@ export default function TrunkReveal({ name, trunk, piece, onOpen }: { slug: stri
 
   return (
     <div ref={rootRef} data-trunk-state={phase} data-trunk-fade={fade ? "" : undefined} className="trunk-reveal" style={style}>
-      <div className="relative aspect-square w-full overflow-hidden bg-[#050403]" onPointerEnter={() => setLoadOpening(true)}>
+      <div className="relative aspect-square w-full overflow-hidden bg-[#050403]" onPointerEnter={() => setLoadOpening(true)} onFocusCapture={() => setLoadOpening(true)}>
         {picture("closed")}
         {picture("open")}
         {film("opening")}

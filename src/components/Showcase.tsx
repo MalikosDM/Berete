@@ -6,6 +6,9 @@ import { cutoutLargest, cutoutSrcSet, isCutTop, type CutoutView } from "@/data/s
 import type { JewelEffect } from "@/data/themes";
 import { useI18n } from "@/i18n";
 
+/** A transparent pixel: what a layout that is not shown loads instead of its photo. */
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+
 /*
  * The opening of a piece: its jewel cut out (src/data/showcase.ts), alone or in a showcase of several views.
  * - Computer: the main view large in the middle of the universe, the others smaller around it, in depth; they float
@@ -132,7 +135,10 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
     });
   };
 
-  const img = (v: CutoutView, main: boolean, sizes: string) => (
+  // A photo for one layout only (28/11/2026): the computer never downloads the photos of the phone's swipe, nor the phone those of
+  // the computer's depth (both are written in the page; a hidden photo that is not lazy was downloaded anyway: 700 KB a page).
+  const img = (v: CutoutView, main: boolean, sizes: string, only?: "computer" | "phone") => {
+    const tag = (
     <img
       src={cutoutLargest(slug, v)}
       srcSet={cutoutSrcSet(slug, v)}
@@ -141,17 +147,27 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
       width={v.width}
       height={v.height}
       loading={main ? "eager" : "lazy"}
-      fetchPriority={main ? "high" : undefined}
+      // Its preload is written once, by the computer's photo (React writes one for each photo of high priority): on a phone the
+      // same sizes ask for the same file as the swipe's photo.
+      fetchPriority={main && only !== "phone" ? "high" : undefined}
       decoding="async"
       draggable={false}
       ref={jewel ? jewelSource : undefined}
       className="h-full w-full select-none object-contain"
     />
-  );
+    );
+    if (!only) return tag;
+    return (
+      <picture className="contents">
+        <source media={only === "computer" ? "(max-width: 1023.98px)" : "(min-width: 1024px)"} srcSet={BLANK} />
+        {tag}
+      </picture>
+    );
+  };
   // The jewel and the effect of its world on it, in one frame (isolated: the halo stays behind it).
-  const framed = (v: CutoutView, main: boolean, sizes: string) => (
+  const framed = (v: CutoutView, main: boolean, sizes: string, only?: "computer" | "phone") => (
     <span data-cut-top={!multi && isCutTop(v) ? "" : undefined} className={"sv-float block h-full w-full" + (jewel ? " relative isolate" : "")}>
-      {img(v, main, sizes)}
+      {img(v, main, sizes, only)}
       {jewel ? <JewelFx kind={jewel} /> : null}
     </span>
   );
@@ -192,7 +208,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
             >
               {main && multi ? <span aria-hidden="true" className="pointer-events-auto absolute inset-[16%] z-10 cursor-zoom-in" /> : null}
               <span className="sv-par block h-full w-full">
-                {framed(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw")}
+                {framed(v, viewIndex === 0, main ? "(max-width: 1023px) 92vw, 50vw" : "18vw", "computer")}
               </span>
             </button>
           );
@@ -212,7 +228,7 @@ export default function Showcase({ slug, title, views, jewel = null, large = fal
             <div key={v.id} data-showcase-slide={i} className={"h-full w-full shrink-0 snap-center " + (multi ? "pb-12" : "")} style={{ "--i": i } as CSSProperties}>
               {/* A touch: full screen, two fingers to zoom. */}
               <button type="button" onClick={() => setOpened(i)} data-showcase-open={i} aria-label={t.gallery.open(t.piece.viewAlt(title, kindName(v)))} className="block h-full w-full cursor-zoom-in">
-                {framed(v, i === 0, "92vw")}
+                {framed(v, i === 0, "92vw", "phone")}
               </button>
             </div>
           ))}

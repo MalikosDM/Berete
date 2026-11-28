@@ -155,7 +155,8 @@ function useEntrance(ref: React.RefObject<HTMLElement | null>, slug: string | un
     // Its time starts once the intro of the house has left (the first page of a visit), else at once.
     let timer = 0;
     const play = () => {
-      timer = window.setTimeout(() => page.removeAttribute("data-entering"), 2600);
+      // (Its cinema shortened to 55 % on 28/11/2026: the page is read sooner.)
+      timer = window.setTimeout(() => page.removeAttribute("data-entering"), 1450);
     };
     if (document.documentElement.hasAttribute("data-intro")) window.addEventListener("berete:intro-done", play, { once: true });
     else play();

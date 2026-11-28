@@ -7,12 +7,15 @@ import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import BrandIcon from "@/components/BrandIcon";
 import Preloader from "@/components/Preloader";
+import { prefetchOnIntent } from "@/lib/prefetch";
 import { Link, LocaleSync, useI18n } from "@/i18n";
 import { waLink } from "@/lib/site";
 import { useWhatsAppMessage } from "@/lib/whatsapp";
 
 export default function Layout() {
   const { t } = useI18n();
+  // The photo of a piece starts loading as the visitor heads for its link (src/lib/prefetch.ts).
+  useEffect(() => prefetchOnIntent(), []);
   const waMessage = useWhatsAppMessage();
   const [showBar, setShowBar] = useState(false);
 

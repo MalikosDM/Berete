@@ -557,7 +557,7 @@ html.lenis body {
   inset: 0;
 }
 [data-entering] .universe-stage {
-  animation: u-enter 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation: u-enter 0.88s cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 @keyframes u-enter {
   from {
@@ -639,7 +639,7 @@ html.lenis body {
   opacity: 0;
 }
 [data-entering] .u-backdrop img {
-  animation: u-ignite 1.8s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  animation: u-ignite 0.99s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
 @keyframes u-ignite {
   from {
@@ -898,7 +898,7 @@ html.lenis body {
   }
 }
 [data-entering] .u-mark {
-  animation: u-mark-in 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+  animation: u-mark-in 0.88s cubic-bezier(0.2, 0.7, 0.2, 1) 0.165s both;
 }
 @keyframes u-mark-in {
   from {
@@ -1027,7 +1027,7 @@ html.lenis body {
 [data-entering] .u-rain {
   animation:
     u-rain 2.1s linear infinite,
-    u-ignite 1.8s ease-out both;
+    u-ignite 0.99s ease-out both;
 }
 
 /* The twenty stars of Inter Milan, on an arc above the ring: they light up one by one at the entrance. */
@@ -1064,8 +1064,8 @@ html.lenis body {
   clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 [data-entering] .u-twenty > span {
-  animation: u-star-on 0.9s ease-out both;
-  animation-delay: calc(0.45s + var(--i) * 0.07s);
+  animation: u-star-on 0.495s ease-out both;
+  animation-delay: calc(0.248s + var(--i) * 0.039s);
 }
 /* The eyes of the oni masks (Sirius): a dim red glow that flares now and then, both eyes of one mask together, the masks
    one after the other. Still (dim) with reduced motion. */
@@ -1257,7 +1257,7 @@ html.lenis body {
   }
 }
 [data-entering] :is(.u-genki, .u-spots) {
-  animation: u-genki-in 2s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  animation: u-genki-in 1.1s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
 @keyframes u-genki-in {
   from {
@@ -2155,7 +2155,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 .u-flash {
   background: radial-gradient(55% 55% at var(--u-at-x) var(--u-at-y), #fff 0%, color-mix(in oklab, var(--u-glow) 80%, #fff) 16%, color-mix(in oklab, var(--u-glow) 38%, transparent) 42%, transparent 72%);
   mix-blend-mode: screen;
-  animation: u-flash 1.5s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+  animation: u-flash 0.825s cubic-bezier(0.2, 0.7, 0.2, 1) 0.138s both;
 }
 @keyframes u-flash {
   0% {
@@ -2182,7 +2182,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   box-shadow:
     0 0 40px var(--u-glow),
     inset 0 0 30px var(--u-glow);
-  animation: u-shock 1.3s cubic-bezier(0.15, 0.7, 0.3, 1) 0.35s both;
+  animation: u-shock 0.715s cubic-bezier(0.15, 0.7, 0.3, 1) 0.193s both;
 }
 @keyframes u-shock {
   from {
@@ -2214,8 +2214,8 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   margin: calc(-4.5px * var(--s));
   border-radius: 50%;
   background: radial-gradient(circle, #fff 0%, var(--u-glow) 40%, transparent 70%);
-  animation: u-burst 1.5s cubic-bezier(0.15, 0.65, 0.3, 1) both;
-  animation-delay: calc(0.2s + var(--t));
+  animation: u-burst 0.825s cubic-bezier(0.15, 0.65, 0.3, 1) both;
+  animation-delay: calc(0.11s + var(--t));
 }
 [data-entrance="flutter"] .u-burst > i {
   width: calc(24px * var(--s));
@@ -2225,16 +2225,16 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
     radial-gradient(48% 60% at 25% 45%, color-mix(in oklab, #ffd6f2 80%, transparent) 0 55%, transparent 60%),
     radial-gradient(48% 60% at 75% 45%, color-mix(in oklab, #e6d2ff 80%, transparent) 0 55%, transparent 60%);
   animation:
-    u-burst 2.1s cubic-bezier(0.2, 0.6, 0.3, 1) both,
+    u-burst 1.155s cubic-bezier(0.2, 0.6, 0.3, 1) both,
     u-flap 0.16s ease-in-out infinite alternate;
-  animation-delay: calc(0.25s + var(--t)), 0s;
+  animation-delay: calc(0.138s + var(--t)), 0s;
 }
 [data-entrance="bloom"] .u-burst > i {
   width: calc(14px * var(--s));
   height: calc(20px * var(--s));
   border-radius: 50% 0;
   background: linear-gradient(135deg, color-mix(in oklab, var(--u-glow) 90%, #fff), color-mix(in oklab, var(--u-tint) 60%, var(--u-glow)));
-  animation-duration: 2s;
+  animation-duration: 1.1s;
 }
 [data-entrance="stars"] .u-burst > i {
   clip-path: polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
@@ -2275,7 +2275,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   top: calc(var(--u-at-y) - 35vmax);
   border-radius: 50%;
   background: radial-gradient(closest-side, color-mix(in oklab, var(--u-glow) 50%, #1c0204) 0%, color-mix(in oklab, var(--u-glow) 32%, transparent) 42%, transparent 74%);
-  animation: u-curtain 2.1s cubic-bezier(0.35, 0.05, 0.2, 1) both;
+  animation: u-curtain 1.155s cubic-bezier(0.35, 0.05, 0.2, 1) both;
 }
 .u-curtain > i:nth-child(1) {
   --dx: -38vmax;
@@ -2284,22 +2284,22 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 .u-curtain > i:nth-child(2) {
   --dx: 36vmax;
   --dy: -12vmax;
-  animation-delay: 0.08s;
+  animation-delay: 0.044s;
 }
 .u-curtain > i:nth-child(3) {
   --dx: -20vmax;
   --dy: 24vmax;
-  animation-delay: 0.16s;
+  animation-delay: 0.088s;
 }
 .u-curtain > i:nth-child(4) {
   --dx: 26vmax;
   --dy: 22vmax;
-  animation-delay: 0.04s;
+  animation-delay: 0.022s;
 }
 .u-curtain > i:nth-child(5) {
   --dx: 0;
   --dy: -30vmax;
-  animation-delay: 0.12s;
+  animation-delay: 0.066s;
 }
 @keyframes u-curtain {
   0% {
@@ -2315,7 +2315,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
 }
 [data-entering] [data-entrance="smoke"] .u-light {
-  animation: u-light-on 1.3s steps(1, end) 0.7s both;
+  animation: u-light-on 0.715s steps(1, end) 0.385s both;
 }
 @keyframes u-light-on {
   0% {
@@ -2338,11 +2338,11 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 }
 .u-dark {
   background: var(--u-base);
-  animation: u-lights 1.5s steps(1, end) both;
+  animation: u-lights 0.825s steps(1, end) both;
 }
 [data-entrance="spotlight"] .u-dark {
   animation-name: u-spot;
-  animation-duration: 1.2s;
+  animation-duration: 0.66s;
 }
 @keyframes u-lights {
   0% {
@@ -2381,7 +2381,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
 }
 [data-entering] [data-entrance="tunnel"] .universe-stage {
-  animation: u-dolly 1.9s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  animation: u-dolly 1.045s cubic-bezier(0.2, 0.6, 0.2, 1) both;
 }
 @keyframes u-dolly {
   from {
@@ -2396,7 +2396,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 [data-entering] [data-entrance="rain"] .u-flash {
   display: block;
   background: linear-gradient(to bottom, rgb(255 255 255 / 0.3), transparent 70%);
-  animation: u-thunder 1.8s linear both;
+  animation: u-thunder 0.99s linear both;
 }
 @keyframes u-thunder {
   0%,
@@ -2420,7 +2420,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 
 /* The space unfolds (The Hand): the screen black, then the world opens from the piece in a circle of light. */
 [data-entering] .universe[data-entrance="unfold"] .universe-stage {
-  animation: u-unfold 1.9s cubic-bezier(0.65, 0, 0.25, 1) both;
+  animation: u-unfold 1.045s cubic-bezier(0.65, 0, 0.25, 1) both;
 }
 @keyframes u-unfold {
   0%,
@@ -2435,7 +2435,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   display: block;
   border: 2px solid rgb(222 236 255 / 0.9);
   box-shadow: 0 0 40px 8px rgb(150 190 255 / 0.55), inset 0 0 30px rgb(150 190 255 / 0.4);
-  animation: u-unfold-ring 1.9s cubic-bezier(0.65, 0, 0.25, 1) both;
+  animation: u-unfold-ring 1.045s cubic-bezier(0.65, 0, 0.25, 1) both;
 }
 @keyframes u-unfold-ring {
   0%,
@@ -2452,15 +2452,15 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   }
 }
 [data-entering][data-entrance="unfold"] [data-piece-cover] > :is(img, video) {
-  animation-duration: 1.3s;
-  animation-delay: 0.8s;
+  animation-duration: 0.715s;
+  animation-delay: 0.44s;
 }
 [data-entering][data-entrance="unfold"] .sv-float > img {
-  animation-delay: calc(0.8s + var(--i, 0) * 0.2s);
+  animation-delay: calc(0.44s + var(--i, 0) * 0.11s);
 }
 /* Its halo and its glints come with the piece, never in the black before. */
 [data-entering][data-entrance="unfold"] :is(.sv-float, [data-piece-cover]) :is(.u-jewel-halo, .u-jewel) {
-  animation: u-unfold-fx 1.3s ease-out 0.9s both;
+  animation: u-unfold-fx 0.715s ease-out 0.495s both;
 }
 @keyframes u-unfold-fx {
   from {
@@ -2471,7 +2471,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 /* The wheels of the watch start turning. */
 [data-entering] [data-entrance="tick"] [data-texture="clockwork"] .u-texture,
 [data-entering][data-entrance="tick"] [data-texture="clockwork"] .u-texture {
-  animation: u-tick 2s cubic-bezier(0.1, 0.7, 0.2, 1) both;
+  animation: u-tick 1.1s cubic-bezier(0.1, 0.7, 0.2, 1) both;
 }
 @keyframes u-tick {
   from {
@@ -2486,21 +2486,21 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 /* The piece and its texts arrive with the world (the texts readable at once). The photo itself moves, never its box:
    a box that moves would isolate the photo, and its black would no longer melt into the world. */
 [data-entering] [data-piece-cover] > :is(img, video) {
-  animation: u-piece-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+  animation: u-piece-in 0.66s cubic-bezier(0.2, 0.7, 0.2, 1) 0.165s both;
 }
 [data-entering][data-entrance="smoke"] [data-piece-cover] > :is(img, video) {
-  animation-duration: 1.4s;
-  animation-delay: 0.7s;
+  animation-duration: 0.77s;
+  animation-delay: 0.385s;
 }
 [data-entering][data-entrance="flash"] [data-piece-cover] > :is(img, video) {
   animation-name: u-piece-flash;
-  animation-delay: 0.18s;
+  animation-delay: 0.099s;
 }
 [data-entering][data-entrance="tunnel"] [data-piece-cover] > :is(img, video) {
-  animation-delay: 0.6s;
+  animation-delay: 0.33s;
 }
 [data-entering] [data-piece-text] {
-  animation: u-text-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.12s both;
+  animation: u-text-in 0.495s cubic-bezier(0.2, 0.7, 0.2, 1) 0.066s both;
 }
 @keyframes u-piece-in {
   from {
@@ -2538,18 +2538,18 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
 }
 /* The views of the showcase arrive one by one (src/components/Showcase.tsx). */
 [data-entering] .sv-float > img {
-  animation: u-view-in 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  animation-delay: calc(0.35s + var(--i, 0) * 0.22s);
+  animation: u-view-in 0.605s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(0.193s + var(--i, 0) * 0.121s);
 }
 [data-entering][data-entrance="smoke"] .sv-float > img {
-  animation-delay: calc(0.75s + var(--i, 0) * 0.22s);
+  animation-delay: calc(0.413s + var(--i, 0) * 0.121s);
 }
 [data-entering][data-entrance="flash"] .sv-float > img {
   animation-name: u-piece-flash;
-  animation-delay: calc(0.18s + var(--i, 0) * 0.22s);
+  animation-delay: calc(0.099s + var(--i, 0) * 0.121s);
 }
 [data-entering][data-entrance="tunnel"] .sv-float > img {
-  animation-delay: calc(0.6s + var(--i, 0) * 0.22s);
+  animation-delay: calc(0.33s + var(--i, 0) * 0.121s);
 }
 @keyframes u-view-in {
   from {
@@ -2576,7 +2576,7 @@ html[data-intro] [data-entering] [data-piece-cover]::after {
   mask-image: radial-gradient(closest-side, #000 55%, transparent);
 }
 [data-entering]:is([data-entrance="glint"], [data-entrance="tick"], [data-entrance="flash"], [data-entrance="spotlight"]) [data-piece-cover]::after {
-  animation: u-sweep 1.3s cubic-bezier(0.3, 0.1, 0.3, 1) 0.9s both;
+  animation: u-sweep 0.715s cubic-bezier(0.3, 0.1, 0.3, 1) 0.495s both;
 }
 @keyframes u-sweep {
   from {
